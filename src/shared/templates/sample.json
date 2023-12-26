@@ -1,0 +1,577 @@
+{
+  "global": {
+    "variables": {
+      "watermark": "https://gutenku.xyz/assets/gutenku_white-0a049c48.png",
+      "videoSample": "https://file-examples.com/storage/feaef18a3c6587263a0ed0e/2017/04/file_example_MP4_1280_10MG.mp4",
+      "colorsList": ["#FFFFFF"]
+    },
+    "music": {
+      "name": "default",
+      "url": "https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Sevish_-__nbsp_.mp3"
+    },
+    "orientation": "landscape",
+    "musicEnabled": true,
+    "audioVolumeLevel": 4,
+    "transitionDuration": 0.5
+  },
+  "sections": [
+    {
+      "name": "intro_1",
+      "type": "video",
+      "visibility": ["video_segment"],
+      "options": {
+        "useVideoSection": "video_1",
+        "duration": 6,
+        "musicVolumeLevel": 0.4
+      },
+      "inputs": [
+        {
+          "name": "intertitles_border",
+          "url": "https://github.com/heristop/ffmpeg-template-assembly/blob/develop/src/shared/assets/animations/white_border.zip",
+          "type": "frame",
+          "options": {
+            "frequency": 0.04,
+            "overlay": "0:0",
+            "scale": "1280:720",
+            "persistent": true
+          },
+          "filters": []
+        },
+        {
+          "name": "watermark",
+          "url": "{{ watermark }}"
+        }
+      ],
+      "maps": [
+        {
+          "inputs": ["@watermark"],
+          "filters": [
+            {
+              "type": "scale",
+              "values": {
+                "h": -1,
+                "w": 200
+              }
+            }
+          ],
+          "outputs": ["scaled_logo"]
+        },
+        {
+          "inputs": ["@video"],
+          "options": {
+            "useSectionFilters": true
+          },
+          "outputs": ["video"]
+        },
+        {
+          "inputs": ["@intertitles_border", "scaled_logo"],
+          "filters": [
+            {
+              "type": "overlay",
+              "value": "50:50"
+            }
+          ],
+          "outputs": ["animation_and_logo"]
+        },
+        {
+          "inputs": ["video", "animation_and_logo"],
+          "filters": [
+            {
+              "type": "overlay",
+              "value": "0:0"
+            }
+          ],
+          "outputs": ["final"]
+        }
+      ],
+      "filters": [
+        {
+          "type": "boxblur",
+          "value": "5"
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 720,
+            "c": "{{ color1 }}@0.15",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_1_firstname }} {{ form_1_lastname }}"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 40,
+            "x": "(w-text_w)/2",
+            "y": "(h-text_h)/1.4",
+            "fontfile": "Quicksand.ttf",
+            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Job: {{ form_1_job }}"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 40,
+            "x": "(w-text_w)/2",
+            "y": "(h-text_h)/1.4+60",
+            "fontfile": "Quicksand.ttf",
+            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
+          }
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "out",
+            "d": "{{ transitionDuration }}",
+            "st": "{{ transitionStartTime }}",
+            "color": "#000000"
+          }
+        }
+      ]
+    },
+    {
+      "name": "form_1",
+      "type": "form",
+      "visibility": ["storyboard"],
+      "title": {
+        "fr": "Des infos avant de commencer",
+        "en": "A few info before we start"
+      },
+      "description": {
+        "fr": "",
+        "en": ""
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "form_1_firstname",
+            "maxLength": 30,
+            "label": {
+              "fr": "Prénom",
+              "en": "First name"
+            }
+          },
+          {
+            "name": "form_1_lastname",
+            "maxLength": 30,
+            "label": {
+              "en": "Last name"
+            }
+          },
+          {
+            "name": "form_1_job",
+            "maxLength": 40,
+            "label": {
+              "en": "Your Job"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "video_1",
+      "type": "project_video",
+      "visibility": ["storyboard", "video_segment"],
+      "title": {
+        "en": "Tell us a little bit about you"
+      },
+      "description": {
+        "en": "Tell us your first and last name, the job that you do and the name of your company."
+      },
+      "options": {
+        "duration": 20000,
+        "maxDuration": 120000,
+        "musicVolumeLevel": 0.1
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_1_firstname }} {{ form_1_lastname }}"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 40,
+            "x": "(w-tw-40)",
+            "y": "(h-th-220)",
+            "fontfile": "Quicksand.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_1_job }}"
+            },
+            "fontcolor": "FFFFFF",
+            "fontsize": 30,
+            "x": "(w-tw-40)",
+            "y": "(h-th-160)",
+            "fontfile": "Quicksand.ttf",
+            "box": 1,
+            "boxcolor": "{{ color1 }}@0.5",
+            "boxborderw": 10
+          }
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "in",
+            "d": "{{ transitionDuration }}",
+            "color": "#FFFFFF"
+          }
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "out",
+            "d": "{{ transitionDuration }}",
+            "st": "{{ transitionStartTime }}",
+            "color": "#000000"
+          }
+        }
+      ]
+    },
+    {
+      "name": "intertitle_1",
+      "type": "video",
+      "visibility": ["video_segment"],
+      "options": {
+        "useVideoSection": "video_2",
+        "duration": 3,
+        "musicVolumeLevel": 0.4,
+        "upperCase": true
+      },
+      "inputs": [
+        {
+          "name": "watermark",
+          "url": "{{ watermark }}"
+        }
+      ],
+      "maps": [
+        {
+          "inputs": ["@watermark"],
+          "filters": [
+            {
+              "type": "scale",
+              "values": {
+                "h": -1,
+                "w": 200
+              }
+            }
+          ],
+          "outputs": ["scaled_logo"]
+        },
+        {
+          "inputs": ["@video"],
+          "options": {
+            "useSectionFilters": true
+          },
+          "outputs": ["video"]
+        },
+        {
+          "inputs": ["video", "scaled_logo"],
+          "filters": [
+            {
+              "type": "overlay",
+              "value": "50:50"
+            }
+          ],
+          "outputs": ["final"]
+        }
+      ],
+      "filters": [
+        {
+          "type": "boxblur",
+          "value": "3"
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 720,
+            "c": "{{ color1 }}@0.4",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 20,
+            "y": 20,
+            "w": 1240,
+            "h": 680,
+            "c": "{{ color1 }}@0.9",
+            "t": 4
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Why me?"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 40,
+            "x": "(w-text_w)/2",
+            "y": "(h-text_h)/1.4",
+            "fontfile": "Quicksand.ttf",
+            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
+          }
+        },
+        {
+          "type": "fadein",
+          "values": {
+            "color": "black"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "black"
+          }
+        }
+      ]
+    },
+    {
+      "name": "form_2",
+      "type": "form",
+      "visibility": ["storyboard"],
+      "title": {
+        "en": "3 keywords to describe your job"
+      },
+      "description": {
+        "fr": "",
+        "en": ""
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "form_2_keyword1",
+            "maxLength": 25,
+            "label": {
+              "en": "Keyword 1"
+            }
+          },
+          {
+            "name": "form_2_keyword2",
+            "maxLength": 25,
+            "label": {
+              "en": "Keyword 2"
+            }
+          },
+          {
+            "name": "form_2_keyword3",
+            "maxLength": 25,
+            "label": {
+              "en": "Keyword 3"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "video_2",
+      "type": "project_video",
+      "visibility": ["storyboard", "video_segment"],
+      "title": {
+        "en": "Make your speech"
+      },
+      "description": {
+        "en": "What are you going to make us discover?"
+      },
+      "options": {
+        "duration": 45000,
+        "maxDuration": 120000,
+        "musicVolumeLevel": 0.1
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "fr": "{{ form_2_keyword1 }}",
+              "en": "{{ form_2_keyword1 }}"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 36,
+            "x": "w-text_w-17",
+            "y": 60,
+            "fontfile": "Quicksand.ttf",
+            "box": 1,
+            "boxcolor": "{{ color1 }}@0.5",
+            "boxborderw": 17
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "fr": "{{ form_2_keyword2 }}",
+              "en": "{{ form_2_keyword2 }}"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 36,
+            "x": "w-text_w-17",
+            "y": 180,
+            "fontfile": "Quicksand.ttf",
+            "box": 1,
+            "boxcolor": "{{ color1 }}@0.5",
+            "boxborderw": 17
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_2_keyword3 }}"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 36,
+            "x": "w-text_w-17",
+            "y": 300,
+            "fontfile": "Quicksand.ttf",
+            "box": 1,
+            "boxcolor": "{{ color1 }}@0.5",
+            "boxborderw": 17
+          }
+        },
+        {
+          "type": "fadein",
+          "values": {
+            "color": "black"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "black"
+          }
+        }
+      ]
+    },
+    {
+      "name": "form_3",
+      "type": "form",
+      "visibility": ["storyboard"],
+      "title": {
+        "en": "Describe your work environment"
+      },
+      "description": {
+        "fr": "",
+        "en": ""
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "form_3_keyword1",
+            "maxLength": 25,
+            "label": {
+              "en": "1 word to describe your work environment"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "video_3",
+      "type": "project_video",
+      "visibility": ["storyboard", "video_segment"],
+      "title": {
+        "en": "Show the work environment"
+      },
+      "description": {},
+      "options": {
+        "duration": 30000,
+        "maxDuration": 120000,
+        "musicVolumeLevel": 0.4,
+        "speed": 0.25,
+        "muteSection": true
+      },
+      "maps": [
+        {
+          "inputs": ["1:v"],
+          "filters": [
+            {
+              "type": "setpts",
+              "value": "0.25*PTS"
+            }
+          ],
+          "outputs": ["final"]
+        }
+      ],
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_3_keyword1 }}"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 40,
+            "x": "(w-tw-40)",
+            "y": "(h-th-160)",
+            "fontfile": "Quicksand.ttf",
+            "box": 1,
+            "boxcolor": "{{ color1 }}@0.5",
+            "boxborderw": 10
+          }
+        },
+        {
+          "type": "fadein",
+          "values": {
+            "color": "black"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "black"
+          }
+        }
+      ]
+    },
+    {
+      "name": "outro",
+      "type": "video",
+      "visibility": ["video_segment"],
+      "options": {
+        "videoUrl": "{{ videoSample }}",
+        "duration": 2,
+        "musicVolumeLevel": 0.5
+      },
+      "filters": [
+        {
+          "type": "fadein",
+          "values": {
+            "color": "black"
+          }
+        }
+      ]
+    },
+    {
+      "name": "music_1",
+      "type": "music",
+      "visibility": ["storyboard"],
+      "title": {
+        "en": "Pick your music"
+      },
+      "description": {
+        "en": ""
+      },
+      "options": {}
+    }
+  ]
+}

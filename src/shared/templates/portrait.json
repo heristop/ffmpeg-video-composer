@@ -1,0 +1,51 @@
+{
+  "global": {
+    "variables": {
+      "colorsList": ["#FFFFFF"]
+    },
+    "orientation": "portrait",
+    "musicEnabled": false,
+    "transitionDuration": 0.5
+  },
+  "sections": [
+    {
+      "name": "test_portrait",
+      "type": "video",
+      "visibility": ["video_segment"],
+      "options": {
+        "useVideoSection": "video_1",
+        "duration": 6,
+        "musicVolumeLevel": 0.4,
+        "forceOriginalAspectRatio": true
+      },
+      "inputs": [],
+      "maps": [],
+      "filters": [
+        {
+          "type": "boxblur",
+          "value": "5"
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 720,
+            "c": "{{ color1 }}@0.15",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "out",
+            "d": "{{ transitionDuration }}",
+            "st": "{{ transitionStartTime }}",
+            "color": "#000000"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "global": {
+    "variables": {
+      "colorTransition": "blue"
+    },
+    "music": {
+      "name": "point_being_-_go_by_ocean___ryan_mccaffrey.mp3"
+    },
+    "orientation": "landscape",
+    "musicEnabled": true,
+    "transitionDuration": 2
+  },
+  "sections": [
+    {
+      "name": "earth",
+      "type": "project_video",
+      "visibility": ["video_segment"],
+      "options": {
+        "duration": 6
+      },
+      "filters": [
+        {
+          "type": "fadein",
+          "values": {
+            "color": "{{ colorTransition }}"
+          }
+        }
+      ]
+    }
+  ]
+}

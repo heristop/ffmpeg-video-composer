@@ -1,0 +1,245 @@
+{
+  "global": {
+    "variables": {
+      "watermark": "https://gutenku.xyz/assets/gutenku_white-0a049c48.png",
+      "colorsList": ["#FFFFFF", "#000000"]
+    },
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "transitionDuration": 2
+  },
+  "sections": [
+    {
+      "name": "intro_1_1",
+      "type": "color_background",
+      "visibility": ["video_segment"],
+      "options": {
+        "backgroundColor": "{{ color1 }}",
+        "duration": 0.5,
+        "music_volume_level": 0.4
+      },
+      "filters": [
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color2 }}@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 360,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color1 }}@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "fast"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 - 168",
+            "y": "(h-text_h)/2 - 70",
+            "fontfile": "Quicksand.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "curious"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 + 100 ",
+            "y": "(h-text_h)/2 + 27",
+            "fontfile": "Quicksand.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "with {{ form_1_firstname }}"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 40,
+            "x": "(w-tw) - 180",
+            "y": "(h-text_h)/2 + 200",
+            "fontfile": "Quicksand.ttf",
+            "box": 1,
+            "boxcolor": "{{ color2 }}",
+            "boxborderw": 16
+          }
+        }
+      ]
+    },
+    {
+      "name": "intro_1_2",
+      "type": "color_background",
+      "visibility": ["video_segment"],
+      "options": {
+        "backgroundColor": "{{ color2 }}",
+        "duration": 0.5,
+        "music_volume_level": 0.4
+      },
+      "filters": [
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color1 }}@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 360,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color2 }}@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "fr": "fast",
+              "en": "fast"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 - 168",
+            "y": "(h-text_h)/2 - 70",
+            "fontfile": "Quicksand.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "fr": "curious",
+              "en": "curious"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 + 100 ",
+            "y": "(h-text_h)/2 + 27",
+            "fontfile": "Quicksand.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "with {{ form_1_firstname }}"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 40,
+            "x": "(w-tw) - 180",
+            "y": "(h-text_h)/2 + 200",
+            "fontfile": "Quicksand.ttf",
+            "box": 1,
+            "boxcolor": "{{ color1 }}",
+            "boxborderw": 16
+          }
+        }
+      ]
+    },
+    {
+      "name": "intro_1_3",
+      "type": "color_background",
+      "visibility": ["video_segment"],
+      "options": {
+        "backgroundColor": "{{ color2 }}",
+        "duration": 1.1,
+        "music_volume_level": 0.4
+      },
+      "filters": [
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color2 }}@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 360,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color1 }}@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "fr": "fast",
+              "en": "fast"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 - 168",
+            "y": "(h-text_h)/2 - 70",
+            "fontfile": "Quicksand.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "fr": "curious",
+              "en": "curious"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 + 100 ",
+            "y": "(h-text_h)/2 + 27",
+            "fontfile": "Quicksand.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "with {{ form_1_firstname }}"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 40,
+            "x": "(w-tw) - 180",
+            "y": "(h-text_h)/2 + 200",
+            "fontfile": "Quicksand.ttf",
+            "box": 1,
+            "boxcolor": "{{ color2 }}",
+            "boxborderw": 16
+          }
+        }
+      ]
+    }
+  ]
+}
