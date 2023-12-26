@@ -1,0 +1,50 @@
+{
+  "global": {
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "transitionDuration": 0.5
+  },
+  "sections": [
+    {
+      "name": "video_3",
+      "type": "project_video",
+      "visibility": ["storyboard", "video_segment"],
+      "title": {
+        "en": "Show accelerated video"
+      },
+      "description": {},
+      "options": {
+        "duration": 30000,
+        "maxDuration": 120000,
+        "speed": 0.25,
+        "muteSection": true
+      },
+      "maps": [
+        {
+          "inputs": ["1:v"],
+          "filters": [
+            {
+              "type": "setpts",
+              "value": "0.25*PTS"
+            }
+          ],
+          "outputs": ["final"]
+        }
+      ],
+      "filters": [
+        {
+          "type": "fadein",
+          "values": {
+            "color": "#000000"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "#000000"
+          }
+        }
+      ]
+    }
+  ]
+}

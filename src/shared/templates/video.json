@@ -1,0 +1,30 @@
+{
+  "global": {
+    "variables": {
+      "videoSample": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/videos/earth.mp4",
+      "colorTransition": "#000000"
+    },
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "transitionDuration": 0.5
+  },
+  "sections": [
+    {
+      "name": "test_video",
+      "type": "video",
+      "visibility": ["video_segment"],
+      "options": {
+        "videoUrl": "{{ videoSample }}",
+        "duration": 2
+      },
+      "filters": [
+        {
+          "type": "fadein",
+          "values": {
+            "color": "{{ colorTransition }}"
+          }
+        }
+      ]
+    }
+  ]
+}

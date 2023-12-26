@@ -1,0 +1,42 @@
+{
+  "global": {
+    "variables": {
+      "colorsList": ["#FFFFFF"]
+    },
+    "music": {
+      "name": "popopop",
+      "url": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/musics/pop.mp3"
+    },
+    "orientation": "landscape",
+    "musicEnabled": true,
+    "audioVolumeLevel": 4,
+    "transitionDuration": 0.5
+  },
+  "sections": [
+    {
+      "name": "test_loop_intro",
+      "type": "video",
+      "visibility": ["video_segment"],
+      "options": {
+        "useVideoSection": "video_4",
+        "duration": 6,
+        "musicVolumeLevel": 0.6
+      },
+      "filters": [
+        {
+          "type": "boxblur",
+          "value": "5"
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "out",
+            "d": "{{ transitionDuration }}",
+            "st": "{{ transitionStartTime }}",
+            "color": "black"
+          }
+        }
+      ]
+    }
+  ]
+}

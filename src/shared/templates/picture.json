@@ -1,0 +1,64 @@
+{
+  "global": {
+    "variables": {
+      "colorsList": ["#FFFFFF"]
+    },
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "transitionDuration": 0.5
+  },
+  "sections": [
+    {
+      "name": "test_picture",
+      "type": "image_background",
+      "visibility": ["video_segment"],
+      "options": {
+        "duration": 6,
+        "pictureUrl": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/pictures/SamplePNGImage_3mbmb.png"
+      },
+      "filters": [
+        {
+          "type": "boxblur",
+          "value": "5"
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_1_firstname }} {{ form_1_lastname }}"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 40,
+            "x": "(w-text_w)/2",
+            "y": "(h-text_h)/1.4",
+            "fontfile": "Inconsolata.ttf",
+            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Job: {{ form_1_job }}"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 40,
+            "x": "(w-text_w)/2",
+            "y": "(h-text_h)/1.4+60",
+            "fontfile": "Inconsolata.ttf",
+            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
+          }
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "out",
+            "d": "{{ transitionDuration }}",
+            "st": "{{ transitionStartTime }}",
+            "color": "#000000"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "global": {
+    "variables": {
+      "video": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/videos/earth.mp4",
+      "colorTransition": "#000000"
+    },
+    "music": {
+      "name": "point_being_-_go_by_ocean___ryan_mccaffrey.mp3"
+    },
+    "orientation": "landscape",
+    "musicEnabled": true,
+    "transitionDuration": 0.1
+  },
+  "sections": [
+    {
+      "name": "test_video_1",
+      "type": "video",
+      "visibility": ["video_segment"],
+      "options": {
+        "videoUrl": "{{ video }}",
+        "duration": 4,
+        "musicVolumeLevel": 1
+      },
+      "filters": [
+        {
+          "type": "fadein",
+          "values": {
+            "color": "{{ colorTransition }}"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "{{ colorTransition }}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "test_video_2",
+      "type": "video",
+      "visibility": ["video_segment"],
+      "options": {
+        "videoUrl": "{{ video }}",
+        "duration": 4,
+        "musicVolumeLevel": 0.1
+      },
+      "filters": [
+        {
+          "type": "fadein",
+          "values": {
+            "color": "{{ colorTransition }}"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "{{ colorTransition }}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "test_video_2",
+      "type": "video",
+      "visibility": ["video_segment"],
+      "options": {
+        "videoUrl": "{{ video }}",
+        "duration": 4,
+        "musicVolumeLevel": 2
+      },
+      "filters": [
+        {
+          "type": "fadein",
+          "values": {
+            "color": "{{ colorTransition }}"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "{{ colorTransition }}"
+          }
+        }
+      ]
+    }
+  ]
+}
