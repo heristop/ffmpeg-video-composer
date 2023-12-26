@@ -3,7 +3,8 @@
     "variables": {
       "watermark": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/pictures/logo.png",
       "videoSample": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/videos/earth.mp4",
-      "colorsList": ["#FFFFFF"]
+      "animated_icon": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/animations/animation_icons.zip",
+      "colorsList": ["#000000", "#FFFFFF"]
     },
     "music": {
       "name": "default",
@@ -96,7 +97,7 @@
             "y": 0,
             "w": 1280,
             "h": 720,
-            "c": "{{ color1 }}@0.15",
+            "c": "{{ color1 }}@0.2",
             "t": "fill"
           }
         },
@@ -106,11 +107,11 @@
             "text": {
               "en": "{{ form_1_firstname }} {{ form_1_lastname }}"
             },
-            "fontcolor": "#FFFFFF",
+            "fontcolor": "{{ color2 }}",
             "fontsize": 40,
             "x": "(w-text_w)/2",
             "y": "(h-text_h)/1.4",
-            "fontfile": "Quicksand.ttf",
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
             "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
           }
         },
@@ -118,13 +119,13 @@
           "type": "drawtext",
           "values": {
             "text": {
-              "en": "Job: {{ form_1_job }}"
+              "en": "“{{ form_1_job }}”"
             },
-            "fontcolor": "#FFFFFF",
+            "fontcolor": "{{ color2 }}",
             "fontsize": 40,
             "x": "(w-text_w)/2",
             "y": "(h-text_h)/1.4+60",
-            "fontfile": "Quicksand.ttf",
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
             "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
           }
         },
@@ -193,6 +194,19 @@
         "maxDuration": 120000,
         "musicVolumeLevel": 0.1
       },
+      "inputs": [
+        {
+          "name": "animated_icon",
+          "type": "frame",
+          "options": {
+            "frequency": 0.3,
+            "overlay": "20:150",
+            "scale": "1280:720",
+            "persistent": false
+          },
+          "filters": []
+        }
+      ],
       "filters": [
         {
           "type": "drawtext",
@@ -200,7 +214,7 @@
             "text": {
               "en": "{{ form_1_firstname }} {{ form_1_lastname }}"
             },
-            "fontcolor": "#FFFFFF",
+            "fontcolor": "{{ color2 }}",
             "fontsize": 40,
             "x": "(w-tw-40)",
             "y": "(h-th-220)",
@@ -213,13 +227,13 @@
             "text": {
               "en": "{{ form_1_job }}"
             },
-            "fontcolor": "FFFFFF",
+            "fontcolor": "{{ color2 }}",
             "fontsize": 30,
             "x": "(w-tw-40)",
             "y": "(h-th-160)",
-            "fontfile": "Quicksand.ttf",
+            "fontfile": "Rubik.ttf",
             "box": 1,
-            "boxcolor": "{{ color1 }}@0.5",
+            "boxcolor": "{{ color2 }}@0.5",
             "boxborderw": 10
           }
         },
@@ -313,7 +327,7 @@
             "y": 20,
             "w": 1240,
             "h": 680,
-            "c": "{{ color1 }}@0.9",
+            "c": "{{ color2 }}@0.8",
             "t": 4
           }
         },
@@ -323,24 +337,24 @@
             "text": {
               "en": "Why me?"
             },
-            "fontcolor": "#FFFFFF",
-            "fontsize": 40,
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 60,
             "x": "(w-text_w)/2",
             "y": "(h-text_h)/1.4",
-            "fontfile": "Quicksand.ttf",
+            "fontfile": "Rubik+Marker+Hatch.ttf",
             "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
           }
         },
         {
           "type": "fadein",
           "values": {
-            "color": "black"
+            "color": "{{ color1 }}"
           }
         },
         {
           "type": "fadeout",
           "values": {
-            "color": "black"
+            "color": "{{ color1 }}"
           }
         }
       ]
@@ -405,11 +419,11 @@
               "fr": "{{ form_2_keyword1 }}",
               "en": "{{ form_2_keyword1 }}"
             },
-            "fontcolor": "#FFFFFF",
+            "fontcolor": "{{ color2 }}",
             "fontsize": 36,
             "x": "w-text_w-17",
             "y": 60,
-            "fontfile": "Quicksand.ttf",
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
             "box": 1,
             "boxcolor": "{{ color1 }}@0.5",
             "boxborderw": 17
@@ -422,11 +436,11 @@
               "fr": "{{ form_2_keyword2 }}",
               "en": "{{ form_2_keyword2 }}"
             },
-            "fontcolor": "#FFFFFF",
+            "fontcolor": "{{ color2 }}",
             "fontsize": 36,
             "x": "w-text_w-17",
             "y": 180,
-            "fontfile": "Quicksand.ttf",
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
             "box": 1,
             "boxcolor": "{{ color1 }}@0.5",
             "boxborderw": 17
@@ -438,11 +452,11 @@
             "text": {
               "en": "{{ form_2_keyword3 }}"
             },
-            "fontcolor": "#FFFFFF",
+            "fontcolor": "{{ color2 }}",
             "fontsize": 36,
             "x": "w-text_w-17",
             "y": 300,
-            "fontfile": "Quicksand.ttf",
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
             "box": 1,
             "boxcolor": "{{ color1 }}@0.5",
             "boxborderw": 17
@@ -451,13 +465,13 @@
         {
           "type": "fadein",
           "values": {
-            "color": "black"
+            "color": "{{ color1 }}"
           }
         },
         {
           "type": "fadeout",
           "values": {
-            "color": "black"
+            "color": "{{ color1 }}"
           }
         }
       ]
@@ -519,11 +533,11 @@
             "text": {
               "en": "{{ form_3_keyword1 }}"
             },
-            "fontcolor": "#FFFFFF",
+            "fontcolor": "{{ color2 }}",
             "fontsize": 40,
             "x": "(w-tw-40)",
             "y": "(h-th-160)",
-            "fontfile": "Quicksand.ttf",
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
             "box": 1,
             "boxcolor": "{{ color1 }}@0.5",
             "boxborderw": 10
@@ -532,13 +546,13 @@
         {
           "type": "fadein",
           "values": {
-            "color": "black"
+            "color": "{{ color1 }}"
           }
         },
         {
           "type": "fadeout",
           "values": {
-            "color": "black"
+            "color": "{{ color1 }}"
           }
         }
       ]
@@ -550,13 +564,13 @@
       "options": {
         "videoUrl": "{{ videoSample }}",
         "duration": 2,
-        "musicVolumeLevel": 0.5
+        "musicVolumeLevel": 0.2
       },
       "filters": [
         {
           "type": "fadein",
           "values": {
-            "color": "black"
+            "color": "{{ color1 }}"
           }
         }
       ]

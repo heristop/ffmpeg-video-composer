@@ -12,7 +12,7 @@ class FFmpegNodeAdapter extends AbstractFFmpeg {
     new Promise((resolve) => {
       exec(ffmpegStatic + command, (error) => {
         if (error) {
-          throw new Error('[Concat] Errors on concatenation');
+          throw new Error(JSON.stringify(error));
         }
 
         resolve({ rc: 0 });
