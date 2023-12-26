@@ -26,11 +26,8 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Run Tests and Collect Coverage
-        run: pnpm coverage
+      - name: Build
+        run: pnpm build
 
-      - name: Upload Coverage Report to GitHub
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-report
-          path: coverage/lcov-report
+      - name: Run Tests and Collect Coverage
+        run: pnpm test:ci

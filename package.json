@@ -11,7 +11,8 @@
     "lint": "eslint src tests --fix",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "coverage": "vitest run --coverage",
+    "test:ci": "vitest run --coverage.enabled --coverage.reporter='text-summary'",
+    "test:coverage": "vitest run --coverage",
     "build": "tsup"
   },
   "tsup": {
