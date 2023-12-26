@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { inject, injectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 import ffmpegStatic from 'ffmpeg-static';
 import ffprobe from 'ffprobe';
 import ffprobeStatic from 'ffprobe-static';
