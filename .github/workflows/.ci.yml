@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build-and-test:
-    name: Run Lint and Tests
+    name: Run Lint, Build and Tests
     runs-on: ubuntu-latest
 
     steps:
