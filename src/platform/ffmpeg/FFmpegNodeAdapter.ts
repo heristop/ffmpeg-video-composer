@@ -4,22 +4,15 @@ import ffmpegStatic from 'ffmpeg-static';
 import ffprobe from 'ffprobe';
 import ffprobeStatic from 'ffprobe-static';
 import { FFMpegInfos } from '@/core/types';
-import AbstractLogger from '../logging/AbstractLogger';
 import AbstractFFmpeg from './AbstractFFmpeg';
 
 @injectable()
 class FFmpegNodeAdapter extends AbstractFFmpeg {
-  constructor(@inject('logger') private readonly logger: AbstractLogger) {
-    super();
-  }
-
   execute = (command: string): Promise<{ rc: number }> =>
-    new Promise((resolve, reject) => {
+    new Promise((resolve) => {
       exec(ffmpegStatic + command, (error) => {
         if (error) {
-          this.logger.error(`Error executing command: ${error}`);
-
-          reject({ rc: 1 });
+          throw new Error('[Concat] Errors on concatenation');
         }
 
         resolve({ rc: 0 });

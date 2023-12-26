@@ -1,7 +1,7 @@
 {
   "global": {
     "variables": {
-      "watermark": "https://gutenku.xyz/assets/gutenku_white-0a049c48.png",
+      "watermark": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/pictures/logo.png",
       "colorsList": ["#FFFFFF"]
     },
     "orientation": "landscape",
@@ -21,7 +21,7 @@
       "inputs": [
         {
           "name": "intertitles_border",
-          "url": "https://github.com/heristop/ffmpeg-template-assembly/blob/develop/src/shared/assets/animations/white_border.zip",
+          "url": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/animations/white_border.zip",
           "type": "frame",
           "options": {
             "frequency": 0.04,

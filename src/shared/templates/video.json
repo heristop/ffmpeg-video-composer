@@ -1,7 +1,7 @@
 {
   "global": {
     "variables": {
-      "videoSample": "https://file-examples.com/storage/feaef18a3c6587263a0ed0e/2017/04/file_example_MP4_1280_10MG.mp4",
+      "videoSample": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/videos/earth.mp4",
       "colorTransition": "#000000"
     },
     "orientation": "landscape",

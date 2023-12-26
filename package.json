@@ -9,20 +9,22 @@
     "compile": "ts-node-esm src/main.ts",
     "format": "prettier --write .",
     "lint": "eslint src tests --fix",
-    "test": "vitest run",
+    "test": "vitest",
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage",
-    "build": "tsup src"
+    "build": "tsup"
   },
   "tsup": {
     "entry": [
-      "src/index.ts"
+      "src",
+      "!src/shared/assets/*",
+      "!src/shared/assets/**/*"
     ],
     "format": [
       "esm"
     ],
     "splitting": false,
-    "sourcemap": true,
+    "sourcemap": false,
     "dts": true,
     "clean": true
   },

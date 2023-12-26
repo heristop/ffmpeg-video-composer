@@ -68,7 +68,7 @@ describe('Concat', () => {
   }, 40000);
 });
 
-describe('Full Template', () => {
+describe('Mixed Template', () => {
   it('should compile a complete template successfully', async () => {
     expect(await main('sample.json')).toBe(true);
   }, 100000);

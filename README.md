@@ -33,7 +33,7 @@ Create a JSON file (e.g., `sample.json`) in the `src/shared/templates` directory
 1. To use the `ffmpeg-template-assembly`, you can run the compile command with the path to your template JSON file as an argument:
 
 ```bash
-pnpm compile path/to/your-template.json
+pnpm compile your-template.json
 ```
 
 This will compile the video based on the specified template.

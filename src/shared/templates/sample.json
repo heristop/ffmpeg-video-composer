@@ -1,13 +1,13 @@
 {
   "global": {
     "variables": {
-      "watermark": "https://gutenku.xyz/assets/gutenku_white-0a049c48.png",
-      "videoSample": "https://file-examples.com/storage/feaef18a3c6587263a0ed0e/2017/04/file_example_MP4_1280_10MG.mp4",
+      "watermark": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/pictures/logo.png",
+      "videoSample": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/videos/earth.mp4",
       "colorsList": ["#FFFFFF"]
     },
     "music": {
       "name": "default",
-      "url": "https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Sevish_-__nbsp_.mp3"
+      "url": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/musics/point_being_-_go_by_ocean___ryan_mccaffrey.mp3"
     },
     "orientation": "landscape",
     "musicEnabled": true,
@@ -27,7 +27,7 @@
       "inputs": [
         {
           "name": "intertitles_border",
-          "url": "https://github.com/heristop/ffmpeg-template-assembly/blob/develop/src/shared/assets/animations/white_border.zip",
+          "url": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/animations/white_border.zip",
           "type": "frame",
           "options": {
             "frequency": 0.04,

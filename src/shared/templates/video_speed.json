@@ -6,7 +6,7 @@
   },
   "sections": [
     {
-      "name": "test_video_speed",
+      "name": "video_3",
       "type": "project_video",
       "visibility": ["storyboard", "video_segment"],
       "title": {
