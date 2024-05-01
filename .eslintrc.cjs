@@ -11,5 +11,6 @@ module.exports = {
   rules: {
     '@typescript-eslint/dot-notation': 'error',
     'eol-last': 'error',
+    'prettier/prettier': 'error',
   },
 };

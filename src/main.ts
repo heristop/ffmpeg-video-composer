@@ -3,7 +3,7 @@ import { compile, loadConfig } from '.';
 const configFilePath = process.argv[2];
 
 async function main(configFilePath: string): Promise<boolean> {
-  const templateDescriptor = await loadConfig(`./src/shared/templates/${configFilePath}`);
+  const templateDescriptor = await loadConfig(`${configFilePath}`);
 
   const projectConfig = {
     assetsDir: './src/shared/assets',
