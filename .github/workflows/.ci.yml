@@ -1,6 +1,6 @@
 name: Continuous Integration
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build-and-test:
@@ -13,7 +13,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9
 
       - uses: actions/setup-node@v3
         with:
@@ -21,7 +21,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install Dependencies
-        run: pnpm install
+        run: pnpm i
 
       - name: Lint
         run: pnpm lint
@@ -31,3 +31,30 @@ jobs:
 
       - name: Run Tests and Collect Coverage
         run: pnpm test:ci
+
+  # publish:
+  #   needs: build-and-test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v3
+
+  #     - uses: pnpm/action-setup@v2
+  #       with:
+  #         version: 9
+
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
+  #         registry-url: 'https://registry.npmjs.org'
+
+  #     - name: Install Dependencies
+  #       run: pnpm i
+
+  #     - name: Build
+  #       run: pnpm build
+
+  #     - name: Publish
+  #       run: npm publish
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

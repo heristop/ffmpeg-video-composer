@@ -21,7 +21,7 @@ Clone the repository and install the dependencies:
 ```bash
 git clone https://github.com/heristop/ffmpeg-template-assembly.git
 cd ffmpeg-template-assembly
-pnpm install
+pnpm i
 ```
 
 ### Configuration
@@ -30,90 +30,103 @@ Create a JSON file (e.g., `sample.json`) in the `src/shared/templates` directory
 
 ### Usage
 
-1. To use the `ffmpeg-template-assembly`, you can run the compile command with the path to your template JSON file as an argument:
+#### Command Line Interface
+
+To use the `ffmpeg-template-assembly`, you can run the compile command with the path to your template JSON file as an argument:
 
 ```bash
-pnpm compile your-template.json
+pnpm compile src/shared/templates/sample.json
 ```
 
-This will compile the video based on the specified template.
+This will generate a video named `sample_output.mp4` in the `build` directory.
 
-2. You might provide a configuration object and the path to your template JSON file:
+#### Compilation Function
+
+Import the `compile` function from the package and provide a project configuration object:
 
 ```javascript
 import { compile } from 'ffmpeg-template-assembly';
 
-async function buildVideo() {
-  const templateDescriptor = {
-    "global": {
-      "variables": {
-        "videoDemo": "https://file-examples.com/storage/fee4e04377657b56c9a6785/2017/04/file_example_MP4_1280_10MG.mp4",
-        "colorsList": ["#FFFFFF","#000000"]
+// Project Configuration
+const projectConfig: ProjectConfig = {
+  assetsDir: './src/shared/assets',
+  currentLocale: 'en',
+  fields: {
+    form_1_firstname: 'Firsname',
+    form_1_lastname: 'Lastname',
+    form_1_job: 'Developer',
+    form_2_keyword1: 'One',
+    form_2_keyword2: 'Two',
+    form_2_keyword3: 'Three',
+  },
+};
+```
+
+You might provide a template descriptor to the `compile` function to generate a video:
+
+```javascript
+const templateDescriptor = {
+  "global": {
+    "variables": {
+      "videoDemo": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/videos/earth.mp4",
+      "colorsList": ["#FFFFFF","#000000"]
+    },
+    "orientation": "landscape",
+    "musicEnabled": true,
+    "transitionDuration": 0.5
+  },
+  "sections": [
+    {
+      "name": "readme_video",
+      "type": "project_video",
+      "visibility": ["video_segment"],
+      "options": {
+        "backgroundColor": "{{ color1 }}@0.1",
+        "videoUrl": "{{ videoDemo }}",
+        "duration": 0.5,
+        "musicVolumeLevel": 0.4
       },
-      "orientation": "landscape",
-      "musicEnabled": true,
-      "transitionDuration": 0.5
-    },
-    "sections": [
-      {
-        "name": "readme_video",
-        "type": "video",
-        "visibility": ["video_segment"],
-        "options": {
-          "backgroundColor": "{{ color1 }}@0.1",
-          "videoUrl": "{{ videoDemo }}",
-          "duration": 0.5,
-          "music_volume_level": 0.4
+      "filters": [
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color2 }}@1",
+            "t": "fill"
+          }
         },
-        "filters": [
-          {
-            "type": "drawbox",
-            "values": {
-              "x": 0,
-              "y": 0,
-              "w": 1280,
-              "h": 360,
-              "c": "{{ color2 }}@1",
-              "t": "fill"
-            }
-          },
-          {
-            "type": "drawtext",
-            "values": {
-              "text": {
-                "en": "{{ form_1_firstname }} {{ form_1_lastname }}"
-              },
-              "fontcolor": "#FFFFFF",
-              "fontsize": 40,
-              "x": "(w-text_w)/2",
-              "y": "(h-text_h)/1.4",
-              "fontfile": "Quicksand.ttf",
-              "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
-            }
-          },
-        ]
-      }
-    ]
-  };
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_1_firstname }} {{ form_1_lastname }}"
+            },
+            "fontcolor": "#FFFFFF",
+            "fontsize": 40,
+            "x": "(w-text_w)/2",
+            "y": "(h-text_h)/1.4",
+            "fontfile": "Quicksand.ttf",
+            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
+          }
+        },
+      ]
+    }
+  ]
+};
 
-  // Project Configuration
-  const projectConfig: ProjectConfig = {
-    assetsDir: './src/shared/assets',
-    currentLocale: 'en',
-    fields: {
-      form_1_firstname: 'Firsname',
-      form_1_lastname: 'Lastname',
-      form_1_job: 'Tech Lead',
-      form_2_keyword1: 'One',
-      form_2_keyword2: 'Two',
-      form_2_keyword3: 'Three',
-    },
-  };
 
-  await compile(projectConfig, templateDescriptor);
-}
+await compile(projectConfig, templateDescriptor);
+```
 
-buildVideo();
+Or you might provide a path to the template descriptor JSON file:
+
+```javascript
+const templatePath = './src/shared/templates/sample.json';
+
+await compile(projectConfig, templatePath);
 ```
 
 ## Running Tests
@@ -123,6 +136,10 @@ To run tests, use the following command:
 ```bash
 pnpm test
 ```
+
+## Architecture
+
+[![Architecture](graph.svg)](graph.svg)
 
 ## Contributing
 

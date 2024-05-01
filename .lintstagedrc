@@ -1,0 +1,7 @@
+{
+    "*.{ts,json,md,yml}": ["prettier --write"],
+    "*.{ts}": [
+        "pnpm lint",
+        "pnpm test"
+    ]
+}
