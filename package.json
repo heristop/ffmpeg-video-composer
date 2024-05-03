@@ -1,9 +1,14 @@
 {
   "name": "ffmpeg-template-assembly",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "types": "./dist/core/types.d.ts",
+  "types": "./dist/index.d.ts",
   "author": "heristop",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heristop/ffmpeg-template-assembly.git"
+  },
   "license": "MIT",
   "scripts": {
     "compile": "ts-node-esm src/main.ts",
@@ -19,18 +24,30 @@
   "tsup": {
     "entry": [
       "src",
+      "!src/main.ts",
       "!src/shared/assets/*",
       "!src/shared/assets/**/*"
     ],
     "format": [
-      "esm"
+      "esm",
+      "cjs"
     ],
     "splitting": false,
-    "sourcemap": false,
+    "sourcemap": true,
     "dts": true,
-    "clean": true
+    "clean": true,
+    "minify": false
   },
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "ffmpeg",
+    "video-processing",
+    "video-editing",
+    "ffmpeg-script"
+  ],
   "dependencies": {
     "axios": "^1.6.8",
     "extract-zip": "^2.0.1",

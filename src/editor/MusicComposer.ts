@@ -36,12 +36,7 @@ class MusicComposer {
 
       // Add a default music
       if (!this.project.config.music) {
-        this.project.config = {
-          ...this.project.config,
-          music: {
-            name: 'silence-1-min.mp3',
-          },
-        };
+        return;
       }
     }
 

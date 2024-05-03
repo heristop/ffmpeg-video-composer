@@ -21,7 +21,14 @@ async function main(configFilePath: string): Promise<boolean> {
 }
 
 if (configFilePath) {
-  await main(configFilePath);
+  (async () => {
+    try {
+      await main(configFilePath);
+    } catch (error) {
+      console.error(error);
+      process.exit(1);
+    }
+  })();
 }
 
 export { main };

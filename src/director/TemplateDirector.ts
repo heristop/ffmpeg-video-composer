@@ -44,7 +44,7 @@ class TemplateDirector {
     this.template.descriptor = templateDescriptor;
 
     this.filesystemAdapter.setBuildDir(this.project.config.buildDir || 'build');
-    this.filesystemAdapter.setAssetsDir(this.project.config.assetsDir || 'src/shared/assets');
+    this.filesystemAdapter.setAssetsDir(this.project.config.assetsDir || 'assets');
 
     this.project.applyDefault();
 
