@@ -14,13 +14,14 @@ https://github.com/user-attachments/assets/266f07b5-a5da-4512-80fa-3b6f47b2001c
 
 ## 🚀 Features
 
-- Dynamic video and audio template generation
-- Easy video compilation and audio mixing using FFmpeg
-- Supports custom project configurations
-- CLI and programmatic usage options
-- Flexible template descriptor system
-- Audio overlay and mixing capabilities
-- Automated video editing and composition
+* Dynamic video and audio template generation
+* Easy video compilation and audio mixing using FFmpeg
+* Flexible JSON-based template descriptor system
+* CLI for quick video creation
+* JSON configuration for complex project setups
+* Custom project configurations support
+* Audio overlay and mixing capabilities
+* Automated video editing and composition
 
 ## 🛠 Installation
 
