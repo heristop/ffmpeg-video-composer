@@ -1,8 +1,8 @@
 {
   "global": {
     "variables": {
-      "watermark": "https://github.com/heristop/ffmpeg-video-composer/raw/sample/src/shared/assets/pictures/logo.png",
-      "videoOutro": "https://github.com/heristop/ffmpeg-video-composer/raw/sample/src/shared/assets/videos/outro.mp4",
+      "watermark": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/pictures/logo.png",
+      "videoOutro": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/videos/outro.mp4",
       "animatedIcon": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/animations/animation_icons.zip",
       "colorsList": ["#000000", "#FFFFFF"]
     },
