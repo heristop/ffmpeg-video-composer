@@ -74,9 +74,10 @@ class AssetManager {
           this.logger.info(`[${this.segment.currentSection.name}][Assets] ${item.name}`);
         })
       );
-    } catch (err) {
-      this.logger.error(err);
-      throw err;
+    } catch (error) {
+      this.logger.error(error);
+
+      throw error;
     }
   };
 

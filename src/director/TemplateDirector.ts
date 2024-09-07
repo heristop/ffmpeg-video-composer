@@ -142,6 +142,8 @@ class TemplateDirector {
           resolve(true);
         });
       } catch (err) {
+        this.fireError(err);
+
         reject(false);
       }
     });
@@ -200,7 +202,7 @@ class TemplateDirector {
   };
 
   fireError = (error: unknown): void => {
-    console.error(error);
+    globalThis.console.error(error);
     this.logger.error(`[TemplateDirector][Error] ${JSON.stringify(error)}`);
 
     // Stop the Director build

@@ -50,6 +50,12 @@ pnpm compile src/shared/templates/sample.json
 
 This will generate a video named `sample_output.mp4` in the `build` directory.
 
+#### Output Sample
+
+[![Sample Video](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://github.com/heristop/ffmpeg-template-assembly/blob/main/assets/sample.mp4)
+
+```bash
+
 #### Importing the Package
 
 Import the `compile` function from the package and provide a project configuration object:

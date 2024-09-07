@@ -1,23 +1,26 @@
 {
   "compilerOptions": {
-    "rootDirs": ["src"],
-    "outDir": "dist",
-    "lib": ["es2022"],
-    "target": "es2022",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "types": ["node", "jest"],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+      "rootDirs": ["src"],
+      "outDir": "dist",
+      "lib": ["es2022"],
+      "target": "es2022",
+      "module": "esnext",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "types": ["node", "jest"],
+      "baseUrl": ".",
+      "paths": {
+          "@/*": ["./src/*"]
+      },
+      "resolveJsonModule": true,
+      "strict": true,
+      "skipLibCheck": true
   },
   "exclude": ["dist", "./src/shared/assets/**/*"],
   "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node"
+      "esm": true,
+      "experimentalSpecifierResolution": "node"
   }
 }

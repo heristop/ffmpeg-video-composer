@@ -1,15 +1,15 @@
 import { inject, injectable } from 'tsyringe';
-import { promises as fs, createWriteStream } from 'fs';
-import path from 'path';
+import { promises as fs, createWriteStream } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import axios from 'axios';
 import extract from 'extract-zip';
-import os from 'os';
 import AbstractFilesystem from './AbstractFilesystem';
 import AbstractLogger from '../logging/AbstractLogger';
 
 @injectable()
 class FilesystemNodeAdapter extends AbstractFilesystem {
-  protected root: string = process.cwd();
+  protected root: string = globalThis.process.cwd();
   protected tempDir: string = os.tmpdir();
 
   constructor(@inject('logger') private readonly logger: AbstractLogger) {
@@ -34,7 +34,7 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
       segmentName = this.segmentName;
     }
 
-    return path.join(this.assetsDir, 'videos', `${segmentName}.mp4`); // @fixme
+    return segmentName ? path.join(this.assetsDir, 'videos', `${segmentName}.mp4`) : '';
   };
 
   getDestination = (): string => path.join(this.buildDir, `${this.segmentName}_output.mp4`);
