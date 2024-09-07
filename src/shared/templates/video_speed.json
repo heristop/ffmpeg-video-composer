@@ -15,7 +15,6 @@
       "description": {},
       "options": {
         "duration": 30000,
-        "maxDuration": 120000,
         "speed": 0.25,
         "muteSection": true
       },

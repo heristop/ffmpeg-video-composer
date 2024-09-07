@@ -90,7 +90,6 @@ interface SectionOptions {
   duration?: number;
   musicVolumeLevel?: number;
   fields?: Field[];
-  maxDuration?: number;
   speed?: number;
   muteSection?: boolean;
   videoUrl?: string;

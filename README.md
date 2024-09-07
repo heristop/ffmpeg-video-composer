@@ -6,7 +6,7 @@
 
 ## 🎥 Demo
 
-Check out the video sample to see `ffmpeg-video-composer` in action:
+Check out the video sample to see `ffmpeg-video-composer` in action (unmute for sound):
 
 https://github.com/user-attachments/assets/ae226526-c21c-4d10-9ac6-e47c0db5ae8b
 
