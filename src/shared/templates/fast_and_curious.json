@@ -1,7 +1,7 @@
 {
   "global": {
     "variables": {
-      "watermark": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/pictures/logo.png",
+      "watermark": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/pictures/logo.png",
       "colorsList": ["#FFFFFF", "#000000"]
     },
     "orientation": "landscape",

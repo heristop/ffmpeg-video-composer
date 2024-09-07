@@ -1,14 +1,14 @@
 {
   "global": {
     "variables": {
-      "watermark": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/pictures/logo.png",
-      "videoSample": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/videos/earth.mp4",
-      "animated_icon": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/animations/animation_icons.zip",
+      "watermark": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/pictures/logo.png",
+      "videoSample": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/videos/earth.mp4",
+      "animated_icon": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/animations/animation_icons.zip",
       "colorsList": ["#000000", "#FFFFFF"]
     },
     "music": {
       "name": "default",
-      "url": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/musics/point_being_-_go_by_ocean___ryan_mccaffrey.mp3"
+      "url": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/musics/point_being_-_go_by_ocean___ryan_mccaffrey.mp3"
     },
     "orientation": "landscape",
     "musicEnabled": true,
@@ -28,7 +28,7 @@
       "inputs": [
         {
           "name": "intertitles_border",
-          "url": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/animations/white_border.zip",
+          "url": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/animations/white_border.zip",
           "type": "frame",
           "options": {
             "frequency": 0.04,

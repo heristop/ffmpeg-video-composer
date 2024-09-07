@@ -1,7 +1,7 @@
 {
   "global": {
     "variables": {
-      "video": "https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/videos/earth.mp4",
+      "video": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/videos/earth.mp4",
       "colorTransition": "#000000"
     },
     "music": {
