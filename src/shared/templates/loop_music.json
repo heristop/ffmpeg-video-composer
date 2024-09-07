@@ -5,7 +5,7 @@
     },
     "music": {
       "name": "popopop",
-      "url": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/musics/pop.mp3"
+      "url": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/musics/pop.mp3"
     },
     "orientation": "landscape",
     "musicEnabled": true,

@@ -16,7 +16,7 @@ class FormattersManager {
     private readonly variableManager: VariableManager,
 
     @inject('logger') private readonly logger: AbstractLogger
-  ) {}
+  ) { }
 
   formatMultipleTypesValue = (filter: Filter): string => {
     switch (filter.type) {
@@ -115,6 +115,11 @@ class FormattersManager {
     // Upper case
     if (this.segment.currentSection.options.upperCase) {
       text = text.toUpperCase();
+    }
+
+    // Lower case
+    if (this.segment.currentSection.options.lowerCase) {
+      text = text.toLowerCase();
     }
 
     return text;

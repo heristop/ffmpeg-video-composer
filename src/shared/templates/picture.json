@@ -14,7 +14,7 @@
       "visibility": ["video_segment"],
       "options": {
         "duration": 6,
-        "pictureUrl": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/pictures/SamplePNGImage_3mbmb.png"
+        "pictureUrl": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/pictures/SamplePNGImage_3mbmb.png"
       },
       "filters": [
         {

@@ -8,12 +8,13 @@ async function main(configFilePath: string): Promise<boolean> {
   const projectConfig = {
     assetsDir: './src/shared/assets',
     fields: {
-      form_1_firstname: 'John',
-      form_1_lastname: 'Doe',
-      form_1_job: 'Developer',
-      form_2_keyword1: 'One',
-      form_2_keyword2: 'Two',
-      form_2_keyword3: 'Three',
+      form_1_firstname: 'Emily',
+      form_1_lastname: 'Parker',
+      form_1_job: 'Frontend Developer',
+      form_2_keyword1: 'php',
+      form_2_keyword2: 'javascript',
+      form_2_keyword3: 'typescript',
+      form_2_keyword4: 'caffeine',
     },
   };
 

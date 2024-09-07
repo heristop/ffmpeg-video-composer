@@ -1,14 +1,14 @@
 {
   "global": {
     "variables": {
-      "watermark": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/pictures/logo.png",
-      "videoSample": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/videos/earth.mp4",
-      "animated_icon": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/animations/animation_icons.zip",
+      "watermark": "https://github.com/heristop/ffmpeg-video-composer/raw/sample/src/shared/assets/pictures/logo.png",
+      "videoOutro": "https://github.com/heristop/ffmpeg-video-composer/raw/sample/src/shared/assets/videos/outro.mp4",
+      "animatedIcon": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/animations/animation_icons.zip",
       "colorsList": ["#000000", "#FFFFFF"]
     },
     "music": {
       "name": "default",
-      "url": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/musics/point_being_-_go_by_ocean___ryan_mccaffrey.mp3"
+      "url": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/musics/point_being_-_go_by_ocean___ryan_mccaffrey.mp3"
     },
     "orientation": "landscape",
     "musicEnabled": true,
@@ -28,7 +28,7 @@
       "inputs": [
         {
           "name": "intertitles_border",
-          "url": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/animations/white_border.zip",
+          "url": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/animations/white_border.zip",
           "type": "frame",
           "options": {
             "frequency": 0.04,
@@ -51,7 +51,7 @@
               "type": "scale",
               "values": {
                 "h": -1,
-                "w": 200
+                "w": 100
               }
             }
           ],
@@ -191,16 +191,15 @@
       },
       "options": {
         "duration": 20000,
-        "maxDuration": 120000,
         "musicVolumeLevel": 0.1
       },
       "inputs": [
         {
-          "name": "animated_icon",
+          "name": "animatedIcon",
           "type": "frame",
           "options": {
             "frequency": 0.3,
-            "overlay": "20:150",
+            "overlay": "600:200",
             "scale": "1280:720",
             "persistent": false
           },
@@ -218,7 +217,7 @@
             "fontsize": 40,
             "x": "(w-tw-40)",
             "y": "(h-th-220)",
-            "fontfile": "Quicksand.ttf"
+            "fontfile": "Rubik.ttf"
           }
         },
         {
@@ -256,105 +255,234 @@
         }
       ]
     },
+
     {
-      "name": "intertitle_1",
-      "type": "video",
+      "name": "intertitle_1_1",
+      "type": "color_background",
       "visibility": ["video_segment"],
       "options": {
-        "useVideoSection": "video_2",
-        "duration": 3,
-        "musicVolumeLevel": 0.4,
-        "upperCase": true
+        "backgroundColor": "{{ color1 }}",
+        "duration": 0.5,
+        "music_volume_level": 0.4,
+        "lowerCase": true
       },
-      "inputs": [
-        {
-          "name": "watermark",
-          "url": "{{ watermark }}"
-        }
-      ],
-      "maps": [
-        {
-          "inputs": ["@watermark"],
-          "filters": [
-            {
-              "type": "scale",
-              "values": {
-                "h": -1,
-                "w": 200
-              }
-            }
-          ],
-          "outputs": ["scaled_logo"]
-        },
-        {
-          "inputs": ["@video"],
-          "options": {
-            "useSectionFilters": true
-          },
-          "outputs": ["video"]
-        },
-        {
-          "inputs": ["video", "scaled_logo"],
-          "filters": [
-            {
-              "type": "overlay",
-              "value": "50:50"
-            }
-          ],
-          "outputs": ["final"]
-        }
-      ],
       "filters": [
-        {
-          "type": "boxblur",
-          "value": "3"
-        },
         {
           "type": "drawbox",
           "values": {
             "x": 0,
             "y": 0,
             "w": 1280,
-            "h": 720,
-            "c": "{{ color1 }}@0.4",
+            "h": 360,
+            "c": "{{ color2 }}@1",
             "t": "fill"
           }
         },
         {
           "type": "drawbox",
           "values": {
-            "x": 20,
-            "y": 20,
-            "w": 1240,
-            "h": 680,
-            "c": "{{ color2 }}@0.8",
-            "t": 4
+            "x": 0,
+            "y": 360,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color1 }}@1",
+            "t": "fill"
           }
         },
         {
           "type": "drawtext",
           "values": {
             "text": {
-              "en": "Why me?"
+              "en": "build"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 - 168",
+            "y": "(h-text_h)/2 - 70",
+            "fontfile": "Rubik.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "& run"
             },
             "fontcolor": "{{ color2 }}",
-            "fontsize": 60,
-            "x": "(w-text_w)/2",
-            "y": "(h-text_h)/1.4",
-            "fontfile": "Rubik+Marker+Hatch.ttf",
-            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
+            "fontsize": 192,
+            "x": "(w-text_w)/2 + 100 ",
+            "y": "(h-text_h)/2 + 27",
+            "fontfile": "Rubik.ttf"
           }
         },
         {
-          "type": "fadein",
+          "type": "drawtext",
           "values": {
-            "color": "{{ color1 }}"
+            "text": {
+              "en": "with {{ form_1_firstname }}"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 40,
+            "x": "(w-tw) - 180",
+            "y": "(h-text_h)/2 + 200",
+            "fontfile": "Rubik.ttf",
+            "box": 1,
+            "boxcolor": "{{ color2 }}",
+            "boxborderw": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "intertitle_1_2",
+      "type": "color_background",
+      "visibility": ["video_segment"],
+      "options": {
+        "backgroundColor": "{{ color2 }}",
+        "duration": 0.5,
+        "music_volume_level": 0.4,
+        "lowerCase": true
+      },
+      "filters": [
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color1 }}@1",
+            "t": "fill"
           }
         },
         {
-          "type": "fadeout",
+          "type": "drawbox",
           "values": {
-            "color": "{{ color1 }}"
+            "x": 0,
+            "y": 360,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color2 }}@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "build"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 - 168",
+            "y": "(h-text_h)/2 - 70",
+            "fontfile": "Rubik.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "& run"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 + 100 ",
+            "y": "(h-text_h)/2 + 27",
+            "fontfile": "Rubik.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "with {{ form_1_firstname }}"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 40,
+            "x": "(w-tw) - 180",
+            "y": "(h-text_h)/2 + 200",
+            "fontfile": "Rubik.ttf",
+            "box": 1,
+            "boxcolor": "{{ color1 }}",
+            "boxborderw": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "intertitle_1_3",
+      "type": "color_background",
+      "visibility": ["video_segment"],
+      "options": {
+        "backgroundColor": "{{ color2 }}",
+        "duration": 1.1,
+        "music_volume_level": 0.4,
+        "lowerCase": true
+      },
+      "filters": [
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color2 }}@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 360,
+            "w": 1280,
+            "h": 360,
+            "c": "{{ color1 }}@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "build"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 - 168",
+            "y": "(h-text_h)/2 - 70",
+            "fontfile": "Rubik.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "& run"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 192,
+            "x": "(w-text_w)/2 + 100 ",
+            "y": "(h-text_h)/2 + 27",
+            "fontfile": "Rubik.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "with {{ form_1_firstname }}"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 40,
+            "x": "(w-tw) - 180",
+            "y": "(h-text_h)/2 + 200",
+            "fontfile": "Rubik.ttf",
+            "box": 1,
+            "boxcolor": "{{ color2 }}",
+            "boxborderw": 12
           }
         }
       ]
@@ -408,10 +536,25 @@
       },
       "options": {
         "duration": 45000,
-        "maxDuration": 120000,
         "musicVolumeLevel": 0.1
       },
       "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Languages"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 24,
+            "x": "w-text_w-12",
+            "y": 60,
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
+            "box": 1,
+            "boxcolor": "{{ color2 }}@0.5",
+            "boxborderw": 12
+          }
+        },
         {
           "type": "drawtext",
           "values": {
@@ -420,13 +563,13 @@
               "en": "{{ form_2_keyword1 }}"
             },
             "fontcolor": "{{ color2 }}",
-            "fontsize": 36,
-            "x": "w-text_w-17",
-            "y": 60,
+            "fontsize": 24,
+            "x": "w-text_w-12",
+            "y": 160,
             "fontfile": "Rubik+Doodle+Shadow.ttf",
             "box": 1,
             "boxcolor": "{{ color1 }}@0.5",
-            "boxborderw": 17
+            "boxborderw": 12
           }
         },
         {
@@ -437,13 +580,13 @@
               "en": "{{ form_2_keyword2 }}"
             },
             "fontcolor": "{{ color2 }}",
-            "fontsize": 36,
-            "x": "w-text_w-17",
-            "y": 180,
+            "fontsize": 24,
+            "x": "w-text_w-12",
+            "y": 240,
             "fontfile": "Rubik+Doodle+Shadow.ttf",
             "box": 1,
             "boxcolor": "{{ color1 }}@0.5",
-            "boxborderw": 17
+            "boxborderw": 12
           }
         },
         {
@@ -453,13 +596,29 @@
               "en": "{{ form_2_keyword3 }}"
             },
             "fontcolor": "{{ color2 }}",
-            "fontsize": 36,
-            "x": "w-text_w-17",
-            "y": 300,
+            "fontsize": 24,
+            "x": "w-text_w-12",
+            "y": 320,
             "fontfile": "Rubik+Doodle+Shadow.ttf",
             "box": 1,
             "boxcolor": "{{ color1 }}@0.5",
-            "boxborderw": 17
+            "boxborderw": 12
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_2_keyword4 }}"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 24,
+            "x": "w-text_w-12",
+            "y": 400,
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
+            "box": 1,
+            "boxcolor": "{{ color1 }}@0.5",
+            "boxborderw": 12
           }
         },
         {
@@ -508,8 +667,7 @@
       },
       "description": {},
       "options": {
-        "duration": 30000,
-        "maxDuration": 120000,
+        "duration": 180000,
         "musicVolumeLevel": 0.4,
         "speed": 0.25,
         "muteSection": true
@@ -534,7 +692,7 @@
               "en": "{{ form_3_keyword1 }}"
             },
             "fontcolor": "{{ color2 }}",
-            "fontsize": 40,
+            "fontsize": 36,
             "x": "(w-tw-40)",
             "y": "(h-th-160)",
             "fontfile": "Rubik+Doodle+Shadow.ttf",
@@ -562,8 +720,8 @@
       "type": "video",
       "visibility": ["video_segment"],
       "options": {
-        "videoUrl": "{{ videoSample }}",
-        "duration": 2,
+        "videoUrl": "{{ videoOutro }}",
+        "duration": 3,
         "musicVolumeLevel": 0.2
       },
       "filters": [
@@ -571,6 +729,26 @@
           "type": "fadein",
           "values": {
             "color": "{{ color1 }}"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "{{ color1 }}"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Thank you for watching!"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 60,
+            "x": "(w-text_w)/2",
+            "y": "(h-text_h)/1.4",
+            "fontfile": "Rubik+Marker+Hatch.ttf",
+            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
           }
         }
       ]

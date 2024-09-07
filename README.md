@@ -2,23 +2,25 @@
 
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.x-brightgreen.svg)](https://nodejs.org/en/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-`ffmpeg-video-composer` is a tool designed to streamline the process of video compilation using FFmpeg. It enables dynamic template generation and video rendering, making it a solution for creating personalized videos programmatically.
+`ffmpeg-video-composer` is a tool designed to streamline the process of video compilation and audio mixing using FFmpeg. It enables dynamic template generation, video rendering, and audio composition, making it a comprehensive solution for creating personalized multimedia content programmatically.
 
 ## 🎥 Demo
 
-Check out the video sample to see `ffmpeg-video-composer` in action:
+Check out the video sample to see `ffmpeg-video-composer` in action (unmute for sound):
 
-https://github.com/user-attachments/assets/ae226526-c21c-4d10-9ac6-e47c0db5ae8b
+https://github.com/user-attachments/assets/266f07b5-a5da-4512-80fa-3b6f47b2001c
 
 [View the template descriptor](https://github.com/heristop/ffmpeg-video-composer/blob/main/src/shared/templates/sample.json)
 
 ## 🚀 Features
 
-- Dynamic template generation
-- Easy video compilation using FFmpeg
+- Dynamic video and audio template generation
+- Easy video compilation and audio mixing using FFmpeg
 - Supports custom project configurations
 - CLI and programmatic usage options
 - Flexible template descriptor system
+- Audio overlay and mixing capabilities
+- Automated video editing and composition
 
 ## 🛠 Installation
 
@@ -87,18 +89,6 @@ Ensure the quality of the codebase by running the test suite:
 ```bash
 pnpm test
 ```
-
-## 🤝 Contributing
-
-Contributions are welcome! If you'd like to contribute:
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/my-feature`)
-3. Commit your changes (`git commit -m 'feat: add my feature'`)
-4. Push to the branch (`git push origin feature/my-feature`)
-5. Open a Pull Request
-
-For major changes, please open an issue first to discuss what you would like to change.
 
 ## 📄 License
 

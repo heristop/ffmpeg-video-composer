@@ -86,11 +86,11 @@ export interface Section {
 
 interface SectionOptions {
   upperCase?: boolean;
+  lowerCase?: boolean;
   useVideoSection?: string;
   duration?: number;
   musicVolumeLevel?: number;
   fields?: Field[];
-  maxDuration?: number;
   speed?: number;
   muteSection?: boolean;
   videoUrl?: string;

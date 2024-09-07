@@ -1,7 +1,7 @@
 {
   "global": {
     "variables": {
-      "watermark": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/pictures/logo.png",
+      "watermark": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/pictures/logo.png",
       "colorsList": ["#FFFFFF"]
     },
     "orientation": "landscape",
@@ -21,7 +21,7 @@
       "inputs": [
         {
           "name": "intertitles_border",
-          "url": "https://github.com/heristop/ffmpeg-video-composer/raw/develop/src/shared/assets/animations/white_border.zip",
+          "url": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/animations/white_border.zip",
           "type": "frame",
           "options": {
             "frequency": 0.04,

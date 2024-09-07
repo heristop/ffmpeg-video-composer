@@ -13,7 +13,7 @@
       "type": "video",
       "visibility": ["video_segment"],
       "options": {
-        "useVideoSection": "video_1",
+        "useVideoSection": "video_portrait",
         "duration": 6,
         "musicVolumeLevel": 0.4,
         "forceOriginalAspectRatio": true
@@ -30,8 +30,8 @@
           "values": {
             "x": 0,
             "y": 0,
-            "w": 1280,
-            "h": 720,
+            "w": 720,
+            "h": 1280,
             "c": "{{ color1 }}@0.15",
             "t": "fill"
           }
