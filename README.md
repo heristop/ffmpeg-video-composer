@@ -1,32 +1,34 @@
 # FFmpeg Template Assembly
 
-`ffmpeg-template-assembly` is a tool designed to streamline the process of video compilation using FFmpeg. It allows for dynamic template generation and video rendering, making it an ideal solution for creating personalized videos programmatically.
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.x-brightgreen.svg)](https://nodejs.org/en/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-## Description
+`ffmpeg-template-assembly` is a powerful tool designed to streamline the process of video compilation using FFmpeg. It enables dynamic template generation and video rendering, making it an ideal solution for creating personalized videos programmatically.
 
-This project leverages FFmpeg for video processing, providing an interface to compile videos based on a template descriptor and project configuration. It simplifies the process of generating custom videos by handling complex FFmpeg commands and configurations internally.
+## 🎥 Demo
 
-## Getting Started
+Check out our video sample to see `ffmpeg-template-assembly` in action:
 
-### Dependencies
+https://github.com/user-attachments/assets/ae226526-c21c-4d10-9ac6-e47c0db5ae8b
 
-Ensure you have the following prerequisites installed:
+[View the template descriptor](https://github.com/heristop/ffmpeg-template-assembly/blob/main/src/shared/templates/sample.json)
 
-- Node.js (v18.x or higher)
+## 🚀 Features
 
-### Installing
+- Dynamic template generation
+- Easy video compilation using FFmpeg
+- Supports custom project configurations
+- CLI and programmatic usage options
+- Flexible template descriptor system
 
-#### NPM
+## 🛠 Installation
 
-Install the project dependencies using npm, yarn or [pnpm](https://pnpm.io/):
+### Using npm (or yarn/pnpm)
 
 ```bash
 pnpm add ffmpeg-template-assembly
 ```
 
-#### Clone Repository
-
-Clone the repository and install the dependencies:
+### Cloning the Repository
 
 ```bash
 git clone https://github.com/heristop/ffmpeg-template-assembly.git
@@ -34,153 +36,74 @@ cd ffmpeg-template-assembly
 pnpm i
 ```
 
-### Configuration
+## 📖 Usage
 
-Create a JSON file (e.g., `sample.json` in the `src/shared/templates` directory) with your template descriptor.
-
-### Usage
-
-#### Command Line Interface
-
-To use the `ffmpeg-template-assembly`, you can run the compile command with the path to your template JSON file as an argument:
+### Command Line Interface
 
 ```bash
 pnpm compile src/shared/templates/sample.json
 ```
 
-This will generate a video named `sample_output.mp4` in the `build` directory.
+This generates `sample_output.mp4` in the `build` directory.
 
-#### 🎥 See Video Sample
-
-https://github.com/user-attachments/assets/ae226526-c21c-4d10-9ac6-e47c0db5ae8b
-
-See the template descriptor: [sample.json](https://github.com/heristop/ffmpeg-template-assembly/blob/main/src/shared/templates/sample.json)
-
-```bash
-#### Importing the Package
-
-Import the `compile` function from the package and provide a project configuration object:
+### Programmatic Usage
 
 ```javascript
 import { compile, loadConfig } from 'ffmpeg-template-assembly';
 
-// Project Configuration
 const projectConfig = {
   assetsDir: './assets',
   currentLocale: 'en',
   fields: {
-    form_1_firstname: 'Firsname',
+    form_1_firstname: 'Firstname',
     form_1_lastname: 'Lastname',
   },
 };
-```
 
-You might provide a template descriptor to the `compile` function to generate a video:
-
-```javascript
+// Using a template descriptor object
 compile(projectConfig, {
   global: {
-    variables: {
-      videoDemo: 'https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/videos/earth.mp4',
-      colorsList: ['#FFFFFF', '#000000'],
-    },
-    music: {
-      name: 'default',
-      url: 'https://github.com/heristop/ffmpeg-template-assembly/raw/develop/src/shared/assets/musics/point_being_-_go_by_ocean___ryan_mccaffrey.mp3',
-    },
-    orientation: 'landscape',
-    musicEnabled: true,
-    transitionDuration: 0.5,
+    // ... (template configuration)
   },
   sections: [
-    {
-      name: 'intertitle_1',
-      type: 'color_background',
-      visibility: ['video_segment'],
-      options: {
-        backgroundColor: '{{ color2 }}@0.1',
-        videoUrl: '{{ videoDemo }}',
-        duration: 3,
-        musicVolumeLevel: 0.4,
-      },
-      filters: [
-        {
-          type: 'drawbox',
-          values: {
-            x: 0,
-            y: 0,
-            w: 1280,
-            h: 360,
-            c: '{{ color1 }}@1',
-            t: 'fill',
-          },
-        },
-        {
-          type: 'drawtext',
-          values: {
-            text: {
-              en: '{{ form_1_firstname }} {{ form_1_lastname }}',
-            },
-            fontcolor: '{{ color1 }}',
-            fontsize: 40,
-            x: '(w-text_w)/2',
-            y: '(h-text_h)/1.4',
-            fontfile: 'Quicksand.ttf',
-            alpha: "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'",
-          },
-        },
-      ],
-    },
-    {
-      name: 'video_1',
-      type: 'video',
-      visibility: ['video_segment'],
-      options: {
-        videoUrl: '{{ videoDemo }}',
-        duration: 4,
-        musicVolumeLevel: 1,
-      },
-      filters: [
-        {
-          type: 'fadein',
-          values: {
-            color: '{{ color2 }}',
-          },
-        },
-        {
-          type: 'fadeout',
-          values: {
-            color: '{{ color2 }}',
-          },
-        },
-      ],
-    },
+    // ... (section configurations)
   ],
 });
-```
 
-Or you might provide a path to the template descriptor JSON file:
-
-```javascript
+// Or using a JSON file
 await compile(projectConfig, await loadConfig('./src/shared/templates/sample.json'));
 ```
 
-## Running Tests
+## 🏗 Architecture
 
-To run tests, use the following command:
+Our project architecture ensures efficient video processing and template management:
+
+[![Architecture](https://github.com/heristop/ffmpeg-template-assembly/blob/main/graph.svg)](https://github.com/heristop/ffmpeg-template-assembly/blob/main/graph.svg)
+
+## 🧪 Running Tests
+
+Ensure the quality of the codebase by running our test suite:
 
 ```bash
 pnpm test
 ```
 
-## Architecture
+## 🤝 Contributing
 
-[![Architecture](https://github.com/heristop/ffmpeg-template-assembly/blob/main/graph.svg)](https://github.com/heristop/ffmpeg-template-assembly/blob/main/graph.svg)
+We welcome contributions! If you'd like to contribute:
 
-## Contributing
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/my-feature`)
+3. Commit your changes (`git commit -m 'feat: add my feature'`)
+4. Push to the branch (`git push origin feature/my-feature`)
+5. Open a Pull Request
 
-Contributions are welcome! For major changes, please open an issue first to discuss what you would like to change. Ensure to update tests as appropriate.
+For major changes, please open an issue first to discuss what you would like to change.
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📬 Contact
+
+If you have any questions or feedback, please open an issue on GitHub.
