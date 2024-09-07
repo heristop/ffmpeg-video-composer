@@ -263,7 +263,8 @@
       "options": {
         "backgroundColor": "{{ color1 }}",
         "duration": 0.5,
-        "music_volume_level": 0.4
+        "music_volume_level": 0.4,
+        "lowerCase": true
       },
       "filters": [
         {
@@ -339,7 +340,8 @@
       "options": {
         "backgroundColor": "{{ color2 }}",
         "duration": 0.5,
-        "music_volume_level": 0.4
+        "music_volume_level": 0.4,
+        "lowerCase": true
       },
       "filters": [
         {
@@ -415,7 +417,8 @@
       "options": {
         "backgroundColor": "{{ color2 }}",
         "duration": 1.1,
-        "music_volume_level": 0.4
+        "music_volume_level": 0.4,
+        "lowerCase": true
       },
       "filters": [
         {
@@ -540,7 +543,7 @@
           "type": "drawtext",
           "values": {
             "text": {
-              "en": "languages"
+              "en": "Languages"
             },
             "fontcolor": "{{ color1 }}",
             "fontsize": 24,
@@ -603,6 +606,22 @@
           }
         },
         {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_2_keyword4 }}"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 24,
+            "x": "w-text_w-12",
+            "y": 400,
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
+            "box": 1,
+            "boxcolor": "{{ color1 }}@0.5",
+            "boxborderw": 12
+          }
+        },
+        {
           "type": "fadein",
           "values": {
             "color": "{{ color1 }}"
@@ -648,7 +667,7 @@
       },
       "description": {},
       "options": {
-        "duration": 160000,
+        "duration": 180000,
         "musicVolumeLevel": 0.4,
         "speed": 0.25,
         "muteSection": true
@@ -702,12 +721,18 @@
       "visibility": ["video_segment"],
       "options": {
         "videoUrl": "{{ videoOutro }}",
-        "duration": 2,
+        "duration": 3,
         "musicVolumeLevel": 0.2
       },
       "filters": [
         {
           "type": "fadein",
+          "values": {
+            "color": "{{ color1 }}"
+          }
+        },
+        {
+          "type": "fadeout",
           "values": {
             "color": "{{ color1 }}"
           }
