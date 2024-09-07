@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec } from 'node:child_process';
 import { injectable } from 'tsyringe';
 import ffmpegStatic from 'ffmpeg-static';
 import ffprobe from 'ffprobe';

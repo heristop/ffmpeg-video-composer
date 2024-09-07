@@ -95,7 +95,9 @@ class SegmentBuilder {
       // Fetch remote or cached fonts
       await this.assetManager.fetchFonts();
       this.logger.info(`[${this.section.name}][Fonts] fetched`);
-    } catch (err) {
+    } catch (error) {
+      this.logger.error(error);
+
       return false;
     }
 

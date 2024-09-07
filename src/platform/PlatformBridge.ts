@@ -27,7 +27,10 @@ class PlatformBridge {
     return new classesMapping[adapter][platform]();
   };
 
-  isNodeEnvironment = () => typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+  isNodeEnvironment = () =>
+    typeof globalThis.process !== 'undefined' &&
+    globalThis.process.versions != null &&
+    globalThis.process.versions.node != null;
 }
 
 export default PlatformBridge;

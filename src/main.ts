@@ -1,6 +1,6 @@
 import { compile, loadConfig } from '.';
 
-const configFilePath = process.argv[2];
+const configFilePath = globalThis.process.argv[2];
 
 async function main(configFilePath: string): Promise<boolean> {
   const templateDescriptor = await loadConfig(`${configFilePath}`);
@@ -8,9 +8,9 @@ async function main(configFilePath: string): Promise<boolean> {
   const projectConfig = {
     assetsDir: './src/shared/assets',
     fields: {
-      form_1_firstname: 'Alexandre',
-      form_1_lastname: 'Mogère',
-      form_1_job: 'Chapter Lead',
+      form_1_firstname: 'John',
+      form_1_lastname: 'Doe',
+      form_1_job: 'Developer',
       form_2_keyword1: 'One',
       form_2_keyword2: 'Two',
       form_2_keyword3: 'Three',
@@ -25,8 +25,8 @@ if (configFilePath) {
     try {
       await main(configFilePath);
     } catch (error) {
-      console.error(error);
-      process.exit(1);
+      globalThis.console.error(error);
+      globalThis.process.exit(1);
     }
   })();
 }
