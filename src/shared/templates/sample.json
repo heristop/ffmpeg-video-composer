@@ -4,7 +4,7 @@
       "watermark": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/pictures/logo.png",
       "videoOutro": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/videos/outro.mp4",
       "animatedIcon": "https://github.com/heristop/ffmpeg-video-composer/raw/main/src/shared/assets/animations/animation_icons.zip",
-      "colorsList": ["#000000", "#FFFFFF"]
+      "colorsList": ["rgb(41 37 36)", "rgb(250 250 249)"]
     },
     "music": {
       "name": "default",
@@ -12,7 +12,7 @@
     },
     "orientation": "landscape",
     "musicEnabled": true,
-    "audioVolumeLevel": 4,
+    "audioVolumeLevel": 1,
     "transitionDuration": 0.5
   },
   "sections": [
@@ -135,7 +135,7 @@
             "t": "out",
             "d": "{{ transitionDuration }}",
             "st": "{{ transitionStartTime }}",
-            "color": "#000000"
+            "color": "{{ color1 }}"
           }
         }
       ]
@@ -241,7 +241,7 @@
           "values": {
             "t": "in",
             "d": "{{ transitionDuration }}",
-            "color": "#FFFFFF"
+            "color": "{{ color2 }}"
           }
         },
         {
@@ -250,7 +250,7 @@
             "t": "out",
             "d": "{{ transitionDuration }}",
             "st": "{{ transitionStartTime }}",
-            "color": "#000000"
+            "color": "{{ color1 }}"
           }
         }
       ]
@@ -263,7 +263,7 @@
       "options": {
         "backgroundColor": "{{ color1 }}",
         "duration": 0.5,
-        "music_volume_level": 0.4,
+        "musicVolumeLevel": 0.4,
         "lowerCase": true
       },
       "filters": [
@@ -293,42 +293,13 @@
           "type": "drawtext",
           "values": {
             "text": {
-              "en": "build"
+              "en": "drink"
             },
             "fontcolor": "{{ color1 }}",
             "fontsize": 192,
             "x": "(w-text_w)/2 - 168",
-            "y": "(h-text_h)/2 - 70",
+            "y": "(h-text_h)/2 - 68",
             "fontfile": "Rubik.ttf"
-          }
-        },
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "& run"
-            },
-            "fontcolor": "{{ color2 }}",
-            "fontsize": 192,
-            "x": "(w-text_w)/2 + 100 ",
-            "y": "(h-text_h)/2 + 27",
-            "fontfile": "Rubik.ttf"
-          }
-        },
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "with {{ form_1_firstname }}"
-            },
-            "fontcolor": "{{ color1 }}",
-            "fontsize": 40,
-            "x": "(w-tw) - 180",
-            "y": "(h-text_h)/2 + 200",
-            "fontfile": "Rubik.ttf",
-            "box": 1,
-            "boxcolor": "{{ color2 }}",
-            "boxborderw": 12
           }
         }
       ]
@@ -340,7 +311,7 @@
       "options": {
         "backgroundColor": "{{ color2 }}",
         "duration": 0.5,
-        "music_volume_level": 0.4,
+        "musicVolumeLevel": 0.4,
         "lowerCase": true
       },
       "filters": [
@@ -370,25 +341,12 @@
           "type": "drawtext",
           "values": {
             "text": {
-              "en": "build"
+              "en": "code"
             },
             "fontcolor": "{{ color2 }}",
             "fontsize": 192,
             "x": "(w-text_w)/2 - 168",
-            "y": "(h-text_h)/2 - 70",
-            "fontfile": "Rubik.ttf"
-          }
-        },
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "& run"
-            },
-            "fontcolor": "{{ color1 }}",
-            "fontsize": 192,
-            "x": "(w-text_w)/2 + 100 ",
-            "y": "(h-text_h)/2 + 27",
+            "y": "(h-text_h)/2 - 68",
             "fontfile": "Rubik.ttf"
           }
         },
@@ -417,7 +375,7 @@
       "options": {
         "backgroundColor": "{{ color2 }}",
         "duration": 1.1,
-        "music_volume_level": 0.4,
+        "musicVolumeLevel": 0.4,
         "lowerCase": true
       },
       "filters": [
@@ -447,12 +405,12 @@
           "type": "drawtext",
           "values": {
             "text": {
-              "en": "build"
+              "en": "drink"
             },
             "fontcolor": "{{ color1 }}",
             "fontsize": 192,
             "x": "(w-text_w)/2 - 168",
-            "y": "(h-text_h)/2 - 70",
+            "y": "(h-text_h)/2 - 68",
             "fontfile": "Rubik.ttf"
           }
         },
@@ -460,29 +418,26 @@
           "type": "drawtext",
           "values": {
             "text": {
-              "en": "& run"
+              "en": "& code"
+            },
+            "fontcolor": "{{ color1 }}",
+            "fontsize": 194,
+            "x": "(w-text_w)/2 + 99",
+            "y": "(h-text_h)/2 + 26",
+            "fontfile": "Rubik.ttf"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "& code"
             },
             "fontcolor": "{{ color2 }}",
             "fontsize": 192,
             "x": "(w-text_w)/2 + 100 ",
             "y": "(h-text_h)/2 + 27",
             "fontfile": "Rubik.ttf"
-          }
-        },
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "with {{ form_1_firstname }}"
-            },
-            "fontcolor": "{{ color1 }}",
-            "fontsize": 40,
-            "x": "(w-tw) - 180",
-            "y": "(h-text_h)/2 + 200",
-            "fontfile": "Rubik.ttf",
-            "box": 1,
-            "boxcolor": "{{ color2 }}",
-            "boxborderw": 12
           }
         }
       ]

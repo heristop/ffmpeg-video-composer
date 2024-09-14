@@ -77,12 +77,6 @@ compile(projectConfig, {
 await compile(projectConfig, await loadConfig('./src/shared/templates/sample.json'));
 ```
 
-## 🏗 Architecture
-
-The project architecture ensures efficient video processing and template management:
-
-[![Architecture](https://github.com/heristop/ffmpeg-video-composer/blob/main/graph.svg)](https://github.com/heristop/ffmpeg-video-composer/blob/main/graph.svg)
-
 ## 🧪 Running Tests
 
 Ensure the quality of the codebase by running the test suite:
