@@ -75,9 +75,6 @@ class MapManager {
 
     if (input.options.frequency) {
       frequency = input.options.frequency;
-    } else if (input.options.duration) {
-      // Manage legacy
-      frequency = input.options.duration;
     }
 
     let inputs = [`${input.name}_${frame - 1}`, `${videoInputIncrement}:v`];

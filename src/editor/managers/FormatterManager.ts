@@ -16,7 +16,7 @@ class FormattersManager {
     private readonly variableManager: VariableManager,
 
     @inject('logger') private readonly logger: AbstractLogger
-  ) { }
+  ) {}
 
   formatMultipleTypesValue = (filter: Filter): string => {
     switch (filter.type) {
@@ -36,10 +36,15 @@ class FormattersManager {
 
     for (const key in filter.values) {
       switch (key) {
-        case 'text':
-          values.push(`${key}='${this.formatText(filter.values[key.toString()])}'`);
-          break;
+        case 'text': {
+          const textValue = filter.values[key.toString()];
 
+          if (textValue) {
+            values.push(`${key}='${this.formatText(textValue)}'`);
+          }
+
+          break;
+        }
         case 'duration':
         case 'd': {
           let duration = filter.values[key]
@@ -52,6 +57,7 @@ class FormattersManager {
           if (!isNaN(Number(duration))) {
             values.push(`${key}='${duration}'`);
           }
+
           break;
         }
 
@@ -69,6 +75,7 @@ class FormattersManager {
           if (!isNaN(Number(startTimeStr))) {
             values.push(`${key}='${startTimeStr}'`);
           }
+
           break;
         }
 
@@ -147,7 +154,7 @@ class FormattersManager {
   }
 
   /**
-   * Replace color variables
+   * Replace color variables and handle both HEX and RGB formats
    */
   formatColor = (color: string): string => {
     if (!this.template.descriptor.global.variables?.colorsList) {
@@ -156,10 +163,25 @@ class FormattersManager {
 
     for (let i = 0; i < this.template.descriptor.global.variables.colorsList.length; i++) {
       const colorTag = `{{ color${i + 1} }}`;
-      color = color.replace(colorTag, this.template.descriptor.global.variables.colorsList[i]);
+      let colorValue = this.template.descriptor.global.variables.colorsList[i];
+
+      // Check if the color format is RGB
+      if (colorValue.startsWith('rgb')) {
+        colorValue = this.convertRGBToHex(colorValue);
+      }
+
+      color = color.replace(colorTag, colorValue);
     }
 
     return color;
+  };
+
+  /**
+   * Convert RGB to HEX format
+   */
+  convertRGBToHex = (rgb: string): string => {
+    const rgbArray = rgb.match(/\d+/g).map(Number);
+    return `#${((1 << 24) + (rgbArray[0] << 16) + (rgbArray[1] << 8) + rgbArray[2]).toString(16).slice(1).toUpperCase()}`;
   };
 }
 

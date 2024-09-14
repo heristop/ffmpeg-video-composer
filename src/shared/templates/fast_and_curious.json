@@ -16,7 +16,7 @@
       "options": {
         "backgroundColor": "{{ color1 }}",
         "duration": 0.5,
-        "music_volume_level": 0.4
+        "musicVolumeLevel": 0.4
       },
       "filters": [
         {
@@ -92,7 +92,7 @@
       "options": {
         "backgroundColor": "{{ color2 }}",
         "duration": 0.5,
-        "music_volume_level": 0.4
+        "musicVolumeLevel": 0.4
       },
       "filters": [
         {
@@ -170,7 +170,7 @@
       "options": {
         "backgroundColor": "{{ color2 }}",
         "duration": 1.1,
-        "music_volume_level": 0.4
+        "musicVolumeLevel": 0.4
       },
       "filters": [
         {
