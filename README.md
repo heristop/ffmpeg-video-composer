@@ -8,7 +8,7 @@
 
 Check out the video sample to see `ffmpeg-video-composer` in action (unmute for sound):
 
-https://github.com/user-attachments/assets/266f07b5-a5da-4512-80fa-3b6f47b2001c
+https://github.com/heristop/assets/6bcd0578-7dee-4630-aa6b-c730cf5cec17
 
 [View the template descriptor](https://github.com/heristop/ffmpeg-video-composer/blob/main/src/shared/templates/sample.json)
 
