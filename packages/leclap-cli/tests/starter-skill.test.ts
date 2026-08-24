@@ -12,7 +12,7 @@ describe('starterSkill', () => {
   it('opens with the frontmatter a skill loader reads', () => {
     expect(skill.startsWith('---\n')).toBe(true);
     expect(skill).toContain('name: authoring-leclap-videos');
-    expect(skill).toMatch(/^description: Use when .+/m);
+    expect(skill).toMatch(/^description: "Use when .+"$/m);
   });
 
   // Agents scan before they read. The checklist facts — which command, which directory — belong in a
@@ -24,13 +24,13 @@ describe('starterSkill', () => {
     expect(preamble).toMatch(/^\| Render \|/m);
   });
 
-  it('names the validate → render loop', () => {
-    expect(skill).toContain('leclap validate template.json');
-    expect(skill).toContain('leclap render template.json');
+  it('names the check → render loop', () => {
+    expect(skill).toContain('npm run validate');
+    expect(skill).toContain('npm run render');
   });
 
-  it('sends the reader to the schema instead of restating its fields', () => {
-    expect(skill).toContain('https://leclap.dev/doc/schema');
+  it('sends the reader to the reference instead of restating its fields', () => {
+    expect(skill).toContain('https://leclap.dev/llms.txt');
   });
 
   // A third hand-maintained copy of the field reference (after the MCP's authoring guide and the
@@ -59,14 +59,43 @@ describe('starterSkill', () => {
     expect(skill).toMatch(/slow/i);
   });
 
+  // global.audio.ducking.attack/release are the only millisecond fields in the descriptor, and they
+  // live in the audio sugar tier this same skill tells the agent to prefer. An absolute
+  // "never milliseconds" rule makes an agent write 0.02 for 20ms — a silent 1000x error.
+  it('does not claim every duration is in seconds', () => {
+    expect(skill).not.toMatch(/never milliseconds/i);
+    expect(skill).toContain('ducking');
+  });
+
   it('says where media is read from and written to', () => {
     expect(skill).toContain('assets/');
     expect(skill).toContain('build/');
   });
 
-  it('shows how to pass variables and clips in', () => {
+  it('shows how to pass variables in, and clips only where a clip slot exists', () => {
     expect(skill).toContain('--field');
-    expect(skill).toContain('--video');
+    expect(starterSkill('demo', { remotion: true })).toContain('--video intro=');
+  });
+
+  // `leclap` is a devDependency, not a global install — a bare `leclap validate` in a scaffolded
+  // project is `command not found`. Every command the skill prints must go through the package
+  // manager, which puts node_modules/.bin on PATH.
+  it('routes every command through the package manager', () => {
+    // No bare `leclap …` anywhere: it is a devDependency, so only a script runner finds it.
+    expect(skill).not.toMatch(/(^|[`|\s])leclap\s/);
+    expect(skill).toMatch(/npm run (validate|render)/);
+  });
+
+  it('renders the detected package manager in its commands', () => {
+    expect(starterSkill('demo', { packageManager: 'pnpm' })).toContain('pnpm validate');
+    expect(starterSkill('demo', { packageManager: 'bun' })).toContain('bun run validate');
+    expect(starterSkill('demo', { packageManager: 'npm' })).toContain('npm run render');
+  });
+
+  // /doc/schema is a client-rendered SPA — only <head> is pre-baked, so an agent fetching it gets a
+  // shell with no schema in it. llms.txt is the authority built for machine retrieval.
+  it('points a fetching agent at llms.txt, not the SPA route', () => {
+    expect(skill).toContain('https://leclap.dev/llms.txt');
   });
 
   it('stays short enough to be read in full', () => {
@@ -100,6 +129,34 @@ describe('starterSkill — conditional sections', () => {
 
   it('carries the project name so the guidance reads as this project', () => {
     expect(starterSkill('summer-reel')).toContain('summer-reel');
+  });
+
+  // starterFiles is exported API: {mcp:false, remotion:true} is reachable by a caller even though
+  // init.run currently implies mcp from remotion. The Remotion guidance must follow the Remotion
+  // scaffold, not the MCP flag.
+  it('gates the Remotion hand-off on remotion, not on mcp', () => {
+    const remotionOnly = starterSkill('demo', { remotion: true });
+    expect(remotionOnly).toContain('remotion/Intro.tsx');
+    expect(remotionOnly).not.toBe(starterSkill('demo'));
+  });
+
+  // The bare starter has one color_background section and no remotion/ directory, so guidance
+  // referring to either has no referent and invites an agent to invent one.
+  it('omits remotion and project_video guidance from the bare starter', () => {
+    const bare = starterSkill('demo');
+    expect(bare).not.toContain('remotion/');
+    expect(bare).not.toContain('--video intro=');
+    expect(bare).not.toContain('project_video');
+  });
+
+  // A directory name may legally contain ':' or '#'. Interpolated raw, either breaks the YAML and
+  // the whole skill silently stops loading.
+  it('quotes the description so an odd project name cannot break the frontmatter', () => {
+    const skill = starterSkill('my: reel #2');
+    const description = skill.split('\n').find((line) => line.startsWith('description:'));
+    expect(description).toBe(
+      'description: "Use when editing template.json in my: reel #2, adding or changing sections, transitions, looks, colour grading, motion or audio, or when a render fails or looks wrong."'
+    );
   });
 });
 

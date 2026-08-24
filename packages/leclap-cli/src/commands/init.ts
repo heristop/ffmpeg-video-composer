@@ -129,7 +129,7 @@ function packageJson(projectName: string, opts: StarterOptions) {
     name: projectName,
     private: true,
     type: 'module',
-    scripts: { render: 'leclap render template.json' },
+    scripts: { render: 'leclap render template.json', validate: 'leclap validate template.json' },
     devDependencies,
   };
 }
@@ -300,10 +300,11 @@ export function starterFiles(projectName: string, opts: StarterOptions = {}): Re
     'assets/.gitkeep': '',
     // Unconditional: an agent opening this project has no monorepo, no docs/ and — without the MCP —
     // no get_template_schema, so the skill is the only LeClap context it gets.
-    'AGENTS.md': agentsMd(projectName),
+    'AGENTS.md': agentsMd(projectName, { packageManager: opts.packageManager }),
     '.agents/skills/authoring-leclap-videos/SKILL.md': starterSkill(projectName, {
       mcp: opts.mcp,
       remotion: opts.remotion,
+      packageManager: opts.packageManager,
     }),
   };
 

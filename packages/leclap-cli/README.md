@@ -300,8 +300,9 @@ first `render` just works), `package.json`, `README.md`, `assets/`, and a `pnpm-
 
 It also writes agent guidance — an `AGENTS.md` pointer and `.agents/skills/authoring-leclap-videos/SKILL.md` —
 so an AI agent opening the project knows the validate/render loop, which authoring layer to prefer,
-and the traps that never surface as errors. The skill points at the published schema rather than
-restating it, so it cannot drift out of date on a user's machine.
+and the traps that never surface as errors. Its commands go through the package manager (`leclap` is
+a devDependency, not a global install), and it links to `llms.txt` rather than restating the schema,
+so it cannot drift out of date on a user's machine.
 
 It then **prompts** whether to also set up:
 

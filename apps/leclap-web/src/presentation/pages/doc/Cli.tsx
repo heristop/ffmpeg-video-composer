@@ -248,8 +248,8 @@ export const DocCli = () => (
         <p>
           It also writes agent guidance: an <Code>AGENTS.md</Code> pointer and{' '}
           <Code>.agents/skills/authoring-leclap-videos/SKILL.md</Code>, so an AI agent opening the project knows the
-          validate/render loop, which authoring layer to prefer, and the traps that never surface as errors. The skill
-          links to the published schema rather than restating it, so it cannot drift on a user&apos;s machine.
+          check/render loop, which authoring layer to prefer, and the traps that never surface as errors. It links to{' '}
+          <Code>llms.txt</Code> rather than restating the schema, so it cannot drift on a user&apos;s machine.
         </p>
         <p>It then asks whether to also wire two optional pieces:</p>
         <ul>
