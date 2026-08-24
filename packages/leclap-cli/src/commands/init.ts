@@ -8,6 +8,7 @@ import { success, fail, step, hint } from '../ui.js';
 import { wordmark } from '../theme.js';
 import { confirm } from '../prompt.js';
 import { runStudioInit } from './studio-init.js';
+import { agentsMd, starterSkill } from './starter-skill.js';
 
 export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun';
 
@@ -297,6 +298,13 @@ export function starterFiles(projectName: string, opts: StarterOptions = {}): Re
     'pnpm-workspace.yaml': PNPM_WORKSPACE,
     'README.md': readme(projectName, opts),
     'assets/.gitkeep': '',
+    // Unconditional: an agent opening this project has no monorepo, no docs/ and — without the MCP —
+    // no get_template_schema, so the skill is the only LeClap context it gets.
+    'AGENTS.md': agentsMd(projectName),
+    '.agents/skills/authoring-leclap-videos/SKILL.md': starterSkill(projectName, {
+      mcp: opts.mcp,
+      remotion: opts.remotion,
+    }),
   };
 
   if (opts.mcp) {
