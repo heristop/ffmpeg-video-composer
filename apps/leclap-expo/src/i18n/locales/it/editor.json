@@ -175,6 +175,7 @@
     "similarity": "Intensità"
   },
   "titleCard": {
+    "stagger": "Ritardo tra le righe",
     "hint": "Un cartello pulito con occhiello / titolo / sottotitolo — dimensionato in base all’orientamento.",
     "kicker": "Occhiello",
     "kickerPlaceholder": "es. IN ARRIVO",
@@ -371,7 +372,34 @@
     "mirrorVertical": "Verticale",
     "add": "Aggiungi un'animazione",
     "layer": "Animazione {{number}}",
-    "remove": "Rimuovi animazione"
+    "remove": "Rimuovi animazione",
+    "effects": {
+      "label": "Combinazioni di effetti",
+      "interface-focus": {
+        "name": "Focus interfaccia",
+        "description": "Inquadra un dettaglio con un breve impulso."
+      },
+      "product-spotlight": {
+        "name": "Prodotto in evidenza",
+        "description": "Un movimento orbitale delicato e un singolo riflesso."
+      },
+      "celebration-burst": {
+        "name": "Esplosione festosa",
+        "description": "Un breve accento di coriandoli e scintille."
+      },
+      "focus-lock": {
+        "name": "Blocco del fuoco",
+        "description": "Una cornice angolare con un anello delicato."
+      },
+      "light-pass": {
+        "name": "Passaggio di luce",
+        "description": "Un breve velo luminoso e un piccolo scintillio."
+      },
+      "frame-reveal": {
+        "name": "Rivelazione della cornice",
+        "description": "Una cornice sottile con un unico riflesso luminoso."
+      }
+    }
   },
   "overlays": {
     "kind": "Sovrimpressioni",

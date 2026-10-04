@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "name": "Agentic PR Evidence",
+    "description": "A short, review-focused video that an agent can render from implementation evidence and attach to a pull or merge request.",
+    "creativeDirection": "Audience: a pull-request reviewer. Direction: evidence-first presentation with restrained dark surfaces and clear type. Move from implementation context to the actual recorded behavior, then state what the reviewer should inspect. Keep the walkthrough unobstructed and use captions only for verified change context. Favor calm timing and cuts over promotional motion. Avoid invented test results, simulated interactions and decorative camera moves. Review the recording, readable context, review-focus text, scene joins and final evidence card."
+  },
+  "global": {
+    "orientation": "landscape",
+    "variables": {
+      "project": "Example project",
+      "change": "Keyboard navigation",
+      "reviewFocus": "Focus order and visible focus states"
+    },
+    "musicEnabled": false,
+    "transition": {
+      "type": "fade",
+      "duration": 0.35
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "musicVolume": 0
+    }
+  },
+  "sections": [
+    {
+      "name": "intro",
+      "type": "color_background",
+      "titleCard": {
+        "kicker": {
+          "en": "{{ project }}"
+        },
+        "headline": {
+          "en": "{{ change }}"
+        },
+        "subtitle": {
+          "en": "Implementation evidence"
+        },
+        "accent": "#8b91ff",
+        "reveal": "slide-left",
+        "effect": {
+          "shadow": true,
+          "outline": true
+        }
+      },
+      "options": {
+        "backgroundColor": "#0f1117",
+        "duration": 2
+      }
+    },
+    {
+      "name": "walkthrough",
+      "type": "project_video",
+      "look": "cool",
+      "lowerThird": {
+        "title": {
+          "en": "{{ reviewFocus }}"
+        },
+        "badge": {
+          "en": "REVIEW FOCUS"
+        },
+        "accent": "#ff8aae",
+        "reveal": "rise",
+        "effect": {
+          "shadow": true,
+          "outline": true
+        }
+      },
+      "title": {
+        "en": "Recorded implementation walkthrough"
+      },
+      "description": {
+        "en": "Use a real screen recording from the change under review"
+      },
+      "options": {
+        "duration": 12,
+        "forceAspectRatio": true
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        }
+      ]
+    },
+    {
+      "name": "review",
+      "type": "color_background",
+      "titleCard": {
+        "kicker": {
+          "en": "WHAT TO REVIEW"
+        },
+        "headline": {
+          "en": "{{ reviewFocus }}"
+        },
+        "subtitle": {
+          "en": "Watch the behavior, then inspect the diff"
+        },
+        "accent": "#fff685",
+        "align": "left",
+        "reveal": "rise",
+        "effect": {
+          "shadow": true,
+          "outline": true
+        }
+      },
+      "options": {
+        "backgroundColor": "#171923",
+        "duration": 3
+      }
+    },
+    {
+      "name": "outro",
+      "type": "color_background",
+      "titleCard": {
+        "headline": {
+          "en": "EVIDENCE ATTACHED"
+        },
+        "subtitle": {
+          "en": "Code, context, and behavior in one review"
+        },
+        "accent": "#8b91ff",
+        "align": "center",
+        "reveal": "rise",
+        "fade": {
+          "out": false
+        },
+        "effect": {
+          "shadow": true,
+          "outline": true
+        }
+      },
+      "options": {
+        "backgroundColor": "#0f1117",
+        "duration": 2
+      }
+    }
+  ]
+}

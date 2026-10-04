@@ -1,4 +1,4 @@
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { buildDescriptionVars } from '@/src/utils/i18nText';
@@ -16,11 +16,14 @@ import { CreateCta } from '@/src/features/templates/detail/components/create-cta
 import { FormModal } from '@/src/features/templates/detail/modals/form-modal';
 import { MusicModal } from '@/src/features/templates/detail/modals/music-modal';
 import { styles } from '@/src/features/templates/detail/detail.styles';
+import { useAdaptiveLayout } from '@/src/hooks/use-adaptive-layout';
+import { CONTENT_MAX_WIDTH } from '@/src/styles/adaptive-layout';
 
 // The compose hub. All state/behaviour lives in useTemplateDetail; this file composes the editorial
 // masthead → program status strip → shot-list timeline → signature create CTA, plus the modals.
 const TemplateDetailScreen = () => {
   const params = useLocalSearchParams<{ id: string; projectId?: string }>();
+  const { sidePanel } = useAdaptiveLayout();
   const {
     template,
     templateLoading,
@@ -91,42 +94,53 @@ const TemplateDetailScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.container}>
+      <View
+        style={{
+          flex: 1,
+          width: '100%',
+          maxWidth: CONTENT_MAX_WIDTH,
+          alignSelf: 'center',
+          flexDirection: sidePanel ? 'row' : 'column',
+        }}
       >
-        <TemplateMasthead
-          title={template.name.replace('.json', '')}
-          description={description}
-          orientation={orientation}
-          onBack={goBack}
-        />
-        <ProgramStatusStrip totalDone={totalDone} totalItems={totalItems} />
-        <ShotList
-          sections={filteredSections}
-          project={project}
-          vars={vars}
-          hasMediaStep={hasMediaStep}
-          mediaStepDone={mediaStepDone}
-          onSectionPress={handleSectionPress}
-          onPreview={handlePreviewVideo}
-          onMediaPress={() => {
-            setMediaPickerVisible(true);
-          }}
-        />
-      </ScrollView>
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          <TemplateMasthead
+            title={template.name.replace('.json', '')}
+            description={description}
+            orientation={orientation}
+            onBack={goBack}
+          />
+          <ProgramStatusStrip totalDone={totalDone} totalItems={totalItems} />
+          <ShotList
+            sections={filteredSections}
+            project={project}
+            vars={vars}
+            hasMediaStep={hasMediaStep}
+            mediaStepDone={mediaStepDone}
+            onSectionPress={handleSectionPress}
+            onPreview={handlePreviewVideo}
+            onMediaPress={() => {
+              setMediaPickerVisible(true);
+            }}
+          />
+        </ScrollView>
 
-      <CreateCta
-        isDisabled={isDisabled}
-        isPending={isPending}
-        willQueue={willQueue}
-        shotsLeft={totalItems - totalDone}
-        qualityTier={qualityTier}
-        onQualityTierChange={setQualityTier}
-        onCompile={handleCompile}
-      />
+        <CreateCta
+          sidePanel={sidePanel}
+          isDisabled={isDisabled}
+          isPending={isPending}
+          willQueue={willQueue}
+          shotsLeft={totalItems - totalDone}
+          qualityTier={qualityTier}
+          onQualityTierChange={setQualityTier}
+          onCompile={handleCompile}
+        />
+      </View>
 
       <FormModal
         section={activeFormSection}

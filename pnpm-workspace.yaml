@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - packages/*
+  - examples/llm-remotion-title
 
 # Resolve ffmpeg-video-composer to the copy in this repo whenever its version satisfies the range the
 # dependent declares, instead of downloading it. pnpm 10 flipped this default to false and moved the
@@ -12,6 +13,13 @@ packages:
 # "workspace:*". Four releases went out that way and could not be installed at all. A semver range
 # cannot be published wrong; this setting is what keeps local development linked to the source.
 linkWorkspacePackages: true
+
+# Moti's declarations import React Native, but its manifest omits that peer.
+# Resolve it alongside the consuming app instead of an unrelated hoisted RN version.
+packageExtensions:
+  moti@0.30.0:
+    peerDependencies:
+      react-native: '*'
 
 allowBuilds:
   '@swc/core': true

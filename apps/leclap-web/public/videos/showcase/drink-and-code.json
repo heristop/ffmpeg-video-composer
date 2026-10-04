@@ -1,0 +1,904 @@
+{
+  "partials": [
+    {
+      "id": "flash-card",
+      "description": "Blinking this-or-that flash card — the two options swap colorA/colorB three times within one section (instant cuts via enable timelines). Every placeholder has a default and is overridable on the ref: optionA/optionB (the two choices), conjunction (separator word, e.g. 'OR' or '&'), and colorA/colorB/textColor (the bold red/white palette).",
+      "variables": {
+        "optionA": "THIS",
+        "optionB": "THAT",
+        "conjunction": "OR",
+        "colorA": "#ff2e4d",
+        "colorB": "#f5f5f0",
+        "textColor": "#f5f5f0"
+      },
+      "sections": [
+        {
+          "name": "flash",
+          "type": "video",
+          "options": {
+            "videoUrl": "videos/video_2.mp4",
+            "duration": 2.8,
+            "muteSection": true
+          },
+          "filters": [
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 0,
+                "w": 640,
+                "h": 720,
+                "c": "{{ colorA }}@0.82",
+                "t": "fill",
+                "enable": "'lt(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 640,
+                "y": 0,
+                "w": 640,
+                "h": 720,
+                "c": "{{ colorB }}@0.82",
+                "t": "fill",
+                "enable": "'lt(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 0,
+                "w": 640,
+                "h": 720,
+                "c": "{{ colorB }}@0.82",
+                "t": "fill",
+                "enable": "'gte(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 640,
+                "y": 0,
+                "w": 640,
+                "h": 720,
+                "c": "{{ colorA }}@0.82",
+                "t": "fill",
+                "enable": "'gte(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 628,
+                "y": 0,
+                "w": 24,
+                "h": 720,
+                "c": "#141416@1",
+                "t": "fill"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ optionA }}"
+                },
+                "fontcolor": "{{ colorB }}",
+                "fontsize": 100,
+                "x": "(640-text_w)/2",
+                "y": "(h-text_h)/2",
+                "fontfile": "BebasNeue.ttf",
+                "enable": "'lt(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ optionB }}"
+                },
+                "fontcolor": "{{ colorA }}",
+                "fontsize": 100,
+                "x": "640 + (640-text_w)/2",
+                "y": "(h-text_h)/2",
+                "fontfile": "BebasNeue.ttf",
+                "enable": "'lt(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ optionA }}"
+                },
+                "fontcolor": "{{ colorA }}",
+                "fontsize": 100,
+                "x": "(640-text_w)/2",
+                "y": "(h-text_h)/2",
+                "fontfile": "BebasNeue.ttf",
+                "enable": "'gte(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ optionB }}"
+                },
+                "fontcolor": "{{ colorB }}",
+                "fontsize": 100,
+                "x": "640 + (640-text_w)/2",
+                "y": "(h-text_h)/2",
+                "fontfile": "BebasNeue.ttf",
+                "enable": "'gte(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ conjunction }}"
+                },
+                "fontcolor": "{{ textColor }}",
+                "fontsize": 46,
+                "x": "(w-text_w)/2",
+                "y": "(h-text_h)/2 + 6",
+                "fontfile": "Oswald.ttf",
+                "box": 1,
+                "boxcolor": "#141416",
+                "boxborderw": 22
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "global": {
+    "variables": {
+      "watermark": "pictures/logo.png",
+      "videoOutro": "videos/outro.mp4",
+      "animatedIcon": "animations/animation_icons.apng",
+      "colorsList": ["rgb(41 37 36)", "rgb(250 250 249)"],
+      "form_1_firstname": "Emily",
+      "form_1_lastname": "Parker",
+      "form_1_job": "Fullstack Developer",
+      "form_2_keyword1": "Javascript",
+      "form_2_keyword2": "Typescript",
+      "form_2_keyword3": "Rust",
+      "form_2_keyword4": "Caffeine",
+      "form_3_keyword1": "Coffee Shop"
+    },
+    "music": {
+      "name": "point-being",
+      "url": "musics/point-being.mp3"
+    },
+    "orientation": "landscape",
+    "musicEnabled": true,
+    "grade": {
+      "contrast": 1.04,
+      "saturation": 1.12,
+      "gamma": 1,
+      "colorBalance": {
+        "midtones": {
+          "b": 0.05
+        },
+        "highlights": {
+          "r": 0.04
+        }
+      }
+    },
+    "transition": {
+      "type": "dissolve",
+      "duration": 0.5
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "normalize": "loudnorm",
+      "ducking": {
+        "threshold": 0.05,
+        "ratio": 8,
+        "attack": 20,
+        "release": 400
+      }
+    },
+    "animations": [
+      {
+        "url": "animations/light_leak.apng",
+        "start": 14,
+        "duration": 3,
+        "opacity": 0.35
+      }
+    ]
+  },
+  "sections": [
+    {
+      "name": "intro_1",
+      "type": "video",
+      "look": "teal-orange",
+      "transition": {
+        "type": "smoothup",
+        "duration": 0.6
+      },
+      "options": {
+        "useVideoSection": "video_1",
+        "duration": 6,
+        "musicVolume": 0.4
+      },
+      "inputs": [
+        {
+          "name": "intertitles_border",
+          "url": "animations/rounded_border.apng",
+          "type": "animation",
+          "options": {
+            "fps": 25,
+            "position": "0:0",
+            "scale": "1280:720",
+            "persistent": true
+          },
+          "filters": []
+        },
+        {
+          "name": "watermark",
+          "url": "{{ watermark }}"
+        }
+      ],
+      "maps": [
+        {
+          "inputs": ["@watermark"],
+          "filters": [
+            {
+              "type": "scale",
+              "values": {
+                "h": -1,
+                "w": 100
+              }
+            }
+          ],
+          "outputs": ["scaled_logo"]
+        },
+        {
+          "inputs": ["@video"],
+          "options": {
+            "useSectionFilters": true
+          },
+          "outputs": ["video"]
+        },
+        {
+          "inputs": ["@intertitles_border", "scaled_logo"],
+          "filters": [
+            {
+              "type": "overlay",
+              "value": "50:50"
+            }
+          ],
+          "outputs": ["animation_and_logo"]
+        },
+        {
+          "inputs": ["video", "animation_and_logo"],
+          "filters": [
+            {
+              "type": "overlay",
+              "value": "0:0"
+            }
+          ],
+          "outputs": ["final"]
+        }
+      ],
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "boxblur",
+          "value": "5"
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 720,
+            "c": "{{ color1 }}@0.32",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Meet {{ form_1_firstname }}"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 58,
+            "x": "(w-text_w)/2",
+            "y": "(h-text_h)/1.4",
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
+            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Fueled by coffee & code"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 34,
+            "x": "(w-text_w)/2",
+            "y": "(h-text_h)/1.4+72",
+            "fontfile": "Rubik+Doodle+Shadow.ttf",
+            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
+          }
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "out",
+            "d": "{{ transitionDuration }}",
+            "st": "{{ transitionStartTime }}",
+            "color": "{{ color1 }}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "form_1",
+      "type": "form",
+      "title": {
+        "fr": "Des infos avant de commencer",
+        "en": "A few info before we start"
+      },
+      "description": {
+        "fr": "",
+        "en": ""
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "form_1_firstname",
+            "maxLength": 30,
+            "label": {
+              "fr": "Prénom",
+              "en": "First name"
+            }
+          },
+          {
+            "name": "form_1_lastname",
+            "maxLength": 30,
+            "label": {
+              "en": "Last name"
+            }
+          },
+          {
+            "name": "form_1_job",
+            "maxLength": 40,
+            "label": {
+              "en": "Your Job"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "video_1",
+      "type": "project_video",
+      "look": "teal-orange",
+      "motion": [
+        {
+          "type": "kenburns",
+          "direction": "in",
+          "intensity": 1.18
+        }
+      ],
+      "transition": {
+        "type": "smoothleft",
+        "duration": 0.5
+      },
+      "title": {
+        "en": "Tell us a little bit about you"
+      },
+      "description": {
+        "en": "Tell us your first and last name, the job that you do and the name of your company."
+      },
+      "options": {
+        "duration": 20,
+        "musicVolume": 0.1
+      },
+      "inputs": [
+        {
+          "name": "caption_panel",
+          "url": "panel:w=470,h=150,r=28,c=0a0f14,o=0.72"
+        }
+      ],
+      "maps": [
+        {
+          "inputs": ["0:v"],
+          "outputs": ["base"],
+          "options": {
+            "useSectionFilters": true
+          }
+        },
+        {
+          "inputs": ["base", "1:v"],
+          "filters": [
+            {
+              "type": "overlay",
+              "value": "x=40:y='if(lt(t,5.3),460+(1-(if(lt(t,0.12),0,if(lt(t,0.5),(t-0.12)/0.38,1))))*70,460+(if(lt(t,5.9),(t-5.3)/0.6,1))*280)'"
+            }
+          ],
+          "outputs": ["carded"]
+        },
+        {
+          "inputs": ["carded"],
+          "filters": [
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ form_1_firstname }} {{ form_1_lastname }}"
+                },
+                "fontcolor": "#ffffff",
+                "fontsize": 44,
+                "x": 66,
+                "y": 482,
+                "fontfile": "Anton.ttf",
+                "shadowcolor": "#000000@0.5",
+                "shadowx": 1,
+                "shadowy": 1,
+                "alpha": "'if(lt(t,0.55),0,if(lt(t,0.95),(t-0.55)/0.4,if(lt(t,4.8),1,if(lt(t,5.2),1-(t-4.8)/0.4,0))))'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ form_1_job }}"
+                },
+                "fontcolor": "#E0884C",
+                "fontsize": 28,
+                "x": 66,
+                "y": 542,
+                "fontfile": "Oswald.ttf",
+                "shadowcolor": "#000000@0.5",
+                "shadowx": 1,
+                "shadowy": 1,
+                "alpha": "'if(lt(t,0.68),0,if(lt(t,1.08),(t-0.68)/0.4,if(lt(t,4.8),1,if(lt(t,5.2),1-(t-4.8)/0.4,0))))'"
+              }
+            }
+          ],
+          "outputs": ["final"]
+        }
+      ],
+      "filters": [
+        {
+          "type": "vignette",
+          "value": "PI/5"
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "in",
+            "d": "{{ transitionDuration }}",
+            "color": "{{ color2 }}"
+          }
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "out",
+            "d": "{{ transitionDuration }}",
+            "st": "{{ transitionStartTime }}",
+            "color": "{{ color1 }}"
+          }
+        }
+      ]
+    },
+    {
+      "type": "partial",
+      "ref": "flash-card",
+      "variables": {
+        "optionA": "drink",
+        "optionB": "code",
+        "conjunction": "&",
+        "colorA": "{{ color1 }}",
+        "colorB": "{{ color2 }}",
+        "textColor": "{{ color2 }}"
+      }
+    },
+    {
+      "name": "form_2",
+      "type": "form",
+      "title": {
+        "en": "3 keywords to describe your job"
+      },
+      "description": {
+        "fr": "",
+        "en": ""
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "form_2_keyword1",
+            "maxLength": 25,
+            "label": {
+              "en": "Keyword 1"
+            }
+          },
+          {
+            "name": "form_2_keyword2",
+            "maxLength": 25,
+            "label": {
+              "en": "Keyword 2"
+            }
+          },
+          {
+            "name": "form_2_keyword3",
+            "maxLength": 25,
+            "label": {
+              "en": "Keyword 3"
+            }
+          },
+          {
+            "name": "form_2_keyword4",
+            "maxLength": 25,
+            "label": {
+              "en": "Keyword 4"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "video_2",
+      "type": "project_video",
+      "look": "teal-orange",
+      "motion": [
+        {
+          "type": "kenburns",
+          "direction": "out",
+          "intensity": 1.08
+        }
+      ],
+      "transition": {
+        "type": "coverleft",
+        "duration": 0.5
+      },
+      "title": {
+        "en": "Make your speech"
+      },
+      "description": {
+        "en": "What are you going to make us discover?"
+      },
+      "options": {
+        "duration": 45,
+        "musicVolume": 0.1
+      },
+      "inputs": [
+        {
+          "name": "caption_panel",
+          "url": "panel:w=360,h=340,r=28,c=0a0f14,o=0.72"
+        }
+      ],
+      "maps": [
+        {
+          "inputs": ["0:v"],
+          "outputs": ["base"],
+          "options": {
+            "useSectionFilters": true
+          }
+        },
+        {
+          "inputs": ["base", "1:v"],
+          "filters": [
+            {
+              "type": "overlay",
+              "value": "x=48:y='150+(1-(if(lt(t,0.12),0,if(lt(t,0.5),(t-0.12)/0.38,1))))*70'"
+            }
+          ],
+          "outputs": ["carded"]
+        },
+        {
+          "inputs": ["carded"],
+          "filters": [
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "Languages"
+                },
+                "fontcolor": "#E0884C",
+                "fontsize": 40,
+                "x": 74,
+                "y": 200,
+                "fontfile": "Anton.ttf",
+                "shadowcolor": "#000000@0.5",
+                "shadowx": 1,
+                "shadowy": 1,
+                "alpha": "'if(lt(t,0.55),0,if(lt(t,0.9),(t-0.55)/0.35,1))'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "fr": "{{ form_2_keyword1 }}",
+                  "en": "{{ form_2_keyword1 }}"
+                },
+                "fontcolor": "#ffffff",
+                "fontsize": 30,
+                "x": 74,
+                "y": 270,
+                "fontfile": "Oswald.ttf",
+                "shadowcolor": "#000000@0.5",
+                "shadowx": 1,
+                "shadowy": 1,
+                "alpha": "'if(lt(t,0.72),0,if(lt(t,1.07),(t-0.72)/0.35,1))'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "fr": "{{ form_2_keyword2 }}",
+                  "en": "{{ form_2_keyword2 }}"
+                },
+                "fontcolor": "#ffffff",
+                "fontsize": 30,
+                "x": 74,
+                "y": 320,
+                "fontfile": "Oswald.ttf",
+                "shadowcolor": "#000000@0.5",
+                "shadowx": 1,
+                "shadowy": 1,
+                "alpha": "'if(lt(t,0.87),0,if(lt(t,1.22),(t-0.87)/0.35,1))'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ form_2_keyword3 }}"
+                },
+                "fontcolor": "#ffffff",
+                "fontsize": 30,
+                "x": 74,
+                "y": 370,
+                "fontfile": "Oswald.ttf",
+                "shadowcolor": "#000000@0.5",
+                "shadowx": 1,
+                "shadowy": 1,
+                "alpha": "'if(lt(t,1.02),0,if(lt(t,1.37),(t-1.02)/0.35,1))'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ form_2_keyword4 }}"
+                },
+                "fontcolor": "#ffffff",
+                "fontsize": 30,
+                "x": 74,
+                "y": 420,
+                "fontfile": "Oswald.ttf",
+                "shadowcolor": "#000000@0.5",
+                "shadowx": 1,
+                "shadowy": 1,
+                "alpha": "'if(lt(t,1.17),0,if(lt(t,1.52),(t-1.17)/0.35,1))'"
+              }
+            }
+          ],
+          "outputs": ["final"]
+        }
+      ],
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "fadein",
+          "values": {
+            "color": "{{ color1 }}"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "{{ color1 }}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "form_3",
+      "type": "form",
+      "title": {
+        "en": "Describe your work environment"
+      },
+      "description": {
+        "fr": "",
+        "en": ""
+      }
+    },
+    {
+      "name": "video_3",
+      "type": "project_video",
+      "look": "teal-orange",
+      "transition": {
+        "type": "circleclose",
+        "duration": 0.7
+      },
+      "title": {
+        "en": "Show the work environment"
+      },
+      "description": {},
+      "options": {
+        "duration": 180,
+        "speed": 0.25,
+        "muteSection": true,
+        "musicVolume": 0.4
+      },
+      "inputs": [
+        {
+          "name": "caption_panel",
+          "url": "panel:w=380,h=150,r=28,c=0a0f14,o=0.72"
+        }
+      ],
+      "maps": [
+        {
+          "inputs": ["1:v"],
+          "filters": [
+            {
+              "type": "setpts",
+              "value": "0.25*PTS"
+            }
+          ],
+          "outputs": ["sped"],
+          "options": {
+            "useSectionFilters": true
+          }
+        },
+        {
+          "inputs": ["sped", "2:v"],
+          "filters": [
+            {
+              "type": "overlay",
+              "value": "x=48:y='474+(1-(if(lt(t,0.12),0,if(lt(t,0.5),(t-0.12)/0.38,1))))*70'"
+            }
+          ],
+          "outputs": ["carded"]
+        },
+        {
+          "inputs": ["carded"],
+          "filters": [
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "Environment"
+                },
+                "fontcolor": "#E0884C",
+                "fontsize": 30,
+                "x": 74,
+                "y": 500,
+                "fontfile": "Anton.ttf",
+                "shadowcolor": "#000000@0.5",
+                "shadowx": 1,
+                "shadowy": 1,
+                "alpha": "'if(lt(t,0.55),0,if(lt(t,0.95),(t-0.55)/0.4,1))'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ form_3_keyword1 }}"
+                },
+                "fontcolor": "#ffffff",
+                "fontsize": 40,
+                "x": 74,
+                "y": 548,
+                "fontfile": "Oswald.ttf",
+                "shadowcolor": "#000000@0.5",
+                "shadowx": 1,
+                "shadowy": 1,
+                "alpha": "'if(lt(t,0.65),0,if(lt(t,1.05),(t-0.65)/0.4,1))'"
+              }
+            }
+          ],
+          "outputs": ["final"]
+        }
+      ],
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "fadein",
+          "values": {
+            "color": "{{ color1 }}"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "{{ color1 }}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "outro",
+      "type": "video",
+      "look": "teal-orange",
+      "motion": [
+        {
+          "type": "kenburns",
+          "direction": "in",
+          "intensity": 1.12
+        },
+        {
+          "type": "flip",
+          "axis": "horizontal"
+        }
+      ],
+      "options": {
+        "videoUrl": "{{ videoOutro }}",
+        "duration": 5,
+        "musicVolume": 0.2
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "fadein",
+          "values": {
+            "color": "{{ color1 }}"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "{{ color1 }}"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Thank you for watching!"
+            },
+            "fontcolor": "{{ color2 }}",
+            "fontsize": 60,
+            "x": "(w-text_w)/2",
+            "y": "(h-text_h)/1.4",
+            "fontfile": "Rubik+Marker+Hatch.ttf",
+            "shadowcolor": "{{ color1 }}@0.6",
+            "shadowx": 3,
+            "shadowy": 3,
+            "bordercolor": "{{ color1 }}",
+            "borderw": 2,
+            "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
+          }
+        }
+      ]
+    },
+    {
+      "name": "music_1",
+      "type": "music",
+      "title": {
+        "en": "Pick your music"
+      },
+      "description": {
+        "en": ""
+      },
+      "options": {}
+    }
+  ]
+}

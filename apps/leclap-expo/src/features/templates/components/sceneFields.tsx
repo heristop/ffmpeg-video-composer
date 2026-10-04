@@ -14,6 +14,8 @@ import { SpeedField } from './speed-field';
 import { Slider, Segmented } from './EditorControls';
 import {
   makeTemplateId,
+  ANIMATION_EFFECT_PRESETS,
+  animationDefaultsForUrl,
   hasFlipAxis,
   toggleFlipAxis,
   type EditorSection,
@@ -22,6 +24,7 @@ import {
   type OverlayFit,
   type OverlayFlip,
   type FlipAxis,
+  type Orientation,
 } from '../model/templateEditorModel';
 
 const toggleId = (list: string[], id: string): string[] =>
@@ -30,6 +33,7 @@ const toggleId = (list: string[], id: string): string[] =>
 interface SceneBasicsProps {
   index: number;
   section: EditorSection;
+  orientation: Orientation;
   t: TFunction<'editor'>;
   defaultCountdownSeconds: (duration: number) => number;
   onChange: (p: Partial<EditorSection>) => void;
@@ -39,6 +43,7 @@ interface SceneBasicsProps {
 export const SceneBasics = ({
   index,
   section,
+  orientation,
   t,
   defaultCountdownSeconds,
   onChange,
@@ -146,6 +151,7 @@ export const SceneBasics = ({
           </FieldRow>
         ) : null}
         <OverlaysField
+          orientation={orientation}
           animations={section.animations}
           images={section.images}
           onChangeAnimations={(animations) => {
@@ -194,6 +200,7 @@ export const SceneBasics = ({
           }}
         />
         <AnimationFieldsList
+          orientation={orientation}
           value={section.animations}
           onChange={(animations) => {
             onChange({ animations });
@@ -415,12 +422,14 @@ const formatPair = (a: string, b: string): string | undefined =>
 type OverlayKind = 'animation' | 'image';
 
 export const OverlaysField = ({
+  orientation,
   animations,
   images,
   onChangeAnimations,
   onChangeImages,
   t,
 }: {
+  orientation: Orientation;
   animations: AnimationOverlay[] | undefined;
   images: ImageOverlay[] | undefined;
   onChangeAnimations: (animations: AnimationOverlay[] | undefined) => void;
@@ -441,7 +450,7 @@ export const OverlaysField = ({
         onChange={setKind}
       />
       {kind === 'animation' ? (
-        <AnimationFieldsList value={animations} onChange={onChangeAnimations} t={t} />
+        <AnimationFieldsList orientation={orientation} value={animations} onChange={onChangeAnimations} t={t} />
       ) : (
         <ImageFieldsList value={images} onChange={onChangeImages} t={t} />
       )}
@@ -453,10 +462,12 @@ export const OverlaysField = ({
 // remove control, plus a trailing picker to append more. Mirrors the web AnimationOverlayField; writes
 // section.animations.
 export const AnimationFieldsList = ({
+  orientation,
   value,
   onChange,
   t,
 }: {
+  orientation: Orientation;
   value: AnimationOverlay[] | undefined;
   onChange: (animations: AnimationOverlay[] | undefined) => void;
   t: TFunction<'editor'>;
@@ -479,6 +490,27 @@ export const AnimationFieldsList = ({
 
   return (
     <View>
+      <Text style={[styles.fieldLabel, { marginTop: spacing.m }]}>{t('animation.effects.label')}</Text>
+      {ANIMATION_EFFECT_PRESETS.map((preset) => (
+        <TouchableOpacity
+          key={preset.id}
+          accessibilityRole="button"
+          accessibilityLabel={t(preset.nameKey)}
+          testID={`animation-effect-${preset.id}`}
+          style={styles.effectPreset}
+          onPress={() => {
+            const added = preset.build(orientation).map((animation) => ({ ...animation, id: makeTemplateId() }));
+            onChange([...animations, ...added]);
+          }}
+        >
+          <View style={styles.effectPresetHeading}>
+            <Ionicons name="sparkles-outline" size={16} color={colors.primary} />
+            <Text style={styles.effectPresetTitle}>{t(preset.nameKey)}</Text>
+            <Ionicons name="add" size={18} color={colors.primary} />
+          </View>
+          <Text style={styles.effectPresetDescription}>{t(preset.descriptionKey)}</Text>
+        </TouchableOpacity>
+      ))}
       {animations.map((animation, index) => (
         <View key={animation.id ?? `animation-${index}`} style={styles.animLayer}>
           <View style={styles.animLayerHead}>
@@ -695,7 +727,7 @@ export const AnimationFields = ({
             label={animation.label}
             active={value?.url === animation.url}
             onPress={() => {
-              onChange({ url: animation.url, label: animation.label });
+              onChange({ ...animationDefaultsForUrl(animation.url), url: animation.url, label: animation.label });
             }}
             source={animation.module}
           />
@@ -1137,6 +1169,18 @@ const styles = StyleSheet.create({
   mirrorText: { ...typography.caption, fontSize: 13, color: colors.textSecondary },
   mirrorTextActive: { color: '#fff', fontWeight: '600' },
   animStrip: { gap: spacing.s, paddingVertical: spacing.xs, paddingRight: spacing.s },
+  effectPreset: {
+    minHeight: 44,
+    marginTop: spacing.s,
+    padding: spacing.s,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.divider,
+    backgroundColor: colors.surface,
+  },
+  effectPresetHeading: { flexDirection: 'row', alignItems: 'center', gap: spacing.s },
+  effectPresetTitle: { ...typography.caption, color: colors.text, fontWeight: '600', flex: 1 },
+  effectPresetDescription: { ...typography.smallText, color: colors.textSecondary, marginTop: spacing.xs },
   animLayer: {
     borderRadius: 12,
     borderWidth: 1,

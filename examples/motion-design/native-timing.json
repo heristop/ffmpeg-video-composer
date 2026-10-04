@@ -1,0 +1,255 @@
+{
+  "meta": {
+    "name": "Native motion timing study",
+    "description": "Asset-free landscape demonstration of staggered type and eased exits.",
+    "creativeDirection": "Direction: an asset-free timing study with condensed white typography on dark ink. Establish hierarchy through staggered entrances, then demonstrate an eased exit in a separate scene. Use native title and drawtext controls so the same authored timing can be reviewed across backends. Avoid constant motion and obscuring text with accents. Inspect the first reveal, line stagger, readable hold, exit midpoint and final frame; change timing explicitly rather than interpreting this brief during rendering."
+  },
+  "global": {
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "stagger",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#10141e",
+        "duration": 3.2,
+        "layers": [
+          {
+            "color": "#ff9a55",
+            "x": 32,
+            "y": 32,
+            "w": 30,
+            "h": 2,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 32,
+            "y": 32,
+            "w": 2,
+            "h": 30,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 1218,
+            "y": 32,
+            "w": 30,
+            "h": 2,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 1246,
+            "y": 32,
+            "w": 2,
+            "h": 30,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 32,
+            "y": 658,
+            "w": 2,
+            "h": 30,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 32,
+            "y": 686,
+            "w": 30,
+            "h": 2,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 1246,
+            "y": 658,
+            "w": 2,
+            "h": 30,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 1218,
+            "y": 686,
+            "w": 30,
+            "h": 2,
+            "opacity": 0.65
+          }
+        ]
+      },
+      "titleCard": {
+        "kicker": {
+          "en": "LECLAP / MOTION STUDY"
+        },
+        "headline": {
+          "en": "DESIGNED TO MOVE"
+        },
+        "subtitle": {
+          "en": "Arrive. Settle. Hold."
+        },
+        "accent": "#ff9a55",
+        "headlineStyle": {
+          "font": "bebas",
+          "fontsize": 96
+        },
+        "kickerStyle": {
+          "font": "oswald",
+          "fontsize": 24
+        },
+        "subtitleStyle": {
+          "font": "oswald",
+          "fontsize": 32
+        },
+        "stagger": 0.07,
+        "reveal": {
+          "type": "rise",
+          "delay": 0.12,
+          "duration": 0.28,
+          "distance": 36,
+          "easing": "ease-out"
+        },
+        "fade": {
+          "in": false,
+          "out": false
+        }
+      }
+    },
+    {
+      "name": "exit",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#10141e",
+        "duration": 3.2,
+        "layers": [
+          {
+            "color": "#ff9a55",
+            "x": 32,
+            "y": 32,
+            "w": 30,
+            "h": 2,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 32,
+            "y": 32,
+            "w": 2,
+            "h": 30,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 1218,
+            "y": 32,
+            "w": 30,
+            "h": 2,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 1246,
+            "y": 32,
+            "w": 2,
+            "h": 30,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 32,
+            "y": 658,
+            "w": 2,
+            "h": 30,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 32,
+            "y": 686,
+            "w": 30,
+            "h": 2,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 1246,
+            "y": 658,
+            "w": 2,
+            "h": 30,
+            "opacity": 0.65
+          },
+          {
+            "color": "#ff9a55",
+            "x": 1218,
+            "y": 686,
+            "w": 30,
+            "h": 2,
+            "opacity": 0.65
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "MAKE THE NEXT MOVE"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 96,
+            "fontcolor": "#ffffff",
+            "x": 80,
+            "y": 250
+          },
+          "reveal": {
+            "type": "slide-right",
+            "delay": 0.04,
+            "duration": 0.28,
+            "distance": 60,
+            "easing": "ease-out"
+          },
+          "exit": {
+            "type": "slide-left",
+            "after": 2.7,
+            "duration": 0.24,
+            "distance": 32,
+            "easing": "ease-out"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "A SHORT ARRIVAL. A CLEAR HOLD."
+            },
+            "fontfile": "Oswald.ttf",
+            "fontsize": 28,
+            "fontcolor": "#ff9a55",
+            "x": 80,
+            "y": 395
+          },
+          "reveal": {
+            "type": "rise",
+            "delay": 0.11,
+            "duration": 0.24,
+            "distance": 22,
+            "easing": "ease-out"
+          },
+          "exit": {
+            "type": "fade",
+            "after": 2.74,
+            "duration": 0.2,
+            "easing": "ease-out"
+          }
+        }
+      ]
+    }
+  ]
+}

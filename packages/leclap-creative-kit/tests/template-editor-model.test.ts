@@ -1332,13 +1332,13 @@ describe('templateEditorModel — video overlays → drawtext filters', () => {
     const animated = overlay({
       text: 'Bye',
       reveal: 'rise' as const,
-      exit: { type: 'fade', after: 2.5 },
+      exit: { type: 'fade', after: 2.5, easing: 'ease-out' },
     });
     const d = buildDescriptor(baseState([videoSection([animated])]));
     const filter = (d.sections?.find((s) => s.type === 'project_video')?.filters ?? [])[0];
 
     expect(filter.reveal).toBe('rise');
-    expect(filter.exit).toEqual({ type: 'fade', after: 2.5 });
+    expect(filter.exit).toEqual({ type: 'fade', after: 2.5, easing: 'ease-out' });
     expect(() => TemplateDescriptorSchema.parse(d)).not.toThrow();
 
     const back = toEditorState(asTemplate(baseState([videoSection([animated])])));
@@ -1346,8 +1346,31 @@ describe('templateEditorModel — video overlays → drawtext filters', () => {
     expect(recovered.overlays[0]).toMatchObject({
       text: 'Bye',
       reveal: 'rise',
-      exit: { type: 'fade', after: 2.5 },
+      exit: { type: 'fade', after: 2.5, easing: 'ease-out' },
     });
+  });
+});
+
+describe('native timing editor roundtrip', () => {
+  it('preserves title-card zero/short stagger and reveal easing through descriptor import/export', () => {
+    for (const stagger of [0, 0.07]) {
+      const titleCard = {
+        headline: { en: 'A headline' },
+        stagger,
+        reveal: { type: 'rise' as const, easing: 'ease-out' as const },
+      };
+      const state = baseState([{ ...(newSection('color') as Extract<EditorSection, { kind: 'color' }>), titleCard }]);
+      const descriptor = buildDescriptor(state);
+      expect(() => TemplateDescriptorSchema.parse(descriptor)).not.toThrow();
+      const imported = toEditorState(asTemplate(state));
+      const color = imported.sections.find((section) => section.kind === 'color') as Extract<
+        EditorSection,
+        { kind: 'color' }
+      >;
+      expect(color.titleCard).toEqual(titleCard);
+      const emitted = buildDescriptor(imported).sections?.find((section) => section.type === 'color_background');
+      expect(emitted && 'titleCard' in emitted ? emitted.titleCard : undefined).toEqual(titleCard);
+    }
   });
 });
 

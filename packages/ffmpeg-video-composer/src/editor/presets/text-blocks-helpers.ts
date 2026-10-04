@@ -36,7 +36,7 @@ export function pushLine(
   spec: LineSpec,
   reveal: RevealInput,
   index: number,
-  effect?: TextEffect
+  options?: { effect?: TextEffect; stagger?: number }
 ): number {
   if (!hasText(spec.text)) {
     return index;
@@ -51,8 +51,8 @@ export function pushLine(
     fontcolor: spec.color,
   };
 
-  applyTextEffect(values, effect);
-  applyReveal(values, staggered(reveal, index), { x: spec.x, y: spec.y });
+  applyTextEffect(values, options?.effect);
+  applyReveal(values, staggered(reveal, index, options?.stagger), { x: spec.x, y: spec.y });
   filters.push({ type: 'drawtext', values });
 
   return index + 1;

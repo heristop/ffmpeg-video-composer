@@ -155,3 +155,15 @@ describe('resolveCanvasDrop library', () => {
     expect(result).toBeNull();
   });
 });
+
+it('newly dropped tap cues play once and disappear instead of freezing on the UI', () => {
+  const result = resolveCanvasDrop(
+    videoSection(),
+    NO_SELECTION,
+    { source: 'library', element: 'animation', url: '/assets/animations/tap_pulse.apng' },
+    { fracX: 0.5, fracY: 0.5 },
+    'landscape'
+  );
+  const overlays = field<AnimationOverlay>(result!.patch, 'animations');
+  expect(overlays.at(-1)).toMatchObject({ loop: false, loops: 1, persistent: false });
+});

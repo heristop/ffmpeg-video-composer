@@ -76,6 +76,15 @@ describe('docGroups', () => {
     }
   });
 
+  it('keeps type-specific motion bounds separate', () => {
+    const variants = docGroups.motionVariants();
+    expect(variants).toHaveLength(6);
+    const shake = variants.find((variant) => variant.name === 'shake');
+    const pulse = variants.find((variant) => variant.name === 'pulse');
+    expect(shake?.rows.find((row) => row.name === 'intensity')?.constraints).toContain('1…20');
+    expect(pulse?.rows.find((row) => row.name === 'intensity')?.constraints).toContain('1.01…1.3');
+  });
+
   it('unions options across section types (layers + framingGuide both surface)', () => {
     const names = docGroups.options().map((r) => r.name);
     expect(names).toContain('layers');

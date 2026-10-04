@@ -10,6 +10,8 @@ import {
 } from 'ffmpeg-video-composer';
 import { z } from 'zod';
 
+import { validateEffects, type EffectConfig } from '../effects/title-registry.js';
+import { templateRevision } from '../effects/template-revision.js';
 import type { McpConfig } from '../config.js';
 import { assertDescriptorSafe } from '../compose/descriptorGuard.js';
 import { runGeometryCheck } from '../compose/renderRunner.js';
@@ -29,6 +31,8 @@ const inputSchema = z.object({
 
 const outputSchema = z.object({
   valid: z.boolean(),
+  revision: z.string(),
+  capabilities: z.object({ effects: z.boolean(), backend: z.string(), geometry: z.string() }).optional(),
   sectionCount: z.number(),
   orientation: z.string().nullable(),
   requiredClips: z.array(z.string()),
@@ -52,7 +56,7 @@ const outputSchema = z.object({
 
 type ValidateArgs = { template: Record<string, unknown>; render?: boolean };
 type RenderSummary = { measured: number; seconds: number; unavailable?: string };
-type RenderConfig = Pick<McpConfig, 'mediaDir' | 'outputDir' | 'renderTimeoutMs'>;
+type RenderConfig = Pick<McpConfig, 'mediaDir' | 'outputDir' | 'renderTimeoutMs'> & EffectConfig;
 type ToolError = { isError: true; content: [{ type: 'text'; text: string }] };
 type DescriptorResult = { ok: true; descriptor: TemplateDescriptor } | ToolError;
 
@@ -218,12 +222,55 @@ async function findings(
   return renderedGeometry(descriptor, authored, request.config, request.signal);
 }
 
-async function summary(descriptor: TemplateDescriptor, authored: TemplateDescriptor, request: RenderRequest | null) {
+const EFFECT_GEOMETRY_NOTE = 'Remotion text fit and contrast are not measured; inspect render_preview.';
+async function effectFindings(
+  descriptor: TemplateDescriptor,
+  authored: TemplateDescriptor,
+  request: RenderRequest | null
+) {
+  // Core expands partials and measures FFmpeg layers on generated effect footage. Its rendered
+  // check excludes effects from pixel targets while refining ordinary sections normally.
+  const result = await findings(descriptor, authored, request);
+
+  return {
+    geometry: [...(result.geometry ?? []), EFFECT_GEOMETRY_NOTE],
+    render: effectRenderSummary(result.render, request),
+  };
+}
+function effectRenderSummary(render: RenderSummary | undefined, request: RenderRequest | null) {
+  if (!request) return render;
+
+  return {
+    measured: render?.measured ?? 0,
+    seconds: render?.seconds ?? 0,
+    unavailable: [render?.unavailable, EFFECT_GEOMETRY_NOTE].filter(Boolean).join(' '),
+  };
+}
+function effectCapabilities(hasEffects: boolean, config: RenderConfig) {
+  if (!hasEffects) return {};
+
+  return {
+    capabilities: {
+      effects: Boolean(config.allowRemotion && config.remotionEntry),
+      backend: 'Remotion/Chromium (trusted local Node source)',
+      geometry: EFFECT_GEOMETRY_NOTE,
+    },
+  };
+}
+async function summary(
+  descriptor: TemplateDescriptor,
+  authored: TemplateDescriptor,
+  request: RenderRequest | null,
+  config: RenderConfig
+) {
   const sectionCount = descriptor.sections?.length ?? 0;
   const orientation = descriptor.global?.orientation ?? null;
   const clips = requiredClips(descriptor);
   const fields = formFields(descriptor);
-  const { geometry, render } = await findings(descriptor, authored, request);
+  const hasEffects = (descriptor.sections ?? []).some((section) => section.type === 'effect');
+  const { geometry, render } = hasEffects
+    ? await effectFindings(descriptor, authored, request)
+    : await findings(descriptor, authored, request);
   const needs = [
     clips.length > 0 ? `clips: ${clips.join(', ')}` : 'no clips',
     fields.length > 0 ? `fields: ${fields.join(', ')}` : 'no fields',
@@ -238,6 +285,8 @@ async function summary(descriptor: TemplateDescriptor, authored: TemplateDescrip
     ],
     structuredContent: {
       valid: true,
+      revision: templateRevision(authored as Record<string, unknown>),
+      ...effectCapabilities(hasEffects, config),
       sectionCount,
       orientation,
       requiredClips: clips,
@@ -255,9 +304,14 @@ async function handleValidate(args: ValidateArgs, config: RenderConfig, ctx?: Se
     return resolved;
   }
 
+  try {
+    await validateEffects(args.template, config, ctx?.mcpReq.signal);
+  } catch (error) {
+    return errorResult(`Effect validation failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
   const request = args.render === true ? { config, signal: ctx?.mcpReq.signal } : null;
 
-  return summary(resolved.descriptor, args.template, request);
+  return summary(resolved.descriptor, args.template, request, config);
 }
 
 export function registerValidateTemplate(server: McpServer, config: RenderConfig): void {

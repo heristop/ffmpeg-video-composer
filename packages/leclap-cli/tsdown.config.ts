@@ -4,6 +4,7 @@ import { defineConfig } from 'tsdown';
 // bundled, so npm's installer brings them in.
 const external = [
   'ffmpeg-video-composer',
+  'ffmpeg-video-composer/samples',
   'citty',
   'picocolors',
   'reflect-metadata',

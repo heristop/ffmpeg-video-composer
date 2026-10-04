@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Seo } from '@/presentation/components/Seo';
 import { Code, DocSection, DocSubsection, JsonBlock } from '@/presentation/components/doc/DocBlocks';
 import { examples } from '@/presentation/components/doc/examples';
@@ -13,7 +14,9 @@ export const DocExamples = () => (
 
     <DocPageHeader kicker="Copy-paste" title="Example descriptors">
       Complete, runnable descriptors. Save any one as a <Code>.json</Code> file and render it with{' '}
-      <Code>leclap render</Code>.
+      <Code>leclap render</Code>. Discover the complete catalog with <Code>leclap samples list</Code> or MCP{' '}
+      <Code>list_samples</Code>; <Link to="/showcase">watch the showcase</Link> and inspect required media before
+      rendering. Registered samples need the <Link to="/doc/effects">configured effect backend</Link>.
     </DocPageHeader>
 
     <DocSection id="examples" title="Examples" kicker={`${examples.length} templates`}>

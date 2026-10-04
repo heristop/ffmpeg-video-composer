@@ -12,10 +12,13 @@ vi.mock('ffmpeg-video-composer', () => ({
 // which names the failing section — has to travel in `error`.
 describe('render worker', () => {
   const originalSend = process.send;
+  const originalListeners = new Set(process.listeners('message'));
 
   afterEach(() => {
     process.send = originalSend;
-    process.removeAllListeners('message');
+    for (const listener of process.listeners('message')) {
+      if (!originalListeners.has(listener)) process.removeListener('message', listener);
+    }
     vi.restoreAllMocks();
   });
 
@@ -27,9 +30,10 @@ describe('render worker', () => {
         return null;
       }
     );
-    vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
+    const exit = vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
     const sent = new Promise<unknown>((resolve) => {
-      process.send = ((message: unknown) => {
+      process.send = ((message: unknown, _handle: unknown, _options: unknown, callback?: () => void) => {
+        callback?.();
         resolve(message);
 
         return true;
@@ -43,5 +47,6 @@ describe('render worker', () => {
       ok: false,
       error: 'Section "broken" failed: font Nope.ttf could not be resolved',
     });
+    await vi.waitFor(() => expect(exit).toHaveBeenCalledWith(0));
   });
 });

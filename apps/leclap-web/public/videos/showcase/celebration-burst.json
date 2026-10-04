@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "name": "Overlay effect recipes",
+    "description": "Synthetic review fixture with adaptive shapes and labels for the shared composited effect presets.",
+    "creativeDirection": "Direction: an honest synthetic test fixture for six composited recipes. Frame an interface detail, reveal a product shape, mark a celebration, lock focus, pass a soft light or reveal a fine frame. Keep labels readable and the focal element visible. Use at most two brief layers per scene and a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
+  },
+  "global": {
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "celebration_burst",
+      "type": "color_background",
+      "options": {
+        "duration": 6,
+        "backgroundColor": "#22142e",
+        "layers": [
+          {
+            "color": "#38204c",
+            "x": "iw*0.27",
+            "y": "ih*0.30",
+            "w": "iw*0.46",
+            "h": "ih*0.44"
+          },
+          {
+            "color": "#ffafcd",
+            "x": "iw*0.43",
+            "y": "ih*0.44",
+            "w": "iw*0.14",
+            "h": "ih*0.16"
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "CELEBRATION BURST"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 44,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": 64
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "A brief burst, then a clear message."
+            },
+            "fontfile": "Oswald-Regular.ttf",
+            "fontsize": 32,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": "h-80"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "effect_0",
+          "type": "animation",
+          "url": "/assets/animations/confetti.apng",
+          "options": {
+            "position": "96:54",
+            "scale": "1088:612",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.18,
+            "duration": 2.52,
+            "opacity": 0.85
+          }
+        },
+        {
+          "name": "effect_1",
+          "type": "animation",
+          "url": "/assets/animations/sparkle.apng",
+          "options": {
+            "position": "256:144",
+            "scale": "768:432",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.65,
+            "duration": 2,
+            "opacity": 0.7
+          }
+        }
+      ]
+    }
+  ]
+}

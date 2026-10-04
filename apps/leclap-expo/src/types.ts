@@ -7,6 +7,7 @@ import type { TemplateOrientation } from '@leclap/creative-kit';
 export type Orientation = TemplateOrientation;
 
 export interface Template {
+  id?: string;
   name: string;
   content: TemplateDescriptor;
   /** `user` = built by the user in the editor; `sample` = a bundled @leclap/creative-kit template. */
@@ -14,6 +15,7 @@ export interface Template {
 }
 
 export interface TemplateDescriptor {
+  meta?: { name?: string; description?: string };
   global?: {
     variables?: Record<string, string | string[]>;
     orientation?: Orientation;

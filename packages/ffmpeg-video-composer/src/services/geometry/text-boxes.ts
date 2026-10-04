@@ -35,9 +35,10 @@ function declaredDuration(section: { options?: { duration?: number } }): number 
 }
 
 // TemplateDirector renders only VIDEO_SEGMENT_TYPES; a `form` or `music` section's caption is never
-// lowered to a filter, and its duration adds nothing to the output timeline.
+// lowered to a filter, and its duration adds nothing to the output timeline. Effect sections
+// become project_video before rendering; their downstream FFmpeg text layers are measurable here.
 export function isRenderableSection(section: { type?: string }): boolean {
-  return section.type !== undefined && VIDEO_SEGMENT_TYPES.has(section.type);
+  return section.type === 'effect' || (section.type !== undefined && VIDEO_SEGMENT_TYPES.has(section.type));
 }
 
 // One renderable section, lowered: its place on the timeline and what it draws, in draw order.
@@ -76,7 +77,7 @@ export function lowerTemplate(template: TemplateDescriptor, canvas: Canvas, orig
       duration,
       scale: `${canvas.width}:${canvas.height}`,
       fps: DefaultConfig.FPS,
-      isVideo: section.type === 'project_video' || section.type === 'video',
+      isVideo: section.type === 'project_video' || section.type === 'video' || section.type === 'effect',
     };
     // Typed as required, but an unvalidated descriptor may omit it.
     const name: unknown = section.name;

@@ -9,7 +9,7 @@ import { out } from './stdout-guard-install.js';
 import { StdioServerTransport, serveStdio } from '@modelcontextprotocol/server/stdio';
 
 import { loadConfig } from './config.js';
-import { createServer } from './server.js';
+import { createServer, snapshotEffectConfig } from './server.js';
 
 // The tool surface is authoring-only (get_template_schema, validate_template, compose_video,
 // probe_media, the Remotion authoring helpers, ping). All diagnostics go to stderr — never
@@ -22,7 +22,8 @@ import { createServer } from './server.js';
 // The transport is supplied explicitly so the JSON-RPC channel keeps writing through the stdout
 // guard's genuine fd-1 writer rather than the hijacked `process.stdout`.
 function main(): void {
-  const config = loadConfig();
+  // Fail catalog configuration before stdin/transport starts; the protocol factory is lazy.
+  const config = snapshotEffectConfig(loadConfig());
 
   serveStdio(() => createServer(config), {
     transport: new StdioServerTransport(process.stdin, out),

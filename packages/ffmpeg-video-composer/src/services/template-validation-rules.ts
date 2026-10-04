@@ -8,11 +8,11 @@ export interface ValidationError {
   code: string;
 }
 
-const RENDERING_SECTION_TYPES = new Set(['video', 'project_video', 'color_background', 'image_background']);
+const RENDERING_SECTION_TYPES = new Set(['video', 'project_video', 'color_background', 'image_background', 'effect']);
 
 // Section types kenburns can zoom/pan: stills (image_background) and real footage (project_video,
 // video). A solid color_background or non-rendering type (form, music) has nothing to pan.
-const KENBURNS_SECTION_TYPES = new Set(['image_background', 'project_video', 'video']);
+const KENBURNS_SECTION_TYPES = new Set(['image_background', 'project_video', 'video', 'effect']);
 
 type IndexedSection = { section: Section; index: number };
 

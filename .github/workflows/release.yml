@@ -23,10 +23,10 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
-# Only what publishing needs. The old setup also asked for `pull-requests: write` for the bot PR;
-# nothing here opens a PR any more.
+# Read sources and mint the identity token required for npm provenance.
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   publish:
@@ -47,8 +47,15 @@ jobs:
       - name: Set up toolchain (mise)
         uses: jdx/mise-action@v4
 
+      # Keep mise's Node version; setup-node supplies the registry .npmrc for NODE_AUTH_TOKEN.
+      - name: Configure npm registry authentication
+        uses: actions/setup-node@v6
+        with:
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
       - name: Install Dependencies
-        run: pnpm i
+        run: pnpm i --frozen-lockfile
 
       # The published packages depend on ffmpeg-video-composer by plain semver range, never by pnpm's
       # `workspace:*` protocol. That protocol only survives if pnpm does the packing; a bare

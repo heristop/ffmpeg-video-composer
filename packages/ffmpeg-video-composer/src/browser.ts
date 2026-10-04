@@ -18,7 +18,7 @@ import VideoEditor from './editor/VideoEditor';
 import MusicComposer from './editor/MusicComposer';
 import AnimationComposer from './editor/AnimationComposer';
 import Project from './core/models/Project';
-import Template from './core/models/Template';
+import Template, { assertEffectsResolved } from './core/models/Template';
 import { attachCompilationListeners } from './platform/compilation-listeners';
 import type { ProjectConfig, TemplateDescriptor } from './core/types';
 
@@ -263,6 +263,7 @@ export async function compileBrowser(
   options: BrowserCompileOptions = {}
 ): Promise<string | null> {
   try {
+    assertEffectsResolved(templateDescriptor);
     await initializeBrowserPlatform(options.loadFFmpegCore);
 
     const ctx: CompilationContext = {
@@ -301,3 +302,16 @@ export type { ProjectConfig, TemplateDescriptor, Variables, Section, Filter } fr
 export { isFontRef, type FontRef, type FontInput } from './core/fonts';
 export { container } from 'tsyringe';
 export { compileBrowser as compile };
+
+export { EffectReferenceSchema, JsonValueSchema } from './schemas/effect-reference.schema';
+export type { EffectReference, JsonValue } from './schemas/effect-reference.schema';
+export { EffectSectionSchema } from './schemas/section.schemas';
+export type { EffectSection } from './schemas/section.schemas';
+export { resolveTemplateEffects } from './core/resolve-template-effects';
+export type {
+  EffectRenderResult,
+  EffectRenderer,
+  ResolveTemplateEffectsOptions,
+  ResolvedEffectProvenance,
+  ResolvedTemplateEffects,
+} from './core/resolve-template-effects';

@@ -113,6 +113,7 @@ export const FEATURE_CONTROLS: Record<FeatureKey, ControlSpec[]> = {
     colorSpec('titleCard', 'titleCard.accent', 'titleCard.accent'),
     enumSpec('titleCard', 'titleCard.align', 'titleCard.align', 'segmented'),
     colorSpec('titleCard', 'titleCard.background', 'titleCard.background'),
+    sliderSpec('titleCard', 'titleCard.stagger', 'titleCard.stagger'),
   ],
   lowerThird: [
     textSpec('lowerThird', 'lowerThird.title', 'lowerThird.title'),

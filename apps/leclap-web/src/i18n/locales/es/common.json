@@ -30,7 +30,8 @@
     "templates": "Plantillas",
     "docs": "Docs",
     "about": "Acerca de",
-    "primaryLabel": "Principal"
+    "primaryLabel": "Principal",
+    "showcase": "Muestras"
   },
   "header": {
     "switchToLight": "Cambiar a tema claro",

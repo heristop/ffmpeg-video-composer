@@ -14,18 +14,21 @@ export const DocOverview = () => (
 
     <DocPageHeader kicker="Shape" title="The template descriptor">
       A descriptor is a single JSON document the engine compiles into a finished video — the same source on Node, in the
-      browser via WebAssembly, and on-device in React Native. Everything in this reference is generated from the
-      engine's own schema, so it never drifts from what compiles.
+      browser via WebAssembly, and on-device in React Native. Field tables come from the engine&apos;s schema.
+      Registered effects require a configured backend to resolve them into clips before composition.
     </DocPageHeader>
 
     <DocSection id="shape" title="The two keys" kicker="Structure">
       <Prose>
         <p>
-          Every descriptor is a single object with two keys: <Code>{'{ global, sections[] }'}</Code>.{' '}
-          <Code>global</Code> holds project-wide defaults; <Code>sections</Code> is an ordered list where each entry
-          becomes one clip, composed in order. Both keys are optional so partial descriptors validate incrementally, but
-          a useful template has at least one section. An optional <Code>meta</Code> object carries a human name and
-          description.
+          A descriptor is organized around two keys: <Code>{'{ global, sections[] }'}</Code>. <Code>global</Code> holds
+          project-wide defaults; <Code>sections</Code> is an ordered list where each entry can define a visual clip,
+          audio, a form step or a reusable partial. Both keys are optional so partial descriptors validate
+          incrementally, but a useful template has at least one section. An optional <Code>meta</Code> object carries a
+          human name and description and <Code>creativeDirection</Code> authoring brief; <Code>partials</Code> carries
+          reusable section definitions. The brief does not select effects or change rendering automatically. See the{' '}
+          <Link to="/doc/reference">complete field reference</Link>, <Link to="/doc/effects">effect contracts</Link> and{' '}
+          <Link to="/doc/creative-direction">creative direction guide</Link>.
         </p>
         <p>
           The descriptor has two layers you can mix freely. The{' '}
@@ -41,9 +44,29 @@ export const DocOverview = () => (
           mental models separate.
         </p>
         <p>
-          <strong className="text-foreground">All durations are in seconds</strong>, everywhere —{' '}
+          <strong className="text-foreground">Native descriptor durations are in seconds</strong> —{' '}
           <Code>options.duration</Code>, <Code>transition.duration</Code>, <Code>audioFade.in.duration</Code>, and the
-          rest.
+          rest. Registered-effect props use the units declared by their contract, which can include frame counts.
+        </p>
+      </Prose>
+    </DocSection>
+
+    <DocSection id="engine-config" title="Host and engine configuration" kicker="Separate layers">
+      <Prose>
+        <p>
+          Template JSON defines scenes, timing, motion and <Code>global.orientation</Code> / <Code>global.fps</Code>.
+          The library&apos;s <Code>ProjectConfig</Code> supplies asset/build paths, media and field bindings, locale,
+          codec, quality and segment concurrency. Orientation comes from the descriptor; its fps overrides host fps.
+        </p>
+        <p>
+          Default landscape output is 1280×720 at 30 fps; portrait swaps the base dimensions and square uses 1080×1080.
+          The encoder preset defaults to <Code>ultrafast</Code>, even when quality tier changes. WASM and native
+          segments run serially; Node/static defaults to up to three concurrent segments.
+        </p>
+        <p>
+          <Link to="/doc/mcp">MCP server settings</Link> configure media containment, deadlines, trusted Remotion
+          source, browser, catalog and cache. Registered effects currently require landscape 1280×720, 30 fps and ten
+          seconds. See the complete <Link to="/doc/engine">engine configuration reference</Link>.
         </p>
       </Prose>
     </DocSection>
@@ -83,7 +106,7 @@ export const DocOverview = () => (
         <RefTable
           id="meta"
           title="meta"
-          summary="Optional template metadata — a display name and description."
+          summary="Optional template metadata — display name, description and creative direction."
           rows={docGroups.meta()}
         />
         <RefTable

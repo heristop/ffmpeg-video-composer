@@ -1,126 +1,93 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Card, type ColorTokens, type FontTokens, Text, YStack, XStack, View } from 'tamagui';
-import { LinearGradient } from 'expo-linear-gradient';
 import type { Template } from '@/src/types';
-import { buildDescriptionVars, resolveVariables } from '@/src/utils/i18nText';
-import { ORIENTATION_ICON } from '@/src/features/templates/orientationMeta';
-import { colors as theme, fonts } from '@/src/styles/theme';
-import { coverFor } from '@/src/styles/gradients';
+import { colors, spacing, typography, withAlpha } from '@/src/styles/theme';
+import { PressableScale } from '@/src/components/kinetic/pressable-scale';
+import { templatePresentation } from '../template-presentation';
+import { templatePosters } from '../template-posters';
 
 interface TemplateCardProps {
   template: Template;
   onPress: (template: Template) => void;
 }
 
-const TemplateCard: React.FC<TemplateCardProps> = ({ template, onPress }) => {
-  const { t } = useTranslation('templates');
-  const orientation = template.content.global?.orientation ?? 'portrait';
-  const templateName = template.name.replace('.json', '');
-
-  // Interpolate the first section's `{{ tokens }}` against the template's variable defaults so the
-  // card preview reads with real values (no project/answers yet — globals only), matching the web.
-  const rawDescription = template.content.sections?.find((section) => section.description?.en)?.description?.en;
-  const description = rawDescription
-    ? resolveVariables(
-        rawDescription,
-        buildDescriptionVars(template.content.global?.variables, template.content.global?.colorsList)
-      )
-    : t('cardDefaultDescription');
-
-  const [c1, c2] = coverFor(templateName);
-
-  // The Tamagui config registers an animation driver at runtime, but its prop types
-  // aren't injected into component props in this setup — pass `animation` via a typed
-  // spread so the value is applied without an untyped/`any` escape.
-  const animationProps: { animation: string } = { animation: 'quick' };
+export default function TemplateCard({ template, onPress }: TemplateCardProps) {
+  const { t, i18n } = useTranslation('templates');
+  const { title, description, orientation } = templatePresentation(template, i18n.resolvedLanguage ?? i18n.language);
+  const poster = template.source === 'sample' && template.id ? templatePosters[template.id] : undefined;
+  const format = { portrait: '9:16', square: '1:1', landscape: '16:9' }[orientation];
+  const orientationLabel = t(`orientation.${orientation}`);
 
   return (
-    <Card
-      size="$4"
-      {...animationProps}
-      pressStyle={{ scale: 0.97 }}
-      // Gentle fade + rise as each card mounts (and as more enter on scroll), driven by the same
-      // `quick` animation already configured — no scale, so text stays crisp.
-      enterStyle={{ opacity: 0, y: 10 }}
+    <PressableScale
       onPress={() => {
         onPress(template);
       }}
-      width="45%"
-      margin="$s"
-      overflow="hidden"
-      backgroundColor={theme.surface as ColorTokens}
-      borderWidth={1}
-      borderColor={theme.divider as ColorTokens}
-      borderRadius={20}
-      shadowColor={theme.primary as ColorTokens}
-      shadowOffset={{ width: 0, height: 6 }}
-      shadowOpacity={0.14}
-      shadowRadius={14}
+      haptic={false}
+      scaleTo={0.98}
+      accessibilityLabel={`${title}. ${orientationLabel}. ${description ?? t('cardDefaultDescription')}`}
+      style={styles.card}
     >
-      <YStack>
-        <View height={150} alignItems="center" justifyContent="center" overflow="hidden">
-          <LinearGradient
-            colors={[c1, c2]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFill}
+      <View style={[styles.cover, !poster && styles.customCover]}>
+        {poster ? (
+          <Image source={poster} style={styles.poster} resizeMode="contain" accessible={false} />
+        ) : (
+          <Ionicons
+            name={template.source === 'user' ? 'sparkles-outline' : 'film-outline'}
+            size={32}
+            color={colors.primaryDark}
           />
-          <Ionicons name="film-outline" size={46} color="rgba(255,255,255,0.92)" />
-
-          {/* `Custom` badge for user-built templates — iso with the web TemplateSelector (brand badge). */}
-          {template.source === 'user' && (
-            <XStack
-              position="absolute"
-              top="$s"
-              left="$s"
-              backgroundColor={theme.primary as ColorTokens}
-              paddingHorizontal="$s"
-              paddingVertical="$xs"
-              borderRadius={999}
-              alignItems="center"
-              gap={4}
-            >
-              <Ionicons name="sparkles" size={11} color="white" />
-              <Text fontFamily={fonts.poppins.semiBold as FontTokens} fontSize={11} color="white">
-                {t('custom')}
-              </Text>
-            </XStack>
-          )}
-
-          <XStack
-            position="absolute"
-            top="$s"
-            right="$s"
-            backgroundColor="rgba(27,24,48,0.55)"
-            paddingHorizontal="$s"
-            paddingVertical="$xs"
-            borderRadius={999}
-            alignItems="center"
-            accessibilityLabel={t(`orientation.${orientation}`)}
-          >
-            <Ionicons name={ORIENTATION_ICON[orientation]} size={14} color="white" />
-          </XStack>
+        )}
+        {template.source === 'user' ? <Text style={styles.customBadge}>{t('custom')}</Text> : null}
+      </View>
+      <View style={styles.copy}>
+        <Text style={styles.title} numberOfLines={2}>
+          {title}
+        </Text>
+        <Text style={styles.description} numberOfLines={2}>
+          {description ?? t('cardDefaultDescription')}
+        </Text>
+        <View style={styles.metadata}>
+          <Text style={styles.format}>{format}</Text>
+          <Text style={styles.orientation}>{orientationLabel}</Text>
         </View>
-
-        <YStack paddingHorizontal="$m" paddingVertical="$s" gap={2}>
-          <Text
-            fontFamily={fonts.poppins.semiBold as FontTokens}
-            fontSize={18}
-            color={theme.text as ColorTokens}
-            numberOfLines={1}
-          >
-            {templateName}
-          </Text>
-          <Text fontSize={13} lineHeight={18} color={theme.textSecondary as ColorTokens} numberOfLines={2}>
-            {description}
-          </Text>
-        </YStack>
-      </YStack>
-    </Card>
+      </View>
+    </PressableScale>
   );
-};
+}
 
-export default TemplateCard;
+const styles = StyleSheet.create({
+  card: { flexGrow: 1, backgroundColor: colors.surfaceRaised, borderRadius: 16, overflow: 'hidden' },
+  cover: {
+    aspectRatio: 4 / 3,
+    overflow: 'hidden',
+    backgroundColor: colors.textStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  poster: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  customCover: { backgroundColor: colors.primaryMuted },
+  customBadge: { ...typography.smallText, color: colors.primaryDark, marginTop: spacing.s, fontWeight: '600' },
+  copy: { flexGrow: 1, padding: spacing.m, gap: spacing.s, backgroundColor: colors.surfaceRaised },
+  title: { ...typography.heading, color: colors.text, lineHeight: 26 },
+  description: { ...typography.caption, lineHeight: 20 },
+  metadata: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: spacing.s,
+    marginTop: 'auto',
+    paddingTop: spacing.xs,
+  },
+  format: {
+    ...typography.smallText,
+    color: colors.primaryDark,
+    fontWeight: '600',
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: withAlpha(colors.primary, 0.1),
+  },
+  orientation: { ...typography.smallText, color: colors.textSecondary, flexShrink: 1 },
+});

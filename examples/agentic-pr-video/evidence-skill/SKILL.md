@@ -1,12 +1,12 @@
 ---
 name: evidence-video
-description: "Use when producing the before/after evidence video a UI-touching pull or merge request carries. The render is NOT hand-rolled; `build.py --content <copy>.json --work <dir>` composes every card, panel and caption from this directory, and anything else produces a clip that is not the house video. Holds that pipeline, the capture recipe, and the traps that have already cost hours: the `project_video` naming convention, cover-crop, `trim` being a START offset, and Playwright's non-wall-clock video timeline."
+description: Create the house-style before/after PR or MR evidence video with build.py and its JSON template. Use when preparing this specific artifact, capturing its evidence, or debugging its render.
 ---
 
 # Evidence video: the house template
 
-A change that touches the UI ships a video of the behaviour, embedded inline in the pull or merge
-request description beside any stills. This skill is the video half: the template behind the render
+When a task calls for the house-style before/after evidence video, prepare the artifact for the pull
+or merge request beside any stills. This skill covers that specific video workflow: the template behind the render
 the team settled on, the script that composes it, and the traps between a Playwright capture and a
 finished clip.
 
@@ -116,7 +116,8 @@ npx @leclap/cli validate <work>/evidence.template.json
 where it stops being fine**: it boots on every session, so an unpinned spec pays the package
 resolution every time and silently runs whatever was published last. Pin a version in the MCP config
 (`@leclap/mcp@<version>`), or, inside the LeClap repo, run the local build
-(`node packages/leclap-mcp/dist/index.js` after `pnpm --filter @leclap/mcp build`) so it exercises the
+(`node packages/leclap-mcp/dist/index.js` after
+`pnpm --filter ffmpeg-video-composer --filter @leclap/mcp build`) so it exercises the
 working copy.
 
 **The CLI is the fallback**, for a session with no MCP or when you want `diagnose`. Same engine, same
@@ -124,9 +125,9 @@ output. `render` reads assets from `<cwd>/assets` and writes to `<cwd>/build` un
 `--build` say otherwise; `build.py --leclap` passes both, so it runs from anywhere. From the LeClap
 repo root, `--leclap "node packages/leclap-cli/dist/index.js"` renders with the working copy.
 
-**Which FFmpeg runs the join is not cosmetic.** `diagnose` reports what was picked (system, then the
-bundled `ffmpeg-static`, then WASM), and the answer changes the file: two builds render the same
-picture but not the same bytes. The template pins `fps` and every engine default it can, but not the
+**Which FFmpeg runs the join is not cosmetic.** In this Node workflow, `diagnose` reports the
+system or bundled `ffmpeg-static` binary; the detector's WASM branch is not a pure-Node fallback.
+The selected build changes the file: two builds render the same picture but not the same bytes. The template pins `fps` and every engine default it can, but not the
 encoder, so "reproducible" means _per FFmpeg build_. Pin one FFmpeg for a batch of changes so their
 videos match each other.
 
@@ -163,8 +164,9 @@ that (§3). Do **not** parameterise durations through `variables`: they are type
 `record(string, string | string[])`, so a substituted `{{ }}` arrives where the schema wants a
 number. `clipSeconds` in the content file is the one override, and `build.py` writes the resolved
 template to `<work>/evidence.template.json` so the render uses the same number the clips were cut to.
-A mismatch there is silent, because the engine pads or truncates. Render that file, not
-`template.json`.
+A mismatch changes the timeline: the engine caps the section at its declared duration, but a
+shorter source can end early. `build.py` holds a short capture to fill its authored clip. Render
+`evidence.template.json`, not `template.json`.
 
 **The logo is `global.watermark`, not a baked overlay.** One declaration, composited over every
 section and through the crossfades:
@@ -238,10 +240,10 @@ Light, whatever other weights the file contains.
 `<assets>/videos/beforeclip.mp4`. The CLI's `--video <section>=<path>` and the MCP's
 `userVideoPaths` map a file explicitly (`@leclap/cli` 0.2.4 keeps only the last `--video`; later
 releases take several), and `build.py` writes every clip under its expanded name so the convention
-just works. A missing clip does not fail by name: the engine logs
-`Could not stage demo clip for aftercard`, carries on, and the render ends in the bare
-`✗ Compilation failed to produce output`. The `[<section>][Source]` lines in `<build>/render.log`
-name the file each section wanted.
+just works. Without an explicit mapping, the Node engine can try a same-named catalog demo clip; a failed
+staging attempt logs the section name. Supply deliberate evidence files instead of relying on that
+fallback. The current CLI reports the underlying compilation error when available and records the
+section sources in `<build>/render.log`; MCP rejects missing required mappings before rendering.
 
 **The engine covers the frame by default.** Its scaler is
 `scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720`, so a 4:3 capture (1024×768) in a
@@ -277,11 +279,12 @@ without libfreetype (the Homebrew bottle, at the time of writing), and every car
 ffmpeg -hide_banner -filters | grep -c drawtext      # 0 means it cannot draw a single card
 ```
 
-Where to get one, cheapest first: the `ffmpeg-static` binary LeClap itself falls back to (its 6.0
-build has drawtext; `node -p "require('ffmpeg-static')"` prints its path from any project that
-depends on it, such as `packages/ffmpeg-video-composer` in the LeClap repo), the FFmpeg the LeClap
-repo pins through `mise`, or a container wrapped as the binary, which takes a minute and costs nothing
-afterwards:
+Use the FFmpeg pinned through the repo's `mise.toml`, or pass `--ffmpeg` a verified binary.
+`ffmpeg-static` supplies an FFmpeg binary, but this helper's banner probe is separate from LeClap's
+ffprobe requirement for the final join. Check the binary's actual version and filters rather than
+assuming a particular build. From the repo, locate the optional static binary with
+`pnpm --filter ffmpeg-video-composer exec node -p "require('ffmpeg-static')"`.
+A container wrapper is another option when its image and mounted paths are controlled:
 
 ```bash
 mkdir -p <work>/bin && cat > <work>/bin/ffmpeg <<'SH'
@@ -307,17 +310,13 @@ wide default sans, so the render "succeeds" in the wrong typeface, and the only 
 `Fontconfig error` line that reads like noise. That is why `build.py` checks and parses each font
 before building a filtergraph.
 
-**An apostrophe cannot go through drawtext's `text=` at all.** Not "needs escaping": cannot. `\'`,
-`'\''` (the shell idiom, which is not ffmpeg's) and `\\\'` all exit 0, and all three render "it's" as
-"its", dropping the character silently. One of them also swallows the `:fontfile=…` that follows, so
-the _rest of the filter string_ is drawn across the top of the frame as literal text: a card reading
-`…popup:fontfile=build/fonts/…`. That reached a finished render, and its only warning was the same
-stray `Fontconfig error`, since losing the quote loses the font with it.
-
-`textfile=` has no quoting layer, so every literal `build.py` draws goes through the single `txt()`
-helper, whose `tmp` argument is keyword-**required** so the inline form cannot be picked by accident.
-Build any new drawtext with `txt()` rather than reaching for an escape that does not exist. French or
-Italian copy (`l'écran`, `d'origine`) hits this constantly.
+**Inline drawtext copy has multiple escaping layers.** FFmpeg supports escaped quotes; see its
+[quoting rules](https://ffmpeg.org/ffmpeg-utils.html#Quoting-and-escaping) and
+[filtergraph escaping](https://ffmpeg.org/ffmpeg-filters.html#Notes-on-filtergraph-escaping).
+This pipeline uses UTF-8 `textfile=` with `expansion=none` to avoid repeatedly escaping literal copy
+through those layers. Its `txt()` helper requires the temporary directory argument, so new house
+cards should reuse it rather than introduce inline text handling. This also preserves apostrophes
+in French or Italian copy.
 
 Two things `textfile=` does **not** buy you, both of which bit before they were closed. The file is
 _decoded_ as UTF-8, so it has to be _written_ as UTF-8: `Path.write_text()` with no `encoding=` uses
@@ -333,16 +332,18 @@ few points off (`#a4122b` came back `#a01026` through FFmpeg 6.0). `build.py` co
 converts once with the BT.709 matrix, and reads each capture with its own tag (Chrome's recordings
 say `bt470bg`).
 
-**LeClap fetches its own fonts over the network, and TLS interception breaks it.** Only relevant when
-a section uses LeClap's `titleCard`, `lowerThird` or `caption` (the house template uses none): the
-engine fetches the font file into `<build>/fonts/` at render time and, behind a proxy that re-signs
-TLS, dies with `self-signed certificate in certificate chain`, surfacing as the same bare
-`✗ Compilation failed to produce output`. Pre-seed `<build>/fonts/` with the TTFs and it reuses them.
-`NODE_EXTRA_CA_CERTS` did not help there.
+**Font staging can require a network fetch.** Published engine packages do not bundle the catalog
+TTFs. The current asset manager first reuses staged, locally bundled or persistently cached fonts;
+only unresolved fonts use the catalog URL or Google Fonts. For offline renders, stage the exact
+fonts in the configured assets library rather than assuming a pre-seeded build directory survives
+cleanup. `FVC_ASSET_BASE_URL` selects a controlled catalog mirror or pinned source. If a remote
+fetch fails, inspect the reported font error and certificate configuration; the current CLI exposes
+the underlying compilation error when available. The house cards themselves use the fonts passed
+to `build.py`, independently of LeClap's text sugar.
 
-**A label never wraps, so plan for more than one line.** drawtext has no wrapping whatsoever: a
-description longer than its box runs straight out of it and over the capture, and neither the render
-nor `validate` says a word. This has already shipped an overflowing panel. Treat every title and
+**Raw drawtext does not wrap, so plan for more than one line.** A description can run beyond its
+box. Current CLI/MCP geometry checks can issue advisory bounds warnings, but they do not provide
+wrapping or prove this custom panel fits. This has already shipped an overflowing panel. Treat every title and
 description as multi-line by default and give it a measured width, rather than writing copy short
 enough to fit and hoping the next change's is too.
 
@@ -413,8 +414,9 @@ real one.
 
 ## 5. When the change is subtle
 
-A geometric fix, something that must _not_ move, reads as two near-identical clips, and sequential
-before/after makes the viewer hold a memory across a cut. Prefer:
+A geometric fix can read as two near-identical clips. This house template stays sequential. If the
+task requires a synchronized comparison, author and label a separate variant; `build.py` does not
+provide a side-by-side switch. Useful comparison treatments include:
 
 - **side-by-side, synchronised**, so the divergence happens in front of the viewer
   (`ffmpeg -i before.mp4 -i after.mp4 -filter_complex hstack out.mp4`, then hand the result to LeClap
@@ -436,12 +438,14 @@ ffmpeg -i <work>/shop-123-evidence.mp4 -vf "fps=1/1.5,scale=426:-2,tile=4x4" -fr
 This has caught bad takes twice: one fired while a "cancelling…" toast was still up, another was
 polluted by leftover cart state from a debug run. Both were invisible until someone looked.
 
-**Upload and embed inline**, never a bare link:
+**When publication is authorized, upload and embed inline**, rather than leaving a bare link.
+Preparing the local artifact does not itself authorize an upload or a PR/MR description edit:
 
-- GitLab: `glab api projects/:id/uploads --form file=@<work>/shop-123-evidence.mp4`. The response's
-  `markdown` field pastes straight into the description.
-- GitHub has no public upload endpoint for description attachments: drag the `.mp4` into the
-  description, or a comment, in the web editor, which uploads it and inserts an inline player.
+- GitLab: use the [Markdown uploads API](https://docs.gitlab.com/api/project_markdown_uploads/)
+  with the target project and multipart file field. Its `markdown` response can be embedded in the description.
+- GitHub: use the [supported attachment flow](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files).
+  The web editor accepts the `.mp4`; supported GitHub CLI versions can also attach local videos.
+  Check the installed command before choosing that route.
 
 Add it under an `## Evidence` heading and caption it with what it proves. Preserve the rest of the
 description byte-for-byte, except for GIF embeds, which you remove, keeping the uploaded `.mp4`

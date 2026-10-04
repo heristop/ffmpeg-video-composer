@@ -5,6 +5,33 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-10-03
+
+### Added
+
+- Versioned JSON `effect` sections with validated props and asset slots. The exported
+  `resolveTemplateEffects` API runs optional preflight checks, renders effects through a host-supplied
+  backend, and lowers them to ordinary `project_video` clips with bindings and provenance. The core
+  does not execute React or require Remotion; resolve effect sections before calling a compile entry.
+- The `ffmpeg-video-composer/samples` entry point exports `listSamples` and `getSample`, with 32
+  showcase descriptors, creative direction, required clips/form fields, assets and setup requirements.
+  It supports ESM and CommonJS without loading the renderer. Media and effect implementations are
+  supplied separately.
+- `meta.creativeDirection` records the intended audience, visual hierarchy, pacing and motion in the
+  descriptor and survives schema validation.
+- Configurable entrance/exit easing (`linear`, `ease-out`, `ease-in-out`, `ease-out-back`) and title-card
+  line `stagger`. Back easing allows position overshoot while keeping alpha within 0..1. Omitted
+  settings preserve existing animation timing.
+- `{ "type": "scale", "value": "output" }` preserves aspect ratio and pads a custom scene to the
+  configured output dimensions with square pixels.
+
+### Fixed
+
+- Unresolved effects, including those inside active nested partials, fail before platform setup or
+  composition instead of reaching an unsupported segment path.
+- Geometry checks use the configured title-card stagger, including empty-line handling.
+- Sample asset requirements include effective font files introduced by text presets.
+
 ## [2.4.0] - 2026-09-28
 
 ### Added

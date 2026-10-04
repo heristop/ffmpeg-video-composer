@@ -8,7 +8,7 @@ export const DocMotion = () => (
   <>
     <Seo
       title="Motion & layers — template descriptor"
-      description="Per-section motion effects (Ken Burns, rotate, crop, flip), the recording framing guide, and composited background layers."
+      description="Per-section motion effects (Ken Burns, rotate, crop, flip, shake, pulse), the recording framing guide, and composited background layers."
       path="/doc/motion"
     />
 
@@ -21,16 +21,19 @@ export const DocMotion = () => (
       <Prose className="mb-5">
         <p>
           <Code>motion</Code> is an ordered array of effects applied in sequence. It's a discriminated union — each
-          effect carries the fields for its kind (Ken Burns, rotate, crop, flip); the table below merges every variant's
-          fields.
+          effect carries the fields for its kind. The tables below keep each variant separate so bounds such as shake
+          intensity in pixels and pulse intensity as a zoom factor remain unambiguous.
         </p>
       </Prose>
-      <RefTable
-        id="motion-fields"
-        title="motion[]"
-        summary="Per-section motion and geometric effects (Ken Burns, rotate, crop, flip), applied in order."
-        rows={docGroups.motion()}
-      />
+      {docGroups.motionVariants().map((variant) => (
+        <RefTable
+          key={variant.name}
+          id={`motion-${variant.name}`}
+          title={variant.name}
+          summary="Applied in motion[] order; use only the keys declared for this variant."
+          rows={variant.rows}
+        />
+      ))}
       <Sample code={snippets.motion} title="Stacking motion effects" />
     </DocSection>
 

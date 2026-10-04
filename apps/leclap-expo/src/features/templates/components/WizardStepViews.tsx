@@ -184,6 +184,7 @@ export const ScenesStep = (props: ScenesStepProps) => {
           }}
         >
           <SceneCard
+            orientation={state.orientation}
             index={i}
             count={state.sections.length}
             section={section}

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-label="LeClap">
+  <defs>
+    <linearGradient id="lcg" x1="110" y1="90" x2="490" y2="510" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C3C7FF"/>
+      <stop offset="1" stop-color="#FFCFDE"/>
+    </linearGradient>
+    <pattern id="lcs" width="96" height="96" patternUnits="userSpaceOnUse" patternTransform="rotate(-26)">
+      <rect width="96" height="96" fill="#FEF0A6"/>
+      <rect x="48" width="48" height="96" fill="#8C80D8"/>
+    </pattern>
+    <!-- soft gradient for the pink body: lighter top → deeper bottom -->
+    <linearGradient id="lcBoard" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#FFA0B7"/>
+      <stop offset="1" stop-color="#EE6184"/>
+    </linearGradient>
+    <!-- soft top sheen on the background -->
+    <radialGradient id="lcSheen" cx="0.5" cy="0.16" r="0.6">
+      <stop stop-color="#FFFFFF" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <!-- soft dark glow so the clapper separates from the matching gradient -->
+    <filter id="lsh" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#1C1540" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+  <!-- full-bleed gradient (opaque) so the app-icon circle/squircle is filled, not just the disc -->
+  <rect width="600" height="600" fill="url(#lcg)"/>
+  <!-- The platform supplies the corner mask; the mark stays comfortably inset. -->
+  <rect width="600" height="600" fill="url(#lcSheen)"/>
+</svg>

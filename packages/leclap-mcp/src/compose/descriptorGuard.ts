@@ -44,7 +44,9 @@ const DANGEROUS_FILTERS = new Set([
 const PSEUDO_PROTOCOL =
   /(^|[^a-z0-9])(concat|subfile|async|cache|data|file|pipe|fd|crypto|http|https|ftp|ftps|sftp|tcp|udp|rtmp|rtp|rtsp|srtp|tls|unix|gopher|md5|hls):/i;
 // A file-bearing filter OPTION token (curves=psfile=…, drawtext=textfile=…, movie=filename=…, …).
-const FILE_OPTION = /(^|[\s,:;=])(psfile|filename|textfile|pfile|fontfile|model|model_filename|commands)\s*=/i;
+// Quotes are stripped before matching, so 'psfile'=… and "textfile"=… are caught too.
+const FILE_OPTION =
+  /(^|[\s,:;=])(psfile|filename|textfile|pfile|fontfile|model|model_filename|commands|file|stats_file)\s*=/i;
 // A value that is itself an absolute path or a traversal.
 const ABSOLUTE_OR_TRAVERSAL = /^\s*(\/|[a-zA-Z]:[\\/])|(^|[\\/])\.\.([\\/]|$)/;
 
@@ -80,24 +82,65 @@ function fontfileNeedsContainment(fontfile: string): boolean {
 }
 
 function unsafeScalarValueReason(value: string): string | undefined {
-  if (value.includes('://') || PSEUDO_PROTOCOL.test(value)) {
+  const unquoted = value.replace(/["'`]/g, '');
+
+  if (unquoted.includes('://') || PSEUDO_PROTOCOL.test(unquoted)) {
     return 'contains a URL/protocol scheme';
   }
 
-  if (FILE_OPTION.test(value)) {
+  if (FILE_OPTION.test(unquoted)) {
     return 'references a file via a filter option';
   }
 
-  if (ABSOLUTE_OR_TRAVERSAL.test(value)) {
+  if (ABSOLUTE_OR_TRAVERSAL.test(unquoted)) {
     return 'contains an absolute path or a traversal';
   }
 
   return undefined;
 }
 
+// Every string a filter hands to ffmpeg: the scalar `value` plus the structured `values` leaves.
+// Caption text and fontfile are excluded: text is free copy (a URL in a caption is not a fetch) and
+// fontfile has its own realpath containment below.
+function filterStrings(node: Record<string, unknown>): string[] {
+  const strings: string[] = [];
+
+  if (typeof node.value === 'string') {
+    strings.push(node.value);
+  }
+
+  function collect(value: unknown): void {
+    if (typeof value === 'string') {
+      strings.push(value);
+
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        collect(item);
+      }
+
+      return;
+    }
+
+    if (value !== null && typeof value === 'object') {
+      for (const [key, child] of Object.entries(value)) {
+        if (key !== 'text' && key !== 'fontfile') {
+          collect(child);
+        }
+      }
+    }
+  }
+
+  collect(node.values);
+
+  return strings;
+}
+
 // Section/transition `type` values are enum-constrained by the schema (already validated), so a
 // `type` equal to a dangerous filter name can only be a raw filter entry — no false positives.
-// Also scans each filter node's scalar `value` for a smuggled file/URL token.
+// Also scans each filter's `value` and `values` strings for a smuggled file/URL token.
 function findFilterEscape(descriptor: TemplateDescriptor): string | undefined {
   for (const node of objectNodes(descriptor)) {
     const type = node.type;
@@ -110,8 +153,8 @@ function findFilterEscape(descriptor: TemplateDescriptor): string | undefined {
       return `Filter "${type.trim()}" is not allowed: it can read arbitrary files or URLs. Supply media via userVideoPaths (checked against the media dir) instead.`;
     }
 
-    if (typeof node.value === 'string') {
-      const reason = unsafeScalarValueReason(node.value);
+    for (const value of filterStrings(node)) {
+      const reason = unsafeScalarValueReason(value);
 
       if (reason) {
         return `Filter "${type}" value ${reason}: refusing to forward a path/URL to ffmpeg.`;

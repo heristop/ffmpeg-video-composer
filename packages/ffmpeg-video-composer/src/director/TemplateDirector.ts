@@ -16,8 +16,7 @@ import { runFinalize } from './finalize-concat-fold';
 import { resolveOrientationScale, resolveFps } from './resolve-video-config';
 import { assertCanProbe, renderNeeds } from './render-needs';
 import { VIDEO_SEGMENT_TYPES } from '../editor/utils/section-types';
-import type { TemplateDescriptor as SchemaTemplateDescriptor } from '../schemas/template.schemas';
-import { expandPartialsSafe } from '@/core/partials';
+import { expandPartialsSafe, assertEffectsResolved } from '@/core/partials';
 import type Project from '../core/models/Project';
 import type Template from '../core/models/Template';
 import type TemplateConcreteBuilder from './TemplateConcreteBuilder';
@@ -86,7 +85,6 @@ class TemplateDirector {
   }
 
   config = (projectConfig: ProjectConfig, templateDescriptor: TemplateDescriptor): this => {
-    this.project.config = projectConfig;
     // Deep-clone the descriptor: section.filters are mutated in place during builds (sugar/scale prepend
     // preset filters), so compiling the same descriptor twice would double-apply them (Ken Burns twice,
     // contrast squared). JSON round-trip matches the repo's deep-clone (Hermes/WASM-safe plain JSON).
@@ -103,7 +101,8 @@ class TemplateDirector {
       this.logger.warn(`[Director] partial expansion failed: ${expansion.error.message}`);
     }
 
-    this.template.descriptor = (expansion.ok ? expansion.data : clonedDescriptor) as SchemaTemplateDescriptor;
+    this.template.descriptor = assertEffectsResolved(expansion.ok ? expansion.data : clonedDescriptor);
+    this.project.config = projectConfig;
 
     // Reset ALL build-accumulated state at the start of every compile() (config() runs first), so
     // back-to-back compiles in one long-lived process (browser / on-device) are independent — see

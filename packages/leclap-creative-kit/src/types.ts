@@ -67,6 +67,7 @@ export type TemplateComplexity = 'simple' | 'intermediate' | 'advanced';
 export interface TemplateMeta {
   name?: string;
   description?: string;
+  creativeDirection?: string;
 }
 
 export type { CaptureMode } from 'ffmpeg-video-composer/src/schemas/section.schemas.ts';

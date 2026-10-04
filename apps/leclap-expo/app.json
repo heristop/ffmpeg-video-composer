@@ -3,13 +3,13 @@
     "name": "LeClap",
     "slug": "leclap",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
+    "orientation": "default",
+    "icon": "./assets/images/icon.png",
     "scheme": "leclap",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "requireFullScreen": false,
       "infoPlist": {
         "NSCameraUsageDescription": "LeClap needs access to your camera to record videos for your projects",
         "NSMicrophoneUsageDescription": "LeClap needs access to your microphone to record audio for your videos",
@@ -20,7 +20,9 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#7C83FD"
+        "backgroundColor": "#7C83FD",
+        "backgroundImage": "./assets/images/adaptive-background.png",
+        "monochromeImage": "./assets/images/adaptive-monochrome.png"
       },
       "permissions": [
         "android.permission.CAMERA",
@@ -57,7 +59,18 @@
         }
       ],
       "./plugins/withNdkVersion.js",
-      "expo-asset"
+      "./plugins/withIosDeploymentTarget.js",
+      "./plugins/withAdaptiveWindow.js",
+      "./plugins/withAndroidDevelopmentHost.js",
+      "expo-asset",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

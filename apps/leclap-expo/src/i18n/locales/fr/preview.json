@@ -12,5 +12,46 @@
   },
   "crop": {
     "title": "Fais glisser le cadre pour recadrer"
+  },
+  "compile": {
+    "title": "Ta vidéo prend vie",
+    "progress": "Progression du rendu",
+    "preparing": "Préparation des scènes…",
+    "private": "Le rendu reste sur ton appareil",
+    "cancel": "Annuler le rendu",
+    "cancelling": "Annulation…"
+  },
+  "export": {
+    "title": "Exporter la vidéo",
+    "readyTitle": "Ta vidéo est prête",
+    "readyBody": "Garde une copie ou partage ton histoire.",
+    "saveBody": "Enregistrer une copie dans ta photothèque",
+    "share": "Partager",
+    "shareBody": "Ouvrir les options de partage",
+    "shareTitle": "Ma vidéo LeClap",
+    "uploadTitle": "Envoyer vers une URL",
+    "saveErrorTitle": "Échec de l’enregistrement",
+    "saveErrorBody": "Impossible d’enregistrer la vidéo. Réessaie.",
+    "missingUrlTitle": "URL manquante",
+    "missingUrlBody": "Saisis d’abord une URL d’envoi.",
+    "uploadErrorTitle": "Échec de l’envoi",
+    "save": {
+      "idle": "Enregistrer dans la galerie",
+      "saving": "Enregistrement…",
+      "saved": "Vidéo enregistrée",
+      "error": "Échec — touche pour réessayer"
+    },
+    "upload": {
+      "idle": "Envoyer",
+      "uploading": "Envoi… {{percent}} %",
+      "done": "Envoi terminé",
+      "error": "Échec — touche pour réessayer"
+    },
+    "shareErrorTitle": "Partage indisponible",
+    "shareErrorBody": "Impossible de partager la vidéo. Réessayez."
+  },
+  "sheet": {
+    "close": "Fermer",
+    "dismiss": "Fermer le panneau"
   }
 }

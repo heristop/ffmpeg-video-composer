@@ -1,30 +1,24 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import CustomTabBar from '@/src/components/ui/CustomTabBar';
 import Header from '@/src/components/common/Header';
-import { useOrientation } from '@/src/hooks/useOrientation';
+import { useAdaptiveLayout } from '@/src/hooks/use-adaptive-layout';
 
 export default function AppLayout() {
   const { t } = useTranslation('header');
-  const { lockOrientation, unlockOrientation } = useOrientation();
-
-  useEffect(() => {
-    lockOrientation('portrait').catch(() => null); // Lock to portrait on mount
-
-    return () => {
-      unlockOrientation().catch(() => null); // Unlock on unmount
-    };
-  }, [lockOrientation, unlockOrientation]);
+  const { navigationRail } = useAdaptiveLayout();
 
   return (
     <>
-      <Header />
+      <Header variant="light" showSlogan={false} />
 
       <Tabs
         tabBar={(props) => <CustomTabBar {...props} />}
         screenOptions={{
           headerShown: false,
+          tabBarPosition: Platform.OS === 'android' && navigationRail ? 'left' : 'bottom',
         }}
       >
         <Tabs.Screen

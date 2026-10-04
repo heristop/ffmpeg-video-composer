@@ -1,6 +1,6 @@
 {
   "name": "@leclap/cli",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "LeClap CLI — compile videos from JSON templates with ffmpeg-video-composer",
   "homepage": "https://leclap.dev",
   "author": "heristop",
@@ -14,7 +14,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsdown",
@@ -26,7 +27,7 @@
   },
   "dependencies": {
     "citty": "^0.2.2",
-    "ffmpeg-video-composer": "^2.4.0",
+    "ffmpeg-video-composer": "^2.5.0",
     "picocolors": "^1.1.1",
     "reflect-metadata": "^0.2.2"
   },

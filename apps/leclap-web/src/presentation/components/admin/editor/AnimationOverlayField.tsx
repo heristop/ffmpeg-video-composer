@@ -4,7 +4,12 @@
 // ImageOverlayField; both share the same add / remove / drag-resize shape.
 import { useTranslation } from 'react-i18next';
 import type { AnimationAsset } from '@/data/mediaCatalog';
-import { makeTemplateId, type AnimationOverlay, type Orientation } from '../templateEditorModel';
+import {
+  ANIMATION_EFFECT_PRESETS,
+  makeTemplateId,
+  type AnimationOverlay,
+  type Orientation,
+} from '../templateEditorModel';
 import { AnimationGallery } from './AnimationGallery';
 import { OverlayLayer } from './OverlayLayer';
 
@@ -36,6 +41,29 @@ export const AnimationOverlayField = ({ value, orientation, onChange, library }:
 
   return (
     <div>
+      {library ? null : (
+        <div className="mb-4 space-y-2">
+          <span className="text-xs font-semibold text-foreground">{t('animation.effects.label')}</span>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {ANIMATION_EFFECT_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => {
+                  onChange([
+                    ...animations,
+                    ...preset.build(orientation).map((animation) => ({ ...animation, id: makeTemplateId() })),
+                  ]);
+                }}
+                className="rounded-lg border border-border bg-surface-2 p-3 text-left hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className="block text-sm font-semibold text-foreground">{t(preset.nameKey)}</span>
+                <span className="mt-1 block text-xs text-muted-foreground">{t(preset.descriptionKey)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       {animations.map((animation, index) => (
         <OverlayLayer
           key={animation.id ?? `animation-${index}`}

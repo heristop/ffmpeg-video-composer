@@ -76,7 +76,9 @@ export const FilterSchema = z
     value: z
       .union([z.string(), z.number()])
       .optional()
-      .describe('Single scalar parameter for simple filters that accept one value.'),
+      .describe(
+        'Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.'
+      ),
     values: FilterValuesSchema.optional().describe('Structured parameters for multi-argument filters.'),
     range: z.string().optional().describe('Time range over which the filter is active, as "start:end" in seconds.'),
     reveal: RevealSchema.optional().describe(

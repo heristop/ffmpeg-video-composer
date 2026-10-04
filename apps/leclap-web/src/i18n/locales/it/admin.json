@@ -603,7 +603,34 @@
     "keepLastFrame": "Mantieni l’ultimo frame",
     "dragHint": "Trascina per spostare · angolo per ridimensionare · frecce per piccoli spostamenti",
     "reset": "Ripristina i valori predefiniti",
-    "placementGroup": "Posizionamento"
+    "placementGroup": "Posizionamento",
+    "effects": {
+      "label": "Combinazioni di effetti",
+      "interface-focus": {
+        "name": "Focus interfaccia",
+        "description": "Inquadra un dettaglio con un breve impulso."
+      },
+      "product-spotlight": {
+        "name": "Prodotto in evidenza",
+        "description": "Un movimento orbitale delicato e un singolo riflesso."
+      },
+      "celebration-burst": {
+        "name": "Esplosione festosa",
+        "description": "Un breve accento di coriandoli e scintille."
+      },
+      "focus-lock": {
+        "name": "Blocco del fuoco",
+        "description": "Una cornice angolare con un anello delicato."
+      },
+      "light-pass": {
+        "name": "Passaggio di luce",
+        "description": "Un breve velo luminoso e un piccolo scintillio."
+      },
+      "frame-reveal": {
+        "name": "Rivelazione della cornice",
+        "description": "Una cornice sottile con un unico riflesso luminoso."
+      }
+    }
   },
   "element": {
     "resize": "Ridimensiona elemento",
@@ -854,10 +881,12 @@
     "easingLinear": "Lineare",
     "easingEaseOut": "Decelerata",
     "easingEaseInOut": "Morbida",
-    "easingHint": "Ritmo dell'ingresso — Decelerata scivola al suo posto, Morbida accelera e poi si assesta.",
-    "summaryDefault": "tempistica predefinita"
+    "easingHint": "Come si assesta il movimento — decelerazione dolce o un breve superamento della posizione finale.",
+    "summaryDefault": "tempistica predefinita",
+    "easingEaseOutBack": "Decelerazione con slancio"
   },
   "exit": {
+    "easing": "Curva di uscita",
     "label": "Uscita",
     "after": "Inizia dopo",
     "summaryDefault": "termina alla fine della sezione",
@@ -898,6 +927,7 @@
     "summaryOff": "off"
   },
   "titleCard": {
+    "stagger": "Ritardo tra le righe",
     "kicker": "Occhiello",
     "kickerPlaceholder": "es. IN ARRIVO",
     "headline": "Titolo",

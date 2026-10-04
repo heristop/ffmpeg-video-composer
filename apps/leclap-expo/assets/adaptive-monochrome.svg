@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-label="LeClap themed icon">
+  <g transform="translate(300 300) scale(0.56) translate(-298 -304)" fill="#000000">
+    <rect x="84" y="290" width="432" height="218" rx="52"/>
+    <rect x="120" y="240" width="396" height="82" rx="30"/>
+    <g transform="rotate(-25 140 250)">
+      <path fill-rule="evenodd" d="M150 180H486Q516 180 516 210V232Q516 262 486 262H150Q120 262 120 232V210Q120 180 150 180ZM190 199H214L198 243H174ZM270 199H294L278 243H254ZM350 199H374L358 243H334ZM430 199H454L438 243H414Z"/>
+    </g>
+    <rect x="78" y="204" width="104" height="120" rx="36"/>
+  </g>
+</svg>

@@ -6,6 +6,7 @@ import { computeVideoRect } from './previewHelpers';
 interface UseVideoRectResult {
   videoRect: VideoRect;
   containerWidth: number;
+  containerHeight: number;
   onContainerLayout: (e: LayoutChangeEvent) => void;
 }
 
@@ -30,5 +31,5 @@ export function useVideoRect(
     ? computeVideoRect(containerSize, srcSize.width, srcSize.height)
     : computeVideoRect(containerSize, fallbackAspect * 1000, 1000);
 
-  return { videoRect, containerWidth: containerSize.width, onContainerLayout };
+  return { videoRect, containerWidth: containerSize.width, containerHeight: containerSize.height, onContainerLayout };
 }

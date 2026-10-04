@@ -5,6 +5,39 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-10-03
+
+### Added
+
+- Always-available `list_samples` and `get_sample` tools expose all 32 packaged showcase descriptors,
+  creative direction and required inputs without executing effects or downloading media.
+- Always-available `patch_template` edits descriptors with revision checks. Opt-in `get_effect_schema`
+  and `render_preview` tools let agents discover strict versioned effect contracts and inspect selected
+  frames or a frame range before composition. Built-in contracts include `leclap.title-reveal@1.0.0` and
+  `leclap.web-app-promo@1.0.0`.
+- Operator effect catalogs register custom IDs/versions, prop defaults and bounds, asset slots,
+  compositions and output contracts with `--effect-catalog` / `LECLAP_MCP_EFFECT_CATALOG`.
+- `compose_video` preflights and resolves registered effects through the operator's trusted Remotion
+  entry before FFmpeg composition. Remotion execution remains disabled by default; enable it with
+  `--allow-remotion`, install the optional Remotion peers, and configure the trusted entry/browser.
+- Registered-effect artifacts use a bounded persistent cache (512 MiB by default; configurable with
+  `--effect-cache-max-bytes` / `LECLAP_MCP_EFFECT_CACHE_MAX_BYTES`, zero disables it). Rendering runs
+  in bounded workers with timeouts and cancellation; cache identity includes source, contracts,
+  assets and runtime information.
+
+### Changed
+
+- Requires `ffmpeg-video-composer` 2.5.0 or later. Registry metadata and the authoring guide describe
+  sample discovery, custom effects and the new engine configuration.
+- Package tarballs include this changelog.
+
+### Fixed
+
+- Effect preflight rejects incompatible catalogs, props, assets and output contracts before rendering.
+- Descriptor patching rejects unsafe keys and preserves named clip bindings when editing partials.
+- Asset policies confine effect inputs to regular files within the configured media root and isolate
+  staged files for each render. Catalog defaults and file reads are bounded.
+
 ## [0.3.5] - 2026-09-28
 
 ### Added

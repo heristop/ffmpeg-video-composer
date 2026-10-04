@@ -1,5 +1,7 @@
 import { type ColorTokens, type FontSizeTokens, Button as TamaguiButton, Text, XStack } from 'tamagui';
 import { Ionicons } from '@expo/vector-icons';
+import { ActivityIndicator } from 'react-native';
+import { useMotionPreferences } from '@/src/hooks/use-motion-preferences';
 import { colors } from '@/src/styles/theme';
 import { triggerHaptic } from '@/src/hooks/use-haptic-press';
 
@@ -23,11 +25,11 @@ const getVariantProps = (variant: ButtonVariant) => {
   switch (variant) {
     case 'primary':
       return {
-        backgroundColor: '$primary',
-        borderColor: '$primary',
-        hoverStyle: { backgroundColor: '$primaryHover' },
-        pressStyle: { backgroundColor: '$primaryPress' },
-        focusStyle: { backgroundColor: '$primaryFocus' },
+        backgroundColor: colors.primaryDark as ColorTokens,
+        borderColor: colors.primaryDark as ColorTokens,
+        hoverStyle: { backgroundColor: colors.primaryDark as ColorTokens },
+        pressStyle: { backgroundColor: colors.primaryDark as ColorTokens },
+        focusStyle: { backgroundColor: colors.primaryDark as ColorTokens },
       } as const;
     case 'secondary':
       return {
@@ -70,28 +72,28 @@ const getSizeProps = (size: ButtonSize) => {
         paddingHorizontal: '$m',
         paddingVertical: '$s',
         fontSize: '$3',
-        height: 36,
+        minHeight: 48,
       } as const;
     case 'medium':
       return {
         paddingHorizontal: '$l',
         paddingVertical: '$s',
         fontSize: '$4',
-        height: 52,
+        minHeight: 52,
       } as const;
     case 'large':
       return {
         paddingHorizontal: '$xl',
         paddingVertical: '$s',
         fontSize: '$5',
-        height: 62,
+        minHeight: 62,
       } as const;
     case 'x-large':
       return {
         paddingHorizontal: '$xl',
         paddingVertical: '$m',
         fontSize: '$6',
-        height: 68,
+        minHeight: 68,
       } as const;
     default:
       return {};
@@ -99,14 +101,14 @@ const getSizeProps = (size: ButtonSize) => {
 };
 
 const getTextColor = (variant: ButtonVariant, disabled: boolean): ColorTokens => {
-  if (disabled) return '$colorTransparent';
+  if (disabled) return colors.textSecondary as ColorTokens;
 
   switch (variant) {
     case 'primary':
-    case 'secondary':
     case 'destructive':
     case 'success':
       return 'white';
+    case 'secondary':
     case 'ghost':
       return '$color';
     default:
@@ -135,8 +137,8 @@ const resolveIconColor = (textColor: ColorTokens): string => {
   return colors.textSecondary;
 };
 
-const getScales = (disabled: boolean) =>
-  disabled ? { default: 1, hover: 1, press: 1 } : { default: 0.98, hover: 1.02, press: 0.95 };
+const getScales = (disabled: boolean, reduced: boolean) =>
+  disabled || reduced ? { default: 1, hover: 1, press: 1 } : { default: 1, hover: 1, press: 0.97 };
 
 interface ButtonContentProps {
   loading: boolean;
@@ -161,7 +163,7 @@ function ButtonContent({
 }: ButtonContentProps) {
   const leftIcon = loading ? (
     <XStack>
-      <Ionicons name="reload" size={iconSize} color={iconColor} />
+      <ActivityIndicator size="small" color={iconColor} />
     </XStack>
   ) : (
     icon && iconPosition === 'left' && <Ionicons name={icon} size={iconSize} color={iconColor} />
@@ -188,6 +190,12 @@ const runAsync = (fn: () => Promise<void>) => {
   fn().catch(() => {});
 };
 
+function getButtonMotion(unavailable: boolean, preferences: ReturnType<typeof useMotionPreferences>) {
+  const reduced = preferences.reducedMotion || !preferences.appActive;
+
+  return { scales: getScales(unavailable, reduced), transition: reduced ? '0ms' : 'quicker' } as const;
+}
+
 export default function Button({
   children,
   variant = 'primary',
@@ -200,8 +208,9 @@ export default function Button({
   fullWidth = false,
   hapticFeedback = true,
 }: ButtonProps) {
+  const unavailable = disabled || loading;
   const handlePress = () => {
-    if (disabled || loading) return;
+    if (unavailable) return;
 
     const impact = variant === 'destructive' ? 'heavy' : 'light';
     triggerHaptic(hapticFeedback ? impact : false);
@@ -217,14 +226,17 @@ export default function Button({
   const iconSize = getIconSize(size);
   const iconColor = resolveIconColor(textColor);
   const isGhost = variant === 'ghost';
-  const scales = getScales(disabled);
+  const preferences = useMotionPreferences();
+  const { scales, transition } = getButtonMotion(unavailable, preferences);
 
   return (
     <TamaguiButton
       {...variantProps}
       {...sizeProps}
       onPress={handlePress}
-      disabled={disabled || loading}
+      disabled={unavailable}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: unavailable, busy: loading }}
       opacity={disabled ? 0.6 : 1}
       width={fullWidth ? '100%' : 'auto'}
       borderRadius="$4"
@@ -232,7 +244,7 @@ export default function Button({
       shadowOffset={{ width: 0, height: 6 }}
       shadowOpacity={isGhost ? 0 : 0.14}
       shadowRadius={14}
-      transition="bouncy"
+      transition={transition}
       scale={scales.default}
       hoverStyle={{
         ...variantProps.hoverStyle,

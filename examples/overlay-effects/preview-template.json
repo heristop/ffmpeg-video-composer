@@ -1,0 +1,508 @@
+{
+  "meta": {
+    "name": "Overlay effect recipes",
+    "description": "Synthetic review fixture with adaptive shapes and labels for the shared composited effect presets.",
+    "creativeDirection": "Direction: an honest synthetic test fixture for six composited recipes. Frame an interface detail, reveal a product shape, mark a celebration, lock focus, pass a soft light or reveal a fine frame. Keep labels readable and the focal element visible. Use at most two brief layers per scene and a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
+  },
+  "global": {
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "interface_focus",
+      "type": "color_background",
+      "options": {
+        "duration": 6,
+        "backgroundColor": "#141925",
+        "layers": [
+          {
+            "color": "#263247",
+            "x": "iw*0.27",
+            "y": "ih*0.30",
+            "w": "iw*0.46",
+            "h": "ih*0.44"
+          },
+          {
+            "color": "#9fe9d4",
+            "x": "iw*0.43",
+            "y": "ih*0.44",
+            "w": "iw*0.14",
+            "h": "ih*0.16"
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "INTERFACE FOCUS"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 44,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": 64
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Frame the action. Keep controls clear."
+            },
+            "fontfile": "Oswald-Regular.ttf",
+            "fontsize": 32,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": "h-80"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "effect_0",
+          "type": "animation",
+          "url": "/assets/animations/corner_brackets.apng",
+          "options": {
+            "position": "205:130",
+            "scale": "870:489",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.2,
+            "duration": 1.8,
+            "opacity": 0.5
+          }
+        },
+        {
+          "name": "effect_1",
+          "type": "animation",
+          "url": "/assets/animations/tap_pulse.apng",
+          "options": {
+            "position": "518:227",
+            "scale": "245:245",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.4,
+            "duration": 2,
+            "opacity": 0.75
+          }
+        }
+      ]
+    },
+    {
+      "name": "product_spotlight",
+      "type": "color_background",
+      "options": {
+        "duration": 6,
+        "backgroundColor": "#f0e8dc",
+        "layers": [
+          {
+            "color": "#57465f",
+            "x": "iw*0.27",
+            "y": "ih*0.30",
+            "w": "iw*0.46",
+            "h": "ih*0.44"
+          },
+          {
+            "color": "#d9c3b2",
+            "x": "iw*0.43",
+            "y": "ih*0.44",
+            "w": "iw*0.14",
+            "h": "ih*0.16"
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "PRODUCT SPOTLIGHT"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 44,
+            "fontcolor": "#25212e",
+            "x": "w*0.06",
+            "y": 64
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "A soft sweep. A clear product reveal."
+            },
+            "fontfile": "Oswald-Regular.ttf",
+            "fontsize": 32,
+            "fontcolor": "#25212e",
+            "x": "w*0.06",
+            "y": "h-80"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "effect_0",
+          "type": "animation",
+          "url": "/assets/animations/shine_sweep.apng",
+          "options": {
+            "position": "154:101",
+            "scale": "973:547",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.25,
+            "duration": 2.52,
+            "opacity": 0.5
+          }
+        },
+        {
+          "name": "effect_1",
+          "type": "animation",
+          "url": "/assets/animations/spec_orbit.apng",
+          "options": {
+            "position": "499:123",
+            "scale": "283:503",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.1,
+            "duration": 2,
+            "opacity": 0.55
+          }
+        }
+      ]
+    },
+    {
+      "name": "celebration_burst",
+      "type": "color_background",
+      "options": {
+        "duration": 6,
+        "backgroundColor": "#22142e",
+        "layers": [
+          {
+            "color": "#38204c",
+            "x": "iw*0.27",
+            "y": "ih*0.30",
+            "w": "iw*0.46",
+            "h": "ih*0.44"
+          },
+          {
+            "color": "#ffafcd",
+            "x": "iw*0.43",
+            "y": "ih*0.44",
+            "w": "iw*0.14",
+            "h": "ih*0.16"
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "CELEBRATION BURST"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 44,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": 64
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "A brief burst, then a clear message."
+            },
+            "fontfile": "Oswald-Regular.ttf",
+            "fontsize": 32,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": "h-80"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "effect_0",
+          "type": "animation",
+          "url": "/assets/animations/confetti.apng",
+          "options": {
+            "position": "96:54",
+            "scale": "1088:612",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.18,
+            "duration": 2.52,
+            "opacity": 0.85
+          }
+        },
+        {
+          "name": "effect_1",
+          "type": "animation",
+          "url": "/assets/animations/sparkle.apng",
+          "options": {
+            "position": "256:144",
+            "scale": "768:432",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.65,
+            "duration": 2,
+            "opacity": 0.7
+          }
+        }
+      ]
+    },
+    {
+      "name": "focus_lock",
+      "type": "color_background",
+      "options": {
+        "duration": 4,
+        "backgroundColor": "#141925",
+        "layers": [
+          {
+            "color": "#263247",
+            "x": "iw*0.27",
+            "y": "ih*0.30",
+            "w": "iw*0.46",
+            "h": "ih*0.44"
+          },
+          {
+            "color": "#9fe9d4",
+            "x": "iw*0.43",
+            "y": "ih*0.44",
+            "w": "iw*0.14",
+            "h": "ih*0.16"
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "FOCUS LOCK"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 44,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": 64
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "A framed detail. One soft ring."
+            },
+            "fontfile": "Oswald-Regular.ttf",
+            "fontsize": 32,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": "h-80"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "effect_0",
+          "type": "animation",
+          "url": "/assets/animations/corner_brackets.apng",
+          "options": {
+            "position": "230:144",
+            "scale": "819:461",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.08,
+            "duration": 1.8,
+            "opacity": 0.45
+          }
+        },
+        {
+          "name": "effect_1",
+          "type": "animation",
+          "url": "/assets/animations/pulse_ring.apng",
+          "options": {
+            "position": "384:230",
+            "scale": "512:288",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.2,
+            "duration": 2,
+            "opacity": 0.4
+          }
+        }
+      ]
+    },
+    {
+      "name": "light_pass",
+      "type": "color_background",
+      "options": {
+        "duration": 4,
+        "backgroundColor": "#141925",
+        "layers": [
+          {
+            "color": "#263247",
+            "x": "iw*0.27",
+            "y": "ih*0.30",
+            "w": "iw*0.46",
+            "h": "ih*0.44"
+          },
+          {
+            "color": "#9fe9d4",
+            "x": "iw*0.43",
+            "y": "ih*0.44",
+            "w": "iw*0.14",
+            "h": "ih*0.16"
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "LIGHT PASS"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 44,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": 64
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "A brief wash. Keep the image clear."
+            },
+            "fontfile": "Oswald-Regular.ttf",
+            "fontsize": 32,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": "h-80"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "effect_0",
+          "type": "animation",
+          "url": "/assets/animations/light_leak.apng",
+          "options": {
+            "position": "77:44",
+            "scale": "1126:633",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.04,
+            "duration": 2,
+            "opacity": 0.2
+          }
+        },
+        {
+          "name": "effect_1",
+          "type": "animation",
+          "url": "/assets/animations/sparkle.apng",
+          "options": {
+            "position": "358:202",
+            "scale": "563:317",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.35,
+            "duration": 2,
+            "opacity": 0.35
+          }
+        }
+      ]
+    },
+    {
+      "name": "frame_reveal",
+      "type": "color_background",
+      "options": {
+        "duration": 4,
+        "backgroundColor": "#141925",
+        "layers": [
+          {
+            "color": "#263247",
+            "x": "iw*0.27",
+            "y": "ih*0.30",
+            "w": "iw*0.46",
+            "h": "ih*0.44"
+          },
+          {
+            "color": "#9fe9d4",
+            "x": "iw*0.43",
+            "y": "ih*0.44",
+            "w": "iw*0.14",
+            "h": "ih*0.16"
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "FRAME REVEAL"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 44,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": 64
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "A fine frame. One passing glint."
+            },
+            "fontfile": "Oswald-Regular.ttf",
+            "fontsize": 32,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": "h-80"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "effect_0",
+          "type": "animation",
+          "url": "/assets/animations/white_border.apng",
+          "options": {
+            "position": "179:115",
+            "scale": "922:519",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.06,
+            "duration": 1.8,
+            "opacity": 0.35
+          }
+        },
+        {
+          "name": "effect_1",
+          "type": "animation",
+          "url": "/assets/animations/shine_sweep.apng",
+          "options": {
+            "position": "179:115",
+            "scale": "922:519",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.18,
+            "duration": 2.52,
+            "opacity": 0.3
+          }
+        }
+      ]
+    }
+  ]
+}

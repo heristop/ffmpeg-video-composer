@@ -7,8 +7,7 @@ export interface DocNavItem {
   end?: boolean;
 }
 
-// Fourteen flat links read as one undifferentiated column; three labelled groups let the eye jump to
-// "the reference", "something to copy" or "a front-end" before reading a single item.
+// Group the reference, reusable resources and tools in reading order.
 export interface DocNavGroup {
   label: string;
   items: readonly DocNavItem[];
@@ -28,11 +27,14 @@ export const docNavGroups: readonly DocNavGroup[] = [
       { to: '/doc/captions', label: 'Captions' },
       { to: '/doc/animations', label: 'Animations & images' },
       { to: '/doc/filters', label: 'Filters & maps' },
+      { to: '/doc/effects', label: 'Registered effects' },
+      { to: '/doc/reference', label: 'Complete field reference' },
     ],
   },
   {
     label: 'Resources',
     items: [
+      { to: '/doc/creative-direction', label: 'Creative direction' },
       { to: '/doc/examples', label: 'Examples' },
       { to: '/doc/schema', label: 'JSON Schema' },
     ],
@@ -41,6 +43,7 @@ export const docNavGroups: readonly DocNavGroup[] = [
   {
     label: 'Tools',
     items: [
+      { to: '/doc/engine', label: 'Engine configuration' },
       { to: '/doc/cli', label: 'Command line' },
       { to: '/doc/mcp', label: 'MCP server' },
     ],

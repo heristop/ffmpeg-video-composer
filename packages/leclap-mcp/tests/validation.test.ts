@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { describe, expect, it } from 'vitest';
 
-import { validateTemplate } from '../src/compose/validation.js';
+import { effectKeyError, validateTemplate } from '../src/compose/validation.js';
 
 describe('validateTemplate', () => {
   it('accepts a structurally valid descriptor', () => {
@@ -64,5 +64,53 @@ describe('validateTemplate', () => {
       expect(result.descriptor.sections?.map((section) => section.type)).toEqual(['project_video']);
       expect(result.descriptor.sections?.[0].name).toBe('clip');
     }
+  });
+
+  it.each(['props', 'assets'])(
+    'rejects reserved raw effect %s keys inside inline partials before normalization',
+    (field) => {
+      const effect = {
+        type: 'effect',
+        name: 'title',
+        options: { duration: 10 },
+        effect: {
+          id: 'leclap.title-reveal',
+          version: '1.0.0',
+          props: { headline: 'Title' },
+          assets: {},
+          [field]: JSON.parse('{"__proto__":{}}'),
+        },
+      };
+      const template = { sections: [{ type: 'partial', sections: [effect] }] };
+      const original = JSON.stringify(template);
+      expect(validateTemplate(template)).toEqual({
+        ok: false,
+        message: 'effect_key_unsafe: reserved effect key __proto__.',
+      });
+      expect(JSON.stringify(template)).toBe(original);
+    }
+  );
+
+  it('retains traversal limits for effect values inside inline partials', () => {
+    const template = {
+      sections: [
+        {
+          type: 'partial',
+          sections: [
+            {
+              type: 'effect',
+              effect: { props: { items: Array.from({ length: 201 }, () => Array(100).fill(0)) }, assets: {} },
+            },
+          ],
+        },
+      ],
+    };
+    expect(effectKeyError(template)).toContain('traversal bounds');
+  });
+
+  it('bounds cyclic inline partial discovery', () => {
+    const partial: { type: string; sections: unknown[] } = { type: 'partial', sections: [] };
+    partial.sections.push(partial);
+    expect(effectKeyError({ sections: [partial] })).toContain('traversal bounds');
   });
 });

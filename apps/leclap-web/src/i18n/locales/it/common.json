@@ -30,7 +30,8 @@
     "templates": "Modelli",
     "docs": "Documentazione",
     "about": "Cos’è LeClap",
-    "primaryLabel": "Principale"
+    "primaryLabel": "Principale",
+    "showcase": "Galleria"
   },
   "header": {
     "switchToLight": "Passa al tema chiaro",

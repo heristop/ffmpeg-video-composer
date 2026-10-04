@@ -22,5 +22,9 @@
   "privacy": {
     "title": "Política de privacidad",
     "description": "LeClap procesa tus archivos en tu dispositivo. Sin subidas, sin cuentas, sin seguimiento: aquí te explicamos exactamente cómo se gestiona tu privacidad."
+  },
+  "showcase": {
+    "title": "Galería de movimiento",
+    "description": "Mira todas las muestras LeClap, explora efectos nativos y Remotion, lee su dirección creativa y descarga plantillas JSON editables."
   }
 }

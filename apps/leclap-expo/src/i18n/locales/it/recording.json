@@ -13,9 +13,11 @@
     "timesUp": "Tempo scaduto"
   },
   "permissions": {
-    "checking": "Verifica dei permessi della fotocamera...",
-    "title": "Permesso fotocamera richiesto",
-    "message": "Concedi i permessi per fotocamera e microfono per registrare il video."
+    "checking": "Verifica delle autorizzazioni di registrazione...",
+    "title": "Autorizzazioni di registrazione necessarie",
+    "message": "Concedi i permessi per fotocamera e microfono per registrare il video.",
+    "allow": "Consenti fotocamera e microfono",
+    "settings": "Apri impostazioni"
   },
   "noDevice": "Nessuna fotocamera disponibile",
   "alerts": {

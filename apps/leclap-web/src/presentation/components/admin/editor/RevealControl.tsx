@@ -29,6 +29,7 @@ const EASING_LABEL_KEYS: Record<RevealEasing, string> = {
   linear: 'easingLinear',
   'ease-out': 'easingEaseOut',
   'ease-in-out': 'easingEaseInOut',
+  'ease-out-back': 'easingEaseOutBack',
 };
 
 // Store a slider value equal to the engine default as "unset" so descriptors stay minimal and the

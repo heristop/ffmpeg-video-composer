@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { colors, spacing } from '@/src/styles/theme';
+import { useMotionPreferences } from '@/src/hooks/use-motion-preferences';
 
 interface SkeletonLoaderProps {
   width?: number | string;
@@ -10,9 +11,17 @@ interface SkeletonLoaderProps {
 }
 
 export function SkeletonLoader({ width = '100%', height = 20, borderRadius = 4, style }: SkeletonLoaderProps) {
-  const animatedValue = useRef(new Animated.Value(0)).current;
+  const [animatedValue] = useState(() => new Animated.Value(0));
+  const { reducedMotion, appActive } = useMotionPreferences();
 
   useEffect(() => {
+    if (reducedMotion || !appActive) {
+      animatedValue.setValue(0.5);
+
+      return () => {
+        animatedValue.stopAnimation();
+      };
+    }
     const animation = Animated.loop(
       Animated.sequence([
         Animated.timing(animatedValue, {
@@ -33,7 +42,7 @@ export function SkeletonLoader({ width = '100%', height = 20, borderRadius = 4, 
     return () => {
       animation.stop();
     };
-  }, [animatedValue]);
+  }, [animatedValue, reducedMotion, appActive]);
 
   const opacity = animatedValue.interpolate({
     inputRange: [0, 1],

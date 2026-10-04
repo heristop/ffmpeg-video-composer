@@ -1,6 +1,6 @@
 # LeClap (ffmpeg-video-composer)
 
-> LeClap renders video from a single JSON _template_ — sections, filters, music, and text overlays — and runs the same template on a server (Node.js), in the browser (WebAssembly), and fully **on-device** on React Native, with no upload and no generative model. Output is deterministic and **reproducible per platform**: the same template and inputs give the same composition — same cuts, same timings, same effects — on every target, but not the same pixels, because the encoder differs (Node and the browser take the libx264 software path, Android encodes with `libopenh264`, iOS with `h264_videotoolbox`, and the LGPL on-device build drops `boxblur` and rewrites `eq` to `lutyuv`). An AI agent can author and render a template through an MCP server with no LLM in the output path — which is how LeClap serves **agentic development**: a coding agent records the behaviour before and after its change and renders a short review video to attach to the pull request.
+> LeClap renders video from a JSON _template_ — sections, filters, music, and text overlays — on Node.js, in the browser (WebAssembly), and **on-device** on React Native. Native scenes need no generative model or render server. Output is reproducible per platform when the template, inputs, host configuration and runtime versions are preserved. Timing and scene order are shared across platforms, while pixels and supported effects depend on the backend: Node and browser default to software H.264, Android uses `libopenh264`, iOS uses `h264_videotoolbox`, and the LGPL on-device build drops `boxblur` and rewrites `eq` to `lutyuv`. Registered React effects render through a trusted Node backend before FFmpeg composition. An AI agent can record the behaviour before and after a code change and author a review video through MCP.
 
 A template is a Zod-validated JSON descriptor: a `global` block plus an ordered list of `sections`, each a clip with its own `inputs → maps → filters` pipeline and `{{ variable }}` placeholders. The engine is a cross-platform TypeScript library with a CLI, published to npm as `ffmpeg-video-composer`. Its corner is **native on-device + reproducible + agent-callable** video: record a clip from the camera, apply effects, mix music, add transitions, and render — all inside your app. Generative video models can't reproduce a result twice — they sample, they don't render; cloud renderers (Shotstack) can't run in a user's pocket; Remotion does render without a server, but it needs a WebCodecs-capable browser engine to do it, where LeClap links FFmpeg into the app itself.
 
@@ -8,6 +8,8 @@ A template is a Zod-validated JSON descriptor: a `global` block plus an ordered 
 
 - [README — overview & quick start](https://raw.githubusercontent.com/heristop/leclap/main/README.md): what LeClap is, the monorepo layout, and how to get running.
 - [Template configuration reference](https://raw.githubusercontent.com/heristop/leclap/main/docs/template-configuration.md): the template JSON reference — global config, sections, the FFmpeg pipeline, and `{{ placeholders }}`.
+- [Registered effect contracts](https://raw.githubusercontent.com/heristop/leclap/main/docs/effects-configuration.md): generated built-in and example contracts, defaults, bounds, assets, registration, previews and revision-safe edits.
+- [Engine configuration reference](https://raw.githubusercontent.com/heristop/leclap/main/docs/engine-configuration.md): `ProjectConfig`, output precedence, encoder tiers, CLI bindings, MCP startup settings, deadlines and effect caching.
 - [Architecture](https://raw.githubusercontent.com/heristop/leclap/main/docs/architecture.md): system architecture and design patterns.
 - [FFmpeg fallback strategy](https://raw.githubusercontent.com/heristop/leclap/main/docs/architecture.md): how automatic FFmpeg detection (native / WASM) chooses a backend.
 - [On-device compilation](https://raw.githubusercontent.com/heristop/leclap/main/docs/on-device-compilation.md): the serverless Expo / React Native compile pipeline.
@@ -18,23 +20,29 @@ A template is a Zod-validated JSON descriptor: a `global` block plus an ordered 
 
 ## Template descriptor reference (web)
 
-The full, schema-driven descriptor reference — generated from the engine's own Zod schema, so it never drifts from what compiles. One page per topic.
+The descriptor field tables come from the engine's Zod schema. Runtime requirements and configuration are documented separately. One page per topic.
 
 - [Overview](https://leclap.dev/doc): the two keys (`global`, `sections[]`), the structured-sugar vs raw-filters layers, how rendering picks cut vs xfade, and project-wide config.
-- [Sections & types](https://leclap.dev/doc/sections): the seven section types (`video`, `project_video`, `form`, `color_background`, `image_background`, `music`, `partial`), base fields, and the full options surface.
+- [Sections & types](https://leclap.dev/doc/sections): the eight section types (`video`, `project_video`, `form`, `color_background`, `image_background`, `music`, `partial`, `effect`), base fields, and options. Registered `effect` sections require the configured backend.
 - [Transitions](https://leclap.dev/doc/transitions): every xfade transition name plus `cut`, and the `transition` fields.
 - [Looks](https://leclap.dev/doc/looks): the named colour-grade presets applied via `look`.
 - [Colour grade](https://leclap.dev/doc/grade): manual `grade` controls — brightness, contrast, saturation, gamma, hue, per-range colour balance, blur, curves.
-- [Motion & layers](https://leclap.dev/doc/motion): `motion[]` effects (Ken Burns, rotate, crop, flip), the recording `framingGuide`, and background `layers[]`.
+- [Motion & layers](https://leclap.dev/doc/motion): `motion[]` effects (Ken Burns, rotate, crop, flip, shake, pulse), the recording `framingGuide`, and background `layers[]`.
 - [Audio](https://leclap.dev/doc/audio): final-mix volumes, normalisation, ducking, and per-section `audioFade` curves.
 - [Captions](https://leclap.dev/doc/captions): the `caption` sugar with its style, position and alignment options.
 - [Filters & maps](https://leclap.dev/doc/filters): the raw FFmpeg escape hatch — `filters[]`, filter values, and explicit `maps[]`.
+- [Complete template configuration](https://leclap.dev/doc/reference): every native feature and example, plus an exhaustive nested schema field index.
+- [Registered effects](https://leclap.dev/doc/effects): all built-in and example catalog props, asset slots, output constraints and authoring workflow.
+- [Creative direction](https://leclap.dev/doc/creative-direction): implement a visual brief with explicit native settings or registered effect props.
+- [Engine configuration](https://leclap.dev/doc/engine): host configuration, encoder tiers, platform requirements and MCP runtime settings.
+- [Animations & images](https://leclap.dev/doc/animations): overlay playback/placement, whole-video animation and six composited APNG recipe configurations.
 - [Examples](https://leclap.dev/doc/examples): copy-paste descriptors that render with `leclap render`.
 - [JSON Schema](https://leclap.dev/doc/schema): the full machine-readable schema for tooling and validation.
 
 ## Packages
 
 - [ffmpeg-video-composer — the library](https://raw.githubusercontent.com/heristop/leclap/main/packages/ffmpeg-video-composer/README.md): install, the `compile()` API, entry points (Node / browser / RN), and FFmpeg detection.
+- [@leclap/cli — command line](https://raw.githubusercontent.com/heristop/leclap/main/packages/leclap-cli/README.md): scaffold, discover samples, validate, bind media and fields, render and diagnose.
 - [@leclap/mcp — agent-callable MCP server](https://raw.githubusercontent.com/heristop/leclap/main/packages/leclap-mcp/README.md): the engine as MCP tools (schema / validate / compose / probe) — author & render templates with no LLM in the loop.
 - [@leclap/creative-kit — templates & assets](https://raw.githubusercontent.com/heristop/leclap/main/packages/leclap-creative-kit/README.md): bundled premium templates, partials, fonts, and media.
 - [ffmpeg-engine — on-device Rust engine](https://raw.githubusercontent.com/heristop/leclap/main/packages/ffmpeg-engine/README.md): the Rust engine embedding FFmpeg fftools for native on-device compiles.
@@ -46,6 +54,10 @@ The full, schema-driven descriptor reference — generated from the engine's own
 - **Instead of a generative video model** when the same input must produce the same output on every run of a given platform.
 - **Not** a replacement for generative video: LeClap composes footage you already have, it does not synthesize new footage.
 
+## Sample discovery
+
+Start with `list_samples` to discover packaged showcase templates, then `get_sample` for the descriptor, creative direction, input requirements and backend setup. The CLI also provides `leclap samples list`, `show` and `export`. Media and preview videos are not bundled in the sample catalog.
+
 ## Use it from an AI agent
 
 Add the MCP server to any MCP-capable client:
@@ -54,9 +66,42 @@ Add the MCP server to any MCP-capable client:
 { "mcpServers": { "leclap": { "command": "npx", "args": ["-y", "@leclap/mcp"] } } }
 ```
 
-Tools: `get_template_schema`, `validate_template`, `compose_video`, `probe_media`. No LLM sits in the output path — the agent authors a JSON template and the engine renders it deterministically.
+Eight tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`, `validate_template`, `patch_template`, `compose_video`, `probe_media`. Opting into Remotion adds `get_effect_schema`, `render_preview` and `render_remotion_clip`. No LLM sits in the output path: the agent authors JSON and the engine renders it.
+
+Registered JSON effects can use trusted, operator-configured Remotion components on Node.js. Inspect the effect schema, preview selected frames, and patch props with a revision guard before composing. Remotion rendering requires operator opt-in; JSON cannot select executable source. Generated effects become video clips before the cross-platform FFmpeg engine runs.
 
 For PR or MR evidence: collect a real walkthrough and review focus, author the template, validate it, render it, and attach the returned local file. LeClap renders the artifact; it does not upload to GitHub or GitLab.
+
+## Configuration boundaries
+
+1. Template JSON controls scenes, effects, `global.orientation`, `global.fps` and reusable partials. `meta.creativeDirection` is an authoring brief; it does not select effects automatically. Native timing fields use seconds; registered props follow their versioned contract and may use frames.
+2. The host's `ProjectConfig` controls assets/build paths, fields, clip bindings, locale, codec, quality, audio/video settings and FFmpeg segment concurrency. Defaults include a 1280:720 base scale, 30 fps, 44100 Hz stereo and the `standard` quality tier. The merged preset defaults to `ultrafast`; changing quality alone does not change it. Descriptor fps overrides host fps. Descriptor portrait swaps the base dimensions; square forces 1080:1080. Node/static adapters default to up to three concurrent segments; WASM/native are serial.
+3. MCP settings resolve startup flag → environment → default. Use absolute paths; supplied tildes are not expanded. `compose_video` accepts template, fields, userVideoPaths, locale, outputBaseName and expectedRevision, not arbitrary ProjectConfig fields.
+
+| Startup flag | Environment | Default |
+| --- | --- | --- |
+| `--output-dir` | `LECLAP_MCP_OUTPUT_DIR` | `~/.leclap/renders` |
+| `--media-dir` | `LECLAP_MCP_MEDIA_DIR` | `~/.leclap/media` |
+| `--render-timeout-ms` | `LECLAP_MCP_RENDER_TIMEOUT_MS` | `600000` ms |
+| `--allow-remotion` | `LECLAP_MCP_ALLOW_REMOTION` | Off |
+| `--remotion-entry` | `LECLAP_MCP_REMOTION_ENTRY` | Unset |
+| `--remotion-browser` | `LECLAP_MCP_REMOTION_BROWSER` | Remotion-managed browser |
+| `--effect-catalog` | `LECLAP_MCP_EFFECT_CATALOG` | Builtin contracts |
+| `--effect-cache-max-bytes` | `LECLAP_MCP_EFFECT_CACHE_MAX_BYTES` | `536870912` bytes (512 MiB) |
+
+The CLI supports repeatable `--video section=path` and `--field key=value`, plus `--assets`, `--build`, `--locale`, `--orientation` and `--output`. Codec, quality and concurrency overrides use the library API. `FVC_RENDER_CONCURRENCY` belongs to the monorepo dev script. Node detects system FFmpeg, then `ffmpeg-static`; it has no pure-Node WASM fallback. Probing requires a separate ffprobe binary on the static path.
+
+## Registered effects
+
+Operator JSON catalogs map strict prop/asset contracts to compositions in the trusted Remotion entry. Enable Remotion and configure the entry at server startup; catalogs are validated once and edits require restart. Discover contracts with `get_effect_schema({list:true})`, inspect a versioned identity, validate local assets, preview, patch with an expected revision and compose. JSON cannot select executable source. Output stays landscape 1280×720, 30 fps, 300 frames, opaque H.264. Other orientations and frame rates are rejected. The separate `render_remotion_clip` tool renders general compositions.
+
+`render_preview` uses section-local frames: 1–10 distinct frames or an inclusive 1–90-frame range within 0–299. `patch_template` edits effective section names, preserves inline partial structure and materializes only the selected registered partial instance. An unresolved effect cannot go directly to `compile`, including with skipValidation enabled. Library hosts can use `resolveTemplateEffects` with their own trusted renderer, then compile its resolved descriptor and merged video bindings.
+
+The MCP process admits one registered-effect preflight or worker job, with at most eight waiters. Queue wait, sequential asset preflight and worker setup/render have separate timeouts; final FFmpeg rendering has its own deadline. This is not an end-to-end budget. Cancellation kills active probes and waits for cleanup before releasing the slot. `probe_media` has a fixed 30-second process timeout.
+
+Persistent effect artifacts live under `<mediaDir>/.leclap-effects/cache-v1`, bounded by the byte budget and 256 entries. Zero disables caching. Hits still stage assets, bundle source, identify the browser and run final FFmpeg assembly. Source/dependencies, props, assets, contract or browser changes invalidate reuse; cache I/O failures fall back to rendering. Revision guards and provenance do not implement strict replay locks or promise matching bytes across hosts.
+
+See the [registered-effect example](https://raw.githubusercontent.com/heristop/leclap/main/examples/llm-remotion-title/README.md) for trusted source, startup commands and a custom product reveal.
 
 ## Optional
 

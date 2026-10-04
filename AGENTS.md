@@ -10,53 +10,67 @@ A template-based, cross-platform FFmpeg video composer. A JSON template describe
 - Design system (brand, colors, typography): [`DESIGN.md`](./DESIGN.md)
 - Architecture & design patterns: [`docs/architecture.md`](./docs/architecture.md)
 - Template JSON reference: [`docs/template-configuration.md`](./docs/template-configuration.md)
+- Registered effect contracts, custom catalogs and authoring workflow: [`docs/effects-configuration.md`](./docs/effects-configuration.md) (regenerate tables with `pnpm docs:effects`).
 - Engine configuration (ProjectConfig, env vars, encoder tiers): [`docs/engine-configuration.md`](./docs/engine-configuration.md)
+- MCP runtime (media/output roots, trusted entry/catalog/browser, deadlines and cache): [`packages/leclap-mcp/README.md`](./packages/leclap-mcp/README.md#configuration)
 - FFmpeg detection/fallback: [`docs/architecture.md`](./docs/architecture.md#cross-platform-support)
 
 ## Repository layout
 
-pnpm workspaces (`apps/*`, `packages/*`); no turbo/nx. The repo root is a **private orchestrator** (`leclap`) holding only shared dev tooling and scripts — not a publishable package. The published artifacts are `ffmpeg-video-composer` (the engine), `@leclap/cli` (the `leclap` command), and `@leclap/mcp`; the rest is private.
+pnpm workspaces (`apps/*`, `packages/*`, plus `examples/llm-remotion-title`); no turbo/nx. The repo root is a **private orchestrator** (`leclap`) holding only shared dev tooling and scripts — not a publishable package. The published artifacts are `ffmpeg-video-composer` (the engine), `@leclap/cli` (the `leclap` command), and `@leclap/mcp`; the rest is private.
 
-| Path                             | Package                 | What it is                                                                                                                           |
-| -------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `.`                              | `leclap` _(private)_    | Workspace root — shared tooling (`vp`, vitest) and orchestration scripts only.                                                       |
-| `packages/ffmpeg-video-composer` | `ffmpeg-video-composer` | The composition library (programmatic API), Node + browser/WASM. The heart of the repo.                                              |
-| `packages/leclap-cli`            | `@leclap/cli`           | The `leclap` CLI (citty): `init` scaffolder, `render`, `diagnose`. Consumes `ffmpeg-video-composer`.                                 |
-| `packages/leclap-mcp`            | `@leclap/mcp`           | MCP server exposing the engine as agent-callable tools (schema/validate/compose/probe) over stdio. Consumes `ffmpeg-video-composer`. |
-| `packages/ffmpeg-engine`         | _(cargo crate)_         | Embedded FFmpeg engine (Rust + uniffi) for on-device compiles; built via `scripts/ffmpeg/`.                                          |
-| `apps/leclap-expo`               | `@leclap/expo`          | Expo / React Native app — on-device native-engine compiles, Tamagui UI _(reference)_.                                                |
-| `apps/leclap-web`                | `@leclap/web`           | React 19 + Vite + Tailwind web app — in-browser FFmpeg via WASM _(reference)_.                                                       |
+| Path                             | Package                                   | What it is                                                                                                                           |
+| -------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `.`                              | `leclap` _(private)_                      | Workspace root — shared tooling (`vp`, vitest) and orchestration scripts only.                                                       |
+| `packages/ffmpeg-video-composer` | `ffmpeg-video-composer`                   | The composition library (programmatic API), Node + browser/WASM. The heart of the repo.                                              |
+| `packages/leclap-cli`            | `@leclap/cli`                             | The `leclap` CLI (citty): `init` scaffolder, `render`, `diagnose`. Consumes `ffmpeg-video-composer`.                                 |
+| `packages/leclap-mcp`            | `@leclap/mcp`                             | MCP server exposing the engine as agent-callable tools (schema/validate/compose/probe) over stdio. Consumes `ffmpeg-video-composer`. |
+| `packages/leclap-creative-kit`   | `@leclap/creative-kit` _(private)_        | Shared templates, partials, fonts, media, and bundled assets.                                                                        |
+| `examples/llm-remotion-title`    | `leclap-json-effects-example` _(private)_ | JSON effects / Remotion integration example; typechecked separately.                                                                 |
+| `packages/ffmpeg-engine`         | _(cargo crate)_                           | Embedded FFmpeg engine (Rust + uniffi) for on-device compiles; built via `scripts/ffmpeg/`.                                          |
+| `apps/leclap-expo`               | `@leclap/expo`                            | Expo / React Native app — on-device native-engine compiles, Tamagui UI _(reference)_.                                                |
+| `apps/leclap-web`                | `@leclap/web`                             | React 19 + Vite + Tailwind web app — in-browser FFmpeg via WASM _(reference)_.                                                       |
 
-The user-facing CLI is `@leclap/cli` (`leclap render|init|diagnose`). The `compile`/`diagnose` monorepo dev scripts still live in `packages/ffmpeg-video-composer` (root `pnpm compile` / `pnpm diagnose` delegate to them).
+The user-facing CLI is `@leclap/cli` (`leclap render|init|validate|samples|diagnose`). The `compile`/`diagnose` monorepo dev scripts still live in `packages/ffmpeg-video-composer` (root `pnpm compile` / `pnpm diagnose` delegate to them).
 
 ## Setup
 
-- **pnpm 12.6.0** (pinned via `packageManager`) and **Node ≥ 24** (pinned to 24 via `mise.toml`; `engine-strict=true` rejects wrong versions).
+- **pnpm 12.6.0** (pinned via `packageManager`) and **Node ≥ 24.11.0** (`mise.toml` selects the Node 24 and pnpm 12 release lines; `engine-strict=true` rejects wrong versions).
 - Install: `pnpm install` at the repo root.
-- FFmpeg is resolved at runtime — system → `ffmpeg-static` → `@ffmpeg/ffmpeg` (WASM). Installing system FFmpeg (e.g. via `mise`) is recommended for Node work. `ffmpeg-static` ships no `ffprobe`, so templates that probe media need system FFmpeg or `ffprobe-static` on that path. See `docs/architecture.md`.
+- Node detects system FFmpeg, then `ffmpeg-static`; its detector's WASM branch requires `window` and is not a pure-Node fallback. Browser hosts use the separate WASM entry point. Installing system FFmpeg (e.g. via `mise`) is recommended for Node work, with `ffprobe` on PATH. The static adapter needs optional `ffprobe-static` or an existence-checked adjacent probe binary. See `docs/architecture.md`.
 
 ## Commands
 
 Run from the repo root unless noted. Tooling is **vite-plus (`vp`)**.
 
-| Task                | Command                                                                 |
-| ------------------- | ----------------------------------------------------------------------- |
-| Lint (oxlint)       | `pnpm lint`                                                             |
-| Format              | `pnpm fmt` / check only: `pnpm fmt:check`                               |
-| All checks          | `pnpm check`                                                            |
-| Test (vitest)       | `pnpm test` · UI: `pnpm test:ui` · coverage: `pnpm test:coverage`       |
-| Build (tsdown)      | `pnpm build`                                                            |
-| Typecheck a package | `pnpm --filter <pkg> exec tsc --noEmit`                                 |
-| Perf bench          | `pnpm --filter ffmpeg-video-composer bench` (see `docs/performance.md`) |
-| Run Expo app        | `pnpm app:expo` (also `app:ios` / `app:android`)                        |
-| Run web app         | `pnpm app:web`                                                          |
+| Task                    | Command                                                                 |
+| ----------------------- | ----------------------------------------------------------------------- |
+| Lint (oxlint)           | `pnpm lint`                                                             |
+| Format                  | `pnpm fmt` / check only: `pnpm fmt:check`                               |
+| Format/lint/type checks | `pnpm check`                                                            |
+| Package tests           | `pnpm test` (recursive; Vitest packages + Expo Jest)                    |
+| Workspace builds        | `pnpm build` (recursive; library/CLI/MCP tsdown + web Vite build)       |
+| Typecheck a package     | `pnpm --filter <pkg> exec tsc --noEmit`                                 |
+| Perf bench              | `pnpm --filter ffmpeg-video-composer bench` (see `docs/performance.md`) |
+| Run Expo app            | `pnpm app:expo` (also `app:ios` / `app:android`)                        |
+| Run web app             | `pnpm app:web`                                                          |
+
+`pnpm test:ui`, `pnpm test:coverage`, and `pnpm test:ci` use the root Vitest config: core, MCP, and
+repo-level tests only. CI runs web, Expo, and CLI suites separately, then `pnpm test:integration`
+(Cucumber core/MCP real renders). Neither `pnpm test` nor `pnpm build` builds/tests the Rust engine;
+CI has a separate Rust job. `pnpm check` does not replace tests or builds.
+
+Type-aware lint needs the core's built `dist` and staged app assets: on a fresh checkout, run
+`pnpm --filter ffmpeg-video-composer build` and `node scripts/copy-core-assets.ts` first, as CI does.
+The root build includes the web app's media fetch/staging and prerender steps; use a package filter
+when only a library build is needed. The dev `compile`/`diagnose` scripts also import built core output.
 
 ## Architecture & patterns
 
-- **Platform abstraction** — `PlatformBridge` (`packages/ffmpeg-video-composer/src/platform/PlatformBridge.ts`) detects the runtime and wires the right adapters. Each capability has an `Abstract*` base and per-platform `*Adapter`s: FFmpeg, filesystem, logging, music, events.
+- **Platform abstraction** — `PlatformBridge` (`packages/ffmpeg-video-composer/src/platform/PlatformBridge.ts`) selects adapters for the Node entry point; browser and React Native entry points register their adapters directly. Each capability has an `Abstract*` base and per-platform `*Adapter`s: FFmpeg, filesystem, logging, music, events.
 - **Compilation flow** — `TemplateDirector` orchestrates: init → build sections → concat → apply music. Sections are created by `SegmentFactory` and rendered by `*Segment` classes; FFmpeg commands are assembled by the editor **managers** (asset/variable/map/filter/formatter).
-- **On-device compilation (Expo)** — the app is fully local: it drives the same core through a native FFmpeg CLI engine (`packages/ffmpeg-engine` + `FFmpegLeclapAdapter`) instead of WASM/system FFmpeg. There is no compile server; templates come from `@leclap/creative-kit` and render on the phone. See [`docs/on-device-compilation.md`](./docs/on-device-compilation.md).
-- **Dependency injection** — tsyringe. Classes use `@injectable()` / `@singleton()`; dependencies are resolved from `container`. Wiring happens in the entry points `packages/ffmpeg-video-composer/src/index.ts` (Node) and `packages/ffmpeg-video-composer/src/browser.ts` (browser/WASM).
+- **On-device compilation (Expo)** — the app is fully local: it drives the same core through a native FFmpeg CLI engine (`packages/ffmpeg-engine` + `FFmpegDeviceAdapter`) instead of WASM/system FFmpeg. There is no compile server; templates come from `@leclap/creative-kit` and render on the phone. See [`docs/on-device-compilation.md`](./docs/on-device-compilation.md).
+- **Dependency injection** — tsyringe. Classes use `@injectable()` / `@singleton()`; dependencies are resolved from `container`. Wiring happens in the entry points `packages/ffmpeg-video-composer/src/index.ts` (Node) and `packages/ffmpeg-video-composer/src/browser.ts` (browser/WASM), and `packages/ffmpeg-video-composer/src/reactnative.ts` (native).
 - **Validation** — templates are validated with zod schemas in `packages/ffmpeg-video-composer/src/schemas/template.schemas.ts` via `services/TemplateValidator.ts`.
 
 ## Conventions
@@ -66,7 +80,7 @@ Run from the repo root unless noted. Tooling is **vite-plus (`vp`)**.
 - **Path alias** — `@/*` → `packages/ffmpeg-video-composer/src/*`.
 - **Decorators** — DI/decorators require `reflect-metadata` to be imported once at the entry point.
 - **React Compiler is enabled** in both apps, through Oxc's Rust port (`oxc-transform-react`) rather than the Babel plugin: `apps/leclap-web` via `vite/oxc-react-compiler.ts`, `apps/leclap-expo` via `metro/oxc-react-compiler-transformer.js`. Both are scoped to the app's own sources and leave JSX to the downstream pass. Don't add `useMemo`/`useCallback`/`React.memo` — the compiler memoizes automatically.
-- **Tests** — core's unit + integration suite lives in `packages/ffmpeg-video-composer/tests/` (run by the root `pnpm test` / vitest); the Expo app keeps its own jest tests under `apps/leclap-expo`.
+- **Tests** — core Vitest tests live in `packages/ffmpeg-video-composer/tests/`; Cucumber integration scenarios live in its `features/`. Other packages and the web app own their Vitest configs; Expo uses its own Jest unit config. See the command boundaries above.
 - Prefer reusing existing managers/adapters/factories over adding new abstractions; follow the patterns already in `packages/ffmpeg-video-composer`.
 
 ### Design system & styling (web — `apps/leclap-web`)
@@ -93,4 +107,4 @@ Repo-specific skills live in [`.agents/skills/`](./.agents/skills/). Load the ma
 
 ## Gotchas
 
-- Browser/WASM compilation is limited to ~**2 GB** input (IndexedDB-backed filesystem).
+- Browser assets live in IndexedDB but are copied into FFmpeg's in-memory MEMFS. The approximate **2 GB** input ceiling is not a supported project-size guarantee: inputs and intermediate copies can exhaust WASM memory earlier.

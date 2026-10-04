@@ -20,6 +20,9 @@ pnpm render                          # runs the scaffolded `leclap render templa
 leclap init [name]        # scaffold a starter project (template.json + assets/ + README + scripts)
 leclap render <template>  # compile a video from a template JSON
 leclap validate <template> # check a template without rendering (schema + text layout)
+leclap samples list       # discover showcase samples (also --category, --backend, --query, --json)
+leclap samples show <id>  # inspect direction and requirements (also --json)
+leclap samples export <id> # raw descriptor JSON to stdout (or --output <new-file>)
 leclap diagnose           # check your FFmpeg setup
 leclap --help             # usage (per-command help with `leclap <command> --help`)
 leclap --version
@@ -28,6 +31,63 @@ leclap --version
 `leclap <template.json>` is a shorthand for `leclap render <template.json>`.
 
 `render` reads assets from `<cwd>/assets` and writes output under `<cwd>/build`.
+
+## Render configuration
+
+```bash
+leclap render template.json \
+  --assets ./assets --build ./build \
+  --video demo=./clips/screen.mp4 \
+  --field form_1_title="Your next release" \
+  --locale en --orientation landscape --output ./exports/promo.mp4
+```
+
+Use the descriptor's effective section and field names. Repeat `--video` and `--field` to bind
+multiple inputs; later values win for the same key. All relative file/directory paths resolve from
+the working directory. `--orientation` overrides `template.global.orientation`, while frame rate
+comes from `global.fps`. `--output` copies the finished video after successful compilation.
+
+Codec, quality tier and segment concurrency are configured through the library's `ProjectConfig`;
+the published CLI has no flags for those fields. MCP server flags belong to `leclap-mcp`, not
+`leclap render`. See [engine configuration](../../docs/engine-configuration.md) for all defaults,
+platform constraints and environment-variable scope.
+
+## `samples` — discover and adapt a showcase
+
+The installed CLI includes the same 32 samples as the [web showcase](https://leclap.dev/showcase/):
+22 native and 10 registered Remotion examples. Discovery and export work without a repository checkout,
+FFmpeg or Remotion, and do not download media or render effects.
+
+```bash
+leclap samples list --category typography --backend remotion --query blur
+leclap samples list --backend native --json
+leclap samples show web-app-promo
+leclap samples show editorial-blur-rise --json
+leclap samples export web-app-promo --output app-demo.json
+leclap samples export native-timing > timing.json
+# Customize copy and supply media before validating and rendering:
+leclap validate app-demo.json
+leclap render app-demo.json
+```
+
+`list --json` returns a metadata array. `show --json` returns the selected metadata plus `template`.
+`export` returns only the descriptor, with referenced partials embedded. `--output` creates a new file
+and fails if that path exists. Unknown IDs or invalid category/backend filters exit 1 with a stderr
+error; successful JSON stdout contains only JSON. Categories are `templates`, `typography`, `app-demos`,
+`overlays` and `evidence`; backends are `native` and `remotion`.
+
+Read `show` before rendering: it reports creative direction, project clip names/durations/capture hints,
+form fields and copy limits, variable defaults/placeholders, asset references and setup requirements.
+Supply your own media and fonts; preview videos/posters and showcase media are not shipped. Asset paths
+remain authored references and must resolve in your configured assets directory or be replaced.
+Effective font files from text presets are marked `source: "preset"`, with font family metadata when available.
+For native samples needing project clips or form inputs, pass repeatable `--video section=path` and
+`--field key=value` flags, or use the library's `userVideoPaths`/`fields` or MCP `compose_video` bindings.
+
+Registered effect samples require MCP's opted-in Node/Chromium backend, Remotion peers and a trusted
+configured entry that registers the named composition. Effects marked `customCatalog: true` additionally
+need the operator's `--effect-catalog`; exporting JSON does not install that catalog or executable source.
+The CLI does not render registered effect sections directly. See the [MCP setup](../leclap-mcp#operator-custom-effect-catalogs).
 
 ## `validate` — check before you render
 
@@ -80,6 +140,26 @@ leclap init my-video --yes                 # accept all defaults (MCP + Remotion
 leclap init my-video --no-mcp --no-remotion # bare CLI-render starter only
 leclap init my-video --mcp --no-remotion    # MCP wiring, no Remotion
 ```
+
+## Creative direction
+
+Every starter includes `meta.creativeDirection`, an editable visual brief describing its initial
+composition. Supply your own when scaffolding:
+
+```bash
+leclap init demo --no-remotion --no-mcp \
+  --creative-direction "Bold editorial. Dark ink, white type, restrained motion and a readable final hold."
+```
+
+The brief is plain text (1–4000 characters), validated with the descriptor and preserved by the editor.
+It guides a human or agent; the flag does not redesign the starter or change rendering automatically.
+Translate it into explicit sections, filters or registered effect props, then validate and inspect the
+render. For a stronger native headline beat, set `reveal.easing` to `"ease-out-back"`; it allows a small
+travel overshoot while keeping opacity bounded. For per-word blur, opposing slides or elastic
+staggering, use the [registered Remotion variants](../../examples/llm-remotion-title/README.md#editorial-typography)
+with the configured Node worker.
+
+See the [creative-direction workflow](../../docs/creative-direction.md).
 
 ## Relation to `@leclap/mcp`
 

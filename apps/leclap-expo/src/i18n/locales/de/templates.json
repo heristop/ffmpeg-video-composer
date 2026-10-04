@@ -13,7 +13,12 @@
   "cardDefaultDescription": "Erstelle ein Video mit dieser Vorlage",
   "custom": "Eigene",
   "search": {
-    "placeholder": "Vorlagen suchen..."
+    "placeholder": "Vorlagen suchen...",
+    "clear": "Suche löschen",
+    "count_one": "{{count}} Vorlage",
+    "count_other": "{{count}} Vorlagen",
+    "emptyTitle": "Keine Vorlagen gefunden",
+    "emptyBody": "Versuche einen anderen Namen oder lösche die Suche."
   },
   "refresh": {
     "syncWhenOnline": "Zum Synchronisieren ziehen, wenn online",

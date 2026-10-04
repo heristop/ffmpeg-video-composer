@@ -77,6 +77,14 @@ export const TitleCardSchema = z
     align: z.enum(['left', 'center']).optional().describe('Horizontal alignment of the card (default left).'),
     background: z.string().optional().describe('Fade colour; defaults to the section background colour.'),
     reveal: RevealSchema.optional().describe('Entrance for the lines, staggered top-to-bottom (default "rise").'),
+    stagger: z
+      .number()
+      .min(0)
+      .max(1)
+      .optional()
+      .describe(
+        'Seconds between non-empty line entrances, 0..1 (default 0.15). Zero reveals all lines together; the accent follows its line.'
+      ),
     effect: TextEffectSchema.optional().describe('Drop shadow / outline applied to every line for legibility.'),
     fade: z
       .object({

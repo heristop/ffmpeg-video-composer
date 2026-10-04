@@ -4,10 +4,10 @@
 // line removes the card. Distinct from the positional OverlayCanvas — this is the structured card.
 import { useTranslation } from 'react-i18next';
 import { FONTS, isFontRef } from '@leclap/creative-kit/fonts';
-import { fontLabel, type TitleCard } from '../../templateEditorModel';
+import { FEATURE_CONTROLS, fontLabel, type TitleCard } from '../../templateEditorModel';
 import { Checkbox, ColorPicker, Select, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui';
 import { NumberField } from '@/presentation/components/ui/NumberField';
-import { SegmentedControl, type SegmentOption } from '../controls';
+import { RangeSlider, SegmentedControl, type SegmentOption } from '../controls';
 import { AccentControl } from '../AccentControl';
 import { SectionDisclosure } from '../SectionDisclosure';
 import { RevealControl } from '../RevealControl';
@@ -17,6 +17,7 @@ import { FONT_REF_OPTION, fontPickerValue } from '../font-picker';
 import { EditorSelectContent } from '../editor-select-content';
 
 type Align = NonNullable<TitleCard['align']>;
+const STAGGER_SPEC = FEATURE_CONTROLS.titleCard.find((spec) => spec.fieldPath === 'titleCard.stagger');
 type LineStyle = NonNullable<TitleCard['kickerStyle']>;
 
 // The engine's preset look per line at the landscape 1280x720 scale (text-blocks.ts styledLook
@@ -201,6 +202,18 @@ const CardOptions = ({ card, patch }: { card: TitleCard; patch: (next: Partial<T
         reveal={card.reveal}
         onChange={(reveal) => {
           patch({ reveal });
+        }}
+      />
+      <RangeSlider
+        label={t('titleCard.stagger')}
+        value={card.stagger ?? 0.15}
+        min={STAGGER_SPEC?.min ?? 0}
+        max={STAGGER_SPEC?.max ?? 1}
+        step={0.01}
+        resetTo={0.15}
+        format={(value) => `${value}s`}
+        onChange={(stagger) => {
+          patch({ stagger: stagger === 0.15 ? undefined : stagger });
         }}
       />
       <TextEffectControl

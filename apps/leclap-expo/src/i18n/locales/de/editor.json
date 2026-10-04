@@ -175,6 +175,7 @@
     "similarity": "Stärke"
   },
   "titleCard": {
+    "stagger": "Zeilenabstand in Sekunden",
     "hint": "Eine saubere Kicker- / Überschrift- / Untertitel-Karte – an die Ausrichtung angepasst.",
     "kicker": "Kicker",
     "kickerPlaceholder": "z. B. NEU VORGESTELLT",
@@ -371,7 +372,34 @@
     "mirrorVertical": "Vertikal",
     "add": "Animation hinzufügen",
     "layer": "Animation {{number}}",
-    "remove": "Animation entfernen"
+    "remove": "Animation entfernen",
+    "effects": {
+      "label": "Effektkombinationen",
+      "interface-focus": {
+        "name": "Interface-Fokus",
+        "description": "Ein Detail mit einem kurzen Impuls einrahmen."
+      },
+      "product-spotlight": {
+        "name": "Produkt im Fokus",
+        "description": "Eine sanfte Umlaufbewegung und ein einzelner Lichtstreifen."
+      },
+      "celebration-burst": {
+        "name": "Festlicher Akzent",
+        "description": "Ein kurzer Konfetti- und Funkelakzent."
+      },
+      "focus-lock": {
+        "name": "Fokusrahmen",
+        "description": "Ein Eckrahmen mit einem dezenten Ring."
+      },
+      "light-pass": {
+        "name": "Lichtpassage",
+        "description": "Ein kurzer Lichtschein und ein kleiner Funkelakzent."
+      },
+      "frame-reveal": {
+        "name": "Rahmenenthüllung",
+        "description": "Ein feiner Rahmen mit einem einzelnen Lichtstreifen."
+      }
+    }
   },
   "overlays": {
     "kind": "Overlays",

@@ -603,7 +603,34 @@
     "keepLastFrame": "Keep last frame",
     "dragHint": "Drag to move · corner to resize · arrows to nudge",
     "reset": "Reset to default",
-    "placementGroup": "Placement"
+    "placementGroup": "Placement",
+    "effects": {
+      "label": "Effect combinations",
+      "interface-focus": {
+        "name": "Interface focus",
+        "description": "Frame a detail with a brief pulse."
+      },
+      "product-spotlight": {
+        "name": "Product spotlight",
+        "description": "A soft orbit and a single shine sweep."
+      },
+      "celebration-burst": {
+        "name": "Celebration burst",
+        "description": "A short confetti and sparkle accent."
+      },
+      "focus-lock": {
+        "name": "Focus lock",
+        "description": "A bracket frame with one soft ring."
+      },
+      "light-pass": {
+        "name": "Light pass",
+        "description": "A brief light wash and a small sparkle."
+      },
+      "frame-reveal": {
+        "name": "Frame reveal",
+        "description": "A fine frame with a single shine sweep."
+      }
+    }
   },
   "element": {
     "resize": "Resize element",
@@ -854,10 +881,12 @@
     "easingLinear": "Linear",
     "easingEaseOut": "Ease out",
     "easingEaseInOut": "Ease in-out",
-    "easingHint": "How the entrance accelerates — Ease out glides into place, Ease in-out ramps up then settles.",
-    "summaryDefault": "default timing"
+    "easingHint": "How motion settles — Ease out glides into place; overshoot briefly passes its resting position.",
+    "summaryDefault": "default timing",
+    "easingEaseOutBack": "Ease out with overshoot"
   },
   "exit": {
+    "easing": "Exit easing",
     "label": "Exit",
     "after": "Starts after",
     "summaryDefault": "ends at section end",
@@ -898,6 +927,7 @@
     "summaryOff": "off"
   },
   "titleCard": {
+    "stagger": "Line delay",
     "kicker": "Kicker",
     "kickerPlaceholder": "e.g. INTRODUCING",
     "headline": "Headline",

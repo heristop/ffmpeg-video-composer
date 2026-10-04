@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { Button, Checkbox, SegmentedControl } from '@/presentation/components/ui';
 import { NumberField } from '@/presentation/components/ui/NumberField';
 import { ANIMATION_LIBRARY, findAnimationByUrl, type AnimationAsset } from '@/data/mediaCatalog';
-import type { AnimationOverlay } from '../templateEditorModel';
+import { animationDefaultsForUrl, type AnimationOverlay } from '../templateEditorModel';
 import { PREVIEW_BG_CLASS } from './animationOverlay';
 import { AnimationMedia } from './AnimationMedia';
 import { CANVAS_DND_MIME, type DropPayload } from '../editor-shell/canvasDrop';
@@ -232,7 +232,7 @@ const AnimationLibraryGrid = ({ value, library, onChange }: LibraryGridProps) =>
             });
           }}
           onClick={() => {
-            onChange({ url: animation.url, label: animation.label });
+            onChange({ url: animation.url, label: animation.label, ...animationDefaultsForUrl(animation.url) });
           }}
           className={cn(
             'group relative block overflow-hidden rounded-xl border text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40',

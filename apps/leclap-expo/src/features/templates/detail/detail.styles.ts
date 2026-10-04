@@ -1,11 +1,12 @@
 import { StyleSheet } from 'react-native';
 import { colors, spacing, typography, fonts, withAlpha } from '@/src/styles/theme';
 import { elevation } from '@/src/styles/elevation';
+import { FORM_MAX_WIDTH } from '@/src/styles/adaptive-layout';
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { flex: 1 },
-  contentContainer: { paddingHorizontal: spacing.l, paddingTop: spacing.s, paddingBottom: spacing.xxl + 48 },
+  contentContainer: { paddingHorizontal: spacing.l, paddingTop: spacing.s, paddingBottom: spacing.l },
 
   // States
   centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.xl },
@@ -94,10 +95,6 @@ export const styles = StyleSheet.create({
   // Create CTA
   qualityRow: { marginBottom: spacing.s },
   footer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
     paddingHorizontal: spacing.l,
     paddingTop: spacing.m,
     paddingBottom: spacing.xl,
@@ -130,7 +127,13 @@ export const styles = StyleSheet.create({
   ctaHelper: { ...typography.caption, textAlign: 'center', marginTop: spacing.s, color: colors.textSecondary },
 
   // Modals (form + music)
-  formModalContainer: { flex: 1, backgroundColor: colors.background },
+  formModalContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: FORM_MAX_WIDTH,
+    alignSelf: 'center',
+    backgroundColor: colors.background,
+  },
   formHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

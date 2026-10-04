@@ -298,6 +298,19 @@ async function buildProjectConfig(input: CompileInput) {
   };
 }
 
+// The engine always writes the same build/output.mp4, so every render moves its result to a unique
+// file. Otherwise an older project opened later would play the newest render, and export would
+// save or share the wrong video.
+async function publishOutput(outputPath: string): Promise<string> {
+  const directory = `${FileSystem.cacheDirectory}leclap-outputs/`;
+  const target = toUri(`${directory}${Date.now()}-${Math.random().toString(36).slice(2)}.mp4`);
+
+  await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
+  await FileSystem.moveAsync({ from: toUri(outputPath), to: target });
+
+  return target;
+}
+
 export class CoreCompilationService implements CompileService {
   async compile(input: CompileInput, options: CompileOptions = {}): Promise<CompileResult> {
     if (options.signal?.aborted) {
@@ -332,9 +345,11 @@ export class CoreCompilationService implements CompileService {
         return { success: false, error: 'Compilation produced an empty output file.' };
       }
 
+      const outputUri = await publishOutput(outputPath);
+
       options.onProgress?.({ ratio: 1, stage: 'Done' });
 
-      return { success: true, outputUri: toUri(outputPath) };
+      return { success: true, outputUri };
     } catch (error) {
       return { success: false, error: error instanceof Error ? error.message : String(error) };
     } finally {

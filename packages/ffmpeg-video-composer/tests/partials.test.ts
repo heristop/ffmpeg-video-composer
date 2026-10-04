@@ -152,3 +152,28 @@ describe('TemplateValidator + partials', () => {
     expect(result.errors?.some((e) => e.message.includes('no-such-partial'))).toBe(true);
   });
 });
+
+describe('expandPartials nesting', () => {
+  it('expands a partial that includes another partial', () => {
+    const descriptor = withPartials(
+      [
+        { id: 'outer', sections: [{ name: 'o', type: 'partial', ref: 'inner' }] },
+        { id: 'inner', sections: [{ name: 'logo', type: 'project_video' }] },
+      ],
+      [{ name: 'root', type: 'partial', ref: 'outer' }]
+    );
+
+    const expanded = expandPartials(descriptor);
+
+    expect(expanded.sections).toEqual([{ name: 'logo', type: 'project_video' }]);
+  });
+
+  it('fails loudly on a partial that includes itself', () => {
+    const descriptor = withPartials(
+      [{ id: 'loop', sections: [{ name: 'again', type: 'partial', ref: 'loop' }] }],
+      [{ name: 'root', type: 'partial', ref: 'loop' }]
+    );
+
+    expect(() => expandPartials(descriptor)).toThrow(/Cyclic template partial/);
+  });
+});

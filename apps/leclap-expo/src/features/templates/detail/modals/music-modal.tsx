@@ -1,6 +1,6 @@
 import { Modal, ScrollView, View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { SafeAreaProvider, SafeAreaView, initialWindowMetrics } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import type { Section } from '@/src/types';
 import { colors } from '@/src/styles/theme';
@@ -69,8 +69,8 @@ export function MusicModal({ section, allowedMusic, selectedId, onSelect, onClos
 
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <SafeAreaView style={styles.formModalContainer} edges={['top', 'bottom']}>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.formModalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.formHeader}>
             <Text style={styles.formTitle}>{section.title?.en ?? section.name}</Text>
             <PressableScale onPress={onClose} accessibilityRole="button" accessibilityLabel={t('music.done')}>

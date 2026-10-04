@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "name": "Overlay effect recipes",
+    "description": "Synthetic review fixture with adaptive shapes and labels for the shared composited effect presets.",
+    "creativeDirection": "Direction: an honest synthetic test fixture for six composited recipes. Frame an interface detail, reveal a product shape, mark a celebration, lock focus, pass a soft light or reveal a fine frame. Keep labels readable and the focal element visible. Use at most two brief layers per scene and a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
+  },
+  "global": {
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "focus_lock",
+      "type": "color_background",
+      "options": {
+        "duration": 4,
+        "backgroundColor": "#141925",
+        "layers": [
+          {
+            "color": "#263247",
+            "x": "iw*0.27",
+            "y": "ih*0.30",
+            "w": "iw*0.46",
+            "h": "ih*0.44"
+          },
+          {
+            "color": "#9fe9d4",
+            "x": "iw*0.43",
+            "y": "ih*0.44",
+            "w": "iw*0.14",
+            "h": "ih*0.16"
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "FOCUS LOCK"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 44,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": 64
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "A framed detail. One soft ring."
+            },
+            "fontfile": "Oswald-Regular.ttf",
+            "fontsize": 32,
+            "fontcolor": "#ffffff",
+            "x": "w*0.06",
+            "y": "h-80"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "effect_0",
+          "type": "animation",
+          "url": "/assets/animations/corner_brackets.apng",
+          "options": {
+            "position": "230:144",
+            "scale": "819:461",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.08,
+            "duration": 1.8,
+            "opacity": 0.45
+          }
+        },
+        {
+          "name": "effect_1",
+          "type": "animation",
+          "url": "/assets/animations/pulse_ring.apng",
+          "options": {
+            "position": "384:230",
+            "scale": "512:288",
+            "fit": "contain",
+            "persistent": false,
+            "start": 0.2,
+            "duration": 2,
+            "opacity": 0.4
+          }
+        }
+      ]
+    }
+  ]
+}

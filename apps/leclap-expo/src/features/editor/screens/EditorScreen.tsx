@@ -92,16 +92,18 @@ interface FullscreenWrapProps {
   children: React.ReactNode;
 }
 const FullscreenWrap: React.FC<FullscreenWrapProps> = ({ section, onBack, children }) => (
-  <View style={st.fullscreen}>
-    <StatusBar hidden={false} backgroundColor="transparent" translucent />
-    <TouchableOpacity style={st.fsBack} onPress={onBack}>
-      <Ionicons name="arrow-back" size={24} color="white" />
-    </TouchableOpacity>
-    <View style={st.fsTitleBox}>
-      <Text style={st.fsTitle}>{section.title?.en ?? section.name}</Text>
+  <SafeAreaView style={st.fullscreen}>
+    <View style={{ flex: 1 }}>
+      <StatusBar hidden={false} backgroundColor="transparent" translucent />
+      <TouchableOpacity style={st.fsBack} onPress={onBack}>
+        <Ionicons name="arrow-back" size={24} color="white" />
+      </TouchableOpacity>
+      <View style={st.fsTitleBox}>
+        <Text style={st.fsTitle}>{section.title?.en ?? section.name}</Text>
+      </View>
+      {children}
     </View>
-    {children}
-  </View>
+  </SafeAreaView>
 );
 
 interface SectionRowProps {

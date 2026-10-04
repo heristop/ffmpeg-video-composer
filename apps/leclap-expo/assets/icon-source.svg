@@ -13,13 +13,7 @@
       <stop stop-color="#FFA0B7"/>
       <stop offset="1" stop-color="#EE6184"/>
     </linearGradient>
-    <!-- metallic gold ring: lighter at top, deeper at bottom -->
-    <linearGradient id="lcRing" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#FFF0A0"/>
-      <stop offset="0.55" stop-color="#FFE45E"/>
-      <stop offset="1" stop-color="#EFC23C"/>
-    </linearGradient>
-    <!-- glossy top sheen on the disc -->
+    <!-- soft top sheen on the background -->
     <radialGradient id="lcSheen" cx="0.5" cy="0.16" r="0.6">
       <stop stop-color="#FFFFFF" stop-opacity="0.34"/>
       <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
@@ -31,10 +25,9 @@
   </defs>
   <!-- full-bleed gradient (opaque) so the app-icon circle/squircle is filled, not just the disc -->
   <rect width="600" height="600" fill="url(#lcg)"/>
-  <!-- glossy top sheen + metallic gold ring near the edge -->
-  <circle cx="300" cy="300" r="286" fill="url(#lcSheen)"/>
-  <circle cx="300" cy="300" r="284" fill="none" stroke="url(#lcRing)" stroke-width="26"/>
-  <g transform="translate(300 300) scale(0.68) translate(-298 -304)" filter="url(#lsh)">
+  <!-- The platform supplies the corner mask; the mark stays comfortably inset. -->
+  <rect width="600" height="600" fill="url(#lcSheen)"/>
+  <g transform="translate(300 300) scale(0.86) translate(-298 -304)" filter="url(#lsh)">
     <!-- board -->
     <rect x="96" y="302" width="408" height="194" rx="40" fill="url(#lcBoard)" stroke="#5E51AC" stroke-width="24" stroke-linejoin="round"/>
     <!-- bottom clap -->

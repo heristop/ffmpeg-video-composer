@@ -64,7 +64,8 @@ media_fetch_bundle() {
   fi
 
   # Anything present, real, and simply the wrong bytes is a local edit, not a pointer to fill in — and
-  # the extract below would overwrite it. CI never hits this (a fresh clone is all pointers); a
+  # the extract below would overwrite it. Fresh CI clones are all pointers, but cached Pages builds
+  # can hold older real bytes (fetch-web-media opts those disposable builds into replacement). A
   # developer previewing a new cut through `pnpm --filter @leclap/web build` does. Losing their file
   # silently is not acceptable, so stop and make it their call.
   local modified='' candidates
@@ -83,7 +84,7 @@ media_fetch_bundle() {
     modified+="    $path"$'\n'
   done < <(printf '%s\n' "$candidates")
 
-  if [ -n "$modified" ] && [ -z "${MEDIA_ALLOW_OVERWRITE:-}" ]; then
+  if [ -n "$modified" ] && [ "${MEDIA_ALLOW_OVERWRITE:-}" != '1' ]; then
     fail "these files differ from the manifest and would be overwritten by the bundle:
 ${modified%$'\n'}
   They exist and hold real media, so this is a local change rather than an LFS pointer to fill in.

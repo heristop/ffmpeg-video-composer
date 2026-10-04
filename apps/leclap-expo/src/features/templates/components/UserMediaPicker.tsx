@@ -11,7 +11,7 @@ import {
   Animated,
   Easing,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView, initialWindowMetrics } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useVideoPlayer } from 'expo-video';
 import * as DocumentPicker from 'expo-document-picker';
@@ -479,8 +479,8 @@ export function UserMediaPicker({
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <SafeAreaView style={st.container} edges={['top', 'bottom']}>
+      <SafeAreaProvider>
+        <SafeAreaView style={st.container} edges={['top', 'bottom', 'left', 'right']}>
           <View style={st.header}>
             <Text style={st.title}>Music &amp; Background</Text>
             <TouchableOpacity onPress={onClose} accessibilityLabel="Close">

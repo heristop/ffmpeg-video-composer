@@ -38,3 +38,5 @@ export async function importTemplate(current: EditorState): Promise<EditorState 
     descriptor,
   });
 }
+
+export { previewRender } from './previewRender';

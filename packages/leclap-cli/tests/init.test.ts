@@ -34,6 +34,28 @@ describe('starterFiles (base)', () => {
   });
 });
 
+describe('starter creative direction', () => {
+  it('embeds a supplied brief without substituting it for rendered copy', () => {
+    const files = starterFiles('demo', { creativeDirection: '  Quiet editorial. Hold the final line.  ' });
+    const descriptor = JSON.parse(files['template.json']);
+    expect(descriptor.meta.creativeDirection).toBe('Quiet editorial. Hold the final line.');
+    expect(descriptor.sections[0].filters[0].values.text.en).toBe('Hello, LeClap');
+    expect(TemplateDescriptorSchema.safeParse(descriptor).success).toBe(true);
+  });
+
+  it('provides direction in both native and Remotion starters', () => {
+    for (const remotion of [false, true]) {
+      const files = starterFiles('demo', { remotion });
+      expect(JSON.parse(files['template.json']).meta.creativeDirection.length).toBeGreaterThan(0);
+      expect(files['README.md']).toContain('meta.creativeDirection');
+    }
+  });
+
+  it.each([' ', 'x'.repeat(4001)])('rejects a supplied brief that cannot validate', (creativeDirection) => {
+    expect(() => starterFiles('demo', { creativeDirection })).toThrow();
+  });
+});
+
 describe('starterFiles (mcp + remotion)', () => {
   const files = starterFiles('demo', { mcp: true, remotion: true, projectDir: '/abs/demo' });
 

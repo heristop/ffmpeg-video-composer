@@ -603,7 +603,34 @@
     "keepLastFrame": "Mantener el último fotograma",
     "dragHint": "Arrastra para mover · esquina para redimensionar · flechas para ajustar",
     "reset": "Restablecer a los valores predeterminados",
-    "placementGroup": "Colocación"
+    "placementGroup": "Colocación",
+    "effects": {
+      "label": "Combinaciones de efectos",
+      "interface-focus": {
+        "name": "Enfoque de interfaz",
+        "description": "Enmarca un detalle con un breve pulso."
+      },
+      "product-spotlight": {
+        "name": "Producto destacado",
+        "description": "Una órbita suave y un único reflejo."
+      },
+      "celebration-burst": {
+        "name": "Explosión festiva",
+        "description": "Un breve acento de confeti y destellos."
+      },
+      "focus-lock": {
+        "name": "Foco fijo",
+        "description": "Un marco de esquinas con un anillo suave."
+      },
+      "light-pass": {
+        "name": "Paso de luz",
+        "description": "Un breve baño de luz y un pequeño destello."
+      },
+      "frame-reveal": {
+        "name": "Revelado del marco",
+        "description": "Un marco fino con un único barrido de brillo."
+      }
+    }
   },
   "element": {
     "resize": "Redimensionar elemento",
@@ -854,10 +881,12 @@
     "easingLinear": "Lineal",
     "easingEaseOut": "Desacelerada",
     "easingEaseInOut": "Suave",
-    "easingHint": "Ritmo de la entrada — Desacelerada se desliza hasta su sitio, Suave acelera y luego se asienta.",
-    "summaryDefault": "tiempos predeterminados"
+    "easingHint": "Cómo se asienta el movimiento — desaceleración suave o un breve paso más allá de la posición final.",
+    "summaryDefault": "tiempos predeterminados",
+    "easingEaseOutBack": "Desaceleración con rebote"
   },
   "exit": {
+    "easing": "Curva de salida",
     "label": "Salida",
     "after": "Empieza después de",
     "summaryDefault": "termina al final de la sección",
@@ -898,6 +927,7 @@
     "summaryOff": "desactivado"
   },
   "titleCard": {
+    "stagger": "Retraso entre líneas",
     "kicker": "Antetítulo",
     "kickerPlaceholder": "p. ej. PRESENTAMOS",
     "headline": "Titular",

@@ -4,12 +4,15 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
+  useWindowDimensions,
   Platform,
   ActivityIndicator,
   StatusBar,
   Animated,
   Easing,
+  Linking,
+  AppState,
+  type LayoutChangeEvent,
 } from 'react-native';
 import { Camera, useCameraDevice, type VideoFile, type CameraDevice } from 'react-native-vision-camera';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,6 +26,7 @@ import { FramingGuideOverlay } from './FramingGuideOverlay';
 import type { FramingGuide, Orientation } from '@/src/types';
 import { ASPECT_RATIO } from '@/src/features/templates/orientationMeta';
 import type { CaptureMode } from '@leclap/creative-kit';
+import { fitFrame } from '@/src/styles/adaptive-layout';
 
 interface VideoRecorderProps {
   orientation: Orientation;
@@ -82,20 +86,6 @@ function getInstructionText(orientation: Orientation, t: TFunction<'recording'>)
 
 function getNextCameraType(current: 'front' | 'back'): 'front' | 'back' {
   return current === 'back' ? 'front' : 'back';
-}
-
-function getPreviewDimensions(orientation: Orientation, fullscreen: boolean) {
-  const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
-
-  if (fullscreen) {
-    return { width: windowWidth, height: windowHeight };
-  }
-
-  // height = width / (w/h) — square stays 1:1, portrait grows tall, landscape stays wide.
-  const width = windowWidth * 0.95;
-
-  return { width, height: width / ASPECT_RATIO[orientation] };
 }
 
 interface TimerOverlayProps {
@@ -198,33 +188,39 @@ function ModeBarOrFlip({
     // possible, and it keeps the frame clean around the record button.
     if (isBusy) return null;
 
-    return <RNCaptureModeBar modes={allowedModes} active={activeMode} onChange={onModeChange} disabled={false} />;
+    return (
+      <RNCaptureModeBar
+        modes={allowedModes}
+        active={activeMode}
+        onChange={onModeChange}
+        disabled={false}
+        isPortrait={isPortrait}
+      />
+    );
   }
 
   return <FlipButton isPortrait={isPortrait} isRecording={isBusy} onPress={onFlip} />;
 }
 
-// Renders the <Camera> element — a simple pass-through wrapper for square orientation that
-// constrains the live view to a 1:1 frame without burning that ternary into VideoRecorder.
+// Fit the template viewfinder inside the available recording window, including short windows.
 function CameraBody({
   cameraRef,
   device,
   orientation,
+  viewport,
+  guide,
 }: {
   cameraRef: React.RefObject<Camera | null>;
   device: CameraDevice;
   orientation: Orientation;
+  viewport: { width: number; height: number };
+  guide?: FramingGuide;
 }) {
-  if (orientation !== 'square') {
-    return <Camera ref={cameraRef} style={styles.camera} device={device} isActive video audio />;
-  }
-
-  const size = Dimensions.get('window').width;
-
   return (
     <View style={styles.squareFrameWrap}>
-      <View style={[styles.squareFrame, { width: size, height: size }]}>
+      <View style={[styles.squareFrame, fitFrame(viewport.width, viewport.height, ASPECT_RATIO[orientation])]}>
         <Camera ref={cameraRef} style={styles.camera} device={device} isActive video audio resizeMode="cover" />
+        <FramingGuideOverlayWhenLive guide={guide} orientation={orientation} />
       </View>
     </View>
   );
@@ -315,15 +311,19 @@ function FlipButton({ isPortrait, isRecording, onPress }: FlipButtonProps) {
 }
 
 interface RNCaptureModeBarProps {
+  isPortrait: boolean;
   modes: CaptureMode[];
   active: CaptureMode;
   onChange: (m: CaptureMode) => void;
   disabled: boolean;
 }
 
-function RNCaptureModeBar({ modes, active, onChange, disabled }: RNCaptureModeBarProps) {
+function RNCaptureModeBar({ modes, active, onChange, disabled, isPortrait }: RNCaptureModeBarProps) {
   return (
-    <View style={styles.captureModeBar} pointerEvents={disabled ? 'none' : 'auto'}>
+    <View
+      style={[styles.captureModeBar, !isPortrait && styles.landscapeModeBar]}
+      pointerEvents={disabled ? 'none' : 'auto'}
+    >
       {/* One translucent track holding equal-width segments — the active segment is the only filled
           one, so it reads as a single segmented control rather than two floating pills. */}
       <View style={styles.captureModeTrack}>
@@ -400,29 +400,42 @@ function DescriptionOverlay({ isPortrait, description, onDismiss }: DescriptionO
 function useCameraPermissions() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isCheckingPermissions, setIsCheckingPermissions] = useState(true);
+  const [blocked, setBlocked] = useState(false);
+
+  const checkPermissions = async () => {
+    setIsCheckingPermissions(true);
+    try {
+      const camera = await Camera.requestCameraPermission();
+      const microphone = await Camera.requestMicrophonePermission();
+      setHasPermission(camera === 'granted' && microphone === 'granted');
+      setBlocked(camera === 'denied' || microphone === 'denied');
+    } catch (error) {
+      console.error('Error checking permissions:', error);
+      setHasPermission(false);
+    } finally {
+      setIsCheckingPermissions(false);
+    }
+  };
 
   useEffect(() => {
-    const checkPermissions = async () => {
-      setIsCheckingPermissions(true);
-
-      try {
-        const cameraPermission = await Camera.requestCameraPermission();
-        const micPermission = await Camera.requestMicrophonePermission();
-        setHasPermission(cameraPermission === 'granted' && micPermission === 'granted');
-      } catch (error) {
-        console.error('Error checking permissions:', error);
-        setHasPermission(false);
-      } finally {
-        setIsCheckingPermissions(false);
-      }
-    };
-
-    checkPermissions().catch((error: unknown) => {
-      console.error('checkPermissions failed:', error);
+    checkPermissions().catch(console.error);
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') return;
+      const camera = Camera.getCameraPermissionStatus();
+      const microphone = Camera.getMicrophonePermissionStatus();
+      setHasPermission(camera === 'granted' && microphone === 'granted');
+      setBlocked(camera === 'denied' || microphone === 'denied');
     });
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
-  return { hasPermission, isCheckingPermissions };
+  const requestAccess = () => {
+    if (blocked) return Linking.openSettings();
+    return checkPermissions();
+  };
+  return { hasPermission, isCheckingPermissions, blocked, requestAccess };
 }
 
 function useRecordingTimer(isRecording: boolean): number {
@@ -852,7 +865,7 @@ const RecorderFooter = ({
       {sectionDescription && showDescription && !isRecording && (
         <DescriptionOverlay isPortrait={isPortrait} description={sectionDescription} onDismiss={onDismissDescription} />
       )}
-      {!isRecording && (
+      {!isRecording && (isPortrait || !hasModeBar) && (
         <View style={[styles.instructionChip, isPortrait ? portraitInstructions : styles.landscapeInstructions]}>
           <Ionicons
             name={isPortrait ? 'phone-portrait-outline' : 'phone-landscape-outline'}
@@ -869,8 +882,9 @@ const RecorderFooter = ({
 interface PermissionGateProps {
   isCheckingPermissions: boolean;
   hasPermission: boolean | null;
+  blocked: boolean;
+  requestAccess: () => Promise<void>;
   device: ReturnType<typeof useCameraDevice>;
-  dimensions: { width: number; height: number };
   t: TFunction<'recording'>;
 }
 
@@ -880,8 +894,9 @@ interface PermissionGateProps {
 const permissionGate = ({
   isCheckingPermissions,
   hasPermission,
+  blocked,
+  requestAccess,
   device,
-  dimensions,
   t,
 }: PermissionGateProps): React.ReactElement | null => {
   if (isCheckingPermissions) {
@@ -899,13 +914,24 @@ const permissionGate = ({
         <Ionicons name="camera-outline" size={48} color={colors.error} />
         <Text style={styles.permissionTitle}>{t('permissions.title')}</Text>
         <Text style={styles.permissionText}>{t('permissions.message')}</Text>
+        <TouchableOpacity
+          accessibilityRole="button"
+          onPress={() => {
+            requestAccess().catch(console.error);
+          }}
+          style={{ minHeight: 48, padding: 16 }}
+        >
+          <Text style={{ ...typography.button, color: colors.primaryDark }}>
+            {t(blocked ? 'permissions.settings' : 'permissions.allow')}
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   if (!device) {
     return (
-      <View style={[styles.container, { width: dimensions.width, height: dimensions.height }]}>
+      <View style={[styles.container, { alignItems: 'center', justifyContent: 'center', padding: spacing.l }]}>
         <Text style={styles.errorText}>{t('noDevice')}</Text>
       </View>
     );
@@ -913,6 +939,22 @@ const permissionGate = ({
 
   return null;
 };
+
+function useRecorderViewport(fullscreen: boolean) {
+  const { width, height } = useWindowDimensions();
+  const [viewport, setViewport] = useState({ width, height });
+  const onLayout = (event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setViewport({ width, height });
+  };
+
+  return {
+    viewport,
+    onLayout,
+    isPortrait: viewport.width <= viewport.height * 1.15,
+    containerStyle: fullscreen ? styles.fullscreenContainer : styles.container,
+  };
+}
 
 const VideoRecorder: React.FC<VideoRecorderProps> = ({
   orientation,
@@ -926,6 +968,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   allowedModes = DEFAULT_MODES,
 }) => {
   const { t } = useTranslation('recording');
+  const { viewport, onLayout, isPortrait, containerStyle } = useRecorderViewport(fullscreen);
   const [isRecording, setIsRecording] = useState(false);
   const { isFinalizing, setIsFinalizing } = useFinalizingSync(onFinalizingChange);
   const { showDescription, dismiss: dismissDescription } = useDescriptionOverlay();
@@ -934,11 +977,9 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   );
   const cameraRef = useRef<Camera | null>(null);
   const device = useCameraDevice(cameraType);
-  const { hasPermission, isCheckingPermissions } = useCameraPermissions();
+  const { hasPermission, isCheckingPermissions, blocked, requestAccess } = useCameraPermissions();
   const recordingDuration = useRecordingTimer(isRecording);
   const pulseAnim = usePulseAnimation(isRecording);
-  // Square records with the phone upright, so it shares the portrait chrome layout (timer/flip/controls).
-  const isPortrait = orientation !== 'landscape';
   const { handleRecordPress } = useRecordingActions({
     cameraRef,
     setIsRecording,
@@ -955,11 +996,9 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
     maxDurationSeconds,
   });
 
-  const containerStyle = fullscreen ? styles.fullscreenContainer : styles.container;
-
   if (isUploadMode) {
     return (
-      <View style={containerStyle}>
+      <View style={containerStyle} onLayout={onLayout}>
         <StatusBar hidden backgroundColor="transparent" translucent />
         <UploadPlaceholder onPick={pickVideo} />
         <ModeBarOrFlip
@@ -978,25 +1017,37 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   const gate = permissionGate({
     isCheckingPermissions,
     hasPermission,
+    blocked,
+    requestAccess,
     device,
-    dimensions: getPreviewDimensions(orientation, fullscreen),
     t,
   });
 
-  if (gate) return gate;
+  if (gate) {
+    return (
+      <View style={containerStyle} onLayout={onLayout}>
+        {gate}
+      </View>
+    );
+  }
 
   // The gate already covers a missing device; this narrows the type for <Camera> below.
   if (!device) return null;
 
   return (
-    <View style={containerStyle}>
+    <View style={containerStyle} onLayout={onLayout}>
       <StatusBar hidden backgroundColor="transparent" translucent />
-      <CameraBody cameraRef={cameraRef} device={device} orientation={orientation} />
+      <CameraBody
+        cameraRef={cameraRef}
+        device={device}
+        orientation={orientation}
+        viewport={viewport}
+        guide={framingGuide}
+      />
       {/* Top + bottom scrims keep the header, description and controls legible over any camera frame. */}
       <LinearGradient pointerEvents="none" colors={TOP_SCRIM_COLORS} style={styles.topScrim} />
       <LinearGradient pointerEvents="none" colors={BOTTOM_SCRIM_COLORS} style={styles.bottomScrim} />
       <CaptureBrackets />
-      <FramingGuideOverlayWhenLive guide={framingGuide} orientation={orientation} />
       <CaptureOverlays
         isPortrait={isPortrait}
         isRecording={isRecording}
@@ -1051,7 +1102,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000', position: 'relative' },
   fullscreenContainer: { flex: 1, backgroundColor: '#000', position: 'relative' },
   camera: { width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 },
-  // Centered 1:1 viewfinder for square templates: black bars fill the rest of the screen.
+  // Center the template frame; black fills any remaining recording viewport.
   squareFrameWrap: {
     position: 'absolute',
     top: 0,
@@ -1086,8 +1137,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     zIndex: 50,
   },
-  portraitTimer: { top: 100, alignSelf: 'center' },
-  landscapeTimer: { top: 50, right: 30 },
+  portraitTimer: { top: 76, alignSelf: 'center' },
+  landscapeTimer: { top: 76, right: 24 },
   countdownOverlay: {
     position: 'absolute',
     top: 0,
@@ -1143,8 +1194,8 @@ const styles = StyleSheet.create({
   timerText: { color: 'white', fontSize: 16, marginRight: spacing.s, fontVariant: ['tabular-nums'] },
   recordingIndicator: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.error },
   controls: { position: 'absolute', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', zIndex: 5 },
-  portraitControls: { bottom: 50, left: 0, right: 0 },
-  landscapeControls: { bottom: 0, top: 0, right: 50, justifyContent: 'center' },
+  portraitControls: { bottom: 24, left: 0, right: 0 },
+  landscapeControls: { bottom: 0, top: 0, right: 24, justifyContent: 'center' },
   recordButton: {
     width: 82,
     height: 82,
@@ -1184,8 +1235,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
   },
-  portraitFlipButton: { bottom: 50, right: 50 },
-  landscapeFlipButton: { bottom: 50, left: 50 },
+  portraitFlipButton: { bottom: 40, right: 24 },
+  landscapeFlipButton: { bottom: 24, left: 24 },
   topScrim: { position: 'absolute', top: 0, left: 0, right: 0, height: 220, zIndex: 1 },
   bottomScrim: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 280, zIndex: 1 },
   descriptionOverlay: {
@@ -1206,7 +1257,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
-  portraitDescriptionOverlay: { top: 96, left: 16, right: 16 },
+  portraitDescriptionOverlay: { top: 76, left: 16, right: 16 },
   landscapeDescriptionOverlay: { top: 76, left: 100, maxWidth: '50%' },
   descriptionIcon: { marginTop: 1 },
   descriptionClose: { marginTop: 1 },
@@ -1236,12 +1287,10 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.85)',
     fontSize: 13,
   },
-  // Clears the record button (bottom 50, 82pt tall). The chip is anchored to the screen, not the
-  // preview, so in 1:1 framing — where the preview's bottom edge lands near 208 — too low a value
-  // puts it on that edge instead of over the preview.
-  portraitInstructions: { bottom: 166 },
-  // Lifted clear of the mode toggle (which sits at bottom 146, ~38pt tall) with an 8pt-rhythm gap.
-  portraitInstructionsWithBar: { bottom: 222 },
+  // Keep instructions above the recording controls.
+  portraitInstructions: { bottom: 124 },
+  // Reserve extra clearance when the capture mode toggle is present.
+  portraitInstructionsWithBar: { bottom: 184 },
   landscapeInstructions: { bottom: 20 },
   errorText: { ...typography.body, color: colors.error, textAlign: 'center' },
   permissionContainer: {
@@ -1259,12 +1308,13 @@ const styles = StyleSheet.create({
   // bottom 50–130), with the hint chip lifted above it (portraitInstructionsWithBar).
   captureModeBar: {
     position: 'absolute',
-    bottom: 146,
+    bottom: 120,
     left: 0,
     right: 0,
     alignItems: 'center',
     zIndex: 10,
   },
+  landscapeModeBar: { bottom: 16, left: 88, right: 128 },
   captureModeTrack: {
     flexDirection: 'row',
     padding: 4,

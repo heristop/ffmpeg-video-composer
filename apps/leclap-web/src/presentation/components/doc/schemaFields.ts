@@ -127,6 +127,18 @@ export const docGroups = {
   transition: (): FieldRow[] => fieldRows(sectionProperty('transition')),
   grade: (): FieldRow[] => fieldRows(sectionProperty('grade')),
   motion: (): FieldRow[] => fieldRows(mergeVariants(sectionProperty('motion')?.items)),
+  motionVariants: (): { name: string; rows: FieldRow[] }[] => {
+    const node = sectionProperty('motion')?.items;
+
+    return (node?.anyOf ?? node?.oneOf ?? []).map((variant) => ({
+      name: String(prop(variant, 'type')?.const),
+      rows: fieldRows(variant),
+    }));
+  },
+  titleCard: (): FieldRow[] => fieldRows(sectionProperty('titleCard')),
+  lowerThird: (): FieldRow[] => fieldRows(sectionProperty('lowerThird')),
+  reveal: (): FieldRow[] => fieldRows(mergeVariants(prop(sectionProperty('caption'), 'reveal'))),
+  textEffect: (): FieldRow[] => fieldRows(prop(sectionProperty('caption'), 'effect')),
   framingGuide: (): FieldRow[] => fieldRows(optionProperty('framingGuide')),
   layers: (): FieldRow[] => fieldRows(optionProperty('layers')?.items),
   caption: (): FieldRow[] => fieldRows(sectionProperty('caption')),

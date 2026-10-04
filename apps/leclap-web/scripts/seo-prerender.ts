@@ -59,6 +59,7 @@ const seoByLocale = Object.fromEntries(
     compareRemotion: SeoEntry;
     legal: SeoEntry;
     privacy: SeoEntry;
+    showcase: SeoEntry;
   }
 >;
 

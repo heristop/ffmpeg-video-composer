@@ -2,7 +2,9 @@
 
 **The shared LeClap creative catalog** — the templates, partials, fonts, media, and bundled assets every LeClap surface renders from.
 
-Private to the monorepo (`workspace:*`, not published). The core engine ([`ffmpeg-video-composer`](../ffmpeg-video-composer)) stays content-free; this package is where the _content_ lives, so the server, MCP, web, and Expo apps all draw from one source and produce identical output.
+Private to the monorepo (`workspace:*`, not published). The core engine ([`ffmpeg-video-composer`](../ffmpeg-video-composer)) stays content-free; this package is where the _content_ lives, so the server, MCP, web, and Expo apps draw from the same authored descriptors and assets. Encoder and filter capabilities vary by platform; output pixels are not identical across hosts.
+
+Descriptors control scene timing, orientation, fps and creative direction. The host supplies paths, fields, clip bindings and encoder settings through `ProjectConfig`; registered effects additionally need the trusted Node renderer configured at MCP startup. See [engine configuration](../../docs/engine-configuration.md) for these boundaries and defaults.
 
 ## What it exports
 

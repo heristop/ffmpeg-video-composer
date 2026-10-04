@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "creativeDirection": "Direction: a landscape web-app launch progressing from promise to screenshot showcase to invitation. Use white type on deep ink, a lavender accent and a shallow camera tilt; let the screenshot dominate the middle beat. Coordinate headline and feature entrances without covering the interface, then hold the approved CTA. This example uses synthetic media; replace it with a verified product screenshot for a real promotion. Avoid invented product claims, continuous camera motion and tiny type. Review the hook, screenshot crop, camera settling, longest copy and final CTA using selected preview frames."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false
+  },
+  "sections": [
+    {
+      "name": "promo",
+      "type": "effect",
+      "effect": {
+        "id": "leclap.web-app-promo",
+        "version": "1.0.0",
+        "props": {
+          "brand": "LeClap",
+          "eyebrow": "FROM IDEA TO LAUNCH",
+          "headline": "Your next big idea. In motion.",
+          "subheadline": "Turn your product into a story worth watching.",
+          "cta": "Start creating",
+          "displayUrl": "leclap.dev",
+          "features": ["Design with intent", "Move with precision", "Ship something remarkable"],
+          "accent": "#B9A2FF",
+          "backgroundColor": "#111120",
+          "textColor": "#FFFFFF",
+          "showcaseStartFrame": 90,
+          "ctaStartFrame": 240,
+          "entranceDurationFrames": 24,
+          "springDamping": 20,
+          "cameraZoom": 1.06,
+          "cameraTiltDegrees": 8
+        },
+        "assets": {
+          "screenshot": "media/screenshot.png",
+          "logo": "media/logo.png",
+          "font": "media/font.ttf"
+        }
+      },
+      "options": {
+        "duration": 10
+      }
+    }
+  ]
+}

@@ -59,3 +59,5 @@ class Template {
 }
 
 export default Template;
+
+export { assertEffectsResolved } from '../partials';

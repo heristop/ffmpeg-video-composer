@@ -2,7 +2,7 @@
 import 'reflect-metadata';
 import { LogBox } from 'react-native';
 import { Stack } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { TamaguiProvider } from '@tamagui/core';
 import {
@@ -17,7 +17,6 @@ import { I18nextProvider } from 'react-i18next';
 import { QueryProvider } from '@/src/providers/QueryProvider';
 import { OfflineProvider } from '@/src/providers/OfflineProvider';
 import { CompileProgressOverlay } from '@/src/components/compile/CompileProgressOverlay';
-import AnimatedSplashScreen from '@/src/components/SplashScreen';
 import i18n from '@/src/i18n';
 import config from '../tamagui.config';
 
@@ -40,9 +39,8 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
-  const [showAnimatedSplash, setShowAnimatedSplash] = useState(true);
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Oswald_300Light,
     Oswald_400Regular,
     Oswald_500Medium,
@@ -50,25 +48,17 @@ export default function RootLayout() {
     Oswald_700Bold,
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      // Hide the native splash screen to show a custom one
-      await SplashScreen.hideAsync();
-      setIsReady(true);
-    }
-  }, [fontsLoaded]);
-
   useEffect(() => {
-    onLayoutRootView().catch(() => {});
-  }, [onLayoutRootView]);
+    if (!fontsLoaded && !fontError) return;
+    SplashScreen.hideAsync()
+      .catch(() => {})
+      .finally(() => {
+        setIsReady(true);
+      });
+  }, [fontsLoaded, fontError]);
 
-  const handleAnimationComplete = () => {
-    setShowAnimatedSplash(false);
-  };
-
-  if (!isReady || !fontsLoaded || showAnimatedSplash) {
-    return showAnimatedSplash ? <AnimatedSplashScreen onAnimationComplete={handleAnimationComplete} /> : null;
-  }
+  // Open the studio as soon as resources are ready; no mandatory animated intro.
+  if (!isReady) return null;
 
   return (
     <TamaguiProvider config={config} defaultTheme="light">

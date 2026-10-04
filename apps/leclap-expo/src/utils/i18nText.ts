@@ -12,7 +12,9 @@ export function resolveTranslation(
     return undefined;
   }
 
-  return translation[locale] ?? translation.en ?? Object.values(translation).find(Boolean);
+  return [translation[locale], translation[locale.split('-')[0]], translation.en, ...Object.values(translation)].find(
+    Boolean
+  );
 }
 
 // Replace `{{ name }}` placeholders in a description with their resolved values. Mirrors the core's

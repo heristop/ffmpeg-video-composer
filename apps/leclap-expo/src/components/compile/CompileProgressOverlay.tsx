@@ -1,227 +1,119 @@
 import { useEffect } from 'react';
-import { Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MotiView, MotiText, AnimatePresence } from 'moti';
-import Svg, { Circle, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
-import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import Animated, {
+  cancelAnimation,
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 import { useCompileProgressStore } from '@/src/stores/useCompileProgressStore';
-import { colors, fonts, withAlpha } from '@/src/styles/theme';
-import { gradients, gradientDir } from '@/src/styles/gradients';
+import { Clappy } from '@/src/components/clappy/Clappy';
+import { colors, spacing, typography, withAlpha } from '@/src/styles/theme';
+import { useMotionPreferences } from '@/src/hooks/use-motion-preferences';
 import { motion } from '@/src/styles/motion';
 
-const logo = require('../../../assets/images/logo.png');
-
-// Ring geometry — the LeClap logo sits at the centre, the progress arc fills around it.
-const RING = 188;
-const STROKE = 9;
-const R = (RING - STROKE) / 2;
-const CIRCUMFERENCE = 2 * Math.PI * R;
-
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-
-/**
- * Full-screen, on-device compile experience: a breathing LeClap logo inside an animated progress ring,
- * the live percentage, the engine's playful stage quip, and a "stays on your device" badge over a
- * cinematic gradient. Mounted once at the app root; visible only while a compilation is in flight,
- * driven by `useCompileProgressStore` (fed by the engine's `compilation-progress` events).
- */
+/** Real engine progress; Clappy holds still while rendering. */
 export function CompileProgressOverlay() {
+  const { t } = useTranslation('preview');
   const visible = useCompileProgressStore((s) => s.visible);
   const ratio = useCompileProgressStore((s) => s.ratio);
   const stage = useCompileProgressStore((s) => s.stage);
   const cancelling = useCompileProgressStore((s) => s.cancelling);
   const requestCancel = useCompileProgressStore((s) => s.requestCancel);
-
-  const progress = useSharedValue(0);
-
+  const { reducedMotion, appActive } = useMotionPreferences();
+  const progress = useSharedValue(ratio);
   useEffect(() => {
-    progress.value = withTiming(ratio, { duration: motion.duration.ring });
-  }, [ratio, progress]);
+    progress.set(
+      reducedMotion || !appActive || !visible || cancelling
+        ? ratio
+        : withTiming(ratio, { duration: motion.duration.instant, reduceMotion: ReduceMotion.Never })
+    );
 
-  const arcProps = useAnimatedProps(() => ({
-    strokeDashoffset: CIRCUMFERENCE * (1 - progress.value),
-  }));
-
+    return () => {
+      cancelAnimation(progress);
+    };
+  }, [ratio, reducedMotion, appActive, visible, cancelling, progress]);
+  const barStyle = useAnimatedStyle(() => ({ transform: [{ scaleX: progress.get() }] }));
   const percent = Math.round(ratio * 100);
 
   return (
-    <Modal visible={visible} transparent statusBarTranslucent animationType="fade" onRequestClose={() => {}}>
-      <LinearGradient colors={[...gradients.monitor]} {...gradientDir.diagonal} style={styles.fill}>
-        <MotiView
-          from={{ opacity: 0, scale: 0.94, translateY: 8 }}
-          animate={{ opacity: 1, scale: 1, translateY: 0 }}
-          transition={{ type: 'timing', duration: motion.duration.slow }}
-          style={styles.center}
-        >
-          <Text style={styles.heading}>Rendering your program</Text>
-
-          <View style={styles.ringWrap}>
-            {/* Soft pulsing halo behind the logo for life. */}
-            <MotiView
-              from={{ opacity: 0.18, scale: 0.9 }}
-              animate={{ opacity: 0.42, scale: 1.18 }}
-              transition={{ loop: true, repeatReverse: true, type: 'timing', duration: motion.duration.halo }}
-              style={styles.halo}
-            />
-
-            <Svg width={RING} height={RING} style={styles.ringSvg}>
-              <Defs>
-                <SvgGradient id="leclapArc" x1="0" y1="0" x2="1" y2="1">
-                  <Stop offset="0" stopColor={colors.primary} />
-                  <Stop offset="1" stopColor={colors.secondary} />
-                </SvgGradient>
-              </Defs>
-              <Circle
-                cx={RING / 2}
-                cy={RING / 2}
-                r={R}
-                stroke="rgba(255,255,255,0.08)"
-                strokeWidth={STROKE}
-                fill="none"
-              />
-              <AnimatedCircle
-                cx={RING / 2}
-                cy={RING / 2}
-                r={R}
-                stroke="url(#leclapArc)"
-                strokeWidth={STROKE}
-                fill="none"
-                strokeLinecap="round"
-                strokeDasharray={CIRCUMFERENCE}
-                animatedProps={arcProps}
-              />
-            </Svg>
-
-            {/* Breathing logo. */}
-            <MotiView
-              from={{ scale: 0.96 }}
-              animate={{ scale: 1.05 }}
-              transition={{ loop: true, repeatReverse: true, type: 'timing', duration: motion.duration.breath }}
-              style={styles.logoWrap}
+    <Modal visible={visible} animationType="fade" onRequestClose={() => {}}>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.fill}>
+          <ScrollView contentContainerStyle={styles.center}>
+            <Clappy size={180} state="working" active={false} />
+            <Text accessibilityRole="header" style={styles.heading}>
+              {t('compile.title')}
+            </Text>
+            <Text style={styles.percent}>{percent}%</Text>
+            <View
+              accessibilityRole="progressbar"
+              accessibilityLabel={t('compile.progress')}
+              accessibilityValue={{ min: 0, max: 100, now: percent }}
+              style={styles.track}
             >
-              <Image source={logo} style={styles.logo} resizeMode="contain" />
-            </MotiView>
-          </View>
-
-          <Text style={styles.percent}>{percent}%</Text>
-
-          <View style={styles.quipSlot}>
-            <AnimatePresence exitBeforeEnter>
-              <MotiText
-                key={stage || 'prep'}
-                from={{ opacity: 0, translateY: 7 }}
-                animate={{ opacity: 1, translateY: 0 }}
-                exit={{ opacity: 0, translateY: -7 }}
-                transition={{ type: 'timing', duration: motion.duration.base }}
-                style={styles.quip}
-              >
-                {stage || 'Warming up the projector…'}
-              </MotiText>
-            </AnimatePresence>
-          </View>
-
-          <View style={styles.badge}>
-            <View style={styles.badgeDot} />
-            <Text style={styles.badgeText}>Rendering privately on your device</Text>
-          </View>
-
-          {/* The overlay is non-dismissible via back — Cancel is the explicit exit. */}
-          <Pressable
-            onPress={requestCancel}
-            disabled={cancelling}
-            accessibilityRole="button"
-            accessibilityLabel="Cancel compilation"
-            accessibilityState={{ disabled: cancelling, busy: cancelling }}
-            hitSlop={12}
-            style={({ pressed }) => [
-              styles.cancel,
-              cancelling && styles.cancelDisabled,
-              pressed && !cancelling && styles.cancelPressed,
-            ]}
-          >
-            <Text style={styles.cancelText}>{cancelling ? 'Cancelling…' : 'Cancel'}</Text>
-          </Pressable>
-        </MotiView>
-      </LinearGradient>
+              <Animated.View style={[styles.bar, barStyle]} />
+            </View>
+            <Text accessibilityLiveRegion="polite" style={styles.stage}>
+              {cancelling ? t('compile.cancelling') : stage || t('compile.preparing')}
+            </Text>
+            <View style={styles.privacy}>
+              <Ionicons name="lock-closed-outline" size={18} color={colors.monitorSecondary} accessible={false} />
+              <Text style={styles.privacyText}>{t('compile.private')}</Text>
+            </View>
+            <Pressable
+              onPress={requestCancel}
+              disabled={cancelling}
+              accessibilityRole="button"
+              accessibilityLabel={t('compile.cancel')}
+              accessibilityState={{ disabled: cancelling, busy: cancelling }}
+              style={({ pressed }) => [styles.cancel, cancelling && styles.disabled, pressed && styles.pressed]}
+            >
+              <Text style={styles.cancelText}>{cancelling ? t('compile.cancelling') : t('compile.cancel')}</Text>
+            </Pressable>
+          </ScrollView>
+        </SafeAreaView>
+      </SafeAreaProvider>
     </Modal>
   );
 }
-
 const styles = StyleSheet.create({
-  fill: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
-  heading: {
-    fontFamily: fonts.poppins.bold,
-    fontSize: 24,
-    letterSpacing: 0.6,
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
-    marginBottom: 40,
+  fill: { flex: 1, backgroundColor: colors.monitorBackground },
+  center: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.l, gap: spacing.m },
+  heading: { ...typography.displayS, color: colors.monitorText, textAlign: 'center', marginTop: spacing.s },
+  percent: { ...typography.displayL, color: colors.monitorText, fontVariant: ['tabular-nums'] },
+  track: {
+    width: '100%',
+    maxWidth: 280,
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
+    backgroundColor: withAlpha(colors.monitorText, 0.15),
   },
-  ringWrap: { width: RING, height: RING, alignItems: 'center', justifyContent: 'center' },
-  ringSvg: { position: 'absolute', transform: [{ rotate: '-90deg' }] },
-  halo: {
-    position: 'absolute',
-    width: RING * 0.82,
-    height: RING * 0.82,
-    borderRadius: RING,
-    backgroundColor: withAlpha(colors.primary, 0.45),
+  bar: {
+    width: '100%',
+    height: '100%',
+    transformOrigin: 'left center',
+    borderRadius: 3,
+    backgroundColor: colors.primary,
   },
-  logoWrap: { width: 96, height: 96, alignItems: 'center', justifyContent: 'center' },
-  logo: { width: 96, height: 96 },
-  percent: {
-    fontFamily: fonts.poppins.bold,
-    fontSize: 56,
-    letterSpacing: 0.5,
-    color: '#FFFFFF',
-    marginTop: 36,
-    fontVariant: ['tabular-nums'],
-  },
-  quipSlot: { height: 26, marginTop: 6, alignItems: 'center', justifyContent: 'center' },
-  quip: {
-    fontFamily: fonts.inter.regular,
-    fontSize: 15,
-    letterSpacing: 0.2,
-    color: withAlpha('#FFFFFF', 0.72),
-    textAlign: 'center',
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 48,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: withAlpha('#FFFFFF', 0.06),
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: withAlpha('#FFFFFF', 0.12),
-  },
-  badgeDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.success },
-  badgeText: {
-    fontFamily: fonts.inter.regular,
-    fontSize: 12.5,
-    letterSpacing: 0.3,
-    color: withAlpha('#FFFFFF', 0.66),
-  },
+  stage: { ...typography.body, color: colors.monitorSecondary, lineHeight: 24, textAlign: 'center', minHeight: 48 },
+  privacy: { flexDirection: 'row', alignItems: 'center', gap: spacing.s, marginTop: spacing.m, maxWidth: 320 },
+  privacyText: { ...typography.caption, color: colors.monitorSecondary, lineHeight: 20, flexShrink: 1 },
   cancel: {
-    marginTop: 20,
-    paddingHorizontal: 26,
-    paddingVertical: 11,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: withAlpha('#FFFFFF', 0.24),
-    backgroundColor: withAlpha('#FFFFFF', 0.04),
+    minHeight: 48,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.l,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: withAlpha(colors.monitorText, 0.1),
   },
-  cancelPressed: { backgroundColor: withAlpha('#FFFFFF', 0.1) },
-  cancelDisabled: { opacity: 0.45 },
-  cancelText: {
-    fontFamily: fonts.poppins.medium,
-    fontSize: 13,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: withAlpha('#FFFFFF', 0.82),
-  },
+  cancelText: { ...typography.body, color: colors.monitorText, textAlign: 'center' },
+  disabled: { opacity: 0.5 },
+  pressed: { backgroundColor: withAlpha(colors.monitorText, 0.2) },
 });
-
 export default CompileProgressOverlay;

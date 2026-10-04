@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "creativeDirection": "Direction: highlight editorial typography with a single readable phrase, restrained accent, a brief entrance and a long settled hold. Give each word a deliberate timing role; avoid continuous motion. Implement the brief through the registered effect props and review arrival, settling and the final frame."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false
+  },
+  "sections": [
+    {
+      "name": "editorial",
+      "type": "effect",
+      "options": {
+        "duration": 10
+      },
+      "effect": {
+        "id": "studio.editorial-type",
+        "version": "1.0.0",
+        "props": {
+          "headline": "Make the important word matter",
+          "kicker": "CREATIVE DIRECTION",
+          "mode": "highlight",
+          "accent": "orange",
+          "entranceDurationFrames": 18,
+          "staggerFrames": 3,
+          "travelPx": 56,
+          "highlightWord": 3
+        },
+        "assets": {}
+      }
+    }
+  ]
+}

@@ -112,7 +112,7 @@ export function renderCapabilityMatrix(): string {
     separator,
     ...dataRows,
     '',
-    `Device allowlist size: ${device.size} filters. The on-device engine binary must be rebuilt (\`scripts/ffmpeg/build-engine.sh\`) whenever the allowlist changes; until then, older installed engines lack newly added filters and on-device compiles of affected templates fail over to the app's fallback path.`,
+    `Device allowlist size: ${device.size} filters. The on-device engine binary must be rebuilt (\`scripts/ffmpeg/build-engine.sh\`) whenever the allowlist changes; until then, older installed engines lack newly added filters and affected renders can fail. Expo compilation stays local; there is no server fallback.`,
     '',
   ].join('\n');
 }

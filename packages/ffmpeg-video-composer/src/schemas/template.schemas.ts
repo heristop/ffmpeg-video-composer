@@ -19,6 +19,7 @@ import type {
 } from './effects.schemas';
 
 export * from './effects.schemas';
+export * from './effect-reference.schema';
 export * from './global.schemas';
 export * from './filter.schemas';
 export * from './section.schemas';

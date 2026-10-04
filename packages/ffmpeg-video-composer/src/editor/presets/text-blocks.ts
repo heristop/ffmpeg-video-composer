@@ -65,6 +65,8 @@ export type TitleCard = {
   background?: string;
   /** Entrance for the lines, staggered top-to-bottom (default "rise"). */
   reveal?: RevealInput;
+  /** Seconds between non-empty line entrances (default 0.15). */
+  stagger?: number;
   /** Drop shadow / outline applied to every line for legibility. */
   effect?: TextEffect;
   /** Auto fade-in / fade-out over the card (both default on). */
@@ -104,6 +106,7 @@ type TitleCardGeom = {
   align: 'left' | 'center';
   margin: number;
   reveal: RevealInput;
+  stagger?: number;
   accent: string | undefined;
   effect: TextEffect | undefined;
   x: string;
@@ -113,7 +116,7 @@ type TitleCardGeom = {
 // headline, so it follows the headline's staggered reveal; when the card has no headline it falls
 // back to the last pushed line (the kicker), or the base stagger slot.
 function pushTitleCardBody(filters: Filter[], titleCard: TitleCard, geom: TitleCardGeom): void {
-  const { w, h, align, margin, reveal, accent, effect, x } = geom;
+  const { w, h, align, margin, reveal, stagger, accent, effect, x } = geom;
 
   let index = 0;
   index = pushLine(
@@ -126,7 +129,7 @@ function pushTitleCardBody(filters: Filter[], titleCard: TitleCard, geom: TitleC
     },
     reveal,
     index,
-    effect
+    { effect, stagger }
   );
   const headlineIndex = index;
   index = pushLine(
@@ -139,7 +142,7 @@ function pushTitleCardBody(filters: Filter[], titleCard: TitleCard, geom: TitleC
     },
     reveal,
     index,
-    effect
+    { effect, stagger }
   );
 
   const barW = round(w * 0.13);
@@ -151,7 +154,7 @@ function pushTitleCardBody(filters: Filter[], titleCard: TitleCard, geom: TitleC
     ...accentBar(
       accent,
       { x: barX, y: round(h * 0.585), w: barW, h: Math.max(4, round(h * 0.006)) },
-      staggered(reveal, barLineIndex)
+      staggered(reveal, barLineIndex, stagger)
     )
   );
 
@@ -165,7 +168,7 @@ function pushTitleCardBody(filters: Filter[], titleCard: TitleCard, geom: TitleC
     },
     reveal,
     index,
-    effect
+    { effect, stagger }
   );
 }
 
@@ -191,6 +194,7 @@ export function titleCardToFilters(titleCard: TitleCard | undefined, ctx: TitleC
     align,
     margin,
     reveal: titleCard.reveal ?? 'rise',
+    stagger: titleCard.stagger,
     accent: titleCard.accent,
     effect: titleCard.effect,
     x,
@@ -318,7 +322,7 @@ export function lowerThirdToFilters(lowerThird: LowerThird | undefined, ctx: Low
     },
     reveal,
     index,
-    effect
+    { effect }
   );
   index = pushLine(
     filters,
@@ -332,7 +336,7 @@ export function lowerThirdToFilters(lowerThird: LowerThird | undefined, ctx: Low
     },
     reveal,
     index,
-    effect
+    { effect }
   );
 
   const badgeGeom = {

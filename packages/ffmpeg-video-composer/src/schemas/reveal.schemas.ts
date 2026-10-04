@@ -13,7 +13,7 @@ export const REVEAL_TYPES = ['none', 'fade', 'rise', 'slide-left', 'slide-right'
 // and overlay x/y (ease-out = 1-(1-p)^3, ease-in-out = smoothstep p*p*(3-2p)) — no extra filter, so
 // the LGPL on-device build keeps parity. An overlay `fade` motion lowers to the fade FILTER, which
 // is linear only, so easing applies to rise/slide overlay paths (text fades ARE eased: drawtext alpha).
-export const REVEAL_EASINGS = ['linear', 'ease-out', 'ease-in-out'] as const;
+export const REVEAL_EASINGS = ['linear', 'ease-out', 'ease-in-out', 'ease-out-back'] as const;
 
 export const RevealObjectSchema = z
   .object({
@@ -25,7 +25,7 @@ export const RevealObjectSchema = z
       .enum(REVEAL_EASINGS)
       .optional()
       .describe(
-        'Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).'
+        'Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).'
       ),
   })
   .strict()
@@ -40,6 +40,10 @@ export const RevealSchema = z
 export const ExitObjectSchema = z
   .object({
     type: z.enum(REVEAL_TYPES).describe('Exit style: none, fade, rise (up/out), slide-left, slide-right.'),
+    easing: z
+      .enum(REVEAL_EASINGS)
+      .optional()
+      .describe('Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.'),
     after: z
       .number()
       .min(0)

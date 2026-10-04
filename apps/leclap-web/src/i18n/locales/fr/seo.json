@@ -22,5 +22,9 @@
   "privacy": {
     "title": "Politique de confidentialité",
     "description": "LeClap traite tes médias sur ton appareil. Aucun envoi, aucun compte, aucun suivi — voici exactement comment ta vie privée est protégée."
+  },
+  "showcase": {
+    "title": "Galerie de mouvement",
+    "description": "Découvrez tous les exemples LeClap, leurs animations natives et Remotion, leur direction créative et leurs modèles JSON modifiables."
   }
 }

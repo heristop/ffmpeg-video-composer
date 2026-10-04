@@ -1,0 +1,284 @@
+{
+  "meta": {
+    "name": "Story Reel",
+    "description": "A full-bleed three-chapter reel with alternating caption anchors, snappy opposing entrances and clean rhythmic cuts.",
+    "creativeDirection": "Audience: people watching a vertical three-chapter story. Direction: full-bleed footage throughout, with alternating caption anchors and clean rhythmic cuts. Use readable, high-contrast captions as punctuation rather than turning each chapter into a title card. Oppose entrance directions to distinguish chapters; let the footage remain dominant after the short reveal. Avoid a repeated lower-third band, continuous shake and cutting away before the message settles. Review each chapter crop, text against the actual footage, the joins and the last readable frame. Alternate the chapter indicator side and give each caption one small overshoot, then hold the footage without decorative overlays."
+  },
+  "global": {
+    "orientation": "portrait",
+    "musicEnabled": true,
+    "music": {
+      "name": "indie-rock-dreamy.mp3"
+    },
+    "allowedMusic": ["indie-rock-dreamy", "lofi-chill", "lofi-hip-hop", "cafe-jazz", "romantic-piano"],
+    "allowUploadMusic": true,
+    "transition": {
+      "type": "cut"
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "musicVolume": 0.25,
+      "musicFade": 0.8,
+      "normalize": "loudnorm",
+      "ducking": {
+        "threshold": 0.05,
+        "ratio": 8,
+        "attack": 20,
+        "release": 400
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "form_1",
+      "type": "form",
+      "title": {
+        "en": "Caption each scene"
+      },
+      "description": {
+        "en": ""
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "form_1_scene1",
+            "maxLength": 24,
+            "label": {
+              "en": "Scene 1 caption"
+            }
+          },
+          {
+            "name": "form_1_scene2",
+            "maxLength": 24,
+            "label": {
+              "en": "Scene 2 caption"
+            }
+          },
+          {
+            "name": "form_1_scene3",
+            "maxLength": 24,
+            "label": {
+              "en": "Scene 3 caption"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "video_1",
+      "type": "project_video",
+      "look": "vivid-pop",
+      "caption": {
+        "text": {
+          "en": "{{ form_1_scene1 }}"
+        },
+        "style": "bold",
+        "position": "lower-third",
+        "align": "left",
+        "effect": {
+          "shadow": true
+        },
+        "font": "bebas",
+        "fontsize": 44,
+        "boxColor": "#0b0e24",
+        "boxOpacity": 0.7,
+        "reveal": {
+          "type": "slide-right",
+          "delay": 0.07,
+          "duration": 0.34,
+          "easing": "ease-out-back",
+          "distance": 40
+        },
+        "box": true
+      },
+      "title": {
+        "en": "Scene 1"
+      },
+      "description": {
+        "en": "Film your first moment — keep it short and punchy"
+      },
+      "options": {
+        "duration": 4,
+        "forceAspectRatio": true,
+        "countdown": true,
+        "countdownDuration": 2
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "1 / 3"
+            },
+            "fontcolor": "#ffffff",
+            "fontsize": 36,
+            "x": "w-text_w-44",
+            "y": 80,
+            "fontfile": "Oswald.ttf",
+            "box": 1,
+            "boxcolor": "#0b0e24@0.55",
+            "boxborderw": 10
+          },
+          "reveal": {
+            "type": "slide-left",
+            "delay": 0,
+            "duration": 0.16,
+            "easing": "ease-out",
+            "distance": 24
+          },
+          "exit": {
+            "type": "fade",
+            "after": 3.88,
+            "duration": 0.12,
+            "easing": "ease-out"
+          }
+        }
+      ]
+    },
+    {
+      "name": "video_2",
+      "type": "project_video",
+      "look": "vivid-pop",
+      "caption": {
+        "text": {
+          "en": "{{ form_1_scene2 }}"
+        },
+        "style": "bold",
+        "position": "top",
+        "align": "right",
+        "effect": {
+          "shadow": true
+        },
+        "font": "bebas",
+        "fontsize": 44,
+        "boxColor": "#0b0e24",
+        "boxOpacity": 0.7,
+        "reveal": {
+          "type": "slide-left",
+          "delay": 0.07,
+          "duration": 0.34,
+          "easing": "ease-out-back",
+          "distance": 40
+        },
+        "box": true
+      },
+      "title": {
+        "en": "Scene 2"
+      },
+      "description": {
+        "en": "Film your second moment"
+      },
+      "options": {
+        "duration": 4,
+        "forceAspectRatio": true,
+        "countdown": true,
+        "countdownDuration": 2
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "2 / 3"
+            },
+            "fontcolor": "#ffffff",
+            "fontsize": 36,
+            "x": 44,
+            "y": 240,
+            "fontfile": "Oswald.ttf",
+            "box": 1,
+            "boxcolor": "#0b0e24@0.55",
+            "boxborderw": 10
+          },
+          "reveal": {
+            "type": "slide-right",
+            "delay": 0,
+            "duration": 0.2,
+            "distance": 24,
+            "easing": "ease-out"
+          },
+          "exit": {
+            "type": "fade",
+            "after": 3.88,
+            "duration": 0.12,
+            "easing": "ease-out"
+          }
+        }
+      ]
+    },
+    {
+      "name": "video_3",
+      "type": "project_video",
+      "look": "vivid-pop",
+      "caption": {
+        "text": {
+          "en": "{{ form_1_scene3 }}"
+        },
+        "style": "bold",
+        "position": "bottom",
+        "align": "center",
+        "effect": {
+          "shadow": true
+        },
+        "font": "bebas",
+        "fontsize": 44,
+        "boxColor": "#0b0e24",
+        "boxOpacity": 0.7,
+        "reveal": {
+          "type": "rise",
+          "delay": 0.07,
+          "duration": 0.34,
+          "easing": "ease-out-back",
+          "distance": 32
+        },
+        "box": true
+      },
+      "title": {
+        "en": "Scene 3"
+      },
+      "description": {
+        "en": "Film your last moment to wrap the reel"
+      },
+      "options": {
+        "duration": 4,
+        "forceAspectRatio": true,
+        "countdown": true,
+        "countdownDuration": 2
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "3 / 3"
+            },
+            "fontcolor": "#ffffff",
+            "fontsize": 36,
+            "x": "w-text_w-44",
+            "y": 80,
+            "fontfile": "Oswald.ttf",
+            "box": 1,
+            "boxcolor": "#0b0e24@0.55",
+            "boxborderw": 10
+          },
+          "reveal": {
+            "type": "slide-left",
+            "delay": 0,
+            "duration": 0.16,
+            "easing": "ease-out",
+            "distance": 24
+          }
+        }
+      ]
+    }
+  ]
+}

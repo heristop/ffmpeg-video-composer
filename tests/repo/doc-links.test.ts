@@ -5,7 +5,17 @@ import { describe, expect, it } from 'vitest';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
-const DOCS = ['README.md', 'AGENTS.md', 'CONTRIBUTING.md', 'DESIGN.md', 'CODE_OF_CONDUCT.md'];
+const DOCS = [
+  'README.md',
+  'AGENTS.md',
+  'CONTRIBUTING.md',
+  'DESIGN.md',
+  'CODE_OF_CONDUCT.md',
+  'docs/effects-configuration.md',
+  'docs/engine-configuration.md',
+  'docs/template-configuration.md',
+  'docs/creative-direction.md',
+];
 
 // Markdown inline links. Reference-style links and bare URLs are out of scope — the repo does not
 // use them for local paths, and a regex that tried to cover both would produce more false

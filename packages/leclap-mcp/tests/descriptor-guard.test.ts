@@ -98,6 +98,48 @@ describe('assertDescriptorSafe', () => {
     expect(result.ok).toBe(false);
   });
 
+  it('rejects a quoted file option smuggled through a scalar value', async () => {
+    const descriptor = {
+      sections: [{ name: 's', type: 'video', filters: [{ type: 'curves', value: "'psfile'=/etc/passwd" }] }],
+    } as unknown as TemplateDescriptor;
+
+    const result = await assertDescriptorSafe(descriptor, mediaDir);
+
+    expect(result.ok).toBe(false);
+  });
+
+  it('rejects a quote-free file option smuggled through a structured values field', async () => {
+    const descriptor = {
+      sections: [
+        {
+          name: 's',
+          type: 'video',
+          filters: [{ type: 'overlay', values: { alpha: '1:textfile=/etc/hosts' } }],
+        },
+      ],
+    } as unknown as TemplateDescriptor;
+
+    const result = await assertDescriptorSafe(descriptor, mediaDir);
+
+    expect(result.ok).toBe(false);
+  });
+
+  it('rejects a metadata filter writing to an absolute path (file option)', async () => {
+    const descriptor = {
+      sections: [{ name: 's', type: 'video', filters: [{ type: 'metadata', value: 'mode=print:file=/tmp/x' }] }],
+    } as unknown as TemplateDescriptor;
+
+    const result = await assertDescriptorSafe(descriptor, mediaDir);
+
+    expect(result.ok).toBe(false);
+  });
+
+  it('still allows a caption that contains a URL-like string', async () => {
+    const result = await assertDescriptorSafe(drawtextDescriptor('BebasNeue.ttf'), mediaDir);
+
+    expect(result.ok).toBe(true);
+  });
+
   it('allows a legitimate curves control-point value (no false positive on slashes)', async () => {
     const descriptor = {
       sections: [{ name: 's', type: 'video', filters: [{ type: 'curves', value: 'all=0/0 0.5/0.4 1/1' }] }],

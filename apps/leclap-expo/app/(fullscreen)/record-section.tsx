@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, StatusBar, Alert } from 'react-native';
 import { MotiView } from 'moti';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import type { VideoFile } from 'react-native-vision-camera';
@@ -15,6 +15,7 @@ import { colors, spacing, fonts, typography, withAlpha } from '@/src/styles/them
 import { PressableScale } from '@/src/components/kinetic/pressable-scale';
 import { useProject, useSaveProject } from '@/src/hooks/useProjects';
 import { useOrientation } from '@/src/hooks/useOrientation';
+import { useAdaptiveLayout } from '@/src/hooks/use-adaptive-layout';
 
 const safeJsonParse = (jsonString: string | undefined | null): unknown => {
   if (!jsonString) return null;
@@ -59,14 +60,8 @@ const RecordSectionHeader = ({
   onBack,
   t,
 }: RecordSectionHeaderProps) => {
-  // `StatusBar.currentHeight` is Android-only — on iOS it is undefined, which left the bar flush with
-  // the top of the screen and slid the shot badge under the notch/Dynamic Island. The safe-area inset
-  // covers both; Android keeps the status-bar height when it reports the larger value.
-  const insets = useSafeAreaInsets();
-  const topInset = Math.max(insets.top, StatusBar.currentHeight ?? 0);
-
   return (
-    <View style={[styles.headerBar, { height: 60 + topInset, paddingTop: topInset }]}>
+    <View style={styles.headerBar}>
       <PressableScale
         style={styles.headerBack}
         onPress={onBack}
@@ -135,17 +130,17 @@ const buildUpdatedProject = (
   return updatedProject;
 };
 
-const useOrientationLock = (orientation: 'portrait' | 'landscape') => {
+const useOrientationLock = (orientation: 'portrait' | 'landscape', enabled: boolean) => {
   // `orientation` here is the DEVICE orientation (square already mapped to portrait by the caller).
   const { lockOrientation, unlockOrientation } = useOrientation();
 
   useEffect(() => {
-    lockOrientation(orientation).catch(console.error);
+    if (enabled) lockOrientation(orientation).catch(console.error);
 
     return () => {
-      unlockOrientation().catch(console.error);
+      if (enabled) unlockOrientation().catch(console.error);
     };
-  }, [orientation, lockOrientation, unlockOrientation]);
+  }, [orientation, enabled, lockOrientation, unlockOrientation]);
 };
 
 const useRecordingTimer = (isRecording: boolean) => {
@@ -215,8 +210,7 @@ const navigateAfterRecording = ({
 
   router.push({
     pathname: '/(fullscreen)/preview',
-    // Pass the TEMPLATE orientation (so square stays square): the preview locks the device to portrait
-    // for a square clip but frames the clip 1:1 to match the engine's compile-time center-crop.
+    // Preserve the template aspect ratio independently of the preview window orientation.
     params: {
       projectId,
       videoUri: video.path,
@@ -251,10 +245,9 @@ const RecordSectionScreen = () => {
     existingVideoPath?: string;
   }>();
 
-  const projectId = params.projectId;
+  const { projectId, existingVideoPath } = params;
   const section = safeJsonParse(params.sectionJson) as Section | null;
   const orientation: Orientation = parseOrientation(params.orientation);
-  const existingVideoPath = params.existingVideoPath;
 
   const { data: project } = useProject(projectId);
   const saveProjectMutation = useSaveProject();
@@ -263,7 +256,9 @@ const RecordSectionScreen = () => {
   const [isFinalizing, setIsFinalizing] = useState(false);
   const recordingDuration = useRecordingTimer(isRecording);
 
-  useOrientationLock(toDeviceOrientation(orientation));
+  const { usableWidth, usableHeight } = useAdaptiveLayout();
+  // Capture may request orientation on phones; large, unfolded, and multitasking windows stay free.
+  useOrientationLock(toDeviceOrientation(orientation), Math.min(usableWidth, usableHeight) < 600);
 
   if (!projectId || !section) {
     console.error('RecordSectionScreen: Missing projectId or section data');
@@ -300,36 +295,38 @@ const RecordSectionScreen = () => {
   const position = shotPosition(project, section.name);
 
   return (
-    <View style={styles.fullscreenContainer}>
-      <StatusBar hidden />
+    <SafeAreaView style={styles.fullscreenContainer}>
+      <View style={styles.fullscreenContainer}>
+        <StatusBar hidden />
 
-      <RecordSectionHeader
-        section={section}
-        isRecording={isRecording}
-        backDisabled={isRecording || isFinalizing}
-        recordingDuration={recordingDuration}
-        shotIndex={position.shotIndex}
-        shotTotal={position.shotTotal}
-        onBack={() => {
-          router.back();
-        }}
-        t={t}
-      />
+        <RecordSectionHeader
+          section={section}
+          isRecording={isRecording}
+          backDisabled={isRecording || isFinalizing}
+          recordingDuration={recordingDuration}
+          shotIndex={position.shotIndex}
+          shotTotal={position.shotTotal}
+          onBack={() => {
+            router.back();
+          }}
+          t={t}
+        />
 
-      <VideoRecorder
-        orientation={orientation}
-        onVideoRecorded={(video) => {
-          handleVideoRecorded(video).catch(console.error);
-        }}
-        existingVideoUri={existingVideoPath}
-        sectionDescription={section.description?.en}
-        countdownSeconds={section.options?.countdown ? (section.options.countdownDuration ?? 4) : undefined}
-        maxDurationSeconds={section.options?.duration}
-        framingGuide={section.options?.framingGuide}
-        onFinalizingChange={setIsFinalizing}
-        fullscreen
-      />
-    </View>
+        <VideoRecorder
+          orientation={orientation}
+          onVideoRecorded={(video) => {
+            handleVideoRecorded(video).catch(console.error);
+          }}
+          existingVideoUri={existingVideoPath}
+          sectionDescription={section.description?.en}
+          countdownSeconds={section.options?.countdown ? (section.options.countdownDuration ?? 4) : undefined}
+          maxDurationSeconds={section.options?.duration}
+          framingGuide={section.options?.framingGuide}
+          onFinalizingChange={setIsFinalizing}
+          fullscreen
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -344,7 +341,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    // height/paddingTop are applied at runtime from the safe-area inset (see RecordSectionHeader).
+    minHeight: 60,
     backgroundColor: 'rgba(0,0,0,0.5)',
     zIndex: 5,
     flexDirection: 'row',

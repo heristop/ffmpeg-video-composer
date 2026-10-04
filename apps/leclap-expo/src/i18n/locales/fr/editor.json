@@ -175,6 +175,7 @@
     "similarity": "Intensité"
   },
   "titleCard": {
+    "stagger": "Délai entre les lignes",
     "hint": "Un carton accroche / titre / sous-titre épuré — dimensionné selon l’orientation.",
     "kicker": "Accroche",
     "kickerPlaceholder": "ex. DÉCOUVRE",
@@ -371,7 +372,34 @@
     "mirrorVertical": "Vertical",
     "add": "Ajouter une animation",
     "layer": "Animation {{number}}",
-    "remove": "Retirer l’animation"
+    "remove": "Retirer l’animation",
+    "effects": {
+      "label": "Combinaisons d’effets",
+      "interface-focus": {
+        "name": "Focus interface",
+        "description": "Encadrez un détail avec une brève pulsation."
+      },
+      "product-spotlight": {
+        "name": "Mise en lumière",
+        "description": "Une orbite douce et un seul reflet."
+      },
+      "celebration-burst": {
+        "name": "Explosion festive",
+        "description": "Un bref accent de confettis et d’étincelles."
+      },
+      "focus-lock": {
+        "name": "Verrouillage du focus",
+        "description": "Un cadre à coins avec un cercle discret."
+      },
+      "light-pass": {
+        "name": "Passage de lumière",
+        "description": "Un bref voile lumineux et une petite étincelle."
+      },
+      "frame-reveal": {
+        "name": "Révélation du cadre",
+        "description": "Un cadre fin et un unique reflet lumineux."
+      }
+    }
   },
   "overlays": {
     "kind": "Surimpressions",

@@ -603,7 +603,34 @@
     "keepLastFrame": "Letztes Bild behalten",
     "dragHint": "Ziehen zum Bewegen · Ecke zum Skalieren · Pfeile zum Justieren",
     "reset": "Auf Standard zurücksetzen",
-    "placementGroup": "Platzierung"
+    "placementGroup": "Platzierung",
+    "effects": {
+      "label": "Effektkombinationen",
+      "interface-focus": {
+        "name": "Interface-Fokus",
+        "description": "Ein Detail mit einem kurzen Impuls einrahmen."
+      },
+      "product-spotlight": {
+        "name": "Produkt im Fokus",
+        "description": "Eine sanfte Umlaufbewegung und ein einzelner Lichtstreifen."
+      },
+      "celebration-burst": {
+        "name": "Festlicher Akzent",
+        "description": "Ein kurzer Konfetti- und Funkelakzent."
+      },
+      "focus-lock": {
+        "name": "Fokusrahmen",
+        "description": "Ein Eckrahmen mit einem dezenten Ring."
+      },
+      "light-pass": {
+        "name": "Lichtpassage",
+        "description": "Ein kurzer Lichtschein und ein kleiner Funkelakzent."
+      },
+      "frame-reveal": {
+        "name": "Rahmenenthüllung",
+        "description": "Ein feiner Rahmen mit einem einzelnen Lichtstreifen."
+      }
+    }
   },
   "element": {
     "resize": "Element skalieren",
@@ -854,10 +881,12 @@
     "easingLinear": "Linear",
     "easingEaseOut": "Ausklingend",
     "easingEaseInOut": "Sanft",
-    "easingHint": "Tempoverlauf des Eingangs — Ausklingend gleitet in Position, Sanft beschleunigt und setzt weich auf.",
-    "summaryDefault": "Standard-Timing"
+    "easingHint": "Wie Bewegung endet — sanft abbremsen oder kurz über die Endposition hinausgehen.",
+    "summaryDefault": "Standard-Timing",
+    "easingEaseOutBack": "Abbremsen mit Überschwingen"
   },
   "exit": {
+    "easing": "Ausgangskurve",
     "label": "Ausgang",
     "after": "Startet nach",
     "summaryDefault": "endet am Abschnittsende",
@@ -898,6 +927,7 @@
     "summaryOff": "aus"
   },
   "titleCard": {
+    "stagger": "Zeilenabstand in Sekunden",
     "kicker": "Kicker",
     "kickerPlaceholder": "z. B. NEU VORGESTELLT",
     "headline": "Überschrift",

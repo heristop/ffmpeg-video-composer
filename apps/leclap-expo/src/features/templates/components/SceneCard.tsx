@@ -22,7 +22,12 @@ import { LetterboxFields } from './letterbox-fields';
 import { Disclosure } from './Disclosure';
 import { SceneBasics, IconBtn, sceneStyles } from './sceneFields';
 import { isVisualKind } from './wizardSteps';
-import { SECTION_LABELS, type EditorSection, type BackgroundLayer } from '../model/templateEditorModel';
+import {
+  SECTION_LABELS,
+  type EditorSection,
+  type BackgroundLayer,
+  type Orientation,
+} from '../model/templateEditorModel';
 
 const KIND_ICON: Record<EditorSection['kind'], keyof typeof Ionicons.glyphMap> = {
   video: 'videocam',
@@ -37,6 +42,7 @@ interface SceneCardProps {
   index: number;
   count: number;
   section: EditorSection;
+  orientation: Orientation;
   t: TFunction<'editor'>;
   defaultCountdownSeconds: (duration: number) => number;
   // Global variable names insertable as `{{ name }}` tokens into titleCard/lowerThird text lines.
@@ -54,6 +60,7 @@ export const SceneCard = (props: SceneCardProps) => {
     index,
     count,
     section,
+    orientation,
     t,
     defaultCountdownSeconds,
     variables,
@@ -110,6 +117,7 @@ export const SceneCard = (props: SceneCardProps) => {
       {collapsed ? null : (
         <>
           <SceneBasics
+            orientation={orientation}
             index={index}
             section={section}
             t={t}

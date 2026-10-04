@@ -208,6 +208,43 @@ beforeEach(() => {
 });
 
 describe('TemplateDirector.config', () => {
+  it.each(['direct', 'registered partial', 'inline partial', 'nested partial', 'trimmed nested partial'])(
+    'rejects an unresolved effect in %s before filesystem or engine operations',
+    (source) => {
+      const { director, project, filesystem, ffmpeg } = makeDirector();
+      const effect = {
+        type: 'effect',
+        name: 'motion-title',
+        effect: { id: 'title', version: '1.0.0', props: {}, assets: {} },
+        options: { duration: 2 },
+      };
+      const descriptors = {
+        direct: { sections: [effect] },
+        'inline partial': { sections: [{ type: 'partial', sections: [effect] }] },
+        'nested partial': {
+          sections: [{ type: 'partial', sections: [{ type: 'partial', ref: 'title' }] }],
+          partials: [{ id: 'title', sections: [effect] }],
+        },
+        'trimmed nested partial': {
+          sections: [{ type: 'partial', sections: [{ type: 'partial', ref: ' title ' }] }],
+          partials: [{ id: 'title', sections: [effect] }],
+        },
+        'registered partial': {
+          sections: [{ type: 'partial', ref: 'title', prefix: 'intro-' }],
+          partials: [{ id: 'title', sections: [effect] }],
+        },
+      };
+      const descriptor = descriptors[source as keyof typeof descriptors];
+      expect(() => director.config({}, descriptor as TemplateDescriptor)).toThrow(
+        /effect_backend_unavailable.*motion-title/
+      );
+      expect(filesystem.setBuildDir).not.toHaveBeenCalled();
+      expect(filesystem.setAssetsDir).not.toHaveBeenCalled();
+      expect(project.resetBuildState).not.toHaveBeenCalled();
+      expect(ffmpeg.execute).not.toHaveBeenCalled();
+    }
+  );
+
   it('applies project config, sets build/assets dirs and logs when no userVideoPaths', () => {
     const { director, project, filesystem, logger } = makeDirector();
     const config: ProjectConfig = { buildDir: '/out', assetsDir: '/media' };

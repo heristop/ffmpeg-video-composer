@@ -16,3 +16,6 @@ export * from './control-metadata';
 // `panel:` overlay URL round trip (parse from the engine, build here) for the rounded caption panel
 // backdrop customization UI.
 export * from './panel-url';
+
+// Curated animation defaults and portable overlay effect recipes shared by both app editors.
+export * from './animation-presets';

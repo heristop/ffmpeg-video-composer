@@ -13,7 +13,12 @@
   "cardDefaultDescription": "Crée une vidéo à partir de ce template",
   "custom": "Personnalisé",
   "search": {
-    "placeholder": "Rechercher des templates..."
+    "placeholder": "Rechercher des templates...",
+    "clear": "Effacer la recherche",
+    "count_one": "{{count}} template",
+    "count_other": "{{count}} templates",
+    "emptyTitle": "Aucun template trouvé",
+    "emptyBody": "Essaie un autre nom ou efface ta recherche."
   },
   "refresh": {
     "syncWhenOnline": "Tire pour synchroniser une fois en ligne",

@@ -158,4 +158,31 @@ set -e
 [[ $status -ne 0 ]] || fail 'single-member fetch must verify the member it extracted'
 [[ $out == *'media/b.mp4'* ]] || fail "single-member failure should name the asset, got: $out"
 
+# 9. Pages may restore stale real media from build caches. Its disposable checkout should refresh
+#    those bytes from the digest-verified bundle, while local builds keep the edit guard above.
+repo="$tmp_dir/repo-pages-cache"
+make_repo "$repo"
+printf 'stale Pages cache bytes\n' > "$repo/media/c.mp3"
+out=$(CF_PAGES=1 run "$repo") || fail "Pages should refresh stale cached media, got: $out"
+media_verify_digests "$manifest" "$repo" || fail 'Pages refresh must still match every manifest digest'
+
+# An explicit opt-out keeps the guard even under Pages.
+printf 'protected edit\n' > "$repo/media/c.mp3"
+set +e
+out=$(CF_PAGES=1 MEDIA_ALLOW_OVERWRITE=0 run "$repo"); status=$?
+set -e
+[[ $status -ne 0 ]] || fail 'explicit Pages opt-out should protect existing media'
+grep -q 'protected edit' "$repo/media/c.mp3" || fail 'explicit opt-out was ignored'
+
+# An automatic refresh must never accept a stale downloaded bundle.
+repo="$tmp_dir/repo-pages-bad-bundle"
+make_repo "$repo"
+printf 'stale Pages cache bytes\n' > "$repo/media/c.mp3"
+set +e
+out=$(REPO_ROOT="$repo" CI_MEDIA_MANIFEST="$manifest" CI_MEDIA_BASE_URL="file://$stale_serve" \
+  CF_PAGES=1 bash "$fetcher" 2>&1); status=$?
+set -e
+[[ $status -ne 0 ]] || fail 'Pages refresh must reject a bundle with the wrong digest'
+[[ $out == *'stale or truncated'* ]] || fail "Pages should report digest mismatch, got: $out"
+
 printf 'all fetch-media tests passed\n'

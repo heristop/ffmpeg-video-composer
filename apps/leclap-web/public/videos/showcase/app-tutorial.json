@@ -1,0 +1,304 @@
+{
+  "meta": {
+    "name": "App Tutorial",
+    "description": "A screen-first square lesson with numbered steps, calm mint typography and a letterboxed walkthrough.",
+    "creativeDirection": "Audience: a new user learning one interaction. Direction: calm, screen-first instruction in a square frame. Use pale mint surfaces and numbered steps; let the walkthrough carry the explanation. Keep caption hierarchy subordinate to the interface and preserve the recorded cursor and controls within the letterboxed screen. Stagger the numbered instruction with short, restrained directional entrances and enough time to understand each action. Avoid promotional camera moves, bouncing labels, tiny interface details and decorative interruptions. Review the step number, interaction visibility, caption placement, longest copy and final instruction."
+  },
+  "global": {
+    "orientation": "square",
+    "musicEnabled": true,
+    "music": {
+      "name": "the-builder.mp3"
+    },
+    "allowedMusic": ["the-builder", "lofi-hip-hop", "point-being", "upbeat-electronic", "lofi-chill"],
+    "allowUploadMusic": true,
+    "transition": {
+      "type": "cut"
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "musicVolume": 0.28,
+      "musicFade": 0.8,
+      "ducking": {
+        "threshold": 0.05,
+        "ratio": 8,
+        "attack": 20,
+        "release": 400
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "form_1",
+      "type": "form",
+      "title": {
+        "en": "Your tutorial"
+      },
+      "description": {
+        "en": "What you're teaching and the step shown over your screen recording"
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "form_1_topic",
+            "maxLength": 20,
+            "label": {
+              "en": "What you'll show"
+            }
+          },
+          {
+            "name": "form_1_step",
+            "maxLength": 38,
+            "label": {
+              "en": "Step caption"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "intro",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#edf4ed",
+        "duration": 1.8,
+        "layers": [
+          {
+            "color": "#c8e4d7",
+            "x": 64,
+            "y": 64,
+            "w": 120,
+            "h": 120
+          },
+          {
+            "color": "#172c25",
+            "x": 64,
+            "y": 280,
+            "w": 952,
+            "h": 3
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "01"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 72,
+            "fontcolor": "#172c25",
+            "x": 88,
+            "y": 86
+          },
+          "reveal": {
+            "type": "fade",
+            "delay": 0,
+            "duration": 0.18,
+            "easing": "ease-out"
+          },
+          "exit": {
+            "type": "fade",
+            "after": 1.61,
+            "duration": 0.17,
+            "easing": "ease-out"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "QUICK LESSON"
+            },
+            "fontfile": "Oswald.ttf",
+            "fontsize": 28,
+            "fontcolor": "#436354",
+            "x": 224,
+            "y": 105
+          },
+          "reveal": {
+            "type": "slide-right",
+            "delay": 0.07,
+            "duration": 0.24,
+            "distance": 14,
+            "easing": "ease-out"
+          },
+          "exit": {
+            "type": "fade",
+            "after": 1.59,
+            "duration": 0.17,
+            "easing": "ease-out"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_1_topic }}"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 76,
+            "fontcolor": "#172c25",
+            "x": 64,
+            "y": 350
+          },
+          "reveal": {
+            "type": "rise",
+            "delay": 0.13,
+            "duration": 0.32,
+            "distance": 24,
+            "easing": "ease-out"
+          },
+          "exit": {
+            "type": "rise",
+            "after": 1.56,
+            "duration": 0.2,
+            "easing": "ease-out",
+            "distance": 18
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "WATCH. THEN TRY."
+            },
+            "fontfile": "Oswald.ttf",
+            "fontsize": 30,
+            "fontcolor": "#436354",
+            "x": 64,
+            "y": 690
+          },
+          "reveal": {
+            "type": "fade",
+            "delay": 0.24,
+            "duration": 0.2,
+            "easing": "ease-out"
+          },
+          "exit": {
+            "type": "fade",
+            "after": 1.59,
+            "duration": 0.17,
+            "easing": "ease-out"
+          }
+        }
+      ]
+    },
+    {
+      "name": "video_1",
+      "type": "project_video",
+      "title": {
+        "en": "Record your screen"
+      },
+      "description": {
+        "en": "Upload or record a screen walkthrough. The full frame is preserved and the step caption appears at the bottom."
+      },
+      "options": {
+        "duration": 10,
+        "forceAspectRatio": true,
+        "countdown": true,
+        "countdownDuration": 2,
+        "forceOriginalAspectRatio": true
+      },
+      "caption": {
+        "text": {
+          "en": "01  /  {{ form_1_step }}"
+        },
+        "style": "bar",
+        "position": "bottom",
+        "align": "left",
+        "font": "oswald",
+        "fontsize": 32,
+        "color": "#edf4ed",
+        "boxColor": "#172c25",
+        "boxOpacity": 0.92,
+        "reveal": {
+          "type": "slide-right",
+          "delay": 0.15,
+          "duration": 0.24,
+          "easing": "ease-out",
+          "distance": 24
+        }
+      }
+    },
+    {
+      "name": "outro",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#edf4ed",
+        "duration": 1.8,
+        "layers": [
+          {
+            "color": "#172c25",
+            "x": 64,
+            "y": 64,
+            "w": 952,
+            "h": 3
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "YOUR TURN"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 110,
+            "fontcolor": "#172c25",
+            "x": 64,
+            "y": 250
+          },
+          "reveal": {
+            "type": "rise",
+            "delay": 0.06,
+            "duration": 0.28,
+            "easing": "ease-out",
+            "distance": 42
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_1_topic }}"
+            },
+            "fontfile": "Oswald.ttf",
+            "fontsize": 48,
+            "fontcolor": "#436354",
+            "x": 64,
+            "y": 430
+          },
+          "reveal": {
+            "type": "fade",
+            "delay": 0.13,
+            "duration": 0.22,
+            "easing": "ease-out"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "02  /  TRY IT IN YOUR APP"
+            },
+            "fontfile": "Oswald.ttf",
+            "fontsize": 30,
+            "fontcolor": "#172c25",
+            "x": 64,
+            "y": 810
+          },
+          "reveal": {
+            "type": "slide-right",
+            "delay": 0.24,
+            "duration": 0.26,
+            "distance": 18,
+            "easing": "ease-out"
+          }
+        }
+      ]
+    }
+  ]
+}

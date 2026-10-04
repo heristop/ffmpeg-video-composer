@@ -1,114 +1,147 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useEffect } from 'react';
+import { View, Text, StyleSheet, Platform } from 'react-native';
+import Animated, {
+  cancelAnimation,
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, type Tabs } from 'expo-router';
-import { colors } from '@/src/styles/theme';
+import { type Tabs } from 'expo-router';
+import { colors, spacing, typography, withAlpha } from '@/src/styles/theme';
+import { motion } from '@/src/styles/motion';
+import { PressableScale } from '@/src/components/kinetic/pressable-scale';
+import { useMotionPreferences } from '@/src/hooks/use-motion-preferences';
+import * as Haptics from 'expo-haptics';
+import { useAdaptiveLayout } from '@/src/hooks/use-adaptive-layout';
+import { NAVIGATION_RAIL_WIDTH } from '@/src/styles/adaptive-layout';
 
-// SDK 56: expo-router no longer ships react-navigation as a direct dependency.
-// Derive the tab bar props from expo-router's own Tabs component instead of
-// importing from '@react-navigation/bottom-tabs'.
 type BottomTabBarProps = Parameters<NonNullable<React.ComponentProps<typeof Tabs>['tabBar']>>[0];
 
 export default function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-  const router = useRouter();
+  const { navigationRail } = useAdaptiveLayout();
+  const rail = Platform.OS === 'android' && navigationRail;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.tabBar}>
-        {state.routes.slice(0, 2).map((route, index) => {
-          const { options } = descriptors[route.key];
-          const label = options.title ?? route.name;
-          const isFocused = state.index === index;
-
-          let iconName: keyof typeof Ionicons.glyphMap | undefined;
-
-          if (route.name === 'index') {
-            iconName = isFocused ? 'film' : 'film-outline';
-          }
-
-          if (route.name === 'videos/index') {
-            iconName = isFocused ? 'videocam' : 'videocam-outline';
-          }
-
-          const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-            }
+    <SafeAreaView
+      edges={rail ? ['bottom', 'left'] : ['bottom', 'left', 'right']}
+      style={[styles.container, rail && styles.rail]}
+    >
+      <View style={[styles.tabBar, rail && styles.railTabs]}>
+        {state.routes.map((route, index) => {
+          const label = descriptors[route.key].options.title ?? route.name;
+          const selected = state.index === index;
+          const icons: Record<string, readonly [keyof typeof Ionicons.glyphMap, keyof typeof Ionicons.glyphMap]> = {
+            index: ['film-outline', 'film'],
+            'videos/index': ['videocam-outline', 'videocam'],
           };
+          const icon = (icons[route.name] ?? icons.index)[selected ? 1 : 0];
 
           return (
-            <TouchableOpacity key={route.key} onPress={onPress} style={styles.tabItem} activeOpacity={0.7}>
-              <View style={isFocused ? styles.activeIconContainer : styles.inactiveIconContainer}>
-                <Ionicons name={iconName} size={24} color={isFocused ? colors.primary : '#888888'} />
-              </View>
-              <Text style={[styles.tabLabel, { color: isFocused ? colors.primary : '#888888' }]}>{label}</Text>
-            </TouchableOpacity>
+            <TabItem
+              key={route.key}
+              label={label}
+              icon={icon}
+              selected={selected}
+              rail={rail}
+              onPress={() => {
+                const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+
+                if (!selected && !event.defaultPrevented) {
+                  navigation.navigate(route.name);
+                  Haptics.selectionAsync().catch(() => {});
+                }
+              }}
+              onLongPress={() => navigation.emit({ type: 'tabLongPress', target: route.key })}
+            />
           );
         })}
-        <TouchableOpacity
-          key="create-template"
-          onPress={() => {
-            router.push('/(fullscreen)/create-template');
-          }}
-          style={styles.tabItem}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityLabel="Create a template"
-        >
-          <View style={styles.inactiveIconContainer}>
-            <Ionicons name="add-circle-outline" size={24} color="#888888" />
-          </View>
-          <Text style={[styles.tabLabel, { color: '#888888' }]}>Create</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
+function TabItem({
+  label,
+  icon,
+  selected,
+  rail,
+  onPress,
+  onLongPress,
+}: {
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  selected: boolean;
+  rail: boolean;
+  onPress: () => void;
+  onLongPress: () => void;
+}) {
+  const { reducedMotion, appActive } = useMotionPreferences();
+  const selection = useSharedValue(selected ? 1 : 0);
+  useEffect(() => {
+    selection.set(
+      reducedMotion || !appActive
+        ? Number(selected)
+        : withTiming(Number(selected), { duration: motion.duration.instant, reduceMotion: ReduceMotion.Never })
+    );
+
+    return () => {
+      cancelAnimation(selection);
+    };
+  }, [selected, reducedMotion, appActive, selection]);
+  const badgeStyle = useAnimatedStyle(() => ({ opacity: selection.get() }));
+
+  return (
+    <PressableScale
+      accessibilityRole="tab"
+      accessibilityLabel={label}
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      haptic={false}
+      scaleTo={0.98}
+      style={[styles.tabItem, rail && styles.railItem]}
+    >
+      <View style={styles.iconWrap}>
+        <Animated.View pointerEvents="none" style={[styles.selected, badgeStyle]} />
+        <Ionicons
+          name={icon}
+          size={24}
+          color={selected ? colors.primaryDark : colors.textSecondary}
+          accessible={false}
+        />
+      </View>
+      <Text style={[styles.label, selected && styles.selectedText]}>{label}</Text>
+    </PressableScale>
+  );
+}
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.surface,
-    borderTopWidth: 1,
+    borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.divider,
   },
-  tabBar: {
-    flexDirection: 'row',
-    height: 60,
-    paddingBottom: 6,
-    paddingTop: 6,
+  tabBar: { flexDirection: 'row', paddingVertical: spacing.s, minHeight: 68 },
+  rail: {
+    width: NAVIGATION_RAIL_WIDTH,
+    borderTopWidth: 0,
+    borderRightWidth: StyleSheet.hairlineWidth,
+    borderRightColor: colors.divider,
   },
+  railTabs: { flexDirection: 'column', gap: spacing.l, paddingTop: spacing.l },
+  railItem: { flex: 0, minHeight: 72 },
   tabItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight: 48,
+    gap: spacing.xs,
+    paddingHorizontal: spacing.s,
   },
-  tabLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  activeIconContainer: {
-    backgroundColor: `${colors.primary}15`,
-    padding: 6,
-    borderRadius: 10,
-    width: 36,
-    height: 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  inactiveIconContainer: {
-    padding: 6,
-    borderRadius: 10,
-    width: 36,
-    height: 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  label: { ...typography.smallText, color: colors.textSecondary, fontWeight: '600', textAlign: 'center' },
+  selectedText: { color: colors.primaryDark },
+  iconWrap: { paddingHorizontal: spacing.l, paddingVertical: spacing.xs, borderRadius: 12 },
+  selected: { ...StyleSheet.absoluteFill, borderRadius: 12, backgroundColor: withAlpha(colors.primary, 0.12) },
 });

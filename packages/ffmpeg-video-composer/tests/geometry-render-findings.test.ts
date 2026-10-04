@@ -175,3 +175,33 @@ describe('mergeRenderedFindings', () => {
     expect(merged.map((w) => w.code)).toEqual(['text_too_small']);
   });
 });
+
+it('retains static effect overlays while measuring and refining ordinary sections', async () => {
+  const effect = {
+    type: 'effect',
+    name: 'promo',
+    options: { duration: 10 },
+    filters: [{ type: 'drawtext', values: { text: { en: 'Generated footage caption' }, fontsize: 40, x: 20, y: 20 } }],
+  };
+  const measured = await measureTemplate(template([effect, card('card', '#ffffff')]), loadFont);
+  const targets = renderTargets(measured);
+  expect(targets.map((target) => target.sectionName)).toEqual(['card']);
+  expect(renderDescriptor(measured.template, new Set(['card'])).sections?.map((section) => section.name)).toEqual([
+    'card',
+  ]);
+  const warnings = mergeRenderedFindings(
+    measured,
+    targets.map((target) => ({
+      target,
+      contrast: { ratio: 10, text: { r: 0, g: 0, b: 0 }, backdrop: { r: 255, g: 255, b: 255 } },
+    }))
+  );
+  expect(
+    warnings.some(
+      (warning) => warning.path.startsWith('sections[0].filters[0]') && warning.code === 'text_unreadable_over_footage'
+    )
+  ).toBe(true);
+  expect(
+    warnings.some((warning) => warning.path === 'sections[1].caption' && warning.code === 'text_low_contrast')
+  ).toBe(false);
+});

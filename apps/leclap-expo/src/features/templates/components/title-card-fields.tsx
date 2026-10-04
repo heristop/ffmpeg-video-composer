@@ -10,13 +10,16 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import type { TFunction } from 'i18next';
 import { colors, spacing, typography } from '@/src/styles/theme';
-import { Segmented } from './EditorControls';
+import { Segmented, Slider } from './EditorControls';
 import { FieldRow, Toggle, ColorField } from './sceneFields';
 import { FEATURE_CONTROLS, type TitleCard } from '../model/templateEditorModel';
 
 const DEFAULT_BACKGROUND = '#000000';
 type Align = NonNullable<TitleCard['align']>;
 
+const STAGGER_SPEC = FEATURE_CONTROLS.titleCard.find((spec) => spec.fieldPath === 'titleCard.stagger');
+const STAGGER_MIN = STAGGER_SPEC?.min ?? 0;
+const STAGGER_MAX = STAGGER_SPEC?.max ?? 1;
 const ALIGN_SPEC = FEATURE_CONTROLS.titleCard.find((spec) => spec.fieldPath === 'titleCard.align');
 const ALIGN_LABEL_KEY: Record<string, string> = { left: 'alignLeft', center: 'alignCenter' };
 
@@ -121,6 +124,18 @@ const TitleCardOptions = ({
       }))}
       onChange={(next) => {
         patch({ align: next });
+      }}
+    />
+    <Slider
+      label={t('titleCard.stagger')}
+      value={card.stagger ?? 0.15}
+      min={STAGGER_MIN}
+      max={STAGGER_MAX}
+      step={0.01}
+      resetTo={0.15}
+      format={(value) => `${value}s`}
+      onChange={(stagger) => {
+        patch({ stagger: stagger === 0.15 ? undefined : stagger });
       }}
     />
     <ColorField

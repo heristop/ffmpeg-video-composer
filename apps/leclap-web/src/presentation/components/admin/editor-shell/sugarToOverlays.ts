@@ -10,6 +10,7 @@
 //   they are dropped. The badge pill and caption bar survive as the overlay's background box.
 // - drawtext x is `(w-text_w)*fx`, so a left/right-aligned line's fraction needs the text width; it
 //   is estimated from the glyph count (condensed faces ≈ 0.5em per glyph).
+import { staggered } from 'ffmpeg-video-composer/src/editor/presets/text.ts';
 import { FONTS, DEFAULT_FONT_ID } from '@leclap/creative-kit/fonts';
 import type { EditorCaption, LowerThird, Orientation, TextOverlay, TitleCard } from '../templateEditorModel';
 import { refVideoHeight } from '../overlayGeometry';
@@ -99,5 +100,9 @@ export function sugarToOverlays(kind: SugarKind, sugar: AnySugar, orientation: O
   const refW = (refH * engine.w) / engine.h;
   const reveal = (sugar as { reveal?: TextOverlay['reveal'] }).reveal;
 
-  return previewLines(kind, sugar, refH, orientation).map((line) => overlayFromLine(line, refW, refH, reveal));
+  return previewLines(kind, sugar, refH, orientation).map((line, index) => {
+    const entrance = kind === 'titleCard' ? staggered(reveal ?? 'rise', index, (sugar as TitleCard).stagger) : reveal;
+
+    return overlayFromLine(line, refW, refH, entrance);
+  });
 }

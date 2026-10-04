@@ -28,7 +28,7 @@ export const DOC_ROUTES: readonly DocRoute[] = [
     path: '/doc/sections',
     title: 'Sections & types — template descriptor',
     description:
-      'The seven LeClap section types, the base fields every section shares, and the full per-section options surface.',
+      'LeClap section types, including registered JSON effects, shared native fields, reusable partials and per-section options.',
     priority: '0.6',
     changefreq: 'monthly',
   },
@@ -60,7 +60,7 @@ export const DOC_ROUTES: readonly DocRoute[] = [
     path: '/doc/motion',
     title: 'Motion & layers — template descriptor',
     description:
-      'Per-section motion effects (Ken Burns, rotate, crop, flip), the recording framing guide, and composited background layers.',
+      'Per-section motion effects (Ken Burns, rotate, crop, flip, shake, pulse), the recording framing guide, and composited background layers.',
     priority: '0.6',
     changefreq: 'monthly',
   },
@@ -123,8 +123,40 @@ export const DOC_ROUTES: readonly DocRoute[] = [
     path: '/doc/mcp',
     title: 'MCP server — agent-callable video tools',
     description:
-      'Expose the LeClap engine to an AI agent over MCP: the six tools and their arguments, the authoring loop, every flag and env var, containment rules, and wiring it into Claude Desktop or a project .mcp.json.',
+      'Expose the LeClap engine to an AI agent over MCP: sample discovery, effect contracts, preview and composition tools and their arguments, the authoring loop, every flag and env var, containment rules, and wiring it into Claude Desktop or a project .mcp.json.',
     priority: '0.7',
+    changefreq: 'monthly',
+  },
+  {
+    path: '/doc/reference',
+    title: 'Template configuration — LeClap reference',
+    description:
+      'Every native template feature, field, timing rule and example, with a complete schema-derived field index.',
+    priority: '0.6',
+    changefreq: 'monthly',
+  },
+  {
+    path: '/doc/effects',
+    title: 'Registered effects — LeClap reference',
+    description:
+      'Every built-in and example catalog effect: props, defaults, bounds, asset slots, timing, registration, preview and reproducibility.',
+    priority: '0.6',
+    changefreq: 'monthly',
+  },
+  {
+    path: '/doc/engine',
+    title: 'Engine configuration — LeClap reference',
+    description:
+      'ProjectConfig, encoder tiers, configuration precedence, CLI bindings, MCP runtime settings and platform limits.',
+    priority: '0.6',
+    changefreq: 'monthly',
+  },
+  {
+    path: '/doc/creative-direction',
+    title: 'Creative direction — LeClap reference',
+    description:
+      'Turn a visual brief into explicit, validated motion settings; discover samples and inspect the rendered result.',
+    priority: '0.6',
     changefreq: 'monthly',
   },
   {

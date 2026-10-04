@@ -1,9 +1,11 @@
 // Pure: text overlays -> drawtext filters for the descriptor. Shared by the video/color/image
 // section builders.
 import type { Section } from 'ffmpeg-video-composer/src/core/types.d.ts';
+import type { VideoFilterStage } from './video-filter-types';
 import { findFont } from '../fonts';
 import { resolveAccentBar, type AccentBar } from './accent-bar';
 import type { TextEffect, TextOverlay } from './model';
+import type { RawPosition } from './raw-position';
 
 type StoredFilter = NonNullable<Section['filters']>[number];
 type StoredValues = NonNullable<StoredFilter['values']>;
@@ -60,9 +62,16 @@ function fontcolorFrom(overlay: TextOverlay): string {
   return `${overlay.fontcolor}@${overlay.textOpacity}`;
 }
 
+// The stored expression wins only while the fraction it was parsed into is still the overlay's fraction.
+function positionExpr(raw: RawPosition['rawX'], fraction: number, anchor: string): string | number {
+  if (raw?.fraction === fraction) return raw.expr;
+
+  return `${anchor}*${roundFraction(fraction)}`;
+}
+
 // A drawtext filter for one overlay. Box keys are only added when the overlay
 // opts into a background box; boxcolor carries the author-set opacity suffix.
-function drawtextFilterFrom(overlay: TextOverlay): StoredFilter {
+function drawtextFilterFrom(overlay: TextOverlay & RawPosition): StoredFilter {
   return {
     type: 'drawtext',
     values: {
@@ -70,8 +79,8 @@ function drawtextFilterFrom(overlay: TextOverlay): StoredFilter {
       fontsize: overlay.fontsize,
       fontcolor: fontcolorFrom(overlay),
       fontfile: findFont(overlay.font)?.file ?? 'Rubik.ttf',
-      x: `(w-text_w)*${roundFraction(overlay.x)}`,
-      y: `(h-text_h)*${roundFraction(overlay.y)}`,
+      x: positionExpr(overlay.rawX, overlay.x, '(w-text_w)'),
+      y: positionExpr(overlay.rawY, overlay.y, '(h-text_h)'),
       ...(overlay.box
         ? {
             box: 1,
@@ -182,4 +191,31 @@ export function overlayFiltersFrom(overlays: TextOverlay[] | undefined): StoredF
 
     return [drawtextFilterFrom(o), ...accentBarFilters(o)];
   });
+}
+
+// Reinsert advanced native filters at their retained text slots. If the author deletes text,
+// stages keep their boundary at the next surviving import slot (or the end).
+export function videoFiltersFrom(overlays: TextOverlay[], stages: VideoFilterStage[] | undefined): StoredFilter[] {
+  const filters: StoredFilter[] = [];
+
+  for (let index = 0; index <= overlays.length; index++) {
+    for (const stage of stages ?? []) {
+      const anchor = overlays.findIndex(
+        (overlay) => overlay.filterSlot !== undefined && overlay.filterSlot >= stage.beforeOverlay
+      );
+      let position = overlays.length;
+
+      if (anchor >= 0) position = anchor;
+
+      if (stage.beforeOverlay === 0) position = 0;
+
+      if (position === index) {
+        filters.push(...(JSON.parse(JSON.stringify(stage.filters)) as StoredFilter[]));
+      }
+    }
+
+    if (index < overlays.length) filters.push(...overlayFiltersFrom([overlays[index]]));
+  }
+
+  return filters;
 }

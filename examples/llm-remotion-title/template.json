@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "creativeDirection": "Direction: a focused brand reveal followed by a quiet native closing card. Keep one dominant wordmark, a dark canvas and a restrained accent. Reveal the headline before the delayed logo, with a short spring entrance and a stable hold. Use the registered title effect for frame-based choreography and ordinary JSON for the closing scene. Treat generated media as illustrative fixtures. Avoid additional claims, decorative noise and unpredictable timing. Inspect entrance, spring settling, logo arrival, the scene join and final native text."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false
+  },
+  "sections": [
+    {
+      "name": "intro",
+      "type": "effect",
+      "effect": {
+        "id": "leclap.title-reveal",
+        "version": "1.0.0",
+        "props": {
+          "headline": "LECLAP",
+          "headlineY": 320,
+          "logoDelayFrames": 15,
+          "entranceDurationFrames": 24,
+          "springDamping": 18
+        },
+        "assets": {
+          "background": "media/background.mp4",
+          "logo": "media/logo.png",
+          "font": "media/font.ttf"
+        }
+      },
+      "options": {
+        "duration": 10
+      }
+    },
+    {
+      "name": "outro",
+      "type": "color_background",
+      "options": {
+        "duration": 2,
+        "backgroundColor": "#101022"
+      }
+    }
+  ]
+}

@@ -1,20 +1,20 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import * as Haptics from 'expo-haptics';
 import Button from '@/src/components/ui/Button';
-import { colors, spacing, typography } from '@/src/styles/theme';
+import { colors, spacing, typography, FORM_MAX_WIDTH } from '@/src/styles/theme';
 import { useUserTemplateStore, type UserTemplate } from '@/src/stores/useUserTemplateStore';
 import { TransitionSheet } from '@/src/features/templates/components/TransitionSheet';
 import { OverlayPositioner } from '@/src/features/templates/components/OverlayPositioner';
 import { StyleAudioStep } from '@/src/features/templates/components/StyleAudioStep';
 import { InfoStep, ScenesStep, SceneTimeline } from '@/src/features/templates/components/WizardStepViews';
 import { useEditorHistory } from '@/src/features/templates/components/useEditorHistory';
-import { exportTemplate, importTemplate } from '@/src/features/templates/components/editorIO';
-import { previewRender } from '@/src/features/templates/components/previewRender';
+import { exportTemplate, importTemplate, previewRender } from '@/src/features/templates/components/editorIO';
 import sampleClip from '../../assets/sample.mp4';
 import { STEP_TITLE_KEY, saveBlocker } from '@/src/features/templates/components/wizardSteps';
 import {
@@ -228,149 +228,156 @@ export default function CreateTemplateScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          testID="close-editor"
-          onPress={close}
-          style={styles.iconBtn}
-          accessibilityLabel={t('header.back')}
-        >
-          <Ionicons name="close" size={26} color={colors.text} />
-        </TouchableOpacity>
-        <View style={styles.headerSpacer} />
-        <View style={styles.actions}>
+    <SafeAreaView style={styles.container}>
+      <View style={{ flex: 1, width: '100%', maxWidth: FORM_MAX_WIDTH, alignSelf: 'center' }}>
+        <View style={styles.header}>
           <TouchableOpacity
-            onPress={undo}
-            disabled={!canUndo}
-            accessibilityLabel={t('header.undo')}
-            style={styles.actionBtn}
+            testID="close-editor"
+            onPress={close}
+            style={styles.iconBtn}
+            accessibilityLabel={t('header.back')}
           >
-            <Ionicons name="arrow-undo" size={20} color={canUndo ? colors.text : colors.divider} />
+            <Ionicons name="close" size={26} color={colors.text} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={redo}
-            disabled={!canRedo}
-            accessibilityLabel={t('header.redo')}
-            style={styles.actionBtn}
-          >
-            <Ionicons name="arrow-redo" size={20} color={canRedo ? colors.text : colors.divider} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onImport} accessibilityLabel={t('header.import')} style={styles.actionBtn}>
-            <Ionicons name="download-outline" size={20} color={colors.text} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onExport} accessibilityLabel={t('header.export')} style={styles.actionBtn}>
-            <Ionicons name="share-outline" size={20} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView ref={scrollRef} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <Text style={styles.sectionHeading}>{t(STEP_TITLE_KEY.info)}</Text>
-        <InfoStep state={state} t={t} onPatch={patch} />
-
-        <Text style={styles.sectionHeading}>{t(STEP_TITLE_KEY.scenes)}</Text>
-        <SceneTimeline state={state} t={t} onSelect={scrollToSection} />
-        <View
-          onLayout={(e) => {
-            scenesRootY.current = e.nativeEvent.layout.y;
-          }}
-        >
-          <ScenesStep
-            state={state}
-            t={t}
-            onSectionLayout={(i, y) => {
-              sectionYs.current[i] = y;
-            }}
-            onPatchSection={patchSection}
-            onLayers={(i, layers) => {
-              setState((s) => patchLayers(s, i, layers));
-            }}
-            onRemove={(i) => {
-              setState((s) => ({ ...s, sections: s.sections.filter((_, idx) => idx !== i) }));
-            }}
-            onDuplicate={(i) => {
-              setState((s) => duplicateSection(s, i));
-              Haptics.selectionAsync().catch(() => {});
-            }}
-            onMove={(i, dir) => {
-              setState((s) => reorderSection(s, i, i + dir));
-              Haptics.selectionAsync().catch(() => {});
-            }}
-            onAdd={(kind) => {
-              setState((s) => ({ ...s, sections: [...s.sections, newSection(kind)] }));
-              Haptics.selectionAsync().catch(() => {});
-            }}
-            onOpenTransition={setTransitionIndex}
-            onEditOverlay={openOverlay}
-          />
-        </View>
-
-        <Text style={styles.sectionHeading}>{t(STEP_TITLE_KEY.style)}</Text>
-        <StyleAudioStep state={state} t={t} onPatch={patch} />
-
-        <View style={{ height: spacing.xl }} />
-      </ScrollView>
-
-      <View style={styles.footer} testID="save-template">
-        <View style={styles.footerRow}>
-          <View style={styles.footerCol}>
-            <Button
-              variant="secondary"
-              size="large"
-              icon="play"
-              fullWidth
-              loading={rendering}
-              disabled={rendering}
-              onPress={onPreview}
+          <View style={styles.headerSpacer} />
+          <View style={styles.actions}>
+            <TouchableOpacity
+              onPress={undo}
+              disabled={!canUndo}
+              accessibilityLabel={t('header.undo')}
+              style={styles.actionBtn}
             >
-              {t('preview')}
-            </Button>
-          </View>
-          <View style={styles.footerCol}>
-            <Button variant="primary" size="large" icon="save" fullWidth disabled={rendering} onPress={onSave}>
-              {t('save')}
-            </Button>
+              <Ionicons name="arrow-undo" size={20} color={canUndo ? colors.text : colors.divider} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={redo}
+              disabled={!canRedo}
+              accessibilityLabel={t('header.redo')}
+              style={styles.actionBtn}
+            >
+              <Ionicons name="arrow-redo" size={20} color={canRedo ? colors.text : colors.divider} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onImport} accessibilityLabel={t('header.import')} style={styles.actionBtn}>
+              <Ionicons name="download-outline" size={20} color={colors.text} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onExport} accessibilityLabel={t('header.export')} style={styles.actionBtn}>
+              <Ionicons name="share-outline" size={20} color={colors.text} />
+            </TouchableOpacity>
           </View>
         </View>
+
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets
+        >
+          <Text style={styles.sectionHeading}>{t(STEP_TITLE_KEY.info)}</Text>
+          <InfoStep state={state} t={t} onPatch={patch} />
+
+          <Text style={styles.sectionHeading}>{t(STEP_TITLE_KEY.scenes)}</Text>
+          <SceneTimeline state={state} t={t} onSelect={scrollToSection} />
+          <View
+            onLayout={(e) => {
+              scenesRootY.current = e.nativeEvent.layout.y;
+            }}
+          >
+            <ScenesStep
+              state={state}
+              t={t}
+              onSectionLayout={(i, y) => {
+                sectionYs.current[i] = y;
+              }}
+              onPatchSection={patchSection}
+              onLayers={(i, layers) => {
+                setState((s) => patchLayers(s, i, layers));
+              }}
+              onRemove={(i) => {
+                setState((s) => ({ ...s, sections: s.sections.filter((_, idx) => idx !== i) }));
+              }}
+              onDuplicate={(i) => {
+                setState((s) => duplicateSection(s, i));
+                Haptics.selectionAsync().catch(() => {});
+              }}
+              onMove={(i, dir) => {
+                setState((s) => reorderSection(s, i, i + dir));
+                Haptics.selectionAsync().catch(() => {});
+              }}
+              onAdd={(kind) => {
+                setState((s) => ({ ...s, sections: [...s.sections, newSection(kind)] }));
+                Haptics.selectionAsync().catch(() => {});
+              }}
+              onOpenTransition={setTransitionIndex}
+              onEditOverlay={openOverlay}
+            />
+          </View>
+
+          <Text style={styles.sectionHeading}>{t(STEP_TITLE_KEY.style)}</Text>
+          <StyleAudioStep state={state} t={t} onPatch={patch} />
+
+          <View style={{ height: spacing.xl }} />
+        </ScrollView>
+
+        <View style={styles.footer} testID="save-template">
+          <View style={styles.footerRow}>
+            <View style={styles.footerCol}>
+              <Button
+                variant="secondary"
+                size="large"
+                icon="play"
+                fullWidth
+                loading={rendering}
+                disabled={rendering}
+                onPress={onPreview}
+              >
+                {t('preview')}
+              </Button>
+            </View>
+            <View style={styles.footerCol}>
+              <Button variant="primary" size="large" icon="save" fullWidth disabled={rendering} onPress={onSave}>
+                {t('save')}
+              </Button>
+            </View>
+          </View>
+        </View>
+
+        <TransitionSheet
+          visible={transitionIndex !== null}
+          t={t}
+          transition={transitionValue}
+          onClose={() => {
+            setTransitionIndex(null);
+          }}
+          onChange={(transition) => {
+            if (transitionIndex !== null) setState((s) => setTransitionAfter(s, transitionIndex, transition));
+          }}
+        />
+
+        <OverlayPositioner
+          visible={overlayIndex !== null && overlay !== undefined}
+          overlay={overlay}
+          orientation={state.orientation}
+          variables={state.globalVariables.map((v) => v.name).filter((name) => name.trim() !== '')}
+          t={t}
+          onClose={() => {
+            setOverlayIndex(null);
+          }}
+          onChange={(next) => {
+            if (overlayIndex === null || !overlaySection || overlaySection.kind !== 'video') return;
+
+            patchSection(overlayIndex, {
+              overlays: overlaySection.overlays.map((o, idx) => (idx === overlayLayer ? next : o)),
+            });
+          }}
+          onRemove={() => {
+            if (overlayIndex === null || !overlaySection || overlaySection.kind !== 'video') return;
+
+            patchSection(overlayIndex, { overlays: overlaySection.overlays.filter((_, idx) => idx !== overlayLayer) });
+            setOverlayIndex(null);
+          }}
+        />
       </View>
-
-      <TransitionSheet
-        visible={transitionIndex !== null}
-        t={t}
-        transition={transitionValue}
-        onClose={() => {
-          setTransitionIndex(null);
-        }}
-        onChange={(transition) => {
-          if (transitionIndex !== null) setState((s) => setTransitionAfter(s, transitionIndex, transition));
-        }}
-      />
-
-      <OverlayPositioner
-        visible={overlayIndex !== null && overlay !== undefined}
-        overlay={overlay}
-        orientation={state.orientation}
-        variables={state.globalVariables.map((v) => v.name).filter((name) => name.trim() !== '')}
-        t={t}
-        onClose={() => {
-          setOverlayIndex(null);
-        }}
-        onChange={(next) => {
-          if (overlayIndex === null || !overlaySection || overlaySection.kind !== 'video') return;
-
-          patchSection(overlayIndex, {
-            overlays: overlaySection.overlays.map((o, idx) => (idx === overlayLayer ? next : o)),
-          });
-        }}
-        onRemove={() => {
-          if (overlayIndex === null || !overlaySection || overlaySection.kind !== 'video') return;
-
-          patchSection(overlayIndex, { overlays: overlaySection.overlays.filter((_, idx) => idx !== overlayLayer) });
-          setOverlayIndex(null);
-        }}
-      />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -381,15 +388,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.m,
-    paddingTop: spacing.xl,
+    paddingTop: spacing.s,
     paddingBottom: spacing.s,
     borderBottomWidth: 1,
     borderBottomColor: colors.divider,
   },
   headerSpacer: { flex: 1 },
-  iconBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  iconBtn: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
   actions: { flexDirection: 'row', alignItems: 'center' },
-  actionBtn: { width: 36, height: 40, alignItems: 'center', justifyContent: 'center' },
+  actionBtn: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
   scroll: { padding: spacing.m },
   sectionHeading: { ...typography.title, color: colors.text, marginTop: spacing.l, marginBottom: spacing.s },
   footer: {

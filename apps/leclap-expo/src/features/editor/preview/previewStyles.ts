@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 50,
+    top: 16,
     right: 20,
     zIndex: 2000,
     backgroundColor: 'rgba(255, 255, 255, 0.92)',
@@ -53,13 +53,15 @@ export const styles = StyleSheet.create({
   },
   toolbar: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 16,
     left: 0,
     right: 0,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: spacing.xl,
+    gap: spacing.s,
+    flexWrap: 'wrap',
+    paddingHorizontal: spacing.m,
     zIndex: 2000,
   },
   toolButton: {

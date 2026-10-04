@@ -20,7 +20,7 @@ describe('revealOffset', () => {
     expect(settled.opacity).toBe(1);
 
     const leaving = revealOffset('rise', 1, 60, false);
-    expect(leaving.translateY).toBe(60);
+    expect(leaving.translateY).toBe(-60);
     expect(leaving.opacity).toBe(0);
   });
 
@@ -84,6 +84,17 @@ describe('overlayVisibilityAt', () => {
 // The authored `easing` mirrors the engine's expression curves (linear ramp, cubic-out, smoothstep);
 // an UNSET easing keeps the monitor's signature ease-out-expo feel, unchanged for old templates.
 describe('reveal easing mirror', () => {
+  it('samples authored exit easing and native departure directions', () => {
+    const exit = { type: 'rise', after: 2, duration: 1, distance: 80, easing: 'ease-out' } as const;
+    expect(overlayVisibilityAt(undefined, exit, 2.5, 4)).toMatchObject({
+      opacity: 0.125,
+      translateY: -70,
+    });
+    expect(revealOffset('slide-left', 0.5, 80, false, 'linear').translateX).toBe(-40);
+    expect(revealOffset('slide-right', 0.5, 80, false, 'linear').translateX).toBe(40);
+    expect(overlayVisibilityAt(undefined, { ...exit, easing: 'ease-in-out' }, 2.25, 4).opacity).toBe(0.84375);
+  });
+
   it('linear easing samples the raw progress', () => {
     const mid = revealOffset('rise', 0.5, 60, true, 'linear');
     expect(mid.opacity).toBeCloseTo(0.5, 5);
@@ -92,6 +103,15 @@ describe('reveal easing mirror', () => {
 
   it('ease-out samples the cubic-out curve the engine lowers (1-(1-p)^3)', () => {
     expect(revealOffset('fade', 0.5, 60, true, 'ease-out').opacity).toBeCloseTo(0.875, 5);
+  });
+
+  it('overshoots native motion without letting entrance or exit opacity exceed its bounds', () => {
+    const enter = revealOffset('rise', 0.5, 80, true, 'ease-out-back');
+    expect(enter.translateY).toBeCloseTo(-7.0158, 4);
+    expect(enter.opacity).toBe(1);
+    const exit = revealOffset('rise', 0.5, 80, false, 'ease-out-back');
+    expect(exit.opacity).toBe(0);
+    expect(revealOffset('rise', 1, 80, true, 'ease-out-back').translateY).toBe(0);
   });
 
   it('ease-in-out samples the smoothstep curve (p*p*(3-2p))', () => {

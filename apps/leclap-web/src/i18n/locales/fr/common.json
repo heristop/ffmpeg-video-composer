@@ -30,7 +30,8 @@
     "templates": "Modèles",
     "docs": "Docs",
     "about": "À propos",
-    "primaryLabel": "Principal"
+    "primaryLabel": "Principal",
+    "showcase": "Inspirations"
   },
   "header": {
     "switchToLight": "Passer en thème clair",

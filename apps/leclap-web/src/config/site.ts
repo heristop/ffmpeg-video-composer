@@ -58,7 +58,7 @@ export const localeUrl = (lng: Language, path: string): string =>
  */
 export type LocalizedRoute = {
   path: string;
-  seoKey: 'default' | 'studio' | 'about' | 'compareRemotion' | 'legal' | 'privacy';
+  seoKey: 'default' | 'studio' | 'about' | 'compareRemotion' | 'showcase' | 'legal' | 'privacy';
   titleVerbatim?: boolean;
   priority: string;
   changefreq: string;
@@ -66,6 +66,7 @@ export type LocalizedRoute = {
 
 export const LOCALIZED_ROUTES: readonly LocalizedRoute[] = [
   { path: '/', seoKey: 'default', titleVerbatim: true, priority: '1.0', changefreq: 'weekly' },
+  { path: '/showcase', seoKey: 'showcase', priority: '0.9', changefreq: 'weekly' },
   { path: '/studio', seoKey: 'studio', priority: '0.9', changefreq: 'weekly' },
   { path: '/about', seoKey: 'about', priority: '0.5', changefreq: 'monthly' },
   // titleVerbatim: the bundle title already names both products, so suffixing " — LeClap" would
@@ -104,6 +105,7 @@ export const UNINDEXED_PATHS: readonly string[] = [
   '/templates/:id/edit',
   '/partials',
   '/admin',
+  '/docs/*',
   // Retired: redirects to the home page's agentic section.
   '/use-cases/agentic-development',
   '*',

@@ -7,8 +7,13 @@
 import type { FontInput } from './fonts';
 
 export type RevealType = 'none' | 'fade' | 'rise' | 'slide-left' | 'slide-right';
-export type Reveal = RevealType | { type: RevealType; delay?: number; duration?: number; distance?: number };
-export type Exit = RevealType | { type: RevealType; after?: number; duration?: number; distance?: number };
+export type RevealEasing = 'linear' | 'ease-out' | 'ease-in-out' | 'ease-out-back';
+export type Reveal =
+  | RevealType
+  | { type: RevealType; delay?: number; duration?: number; distance?: number; easing?: RevealEasing };
+export type Exit =
+  | RevealType
+  | { type: RevealType; after?: number; duration?: number; distance?: number; easing?: RevealEasing };
 
 export type TextEffect = {
   shadow?: boolean | { color?: string; dx?: number; dy?: number };
@@ -23,6 +28,7 @@ export interface TitleCard {
   align?: 'left' | 'center';
   background?: string;
   reveal?: Reveal;
+  stagger?: number;
   fade?: { in?: boolean; out?: boolean };
 }
 

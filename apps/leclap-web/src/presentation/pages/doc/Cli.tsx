@@ -74,7 +74,7 @@ export const DocCli = () => (
   <>
     <Seo
       title="Command line — LeClap CLI"
-      description="Scaffold a LeClap project and render a template descriptor to mp4 from your terminal: init, render, validate, diagnose, every render flag, and how FFmpeg is resolved."
+      description="Discover LeClap samples, scaffold a project, bind media and copy, validate and render JSON templates with the CLI. Includes render flags and FFmpeg configuration."
       path="/doc/cli"
     />
 
@@ -88,7 +88,7 @@ export const DocCli = () => (
       <CliGetStarted />
     </DocSection>
 
-    <DocSection id="commands" title="Commands" kicker="Four verbs">
+    <DocSection id="commands" title="Commands" kicker="Five verbs">
       <CommandList>
         <CommandPill command="leclap init [name]" label="scaffold a starter project that renders as-is" />
         <CommandPill command="leclap render <template>" label="compile a video from a template JSON" />
@@ -97,6 +97,7 @@ export const DocCli = () => (
           label="check a template against the schema and its text geometry, without rendering"
         />
         <CommandPill command="leclap diagnose" label="report which FFmpeg your environment provides" />
+        <CommandPill command="leclap samples list" label="discover packaged showcase samples and requirements" />
       </CommandList>
       <Prose>
         <p>
@@ -107,6 +108,31 @@ export const DocCli = () => (
         <p>
           <Code>leclap --help</Code> and <Code>leclap --version</Code> print the root screen; every subcommand has its
           own <Code>leclap &lt;command&gt; --help</Code>.
+        </p>
+      </Prose>
+    </DocSection>
+
+    <DocSection id="samples" title="Discover samples" kicker="Packaged JSON">
+      <CommandList>
+        <CommandPill
+          command="leclap samples list --backend native --category app-demos"
+          label="find a native app demo"
+        />
+        <CommandPill
+          command="leclap samples show web-app-promo"
+          label="inspect direction, clip names, copy and assets"
+        />
+        <CommandPill
+          command="leclap samples export web-app-promo --output promo.json"
+          label="export JSON to a new file"
+        />
+      </CommandList>
+      <Prose>
+        <p>
+          The 32 samples are discoverable without FFmpeg or Remotion. Supply or replace their listed media and fonts;
+          preview videos are not packaged. Partials are embedded in exports. Use repeatable <Code>--video</Code> and{' '}
+          <Code>--field</Code> flags for the sample&apos;s required bindings. Registered-effect samples render through
+          the configured <Link to="/doc/mcp">MCP backend</Link>, not directly through <Code>leclap render</Code>.
         </p>
       </Prose>
     </DocSection>
@@ -133,6 +159,16 @@ export const DocCli = () => (
         <CommandPill command="leclap render template.json --json --quiet" label="one parseable line, for CI" />
       </CommandList>
       <DefList rows={RENDER_FLAGS} />
+      <Callout label="Host configuration">
+        Paths resolve from the working directory. <Code>--orientation</Code> overrides descriptor{' '}
+        <Code>global.orientation</Code>; frame rate comes from <Code>global.fps</Code>. The published CLI has no codec,
+        quality-tier or segment-concurrency flags. Those use the library&apos;s <Code>ProjectConfig</Code>, documented
+        in the{' '}
+        <a href="https://github.com/heristop/leclap/blob/main/docs/engine-configuration.md">
+          engine configuration reference
+        </a>
+        .
+      </Callout>
       <Tip>
         <Code>validate</Code> takes the same template and the same <Code>--json</Code> flag, but never touches FFmpeg —
         it is the fast check to run in a pre-commit hook or before a long render. Beyond the schema, it reads where the
@@ -171,6 +207,12 @@ export const DocCli = () => (
         <CommandPill command="leclap init my-video --yes" label="accept all defaults (MCP + Remotion)" />
         <CommandPill command="leclap init my-video --no-mcp --no-remotion" label="bare CLI-render starter" />
         <CommandPill command="leclap init my-video --mcp --no-remotion" label="MCP wiring, no Remotion" />
+        <CommandPill
+          command={
+            'leclap init my-video --no-remotion --creative-direction "Screen first, short type entrances, readable CTA."'
+          }
+          label="store an authoring brief in template metadata; edit JSON settings to implement it"
+        />
       </CommandList>
       <Callout label="Absolute paths">
         The generated <Code>.mcp.json</Code> records absolute env paths for the machine that created it — the media dir
@@ -182,9 +224,10 @@ export const DocCli = () => (
     <DocSection id="ffmpeg" title="FFmpeg" kicker="Resolution order">
       <Prose>
         <p>
-          The engine looks for FFmpeg in this order: a system FFmpeg (fastest), then <Code>ffmpeg-static</Code>, then{' '}
-          <Code>@ffmpeg/ffmpeg</Code> (WASM). Run <Code>leclap diagnose</Code> to see which one your environment
-          actually provides.
+          The Node CLI detects system FFmpeg, then <Code>ffmpeg-static</Code>. It has no pure-Node WASM fallback.
+          Templates that probe media also need <Code>ffprobe</Code>: system FFmpeg supplies it, while the static path
+          needs optional <Code>ffprobe-static</Code> or a staged adjacent binary. Run <Code>leclap diagnose</Code> to
+          inspect your environment. Browser hosts use the separate WASM entry.
         </p>
         <p>
           pnpm skips dependency build scripts unless they are approved, and since pnpm 11 it reads approvals only from{' '}

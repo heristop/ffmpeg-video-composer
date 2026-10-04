@@ -8,7 +8,7 @@ import { promisify } from 'node:util';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { McpConfig } from '../src/config.js';
-import { type ProbeRunner, registerProbe } from '../src/tools/probeMedia.js';
+import { type ProbeRunner, probeMedia, registerProbe } from '../src/tools/probeMedia.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -190,4 +190,49 @@ describe.skipIf(!realProbeSupported)('probe_media real ffprobe', () => {
     expect(result.structuredContent?.durationSeconds).toBeGreaterThan(0);
     expect(result.structuredContent?.sizeBytes).toBeGreaterThan(0);
   });
+});
+
+it('uses WebM stream duration tags before a longer container/audio duration', async () => {
+  const result = await probeMedia('/unused.webm', 1, async () => ({
+    streams: [
+      { codec_type: 'video', codec_name: 'vp9', tags: { DURATION: '00:00:03.500000000' } },
+      { codec_type: 'audio', duration: '20' },
+    ],
+    format: { duration: '20' },
+  }));
+  expect(result.durationSeconds).toBe(3.5);
+});
+it('uses container duration for video-only WebM without stream durations', async () => {
+  const result = await probeMedia('/unused.webm', 1, async () => ({
+    streams: [{ codec_type: 'video', codec_name: 'vp9' }],
+    format: { duration: '10.100000' },
+  }));
+  expect(result.durationSeconds).toBe(10.1);
+});
+it('does not infer missing video duration from a longer audio stream or container', async () => {
+  const result = await probeMedia('/unused.webm', 1, async () => ({
+    streams: [
+      { codec_type: 'video', codec_name: 'vp9' },
+      { codec_type: 'audio', duration: '20' },
+    ],
+    format: { duration: '20' },
+  }));
+  expect(result.durationSeconds).toBeNull();
+});
+
+it('subtracts video start time from WebM duration tags rather than accepting a short offset clip', async () => {
+  const result = await probeMedia('/unused.webm', 1, async () => ({
+    streams: [{ codec_type: 'video', codec_name: 'vp9', start_time: '20', tags: { DURATION: '00:00:23.000000000' } }],
+    format: { duration: '23', start_time: '20' },
+  }));
+  expect(result.durationSeconds).toBe(3);
+});
+it('subtracts start time from single-stream container fallback while preserving true stream duration', async () => {
+  for (const duration of [undefined, '3']) {
+    const result = await probeMedia('/unused.webm', 1, async () => ({
+      streams: [{ codec_type: 'video', codec_name: 'vp9', start_time: '20', duration }],
+      format: { duration: '23', start_time: '20' },
+    }));
+    expect(result.durationSeconds).toBe(3);
+  }
 });

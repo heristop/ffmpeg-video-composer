@@ -1,6 +1,13 @@
 import { resolveTranslation, resolveVariables, buildDescriptionVars } from './i18nText';
 
 describe('resolveTranslation', () => {
+  it('resolves regional locales before the English fallback', () => {
+    expect(resolveTranslation({ en: 'Hello', fr: 'Bonjour' }, 'fr-FR')).toBe('Bonjour');
+  });
+
+  it('ignores empty translations when choosing a fallback', () => {
+    expect(resolveTranslation({ fr: '', en: 'Hello' }, 'fr')).toBe('Hello');
+  });
   it('returns the requested locale when present', () => {
     expect(resolveTranslation({ en: 'Hello', fr: 'Bonjour' }, 'fr')).toBe('Bonjour');
   });

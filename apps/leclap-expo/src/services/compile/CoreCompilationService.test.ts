@@ -33,6 +33,7 @@ jest.mock('expo-file-system/legacy', () => ({
   makeDirectoryAsync: jest.fn().mockResolvedValue(null),
   getInfoAsync: jest.fn().mockResolvedValue({ exists: true, size: 1024 }),
   copyAsync: jest.fn().mockResolvedValue(null),
+  moveAsync: jest.fn().mockResolvedValue(null),
 }));
 
 // expo-asset and the media catalog pull in Metro-bundled `require('*.mp3')` assets that ts-jest
@@ -223,5 +224,23 @@ describe('CoreCompilationService image_background staging', () => {
     const copiedTo = (FileSystem.copyAsync as unknown as MockFn).mock.calls.map((c) => (c[0] as { to: string }).to);
     // Without this staging the background image never lands on device and the render fails ffprobe.
     expect(copiedTo).toContain('file:///cache/leclap-assets/backgrounds/desk-flatlay.jpg');
+  });
+});
+
+describe('CoreCompilationService output publishing', () => {
+  it('moves each render off the shared engine output so later renders cannot overwrite it', async () => {
+    (FileSystem.getInfoAsync as unknown as MockFn).mockResolvedValue({ exists: true, size: 1024 });
+    (compileReactNative as unknown as MockFn).mockResolvedValue('/cache/build/output.mp4');
+    const service = new CoreCompilationService();
+
+    const first = await service.compile(input);
+    const second = await service.compile(input);
+
+    expect(first.success && second.success).toBe(true);
+    expect(first.success && second.success && first.outputUri).not.toBe(second.success && second.outputUri);
+    expect((FileSystem.moveAsync as unknown as MockFn).mock.calls[0][0]).toEqual({
+      from: 'file:///cache/build/output.mp4',
+      to: expect.stringMatching(/^file:\/\/\/cache\/leclap-outputs\/.+\.mp4$/),
+    });
   });
 });

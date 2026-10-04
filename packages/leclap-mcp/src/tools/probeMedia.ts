@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { promisify } from 'node:util';
 
-import type { McpServer } from '@modelcontextprotocol/server';
+import type { McpServer, ServerContext } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
 import type { McpConfig } from '../config.js';
@@ -34,12 +34,15 @@ interface FFProbeStream {
   codec_type: string;
   codec_name?: string | null;
   duration?: string;
+  start_time?: string;
   sample_rate?: string;
+  tags?: Record<string, string>;
 }
 
 interface FFProbeData {
   // Optional because the JSON comes from ffprobe at runtime; a malformed payload may omit it.
   streams?: FFProbeStream[];
+  format?: { duration?: string; start_time?: string };
 }
 
 export interface ProbeInfos {
@@ -63,17 +66,46 @@ function errorResult(text: string): ToolError {
 // after first resolution.
 let cachedBin: string | undefined;
 
-async function resolveFfprobeBin(): Promise<string> {
+async function execProbe(bin: string, args: string[], signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  const pending = execFileAsync(bin, args, { timeout: PROBE_TIMEOUT_MS, killSignal: 'SIGKILL' });
+  // Node's execFile signal path can send SIGTERM despite killSignal. Kill explicitly,
+  // then await the child callback so a preflight permit remains held until cleanup.
+  function abort() {
+    pending.child.kill('SIGKILL');
+  }
+  signal?.addEventListener('abort', abort, { once: true });
+
+  if (signal?.aborted) abort();
+
+  try {
+    const result = await pending;
+    signal?.throwIfAborted();
+
+    return result;
+  } catch (error) {
+    signal?.throwIfAborted();
+
+    throw error;
+  } finally {
+    signal?.removeEventListener('abort', abort);
+  }
+}
+
+async function resolveFfprobeBin(signal?: AbortSignal): Promise<string> {
+  signal?.throwIfAborted();
+
   if (cachedBin !== undefined) {
     return cachedBin;
   }
 
   try {
-    await execFileAsync('ffprobe', ['-version'], { timeout: PROBE_TIMEOUT_MS, killSignal: 'SIGKILL' });
+    await execProbe('ffprobe', ['-version'], signal);
     cachedBin = 'ffprobe';
 
     return cachedBin;
   } catch {
+    signal?.throwIfAborted();
     cachedBin = resolveStaticFfprobe();
 
     return cachedBin;
@@ -120,26 +152,44 @@ function resolveFfprobeBesideFfmpegStatic(): string {
 // Probe a local file by invoking ffprobe directly via execFile. This captures stdout into a buffer
 // (zero fd-1 pollution) and deliberately bypasses the core's DI-wired adapter, which logs via pino
 // straight to fd 1 — that would corrupt the MCP stdio JSON-RPC framing.
-export type ProbeRunner = (realPath: string) => Promise<FFProbeData>;
+export type ProbeRunner = (realPath: string, signal?: AbortSignal) => Promise<FFProbeData>;
 
-async function defaultRunner(realPath: string): Promise<FFProbeData> {
-  const bin = await resolveFfprobeBin();
-  const { stdout } = await execFileAsync(bin, ['-v', 'quiet', '-print_format', 'json', '-show_streams', realPath], {
-    timeout: PROBE_TIMEOUT_MS,
-    killSignal: 'SIGKILL',
-  });
+async function defaultRunner(realPath: string, signal?: AbortSignal): Promise<FFProbeData> {
+  const bin = await resolveFfprobeBin(signal);
+  const { stdout } = await execProbe(
+    bin,
+    ['-v', 'quiet', '-print_format', 'json', '-show_streams', '-show_format', realPath],
+    signal
+  );
 
   return JSON.parse(stdout) as FFProbeData;
 }
 
+function numericDuration(value: string | undefined): number | null {
+  if (!value) return null;
+  const number = Number(value);
+
+  return Number.isFinite(number) && number >= 0 ? number : null;
+}
+
+function elapsedDuration(timestamp: number | null, startTime: string | undefined): number | null {
+  if (timestamp === null) return null;
+  const start = Number(startTime ?? 0);
+  // These fallback values are end timestamps in WebM. A true stream.duration is already elapsed.
+  return Math.max(0, timestamp - (Number.isFinite(start) ? Math.max(0, start) : 0));
+}
+
 function parseDuration(stream: FFProbeStream | undefined): number | null {
-  if (!stream?.duration) {
-    return null;
-  }
+  const duration = numericDuration(stream?.duration);
 
-  const value = Number.parseFloat(stream.duration);
+  if (duration !== null) return duration;
+  // Matroska/WebM commonly stores per-stream duration as HH:MM:SS in tags instead.
+  const tag = stream?.tags?.DURATION ?? stream?.tags?.duration;
+  const match = tag?.match(/^(\d+):([0-5]\d):([0-5]\d(?:\.\d+)?)$/);
 
-  return Number.isNaN(value) ? null : value;
+  return match
+    ? elapsedDuration(Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]), stream?.start_time)
+    : null;
 }
 
 function parseSampleRate(stream: FFProbeStream | undefined): number | null {
@@ -152,18 +202,34 @@ function parseSampleRate(stream: FFProbeStream | undefined): number | null {
   return Number.isNaN(value) ? null : value;
 }
 
+function durationFor(streams: FFProbeStream[], format: FFProbeData['format']): number | null {
+  const primary =
+    streams.find((stream) => stream.codec_type === 'video') ?? streams.find((stream) => stream.codec_type === 'audio');
+  // A longer audio/container duration cannot establish that video lasts ten seconds.
+  // Container fallback is safe for a single-stream file, including video-only WebM.
+  return (
+    parseDuration(primary) ??
+    (streams.length === 1
+      ? elapsedDuration(numericDuration(format?.duration), streams[0].start_time ?? format?.start_time)
+      : null)
+  );
+}
+
 export async function probeMedia(
   realPath: string,
   sizeBytes: number,
-  runner: ProbeRunner = defaultRunner
+  runner: ProbeRunner = defaultRunner,
+  signal?: AbortSignal
 ): Promise<ProbeInfos> {
-  const data = await runner(realPath);
+  signal?.throwIfAborted();
+  const data = await runner(realPath, signal);
+  signal?.throwIfAborted();
   const streams = data.streams ?? [];
   const videoStream = streams.find((s) => s.codec_type === 'video');
   const audioStream = streams.find((s) => s.codec_type === 'audio');
 
   return {
-    durationSeconds: parseDuration(videoStream) ?? parseDuration(audioStream),
+    durationSeconds: durationFor(streams, data.format),
     videoCodec: videoStream?.codec_name ?? null,
     audioCodec: audioStream?.codec_name ?? null,
     sampleRate: parseSampleRate(audioStream),
@@ -171,7 +237,7 @@ export async function probeMedia(
   };
 }
 
-async function handleProbe(args: { path: string }, config: McpConfig, runner: ProbeRunner) {
+async function handleProbe(args: { path: string }, config: McpConfig, runner: ProbeRunner, signal?: AbortSignal) {
   let realPath: string;
 
   try {
@@ -182,7 +248,7 @@ async function handleProbe(args: { path: string }, config: McpConfig, runner: Pr
 
   try {
     const { size } = await fs.stat(realPath);
-    const infos = await probeMedia(realPath, size, runner);
+    const infos = await probeMedia(realPath, size, runner, signal);
 
     return {
       content: [
@@ -210,6 +276,6 @@ export function registerProbe(server: McpServer, config: McpConfig, runner: Prob
       inputSchema,
       outputSchema,
     },
-    (args: { path: string }) => handleProbe(args, config, runner)
+    (args: { path: string }, ctx?: ServerContext) => handleProbe(args, config, runner, ctx?.mcpReq.signal)
   );
 }

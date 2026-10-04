@@ -2,8 +2,8 @@ import type * as LeclapFfmpeg from '@/modules/leclap-ffmpeg';
 
 /**
  * Whether the native `leclap-ffmpeg` engine is present in the running build. Dev clients built
- * before the module was added (or Expo Go) won't have it, so the hybrid router must check before
- * trying an on-device compile and fall back to the server otherwise. Cached after the first probe.
+ * before the module was added (or Expo Go) won't have it. The local compile entry checks before
+ * rendering and reports an unavailable-engine error. Cached after the first probe.
  */
 let cached: boolean | undefined;
 

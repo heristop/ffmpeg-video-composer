@@ -9,7 +9,7 @@
 Describe a video in one JSON _template_ — sections, filters, music, overlays — then render **that same template** on a phone (React Native, **on-device**) or in the **browser** (WebAssembly). No upload, no server, no generative model: the render is deterministic and reproducible, not sampled.
 
 [![CI](https://github.com/heristop/leclap/actions/workflows/ci.yml/badge.svg)](https://github.com/heristop/leclap/actions/workflows/ci.yml)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg)](https://nodejs.org/en/)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D24.11.0-brightgreen.svg)](https://nodejs.org/en/)
 [![pnpm](https://img.shields.io/badge/pnpm-12-f69220.svg)](https://pnpm.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -65,7 +65,7 @@ The workflow is explicit: **implement → collect evidence → author template �
 
 ## 🚀 Quick start
 
-> 💡 **Recommended: [mise](https://mise.jdx.dev).** `mise install` provisions the exact pinned toolchain — **Node 24, pnpm 12, FFmpeg 8.1.1, and Rust** — so every contributor and CI run identical versions. Managing versions yourself? Bring **Node ≥ 24** and **pnpm 12**.
+> 💡 **Recommended: [mise](https://mise.jdx.dev).** `mise install` provisions **Node 24, pnpm 12, FFmpeg 8.1.1, and stable Rust**. Node/pnpm release lines and Rust stable can advance; `packageManager` pins pnpm to **12.6.0**. Managing versions yourself? Bring **Node ≥ 24.11.0** and **pnpm 12.6.0**.
 
 ```bash
 git clone https://github.com/heristop/leclap.git
@@ -74,9 +74,10 @@ mise install     # Node 24, pnpm 12, FFmpeg 8.1.1 + Rust
 pnpm install
 ```
 
-Then pick an app:
+Build the shared core, then pick an app:
 
 ```bash
+pnpm --filter ffmpeg-video-composer build
 pnpm app:web      # web app — compiles videos in-browser (no server)
 pnpm app:expo     # Expo mobile app — compiles fully on-device (no server)
 ```
@@ -84,15 +85,25 @@ pnpm app:expo     # Expo mobile app — compiles fully on-device (no server)
 Or use the CLI — [`@leclap/cli`](packages/leclap-cli) is the `leclap` dev tool:
 
 ```bash
+npx @leclap/cli samples list          # discover the packaged showcase
+npx @leclap/cli samples show web-app-promo
+npx @leclap/cli samples export native-timing --output timing.json
 npx @leclap/cli init my-video         # scaffold a starter project
 npx @leclap/cli render template.json  # render it (`leclap diagnose` checks your FFmpeg)
 ```
 
-Or drive it from an AI agent: the [`@leclap/mcp`](packages/leclap-mcp) server exposes the engine as MCP tools — schema → validate → render — with no LLM in the output path.
+Or drive it from an AI agent: the [`@leclap/mcp`](packages/leclap-mcp) server exposes the engine as MCP tools — sample discovery → customize → validate → render — with no LLM in the output path.
+
+The installed CLI and MCP expose all **32 showcase samples** (22 native, 10 Remotion), including creative
+direction and required clips, copy, fonts and assets. Exported descriptor JSON embeds referenced partials;
+supply your own media before rendering. Registered Remotion effects require the configured MCP
+Node/Chromium backend and, where indicated, a trusted operator catalog. Discovery itself needs neither
+FFmpeg nor Remotion. See [CLI sample commands](packages/leclap-cli/README.md#samples--discover-and-adapt-a-showcase)
+and [MCP discovery](packages/leclap-mcp/README.md#discover-samples-before-authoring).
 
 ## 📦 Monorepo
 
-pnpm workspaces (`apps/*`, `packages/*`) — no turbo/nx. The root is a private orchestrator (`leclap`); `ffmpeg-video-composer`, `@leclap/cli`, and `@leclap/mcp` are published to npm. The web and mobile apps both run the same core — the mobile app drives it **fully on-device** via the embedded native engine (no server), the web app in-browser via WASM.
+pnpm workspaces (`apps/*`, `packages/*`, plus `examples/llm-remotion-title`) — no turbo/nx. The root is a private orchestrator (`leclap`); `ffmpeg-video-composer`, `@leclap/cli`, and `@leclap/mcp` are published to npm. The web and mobile apps both run the same core — the mobile app drives it **fully on-device** via the embedded native engine (no server), the web app in-browser via WASM.
 
 | Package                                                   | Description                                                                      |
 | --------------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -115,10 +126,18 @@ A **template** is a Zod-validated JSON descriptor — a `global` block plus an o
 
 - **[🌐 Descriptor reference (web)](https://leclap.pages.dev/doc)** — the full, schema-driven descriptor reference, one page per topic (sections, transitions, looks, grade, motion, audio, captions, filters, examples, JSON Schema).
 - **[🧩 Template Configuration](docs/template-configuration.md)** — the template JSON reference.
+- **[🎬 Effects Configuration](docs/effects-configuration.md)** — generated effect contracts, custom registration, bounds, assets and preview/edit workflow.
+- **[⚙️ Engine Configuration](docs/engine-configuration.md)** — host `ProjectConfig`, CLI bindings, MCP flags, deadlines, cache and output precedence.
 - **[🏗 Architecture](docs/architecture.md)** — system architecture and design patterns.
 - **[🔧 FFmpeg Fallback Strategy](docs/architecture.md#cross-platform-support)** — how automatic FFmpeg detection works.
 - **[📱 On-Device Compilation](docs/on-device-compilation.md)** — the serverless Expo compile pipeline.
 - **[🤖 AGENTS.md](AGENTS.md)** — repo layout, commands, and conventions for contributors and AI agents.
+
+### Creative direction
+
+Record the visual brief in `meta.creativeDirection`, then implement it with explicit JSON settings or
+registered Remotion props. The CLI starter and MCP authoring prompt accept the same direction.
+See [the guide and distinct example treatments](docs/creative-direction.md).
 
 ## 🤝 Contributing & License
 

@@ -2,9 +2,8 @@
 
 The **on-device FFmpeg engine**: a Rust crate that statically links FFmpeg's own
 command-line tools (`fftools` — `ffmpeg.c` / `ffprobe.c`) and exposes them to the
-[`leclap-expo`](../../apps/leclap-expo) app as in-process `run` / `probe` / `version` calls.
-No subprocess, no `.so` to resolve at runtime, no network — the same FFmpeg that renders on
-the server runs **inside the phone**, so a template compiles to an mp4 fully offline.
+[`leclap-expo`](../../apps/leclap-expo) app as in-process `run` / `probe` / `version` / `cancel` calls.
+The executor invokes FFmpeg in-process. Android loads the engine `.so` with its FFmpeg dependencies statically embedded; iOS links the engine static library. The app can render from local assets, while templates referencing remote media still require downloads.
 
 This is the **runtime half** of on-device compilation. The **build half** lives in
 [`scripts/ffmpeg/`](../../scripts/ffmpeg), which compiles FFmpeg + deps into the static libs
@@ -12,6 +11,8 @@ this crate links against. Full architecture:
 [`docs/on-device-compilation.md`](../../docs/on-device-compilation.md).
 
 ## How it fits together
+
+Runtime output settings belong to the TypeScript host's `ProjectConfig`, not this crate's build flags. The Expo host selects AAC with Android `libopenh264` or iOS `h264_videotoolbox`; template `global.orientation` and `global.fps` resolve the output geometry and frame rate. Native commands remain serial, and registered React effects must be rendered on Node before their clips can be composed locally. See [host configuration](../../docs/on-device-compilation.md#host-configuration) and the [engine configuration reference](../../docs/engine-configuration.md).
 
 ```text
 template JSON
@@ -22,7 +23,7 @@ template JSON
   → libfftools.a + static FFmpeg libs                the actual encode
 ```
 
-The crate is built into the Expo native module — `jniLibs/*.so` on Android, a
+The crate is built into the Expo native module — `jniLibs/<abi>/*.so` on Android, a
 `LeclapFfmpegCore.xcframework` on iOS — by
 [`scripts/ffmpeg/build-engine.sh`](../../scripts/ffmpeg/build-engine.sh). Those binaries are
 **not committed**; that script is how they are (re)produced.
@@ -38,8 +39,8 @@ The crate is built into the Expo native module — `jniLibs/*.so` on Android, a
 | `ARGV_ERROR = -2`                             | Sentinel `code` for malformed `args` (empty, or an interior NUL byte) — distinct from any code ffmpeg itself returns.                                     |
 
 `fftools` keep parse/transcode state in process globals and write to the shared stdout/stderr
-fds, so **only one invocation runs at a time** (`ENGINE_LOCK`); the core issues commands
-sequentially. `run`/`probe` redirect the C-level fd 1/2 to a temp file to capture output
+fds, so **only one invocation runs at a time** (`ENGINE_LOCK` serializes `run`/`probe`); the core issues commands
+sequentially. `cancel` bypasses the mutex so it can stop the current `run`, and does not affect `probe`. `version` also runs without the mutex. `ARGV_ERROR` is a Rust constant returned in result codes; it is not a separate uniffi/JS function. `run`/`probe` redirect the C-level fd 1/2 to a temp file to capture output
 in-process, restoring it even across a panic.
 
 ## Layout
@@ -57,13 +58,26 @@ in-process, restoring it even across a panic.
 
 ## Build & test
 
-```bash
-# Whole engine into the Expo module (FFmpeg deps + static libs + this crate):
-bash scripts/ffmpeg/build-engine.sh [android|ios|all]
+Run the platform build from the repository root; select `android`, `ios`, or `all` (default). The current scripts assume macOS: Android selects the NDK `darwin-x86_64` host toolchain, and iOS requires Xcode. Prerequisites and pinned versions are described in [On-Device Compilation](../../docs/on-device-compilation.md#building-the-engine-locally).
 
-# Unit tests against a host build (no device needed):
-cargo test                      # from this directory
+```bash
+bash scripts/ffmpeg/build-engine.sh android
 ```
+
+For real host tests on macOS, build the patched host libraries first. The host build needs system pkg-config dependencies (freetype, harfbuzz, openh264, libvpx); `build.rs` also links macOS Homebrew dependencies dynamically.
+
+```bash
+# Start at the repository root:
+bash scripts/ffmpeg/build-host.sh
+cd packages/ffmpeg-engine
+export FFMPEG_PKG_CONFIG_PATH="$PWD/../../scripts/ffmpeg/dist/host/lib/pkgconfig"
+export PKG_CONFIG_PATH="$FFMPEG_PKG_CONFIG_PATH"
+export DYLD_FALLBACK_LIBRARY_PATH="$PWD/../../scripts/ffmpeg/dist/host/lib"
+export CARGO_TARGET_DIR=target-host
+cargo test --release
+```
+
+`PKG_CONFIG_PATH` must point at the patched host build, rather than a different system FFmpeg. API changes also require rebuilding the engine and regenerating the Kotlin/Swift bindings, then copying them into the Expo module; `build-engine.sh` stages binaries but does not generate bindings. The `ondevice-ffmpeg-engine` [skill](../../.agents/skills/ondevice-ffmpeg-engine/SKILL.md#regenerating-uniffi-bindings-after-changing-the-rust-api) lists the command and destinations.
 
 LGPL-3.0-or-later (no `--enable-gpl` in the FFmpeg build — see
 [`scripts/ffmpeg/common.sh`](../../scripts/ffmpeg/common.sh)).

@@ -1,6 +1,6 @@
 // Turns a rendered doc page into Markdown and builds the "take this page elsewhere" links used by the
-// docs Copy-page menu. Doc pages are JSX (no Markdown source), so we serialise the live DOM at click
-// time — the output always matches what the reader sees. The link/prompt builders and the per-block
+// docs Copy-page menu. Pages combine JSX and canonical Markdown, so we serialise the live DOM at
+// click time — the output always matches what the reader sees. The link/prompt builders and the per-block
 // formatters are pure and unit-tested; the DOM walk that feeds them is exercised in the browser.
 
 export type AiProvider = 'chatgpt' | 'claude';
@@ -230,7 +230,7 @@ const asideMd = (aside: HTMLElement): string => {
 
 // Blocks serialised whole, by tag; anything else is a container the walk descends into.
 const BLOCKS: Partial<Record<string, (el: HTMLElement) => string>> = {
-  pre: (el) => `\`\`\`json\n${preText(el)}\n\`\`\``,
+  pre: (el) => `\`\`\`${el.dataset.language ?? 'json'}\n${preText(el)}\n\`\`\``,
   table: tableMd,
   ul: listMd,
   ol: listMd,

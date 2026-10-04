@@ -39,7 +39,9 @@
     "app:expo": "pnpm --filter @leclap/expo run start",
     "app:ios": "pnpm --filter @leclap/expo run ios",
     "app:android": "pnpm --filter @leclap/expo run android",
-    "mcp:dev": "pnpm --filter ffmpeg-video-composer build && pnpm --filter @leclap/mcp build && node packages/leclap-mcp/dist/index.js"
+    "mcp:dev": "pnpm --filter ffmpeg-video-composer build && pnpm --filter @leclap/mcp build && node packages/leclap-mcp/dist/index.js",
+    "docs:effects": "pnpm --filter @leclap/mcp exec tsx scripts/generate-effect-docs.ts",
+    "docs:effects:check": "pnpm --filter @leclap/mcp exec tsx scripts/generate-effect-docs.ts --check"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",

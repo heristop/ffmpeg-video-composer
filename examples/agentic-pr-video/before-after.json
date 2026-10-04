@@ -1,7 +1,8 @@
 {
   "meta": {
     "name": "Agentic PR Evidence — Before / After",
-    "description": "A short review video an agent renders for a UI change: the change named, the old behavior, a wipe to the new behavior, and what the reviewer should check."
+    "description": "A short review video an agent renders for a UI change: the change named, the old behavior, a wipe to the new behavior, and what the reviewer should check.",
+    "creativeDirection": "Audience: a pull-request reviewer comparing behavior. Direction: a factual before-and-after demonstration using matched captures and clear labels. Keep framing and visual treatment consistent between both recordings so the change is easy to judge. Use quiet transitions and concise context rather than dramatic reveals. Avoid changing crop to exaggerate an improvement, invented findings and covering the changed control. Review both captures, the comparison boundary, reviewer instructions and the final evidence card."
   },
   "global": {
     "orientation": "landscape",

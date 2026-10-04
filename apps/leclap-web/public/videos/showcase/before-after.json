@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "name": "Agentic PR Evidence — Before / After",
+    "description": "A short review video an agent renders for a UI change: the change named, the old behavior, a wipe to the new behavior, and what the reviewer should check.",
+    "creativeDirection": "Audience: a pull-request reviewer comparing behavior. Direction: a factual before-and-after demonstration using matched captures and clear labels. Keep framing and visual treatment consistent between both recordings so the change is easy to judge. Use quiet transitions and concise context rather than dramatic reveals. Avoid changing crop to exaggerate an improvement, invented findings and covering the changed control. Review both captures, the comparison boundary, reviewer instructions and the final evidence card."
+  },
+  "global": {
+    "orientation": "landscape",
+    "variables": {
+      "project": "Example project",
+      "change": "Describe the change",
+      "beforeCaption": "What was wrong",
+      "afterCaption": "What changed",
+      "reviewFocus": "What the reviewer should check"
+    },
+    "musicEnabled": false,
+    "transition": {
+      "type": "fade",
+      "duration": 0.3
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "musicVolume": 0
+    }
+  },
+  "sections": [
+    {
+      "name": "intro",
+      "type": "color_background",
+      "titleCard": {
+        "kicker": {
+          "en": "{{ project }}"
+        },
+        "headline": {
+          "en": "{{ change }}"
+        },
+        "subtitle": {
+          "en": "Before / after — recorded for review"
+        },
+        "accent": "#8b91ff",
+        "reveal": "slide-left",
+        "effect": {
+          "shadow": true
+        }
+      },
+      "options": {
+        "backgroundColor": "#0f1117",
+        "duration": 1.6
+      }
+    },
+    {
+      "name": "before",
+      "type": "project_video",
+      "transition": {
+        "type": "wipeleft",
+        "duration": 0.6
+      },
+      "lowerThird": {
+        "title": {
+          "en": "{{ beforeCaption }}"
+        },
+        "badge": {
+          "en": "BEFORE"
+        },
+        "accent": "#ff5f6d",
+        "reveal": "rise",
+        "effect": {
+          "shadow": true
+        }
+      },
+      "title": {
+        "en": "Before the change"
+      },
+      "description": {
+        "en": "A recording of the behavior the change fixes"
+      },
+      "options": {
+        "duration": 3.8,
+        "forceAspectRatio": true
+      }
+    },
+    {
+      "name": "after",
+      "type": "project_video",
+      "lowerThird": {
+        "title": {
+          "en": "{{ afterCaption }}"
+        },
+        "badge": {
+          "en": "AFTER"
+        },
+        "accent": "#34d399",
+        "reveal": "rise",
+        "effect": {
+          "shadow": true
+        }
+      },
+      "title": {
+        "en": "After the change"
+      },
+      "description": {
+        "en": "The same walkthrough on the branch under review"
+      },
+      "options": {
+        "duration": 4.2,
+        "forceAspectRatio": true
+      }
+    },
+    {
+      "name": "review",
+      "type": "color_background",
+      "titleCard": {
+        "kicker": {
+          "en": "WHAT TO REVIEW"
+        },
+        "headline": {
+          "en": "{{ reviewFocus }}"
+        },
+        "subtitle": {
+          "en": "Watch the behavior, then read the diff"
+        },
+        "accent": "#fff685",
+        "align": "left",
+        "reveal": "rise",
+        "fade": {
+          "out": false
+        },
+        "effect": {
+          "shadow": true
+        }
+      },
+      "options": {
+        "backgroundColor": "#171923",
+        "duration": 2.4
+      }
+    }
+  ]
+}

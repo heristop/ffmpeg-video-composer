@@ -402,3 +402,37 @@ describe('collectGeometryWarnings on sections without a duration', () => {
     expect(found.some((w) => w.approx)).toBe(false);
   });
 });
+
+it.each(['direct', 'inline', 'registry', 'variable'])(
+  'checks effect overlays after %s expansion with authored paths',
+  async (kind) => {
+    const effect = {
+      type: 'effect',
+      name: 'promo',
+      options: { duration: 10 },
+      effect: { id: 'leclap.web-app-promo', version: '1.0.0', props: {}, assets: {} },
+      filters: [{ type: 'drawtext', values: { text: { en: 'OFF SCREEN' }, fontsize: 120, x: 1400, y: 800 } }],
+    };
+    let raw: unknown = { global: { orientation: 'landscape' }, sections: [effect] };
+    let origin = 'sections[0]';
+    if (kind === 'inline') {
+      raw = { global: { orientation: 'landscape' }, sections: [{ type: 'partial', sections: [effect] }] };
+      origin = 'sections[0].sections[0]';
+    }
+    if (kind === 'registry' || kind === 'variable') {
+      raw = {
+        global: { orientation: 'landscape' },
+        sections: [{ type: 'partial', ref: 'promo', variables: { kind: 'effect' } }],
+        partials: [{ id: 'promo', sections: [{ ...effect, type: kind === 'variable' ? '{{kind}}' : 'effect' }] }],
+      };
+      origin = 'partials[0].sections[0]';
+    }
+    const before = structuredClone(raw);
+    const warnings = await collectGeometryWarnings(raw as TemplateDescriptor);
+    expect(warnings.some((warning) => warning.code === 'text_out_of_frame' && warning.path.startsWith(origin))).toBe(
+      true
+    );
+    expect(warnings.some((warning) => warning.code === 'text_unreadable_over_footage')).toBe(true);
+    expect(raw).toEqual(before);
+  }
+);

@@ -76,6 +76,11 @@ jobs:
       - name: Lint
         run: pnpm lint -f stylish
 
+      # The generic example is a private workspace package: its pinned React/Remotion dependencies
+      # are installed from the root lockfile. The optional private film adapter is checked locally.
+      - name: Typecheck JSON effects example
+        run: pnpm --filter leclap-json-effects-example typecheck
+
       - name: Check Dependencies
         run: pnpm deps:check
 

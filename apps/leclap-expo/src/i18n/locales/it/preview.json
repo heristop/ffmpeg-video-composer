@@ -12,5 +12,46 @@
   },
   "crop": {
     "title": "Trascina il riquadro per ritagliare"
+  },
+  "compile": {
+    "title": "Il tuo video prende vita",
+    "progress": "Avanzamento del video",
+    "preparing": "Preparazione delle scene…",
+    "private": "Il video viene creato solo sul tuo dispositivo",
+    "cancel": "Annulla creazione",
+    "cancelling": "Annullamento…"
+  },
+  "export": {
+    "title": "Esporta video",
+    "readyTitle": "Il tuo video è pronto",
+    "readyBody": "Salva una copia o condividi la tua storia.",
+    "saveBody": "Salva una copia nella libreria fotografica",
+    "share": "Condividi",
+    "shareBody": "Apri le opzioni di condivisione",
+    "shareTitle": "Il mio video LeClap",
+    "uploadTitle": "Carica su un URL",
+    "saveErrorTitle": "Salvataggio non riuscito",
+    "saveErrorBody": "Impossibile salvare il video. Riprova.",
+    "missingUrlTitle": "URL mancante",
+    "missingUrlBody": "Inserisci prima un URL di caricamento.",
+    "uploadErrorTitle": "Caricamento non riuscito",
+    "save": {
+      "idle": "Salva nella galleria",
+      "saving": "Salvataggio…",
+      "saved": "Salvato nella galleria",
+      "error": "Errore — tocca per riprovare"
+    },
+    "upload": {
+      "idle": "Carica",
+      "uploading": "Caricamento… {{percent}} %",
+      "done": "Caricamento completato",
+      "error": "Errore — tocca per riprovare"
+    },
+    "shareErrorTitle": "Condivisione non disponibile",
+    "shareErrorBody": "Impossibile condividere il video. Riprova."
+  },
+  "sheet": {
+    "close": "Chiudi",
+    "dismiss": "Chiudi pannello"
   }
 }

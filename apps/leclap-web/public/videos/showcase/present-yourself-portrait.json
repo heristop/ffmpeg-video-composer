@@ -1,0 +1,205 @@
+{
+  "meta": {
+    "name": "Present Yourself (Portrait)",
+    "description": "Introduce yourself — a cinematic title card wipes into your graded clip with your name on a lower third, all rendered on this device."
+  },
+  "global": {
+    "orientation": "portrait",
+    "musicEnabled": true,
+    "music": {
+      "name": "party-dance.mp3"
+    },
+    "allowedMusic": ["party-dance", "future-bass-energy", "upbeat-electronic", "indie-rock-dreamy", "cafe-jazz"],
+    "allowUploadMusic": true,
+    "transition": {
+      "type": "fade",
+      "duration": 0.5
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "musicVolume": 0.25,
+      "musicFade": 0.8,
+      "normalize": "loudnorm",
+      "ducking": {
+        "threshold": 0.05,
+        "ratio": 8,
+        "attack": 20,
+        "release": 400
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "form_1",
+      "type": "form",
+      "title": {
+        "en": "Present yourself"
+      },
+      "description": {
+        "en": ""
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "form_1_firstname",
+            "maxLength": 24,
+            "label": {
+              "en": "Your first name"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "intro",
+      "type": "color_background",
+      "transition": {
+        "type": "wipeleft",
+        "duration": 0.45
+      },
+      "titleCard": {
+        "kicker": {
+          "en": "PRESENTING"
+        },
+        "headline": {
+          "en": "{{ form_1_firstname }}"
+        },
+        "subtitle": {
+          "en": "shot & rendered on this device"
+        },
+        "accent": "#7C83FD",
+        "align": "center",
+        "reveal": {
+          "type": "slide-left",
+          "duration": 0.6
+        },
+        "effect": {
+          "shadow": true
+        }
+      },
+      "options": {
+        "backgroundColor": "#0d1b2a",
+        "duration": 2.8,
+        "layers": [
+          {
+            "gradient": {
+              "from": "#13243f",
+              "to": "#0d1b2a",
+              "direction": "vertical"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "video_1",
+      "type": "project_video",
+      "look": "teal-orange",
+      "inputs": [
+        {
+          "name": "frame_glow",
+          "url": "/assets/animations/glow_border.apng",
+          "type": "animation",
+          "options": {
+            "loop": true,
+            "persistent": true,
+            "position": "0:0",
+            "scale": "720:1280",
+            "opacity": 0.3
+          }
+        }
+      ],
+      "title": {
+        "en": "Record your clip"
+      },
+      "description": {
+        "en": "Say hi — your moment, graded and signed"
+      },
+      "options": {
+        "duration": 6,
+        "forceAspectRatio": true,
+        "countdown": true,
+        "countdownDuration": 2,
+        "musicVolume": 0.04,
+        "framingGuide": {
+          "type": "silhouette",
+          "position": "center"
+        }
+      },
+      "lowerThird": {
+        "title": {
+          "en": "{{ form_1_firstname }}"
+        },
+        "badge": {
+          "en": "ON-DEVICE"
+        },
+        "accent": "#7C83FD",
+        "reveal": "rise",
+        "effect": {
+          "shadow": true
+        }
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        }
+      ]
+    },
+    {
+      "type": "partial",
+      "ref": "logo-bumper-portrait"
+    }
+  ],
+  "partials": [
+    {
+      "id": "logo-bumper-portrait",
+      "sections": [
+        {
+          "name": "logo_bumper",
+          "type": "video",
+          "options": {
+            "videoUrl": "https://github.com/heristop/leclap/raw/main/src/shared/assets/videos/leclap_bumper_portrait.mp4",
+            "duration": 2.4,
+            "muteSection": true
+          },
+          "filters": [
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 0,
+                "w": 720,
+                "h": 10,
+                "c": "#7C83FD@1",
+                "t": "fill"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 1270,
+                "w": 720,
+                "h": 10,
+                "c": "#FF8AAE@1",
+                "t": "fill"
+              }
+            },
+            {
+              "type": "fadein",
+              "values": {
+                "color": "#0b0b0f"
+              }
+            },
+            {
+              "type": "fadeout",
+              "values": {
+                "color": "#0b0b0f"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

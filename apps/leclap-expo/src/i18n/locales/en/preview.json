@@ -12,5 +12,46 @@
   },
   "crop": {
     "title": "Drag the frame to crop"
+  },
+  "compile": {
+    "title": "Making your video",
+    "progress": "Video rendering progress",
+    "preparing": "Preparing your scenes…",
+    "private": "Rendering privately on your device",
+    "cancel": "Cancel render",
+    "cancelling": "Cancelling…"
+  },
+  "export": {
+    "title": "Export video",
+    "readyTitle": "Your video is ready",
+    "readyBody": "Keep a copy or share your story.",
+    "saveBody": "Save a copy to your photo library",
+    "share": "Share",
+    "shareBody": "Open the system share sheet",
+    "shareTitle": "My LeClap video",
+    "uploadTitle": "Upload to a URL",
+    "saveErrorTitle": "Save failed",
+    "saveErrorBody": "Could not save the video. Please try again.",
+    "missingUrlTitle": "Missing URL",
+    "missingUrlBody": "Enter an upload URL first.",
+    "uploadErrorTitle": "Upload failed",
+    "save": {
+      "idle": "Save to gallery",
+      "saving": "Saving…",
+      "saved": "Saved to gallery",
+      "error": "Save failed — tap to retry"
+    },
+    "upload": {
+      "idle": "Upload",
+      "uploading": "Uploading… {{percent}}%",
+      "done": "Upload complete",
+      "error": "Upload failed — tap to retry"
+    },
+    "shareErrorTitle": "Sharing unavailable",
+    "shareErrorBody": "Could not share the video. Please try again."
+  },
+  "sheet": {
+    "close": "Close",
+    "dismiss": "Dismiss"
   }
 }

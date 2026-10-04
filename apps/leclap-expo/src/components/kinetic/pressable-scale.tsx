@@ -1,14 +1,22 @@
-import { type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Pressable, type StyleProp, type ViewStyle, type AccessibilityRole } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, {
+  cancelAnimation,
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { motion } from '@/src/styles/motion';
 import { useHapticPress, type HapticStyle } from '@/src/hooks/use-haptic-press';
+import { useMotionPreferences } from '@/src/hooks/use-motion-preferences';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface PressableScaleProps {
   children: ReactNode;
   onPress?: () => void | Promise<void>;
+  onLongPress?: () => void;
   scaleTo?: number;
   haptic?: HapticStyle;
   disabled?: boolean;
@@ -25,6 +33,7 @@ interface PressableScaleProps {
 export function PressableScale({
   children,
   onPress,
+  onLongPress,
   scaleTo = 0.96,
   haptic = 'light',
   disabled = false,
@@ -35,20 +44,44 @@ export function PressableScale({
   testID,
 }: PressableScaleProps) {
   const scale = useSharedValue(1);
+  const pressed = useSharedValue(false);
+  const { reducedMotion, appActive } = useMotionPreferences();
+  const animate = !reducedMotion && appActive;
   const handlePress = useHapticPress(onPress, haptic);
-  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  useEffect(() => {
+    if (!animate || disabled) {
+      cancelAnimation(scale);
+      scale.set(1);
+    }
+
+    if (disabled || !appActive) pressed.set(false);
+
+    return () => {
+      cancelAnimation(scale);
+    };
+  }, [animate, disabled, appActive, scale, pressed]);
+  const animatedStyle = useAnimatedStyle(() => {
+    let opacity = pressed.get() ? 0.8 : 1;
+
+    if (disabled) opacity = 0.5;
+
+    return { transform: [{ scale: animate && !disabled ? scale.get() : 1 }], opacity };
+  });
 
   return (
     <AnimatedPressable
       onPressIn={() => {
         if (disabled) return;
 
-        scale.value = withSpring(scaleTo, motion.spring.tap);
+        pressed.set(true);
+        scale.set(animate ? withSpring(scaleTo, { ...motion.spring.tap, reduceMotion: ReduceMotion.Never }) : 1);
       }}
       onPressOut={() => {
-        scale.value = withSpring(1, motion.spring.tap);
+        pressed.set(false);
+        scale.set(animate ? withSpring(1, { ...motion.spring.tap, reduceMotion: ReduceMotion.Never }) : 1);
       }}
       onPress={disabled ? undefined : handlePress}
+      onLongPress={disabled ? undefined : onLongPress}
       disabled={disabled}
       style={[style, animatedStyle]}
       accessibilityLabel={accessibilityLabel}

@@ -12,5 +12,46 @@
   },
   "crop": {
     "title": "Ziehe den Rahmen zum Beschneiden"
+  },
+  "compile": {
+    "title": "Dein Video entsteht",
+    "progress": "Fortschritt der Videoerstellung",
+    "preparing": "Szenen werden vorbereitet…",
+    "private": "Das Video wird nur auf deinem Gerät erstellt",
+    "cancel": "Erstellung abbrechen",
+    "cancelling": "Wird abgebrochen…"
+  },
+  "export": {
+    "title": "Video exportieren",
+    "readyTitle": "Dein Video ist fertig",
+    "readyBody": "Speichere es oder teile deine Geschichte.",
+    "saveBody": "Eine Kopie in deiner Fotomediathek speichern",
+    "share": "Teilen",
+    "shareBody": "Systemfreigabe öffnen",
+    "shareTitle": "Mein LeClap-Video",
+    "uploadTitle": "An eine URL senden",
+    "saveErrorTitle": "Speichern fehlgeschlagen",
+    "saveErrorBody": "Das Video konnte nicht gespeichert werden. Versuche es erneut.",
+    "missingUrlTitle": "URL fehlt",
+    "missingUrlBody": "Gib zuerst eine Upload-URL ein.",
+    "uploadErrorTitle": "Upload fehlgeschlagen",
+    "save": {
+      "idle": "In Galerie speichern",
+      "saving": "Wird gespeichert…",
+      "saved": "In Galerie gespeichert",
+      "error": "Fehlgeschlagen — erneut versuchen"
+    },
+    "upload": {
+      "idle": "Hochladen",
+      "uploading": "Upload… {{percent}} %",
+      "done": "Upload abgeschlossen",
+      "error": "Fehlgeschlagen — erneut versuchen"
+    },
+    "shareErrorTitle": "Teilen nicht verfügbar",
+    "shareErrorBody": "Das Video konnte nicht geteilt werden. Bitte versuche es erneut."
+  },
+  "sheet": {
+    "close": "Schließen",
+    "dismiss": "Panel schließen"
   }
 }

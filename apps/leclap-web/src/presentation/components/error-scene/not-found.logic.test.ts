@@ -4,7 +4,7 @@ import { LOCALIZED_ROUTES, UNINDEXED_PATHS } from '@/config/site';
 import { KNOWN_PATHS, suggestPath, withPath } from './not-found.logic';
 
 // The router's redirects: real paths, but never a page worth pointing a lost visitor to.
-const REDIRECTS = new Set(['/builder', '/admin', '/projects', '/use-cases/agentic-development']);
+const REDIRECTS = new Set(['/builder', '/admin', '/projects', '/use-cases/agentic-development', '/docs/*']);
 
 describe('KNOWN_PATHS', () => {
   it('lists every page the router serves except home, and nothing else', () => {

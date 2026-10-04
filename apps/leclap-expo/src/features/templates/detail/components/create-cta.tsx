@@ -13,6 +13,7 @@ import { styles } from '@/src/features/templates/detail/detail.styles';
 const QUALITY_TIERS: QualityTier[] = ['draft', 'standard', 'high'];
 
 interface CreateCtaProps {
+  sidePanel?: boolean;
   isDisabled: boolean;
   isPending: boolean;
   willQueue: boolean;
@@ -26,6 +27,7 @@ interface CreateCtaProps {
 // the morphing label, with a draft/standard/high quality picker riding above it. Disabled collapses to
 // a flat muted lavender with a "N shots left" helper so the gate teaches rather than just greys out.
 export function CreateCta({
+  sidePanel = false,
   isDisabled,
   isPending,
   willQueue,
@@ -40,7 +42,7 @@ export function CreateCta({
   const contentColor = isDisabled ? withAlpha(colors.textStrong, 0.72) : '#FFFFFF';
 
   return (
-    <View style={styles.footer}>
+    <View style={[styles.footer, sidePanel && { width: 300, alignSelf: 'flex-end', borderTopWidth: 0 }]}>
       <View style={styles.qualityRow}>
         <Segmented
           label={t('quality.label')}

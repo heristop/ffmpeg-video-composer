@@ -1,6 +1,6 @@
 {
   "name": "ffmpeg-video-composer",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Template-driven video composition: one JSON spec renders on Node, in the browser via WebAssembly, and fully on-device on React Native — powered by FFmpeg.",
   "homepage": "https://leclap.dev",
   "type": "module",
@@ -23,6 +23,16 @@
       "types": "./dist/reactnative.d.ts",
       "default": "./dist/reactnative.js"
     },
+    "./samples": {
+      "import": {
+        "types": "./dist/samples.d.ts",
+        "default": "./dist/samples.js"
+      },
+      "require": {
+        "types": "./dist/samples.d.cts",
+        "default": "./dist/samples.cjs"
+      }
+    },
     "./src/*": "./src/*"
   },
   "scripts": {
@@ -33,6 +43,8 @@
     "diagnose": "node diagnose.ts",
     "generate:schema": "tsx scripts/generate-schema-json.ts",
     "generate:capabilities": "tsx scripts/generate-capability-matrix.ts",
+    "generate:samples": "tsx scripts/generate-samples.ts",
+    "check:samples": "tsx scripts/generate-samples.ts --check",
     "bench": "tsx scripts/bench.ts",
     "typecheck": "tsc --noEmit",
     "test": "vp test run",

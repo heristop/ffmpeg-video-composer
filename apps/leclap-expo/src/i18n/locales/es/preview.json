@@ -12,5 +12,46 @@
   },
   "crop": {
     "title": "Arrastra el marco para encuadrar"
+  },
+  "compile": {
+    "title": "Tu vídeo cobra vida",
+    "progress": "Progreso del vídeo",
+    "preparing": "Preparando las escenas…",
+    "private": "El vídeo se crea de forma privada en tu dispositivo",
+    "cancel": "Cancelar creación",
+    "cancelling": "Cancelando…"
+  },
+  "export": {
+    "title": "Exportar vídeo",
+    "readyTitle": "Tu vídeo está listo",
+    "readyBody": "Guarda una copia o comparte tu historia.",
+    "saveBody": "Guardar una copia en tu fototeca",
+    "share": "Compartir",
+    "shareBody": "Abrir las opciones para compartir",
+    "shareTitle": "Mi vídeo de LeClap",
+    "uploadTitle": "Subir a una URL",
+    "saveErrorTitle": "Error al guardar",
+    "saveErrorBody": "No se pudo guardar el vídeo. Inténtalo de nuevo.",
+    "missingUrlTitle": "Falta la URL",
+    "missingUrlBody": "Introduce primero una URL de subida.",
+    "uploadErrorTitle": "Error al subir",
+    "save": {
+      "idle": "Guardar en la galería",
+      "saving": "Guardando…",
+      "saved": "Guardado en la galería",
+      "error": "Error — toca para reintentar"
+    },
+    "upload": {
+      "idle": "Subir",
+      "uploading": "Subiendo… {{percent}} %",
+      "done": "Subida completada",
+      "error": "Error — toca para reintentar"
+    },
+    "shareErrorTitle": "No se puede compartir",
+    "shareErrorBody": "No se pudo compartir el vídeo. Vuelve a intentarlo."
+  },
+  "sheet": {
+    "close": "Cerrar",
+    "dismiss": "Cerrar el panel"
   }
 }

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { buildDescriptor, newSection, type EditorState, type EditorSection } from '../templateEditorModel';
 import { exportDescriptorJson, exportFilename, importDescriptorJson } from './templateIO';
@@ -137,5 +139,19 @@ describe('import/export round-trip', () => {
     if (result.ok) return;
 
     expect(result.errors[0]).toContain('Invalid JSON');
+  });
+});
+
+describe('importDescriptorJson effect sections', () => {
+  it('refuses a template with an effect section instead of turning it into a video slot', () => {
+    const text = readFileSync(
+      fileURLToPath(new URL('../../../../../../../examples/llm-remotion-title/template.json', import.meta.url)),
+      'utf8'
+    );
+
+    const result = importDescriptorJson(text, state());
+
+    expect(result.ok).toBe(false);
+    expect(!result.ok && result.errors.join(' ')).toMatch(/effect/i);
   });
 });

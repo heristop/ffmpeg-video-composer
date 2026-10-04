@@ -41,8 +41,8 @@ export const mcpDoc: McpDoc = {
   id: 'mcp',
   title: 'MCP for agents',
   intro:
-    'The LeClap MCP server exposes this same descriptor engine to local AI agents. The agent authors a JSON descriptor from the schema, the server validates it, and compose_video renders a deterministic MP4 through the FFmpeg pipeline. It ships no template catalog; an optional render_remotion_clip turns your own Remotion project into an animated intro clip.',
-  flow: ['get_template_schema', 'validate_template', 'compose_video'],
+    'The LeClap MCP server exposes this same descriptor engine to local AI agents. The agent authors a JSON descriptor from the schema, the server validates it, and compose_video renders a deterministic MP4 through the FFmpeg pipeline. The packaged catalog includes 32 samples with creative direction and input requirements. Registered JSON effects use a configured trusted Node/Remotion backend; render_remotion_clip also accepts your own Remotion composition.',
+  flow: ['list_samples', 'get_sample', 'get_template_schema', 'validate_template', 'compose_video'],
   agenticReview: {
     intro:
       'For a pull or merge request, the development agent can turn a real walkthrough into a short evidence video before handing the change to a reviewer.',
@@ -58,6 +58,18 @@ export const mcpDoc: McpDoc = {
   },
   tools: [
     {
+      name: 'list_samples',
+      args: 'category?, backend?, query?',
+      purpose: 'Discovers packaged sample metadata, creative direction, required inputs and backend setup.',
+      when: 'Available without FFmpeg or Remotion; media and preview videos are not downloaded.',
+    },
+    {
+      name: 'get_sample',
+      args: 'id',
+      purpose: 'Returns a sample descriptor with embedded partials and its input requirements.',
+      when: 'Customize copy, supply required clips/assets and inspect setup before validating.',
+    },
+    {
       name: 'get_template_schema',
       args: 'no arguments',
       purpose: 'Returns the authoritative JSON Schema for the template descriptor plus a short authoring guide.',
@@ -67,14 +79,35 @@ export const mcpDoc: McpDoc = {
       name: 'validate_template',
       args: 'template, render?',
       purpose:
-        'Dry-runs validation of an inline descriptor — no render unless render: true, which renders the text-bearing sections and measures contrast from real pixels (seconds). Returns valid, sectionCount, orientation, requiredClips and formFields, plus an optional geometry array listing text that would run off the frame or out of title-safe, collide with other text, sit under a band, be too small, lack contrast, or sit over footage with no box, outline or shadow.',
+        'Dry-runs validation of an inline descriptor — no render unless render: true, which renders the text-bearing sections and measures contrast from real pixels (seconds). Returns valid, revision, capabilities, sectionCount, orientation, requiredClips and formFields, plus an optional geometry array listing text that would run off the frame or out of title-safe, collide with other text, sit under a band, be too small, lack contrast, or sit over footage with no box, outline or shadow.',
       when: 'Use repeatedly to iterate on the descriptor before a slower render. The geometry findings are advisory — valid stays true — and the field is absent when there is nothing to fix.',
     },
     {
-      name: 'compose_video',
-      args: 'template, fields?, userVideoPaths?, locale?, outputBaseName?',
+      name: 'get_effect_schema',
+      args: 'id?, version?, list?',
       purpose:
-        'Validates then renders an inline descriptor. Returns outputPath, durationSeconds, sizeBytes, videoCodec, audioCodec and renderId, plus a resource_link to the mp4.',
+        'Lists registered effect identities or describes strict props, local asset slots, output and contract digest.',
+      when: 'Use list: true for discovery, or exact id/version for a contract. The zero-argument call describes the builtin title.',
+      optIn: true,
+    },
+    {
+      name: 'render_preview',
+      args: 'template, section, frames? or frameRange?, expectedRevision?, userVideoPaths?',
+      purpose: 'Renders selected effect-local frames or a short inclusive range through the configured trusted entry.',
+      when: 'Use expanded section names, including partial prefixes. Provide 1..10 distinct frames in 0..299, or an inclusive range of 1..90 frames.',
+      optIn: true,
+    },
+    {
+      name: 'patch_template',
+      args: 'template, expectedRevision, edits',
+      purpose: 'Atomically applies named effect-prop edits and returns updated JSON, revision and changedSections.',
+      when: 'Use expanded section names. Registry partial edits materialize only the selected instance; rendering/backend validation still requires opt-in.',
+    },
+    {
+      name: 'compose_video',
+      args: 'template, fields?, userVideoPaths?, locale?, outputBaseName?, expectedRevision?',
+      purpose:
+        'Validates then renders an inline descriptor. Returns outputPath, durationSeconds, sizeBytes, videoCodec, audioCodec and renderId, plus a resource_link to the mp4. Effect templates also report effectProvenance and effectCache.',
       when: 'Use after validation succeeds and every project_video section has a clip in userVideoPaths.',
     },
     {
@@ -120,21 +153,46 @@ export const mcpDoc: McpDoc = {
       env: 'LECLAP_MCP_ALLOW_REMOTION',
       fallback: 'off',
       detail:
-        'render_remotion_clip bundles and executes a caller-supplied entry — arbitrary local JS. Without this the tool is never registered and never appears in tools/list.',
+        'Registers get_effect_schema, render_preview and render_remotion_clip. Trusted local JavaScript runs in Chromium; JSON cannot select executable source for registered effects.',
     },
     {
       label: 'Remotion entry',
       flag: '--remotion-entry',
       env: 'LECLAP_MCP_REMOTION_ENTRY',
       fallback: 'none',
-      detail: 'A default entry module (the one that calls registerRoot) so calls can omit the entry argument.',
+      detail:
+        'Trusted module calling registerRoot. Required for registered JSON effects; also the default entry for render_remotion_clip.',
     },
     {
       label: 'Render timeout',
       flag: '--render-timeout-ms',
       env: 'LECLAP_MCP_RENDER_TIMEOUT_MS',
       fallback: '600000 (10 minutes)',
-      detail: 'How long a single render may run before the worker is killed.',
+      detail:
+        'Separate deadline for queue wait, asset preflight and worker setup/render; final FFmpeg rendering also has its own deadline. This is not a whole-request time budget.',
+    },
+    {
+      label: 'Chrome executable',
+      flag: '--remotion-browser',
+      env: 'LECLAP_MCP_REMOTION_BROWSER',
+      fallback: 'none; Remotion manages its browser',
+      detail: 'Absolute path to a compatible installed Chrome executable for registered effects.',
+    },
+    {
+      label: 'Operator effect catalog',
+      flag: '--effect-catalog',
+      env: 'LECLAP_MCP_EFFECT_CATALOG',
+      fallback: 'none; builtin contracts only',
+      detail:
+        'Strict JSON contracts loaded once at startup. Register their compositions in the trusted entry and restart after catalog edits.',
+    },
+    {
+      label: 'Effect cache bytes',
+      flag: '--effect-cache-max-bytes',
+      env: 'LECLAP_MCP_EFFECT_CACHE_MAX_BYTES',
+      fallback: '536870912 (512 MiB)',
+      detail:
+        'Artifact cache under <media-dir>/.leclap-effects/cache-v1, with at most 256 entries. Zero disables lookup/publication; invalid values use the default.',
     },
   ],
   // Mirrors the one-click editor deep-links in docMarkdown.ts, which install via npx. Env values are

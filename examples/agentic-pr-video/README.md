@@ -1,5 +1,10 @@
 # Agentic PR evidence video
 
+The example descriptors include `meta.creativeDirection` with their visual intent and review criteria.
+See the [creative-direction guide](../../docs/creative-direction.md) for CLI and MCP authoring.
+
+See [engine configuration](../../docs/engine-configuration.md) for CLI bindings, host output defaults and MCP media containment. This native example needs no Remotion backend; keep MCP source recordings inside its configured media directory.
+
 Use this template when an agent has finished a code change and the reviewer needs more than a written summary. The agent collects a short, real screen recording, gives the change and review focus to LeClap, validates the descriptor, and renders a deterministic MP4. Attach the finished file to the pull or merge request beside the code.
 
 LeClap creates the artifact. Uploading it remains an explicit step in your GitHub or GitLab workflow.

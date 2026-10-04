@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "name": "Type impact",
+    "description": "Overshoot entrances, opposing word travel and a deliberate final hold.",
+    "creativeDirection": "Direction: a typographic poster in motion. Place MOVE at monumental scale on dark ink, with a lavender secondary word and one pink rule. Stage opposing word entrances with short ease-out-back travel; clear them together before the next beat. Follow with an off-centre pink scene and a calm final statement. Give every phrase a readable hold. Use native positioned text, bounded alpha and explicit entrance/exit times; no background footage, worker or new FFmpeg filter is needed. Review first readable frame, overshoot settling, coordinated exits and the clean closing hold."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "impact",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.2,
+        "layers": [
+          {
+            "color": "#FF8AAE",
+            "x": 76,
+            "y": 80,
+            "w": 96,
+            "h": 7
+          }
+        ]
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "MOVE"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 250,
+            "fontcolor": "#F5F3F7",
+            "x": 72,
+            "y": 146
+          },
+          "reveal": {
+            "type": "slide-right",
+            "delay": 0.04,
+            "duration": 0.38,
+            "distance": 100,
+            "easing": "ease-out-back"
+          },
+          "exit": {
+            "type": "slide-right",
+            "after": 2.55,
+            "duration": 0.25,
+            "distance": 48,
+            "easing": "ease-out"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "WITH INTENT."
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 110,
+            "fontcolor": "#B8ADFF",
+            "x": 80,
+            "y": 438
+          },
+          "reveal": {
+            "type": "slide-left",
+            "delay": 0.19,
+            "duration": 0.38,
+            "distance": 72,
+            "easing": "ease-out-back"
+          },
+          "exit": {
+            "type": "slide-left",
+            "after": 2.55,
+            "duration": 0.25,
+            "distance": 48,
+            "easing": "ease-out"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "A LITTLE ENERGY. A CLEAR IDEA."
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 27,
+            "fontcolor": "#F5F3F7",
+            "x": 80,
+            "y": 626
+          },
+          "reveal": {
+            "type": "rise",
+            "delay": 0.35,
+            "duration": 0.38,
+            "distance": 20,
+            "easing": "ease-out-back"
+          },
+          "exit": {
+            "type": "rise",
+            "after": 2.55,
+            "duration": 0.25,
+            "distance": 48,
+            "easing": "ease-out"
+          }
+        }
+      ]
+    },
+    {
+      "name": "counterpoint",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#FF8AAE",
+        "duration": 3.2
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "MAKE"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 220,
+            "fontcolor": "#141416",
+            "x": 78,
+            "y": 130
+          },
+          "reveal": {
+            "type": "slide-right",
+            "delay": 0.02,
+            "duration": 0.38,
+            "distance": 90,
+            "easing": "ease-out-back"
+          },
+          "exit": {
+            "type": "slide-right",
+            "after": 2.55,
+            "duration": 0.25,
+            "distance": 48,
+            "easing": "ease-out"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "IT COUNT."
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 200,
+            "fontcolor": "#141416",
+            "x": 356,
+            "y": 340
+          },
+          "reveal": {
+            "type": "slide-left",
+            "delay": 0.15,
+            "duration": 0.38,
+            "distance": 110,
+            "easing": "ease-out-back"
+          },
+          "exit": {
+            "type": "slide-left",
+            "after": 2.55,
+            "duration": 0.25,
+            "distance": 48,
+            "easing": "ease-out"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "SHORT ARRIVAL / LONG IMPRESSION"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 28,
+            "fontcolor": "#141416",
+            "x": 84,
+            "y": 634
+          },
+          "reveal": {
+            "type": "rise",
+            "delay": 0.3,
+            "duration": 0.38,
+            "distance": 20,
+            "easing": "ease-out-back"
+          },
+          "exit": {
+            "type": "rise",
+            "after": 2.55,
+            "duration": 0.25,
+            "distance": 48,
+            "easing": "ease-out"
+          }
+        }
+      ]
+    },
+    {
+      "name": "hold",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.4
+      },
+      "titleCard": {
+        "headline": {
+          "en": "YOUR NEXT MOVE."
+        },
+        "subtitle": {
+          "en": "Explicit timing. Endless expression."
+        },
+        "headlineStyle": {
+          "font": "bebas",
+          "fontsize": 116
+        },
+        "subtitleStyle": {
+          "font": "oswald",
+          "fontsize": 31
+        },
+        "accent": "#B8ADFF",
+        "stagger": 0.11,
+        "reveal": {
+          "type": "rise",
+          "delay": 0.06,
+          "duration": 0.3,
+          "distance": 32,
+          "easing": "ease-out"
+        },
+        "fade": {
+          "in": false,
+          "out": false
+        }
+      }
+    }
+  ]
+}

@@ -3,14 +3,15 @@
 // DropPayload; on drop, resolveCanvasDrop turns it + the drop point into an immutable section patch
 // plus the ref to select. No React/DOM here — SectionCanvas reads the payload + computes the frame
 // fraction, EditorMonitor applies the patch.
-import type {
-  AnimationOverlay,
-  EditorSection,
-  ImageOverlay,
-  MediaChoice,
-  Orientation,
-  TextOverlay,
-  BackgroundLayer,
+import {
+  animationDefaultsForUrl,
+  type AnimationOverlay,
+  type EditorSection,
+  type ImageOverlay,
+  type MediaChoice,
+  type Orientation,
+  type TextOverlay,
+  type BackgroundLayer,
 } from '../templateEditorModel';
 import { clampFraction } from '../overlayGeometry';
 import { resolveOverlayRect, positionFromFraction } from './imageAnimationDrag';
@@ -169,7 +170,11 @@ const applyLibrarySource = (
 ): Partial<EditorSection> => {
   const { payload, point, orientation } = drop;
   const source = payload.element === 'image' ? { choice: payload.choice } : { url: payload.url, label: payload.label };
-  const sized = items.map((item, i) => (i === index ? { ...item, ...source } : item));
+  const defaults =
+    payload.element === 'animation' && 'url' in items[index] && !items[index].url
+      ? animationDefaultsForUrl(payload.url)
+      : {};
+  const sized = items.map((item, i) => (i === index ? { ...item, ...defaults, ...source } : item));
   const position = mediaPosition(sized, index, point, orientation);
   const next = sized.map((item, i) => (i === index ? { ...item, position } : item));
 

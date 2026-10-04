@@ -22,5 +22,9 @@
   "privacy": {
     "title": "Datenschutzerklärung",
     "description": "LeClap verarbeitet deine Medien auf deinem Gerät. Keine Uploads, keine Konten, kein Tracking – so genau wird mit deiner Privatsphäre umgegangen."
+  },
+  "showcase": {
+    "title": "Bewegungsgalerie",
+    "description": "Alle LeClap-Beispiele ansehen, native und Remotion-Animationen entdecken, kreative Anweisungen lesen und JSON-Vorlagen herunterladen."
   }
 }

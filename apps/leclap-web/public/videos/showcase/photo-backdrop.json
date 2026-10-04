@@ -1,0 +1,238 @@
+{
+  "meta": {
+    "name": "Photo Backdrop",
+    "description": "A photo backdrop with a slow Ken Burns drift and a quote, then your clip graded to match."
+  },
+  "global": {
+    "orientation": "landscape",
+    "musicEnabled": true,
+    "music": {
+      "name": "romantic-piano.mp3"
+    },
+    "allowedMusic": ["romantic-piano", "cafe-bossa-nova", "lofi-sentimental-jazz", "cafe-jazz", "lofi-chill"],
+    "allowUploadMusic": true,
+    "transition": {
+      "type": "dissolve",
+      "duration": 0.6
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "musicVolume": 0.25,
+      "musicFade": 0.8,
+      "normalize": "loudnorm",
+      "ducking": {
+        "threshold": 0.05,
+        "ratio": 8,
+        "attack": 20,
+        "release": 400
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "form_1",
+      "type": "form",
+      "title": {
+        "en": "Your name and a line"
+      },
+      "description": {
+        "en": ""
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "form_1_name",
+            "maxLength": 24,
+            "label": {
+              "en": "Your name"
+            }
+          },
+          {
+            "name": "form_1_quote",
+            "maxLength": 60,
+            "label": {
+              "en": "A short line or quote"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "backdrop",
+      "type": "image_background",
+      "grade": {
+        "curvesPreset": "vintage"
+      },
+      "motion": [
+        {
+          "type": "kenburns",
+          "direction": "in",
+          "intensity": 1.2
+        }
+      ],
+      "caption": {
+        "text": {
+          "en": "{{ form_1_quote }}"
+        },
+        "style": "subtle",
+        "position": "center",
+        "align": "center",
+        "effect": {
+          "shadow": true
+        }
+      },
+      "options": {
+        "pictureUrl": "/assets/backgrounds/golden-hour.jpg",
+        "duration": 4
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "in",
+            "d": "0.6",
+            "color": "#000000"
+          }
+        },
+        {
+          "type": "fade",
+          "values": {
+            "t": "out",
+            "d": "{{ transitionDuration }}",
+            "st": "{{ transitionStartTime }}",
+            "color": "#000000"
+          }
+        }
+      ]
+    },
+    {
+      "name": "video_1",
+      "type": "project_video",
+      "look": "warm-film",
+      "title": {
+        "en": "Record your clip"
+      },
+      "description": {
+        "en": "Your moment — graded warm to match the backdrop"
+      },
+      "options": {
+        "duration": 8,
+        "forceAspectRatio": true,
+        "countdown": true,
+        "countdownDuration": 2,
+        "musicVolume": 0.04
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 600,
+            "w": 1280,
+            "h": 120,
+            "c": "#1a120b@0.55",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 80,
+            "y": 628,
+            "w": 90,
+            "h": 5,
+            "c": "#e7a23b@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ form_1_name }}"
+            },
+            "fontcolor": "#f7e2c4",
+            "fontsize": 52,
+            "x": 80,
+            "y": 644,
+            "fontfile": "PlayfairDisplay.ttf"
+          }
+        },
+        {
+          "type": "fadein",
+          "values": {
+            "color": "#000000"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "#000000"
+          }
+        }
+      ]
+    },
+    {
+      "type": "partial",
+      "ref": "logo-bumper"
+    }
+  ],
+  "partials": [
+    {
+      "id": "logo-bumper",
+      "sections": [
+        {
+          "name": "logo_bumper",
+          "type": "video",
+          "options": {
+            "videoUrl": "https://github.com/heristop/leclap/raw/main/src/shared/assets/videos/leclap_bumper.mp4",
+            "duration": 2.4,
+            "muteSection": true
+          },
+          "filters": [
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 0,
+                "w": 1280,
+                "h": 10,
+                "c": "#7C83FD@1",
+                "t": "fill"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 710,
+                "w": 1280,
+                "h": 10,
+                "c": "#FF8AAE@1",
+                "t": "fill"
+              }
+            },
+            {
+              "type": "fadein",
+              "values": {
+                "color": "#0b0b0f"
+              }
+            },
+            {
+              "type": "fadeout",
+              "values": {
+                "color": "#0b0b0f"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

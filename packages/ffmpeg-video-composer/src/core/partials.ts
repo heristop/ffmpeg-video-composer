@@ -1,3 +1,4 @@
+import { applyVariables } from './partial-variables';
 // Template "partials": reusable section fragments referenced from a template via
 // `{ "type": "partial", "ref": "<id>" }` instead of being copy-pasted. Expanded at load — before
 // validation and compilation — so the schema, validator, and engine only ever see real sections.
@@ -23,27 +24,6 @@ function isPartialRef(section: Section): section is Section & PartialRefSection 
 
 export function partialsById(partials: TemplatePartial[]): Record<string, TemplatePartial | undefined> {
   return Object.fromEntries(partials.map((partial) => [partial.id, partial]));
-}
-
-// Deep-replace every `{{ key }}` placeholder in a partial's sections with the matching ref variable.
-// Keys absent from `variables` are left untouched, so a partial may still reference global template
-// variables (resolved later by the engine). Values are inserted verbatim and never re-scanned.
-function applyVariables<T>(node: T, variables: Record<string, string>): T {
-  if (typeof node === 'string') {
-    return node.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, key: string) =>
-      Object.prototype.hasOwnProperty.call(variables, key) ? variables[key] : match
-    ) as unknown as T;
-  }
-
-  if (Array.isArray(node)) {
-    return node.map((item) => applyVariables(item, variables)) as unknown as T;
-  }
-
-  if (node !== null && typeof node === 'object') {
-    return Object.fromEntries(Object.entries(node).map(([key, value]) => [key, applyVariables(value, variables)])) as T;
-  }
-
-  return node;
 }
 
 // Expand a single `{ type: "partial", ref }` section into its real sections: resolve the registry
@@ -95,19 +75,36 @@ export function expandPartialsWithRegistry(
     return descriptor;
   }
 
-  const registry = partialsById(partials);
+  return { ...descriptor, sections: expandSections(sections, partialsById(partials), []) };
+}
+
+// Expand refs recursively: a partial may itself contain partial refs, which must not survive into
+// validation or compilation (the compiler would skip them silently). `stack` holds the refs being
+// expanded so a partial that includes itself fails loudly instead of recursing forever.
+function expandSections(
+  sections: Section[],
+  registry: Record<string, TemplatePartial | undefined>,
+  stack: string[]
+): Section[] {
   const expanded: Section[] = [];
 
   for (const section of sections) {
-    if (isPartialRef(section)) {
-      expanded.push(...expandRefSection(section, registry));
+    if (!isPartialRef(section)) {
+      expanded.push(section);
       continue;
     }
 
-    expanded.push(section);
+    const ref = (section.ref ?? '').trim();
+
+    if (ref && stack.includes(ref)) {
+      throw new Error(`Cyclic template partial: "${ref}"`);
+    }
+
+    const nested = ref ? [...stack, ref] : stack;
+    expanded.push(...expandSections(expandRefSection(section, registry), registry, nested));
   }
 
-  return { ...descriptor, sections: expanded };
+  return expanded;
 }
 
 // Expand using the registry carried in the descriptor itself (`descriptor.partials`). Inline partials
@@ -143,3 +140,5 @@ export function expandPartialsSafe(templateData: unknown): PartialExpansion {
     };
   }
 }
+
+export { assertEffectsResolved } from './assert-effects-resolved';

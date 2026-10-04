@@ -1,11 +1,12 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, Image, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, typography, spacing } from '@/src/styles/theme';
 import logoImage from '@/assets/images/logo.png';
+import { PressableScale } from '@/src/components/kinetic/pressable-scale';
+import { CONTENT_MAX_WIDTH } from '@/src/styles/adaptive-layout';
 
 interface HeaderProps {
   title?: string;
@@ -15,133 +16,7 @@ interface HeaderProps {
   onBackPress?: () => void;
   showSlogan?: boolean;
   variant?: 'primary' | 'transparent' | 'light';
-  actions?: {
-    icon: string;
-    onPress: () => void;
-    color?: string;
-  }[];
-}
-
-type ContainerStyle = {
-  backgroundColor: string;
-  borderBottomWidth: number;
-  borderBottomColor?: string;
-};
-
-function getContainerStyles(variant: HeaderProps['variant']): ContainerStyle {
-  switch (variant) {
-    case 'transparent':
-      return {
-        backgroundColor: 'transparent',
-        borderBottomWidth: 0,
-      };
-    case 'light':
-      return {
-        backgroundColor: colors.surface,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.divider,
-      };
-    default:
-      return {
-        backgroundColor: colors.primary,
-        borderBottomWidth: 0,
-      };
-  }
-}
-
-function getTextColor(variant: HeaderProps['variant']): string {
-  if (variant === 'light') {
-    return colors.text;
-  }
-
-  if (variant === 'transparent') {
-    return colors.surface;
-  }
-
-  return colors.accent;
-}
-
-function getSubtitleColor(variant: HeaderProps['variant']): string {
-  return variant === 'light' ? colors.textSecondary : colors.surface;
-}
-
-function getStatusBarStyle(variant: HeaderProps['variant']): 'dark-content' | 'light-content' {
-  return variant === 'light' ? 'dark-content' : 'light-content';
-}
-
-function getSafeAreaBackground(variant: HeaderProps['variant'], containerBackground: string): string {
-  return variant === 'transparent' ? 'transparent' : containerBackground;
-}
-
-type ActionItem = {
-  icon: string;
-  onPress: () => void;
-  color?: string;
-};
-
-function useLogoAnimation(): Animated.Value {
-  const logoScaleAnim = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    const pulseAnimation = Animated.sequence([
-      Animated.timing(logoScaleAnim, {
-        toValue: 1.1,
-        duration: 700,
-        useNativeDriver: true,
-        easing: Easing.ease,
-      }),
-      Animated.timing(logoScaleAnim, {
-        toValue: 1,
-        duration: 700,
-        useNativeDriver: true,
-        easing: Easing.ease,
-      }),
-    ]);
-
-    Animated.loop(pulseAnimation, { iterations: 3 }).start();
-
-    return () => {
-      logoScaleAnim.stopAnimation();
-    };
-  }, [logoScaleAnim]);
-
-  return logoScaleAnim;
-}
-
-function ActionButtons({
-  actions,
-  title,
-  onNavigateToBrowseTemplates,
-  textColor,
-}: {
-  actions: ActionItem[];
-  title: string;
-  onNavigateToBrowseTemplates: () => void;
-  textColor: string;
-}): React.ReactElement {
-  const getActionHandler = (action: ActionItem): (() => void) => {
-    if (action.icon === 'add-circle' && title === 'My Videos') {
-      return onNavigateToBrowseTemplates;
-    }
-
-    if (action.icon === 'options-outline') {
-      return () => {
-        /* no-op: options not yet implemented */
-      };
-    }
-
-    return action.onPress;
-  };
-
-  return (
-    <>
-      {actions.map((action, index) => (
-        <TouchableOpacity key={`action-${index}`} style={styles.actionButton} onPress={getActionHandler(action)}>
-          <Ionicons name={action.icon as keyof typeof Ionicons.glyphMap} size={24} color={action.color ?? textColor} />
-        </TouchableOpacity>
-      ))}
-    </>
-  );
+  actions?: { icon: keyof typeof Ionicons.glyphMap; label: string; onPress: () => void; color?: string }[];
 }
 
 export default function Header({
@@ -156,124 +31,108 @@ export default function Header({
 }: HeaderProps) {
   const router = useRouter();
   const { t } = useTranslation('header');
-  useLogoAnimation();
+  const backgroundColor = { transparent: 'transparent', light: colors.background, primary: colors.primaryMuted }[
+    variant
+  ];
+  const textColor = variant === 'transparent' ? colors.monitorText : colors.text;
+  const handleBack = () => {
+    if (onBackPress) {
+      onBackPress();
 
-  const resolvedTitle = title ?? t('defaultTitle');
-
-  const handleBackPress = (): void => {
-    if (!onBackPress) {
       return;
     }
 
-    onBackPress();
-  };
+    if (router.canGoBack()) {
+      router.back();
 
-  const handleNavigateToBrowseTemplates = (): void => {
-    router.navigate('/(app)');
+      return;
+    }
+    router.replace('/(app)');
   };
-
-  const containerStyles = getContainerStyles(variant);
-  const textColor = getTextColor(variant);
 
   return (
-    <SafeAreaView
-      style={[styles.safeArea, { backgroundColor: getSafeAreaBackground(variant, containerStyles.backgroundColor) }]}
-    >
-      <StatusBar barStyle={getStatusBarStyle(variant)} backgroundColor="transparent" translucent />
-      <View style={[styles.container, containerStyles]}>
-        <View style={styles.leftSection}>
-          {showBackButton && (
-            <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-              <Ionicons name="chevron-back" size={28} color={textColor} />
-            </TouchableOpacity>
-          )}
-
-          {showLogo && (
-            <View style={styles.logoContainer}>
-              <Image source={logoImage} style={styles.logo} resizeMode="contain" />
-            </View>
-          )}
-
-          <View style={styles.titleContainer}>
-            <Text style={[styles.title, { color: textColor }]}>{resolvedTitle}</Text>
-            {showSlogan && <Text style={[styles.subtitle, { color: getSubtitleColor(variant) }]}>{t('slogan')}</Text>}
-          </View>
-        </View>
-
-        <View style={styles.rightSection}>
-          <ActionButtons
-            actions={actions}
-            title={resolvedTitle}
-            onNavigateToBrowseTemplates={handleNavigateToBrowseTemplates}
+    <SafeAreaView edges={['top', 'left', 'right']} style={{ backgroundColor }}>
+      <StatusBar barStyle={variant === 'transparent' ? 'light-content' : 'dark-content'} />
+      <View style={styles.container}>
+        <View style={styles.left}>
+          {showBackButton ? (
+            <PressableScale
+              accessibilityRole="button"
+              accessibilityLabel={t('back')}
+              onPress={handleBack}
+              style={styles.action}
+              haptic={false}
+            >
+              <Ionicons name="chevron-back" size={24} color={textColor} />
+            </PressableScale>
+          ) : null}
+          {showLogo ? <Image source={logoImage} style={styles.logo} resizeMode="contain" accessible={false} /> : null}
+          <HeaderIdentity
+            title={title ?? t('defaultTitle')}
+            slogan={showSlogan ? t('slogan') : undefined}
             textColor={textColor}
+            transparent={variant === 'transparent'}
           />
-          {rightContent}
         </View>
+        {actions.map((action, index) => (
+          <PressableScale
+            key={`${action.icon}-${index}`}
+            onPress={action.onPress}
+            accessibilityRole="button"
+            accessibilityLabel={action.label}
+            style={styles.action}
+            haptic={false}
+          >
+            <Ionicons name={action.icon} size={24} color={action.color ?? textColor} />
+          </PressableScale>
+        ))}
+        {rightContent}
       </View>
     </SafeAreaView>
   );
 }
 
+function HeaderIdentity({
+  title,
+  slogan,
+  textColor,
+  transparent,
+}: {
+  title: string;
+  slogan?: string;
+  textColor: string;
+  transparent: boolean;
+}) {
+  return (
+    <View style={styles.copy}>
+      <Text style={[styles.title, { color: textColor }]} accessibilityRole="header">
+        {title}
+      </Text>
+      {slogan ? (
+        <Text style={[styles.subtitle, { color: transparent ? colors.monitorSecondary : colors.textSecondary }]}>
+          {slogan}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: colors.primary,
-    zIndex: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 3,
-  },
   container: {
+    width: '100%',
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    minHeight: 56,
     paddingHorizontal: spacing.m,
     paddingVertical: spacing.s,
-    minHeight: 70,
-    zIndex: 10,
+    gap: spacing.s,
   },
-  leftSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  backButton: {
-    marginRight: spacing.s,
-    padding: spacing.xs,
-  },
-  // The logo is a self-contained gradient disc — show it directly, no boxed backing/ring.
-  logoContainer: {
-    marginRight: spacing.s,
-    width: 40,
-    height: 40,
-    shadowColor: colors.primaryDark,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-  },
-  logo: {
-    width: 40,
-    height: 40,
-  },
-  titleContainer: {
-    justifyContent: 'center',
-    flex: 1,
-  },
-  title: {
-    ...typography.title,
-    fontSize: 22,
-  },
-  subtitle: {
-    ...typography.smallText,
-    marginTop: 2,
-  },
-  rightSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  actionButton: {
-    padding: spacing.s,
-    marginLeft: spacing.xs,
-  },
+  left: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.s },
+  copy: { flex: 1, gap: 2 },
+  title: { ...typography.title, lineHeight: 30 },
+  subtitle: { ...typography.caption, lineHeight: 20 },
+  logo: { width: 32, height: 32 },
+  action: { minWidth: 48, minHeight: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 12 },
 });

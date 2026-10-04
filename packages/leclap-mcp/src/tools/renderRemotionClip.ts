@@ -16,7 +16,22 @@ import { createClipProgressHandler } from './clip-progress.js';
 // so a hung bundle/download can't block the tool indefinitely.
 const SETUP_TIMEOUT_MS = 300_000;
 
-async function withTimeout<T>(label: string, ms: number, run: () => Promise<T>): Promise<T> {
+export async function withTimeout<T>(
+  label: string,
+  ms: number,
+  run: () => Promise<T>,
+  signal?: AbortSignal
+): Promise<T> {
+  signal?.throwIfAborted();
+  let onAbort: (() => void) | undefined;
+  const aborted = new Promise<never>((_resolve, reject) => {
+    if (signal) {
+      onAbort = () => {
+        reject(new Error('Remotion operation aborted', { cause: signal.reason }));
+      };
+      signal.addEventListener('abort', onAbort, { once: true });
+    }
+  });
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_resolve, reject) => {
     timer = setTimeout(() => {
@@ -26,9 +41,11 @@ async function withTimeout<T>(label: string, ms: number, run: () => Promise<T>):
   });
 
   try {
-    return await Promise.race([run(), timeout]);
+    return await Promise.race([run(), timeout, aborted]);
   } finally {
     clearTimeout(timer);
+
+    if (onAbort) signal?.removeEventListener('abort', onAbort);
   }
 }
 
@@ -68,20 +85,32 @@ function errorResult(text: string): ToolError {
 
 // Remotion is an OPTIONAL peer dependency, loaded only when this tool runs so the MCP stays
 // self-contained for consumers who don't use it. A missing module surfaces as a clear error.
-type RemotionModules = {
-  bundle: (options: { entryPoint: string; webpackOverride?: unknown }) => Promise<string>;
+export type RemotionModules = {
+  bundle: (options: {
+    entryPoint: string;
+    webpackOverride?: unknown;
+    publicDir?: string;
+    outDir?: string;
+  }) => Promise<string>;
   ensureBrowser: () => Promise<unknown>;
-  selectComposition: (options: { serveUrl: string; id: string; inputProps?: unknown }) => Promise<{
+  selectComposition: (options: {
+    serveUrl: string;
+    id: string;
+    inputProps?: unknown;
+    browserExecutable?: string;
+    timeoutInMilliseconds?: number;
+  }) => Promise<{
     width: number;
     height: number;
     durationInFrames: number;
     fps: number;
   }>;
   renderMedia: (options: Record<string, unknown>) => Promise<unknown>;
+  renderStill: (options: Record<string, unknown>) => Promise<unknown>;
   makeCancelSignal: () => { cancelSignal: unknown; cancel: () => void };
 };
 
-async function loadRemotion(): Promise<RemotionModules | { error: string }> {
+export async function loadRemotion(): Promise<RemotionModules | { error: string }> {
   try {
     const bundler = (await import('@remotion/bundler')) as unknown as { bundle: RemotionModules['bundle'] };
     const renderer = (await import('@remotion/renderer')) as unknown as Omit<RemotionModules, 'bundle'>;

@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "creativeDirection": "Direction: a kinetic editorial typography study, with one dominant headline and an orange accent on dark ink. Use masked rise as the initial choreography; compare alternative registered modes by changing explicit props, not by replacing the whole composition. Let the text settle into a readable hierarchy before the next beat. Avoid applying every text effect together, excessive overshoot and clipping during travel. Inspect the first visible glyphs, staggered entrance, maximum travel, settled hold and ending with the actual font."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false
+  },
+  "sections": [
+    {
+      "name": "editorial",
+      "type": "effect",
+      "options": {
+        "duration": 10
+      },
+      "effect": {
+        "id": "studio.editorial-type",
+        "version": "1.0.0",
+        "props": {
+          "headline": "Make your next story",
+          "kicker": "CREATIVE DIRECTION",
+          "mode": "masked-rise",
+          "accent": "orange",
+          "entranceDurationFrames": 18,
+          "staggerFrames": 3,
+          "travelPx": 56,
+          "highlightWord": 0
+        },
+        "assets": {}
+      }
+    }
+  ]
+}

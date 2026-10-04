@@ -145,6 +145,7 @@ describe('FormatterManager', () => {
       transitionDuration?: number;
       fonts?: Record<string, string>;
       currentLocale?: string;
+      scale?: string;
       vmStub?: ReturnType<typeof createVariableManagerStub>;
     } = {}
   ) {
@@ -158,7 +159,7 @@ describe('FormatterManager', () => {
       },
       assets: { fonts: opts.fonts ?? {}, musics: {}, inputs: {} },
     });
-    const project = createProject({ currentLocale: opts.currentLocale ?? 'en' });
+    const project = createProject({ currentLocale: opts.currentLocale ?? 'en', videoConfig: { scale: opts.scale } });
     const segment = createSegment(opts.section);
     const logger = createLogger();
     const vm = opts.vmStub ?? createVariableManagerStub();
@@ -169,6 +170,16 @@ describe('FormatterManager', () => {
   }
 
   describe('formatMultipleTypesValue', () => {
+    it.each(['1280:720', '720:1280', '1080:1080', '640:360'])(
+      'scale output conforms an authored frame to %s',
+      (scale) => {
+        const { manager } = build({ scale });
+        expect(manager.formatMultipleTypesValue({ type: 'scale', value: 'output' })).toBe(
+          `scale=${scale}:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=${scale}:(ow-iw)/2:(oh-ih)/2,setsar=1`
+        );
+      }
+    );
+
     it('setpts uses normal PTS when no speed option', () => {
       const { manager } = build({ section: { name: 's', type: 'video' } });
       expect(manager.formatMultipleTypesValue({ type: 'setpts' } as Filter)).toBe('setpts=PTS');

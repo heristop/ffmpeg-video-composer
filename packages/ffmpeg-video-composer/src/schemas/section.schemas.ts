@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { EffectReferenceSchema } from './effect-reference.schema';
 import { TemplatePartialSchema } from './partial.schemas';
 import {
   AudioFadeSchema,
@@ -162,6 +163,20 @@ export const VideoSectionSchema = BaseSectionSchema.extend({
   options: BaseSectionOptionsSchema.optional().describe('Playback and compositing options for the video section.'),
 }).describe('A section that plays a pre-recorded video clip or a user-uploaded video asset.');
 
+export const EffectSectionSchema = BaseSectionSchema.extend({
+  type: z.literal('effect').describe('Section type: a versioned effect rendered to a clip before composition.'),
+  name: z.string().trim().min(1).describe('Unique, nonempty section name used to bind the rendered effect clip.'),
+  effect: EffectReferenceSchema.describe('Versioned effect reference with JSON properties and named assets.'),
+  options: BaseSectionOptionsSchema.omit({ useVideoSection: true, videoUrl: true, pictureUrl: true })
+    .extend({ duration: z.number().positive().describe('Required effect duration in seconds.') })
+    .strict()
+    .describe('Compositing options; effect clips cannot also select another media source.'),
+})
+  .strict()
+  .describe('Authoring effect section; resolve with an effect backend before FFmpeg composition.');
+
+export type EffectSection = z.infer<typeof EffectSectionSchema>;
+
 export const CaptureModeSchema = z.enum(['front', 'back', 'screen', 'upload']);
 export type CaptureMode = z.infer<typeof CaptureModeSchema>;
 
@@ -246,6 +261,7 @@ export const PartialSectionSchema = BaseSectionSchema.extend({
 export const SectionSchema = z.discriminatedUnion('type', [
   VideoSectionSchema,
   ProjectVideoSectionSchema,
+  EffectSectionSchema,
   FormSectionSchema,
   ColorBackgroundSectionSchema,
   ImageBackgroundSectionSchema,
@@ -257,6 +273,17 @@ export const TemplateMetaSchema = z
   .object({
     name: z.string().optional().describe('Human-readable template name for catalogs and editors.'),
     description: z.string().optional().describe('Short human-readable template summary for catalogs and agents.'),
+    creativeDirection: z
+      .string()
+      .trim()
+      .min(1)
+      .max(4000)
+      .optional()
+      .describe(
+        'Authoring brief (1..4000 characters): audience, visual hierarchy, typography, palette, motion, pacing, ' +
+          'avoidances and review criteria. Guides humans/agents; never interpreted or executed by the renderer. ' +
+          'Implement the direction explicitly in sections, filters and effect props.'
+      ),
   })
   .strict()
   .describe('Optional human-facing metadata embedded in the descriptor; behavioral catalog fields are derived.');

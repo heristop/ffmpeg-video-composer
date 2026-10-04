@@ -2,6 +2,7 @@
 // same nested keys, same `{{interpolation}}` tokens and `_one`/`_other` plural suffixes.
 // `satisfies LocaleShape<Resources>` makes `tsc` the completeness gate (see fr/index.ts).
 import common from './common.json';
+import showcase from './showcase.json';
 import home from './home.json';
 import about from './about.json';
 import compare from './compare.json';
@@ -23,6 +24,7 @@ type LocaleShape<T> = { [K in keyof T]: T[K] extends string ? string : LocaleSha
 
 export const de = {
   common,
+  showcase,
   home,
   about,
   compare,

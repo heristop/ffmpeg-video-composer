@@ -279,7 +279,7 @@ const DesktopNav = ({ pathname, items }: { pathname: string; items: readonly Nav
     <nav
       ref={navRef}
       aria-label={t('nav.primaryLabel')}
-      className="relative hidden md:flex items-center gap-1"
+      className="relative hidden lg:flex items-center gap-1"
       onMouseLeave={hidePill}
     >
       <span
@@ -334,7 +334,7 @@ const MobileMenu = ({ isOpen, currentPath, items, onClose }: MobileMenuProps) =>
     <BottomSheet
       open={isOpen}
       onClose={onClose}
-      hideClassName="md:hidden"
+      hideClassName="lg:hidden"
       role="menu"
       ariaLabel={t('header.toggleMenu')}
       panelClassName="space-y-1"
@@ -503,7 +503,7 @@ export const Header = () => {
               onClick={() => {
                 setIsMenuOpen(!isMenuOpen);
               }}
-              className="md:hidden"
+              className="lg:hidden"
               aria-label={t('header.toggleMenu')}
               aria-expanded={isMenuOpen}
               aria-controls="mobile-menu"

@@ -2,6 +2,18 @@ import { defineConfig } from 'tsdown';
 import replace from '@rollup/plugin-replace';
 
 export default defineConfig([
+  // Sample discovery is a separate data-only entry, never imported by the renderer entries.
+  {
+    entry: { samples: 'src/samples.ts' },
+    format: ['esm', 'cjs'],
+    outExtensions: ({ format }) => ({ js: format === 'cjs' ? '.cjs' : '.js' }),
+    dts: true,
+    sourcemap: true,
+    outDir: 'dist',
+    target: 'es2024',
+    platform: 'neutral',
+    deps: { dts: { neverBundle: ['zod'] } },
+  },
   // Node.js build
   {
     entry: ['src/index.ts'],

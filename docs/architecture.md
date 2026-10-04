@@ -26,7 +26,7 @@ graph TD
     %% Entry Points
     subgraph Flow ["🚀 Application Entry"]
         direction TB
-        main[("main.ts")]:::entry --> index["index.ts"]:::entry
+        main[("Node host / CLI")]:::entry --> index["index.ts"]:::entry
     end
 
     %% Core Domain
@@ -143,12 +143,21 @@ graph TD
 
 ## Architecture Overview
 
+Rendering separates descriptor settings, host `ProjectConfig`, and MCP runtime configuration.
+The descriptor owns scene/motion settings and orientation/fps; hosts bind media and choose encoders.
+MCP configures containment, deadlines and an optional trusted Node/Remotion backend. Registered
+effects are preflighted and resolved to ordinary clips before entering this pipeline. The
+[engine configuration reference](./engine-configuration.md) documents precedence and current limits.
+
 The FFmpeg Video Composer follows a layered architecture with clear separation of concerns:
 
 ### 🚀 Entry Points
 
-- **main.ts** - CLI entry point with interactive diagnostics
-- **index.ts** - Library entry point for programmatic use
+- **`packages/leclap-cli/src/index.ts`** - Published `leclap` CLI (`init`, `render`, `validate`, `samples`, `diagnose`)
+- **`packages/ffmpeg-video-composer/src/index.ts`** - Node library entry point; initializes adapters through `PlatformBridge`
+- **`packages/ffmpeg-video-composer/src/browser.ts`** - Browser entry point; registers WASM, IndexedDB, browser logging and events directly
+- **`packages/ffmpeg-video-composer/src/reactnative.ts`** - React Native entry point; registers an injected native engine, Expo filesystem, logging and events directly
+- **`packages/ffmpeg-video-composer/src/main.ts`** - Internal development runner; the published CLI lives in `@leclap/cli`
 
 ### 💎 Domain Layer
 
@@ -173,7 +182,7 @@ Provides cross-platform abstractions and implementations:
 
 #### Core Platform
 
-- **PlatformBridge** - Main platform abstraction factory
+- **PlatformBridge** - Node entry point's adapter factory and FFmpeg detector; browser/RN entry points wire their adapters directly
 - **EventManager** - Event handling and notifications
 
 #### Abstractions
@@ -185,9 +194,11 @@ Provides cross-platform abstractions and implementations:
 
 #### Platform Adapters
 
-- **FFmpegNodeAdapter** - System FFmpeg implementation
+- **FFmpegNodeAdapter** - System FFmpeg implementation using `execFile` and parsed argv
 - **FFmpegStaticAdapter** - Static binary FFmpeg implementation (`ffmpeg-static` ships `ffmpeg` only; see [Cross-Platform Support](#cross-platform-support) for ffprobe)
-- **FFmpegWasmAdapter** - WebAssembly FFmpeg implementation
+- **FFmpegWasmAdapter** - WebAssembly FFmpeg implementation; bridges IndexedDB input/output files to FFmpeg's separate MEMFS
+- **FFmpegDeviceAdapter** - Injected native `run`/`probe` executor for React Native; uses real device paths
+- **MusicWasmAdapter / MusicFFmpegAdapter** - Music adapters for browser and native-engine entry points
 - **FFmpegDetector** - FFmpeg detection and diagnostics
 - **MusicNodeAdapter** - Node.js music processing
 - **FilesystemNodeAdapter** - Node.js filesystem operations
@@ -251,13 +262,19 @@ The architecture is designed to support multiple platforms:
 - **Browser** - WebAssembly-based implementation for client-side processing
 - **React Native** - On-device compilation through the embedded FFmpeg CLI engine (`packages/ffmpeg-engine` + `FFmpegDeviceAdapter`); see [on-device-compilation.md](./on-device-compilation.md)
 
-On Node, `FFmpegDetector` takes the first FFmpeg that runs: `ffmpeg` on PATH (`FFmpegNodeAdapter`, which probes with the `ffprobe` on PATH), then the `ffmpeg-static` package (`FFmpegStaticAdapter`). `ffmpeg-static` ships no ffprobe, so the static adapter looks for one from the optional `ffprobe-static` package or beside the resolved `ffmpeg` binary, and uses only a binary that exists (`resolve-ffprobe.ts`). With neither, it sets `probeUnavailableReason`, and the director stops any template that probes media before its first segment renders. Transitions, music, whole-video overlays and `project_video` clips all probe. `MusicNodeAdapter` spawns FFmpeg itself to probe and loop the track, and runs the picked adapter's `binaries` to do it, so music needs nothing the other probes don't.
+On Node, `FFmpegDetector` checks system `ffmpeg -version` first (`FFmpegNodeAdapter`), then the `ffmpeg-static` package (`FFmpegStaticAdapter`). Both execute commands through `execFile` with parsed argv, without a shell. System detection checks FFmpeg only; `FFmpegNodeAdapter.getInfos()` separately expects `ffprobe` on PATH. The detector's last WASM branch requires `window`, so it is not a fallback for a pure Node environment. Browser hosts load `browser.ts` directly.
+
+`ffmpeg-static` ships no ffprobe. The static adapter looks for one from the optional `ffprobe-static` package or beside the resolved FFmpeg binary, using only a candidate that exists (`platform/ffmpeg/resolve-ffprobe.ts`). Without one, it sets `probeUnavailableReason`. The director rejects probing templates before the first segment encodes: non-cut transitions, enabled/resolved music, whole-video overlays, and `project_video` sections. `MusicNodeAdapter` probes and loops with the selected adapter's `binaries`, including on the static path.
+
+Browser storage uses IndexedDB, while FFmpeg reads its own in-memory MEMFS. Inputs, concat-list references, and embedded font paths are bridged before execution, and output is copied back. IndexedDB quota does not increase WASM memory capacity; the approximate 2 GB input ceiling does not guarantee a project of that size can render with its intermediate copies. The core pin and default CDN loader live in `platform/ffmpeg/ffmpeg-core.ts`; browser hosts can provide a loader through `BrowserCompileOptions.loadFFmpegCore`. Browser fonts must be bundled font IDs or readable TTF assets; family-based remote font resolution is rejected.
+
+Node/static adapters allow concurrent executions because each command has its own process. WASM and device adapters use shared instances and render segments serially. Progress is delivered through `AbstractFFmpeg.progressListener` to director events; WASM uses elapsed time, while the native adapter can poll an injected progress file. The web app emits `task-cancelled` to stop at director checkpoints, which does not interrupt an active WASM command. Native cancellation uses the module's cooperative `cancel()` hook; see the [native API contracts](./on-device-compilation.md#boundary-contracts-the-schema).
 
 ## Error Handling & Diagnostics
 
 The architecture includes error handling and diagnostics:
 
-- **Interactive Setup** - Guides users through first-time configuration
+- **Interactive Setup** - Node bridge displays detection/install guidance in interactive terminals (suppressed in CI/tests, non-TTY contexts, or when `LECLAP_CLI_UI=1`)
 - **Detection** - Automatically detects available FFmpeg implementations
-- **Fallback Strategy** - Graceful degradation through multiple FFmpeg options
+- **Fallback Strategy** - Node selects a detected system/static backend; unavailable backends and execution failures surface errors
 - **Rich Diagnostics** - Detailed system analysis and recommendations

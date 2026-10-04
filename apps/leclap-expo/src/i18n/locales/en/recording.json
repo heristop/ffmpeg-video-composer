@@ -13,9 +13,11 @@
     "timesUp": "Time’s up"
   },
   "permissions": {
-    "checking": "Checking camera permissions...",
-    "title": "Camera Permission Required",
-    "message": "Please grant camera and microphone permissions to record video."
+    "checking": "Checking recording permissions...",
+    "title": "Recording Permissions Required",
+    "message": "Please grant camera and microphone permissions to record video.",
+    "allow": "Allow camera and microphone",
+    "settings": "Open Settings"
   },
   "noDevice": "No camera device available",
   "alerts": {

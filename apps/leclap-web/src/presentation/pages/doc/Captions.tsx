@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import {
   CAPTION_STYLES,
   CAPTION_POSITIONS,
@@ -30,6 +31,26 @@ export const DocCaptions = () => (
         rows={docGroups.caption()}
       />
       <Sample code={snippets.caption} title="A captioned section" />
+    </DocSection>
+
+    <DocSection id="typography" title="Title cards, lower thirds and reveal timing">
+      <Prose>
+        <p>
+          Use a titleCard on color_background for an editorial card, or lowerThird on a visual scene for a
+          title/subtitle/badge band. All text blocks support reveal entrances and text legibility effects. Title-card
+          stagger is seconds between non-empty line entrances; zero starts lines together. Easing curves travel and
+          opacity; ease-out-back overshoots position while clamping opacity.
+        </p>
+        <p>
+          Native exit settings belong to positioned drawtext filters, not caption/titleCard/lowerThird blocks. See the{' '}
+          <Link to="/doc/reference#reveal">complete reveal and exit reference</Link> for defaults, font contracts and
+          examples, and <Link to="/doc/effects">registered effects</Link> for per-word choreography.
+        </p>
+      </Prose>
+      <RefTable id="title-card" title="titleCard" rows={docGroups.titleCard()} />
+      <RefTable id="lower-third" title="lowerThird" rows={docGroups.lowerThird()} />
+      <RefTable id="text-reveal" title="reveal (object form)" rows={docGroups.reveal()} />
+      <RefTable id="text-effect" title="effect (legibility)" rows={docGroups.textEffect()} />
     </DocSection>
 
     <DocSection id="enums" title="Style, position & alignment" kicker="Enums">

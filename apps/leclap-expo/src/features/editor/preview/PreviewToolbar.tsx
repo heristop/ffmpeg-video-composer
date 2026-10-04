@@ -17,7 +17,13 @@ function ToolButton({
   onPress: () => void;
 }) {
   return (
-    <TouchableOpacity style={styles.toolButton} onPress={onPress} activeOpacity={0.8}>
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={styles.toolButton}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
       <Ionicons name={icon} size={24} color={active ? colors.accent : colors.surface} />
       <Text style={[styles.toolButtonText, active && { color: colors.accent }]}>{label}</Text>
     </TouchableOpacity>
@@ -29,18 +35,20 @@ interface PreviewToolbarProps {
   canEdit: boolean;
   trimActive: boolean;
   cropActive: boolean;
+  onExport?: () => void;
   onDone: () => void;
   onTrim: () => void;
   onCrop: () => void;
   onRetake: () => void;
 }
 
-/** View-mode chrome: the save/close button and the bottom Trim / Crop / Retake toolbar. */
+/** Recorded clips offer editing; finished outputs offer export. */
 export function PreviewToolbar({
   saving,
   canEdit,
   trimActive,
   cropActive,
+  onExport,
   onDone,
   onTrim,
   onCrop,
@@ -61,9 +69,10 @@ export function PreviewToolbar({
       </TouchableOpacity>
 
       <View style={styles.toolbar}>
+        {onExport && <ToolButton icon="share-outline" label={t('export.title')} onPress={onExport} />}
         {canEdit && <ToolButton icon="cut-outline" label={t('toolbar.trim')} active={trimActive} onPress={onTrim} />}
         {canEdit && <ToolButton icon="crop-outline" label={t('toolbar.crop')} active={cropActive} onPress={onCrop} />}
-        <ToolButton icon="refresh" label={t('toolbar.retake')} onPress={onRetake} />
+        {canEdit && <ToolButton icon="refresh" label={t('toolbar.retake')} onPress={onRetake} />}
       </View>
     </>
   );

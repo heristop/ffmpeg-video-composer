@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import pc from 'picocolors';
+import { starterMeta } from '../starter-direction.js';
 import { success, fail, step, hint } from '../ui.js';
 import { wordmark } from '../theme.js';
 import { confirm } from '../prompt.js';
@@ -45,6 +46,8 @@ function resolveCliVersion(): string | undefined {
 }
 
 export interface StarterOptions {
+  /** Authoring brief embedded in template metadata; does not change rendering automatically. */
+  creativeDirection?: string;
   /** Add a `.mcp.json` wiring `@leclap/mcp` so an agent can author + render in this project. */
   mcp?: boolean;
   /** Add a Remotion starter project (`remotion/`) for animated intros, rendered via the MCP. */
@@ -59,7 +62,8 @@ export interface StarterOptions {
 
 // A title card that renders with no external media — `BebasNeue.ttf` resolves from the engine's
 // bundled fonts. `withIntro` prepends a project_video "intro" slot for a rendered Remotion clip.
-function starterTemplate(withIntro: boolean) {
+function starterTemplate(withIntro: boolean, creativeDirection?: string) {
+  const meta = starterMeta(withIntro, creativeDirection);
   const titleCard = {
     name: 'title',
     type: 'color_background',
@@ -80,7 +84,7 @@ function starterTemplate(withIntro: boolean) {
   };
 
   if (!withIntro) {
-    return { global: { orientation: 'landscape', musicEnabled: false }, sections: [titleCard] };
+    return { meta, global: { orientation: 'landscape', musicEnabled: false }, sections: [titleCard] };
   }
 
   // The Remotion intro is supplied at compose time via userVideoPaths.intro.
@@ -91,7 +95,7 @@ function starterTemplate(withIntro: boolean) {
     transition: { type: 'fade', duration: 0.5 },
   };
 
-  return { global: { orientation: 'landscape', musicEnabled: false }, sections: [intro, titleCard] };
+  return { meta, global: { orientation: 'landscape', musicEnabled: false }, sections: [intro, titleCard] };
 }
 
 function packageJson(projectName: string, opts: StarterOptions) {
@@ -269,6 +273,13 @@ A LeClap video project. Edit \`template.json\`, drop any media into \`assets/\`,
 ${install}
 ${run}
 \`\`\`
+
+## Creative direction
+
+Edit \`meta.creativeDirection\` in \`template.json\` before changing the composition. Record the audience,
+visual hierarchy, typography, palette, motion, pacing, things to avoid and frames to review. This is
+an authoring brief, not a render command: implement it explicitly in JSON settings or Remotion props.
+Keep the rendered copy separate. Validate text bounds and inspect the entrance, settled hold and ending.
 ${mcpSection}${remotionSection}
 
 See the descriptor reference: https://github.com/heristop/leclap
@@ -280,7 +291,7 @@ export function starterFiles(projectName: string, opts: StarterOptions = {}): Re
   const projectDir = opts.projectDir ?? projectName;
 
   const files: Record<string, string> = {
-    'template.json': `${JSON.stringify(starterTemplate(Boolean(opts.remotion)), null, 2)}\n`,
+    'template.json': `${JSON.stringify(starterTemplate(Boolean(opts.remotion), opts.creativeDirection), null, 2)}\n`,
     'package.json': `${JSON.stringify(packageJson(projectName, opts), null, 2)}\n`,
     'pnpm-workspace.yaml': PNPM_WORKSPACE,
     'README.md': readme(projectName, opts),
@@ -339,6 +350,10 @@ export const init = defineCommand({
     },
     mcp: { type: 'boolean', description: 'Add @leclap/mcp wiring (.mcp.json) — prompts by default' },
     remotion: { type: 'boolean', description: 'Add a Remotion starter for animated intros — prompts by default' },
+    'creative-direction': {
+      type: 'string',
+      description: 'Authoring brief stored in template metadata (1..4000 characters; does not change render settings)',
+    },
     yes: { type: 'boolean', alias: 'y', description: 'Accept all defaults (no prompts)' },
   },
   async run({ args }) {
@@ -379,6 +394,7 @@ export const init = defineCommand({
       projectDir: dir,
       cliVersion: resolveCliVersion(),
       packageManager,
+      creativeDirection: args['creative-direction'],
     });
 
     await Promise.all(

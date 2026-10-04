@@ -20,3 +20,10 @@ packages/leclap-creative-kit/src/library/pictures/SamplePNGImage_5mbmb.png filte
 # artwork. Kept binary (-text) so no eol conversion runs.
 apps/leclap-web/public/videos/films/** -filter -diff -merge -text
 apps/leclap-web/public/videos/home/** -filter -diff -merge -text
+
+# Small, reproducible showcase previews use plain blobs like the existing landing films.
+apps/leclap-web/public/videos/showcase/*.mp4 -filter -diff -merge -text
+apps/leclap-web/public/videos/showcase/*.webp -filter -diff -merge -text
+
+# Authored app-demo capture used to reproduce the showcase promo.
+examples/showcase/media/*.mp4 -filter -diff -merge -text

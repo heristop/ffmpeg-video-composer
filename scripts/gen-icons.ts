@@ -12,14 +12,20 @@ import { Resvg } from '@resvg/resvg-js';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const disc = readFileSync(resolve(root, 'apps/leclap-web/public/favicon.svg'), 'utf8');
 const launcher = readFileSync(resolve(root, 'apps/leclap-expo/assets/icon-source.svg'), 'utf8');
+// Separate Android layers preserve launcher masking, motion, and themed tinting.
+const adaptive = readFileSync(resolve(root, 'apps/leclap-expo/assets/adaptive-foreground.svg'), 'utf8');
+const adaptiveBackground = readFileSync(resolve(root, 'apps/leclap-expo/assets/adaptive-background.svg'), 'utf8');
+const adaptiveMonochrome = readFileSync(resolve(root, 'apps/leclap-expo/assets/adaptive-monochrome.svg'), 'utf8');
 
 // [size (px), output path relative to repo root, source svg]
 const targets: [number, string, string][] = [
   // Expo launcher icons (home screen) → full-bleed gradient.
   [1024, 'apps/leclap-expo/assets/images/icon.png', launcher],
-  [1024, 'apps/leclap-expo/assets/images/adaptive-icon.png', launcher],
+  [1024, 'apps/leclap-expo/assets/images/adaptive-icon.png', adaptive],
+  [1024, 'apps/leclap-expo/assets/images/adaptive-background.png', adaptiveBackground],
+  [1024, 'apps/leclap-expo/assets/images/adaptive-monochrome.png', adaptiveMonochrome],
   [1024, 'apps/leclap-expo/assets/icon.png', launcher],
-  [1024, 'apps/leclap-expo/assets/adaptive-icon.png', launcher],
+  [1024, 'apps/leclap-expo/assets/adaptive-icon.png', adaptive],
   // Expo in-app logo + splash + web favicon → disc.
   [600, 'apps/leclap-expo/assets/images/logo.png', disc],
   [600, 'apps/leclap-expo/assets/images/splash-icon.png', disc],
@@ -37,7 +43,7 @@ const targets: [number, string, string][] = [
 // Cache one render per (source, size) — several targets share dimensions.
 const cache = new Map<string, Buffer>();
 const renderAt = (svg: string, size: number): Buffer => {
-  const key = `${svg.length}:${size}`;
+  const key = `${size}:${svg}`;
   const cached = cache.get(key);
 
   if (cached) return cached;

@@ -13,9 +13,18 @@ const argsSchema = z.object({
     .enum(['landscape', 'portrait', 'square'])
     .optional()
     .describe('landscape (16:9), portrait (9:16) or square (1:1).'),
+  creativeDirection: z
+    .string()
+    .trim()
+    .min(1)
+    .max(4000)
+    .optional()
+    .describe(
+      'Visual brief: audience, hierarchy, typography, palette, motion, pacing, avoidances and review criteria.'
+    ),
 });
 
-type GuideArgs = { goal?: string; orientation?: 'landscape' | 'portrait' | 'square' };
+type GuideArgs = z.infer<typeof argsSchema>;
 
 // On-device FFmpeg is an LGPL build (scripts/ffmpeg/common.sh, --disable-gpl). Authoring against this
 // set keeps the output identical across React Native, browser WASM, and the server. GPL filters (eq,
@@ -35,18 +44,31 @@ function buildText(args: GuideArgs): string {
     args.orientation ?? 'the orientation the user wants (landscape 16:9, portrait 9:16 or square 1:1)';
 
   return [
-    'You are composing DETERMINISTIC, on-device video with the LeClap engine — the same JSON template',
-    'renders identically on a phone (React Native), in the browser (WASM), and on a server. This is the',
-    'opposite of generative video: same input → byte-reproducible output, no upload, no server required.',
+    'Compose video with explicit LeClap JSON settings. Native scenes run on phone, browser and Node;',
+    'registered Remotion effects require the configured Node/Chromium backend. Pin source, props, assets',
+    'and runtime for repeatable rendering; encoder differences can change bytes across backends.',
     '',
     `Goal: ${goal}. Orientation: ${orientation}.`,
+    `Creative direction: ${args.creativeDirection?.trim() ?? 'Derive a brief from the user goal and verified assets.'}`,
     '',
     'Workflow:',
-    '1. Call get_template_schema for the authoritative shape and the authoring guide, then author a',
-    '   descriptor for the goal from scratch.',
-    '2. Make it premium: lean on typography, color grading, and timing — use the building blocks below.',
-    '3. Call validate_template (instant, no render) and fix any issues + confirm the required clips/fields.',
-    '4. Call compose_video and read the returned outputPath.',
+    '1. Discover examples with list_samples (category/backend/query), then get_sample by stable ID.',
+    '   Read creativeDirection and requirements: named clips/durations/capture hints, form fields/limits,',
+    '   variables/defaults/placeholders, assets/fonts and registered effects/setup. Discovery is available',
+    '   even when Remotion is disabled; preview media is not bundled. Retrieved template JSON embeds partials.',
+    '2. Call get_template_schema for the authoritative shape, then customize the retrieved template or author',
+    '   a fresh descriptor for the goal. Supply your own media via userVideoPaths and copy via fields or',
+    '   global.variables; replace authored asset references as needed. Store the brief in meta.creativeDirection:',
+    '   audience, hierarchy, typography, palette, motion, pacing, avoidances and review criteria.',
+    '3. Translate the direction into explicit sections, filters and effect props. Choose a dominant element',
+    '   per scene and vary layouts according to purpose. Native samples use FFmpeg; registered effects need',
+    '   allowRemotion, Remotion peers and a trusted configured entry. customCatalog:true effects also need an',
+    '   operator effect catalog and matching composition; exported JSON supplies no executable source.',
+    '4. Inspect the exact registered ID/version with get_effect_schema before editing props. Call',
+    '   validate_template (no render) and fix issues + confirm required clips/fields before composition.',
+    '5. For registered scenes inspect render_preview at entrance, settling and ending. For native scenes',
+    '   compose_video, extract review frames and inspect against the brief. Fix collisions, crop, copy,',
+    '   contrast and pacing before the final compose_video export.',
     '',
     'Premium animated intro (bring your own Remotion): if you have a Remotion project, call',
     'render_remotion_clip with its entry + a compositionId (+ optional inputProps) for motion graphics the',
@@ -59,6 +81,9 @@ function buildText(args: GuideArgs): string {
     'stay legible) over hand-rolled filtergraphs:',
     '  - text: `titleCard` / `lowerThird` / `caption` sugar with `accent`, `reveal` ("rise"/"fade"),',
     '    and `effect: { shadow, outline }` — a staged, on-brand reveal without writing `alpha` expressions.',
+    '    Use `reveal.easing: "ease-out-back"` for one small headline overshoot; keep travel modest and leave room.',
+    '    Keep instructional motion calm. The optional editorial catalog adds blur-rise, split-slide and elastic-stagger;',
+    '    discover its exact props before choosing per-word Remotion motion (Node worker only).',
     '  - colour: a section `look` (named preset, e.g. "cinematic"/"warm-film"/"teal-orange") plus a manual',
     '    `grade` — `colorBalance` (shadows/midtones/highlights r/g/b) and `curvesPreset` (e.g.',
     '    "increase_contrast", "vintage") are LGPL and run everywhere.',
@@ -72,8 +97,7 @@ function buildText(args: GuideArgs): string {
     '  - raw-filter escape hatch (LGPL on-device allowlist, use only these when you must hand-roll):',
     `    ${ON_DEVICE_FILTERS}`,
     '  - NOT available on-device (GPL, dropped by --disable-gpl): `eq` (auto-remapped to `lutyuv`) and',
-    '    `boxblur` (use `gblur`). Everything else the core emits — including `curves`, `colorbalance`,',
-    '    `zoompan`, `gradients`, `geq`, `sidechaincompress` — is LGPL and compiled in.',
+    '    `boxblur` (use `gblur`) and `geq`. Prefer the allowlist above; perspective has a flat mobile fallback.',
     `  bundled fonts (bare names, no path): ${BUNDLED_FONTS}.`,
     '',
     'Portrait is 720x1280 (9:16); landscape is 1280x720 (16:9); square is 1080x1080 (1:1). project_video sections need a user clip',

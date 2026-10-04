@@ -35,6 +35,11 @@ export const withAlpha = (hex: string, alpha: number): string => {
 export const colors = {
   primary: '#7C83FD', // Lavender — soft and creative
   primaryDark: '#5B61D6', // Deeper lavender for depth / pressed states
+  onPrimary: '#FFFFFF',
+  monitorBackground: '#17142B',
+  monitorText: '#FCFBFF',
+  monitorSecondary: '#C6C2DD',
+  scrim: withAlpha('#17142B', 0.55),
   // `primary` at 28% flattened over `background`. Opaque: a translucent fill on a view with
   // elevation lets Android's shadow show through the gap in its own outline, painting a hard-edged
   // lighter rectangle inside the shape.
@@ -140,3 +145,5 @@ const ThemeExports = {
   name: 'Theme',
 };
 export default ThemeExports;
+
+export { FORM_MAX_WIDTH } from './adaptive-layout';

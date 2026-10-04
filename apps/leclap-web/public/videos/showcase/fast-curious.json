@@ -1,0 +1,565 @@
+{
+  "meta": {
+    "name": "Fast & Curious",
+    "description": "Punchy two-tone flash intro — your name on a bold cut, then your clip."
+  },
+  "global": {
+    "variables": {
+      "optionA1": "Tea",
+      "optionB1": "Coffee",
+      "optionA2": "Beach",
+      "optionB2": "Mountains",
+      "optionA3": "Cats",
+      "optionB3": "Dogs"
+    },
+    "orientation": "landscape",
+    "musicEnabled": true,
+    "music": {
+      "name": "future-bass-energy.mp3"
+    },
+    "allowedMusic": ["future-bass-energy", "upbeat-electronic", "lofi-hip-hop", "party-dance", "indie-rock-dreamy"],
+    "allowUploadMusic": true,
+    "transition": {
+      "type": "fade",
+      "duration": 0.2
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "musicVolume": 0.25,
+      "musicFade": 0.8,
+      "normalize": "loudnorm",
+      "ducking": {
+        "threshold": 0.05,
+        "ratio": 8,
+        "attack": 20,
+        "release": 400
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "intro",
+      "type": "color_background",
+      "transition": {
+        "type": "fade",
+        "duration": 0.4
+      },
+      "titleCard": {
+        "kicker": {
+          "en": "FAST & CURIOUS"
+        },
+        "headline": {
+          "en": "Meet {{ form_1_firstname }}"
+        },
+        "subtitle": {
+          "en": "this or that — in 60 seconds"
+        },
+        "accent": "#ff2e4d",
+        "reveal": "rise",
+        "effect": {
+          "shadow": true,
+          "outline": true
+        }
+      },
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.5
+      }
+    },
+    {
+      "name": "form_1",
+      "type": "form",
+      "title": {
+        "en": "Who's the star?"
+      },
+      "description": {
+        "en": ""
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "form_1_firstname",
+            "maxLength": 20,
+            "label": {
+              "en": "First name"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "flash-card",
+      "prefix": "q1_",
+      "variables": {
+        "optionA": "{{ optionA1 }}",
+        "optionB": "{{ optionB1 }}"
+      }
+    },
+    {
+      "name": "video_1",
+      "type": "project_video",
+      "look": "vivid-pop",
+      "title": {
+        "en": "Answer #1"
+      },
+      "description": {
+        "en": "{{ optionA1 }} or {{ optionB1 }}? — film your answer"
+      },
+      "options": {
+        "duration": 12,
+        "forceAspectRatio": true,
+        "countdown": true,
+        "countdownDuration": 2,
+        "musicVolume": 0.04
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 600,
+            "w": 1280,
+            "h": 120,
+            "c": "#141416@0.55",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 80,
+            "y": 628,
+            "w": 90,
+            "h": 5,
+            "c": "#ff2e4d@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ optionA1 }} or {{ optionB1 }}?"
+            },
+            "fontcolor": "#f5f5f0",
+            "fontsize": 44,
+            "x": 80,
+            "y": 644,
+            "fontfile": "BebasNeue.ttf"
+          }
+        },
+        {
+          "type": "fadein",
+          "values": {
+            "color": "#141416"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "#141416"
+          }
+        }
+      ]
+    },
+    {
+      "type": "partial",
+      "ref": "flash-card",
+      "prefix": "q2_",
+      "variables": {
+        "optionA": "{{ optionA2 }}",
+        "optionB": "{{ optionB2 }}"
+      }
+    },
+    {
+      "name": "video_2",
+      "type": "project_video",
+      "look": "vivid-pop",
+      "title": {
+        "en": "Answer #2"
+      },
+      "description": {
+        "en": "{{ optionA2 }} or {{ optionB2 }}? — film your answer"
+      },
+      "options": {
+        "duration": 12,
+        "forceAspectRatio": true,
+        "countdown": true,
+        "countdownDuration": 2,
+        "musicVolume": 0.04
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 600,
+            "w": 1280,
+            "h": 120,
+            "c": "#141416@0.55",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 80,
+            "y": 628,
+            "w": 90,
+            "h": 5,
+            "c": "#ff2e4d@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ optionA2 }} or {{ optionB2 }}?"
+            },
+            "fontcolor": "#f5f5f0",
+            "fontsize": 44,
+            "x": 80,
+            "y": 644,
+            "fontfile": "BebasNeue.ttf"
+          }
+        },
+        {
+          "type": "fadein",
+          "values": {
+            "color": "#141416"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "#141416"
+          }
+        }
+      ]
+    },
+    {
+      "type": "partial",
+      "ref": "flash-card",
+      "prefix": "q3_",
+      "variables": {
+        "optionA": "{{ optionA3 }}",
+        "optionB": "{{ optionB3 }}"
+      }
+    },
+    {
+      "name": "video_3",
+      "type": "project_video",
+      "look": "vivid-pop",
+      "title": {
+        "en": "Answer #3"
+      },
+      "description": {
+        "en": "{{ optionA3 }} or {{ optionB3 }}? — film your answer"
+      },
+      "options": {
+        "duration": 12,
+        "forceAspectRatio": true,
+        "countdown": true,
+        "countdownDuration": 2,
+        "musicVolume": 0.04
+      },
+      "filters": [
+        {
+          "type": "vignette"
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 0,
+            "y": 600,
+            "w": 1280,
+            "h": 120,
+            "c": "#141416@0.55",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 80,
+            "y": 628,
+            "w": 90,
+            "h": 5,
+            "c": "#ff2e4d@1",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ optionA3 }} or {{ optionB3 }}?"
+            },
+            "fontcolor": "#f5f5f0",
+            "fontsize": 44,
+            "x": 80,
+            "y": 644,
+            "fontfile": "BebasNeue.ttf"
+          }
+        },
+        {
+          "type": "fadein",
+          "values": {
+            "color": "#141416"
+          }
+        },
+        {
+          "type": "fadeout",
+          "values": {
+            "color": "#141416"
+          }
+        }
+      ]
+    },
+    {
+      "name": "outro",
+      "type": "color_background",
+      "titleCard": {
+        "headline": {
+          "en": "Thank you for watching!"
+        },
+        "subtitle": {
+          "en": "hit follow for more"
+        },
+        "accent": "#ff2e4d",
+        "align": "center",
+        "reveal": "rise",
+        "fade": {
+          "out": false
+        },
+        "effect": {
+          "shadow": true,
+          "outline": true
+        }
+      },
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 4
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "logo-bumper"
+    }
+  ],
+  "partials": [
+    {
+      "id": "flash-card",
+      "description": "Blinking this-or-that flash card — the two options swap colorA/colorB three times within one section (instant cuts via enable timelines). Every placeholder has a default and is overridable on the ref: optionA/optionB (the two choices), conjunction (separator word, e.g. 'OR' or '&'), and colorA/colorB/textColor (the bold red/white palette).",
+      "variables": {
+        "optionA": "THIS",
+        "optionB": "THAT",
+        "conjunction": "OR",
+        "colorA": "#ff2e4d",
+        "colorB": "#f5f5f0",
+        "textColor": "#f5f5f0"
+      },
+      "sections": [
+        {
+          "name": "flash",
+          "type": "color_background",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2.8
+          },
+          "filters": [
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 0,
+                "w": 640,
+                "h": 720,
+                "c": "{{ colorA }}@1",
+                "t": "fill",
+                "enable": "'lt(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 640,
+                "y": 0,
+                "w": 640,
+                "h": 720,
+                "c": "{{ colorB }}@1",
+                "t": "fill",
+                "enable": "'lt(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 0,
+                "w": 640,
+                "h": 720,
+                "c": "{{ colorB }}@1",
+                "t": "fill",
+                "enable": "'gte(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 640,
+                "y": 0,
+                "w": 640,
+                "h": 720,
+                "c": "{{ colorA }}@1",
+                "t": "fill",
+                "enable": "'gte(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 628,
+                "y": 0,
+                "w": 24,
+                "h": 720,
+                "c": "#141416@1",
+                "t": "fill"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ optionA }}"
+                },
+                "fontcolor": "{{ colorB }}",
+                "fontsize": 100,
+                "x": "(640-text_w)/2",
+                "y": "(h-text_h)/2",
+                "fontfile": "BebasNeue.ttf",
+                "enable": "'lt(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ optionB }}"
+                },
+                "fontcolor": "{{ colorA }}",
+                "fontsize": 100,
+                "x": "640 + (640-text_w)/2",
+                "y": "(h-text_h)/2",
+                "fontfile": "BebasNeue.ttf",
+                "enable": "'lt(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ optionA }}"
+                },
+                "fontcolor": "{{ colorA }}",
+                "fontsize": 100,
+                "x": "(640-text_w)/2",
+                "y": "(h-text_h)/2",
+                "fontfile": "BebasNeue.ttf",
+                "enable": "'gte(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ optionB }}"
+                },
+                "fontcolor": "{{ colorB }}",
+                "fontsize": 100,
+                "x": "640 + (640-text_w)/2",
+                "y": "(h-text_h)/2",
+                "fontfile": "BebasNeue.ttf",
+                "enable": "'gte(mod(t,0.8),0.4)'"
+              }
+            },
+            {
+              "type": "drawtext",
+              "values": {
+                "text": {
+                  "en": "{{ conjunction }}"
+                },
+                "fontcolor": "{{ textColor }}",
+                "fontsize": 46,
+                "x": "(w-text_w)/2",
+                "y": "(h-text_h)/2 + 6",
+                "fontfile": "Oswald.ttf",
+                "box": 1,
+                "boxcolor": "#141416",
+                "boxborderw": 22
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "logo-bumper",
+      "sections": [
+        {
+          "name": "logo_bumper",
+          "type": "video",
+          "options": {
+            "videoUrl": "https://github.com/heristop/leclap/raw/main/src/shared/assets/videos/leclap_bumper.mp4",
+            "duration": 2.4,
+            "muteSection": true
+          },
+          "filters": [
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 0,
+                "w": 1280,
+                "h": 10,
+                "c": "#7C83FD@1",
+                "t": "fill"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 710,
+                "w": 1280,
+                "h": 10,
+                "c": "#FF8AAE@1",
+                "t": "fill"
+              }
+            },
+            {
+              "type": "fadein",
+              "values": {
+                "color": "#0b0b0f"
+              }
+            },
+            {
+              "type": "fadeout",
+              "values": {
+                "color": "#0b0b0f"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

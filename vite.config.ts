@@ -39,6 +39,10 @@ export default defineConfig({
       '**/e2e/**',
       '**/playwright.config.ts',
       'scripts/ffmpeg/.work/**',
+      // Optional adapter requires an operator-staged private companion repository.
+      'examples/llm-remotion-title/remotion/BrandMotionPromo.tsx',
+      'examples/llm-remotion-title/remotion/brand-motion-index.tsx',
+      'examples/llm-remotion-title/remotion/brand-motion-kit/**',
     ],
     env: {
       node: true,
@@ -323,6 +327,22 @@ export default defineConfig({
           // function-declaration convention applies to shipped package source, not test scaffolding.
           'func-style': 'off',
         },
+      },
+      {
+        // The installed native renderer exercises component lifecycle and async state isolation.
+        // Keep this compatibility allowance limited to these component regressions.
+        files: [
+          'apps/leclap-expo/src/features/editor/components/ExportSheet.test.ts',
+          'apps/leclap-expo/src/features/editor/preview/PreviewPage.test.ts',
+          'apps/leclap-expo/src/components/clappy/clappy-motion.test.ts',
+          'apps/leclap-expo/src/hooks/use-motion-preferences.test.ts',
+        ],
+        rules: { 'typescript/no-deprecated': 'off' },
+      },
+      {
+        // This .test.ts component suite supplies children without JSX.
+        files: ['apps/leclap-expo/src/components/clappy/clappy-motion.test.ts'],
+        rules: { 'react/no-children-prop': 'off' },
       },
       {
         // Build/codegen scripts and Cucumber step definitions are tooling, not shipped package

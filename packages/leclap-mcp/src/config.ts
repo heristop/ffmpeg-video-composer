@@ -1,10 +1,17 @@
 import os from 'node:os';
 import path from 'node:path';
+import type { JsonEffectCatalog } from './effects/custom-effect-catalog.js';
 
 // Runtime config for the MCP server. Precedence per field: CLI flag > env var > default.
 // Dirs are resolved to absolute paths but never created here — the compose tool creates
 // per-render output dirs on demand (Task 4).
 export interface McpConfig {
+  /** Operator JSON catalog path; read once when creating the server. */
+  effectCatalogPath?: string;
+  /** Parsed, immutable, plain JSON startup snapshot (also supported by direct tool callers). */
+  effectCatalog?: JsonEffectCatalog;
+  /** Persistent registered-effect cache budget; zero disables it. Defaults to 512 MiB. */
+  effectCacheMaxBytes?: number;
   outputDir: string;
   mediaDir: string;
   renderTimeoutMs: number;
@@ -16,6 +23,8 @@ export interface McpConfig {
   allowRemotion: boolean;
   /** Default Remotion entry (the module that calls registerRoot) for render_remotion_clip; optional. */
   remotionEntry?: string;
+  /** Optional host Chromium/Chrome executable for registered effect rendering. */
+  browserExecutable?: string;
 }
 
 const DEFAULT_RENDER_TIMEOUT_MS = 600_000;
@@ -65,43 +74,72 @@ function readFlag(argv: readonly string[], flag: string): string | undefined {
   return next;
 }
 
+const MAX_TIMER_MS = 2_147_483_647;
+
 function resolveTimeout(raw: string | undefined): number {
   if (raw === undefined) {
     return DEFAULT_RENDER_TIMEOUT_MS;
   }
 
-  const parsed = Number.parseInt(raw, 10);
+  // Node clamps timers above 2^31-1 ms to 1 ms, so larger values would fail every render immediately.
+  const parsed = /^\d+$/.test(raw) ? Number(raw) : NaN;
 
-  if (Number.isNaN(parsed) || parsed <= 0) {
+  if (!Number.isSafeInteger(parsed) || parsed <= 0 || parsed > MAX_TIMER_MS) {
     return DEFAULT_RENDER_TIMEOUT_MS;
   }
 
   return parsed;
 }
 
+function resolveEffectCacheBudget(raw: string | undefined): number {
+  const parsed = raw !== undefined && /^\d+$/.test(raw) ? Number(raw) : NaN;
+
+  return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : 512 * 1024 * 1024;
+}
+
+function catalogPathConfig(argv: readonly string[]): Pick<McpConfig, 'effectCatalogPath'> {
+  const file = readFlag(argv, '--effect-catalog') ?? process.env.LECLAP_MCP_EFFECT_CATALOG;
+
+  return file ? { effectCatalogPath: path.resolve(file) } : {};
+}
+
+function nonEmpty(value: string | undefined): string | undefined {
+  return value !== undefined && value.trim() !== '' ? value : undefined;
+}
+
 export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
+  // An empty value counts as unset: path.resolve('') is the working directory, which would widen the
+  // media sandbox to wherever the server was started.
   const outputDir =
-    readFlag(argv, '--output-dir') ??
-    process.env.LECLAP_MCP_OUTPUT_DIR ??
+    nonEmpty(readFlag(argv, '--output-dir')) ??
+    nonEmpty(process.env.LECLAP_MCP_OUTPUT_DIR) ??
     path.join(os.homedir(), '.leclap', 'renders');
 
   // Narrow default: confining reads to the whole home directory would let probe_media/compose_video
   // read any file under $HOME. Operators who keep media elsewhere set --media-dir / LECLAP_MCP_MEDIA_DIR.
   const mediaDir =
-    readFlag(argv, '--media-dir') ?? process.env.LECLAP_MCP_MEDIA_DIR ?? path.join(os.homedir(), '.leclap', 'media');
+    nonEmpty(readFlag(argv, '--media-dir')) ??
+    nonEmpty(process.env.LECLAP_MCP_MEDIA_DIR) ??
+    path.join(os.homedir(), '.leclap', 'media');
 
   const renderTimeoutMs = resolveTimeout(
     readFlag(argv, '--render-timeout-ms') ?? process.env.LECLAP_MCP_RENDER_TIMEOUT_MS
   );
 
   const remotionEntry = readFlag(argv, '--remotion-entry') ?? process.env.LECLAP_MCP_REMOTION_ENTRY;
+  const browserExecutable = readFlag(argv, '--remotion-browser') ?? process.env.LECLAP_MCP_REMOTION_BROWSER;
   const allowRemotion = readBoolean(argv, '--allow-remotion', process.env.LECLAP_MCP_ALLOW_REMOTION);
 
   return {
     outputDir: path.resolve(outputDir),
     mediaDir: path.resolve(mediaDir),
     renderTimeoutMs,
+    effectCacheMaxBytes: resolveEffectCacheBudget(
+      readFlag(argv, '--effect-cache-max-bytes') ?? process.env.LECLAP_MCP_EFFECT_CACHE_MAX_BYTES
+    ),
     allowRemotion,
+    ...catalogPathConfig(argv),
+    ...(browserExecutable ? { browserExecutable: path.resolve(browserExecutable) } : {}),
     ...(remotionEntry ? { remotionEntry: path.resolve(remotionEntry) } : {}),
   };
 }

@@ -7,27 +7,35 @@ description: Use when building, testing, linting, formatting, typechecking, or r
 
 ## Overview
 
-pnpm workspaces (`apps/*`, `packages/*`), no turbo/nx. Tooling is **vite-plus (`vp`)** — it provides lint (oxlint), format, test (vitest), and staged checks. There is **no eslint, no prettier, and no jest at the root** (jest lives only inside `apps/leclap-expo`).
+pnpm workspaces (`apps/*`, `packages/*`, plus `examples/llm-remotion-title`), no turbo/nx. Tooling is **vite-plus (`vp`)** — it provides lint (oxlint), format, test (vitest), and staged checks. There is **no eslint, no prettier, and no jest at the root** (jest lives only inside `apps/leclap-expo`).
 
 - **pnpm 12.6.0**, **Node ≥ 24.11.0** (`engine-strict` — wrong versions are rejected). Install: `pnpm install`.
 
 ## Command map
 
-| Task                 | Command                                                                                                  |
-| -------------------- | -------------------------------------------------------------------------------------------------------- |
-| Lint                 | `pnpm lint`                                                                                              |
-| Format / check       | `pnpm fmt` · `pnpm fmt:check`                                                                            |
-| All checks           | `pnpm check`                                                                                             |
-| Test                 | `pnpm test` · UI `pnpm test:ui` · coverage `pnpm test:coverage` · CI `pnpm test:ci`                      |
-| Build                | `pnpm build` (tsdown)                                                                                    |
-| Typecheck a package  | `pnpm --filter <pkg> exec tsc --noEmit`                                                                  |
-| Perf bench / profile | `pnpm --filter ffmpeg-video-composer bench` · `FVC_PERF=1 pnpm compile <t.json>` (`docs/performance.md`) |
-| Run Expo app         | `pnpm app:expo` · `app:ios` · `app:android`                                                              |
-| Run web app          | `pnpm app:web`                                                                                           |
-| Build executables    | `pnpm build:exe:all`                                                                                     |
-| Dep graph / check    | `pnpm graph` · `pnpm deps:check`                                                                         |
+| Task                    | Command                                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------------------- |
+| Lint                    | `pnpm lint`                                                                                              |
+| Format / check          | `pnpm fmt` · `pnpm fmt:check`                                                                            |
+| Format/lint/type checks | `pnpm check`                                                                                             |
+| Package tests           | `pnpm test` (recursive; Vitest packages + Expo Jest)                                                     |
+| Build                   | `pnpm build` (recursive; tsdown libraries/CLI/MCP + Vite web app)                                        |
+| Typecheck a package     | `pnpm --filter <pkg> exec tsc --noEmit`                                                                  |
+| Perf bench / profile    | `pnpm --filter ffmpeg-video-composer bench` · `FVC_PERF=1 pnpm compile <t.json>` (`docs/performance.md`) |
+| Run Expo app            | `pnpm app:expo` · `app:ios` · `app:android`                                                              |
+| Run web app             | `pnpm app:web`                                                                                           |
+| Build executables       | `pnpm build:exe:all`                                                                                     |
+| Dep graph / check       | `pnpm deps:graph` (requires Graphviz `dot`) · `pnpm deps:check`                                          |
 
-`<pkg>` names: `ffmpeg-video-composer`, `@leclap/mcp`, `@leclap/creative-kit`, `@leclap/expo`, `@leclap/web`.
+`<pkg>` names: `ffmpeg-video-composer`, `@leclap/cli`, `@leclap/mcp`, `@leclap/creative-kit`, `@leclap/expo`, `@leclap/web`, `leclap-json-effects-example`.
+
+## Scope and prerequisites
+
+- `pnpm test:ui`, `pnpm test:coverage`, and `pnpm test:ci` use the root Vitest config, which covers core, MCP, and repo-level tests. They omit CLI, creative-kit, web, and Expo package suites. `pnpm test` runs workspace packages' own test scripts; it does not collect repo-level `tests/`.
+- CI runs root coverage, web/Expo/CLI tests separately, and `pnpm test:integration` for core/MCP Cucumber real renders. Rust tests run in a separate host-engine job; web Playwright tests are a separate `pnpm --filter @leclap/web test:e2e` command.
+- `pnpm check` checks formatting/lint/types; tests and builds are separate. `pnpm build` includes the web app's media fetch/staging and prerender, but does not build Expo or the Rust engine. Filter the affected package for a narrower build.
+- Fresh-checkout lint needs generated imports: run `pnpm --filter ffmpeg-video-composer build` and `node scripts/copy-core-assets.ts` first (the CI prepare step). Dev `pnpm compile` / `pnpm diagnose` also import the core's built `dist`.
+- Render/probe tests require real media and FFmpeg with `drawtext` plus `ffprobe`. CI uses `scripts/ci/fetch-test-media.sh` and verifies its allowlist; Git LFS pointer files alone are not valid test media. See `.github/workflows/ci.yml` for the current setup.
 
 ## Before committing
 

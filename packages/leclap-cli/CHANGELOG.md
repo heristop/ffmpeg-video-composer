@@ -5,6 +5,22 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-03
+
+### Added
+
+- `leclap samples list` discovers the 32 packaged showcase samples, with category/backend/query
+  filters and JSON output. `samples show <id>` reports creative direction, required inputs, assets,
+  registered effects and setup instructions.
+- `leclap samples export <id>` writes a self-contained descriptor to stdout or creates a new file
+  with `--output`; existing files are never overwritten. Media is not included. Registered effect
+  samples require the configured MCP effect backend rather than direct CLI rendering.
+
+### Changed
+
+- Requires `ffmpeg-video-composer` 2.5.0 or later for sample discovery and the new JSON motion controls.
+- Package tarballs include this changelog.
+
 ## [0.2.5] - 2026-09-28
 
 ### Added

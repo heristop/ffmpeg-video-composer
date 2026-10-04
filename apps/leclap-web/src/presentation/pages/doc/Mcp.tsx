@@ -40,7 +40,7 @@ export const DocMcp = () => (
   <>
     <Seo
       title="MCP server — agent-callable video tools"
-      description="Expose the LeClap engine to an AI agent over MCP: the six tools and their arguments, the authoring loop, every flag and env var, containment rules, and wiring it into Claude Desktop or a project .mcp.json."
+      description="Configure LeClap MCP for sample discovery, deterministic JSON effects and video rendering: tools, startup flags, environment variables, deadlines, cache and trusted Remotion setup."
       path="/doc/mcp"
     />
 
@@ -52,9 +52,10 @@ export const DocMcp = () => (
     <DocSection id="what" title="What it is" kicker="Authoring, not generating">
       <Prose>
         <p>
-          The server ships <strong>no template catalog</strong> — it is decoupled from the app&apos;s creative kit, so
-          it stays a generic authoring tool. The output is agent-composable, deterministic and reproducible video, which
-          is the opposite of generative video: the same descriptor renders the same mp4 every time.
+          The server includes <strong>32 packaged showcase samples</strong> with creative direction and input
+          requirements. Discovery reads data only; rendering uses your media and the configured backend. Keep the
+          descriptor, assets, fonts, configuration and runtime versions together for reproducibility. Different encoders
+          and platforms can produce different bytes.
         </p>
         <p>
           It is the second front-end to the engine behind <Link to="/doc/cli">the CLI</Link>, over the same{' '}
@@ -67,14 +68,16 @@ export const DocMcp = () => (
     <DocSection id="tools" title="Tools" kicker={`${mcpDoc.tools.length} tools`}>
       <Prose>
         <p>
-          Five tools are always registered; <Code>render_remotion_clip</Code> appears only when the Remotion opt-in is
-          set. Every argument below is the literal key the agent passes.
+          Eight tools are always registered. Remotion opt-in adds <Code>get_effect_schema</Code>,{' '}
+          <Code>render_preview</Code> and <Code>render_remotion_clip</Code>. Every argument below is the literal key the
+          agent passes. Patch availability does not bypass effect-backend validation.
         </p>
       </Prose>
       <DefList rows={toolRows} />
       <Callout label="Typical flow">
-        <Code>get_template_schema</Code> → author an inline descriptor → <Code>validate_template</Code> (instant,
-        iterate until valid) → <Code>compose_video</Code> → open the returned <Code>outputPath</Code>.
+        <Code>list_samples</Code> → <Code>get_sample</Code> → inspect requirements and customize →{' '}
+        <Code>validate_template</Code> → preview and patch registered effects when needed → <Code>compose_video</Code> →
+        open the returned <Code>outputPath</Code>.
       </Callout>
     </DocSection>
 
@@ -82,9 +85,10 @@ export const DocMcp = () => (
       <Prose>
         <p>
           The server also ships a prompt, <Code>compose-video</Code>, which surfaces as <Code>/compose-video</Code> in
-          clients like Claude Desktop. It takes optional <Code>goal</Code> and <Code>orientation</Code> arguments and
-          primes the agent with the schema, the building-block recipes (which filters give which look, the bundled
-          fonts, the on-device filter allowlist) and the validate → compose loop.
+          clients like Claude Desktop. It takes optional <Code>goal</Code>, <Code>orientation</Code> and{' '}
+          <Code>creativeDirection</Code> arguments and primes the agent with the schema, the building-block recipes
+          (which filters give which look, the bundled fonts, the on-device filter allowlist) and the validate → compose
+          loop.
         </p>
       </Prose>
     </DocSection>
@@ -137,10 +141,31 @@ export const DocMcp = () => (
       <Prose>
         <p>
           Each setting resolves in one order: <strong>CLI flag → environment variable → default</strong>. Directories
-          are resolved to absolute paths at start-up.
+          are resolved to absolute paths at start-up. Supplied tilde paths are not expanded; use absolute paths.
         </p>
       </Prose>
       <DefList rows={configRows} />
+      <Prose>
+        <p>
+          These are server settings, separate from template JSON and the library&apos;s <Code>ProjectConfig</Code>.
+          <Code>compose_video</Code> binds <Code>fields</Code>, <Code>userVideoPaths</Code> and <Code>locale</Code>; it
+          uses the media directory as the asset root and creates one build folder per render. Set orientation and fps in{' '}
+          <Code>template.global</Code>. Codec and quality overrides use the library API.
+        </p>
+        <p>
+          One registered-effect preflight or render job runs at a time, with at most eight waiters. Queue wait,
+          preflight and worker setup/render have separate deadlines. Preflight probes sequentially and reuses results
+          for the same real file within a request. Cancellation kills active probes before releasing the queue slot.
+          Cache hits still perform staging and bundling; final FFmpeg assembly also runs.
+        </p>
+        <p>
+          The full{' '}
+          <a href="https://github.com/heristop/leclap/blob/main/docs/engine-configuration.md">
+            engine configuration reference
+          </a>{' '}
+          covers output precedence, encoder defaults and platform limits.
+        </p>
+      </Prose>
       <Callout label="Containment">
         Local input paths — <Code>userVideoPaths</Code> and <Code>probe_media</Code> — must resolve inside the media
         dir. The check is symlink-safe, so a link pointing outside is rejected rather than followed. Remote template
@@ -164,7 +189,7 @@ export const DocMcp = () => (
       <Prose>
         <p>
           Then ask for a video in plain language and the agent fetches the schema, authors a descriptor, validates it
-          and renders. There is no catalog to browse: the server authors templates rather than serving stock ones.
+          and renders. Or ask it to list app demos, retrieve a sample, replace its copy and bind your recording.
         </p>
       </Prose>
     </DocSection>
@@ -197,8 +222,8 @@ export const DocMcp = () => (
         </p>
         <p>
           It needs the optional peer deps <Code>@remotion/renderer</Code> and <Code>@remotion/bundler</Code>, and is
-          design-time only (headless Chromium). Everything else in the server stays self-contained and on-device. The{' '}
-          <Link to="/doc/cli">CLI</Link> never needs it.
+          rendered on Node through headless Chromium. Native/browser hosts can compose the resulting clip but do not run
+          React scenes locally. The <Link to="/doc/cli">CLI</Link> never needs it.
         </p>
       </Prose>
       <Tip>
@@ -206,6 +231,12 @@ export const DocMcp = () => (
         by default. Register it with <Code>--allow-remotion</Code> or <Code>LECLAP_MCP_ALLOW_REMOTION=1</Code>, and only
         for a client you trust.
       </Tip>
+      <Callout label="Registered JSON effects">
+        Configure a trusted <Code>--remotion-entry</Code> and optional <Code>--effect-catalog</Code>, then discover
+        strict versioned contracts through <Code>get_effect_schema</Code>. JSON controls props/assets, never source
+        modules. The registered output contract is opaque H.264, landscape 1280×720, 30 fps and 300 frames; other
+        orientations and frame rates are rejected. <Code>render_remotion_clip</Code> is a separate composition route.
+      </Callout>
     </DocSection>
 
     <DocSection id="architecture" title="How a render is isolated" kicker="Forked worker">

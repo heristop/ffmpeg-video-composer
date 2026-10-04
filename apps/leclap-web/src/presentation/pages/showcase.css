@@ -1,0 +1,30 @@
+.showcase-page {
+  --showcase-selection: var(--color-brand-200);
+  accent-color: var(--color-brand-500);
+}
+.showcase-page ::selection {
+  background: var(--showcase-selection);
+  color: var(--color-gray-900);
+}
+.showcase-page pre {
+  scrollbar-color: var(--color-brand-400) transparent;
+  scrollbar-width: thin;
+}
+.showcase-page input {
+  caret-color: var(--color-brand-500);
+}
+.showcase-page summary::-webkit-details-marker {
+  display: none;
+}
+.showcase-page summary {
+  list-style: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .showcase-page *,
+  .showcase-page *::before,
+  .showcase-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

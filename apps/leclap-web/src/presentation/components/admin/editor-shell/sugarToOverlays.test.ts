@@ -48,7 +48,29 @@ describe('sugarToOverlays — titleCard', () => {
     const overlays = sugarToOverlays('titleCard', card, 'landscape');
 
     expect(overlays[0].fontcolor).toBe('#7C83FD');
-    expect(overlays[0].reveal).toEqual({ type: 'rise' });
+    expect(overlays[0].reveal).toEqual({ type: 'rise', delay: 0.3 });
+  });
+
+  it('preserves line stagger, the default reveal and blank-line indices when detached', () => {
+    const detached = sugarToOverlays('titleCard', { ...card, kicker: { en: ' ' }, stagger: 0.07 }, 'landscape');
+    expect(detached.map((overlay) => overlay.reveal)).toEqual([
+      { type: 'rise', delay: 0.3 },
+      { type: 'rise', delay: 0.37 },
+    ]);
+    const defaults = sugarToOverlays('titleCard', { ...card, reveal: undefined }, 'landscape');
+    expect(defaults.map((overlay) => overlay.reveal)).toEqual([
+      { type: 'rise', delay: 0.3 },
+      { type: 'rise', delay: 0.45 },
+      { type: 'rise', delay: 0.6 },
+    ]);
+    const simultaneous = sugarToOverlays(
+      'titleCard',
+      { ...card, stagger: 0, reveal: { type: 'fade', delay: 1, easing: 'ease-out' } },
+      'landscape'
+    );
+    expect(simultaneous.map((overlay) => overlay.reveal)).toEqual(
+      Array(3).fill({ type: 'fade', delay: 1, easing: 'ease-out' })
+    );
   });
 
   it('carries the text effect onto each detached line, except the effect-free badge', () => {

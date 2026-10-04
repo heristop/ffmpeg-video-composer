@@ -30,7 +30,8 @@
     "templates": "Templates",
     "docs": "Docs",
     "about": "About",
-    "primaryLabel": "Primary"
+    "primaryLabel": "Primary",
+    "showcase": "Showcase"
   },
   "header": {
     "switchToLight": "Switch to light theme",

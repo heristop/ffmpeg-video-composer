@@ -4,6 +4,7 @@ import { defineConfig } from 'tsdown';
 // already-compiled core dist; the SDK and reflect-metadata stay node_modules deps.
 const external = [
   'ffmpeg-video-composer',
+  'ffmpeg-video-composer/samples',
   '@modelcontextprotocol/server',
   '@modelcontextprotocol/server/stdio',
   '@modelcontextprotocol/core',
@@ -50,7 +51,7 @@ export default defineConfig([
   },
   // Forked render worker — emitted as dist/render-worker.js (owns fd1/fd2; runs compile()).
   {
-    entry: { 'render-worker': 'src/worker/renderWorker.ts' },
+    entry: { 'render-worker': 'src/worker/renderWorker.ts', 'effect-worker': 'src/worker/effectWorker.ts' },
     format: ['esm'],
     outExtensions: () => ({ js: '.js' }),
     dts: false,

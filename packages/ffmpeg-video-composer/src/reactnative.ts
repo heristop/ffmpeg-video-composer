@@ -21,7 +21,7 @@ import VideoEditor from './editor/VideoEditor';
 import MusicComposer from './editor/MusicComposer';
 import AnimationComposer from './editor/AnimationComposer';
 import Project from './core/models/Project';
-import Template from './core/models/Template';
+import Template, { assertEffectsResolved } from './core/models/Template';
 import type { ProjectConfig, TemplateDescriptor } from './core/types';
 
 class ReactNativeLogger extends AbstractLogger {
@@ -184,6 +184,7 @@ export async function compileReactNative(
   engine: NativeEngine,
   onProgress?: (progress: number) => void
 ): Promise<string | null> {
+  assertEffectsResolved(templateDescriptor);
   initializePlatform(engine);
 
   const ctx: CompilationContext = {
@@ -223,3 +224,16 @@ export { default as FFmpegDeviceAdapter, type NativeEngine } from './platform/ff
 export { default as FilesystemExpoAdapter } from './platform/filesystem/FilesystemExpoAdapter';
 export type { ProjectConfig, TemplateDescriptor, Section, Filter } from './core/types';
 export { isFontRef, type FontRef, type FontInput } from './core/fonts';
+
+export { EffectReferenceSchema, JsonValueSchema } from './schemas/effect-reference.schema';
+export type { EffectReference, JsonValue } from './schemas/effect-reference.schema';
+export { EffectSectionSchema } from './schemas/section.schemas';
+export type { EffectSection } from './schemas/section.schemas';
+export { resolveTemplateEffects } from './core/resolve-template-effects';
+export type {
+  EffectRenderResult,
+  EffectRenderer,
+  ResolveTemplateEffectsOptions,
+  ResolvedEffectProvenance,
+  ResolvedTemplateEffects,
+} from './core/resolve-template-effects';

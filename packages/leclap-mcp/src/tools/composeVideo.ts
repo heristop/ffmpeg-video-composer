@@ -1,12 +1,15 @@
+import type { EffectCacheSummary } from '../effects/effect-runner.js';
 import { randomBytes } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import type { McpServer, ServerContext } from '@modelcontextprotocol/server';
-import type { ProjectConfig, TemplateDescriptor } from 'ffmpeg-video-composer';
+import { type ProjectConfig, type TemplateDescriptor, type ResolvedEffectProvenance } from 'ffmpeg-video-composer';
 import { z } from 'zod';
 
+import { resolveComposeEffects } from '../effects/compose-effects.js';
+import { templateRevision } from '../effects/template-revision.js';
 import type { McpConfig } from '../config.js';
 import { assertWithinMediaDir } from '../compose/pathGuard.js';
 import { assertDescriptorSafe } from '../compose/descriptorGuard.js';
@@ -17,6 +20,7 @@ import { runRender, type RenderResult } from '../compose/renderRunner.js';
 // deprecated since v2 and the object form is what `tools/list` converts to JSON Schema.
 const inputSchema = z.object({
   template: z.record(z.string(), z.unknown()),
+  expectedRevision: z.string().optional(),
   fields: z.record(z.string(), z.string()).optional(),
   userVideoPaths: z.record(z.string(), z.string()).optional(),
   locale: z.string().optional(),
@@ -33,10 +37,13 @@ const outputSchema = z.object({
   videoCodec: z.string().nullable(),
   audioCodec: z.string().nullable(),
   renderId: z.string(),
+  effectProvenance: z.record(z.string(), z.unknown()).optional(),
+  effectCache: z.object({ hits: z.number(), misses: z.number(), writes: z.number() }).optional(),
 });
 
 type ComposeArgs = {
   template: Record<string, unknown>;
+  expectedRevision?: string;
   fields?: Record<string, string>;
   userVideoPaths?: Record<string, string>;
   locale?: string;
@@ -71,7 +78,10 @@ function requiredVideoSections(descriptor: TemplateDescriptor): string[] {
 
 // Reject when a required project_video section has no supplied clip, or when a supplied key names a
 // section the template does not declare.
-function checkSectionCoverage(descriptor: TemplateDescriptor, provided: Record<string, string>): ToolError | undefined {
+export function checkSectionCoverage(
+  descriptor: TemplateDescriptor,
+  provided: Record<string, string>
+): ToolError | undefined {
   const required = requiredVideoSections(descriptor);
   const missing = required.filter((name) => !(name in provided));
 
@@ -102,7 +112,7 @@ async function resolveOne(section: string, value: string, mediaDir: string): Pro
 // Realpath-check every provided clip against the media dir (rejects traversal/symlink escape),
 // returning the canonicalized map the worker will receive. Checks run in parallel; the first
 // rejection wins.
-async function resolveVideoPaths(
+export async function resolveVideoPaths(
   provided: Record<string, string>,
   mediaDir: string
 ): Promise<{ ok: true; paths: Record<string, string> } | ToolError> {
@@ -154,7 +164,12 @@ async function buildProjectConfig(
   };
 }
 
-function successPayload(result: Extract<RenderResult, { ok: true }>, renderId: string) {
+function successPayload(
+  result: Extract<RenderResult, { ok: true }>,
+  renderId: string,
+  effectProvenance?: Record<string, ResolvedEffectProvenance>,
+  effectCache?: EffectCacheSummary
+) {
   return {
     content: [
       {
@@ -177,6 +192,8 @@ function successPayload(result: Extract<RenderResult, { ok: true }>, renderId: s
       videoCodec: result.videoCodec,
       audioCodec: result.audioCodec,
       renderId,
+      ...(effectProvenance ? { effectProvenance } : {}),
+      ...(effectCache ? { effectCache } : {}),
     },
   };
 }
@@ -187,11 +204,38 @@ function failurePayload(result: Extract<RenderResult, { ok: false }>): ToolError
   return errorResult(`${result.error}${tail}`);
 }
 
-type PreparedCompose = { ok: true; descriptor: TemplateDescriptor; paths: Record<string, string> };
+type PreparedCompose = {
+  effectDirectories?: string[];
+  effectCache?: EffectCacheSummary;
+  ok: true;
+  descriptor: TemplateDescriptor;
+  paths: Record<string, string>;
+  effectProvenance?: Record<string, ResolvedEffectProvenance>;
+};
+
+function checkEffectBindings(descriptor: TemplateDescriptor, provided: Record<string, string>) {
+  const collisions = (descriptor.sections ?? [])
+    .filter(
+      (section) =>
+        section.type === 'effect' && typeof section.name === 'string' && Object.hasOwn(provided, section.name)
+    )
+    .map((section) => section.name);
+
+  if (collisions.length > 0) return errorResult(`Effect clip binding collision: ${collisions.join(', ')}.`);
+
+  return checkSectionCoverage(descriptor, provided);
+}
 
 // Validate the descriptor, contain its raw filter chain, check section coverage, and realpath-guard
 // every supplied clip — returning either the render-ready inputs or the first tool error.
-async function prepareCompose(args: ComposeArgs, config: McpConfig): Promise<PreparedCompose | ToolError> {
+async function prepareCompose(
+  args: ComposeArgs,
+  config: McpConfig,
+  signal?: AbortSignal
+): Promise<PreparedCompose | ToolError> {
+  if (args.expectedRevision && templateRevision(args.template) !== args.expectedRevision) {
+    return errorResult('revision_conflict: template changed; validate the current JSON first.');
+  }
   const descriptor = resolveDescriptor(args);
 
   if ('isError' in descriptor) {
@@ -207,23 +251,34 @@ async function prepareCompose(args: ComposeArgs, config: McpConfig): Promise<Pre
   }
 
   const provided = args.userVideoPaths ?? {};
-  const coverageError = checkSectionCoverage(descriptor.descriptor, provided);
+  const bindingError = checkEffectBindings(descriptor.descriptor, provided);
 
-  if (coverageError) {
-    return coverageError;
-  }
-
+  if (bindingError) return bindingError;
   const resolved = await resolveVideoPaths(provided, config.mediaDir);
 
   if ('isError' in resolved) {
     return resolved;
   }
 
+  if (descriptor.descriptor.sections?.some((section) => section.type === 'effect')) {
+    try {
+      return await resolveComposeEffects(args.template, config, resolved.paths, signal);
+    } catch (error) {
+      return errorResult(`Effect preparation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
   return { ok: true, descriptor: descriptor.descriptor, paths: resolved.paths };
 }
 
 // Name the deliverable and prune the render dir down to it, then build the success payload.
-async function finalizeRender(result: Extract<RenderResult, { ok: true }>, args: ComposeArgs, renderId: string) {
+async function finalizeRender(
+  result: Extract<RenderResult, { ok: true }>,
+  args: ComposeArgs,
+  renderId: string,
+  effectProvenance?: Record<string, ResolvedEffectProvenance>,
+  effectCache?: EffectCacheSummary
+) {
   const outputPath = await applyOutputName(result.outputPath, args.outputBaseName);
   // Keep only the deliverable(s); the engine's intermediate segments/concat lists/staged assets are
   // dead weight once the final mp4 exists. Prune the dir that actually holds the output (both the
@@ -231,7 +286,7 @@ async function finalizeRender(result: Extract<RenderResult, { ok: true }>, args:
   // its output under buildDir. Best-effort — never fail a good render on cleanup.
   await pruneRenderDir(path.dirname(result.outputPath), [path.basename(outputPath), path.basename(result.outputPath)]);
 
-  return successPayload({ ...result, outputPath }, renderId);
+  return successPayload({ ...result, outputPath }, renderId, effectProvenance, effectCache);
 }
 
 // Render progress goes to stderr, not to a `notifications/message`: `ctx.mcpReq.log` is deprecated
@@ -246,33 +301,39 @@ function progressLogger(renderId: string): (fraction: number) => void {
 }
 
 async function handleCompose(args: ComposeArgs, config: McpConfig, ctx?: ServerContext) {
-  const prepared = await prepareCompose(args, config);
+  const prepared = await prepareCompose(args, config, ctx?.mcpReq.signal);
 
   if ('isError' in prepared) {
     return prepared;
   }
 
-  const renderId = newRenderId();
-  const buildDir = path.join(config.outputDir, renderId);
-  const projectConfig = await buildProjectConfig(args, prepared.paths, config, renderId);
-  const result = await runRender(
-    { projectConfig, template: prepared.descriptor },
-    {
-      timeoutMs: config.renderTimeoutMs,
-      signal: ctx?.mcpReq.signal,
-      onProgress: progressLogger(renderId),
+  try {
+    const renderId = newRenderId();
+    const buildDir = path.join(config.outputDir, renderId);
+    const projectConfig = await buildProjectConfig(args, prepared.paths, config, renderId);
+    const result = await runRender(
+      { projectConfig, template: prepared.descriptor },
+      {
+        timeoutMs: config.renderTimeoutMs,
+        signal: ctx?.mcpReq.signal,
+        onProgress: progressLogger(renderId),
+      }
+    );
+
+    if (!result.ok) {
+      // Nothing usable was produced — drop the whole render dir so failed/cancelled calls don't
+      // accumulate on disk.
+      await removeDir(buildDir);
+
+      return failurePayload(result);
     }
-  );
 
-  if (!result.ok) {
-    // Nothing usable was produced — drop the whole render dir so failed/cancelled calls don't
-    // accumulate on disk.
-    await removeDir(buildDir);
-
-    return failurePayload(result);
+    return await finalizeRender(result, args, renderId, prepared.effectProvenance, prepared.effectCache);
+  } finally {
+    await Promise.all(
+      (prepared.effectDirectories ?? []).map((directory) => pruneRenderDir(directory, ['provenance.json']))
+    );
   }
-
-  return finalizeRender(result, args, renderId);
 }
 
 async function removeDir(dir: string): Promise<void> {

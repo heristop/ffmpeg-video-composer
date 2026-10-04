@@ -1,7 +1,8 @@
 {
   "meta": {
     "name": "Agentic PR Evidence",
-    "description": "A short, review-focused video that an agent can render from implementation evidence and attach to a pull or merge request."
+    "description": "A short, review-focused video that an agent can render from implementation evidence and attach to a pull or merge request.",
+    "creativeDirection": "Audience: a pull-request reviewer. Direction: evidence-first presentation with restrained dark surfaces and clear type. Move from implementation context to the actual recorded behavior, then state what the reviewer should inspect. Keep the walkthrough unobstructed and use captions only for verified change context. Favor calm timing and cuts over promotional motion. Avoid invented test results, simulated interactions and decorative camera moves. Review the recording, readable context, review-focus text, scene joins and final evidence card."
   },
   "global": {
     "orientation": "landscape",

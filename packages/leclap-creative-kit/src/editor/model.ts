@@ -35,6 +35,7 @@ import type {
   WatermarkSchema,
 } from 'ffmpeg-video-composer/src/schemas/global.schemas.ts';
 import type { AccentBar } from './accent-bar';
+import type { VideoFilterFields, VideoOverlaySlot } from './video-filter-types';
 import { DEFAULT_FONT_ID, findFontByFile, type FontInput } from '../fonts';
 
 export type MediaChoice =
@@ -101,7 +102,7 @@ export type FormField = { name: string; label: string; maxLength: number };
 // A single positionable text overlay on a video section. x/y are [0,1] fractions
 // of the frame; fontcolor/boxcolor are hex strings like '#ffffff'. boxOpacity is
 // the background box alpha in [0,1].
-export interface TextOverlay {
+export interface TextOverlay extends VideoOverlaySlot {
   text: string;
   x: number;
   y: number;
@@ -163,9 +164,7 @@ export interface VisualAudio {
 // value is a PTS multiplier, NOT a rate: speed 2 = slow motion at half rate, speed 0.5 = twice as fast.
 // The builder UI presents the intuitive rate (×) and converts (see speedRate helpers web-side).
 // Omitted means normal speed (1).
-export interface VisualPlayback {
-  speed?: number;
-}
+export type VisualPlayback = { speed?: number };
 
 export interface EditorCaption {
   text: string;
@@ -327,7 +326,8 @@ export type EditorSection =
     } & VisualAudio &
       VisualPlayback &
       VisualCaption &
-      VisualAnimation)
+      VisualAnimation &
+      VideoFilterFields)
   | ({
       kind: 'color';
       duration: number;
@@ -404,7 +404,7 @@ export const DEFAULT_TRANSITION: DefaultTransition = { type: 'cut', duration: DE
 // a freshly-added one. The guide is a recording aid only — never burned into the video.
 export const DEFAULT_FRAMING_OPACITY = 0.45;
 
-export interface EditorState {
+export interface EditorState extends Pick<NonNullable<TemplateDescriptor['meta']>, 'creativeDirection'> {
   id: string;
   name: string;
   description: string;

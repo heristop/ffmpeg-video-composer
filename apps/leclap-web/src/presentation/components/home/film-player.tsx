@@ -1,28 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useInView } from '@/hooks/useInView';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { Captions, CaptionsOff, Pause, Play } from '@/presentation/components/icons';
 import { playWithSound, readSound, tellVideo } from '@/lib/landing-sound';
-import { FilmScreen, FilmStage, FrameButton, SoundControl, useFilmSound } from '@/presentation/components/film-frame';
+import { FilmScreen, FilmStage, useFilmSound } from '@/presentation/components/film-frame';
+import { FilmPlaybackControls, FilmFeedback, type FilmPlayerLabels } from './film-player-controls';
+import { useFilmCaptions, useFilmVisibility } from './use-film-captions';
 import type { FilmAsset } from './films';
 
-interface FilmPlayerLabels {
-  play: string;
-  pause: string;
-  captions: string;
-}
-
 interface FilmPlayerProps {
-  film: FilmAsset;
+  film: Pick<FilmAsset, 'mp4' | 'poster'> & Partial<Pick<FilmAsset, 'captions'>>;
   /** Accessible name of the film. */
   title: string;
   /** The frame's label pill, e.g. "The film · 1:18". */
-  badge: string;
+  badge?: string;
   /** Label of the captions track, and its language. */
-  captionsLabel: string;
-  captionsLang: string;
+  captionsLabel?: string;
+  captionsLang?: string;
   labels: FilmPlayerLabels;
   className?: string;
+  /** Landing films play on view; showcase samples wait for a visitor request. */
+  playback?: 'ambient' | 'requested';
+  startRequested?: boolean;
 }
 
 // Nothing streams before the frame nears the viewport, even where the element already exists (reduced motion).
@@ -40,16 +38,26 @@ const prefersSaveData = (): boolean =>
 // The first time a film is heard it starts over, so the narration is heard whole, and it no longer loops, so
 // the film ends. The glass pill turns the sound on, plays and pauses, and toggles the captions; a visitor's
 // pause sticks. Reduced motion: the native controls and captions, and nothing plays by itself.
-export const FilmPlayer = ({ film, title, badge, captionsLabel, captionsLang, labels, className }: FilmPlayerProps) => {
+export const FilmPlayer = ({
+  film,
+  title,
+  badge,
+  captionsLabel,
+  captionsLang,
+  labels,
+  className,
+  playback = 'ambient',
+  startRequested = false,
+}: FilmPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const reduced = useReducedMotion();
   const [loadRef, shouldLoad] = useInView({ rootMargin: '300px' });
   const [playRef, inView] = useInView({ once: false, threshold: 0.35, rootMargin: '0px' });
   const { muted, volume, toggle, changeVolume, refuse, adopt } = useFilmSound(videoRef);
   const [paused, setPaused] = useState(true);
-  const [held, setHeld] = useState(prefersSaveData);
-  const [captions, setCaptions] = useState(true);
-  const [cue, setCue] = useState('');
+  const [held, setHeld] = useState(() => (playback === 'requested' ? !startRequested : prefersSaveData()));
+  const [waiting, setWaiting] = useState(false);
+  const [failed, setFailed] = useState(false);
   // Whether the film has played with sound yet: the first time it does, it starts from the top.
   const heard = useRef(false);
   // Every control exists before the film does, so a keyboard visitor tabbing down the page lands on them
@@ -57,6 +65,8 @@ export const FilmPlayer = ({ film, title, badge, captionsLabel, captionsLang, la
   // the first render, and under reduced motion the native player itself, which fetches nothing until the
   // frame nears the viewport.
   const mounted = shouldLoad || reduced;
+  const { captions, setCaptions, cue } = useFilmCaptions(videoRef, reduced, mounted);
+  useFilmVisibility(videoRef, reduced, startRequested);
 
   const setFrameRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -94,7 +104,7 @@ export const FilmPlayer = ({ film, title, badge, captionsLabel, captionsLang, la
       return;
     }
 
-    if (reduced) return;
+    if ((reduced && !startRequested) || document.hidden) return;
 
     if (!muted && !heard.current) {
       heard.current = true;
@@ -105,46 +115,21 @@ export const FilmPlayer = ({ film, title, badge, captionsLabel, captionsLang, la
       heard.current = false;
       refuse();
     });
-  }, [inView, held, reduced, shouldLoad, muted, refuse]);
-
-  // Reduced motion switched on mid-visit stills whatever is playing.
-  useEffect(() => {
-    if (reduced) videoRef.current?.pause();
-  }, [reduced]);
-
-  // The captions are drawn in the frame's own type, above the control pill: the track stays hidden and its
-  // active cue is mirrored here. Under reduced motion the native player shows them.
-  useEffect(() => {
-    const track = videoRef.current?.textTracks[0];
-
-    if (!track) return () => {};
-
-    if (reduced) {
-      track.mode = 'showing';
-
-      return () => {};
-    }
-
-    track.mode = 'hidden';
-    const onCueChange = () => {
-      const active = track.activeCues?.[0];
-      setCue(active && 'text' in active ? String(active.text) : '');
-    };
-    track.addEventListener('cuechange', onCueChange);
-
-    return () => {
-      track.removeEventListener('cuechange', onCueChange);
-    };
-  }, [reduced, shouldLoad]);
+  }, [inView, held, reduced, shouldLoad, muted, refuse, startRequested]);
 
   const togglePlay = () => {
     const video = videoRef.current;
 
     if (!video) return;
 
+    if (failed) {
+      video.load();
+      setFailed(false);
+    }
+
     if (video.paused) {
       setHeld(false);
-      video.play().catch(() => {});
+      playWithSound(video, !muted, refuse);
 
       return;
     }
@@ -167,39 +152,31 @@ export const FilmPlayer = ({ film, title, badge, captionsLabel, captionsLang, la
   };
 
   const control = reduced ? undefined : (
-    <>
-      <SoundControl
-        muted={muted}
-        volume={volume}
-        playing={!paused}
-        onToggle={() => {
-          const turningOn = muted;
+    <FilmPlaybackControls
+      labels={labels}
+      paused={paused}
+      failed={failed}
+      muted={muted}
+      volume={volume}
+      captionsAvailable={Boolean(film.captions)}
+      captions={captions}
+      onPlay={togglePlay}
+      onCaptions={() => {
+        setCaptions((shown) => !shown);
+      }}
+      onSound={() => {
+        const turningOn = muted;
+        toggle();
 
-          toggle();
+        if (turningOn) hearFromTheTop();
+      }}
+      onVolume={(next) => {
+        const turningOn = muted && next > 0;
+        changeVolume(next);
 
-          if (turningOn) hearFromTheTop();
-        }}
-        onVolume={(next) => {
-          const turningOn = muted && next > 0;
-
-          changeVolume(next);
-
-          if (turningOn) hearFromTheTop();
-        }}
-      />
-      <FrameButton label={paused ? labels.play : labels.pause} onClick={togglePlay}>
-        {paused ? <Play /> : <Pause />}
-      </FrameButton>
-      <FrameButton
-        label={labels.captions}
-        pressed={captions}
-        onClick={() => {
-          setCaptions((shown) => !shown);
-        }}
-      >
-        {captions ? <Captions /> : <CaptionsOff />}
-      </FrameButton>
-    </>
+        if (turningOn) hearFromTheTop();
+      }}
+    />
   );
 
   return (
@@ -219,9 +196,9 @@ export const FilmPlayer = ({ film, title, badge, captionsLabel, captionsLang, la
             ref={setVideoEl}
             className="absolute inset-0 size-full object-cover"
             poster={film.poster}
-            loop={muted}
+            loop={playback === 'ambient' && muted}
             playsInline
-            preload={preloadWhen(shouldLoad)}
+            preload={playback === 'requested' ? 'none' : preloadWhen(shouldLoad)}
             controls={reduced}
             aria-label={title}
             onPlay={() => {
@@ -232,6 +209,21 @@ export const FilmPlayer = ({ film, title, badge, captionsLabel, captionsLang, la
             }}
             onEnded={() => {
               setHeld(true);
+              setPaused(true);
+            }}
+            onWaiting={() => {
+              setWaiting(true);
+            }}
+            onPlaying={() => {
+              setWaiting(false);
+            }}
+            onCanPlay={() => {
+              setWaiting(false);
+            }}
+            onError={() => {
+              setFailed(true);
+              setWaiting(false);
+              setPaused(true);
             }}
             // Under reduced motion the native controls can turn the sound on or off: every video follows.
             onVolumeChange={
@@ -243,19 +235,12 @@ export const FilmPlayer = ({ film, title, badge, captionsLabel, captionsLang, la
             }
           >
             <source src={film.mp4} type="video/mp4" />
-            <track kind="captions" src={film.captions} srcLang={captionsLang} label={captionsLabel} default />
+            {film.captions && (
+              <track kind="captions" src={film.captions} srcLang={captionsLang} label={captionsLabel} default />
+            )}
           </video>
         )}
-        {captions && cue && !reduced && (
-          <p
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 bottom-14 flex justify-center px-6 sm:bottom-16"
-          >
-            <span className="max-w-3xl rounded-lg bg-black/60 px-3 py-1.5 text-center text-sm font-medium leading-snug text-balance text-white backdrop-blur-sm sm:text-base">
-              {cue}
-            </span>
-          </p>
-        )}
+        <FilmFeedback waiting={waiting} failed={failed} labels={labels} cue={cue} captions={captions && !reduced} />
       </FilmScreen>
     </FilmStage>
   );

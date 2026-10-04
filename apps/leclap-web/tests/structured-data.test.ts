@@ -25,17 +25,6 @@ function listToolModules(): string[] {
     .map((file) => join(dir, file));
 }
 
-// `ping` is a health check, not an authoring tool; `render_remotion_clip` is registered only when
-// the operator opts in (it executes caller-supplied JS), so it is not advertised.
-const EXCUSED_TOOLS = ['ping', 'render_remotion_clip'];
-
-// What llms.txt is expected to advertise: the authoring surface, whole names, no substrings. Derived
-// from what the server registers rather than written out by hand, so a fifth tool is documented by
-// editing llms.txt alone. The previous hardcoded literal pinned llms.txt to exactly four names while
-// a second test demanded every registered tool be documented — two assertions no edit to llms.txt
-// could satisfy at once.
-const DOCUMENTED_TOOLS = REGISTERED_TOOLS.filter((name) => !EXCUSED_TOOLS.includes(name));
-
 // Every assertion about tool names below is derived from REGISTERED_TOOLS, so a scrape that comes
 // back empty would make all of them pass while checking nothing. Anchor it: the four authoring tools
 // are the surface llms.txt exists to describe, and a genuine rename should be a deliberate edit here.
@@ -117,27 +106,18 @@ describe('llms.txt', () => {
     }
   });
 
-  // An agent copies these names straight out of this file and calls them. A `toContain` check is
-  // useless here — 'get_schema' is a substring of 'get_template_schema', so it passes on a wrong
-  // name. Compare whole names against what the server actually registers instead.
-  //
-  // One equality, both directions: llms.txt cannot invent a tool the server never registers, and it
-  // cannot fall behind a tool the server gained — a new tool is documented by editing llms.txt, and
-  // deliberately hiding one means adding it to EXCUSED_TOOLS.
-  it('lists exactly the MCP tools the server registers and does not excuse', () => {
-    const section = llmsTxt.slice(llmsTxt.indexOf('## Use it from an AI agent'));
-    const listed = [...section.matchAll(/`([a-z][a-z0-9_]*[a-z0-9])`/g)].map(([, name]) => name).sort();
-
-    expect(listed, 'the agent section lists no tools at all').not.toHaveLength(0);
-    expect(DOCUMENTED_TOOLS, 'every registered tool is excused — nothing left to advertise').not.toHaveLength(0);
-    expect(listed).toEqual([...DOCUMENTED_TOOLS].sort());
+  it('lists exactly every MCP tool, including health and opt-in tools', () => {
+    const list = llmsTxt.split('\n').find((line) => line.startsWith('Eight tools are always registered:'));
+    expect(list, 'the MCP tool list is missing').toBeDefined();
+    const listed = [...(list ?? '').matchAll(/`([a-z][a-z0-9_]*[a-z0-9])`/g)].map(([, name]) => name).sort();
+    expect(listed).toEqual(REGISTERED_TOOLS);
   });
 
-  // The excuse list is the one hand-written escape hatch above, so it needs its own guard: a renamed
-  // or deleted tool would otherwise leave a stale entry that silently widens what llms.txt may omit.
-  it('excuses only tools the server actually registers', () => {
-    const stale = EXCUSED_TOOLS.filter((name) => !REGISTERED_TOOLS.includes(name));
-    expect(stale, 'EXCUSED_TOOLS names a tool the server no longer registers').toEqual([]);
+  it('lists every MCP startup environment setting', () => {
+    const manifest = JSON.parse(readFileSync(join(repoRoot, 'packages/leclap-mcp/server.json'), 'utf8'));
+    const published = manifest.packages[0].environmentVariables.map((entry: { name: string }) => entry.name).sort();
+    const listed = [...llmsTxt.matchAll(/^\| `--[^`]+` \| `(LECLAP_MCP_[A-Z_]+)`/gm)].map(([, name]) => name).sort();
+    expect(listed).toEqual(published);
   });
 
   // The prose shorthand in the Packages list drifted too — it used to advertise a `list` tool that

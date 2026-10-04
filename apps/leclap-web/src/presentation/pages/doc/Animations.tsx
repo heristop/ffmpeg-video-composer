@@ -1,5 +1,7 @@
+import recipeFixture from '../../../../../../examples/overlay-effects/preview-template.json';
+import { Link } from 'react-router-dom';
 import { Seo } from '@/presentation/components/Seo';
-import { DocSection, Prose, Code, RefTable, Sample, Tip } from '@/presentation/components/doc/DocBlocks';
+import { DocSection, Prose, Code, RefTable, Sample, Tip, JsonBlock } from '@/presentation/components/doc/DocBlocks';
 import { docGroups } from '@/presentation/components/doc/schemaFields';
 import { snippets } from '@/presentation/components/doc/snippets';
 import { DocPageHeader } from './DocLayout';
@@ -82,6 +84,29 @@ export const DocAnimations = () => (
           <strong>Style &amp; audio</strong> step.
         </p>
       </Prose>
+    </DocSection>
+
+    <DocSection id="recipes" title="Six composited effect recipes">
+      <Prose>
+        <p>
+          These landscape examples use the same six native APNG recipes as the app. Each combines two finite overlays:
+          interface-focus, product-spotlight, celebration-burst, focus-lock, light-pass and frame-reveal. Copy the
+          inputs into your own scene and adjust position, scale, opacity, start and duration around the actual action.
+        </p>
+        <p>
+          These coordinates target 1280×720. Rebuild placement for portrait/square; start is seconds, duration is
+          playback extent, not speed, and fps does not retime APNG frame delays. Set persistent explicitly; a frozen
+          ring or light sweep can obscure footage. See the{' '}
+          <a href="https://github.com/heristop/leclap/blob/main/examples/overlay-effects/README.md">recipe guide</a> and
+          <Link to="/doc/reference#complete-field-index"> complete field index</Link> for all overlay controls.
+        </p>
+      </Prose>
+      {recipeFixture.sections.map((section) => (
+        <details key={section.name} className="rounded-xl border border-divider p-4">
+          <summary className="cursor-pointer font-mono text-sm text-foreground">{section.name}</summary>
+          <JsonBlock code={JSON.stringify({ inputs: section.inputs }, null, 2)} />
+        </details>
+      ))}
     </DocSection>
 
     <Tip className="mt-8">

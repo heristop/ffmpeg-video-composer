@@ -4,7 +4,7 @@ import PlatformBridge from './platform/PlatformBridge';
 import TemplateDirector from './director/TemplateDirector';
 import VideoEditor from './editor/VideoEditor';
 import Project from './core/models/Project';
-import Template from './core/models/Template';
+import Template, { assertEffectsResolved } from './core/models/Template';
 import Segment from './core/models/Segment';
 import type AbstractFilesystem from './platform/filesystem/AbstractFilesystem';
 import type AbstractLogger from './platform/logging/AbstractLogger';
@@ -244,12 +244,15 @@ export async function compile(
   templateDescriptor: TemplateDescriptor,
   reporter?: CompileReporter
 ): Promise<string | null> {
-  await initializePlatform();
-
-  const timer = resetPerfTimer();
-  const { logger, restore: restoreLogger } = installReporterLogger(reporter);
+  let restoreLogger: (() => void) | undefined;
 
   try {
+    assertEffectsResolved(templateDescriptor);
+    await initializePlatform();
+    const timer = resetPerfTimer();
+    const { logger, restore } = installReporterLogger(reporter);
+    restoreLogger = restore;
+
     if (!projectConfig.buildDir) {
       throw new Error('buildDir is required in projectConfig');
     }
@@ -265,21 +268,15 @@ export async function compile(
 
     return await runConstruction(projectConfig, templateDescriptor, logger, timer, reporter);
   } catch (error) {
-    if (!(error instanceof Error)) {
-      console.error('Unknown compilation error');
-      reporter?.onError?.(new Error(`Unknown compilation error: ${JSON.stringify(error)}`));
+    const failure = error instanceof Error ? error : new Error(`Unknown compilation error: ${JSON.stringify(error)}`);
+    console.error(error instanceof Error ? `Compilation error: ${failure.message}` : 'Unknown compilation error');
+    reporter?.onError?.(failure);
 
-      return null;
-    }
-
-    console.error(`Compilation error: ${error.message}`);
-    reporter?.onError?.(error);
-
-    if (error.stack) console.error('Stack:', error.stack);
+    if (error instanceof Error && error.stack) console.error('Stack:', error.stack);
 
     return null;
   } finally {
-    restoreLogger();
+    restoreLogger?.();
   }
 }
 
@@ -378,3 +375,16 @@ export { OrientationSchema, FontRefSchema, FontInputSchema } from './schemas/glo
 export type { Orientation } from './schemas/global.schemas';
 export { CaptureModeSchema } from './schemas/section.schemas';
 export type { CaptureMode } from './schemas/section.schemas';
+
+export { EffectReferenceSchema, JsonValueSchema } from './schemas/effect-reference.schema';
+export type { EffectReference, JsonValue } from './schemas/effect-reference.schema';
+export { EffectSectionSchema } from './schemas/section.schemas';
+export type { EffectSection } from './schemas/section.schemas';
+export { resolveTemplateEffects } from './core/resolve-template-effects';
+export type {
+  EffectRenderResult,
+  EffectRenderer,
+  ResolveTemplateEffectsOptions,
+  ResolvedEffectProvenance,
+  ResolvedTemplateEffects,
+} from './core/resolve-template-effects';

@@ -1,7 +1,5 @@
-// One motion vocabulary shared across moti (timing) and reanimated (spring), so every surface —
-// the compile ring, the shot-list reveal, tactile taps — feels like one hand made it. Durations are
-// taken from the compile overlay (the proven reference); springs are numerically aligned to Tamagui's
-// `quick`/`quicker` presets so JS- and Tamagui-driven motion match.
+// Shared timing and spring tokens. Touch feedback is critically damped; Clappy reactions
+// are short, finite sequences, and engine progress uses the fastest timing.
 export const motion = {
   duration: {
     instant: 120,
@@ -13,12 +11,13 @@ export const motion = {
     halo: 1900, // the overlay's halo loop
   },
   spring: {
-    tap: { damping: 18, stiffness: 500, mass: 0.6 }, // ≈ tamagui 'quicker'
+    tap: { damping: 34, stiffness: 500, mass: 0.6 }, // critically damped, interruptible feedback
     enter: { damping: 20, stiffness: 180, mass: 0.8 },
     playhead: { damping: 25, stiffness: 120 }, // smooth scrub
   },
   // Delay between successive words/lines in a KineticHeading reveal (ms).
   stagger: 60,
+  clappy: { anticipate: 130, react: 160, settle: 220 },
 };
 
 export type MotionSpring = keyof typeof motion.spring;

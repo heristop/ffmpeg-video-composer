@@ -1,185 +1,203 @@
-import React, { useState } from 'react';
-import { FlatList, StyleSheet, View, TextInput, RefreshControl, Text } from 'react-native';
+import { useState } from 'react';
+import {
+  FlatList,
+  StyleSheet,
+  View,
+  TextInput,
+  RefreshControl,
+  Text,
+  Pressable,
+  useWindowDimensions,
+  Platform,
+} from 'react-native';
 import type { Template } from '@/src/types';
 import TemplateCard from './TemplateCard';
-import { colors, spacing, typography, fonts } from '@/src/styles/theme';
-import { KineticHeading } from '@/src/components/kinetic/kinetic-heading';
+import { colors, spacing, typography } from '@/src/styles/theme';
+import { Clappy } from '@/src/components/clappy/Clappy';
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { filterTemplates, templateColumns } from '../template-presentation';
+import { CONTENT_MAX_WIDTH } from '@/src/styles/adaptive-layout';
 
 interface TemplateListProps {
   templates: Template[];
   onSelectTemplate: (template: Template) => void;
   isOffline?: boolean;
   onRefresh?: () => Promise<void> | void;
-  kicker?: string;
   screenTitle?: string;
   subtitle?: string;
+  motionActive?: boolean;
 }
 
-const TemplateList: React.FC<TemplateListProps> = ({
+export default function TemplateList({
   templates,
   onSelectTemplate,
-  isOffline = false,
   onRefresh,
-  kicker,
   screenTitle,
   subtitle,
-}) => {
-  const { t } = useTranslation('templates');
+  motionActive = true,
+}: TemplateListProps) {
+  const { t, i18n } = useTranslation('templates');
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-
-  const filteredTemplates = templates.filter((template) => {
-    const searchTerms = searchQuery.toLowerCase();
-
-    // Search in template name
-    if (template.name.toLowerCase().includes(searchTerms)) {
-      return true;
-    }
-
-    // Search in section titles and descriptions
-    if (
-      template.content.sections?.some(
-        (section) =>
-          (section.title?.en.toLowerCase() ?? '').includes(searchTerms) ||
-          (section.description?.en.toLowerCase() ?? '').includes(searchTerms)
-      )
-    ) {
-      return true;
-    }
-
-    return false;
-  });
-
+  const [focused, setFocused] = useState(false);
+  const { width, fontScale } = useWindowDimensions();
+  const [containerWidth, setContainerWidth] = useState(0);
+  const columns = templateColumns(Math.min(containerWidth || width, CONTENT_MAX_WIDTH), fontScale);
+  const filtered = filterTemplates(templates, searchQuery, i18n.resolvedLanguage ?? i18n.language);
   const handleRefresh = async () => {
-    if (isOffline) {
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-
-      return;
-    }
-
-    if (!onRefresh) return;
-
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (!onRefresh || refreshing) return;
     setRefreshing(true);
 
     try {
       await onRefresh();
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch {
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setRefreshing(false);
     }
   };
 
-  const renderHeader = () => (
-    <View style={styles.headerContainer}>
-      {kicker ? <Text style={styles.kicker}>{kicker}</Text> : null}
-      {screenTitle ? (
-        <View style={styles.titleWrap}>
-          <KineticHeading text={screenTitle} level="displayM" />
+  // An element, rather than an inline component type, preserves input focus while filtering.
+  const header = (
+    <View style={styles.header}>
+      <View style={styles.welcome}>
+        <View style={styles.welcomeCopy}>
+          {screenTitle ? (
+            <Text accessibilityRole="header" style={styles.title}>
+              {screenTitle}
+            </Text>
+          ) : null}
+          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         </View>
-      ) : null}
-      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
+        {fontScale < 1.3 ? <Clappy size={76} state={focused ? 'search' : 'welcome'} active={motionActive} /> : null}
+      </View>
+      <View style={[styles.search, focused && styles.searchFocused]}>
+        <Ionicons name="search-outline" size={20} color={colors.textSecondary} accessible={false} />
         <TextInput
           style={styles.searchInput}
           placeholder={t('search.placeholder')}
+          placeholderTextColor={colors.textSecondary}
+          accessibilityLabel={t('search.placeholder')}
           value={searchQuery}
           onChangeText={setSearchQuery}
+          onFocus={() => {
+            setFocused(true);
+          }}
+          onBlur={() => {
+            setFocused(false);
+          }}
+          autoCorrect={false}
+          returnKeyType="search"
+          selectionColor={colors.primaryDark}
         />
-        {searchQuery.length > 0 && (
-          <Ionicons
-            name="close-circle"
-            size={20}
-            color={colors.textSecondary}
-            style={styles.clearIcon}
+        {searchQuery.length > 0 ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('search.clear')}
             onPress={() => {
               setSearchQuery('');
             }}
-          />
-        )}
+            style={({ pressed }) => [styles.clear, pressed && styles.pressed]}
+          >
+            <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
+          </Pressable>
+        ) : null}
       </View>
+      <Text style={styles.results}>{t('search.count', { count: filtered.length })}</Text>
     </View>
   );
 
   return (
     <FlatList
-      data={filteredTemplates}
-      renderItem={({ item }) => <TemplateCard template={item} onPress={onSelectTemplate} />}
-      keyExtractor={(item) => item.name}
-      numColumns={2}
-      contentContainerStyle={styles.list}
-      ListHeaderComponent={renderHeader}
+      style={styles.container}
+      onLayout={(event) => {
+        setContainerWidth(event.nativeEvent.layout.width);
+      }}
+      key={columns}
+      data={filtered}
+      renderItem={({ item }) => (
+        <View style={{ width: `${100 / columns}%`, padding: spacing.xs + 2 }}>
+          <TemplateCard template={item} onPress={onSelectTemplate} />
+        </View>
+      )}
+      keyExtractor={(item) => `${item.source ?? 'sample'}:${item.id ?? item.name}`}
+      numColumns={columns}
+      contentContainerStyle={[styles.list, { paddingBottom: Math.max(112, 64 * fontScale + 48) }]}
+      ListHeaderComponent={header}
+      ListEmptyComponent={
+        <View style={styles.empty}>
+          <Clappy state="search" size={116} active={motionActive} />
+          <Text accessibilityRole="header" style={styles.emptyTitle}>
+            {t('search.emptyTitle')}
+          </Text>
+          <Text style={styles.emptyCopy}>{t('search.emptyBody')}</Text>
+          {searchQuery ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => {
+                setSearchQuery('');
+              }}
+              style={({ pressed }) => [styles.reset, pressed && styles.pressed]}
+            >
+              <Text style={styles.resetText}>{t('search.clear')}</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      }
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
       showsVerticalScrollIndicator={false}
       refreshControl={
         onRefresh ? (
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => {
-              handleRefresh().catch(() => null);
+              handleRefresh().catch(() => {});
             }}
-            tintColor={colors.primary}
-            title={isOffline ? t('refresh.syncWhenOnline') : t('refresh.pullToRefresh')}
-            titleColor={colors.textSecondary}
-            colors={[colors.primary]}
+            tintColor={colors.primaryDark}
+            colors={[colors.primaryDark]}
           />
         ) : undefined
       }
     />
   );
-};
+}
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    paddingTop: spacing.m,
-  },
-  kicker: {
-    fontFamily: fonts.poppins.semiBold,
-    fontSize: 11,
-    letterSpacing: 1.6,
-    textTransform: 'uppercase',
-    color: colors.primary,
-    marginHorizontal: spacing.m,
-    marginBottom: spacing.xs,
-  },
-  titleWrap: {
-    marginHorizontal: spacing.m,
-    marginBottom: spacing.s,
-  },
-  subtitle: {
-    ...typography.caption,
-    marginHorizontal: spacing.m,
-    marginBottom: spacing.m,
-  },
-  searchContainer: {
+  container: { flex: 1, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
+  list: { paddingHorizontal: spacing.m - 6, paddingBottom: 112 },
+  header: { paddingHorizontal: 6, paddingTop: spacing.l, paddingBottom: spacing.s },
+  welcome: { flexDirection: 'row', alignItems: 'center', gap: spacing.m },
+  welcomeCopy: { flex: 1, gap: spacing.s },
+  title: { ...typography.displayM, color: colors.textStrong },
+  subtitle: { ...typography.body, color: colors.textSecondary, lineHeight: 24 },
+  search: {
     flexDirection: 'row',
     alignItems: 'center',
-    margin: spacing.m,
-    paddingHorizontal: spacing.m,
-    backgroundColor: colors.surface,
-    borderRadius: 14,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.hairline,
+    gap: spacing.s,
+    marginTop: spacing.l,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: 12,
+    paddingLeft: spacing.m,
+    borderWidth: 1,
+    borderColor: colors.divider,
   },
-  searchIcon: {
-    marginRight: spacing.s,
-  },
+  searchFocused: { borderColor: colors.primaryDark },
   searchInput: {
+    ...typography.body,
+    // The enclosing search control supplies the focus border.
+    ...Platform.select({ web: { outlineStyle: 'solid', outlineWidth: 0 } }),
+    color: colors.text,
     flex: 1,
-    paddingVertical: spacing.m,
+    minHeight: 52,
+    paddingVertical: 12,
+    paddingRight: spacing.s,
   },
-  clearIcon: {
-    marginLeft: spacing.s,
-  },
-  list: {
-    padding: spacing.s,
-  },
+  clear: { minWidth: 48, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
+  pressed: { opacity: 0.65 },
+  results: { ...typography.caption, marginTop: spacing.m, marginBottom: spacing.xs },
+  empty: { alignItems: 'center', padding: spacing.l, paddingTop: spacing.xl, gap: spacing.m },
+  emptyTitle: { ...typography.title, color: colors.text, textAlign: 'center' },
+  emptyCopy: { ...typography.body, color: colors.textSecondary, textAlign: 'center', lineHeight: 24 },
+  reset: { minHeight: 48, justifyContent: 'center', paddingHorizontal: spacing.m },
+  resetText: { ...typography.body, color: colors.primaryDark, fontWeight: '600' },
 });
-
-export default TemplateList;

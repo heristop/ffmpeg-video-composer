@@ -13,6 +13,12 @@
         "description": {
           "description": "Short human-readable template summary for catalogs and agents.",
           "type": "string"
+        },
+        "creativeDirection": {
+          "description": "Authoring brief (1..4000 characters): audience, visual hierarchy, typography, palette, motion, pacing, avoidances and review criteria. Guides humans/agents; never interpreted or executed by the renderer. Implement the direction explicitly in sections, filters and effect props.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
         }
       },
       "additionalProperties": false
@@ -325,9 +331,9 @@
                         "exclusiveMinimum": 0
                       },
                       "easing": {
-                        "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                        "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                         "type": "string",
-                        "enum": ["linear", "ease-out", "ease-in-out"]
+                        "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                       }
                     },
                     "required": ["type"],
@@ -441,9 +447,9 @@
                         "exclusiveMinimum": 0
                       },
                       "easing": {
-                        "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                        "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                         "type": "string",
-                        "enum": ["linear", "ease-out", "ease-in-out"]
+                        "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                       }
                     },
                     "required": ["type"],
@@ -893,9 +899,9 @@
                                   "exclusiveMinimum": 0
                                 },
                                 "easing": {
-                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                   "type": "string",
-                                  "enum": ["linear", "ease-out", "ease-in-out"]
+                                  "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                 }
                               },
                               "required": ["type"],
@@ -918,7 +924,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -1145,9 +1151,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -1170,6 +1176,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -1236,7 +1247,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -1463,9 +1474,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -1488,6 +1499,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -1545,7 +1561,7 @@
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
-                      "description": "Single scalar parameter for simple filters that accept one value.",
+                      "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                       "anyOf": [
                         {
                           "type": "string"
@@ -1772,9 +1788,9 @@
                               "exclusiveMinimum": 0
                             },
                             "easing": {
-                              "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                              "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                               "type": "string",
-                              "enum": ["linear", "ease-out", "ease-in-out"]
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             }
                           },
                           "required": ["type"],
@@ -1797,6 +1813,11 @@
                               "type": "string",
                               "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                               "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                            },
+                            "easing": {
+                              "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                              "type": "string",
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             },
                             "after": {
                               "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -2047,9 +2068,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -2202,9 +2223,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -3001,9 +3022,9 @@
                                   "exclusiveMinimum": 0
                                 },
                                 "easing": {
-                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                   "type": "string",
-                                  "enum": ["linear", "ease-out", "ease-in-out"]
+                                  "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                 }
                               },
                               "required": ["type"],
@@ -3026,7 +3047,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -3253,9 +3274,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -3278,6 +3299,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -3344,7 +3370,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -3571,9 +3597,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -3596,6 +3622,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -3653,7 +3684,7 @@
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
-                      "description": "Single scalar parameter for simple filters that accept one value.",
+                      "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                       "anyOf": [
                         {
                           "type": "string"
@@ -3880,9 +3911,9 @@
                               "exclusiveMinimum": 0
                             },
                             "easing": {
-                              "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                              "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                               "type": "string",
-                              "enum": ["linear", "ease-out", "ease-in-out"]
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             }
                           },
                           "required": ["type"],
@@ -3905,6 +3936,11 @@
                               "type": "string",
                               "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                               "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                            },
+                            "easing": {
+                              "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                              "type": "string",
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             },
                             "after": {
                               "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -4155,9 +4191,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -4310,9 +4346,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -5007,7 +5043,8 @@
             "properties": {
               "name": {
                 "type": "string",
-                "description": "Unique identifier for the section within the template, used in section references."
+                "minLength": 1,
+                "description": "Unique, nonempty section name used to bind the rendered effect clip."
               },
               "inputs": {
                 "description": "Animation and image overlays composited on top of the section video, in array order.",
@@ -5151,9 +5188,9 @@
                                   "exclusiveMinimum": 0
                                 },
                                 "easing": {
-                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                   "type": "string",
-                                  "enum": ["linear", "ease-out", "ease-in-out"]
+                                  "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                 }
                               },
                               "required": ["type"],
@@ -5176,7 +5213,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -5403,9 +5440,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -5428,6 +5465,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -5494,7 +5536,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -5721,9 +5763,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -5746,6 +5788,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -5803,7 +5850,7 @@
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
-                      "description": "Single scalar parameter for simple filters that accept one value.",
+                      "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                       "anyOf": [
                         {
                           "type": "string"
@@ -6030,9 +6077,9 @@
                               "exclusiveMinimum": 0
                             },
                             "easing": {
-                              "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                              "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                               "type": "string",
-                              "enum": ["linear", "ease-out", "ease-in-out"]
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             }
                           },
                           "required": ["type"],
@@ -6055,6 +6102,11 @@
                               "type": "string",
                               "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                               "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                            },
+                            "easing": {
+                              "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                              "type": "string",
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             },
                             "after": {
                               "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -6305,9 +6357,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -6460,9 +6512,2159 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
+                          }
+                        },
+                        "required": ["type"],
+                        "additionalProperties": false,
+                        "description": "Animated entrance for sugar text, with optional timing overrides."
+                      }
+                    ]
+                  },
+                  "effect": {
+                    "description": "Drop shadow / outline applied to the title + subtitle for legibility.",
+                    "type": "object",
+                    "properties": {
+                      "shadow": {
+                        "description": "Drop shadow: true for the default soft black shadow, or an object to customise colour/offset.",
+                        "anyOf": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "color": {
+                                "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
+                                "type": "string"
+                              },
+                              "dx": {
+                                "description": "Horizontal shadow offset in pixels (default 2).",
+                                "type": "number"
+                              },
+                              "dy": {
+                                "description": "Vertical shadow offset in pixels (default 2).",
+                                "type": "number"
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "outline": {
+                        "description": "Outline/border: true for a 2px black outline, or an object to customise colour/width.",
+                        "anyOf": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "color": {
+                                "description": "Outline colour token (default #000000).",
+                                "type": "string"
+                              },
+                              "width": {
+                                "description": "Outline width in pixels (default 2).",
+                                "type": "number",
+                                "minimum": 0
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "look": {
+                "description": "Named colour-grade preset applied to the section video (default: none).",
+                "type": "string",
+                "enum": [
+                  "cinematic",
+                  "warm",
+                  "cool",
+                  "vintage",
+                  "noir",
+                  "vivid",
+                  "dreamy",
+                  "teal-orange",
+                  "warm-film",
+                  "mono-film",
+                  "noir-film",
+                  "vivid-pop",
+                  "duotone",
+                  "posterize",
+                  "sketch",
+                  "glitch",
+                  "soft-vignette"
+                ]
+              },
+              "grade": {
+                "description": "Fine-grained colour-grade settings applied to the section video.",
+                "type": "object",
+                "properties": {
+                  "brightness": {
+                    "description": "Brightness offset, -1..1 (default 0).",
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 1
+                  },
+                  "contrast": {
+                    "description": "Contrast multiplier, 0..2 (default 1).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2
+                  },
+                  "saturation": {
+                    "description": "Saturation multiplier, 0..3 (default 1).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "gamma": {
+                    "description": "Gamma correction exponent, 0.1..3 (default 1).",
+                    "type": "number",
+                    "minimum": 0.1,
+                    "maximum": 3
+                  },
+                  "hue": {
+                    "description": "Hue rotation in degrees, -180..180 (default 0).",
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180
+                  },
+                  "colorBalance": {
+                    "description": "Per-range colour balance correction.",
+                    "type": "object",
+                    "properties": {
+                      "shadows": {
+                        "description": "RGB adjustment applied to shadow tones.",
+                        "type": "object",
+                        "properties": {
+                          "r": {
+                            "description": "Red channel adjustment, -1..1.",
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          "g": {
+                            "description": "Green channel adjustment, -1..1.",
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          "b": {
+                            "description": "Blue channel adjustment, -1..1.",
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "midtones": {
+                        "description": "RGB adjustment applied to midtone tones.",
+                        "type": "object",
+                        "properties": {
+                          "r": {
+                            "description": "Red channel adjustment, -1..1.",
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          "g": {
+                            "description": "Green channel adjustment, -1..1.",
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          "b": {
+                            "description": "Blue channel adjustment, -1..1.",
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "highlights": {
+                        "description": "RGB adjustment applied to highlight tones.",
+                        "type": "object",
+                        "properties": {
+                          "r": {
+                            "description": "Red channel adjustment, -1..1.",
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          "g": {
+                            "description": "Green channel adjustment, -1..1.",
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          "b": {
+                            "description": "Blue channel adjustment, -1..1.",
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "blur": {
+                    "description": "Gaussian blur radius in pixels, 0..20 (default 0).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 20
+                  },
+                  "grain": {
+                    "description": "Film-grain strength, 0..1 (default 0; lowered to the FFmpeg noise filter).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "curvesPreset": {
+                    "description": "Named curves preset key applied on top of other grade settings.",
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "letterbox": {
+                "description": "Cinemascope-style horizontal bars overlaid top and bottom to simulate a wider aspect ratio.",
+                "type": "object",
+                "properties": {
+                  "aspect": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4,
+                    "description": "Target aspect ratio the bars simulate (e.g. 2.39 for cinemascope)."
+                  },
+                  "color": {
+                    "description": "Bar colour (default black).",
+                    "type": "string"
+                  }
+                },
+                "required": ["aspect"],
+                "additionalProperties": false
+              },
+              "motion": {
+                "description": "Ordered list of motion and geometric effects applied to the section video.",
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "kenburns",
+                          "description": "Slow zoom-and-pan (Ken Burns) effect on the section video."
+                        },
+                        "direction": {
+                          "description": "Direction of the Ken Burns pan or zoom (default: in).",
+                          "type": "string",
+                          "enum": ["in", "out", "left", "right", "up", "down"]
+                        },
+                        "intensity": {
+                          "description": "Zoom scale factor at the end of the effect, 1.01..2 (default 1.15).",
+                          "type": "number",
+                          "minimum": 1.01,
+                          "maximum": 2
+                        }
+                      },
+                      "required": ["type"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "rotate",
+                          "description": "Rotates the video frame by a fixed angle."
+                        },
+                        "angle": {
+                          "type": "number",
+                          "description": "Rotation angle in degrees; positive values rotate clockwise."
+                        }
+                      },
+                      "required": ["type", "angle"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "crop",
+                          "description": "Crops the video frame to the specified rectangle."
+                        },
+                        "w": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ],
+                          "description": "Crop width in pixels or as an FFmpeg expression."
+                        },
+                        "h": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ],
+                          "description": "Crop height in pixels or as an FFmpeg expression."
+                        },
+                        "x": {
+                          "description": "Crop x offset in pixels or FFmpeg expression (default (iw-ow)/2).",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "y": {
+                          "description": "Crop y offset in pixels or FFmpeg expression (default (ih-oh)/2).",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "required": ["type", "w", "h"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "flip",
+                          "description": "Flips the video frame along the specified axis."
+                        },
+                        "axis": {
+                          "type": "string",
+                          "enum": ["horizontal", "vertical"],
+                          "description": "Axis of the flip: \"horizontal\" mirrors left-right, \"vertical\" mirrors top-bottom."
+                        }
+                      },
+                      "required": ["type", "axis"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "shake",
+                          "description": "Handheld camera shake: the frame jitters via a crop window that wanders over time."
+                        },
+                        "intensity": {
+                          "description": "Maximum jitter amplitude in pixels, 1..20 (default 6).",
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 20
+                        },
+                        "frequency": {
+                          "description": "Wobble speed in Hz, 0.5..8 (default 2).",
+                          "type": "number",
+                          "minimum": 0.5,
+                          "maximum": 8
+                        }
+                      },
+                      "required": ["type"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "pulse",
+                          "description": "Rhythmic zoom pulse in and out around the frame centre."
+                        },
+                        "intensity": {
+                          "description": "Peak zoom of each pulse, 1.01..1.3 (default 1.08).",
+                          "type": "number",
+                          "minimum": 1.01,
+                          "maximum": 1.3
+                        },
+                        "frequency": {
+                          "description": "Pulses per second, 0.25..4 (default 1).",
+                          "type": "number",
+                          "minimum": 0.25,
+                          "maximum": 4
+                        }
+                      },
+                      "required": ["type"],
+                      "additionalProperties": false
+                    }
+                  ],
+                  "description": "Motion or geometric effect applied to the section video."
+                }
+              },
+              "chromaKey": {
+                "description": "Background removal: key out a solid screen colour and composite over a solid background.",
+                "type": "object",
+                "properties": {
+                  "color": {
+                    "type": "string",
+                    "description": "Screen colour to remove as a CSS hex string, e.g. \"#00FF00\" for a green screen."
+                  },
+                  "similarity": {
+                    "description": "How close a pixel must be to the key colour to be removed, 0.01..1 (default 0.3).",
+                    "type": "number",
+                    "minimum": 0.01,
+                    "maximum": 1
+                  },
+                  "blend": {
+                    "description": "Softness of the keyed edge, 0..1 (default 0.1).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "background": {
+                    "description": "Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).",
+                    "type": "string"
+                  }
+                },
+                "required": ["color"],
+                "additionalProperties": false
+              },
+              "type": {
+                "type": "string",
+                "const": "effect",
+                "description": "Section type: a versioned effect rendered to a clip before composition."
+              },
+              "effect": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]*(?:\\/[a-zA-Z0-9][a-zA-Z0-9_.-]*)*$",
+                    "description": "Safe effect identifier, optionally namespaced with slash-separated identifiers."
+                  },
+                  "version": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+                    "description": "Exact semantic version; ranges and tags are forbidden."
+                  },
+                  "props": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "$ref": "#/$defs/__schema0"
+                    },
+                    "description": "JSON object of renderer-specific effect properties."
+                  },
+                  "assets": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Named asset paths or URLs consumed by the effect renderer."
+                  }
+                },
+                "required": ["id", "version", "props", "assets"],
+                "additionalProperties": false,
+                "description": "Versioned effect reference with JSON properties and named assets."
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "upperCase": {
+                    "description": "When true, all text values in this section are rendered in upper case (default false).",
+                    "type": "boolean"
+                  },
+                  "lowerCase": {
+                    "description": "When true, all text values in this section are rendered in lower case (default false).",
+                    "type": "boolean"
+                  },
+                  "duration": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "Required effect duration in seconds."
+                  },
+                  "musicVolume": {
+                    "description": "Per-section music volume override, 0..1; overrides global.audio.musicVolume for this section.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "audioFade": {
+                    "description": "Audio fade-in/out applied to this section.",
+                    "type": "object",
+                    "properties": {
+                      "in": {
+                        "description": "Fade-in applied at the start of the section audio.",
+                        "type": "object",
+                        "properties": {
+                          "duration": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "description": "Fade length in seconds."
+                          },
+                          "curve": {
+                            "description": "FFmpeg afade curve shape (default: tri).",
+                            "type": "string",
+                            "enum": [
+                              "tri",
+                              "qsin",
+                              "hsin",
+                              "esin",
+                              "log",
+                              "ipar",
+                              "qua",
+                              "cub",
+                              "squ",
+                              "cbr",
+                              "par",
+                              "exp",
+                              "iqsin",
+                              "ihsin",
+                              "dese",
+                              "desi",
+                              "losi",
+                              "sinc",
+                              "isinc",
+                              "nofade"
+                            ]
+                          }
+                        },
+                        "required": ["duration"],
+                        "additionalProperties": false
+                      },
+                      "out": {
+                        "description": "Fade-out applied at the end of the section audio.",
+                        "type": "object",
+                        "properties": {
+                          "duration": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "description": "Fade length in seconds."
+                          },
+                          "curve": {
+                            "description": "FFmpeg afade curve shape (default: tri).",
+                            "type": "string",
+                            "enum": [
+                              "tri",
+                              "qsin",
+                              "hsin",
+                              "esin",
+                              "log",
+                              "ipar",
+                              "qua",
+                              "cub",
+                              "squ",
+                              "cbr",
+                              "par",
+                              "exp",
+                              "iqsin",
+                              "ihsin",
+                              "dese",
+                              "desi",
+                              "losi",
+                              "sinc",
+                              "isinc",
+                              "nofade"
+                            ]
+                          }
+                        },
+                        "required": ["duration"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "audioEffect": {
+                    "description": "Voice effect applied to the section audio: echo (aecho), telephone band-pass, or muffled low-pass.",
+                    "type": "string",
+                    "enum": ["echo", "telephone", "muffled"]
+                  },
+                  "fields": {
+                    "description": "Form fields defined for this section (used in form sections).",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Unique identifier for this form field, used as a variable name in filter templates."
+                        },
+                        "maxLength": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "Maximum number of characters allowed in this field."
+                        },
+                        "label": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "description": "Localised display label shown to the user for this field."
+                        }
+                      },
+                      "required": ["name", "maxLength", "label"],
+                      "additionalProperties": false,
+                      "description": "A single user-editable text field rendered in a form section."
+                    }
+                  },
+                  "speed": {
+                    "description": "Playback speed multiplier applied to the section clip (default 1).",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "muteSection": {
+                    "description": "When true, the source audio of this section is silenced (default false).",
+                    "type": "boolean"
+                  },
+                  "countdown": {
+                    "description": "When true, a countdown overlay is shown before recording starts (default false).",
+                    "type": "boolean"
+                  },
+                  "countdownDuration": {
+                    "description": "Duration of the countdown in seconds (default 3); only used when countdown is true.",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "logoUrl": {
+                    "description": "URL of a logo image composited into the section.",
+                    "type": "string"
+                  },
+                  "backgroundUrl": {
+                    "description": "URL of a background image or video composited behind the section content.",
+                    "type": "string"
+                  },
+                  "backgroundColor": {
+                    "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
+                    "type": "string"
+                  },
+                  "forceAspectRatio": {
+                    "description": "Cover-crop the clip to fill the output frame, never stretching (on by default; false skips scaling).",
+                    "type": "boolean"
+                  },
+                  "forceOriginalAspectRatio": {
+                    "description": "Preserve original aspect ratio via letterboxing (no crop); overrides cover-crop (default false).",
+                    "type": "boolean"
+                  }
+                },
+                "required": ["duration"],
+                "additionalProperties": false,
+                "description": "Compositing options; effect clips cannot also select another media source."
+              }
+            },
+            "required": ["name", "type", "effect", "options"],
+            "additionalProperties": false,
+            "description": "Authoring effect section; resolve with an effect backend before FFmpeg composition."
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Unique identifier for the section within the template, used in section references."
+              },
+              "inputs": {
+                "description": "Animation and image overlays composited on top of the section video, in array order.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Unique identifier for this input within the section, used as a stream label in maps."
+                    },
+                    "url": {
+                      "description": "URL or file path of the input asset; may use {{ varName }} template variables.",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration.",
+                      "type": "string",
+                      "enum": ["animation", "image"]
+                    },
+                    "shape": {
+                      "description": "Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine.",
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": ["rect", "ellipse"],
+                          "description": "Shape geometry: an axis-aligned rectangle or an ellipse/circle."
+                        },
+                        "color": {
+                          "type": "string",
+                          "description": "Fill colour as a hex string (e.g. \"#ff4d4d\")."
+                        },
+                        "cornerRadius": {
+                          "description": "Rounded-corner radius in output pixels; rectangles only (0/omitted = square corners).",
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "strokeWidth": {
+                          "description": "Outline width in output pixels drawn inside the shape bounds (0/omitted = no outline).",
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "strokeColor": {
+                          "description": "Outline colour as a hex string; used when strokeWidth > 0.",
+                          "type": "string"
+                        }
+                      },
+                      "required": ["kind", "color"],
+                      "additionalProperties": false
+                    },
+                    "options": {
+                      "description": "Playback and compositing options for this input.",
+                      "type": "object",
+                      "properties": {
+                        "fps": {
+                          "description": "Frames per second the animation plays at (default 25).",
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "position": {
+                          "description": "Overlay position as \"x:y\" in output pixels (e.g. \"0:0\" top-left).",
+                          "type": "string"
+                        },
+                        "scale": {
+                          "description": "Scale expression applied to the input before compositing, as \"w:h\".",
+                          "type": "string"
+                        },
+                        "fit": {
+                          "type": "string",
+                          "enum": ["stretch", "contain", "cover"],
+                          "description": "How the overlay maps into its \"w:h\" scale box: \"stretch\" (default) scales freely and may distort; \"contain\" letterboxes inside the box with transparent padding; \"cover\" fills the box and centre-crops the overflow. Ignored without a fixed positive \"w:h\" scale."
+                        },
+                        "persistent": {
+                          "description": "When true, freeze the last frame once the overlay ends (default false).",
+                          "type": "boolean"
+                        },
+                        "loop": {
+                          "description": "When true, loop continuously for the section/video (default false).",
+                          "type": "boolean"
+                        },
+                        "loops": {
+                          "description": "Finite number of times the overlay plays. Takes precedence over loop; omit for loop/once.",
+                          "type": "integer",
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "duration": {
+                          "description": "Seconds the overlay stays visible before it ends (animations loop the source to fill; still images hide). Precedence over loops/loop.",
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "start": {
+                          "description": "Seconds to delay the overlay before it appears (default 0).",
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "opacity": {
+                          "description": "Overlay alpha 0–1; 1 (or omitted) keeps it fully opaque.",
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "rotation": {
+                          "description": "Clockwise rotation in degrees applied before compositing.",
+                          "type": "number"
+                        },
+                        "flip": {
+                          "type": "string",
+                          "enum": ["horizontal", "vertical", "both"],
+                          "description": "Mirror the overlay before compositing: \"horizontal\" flips left-right, \"vertical\" flips top-bottom, \"both\" applies both."
+                        },
+                        "motion": {
+                          "description": "Animated entrance for the overlay: rise/slide in via overlay x/y expressions, or fade in.",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": ["none", "fade", "rise", "slide-left", "slide-right"]
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
+                                  "description": "Entrance style: none, fade, rise (up from below), slide-left, slide-right."
+                                },
+                                "delay": {
+                                  "description": "Seconds before the entrance starts (default 0.3).",
+                                  "type": "number",
+                                  "minimum": 0
+                                },
+                                "duration": {
+                                  "description": "Seconds the entrance takes (default 0.6).",
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "distance": {
+                                  "description": "Pixels the text travels for rise/slide (default 60).",
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "easing": {
+                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                  "type": "string",
+                                  "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false,
+                              "description": "Animated entrance for sugar text, with optional timing overrides."
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "filters": {
+                      "description": "Filter chain applied to this input stream before compositing.",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
+                          },
+                          "value": {
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "values": {
+                            "description": "Structured parameters for multi-argument filters.",
+                            "type": "object",
+                            "properties": {
+                              "h": {
+                                "description": "Height parameter passed to the FFmpeg filter (pixels or expression).",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "w": {
+                                "description": "Width parameter passed to the FFmpeg filter (pixels or expression).",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "x": {
+                                "description": "Horizontal offset parameter passed to the FFmpeg filter.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "y": {
+                                "description": "Vertical offset parameter passed to the FFmpeg filter.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "c": {
+                                "description": "Colour parameter passed to the FFmpeg filter (e.g. for drawbox).",
+                                "type": "string"
+                              },
+                              "t": {
+                                "description": "Time or thickness parameter passed to the FFmpeg filter.",
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "text": {
+                                "description": "Localised text rendered by the filter (e.g. for drawtext).",
+                                "type": "object",
+                                "propertyNames": {
+                                  "type": "string"
+                                },
+                                "additionalProperties": {
+                                  "type": "string"
+                                }
+                              },
+                              "fontcolor": {
+                                "description": "Font colour passed to the drawtext filter, as a CSS hex string or FFmpeg colour name.",
+                                "type": "string"
+                              },
+                              "fontsize": {
+                                "description": "Font size in pixels or as an FFmpeg expression passed to the drawtext filter.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "fontfile": {
+                                "description": "Path or URL to the font file used by the drawtext filter.",
+                                "type": "string"
+                              },
+                              "box": {
+                                "description": "drawtext background box toggle (1 draws a box behind the text).",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "boxcolor": {
+                                "description": "drawtext background box colour token, e.g. \"#000000@0.5\" (the @suffix is the opacity).",
+                                "type": "string"
+                              },
+                              "boxborderw": {
+                                "description": "drawtext background box padding in pixels around the text; FFmpeg n8.0 also accepts per-side \"up|right|down|left\" strings.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "shadowcolor": {
+                                "description": "drawtext drop-shadow colour token, e.g. \"#000000@0.6\".",
+                                "type": "string"
+                              },
+                              "shadowx": {
+                                "description": "drawtext drop-shadow horizontal offset in pixels.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "shadowy": {
+                                "description": "drawtext drop-shadow vertical offset in pixels.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "bordercolor": {
+                                "description": "drawtext outline colour token, e.g. \"#000000\".",
+                                "type": "string"
+                              },
+                              "borderw": {
+                                "description": "drawtext outline width in pixels.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "alpha": {
+                                "description": "Alpha (opacity) expression passed to the filter.",
+                                "type": "string"
+                              },
+                              "d": {
+                                "description": "Duration parameter passed to the FFmpeg filter in seconds.",
+                                "type": "string"
+                              },
+                              "st": {
+                                "description": "Start time parameter passed to the FFmpeg filter in seconds.",
+                                "type": "string"
+                              },
+                              "color": {
+                                "description": "Alternate colour parameter (some filters use \"color\" instead of \"c\").",
+                                "type": "string"
+                              },
+                              "enable": {
+                                "description": "Timeline gate expression forwarded to the filter's enable option, pre-quoted when it holds commas (e.g. \"'gte(t,0.3)'\").",
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "range": {
+                            "description": "Time range over which the filter is active, as \"start:end\" in seconds.",
+                            "type": "string"
+                          },
+                          "reveal": {
+                            "description": "Animated entrance for a drawtext filter; baked to alpha + kinetic x/y at compile.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": ["none", "fade", "rise", "slide-left", "slide-right"]
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
+                                    "description": "Entrance style: none, fade, rise (up from below), slide-left, slide-right."
+                                  },
+                                  "delay": {
+                                    "description": "Seconds before the entrance starts (default 0.3).",
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "duration": {
+                                    "description": "Seconds the entrance takes (default 0.6).",
+                                    "type": "number",
+                                    "exclusiveMinimum": 0
+                                  },
+                                  "distance": {
+                                    "description": "Pixels the text travels for rise/slide (default 60).",
+                                    "type": "number",
+                                    "exclusiveMinimum": 0
+                                  },
+                                  "easing": {
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
+                                  }
+                                },
+                                "required": ["type"],
+                                "additionalProperties": false,
+                                "description": "Animated entrance for sugar text, with optional timing overrides."
+                              }
+                            ]
+                          },
+                          "exit": {
+                            "description": "Animated exit for a drawtext filter; baked alongside the entrance at compile.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": ["none", "fade", "rise", "slide-left", "slide-right"]
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
+                                    "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
+                                  },
+                                  "after": {
+                                    "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "duration": {
+                                    "description": "Seconds the exit takes (default 0.6).",
+                                    "type": "number",
+                                    "exclusiveMinimum": 0
+                                  },
+                                  "distance": {
+                                    "description": "Pixels travelled for rise/slide exits (default 60).",
+                                    "type": "number",
+                                    "exclusiveMinimum": 0
+                                  }
+                                },
+                                "required": ["type"],
+                                "additionalProperties": false,
+                                "description": "Animated exit for sugar text, with optional timing overrides."
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["type"],
+                        "additionalProperties": false,
+                        "description": "A single FFmpeg filter applied to the section or input stream."
+                      }
+                    }
+                  },
+                  "required": ["name"],
+                  "additionalProperties": false,
+                  "description": "An external asset (animation or still image) composited into the section video."
+                }
+              },
+              "maps": {
+                "description": "Custom FFmpeg filtergraph maps overriding the default compositing pipeline.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "inputs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Ordered list of input stream labels fed into this map's filter graph."
+                    },
+                    "outputs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Ordered list of output stream labels produced by this map's filter graph."
+                    },
+                    "filters": {
+                      "description": "Filter chain applied between the map inputs and outputs.",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
+                          },
+                          "value": {
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "values": {
+                            "description": "Structured parameters for multi-argument filters.",
+                            "type": "object",
+                            "properties": {
+                              "h": {
+                                "description": "Height parameter passed to the FFmpeg filter (pixels or expression).",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "w": {
+                                "description": "Width parameter passed to the FFmpeg filter (pixels or expression).",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "x": {
+                                "description": "Horizontal offset parameter passed to the FFmpeg filter.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "y": {
+                                "description": "Vertical offset parameter passed to the FFmpeg filter.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "c": {
+                                "description": "Colour parameter passed to the FFmpeg filter (e.g. for drawbox).",
+                                "type": "string"
+                              },
+                              "t": {
+                                "description": "Time or thickness parameter passed to the FFmpeg filter.",
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "text": {
+                                "description": "Localised text rendered by the filter (e.g. for drawtext).",
+                                "type": "object",
+                                "propertyNames": {
+                                  "type": "string"
+                                },
+                                "additionalProperties": {
+                                  "type": "string"
+                                }
+                              },
+                              "fontcolor": {
+                                "description": "Font colour passed to the drawtext filter, as a CSS hex string or FFmpeg colour name.",
+                                "type": "string"
+                              },
+                              "fontsize": {
+                                "description": "Font size in pixels or as an FFmpeg expression passed to the drawtext filter.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "fontfile": {
+                                "description": "Path or URL to the font file used by the drawtext filter.",
+                                "type": "string"
+                              },
+                              "box": {
+                                "description": "drawtext background box toggle (1 draws a box behind the text).",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "boxcolor": {
+                                "description": "drawtext background box colour token, e.g. \"#000000@0.5\" (the @suffix is the opacity).",
+                                "type": "string"
+                              },
+                              "boxborderw": {
+                                "description": "drawtext background box padding in pixels around the text; FFmpeg n8.0 also accepts per-side \"up|right|down|left\" strings.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "shadowcolor": {
+                                "description": "drawtext drop-shadow colour token, e.g. \"#000000@0.6\".",
+                                "type": "string"
+                              },
+                              "shadowx": {
+                                "description": "drawtext drop-shadow horizontal offset in pixels.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "shadowy": {
+                                "description": "drawtext drop-shadow vertical offset in pixels.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "bordercolor": {
+                                "description": "drawtext outline colour token, e.g. \"#000000\".",
+                                "type": "string"
+                              },
+                              "borderw": {
+                                "description": "drawtext outline width in pixels.",
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "alpha": {
+                                "description": "Alpha (opacity) expression passed to the filter.",
+                                "type": "string"
+                              },
+                              "d": {
+                                "description": "Duration parameter passed to the FFmpeg filter in seconds.",
+                                "type": "string"
+                              },
+                              "st": {
+                                "description": "Start time parameter passed to the FFmpeg filter in seconds.",
+                                "type": "string"
+                              },
+                              "color": {
+                                "description": "Alternate colour parameter (some filters use \"color\" instead of \"c\").",
+                                "type": "string"
+                              },
+                              "enable": {
+                                "description": "Timeline gate expression forwarded to the filter's enable option, pre-quoted when it holds commas (e.g. \"'gte(t,0.3)'\").",
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "range": {
+                            "description": "Time range over which the filter is active, as \"start:end\" in seconds.",
+                            "type": "string"
+                          },
+                          "reveal": {
+                            "description": "Animated entrance for a drawtext filter; baked to alpha + kinetic x/y at compile.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": ["none", "fade", "rise", "slide-left", "slide-right"]
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
+                                    "description": "Entrance style: none, fade, rise (up from below), slide-left, slide-right."
+                                  },
+                                  "delay": {
+                                    "description": "Seconds before the entrance starts (default 0.3).",
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "duration": {
+                                    "description": "Seconds the entrance takes (default 0.6).",
+                                    "type": "number",
+                                    "exclusiveMinimum": 0
+                                  },
+                                  "distance": {
+                                    "description": "Pixels the text travels for rise/slide (default 60).",
+                                    "type": "number",
+                                    "exclusiveMinimum": 0
+                                  },
+                                  "easing": {
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
+                                  }
+                                },
+                                "required": ["type"],
+                                "additionalProperties": false,
+                                "description": "Animated entrance for sugar text, with optional timing overrides."
+                              }
+                            ]
+                          },
+                          "exit": {
+                            "description": "Animated exit for a drawtext filter; baked alongside the entrance at compile.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": ["none", "fade", "rise", "slide-left", "slide-right"]
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
+                                    "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
+                                  },
+                                  "after": {
+                                    "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "duration": {
+                                    "description": "Seconds the exit takes (default 0.6).",
+                                    "type": "number",
+                                    "exclusiveMinimum": 0
+                                  },
+                                  "distance": {
+                                    "description": "Pixels travelled for rise/slide exits (default 60).",
+                                    "type": "number",
+                                    "exclusiveMinimum": 0
+                                  }
+                                },
+                                "required": ["type"],
+                                "additionalProperties": false,
+                                "description": "Animated exit for sugar text, with optional timing overrides."
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["type"],
+                        "additionalProperties": false,
+                        "description": "A single FFmpeg filter applied to the section or input stream."
+                      }
+                    },
+                    "options": {
+                      "description": "Additional behavioural options for this map.",
+                      "type": "object",
+                      "properties": {
+                        "useSectionFilters": {
+                          "description": "When true, the section-level filters are applied inside this map's filter chain (default false).",
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["inputs", "outputs"],
+                  "additionalProperties": false,
+                  "description": "An FFmpeg filtergraph map connecting named input streams to output streams via an optional filter chain."
+                }
+              },
+              "filters": {
+                "description": "Filter chain applied to the section output stream.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
+                    },
+                    "value": {
+                      "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "values": {
+                      "description": "Structured parameters for multi-argument filters.",
+                      "type": "object",
+                      "properties": {
+                        "h": {
+                          "description": "Height parameter passed to the FFmpeg filter (pixels or expression).",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "w": {
+                          "description": "Width parameter passed to the FFmpeg filter (pixels or expression).",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "x": {
+                          "description": "Horizontal offset parameter passed to the FFmpeg filter.",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "y": {
+                          "description": "Vertical offset parameter passed to the FFmpeg filter.",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "c": {
+                          "description": "Colour parameter passed to the FFmpeg filter (e.g. for drawbox).",
+                          "type": "string"
+                        },
+                        "t": {
+                          "description": "Time or thickness parameter passed to the FFmpeg filter.",
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "text": {
+                          "description": "Localised text rendered by the filter (e.g. for drawtext).",
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "fontcolor": {
+                          "description": "Font colour passed to the drawtext filter, as a CSS hex string or FFmpeg colour name.",
+                          "type": "string"
+                        },
+                        "fontsize": {
+                          "description": "Font size in pixels or as an FFmpeg expression passed to the drawtext filter.",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "fontfile": {
+                          "description": "Path or URL to the font file used by the drawtext filter.",
+                          "type": "string"
+                        },
+                        "box": {
+                          "description": "drawtext background box toggle (1 draws a box behind the text).",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "boxcolor": {
+                          "description": "drawtext background box colour token, e.g. \"#000000@0.5\" (the @suffix is the opacity).",
+                          "type": "string"
+                        },
+                        "boxborderw": {
+                          "description": "drawtext background box padding in pixels around the text; FFmpeg n8.0 also accepts per-side \"up|right|down|left\" strings.",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "shadowcolor": {
+                          "description": "drawtext drop-shadow colour token, e.g. \"#000000@0.6\".",
+                          "type": "string"
+                        },
+                        "shadowx": {
+                          "description": "drawtext drop-shadow horizontal offset in pixels.",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "shadowy": {
+                          "description": "drawtext drop-shadow vertical offset in pixels.",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "bordercolor": {
+                          "description": "drawtext outline colour token, e.g. \"#000000\".",
+                          "type": "string"
+                        },
+                        "borderw": {
+                          "description": "drawtext outline width in pixels.",
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "alpha": {
+                          "description": "Alpha (opacity) expression passed to the filter.",
+                          "type": "string"
+                        },
+                        "d": {
+                          "description": "Duration parameter passed to the FFmpeg filter in seconds.",
+                          "type": "string"
+                        },
+                        "st": {
+                          "description": "Start time parameter passed to the FFmpeg filter in seconds.",
+                          "type": "string"
+                        },
+                        "color": {
+                          "description": "Alternate colour parameter (some filters use \"color\" instead of \"c\").",
+                          "type": "string"
+                        },
+                        "enable": {
+                          "description": "Timeline gate expression forwarded to the filter's enable option, pre-quoted when it holds commas (e.g. \"'gte(t,0.3)'\").",
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "range": {
+                      "description": "Time range over which the filter is active, as \"start:end\" in seconds.",
+                      "type": "string"
+                    },
+                    "reveal": {
+                      "description": "Animated entrance for a drawtext filter; baked to alpha + kinetic x/y at compile.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": ["none", "fade", "rise", "slide-left", "slide-right"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
+                              "description": "Entrance style: none, fade, rise (up from below), slide-left, slide-right."
+                            },
+                            "delay": {
+                              "description": "Seconds before the entrance starts (default 0.3).",
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "duration": {
+                              "description": "Seconds the entrance takes (default 0.6).",
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "distance": {
+                              "description": "Pixels the text travels for rise/slide (default 60).",
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "easing": {
+                              "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
+                              "type": "string",
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
+                            }
+                          },
+                          "required": ["type"],
+                          "additionalProperties": false,
+                          "description": "Animated entrance for sugar text, with optional timing overrides."
+                        }
+                      ]
+                    },
+                    "exit": {
+                      "description": "Animated exit for a drawtext filter; baked alongside the entrance at compile.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": ["none", "fade", "rise", "slide-left", "slide-right"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
+                              "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                            },
+                            "easing": {
+                              "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                              "type": "string",
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
+                            },
+                            "after": {
+                              "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "duration": {
+                              "description": "Seconds the exit takes (default 0.6).",
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "distance": {
+                              "description": "Pixels travelled for rise/slide exits (default 60).",
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            }
+                          },
+                          "required": ["type"],
+                          "additionalProperties": false,
+                          "description": "Animated exit for sugar text, with optional timing overrides."
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["type"],
+                  "additionalProperties": false,
+                  "description": "A single FFmpeg filter applied to the section or input stream."
+                }
+              },
+              "title": {
+                "description": "Localised display title shown to the user for this section.",
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "description": {
+                "description": "Localised description shown to the user to explain what to record or fill in.",
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "transition": {
+                "description": "Transition applied after this section; overrides global.transition.",
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "fade",
+                          "fadeblack",
+                          "fadewhite",
+                          "fadegrays",
+                          "fadefast",
+                          "fadeslow",
+                          "distance",
+                          "dissolve",
+                          "pixelize",
+                          "radial",
+                          "hblur",
+                          "wipeleft",
+                          "wiperight",
+                          "wipeup",
+                          "wipedown",
+                          "wipetl",
+                          "wipetr",
+                          "wipebl",
+                          "wipebr",
+                          "slideleft",
+                          "slideright",
+                          "slideup",
+                          "slidedown",
+                          "smoothleft",
+                          "smoothright",
+                          "smoothup",
+                          "smoothdown",
+                          "circlecrop",
+                          "rectcrop",
+                          "circleclose",
+                          "circleopen",
+                          "horzclose",
+                          "horzopen",
+                          "vertclose",
+                          "vertopen",
+                          "diagbl",
+                          "diagbr",
+                          "diagtl",
+                          "diagtr",
+                          "hlslice",
+                          "hrslice",
+                          "vuslice",
+                          "vdslice",
+                          "hlwind",
+                          "hrwind",
+                          "vuwind",
+                          "vdwind",
+                          "coverleft",
+                          "coverright",
+                          "coverup",
+                          "coverdown",
+                          "revealleft",
+                          "revealright",
+                          "revealup",
+                          "revealdown",
+                          "squeezeh",
+                          "squeezev",
+                          "zoomin"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "const": "cut"
+                      }
+                    ],
+                    "description": "xfade transition name between this section and the next, or \"cut\" for a hard cut."
+                  },
+                  "duration": {
+                    "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 5
+                  }
+                },
+                "required": ["type"],
+                "additionalProperties": false
+              },
+              "caption": {
+                "description": "Styled on-screen caption rendered as a drawtext filter.",
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Localised caption text; the active locale is resolved downstream."
+                  },
+                  "style": {
+                    "description": "Visual preset for the caption (default \"bar\").",
+                    "type": "string",
+                    "enum": ["bar", "subtle", "bold"]
+                  },
+                  "position": {
+                    "description": "Vertical placement of the caption (default \"lower-third\").",
+                    "type": "string",
+                    "enum": ["top", "center", "bottom", "lower-third"]
+                  },
+                  "align": {
+                    "description": "Horizontal alignment of the caption (default \"center\").",
+                    "type": "string",
+                    "enum": ["left", "center", "right"]
+                  },
+                  "font": {
+                    "description": "Font id (bundled registry), a raw .ttf filename, or { family, weight, style } to resolve any Google Fonts family; overrides the preset font.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "family": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "Font family name as Google Fonts spells it, e.g. \"Playfair Display\"."
+                          },
+                          "weight": {
+                            "description": "Font weight 100..900 in steps of 100 (default 400).",
+                            "type": "integer",
+                            "minimum": 100,
+                            "maximum": 900,
+                            "multipleOf": 100
+                          },
+                          "style": {
+                            "description": "Font style (default normal).",
+                            "type": "string",
+                            "enum": ["normal", "italic"]
+                          }
+                        },
+                        "required": ["family"],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  "fontsize": {
+                    "description": "Font size in px; overrides the preset size.",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "color": {
+                    "description": "Text colour as a CSS hex string; overrides the preset colour.",
+                    "type": "string"
+                  },
+                  "box": {
+                    "description": "When true, draws a background box behind the text (preset default otherwise).",
+                    "type": "boolean"
+                  },
+                  "boxColor": {
+                    "description": "Box colour as a CSS hex string when the box is on.",
+                    "type": "string"
+                  },
+                  "boxOpacity": {
+                    "description": "Box opacity 0..1 when the box is on.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "reveal": {
+                    "description": "Animated entrance for the caption (fade/rise/slide); default none.",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": ["none", "fade", "rise", "slide-left", "slide-right"]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
+                            "description": "Entrance style: none, fade, rise (up from below), slide-left, slide-right."
+                          },
+                          "delay": {
+                            "description": "Seconds before the entrance starts (default 0.3).",
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "duration": {
+                            "description": "Seconds the entrance takes (default 0.6).",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "distance": {
+                            "description": "Pixels the text travels for rise/slide (default 60).",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "easing": {
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "type": "string",
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
+                          }
+                        },
+                        "required": ["type"],
+                        "additionalProperties": false,
+                        "description": "Animated entrance for sugar text, with optional timing overrides."
+                      }
+                    ]
+                  },
+                  "effect": {
+                    "description": "Drop shadow / outline for legibility over busy footage.",
+                    "type": "object",
+                    "properties": {
+                      "shadow": {
+                        "description": "Drop shadow: true for the default soft black shadow, or an object to customise colour/offset.",
+                        "anyOf": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "color": {
+                                "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
+                                "type": "string"
+                              },
+                              "dx": {
+                                "description": "Horizontal shadow offset in pixels (default 2).",
+                                "type": "number"
+                              },
+                              "dy": {
+                                "description": "Vertical shadow offset in pixels (default 2).",
+                                "type": "number"
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "outline": {
+                        "description": "Outline/border: true for a 2px black outline, or an object to customise colour/width.",
+                        "anyOf": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "color": {
+                                "description": "Outline colour token (default #000000).",
+                                "type": "string"
+                              },
+                              "width": {
+                                "description": "Outline width in pixels (default 2).",
+                                "type": "number",
+                                "minimum": 0
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "required": ["text"],
+                "additionalProperties": false
+              },
+              "lowerThird": {
+                "description": "Title/subtitle band composited over the section clip.",
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "description": "Main line of the lower third.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "subtitle": {
+                    "description": "Supporting line below the title.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "accent": {
+                    "description": "Accent colour: draws an accent bar and the badge background.",
+                    "type": "string"
+                  },
+                  "bandColor": {
+                    "description": "Legibility band colour as a CSS hex string (default near-black #0a0f14).",
+                    "type": "string"
+                  },
+                  "boxOpacity": {
+                    "description": "Legibility band opacity 0..1 (default 0.6; 0 = no band).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "position": {
+                    "description": "Vertical anchor of the band (default bottom).",
+                    "type": "string",
+                    "enum": ["bottom", "top"]
+                  },
+                  "badge": {
+                    "description": "Optional right-aligned pill (price, step number, badge).",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "reveal": {
+                    "description": "Entrance for the lines, staggered (default \"rise\").",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": ["none", "fade", "rise", "slide-left", "slide-right"]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
+                            "description": "Entrance style: none, fade, rise (up from below), slide-left, slide-right."
+                          },
+                          "delay": {
+                            "description": "Seconds before the entrance starts (default 0.3).",
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "duration": {
+                            "description": "Seconds the entrance takes (default 0.6).",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "distance": {
+                            "description": "Pixels the text travels for rise/slide (default 60).",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "easing": {
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "type": "string",
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -7259,9 +9461,9 @@
                                   "exclusiveMinimum": 0
                                 },
                                 "easing": {
-                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                   "type": "string",
-                                  "enum": ["linear", "ease-out", "ease-in-out"]
+                                  "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                 }
                               },
                               "required": ["type"],
@@ -7284,7 +9486,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -7511,9 +9713,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -7536,6 +9738,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -7602,7 +9809,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -7829,9 +10036,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -7854,6 +10061,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -7911,7 +10123,7 @@
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
-                      "description": "Single scalar parameter for simple filters that accept one value.",
+                      "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                       "anyOf": [
                         {
                           "type": "string"
@@ -8138,9 +10350,9 @@
                               "exclusiveMinimum": 0
                             },
                             "easing": {
-                              "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                              "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                               "type": "string",
-                              "enum": ["linear", "ease-out", "ease-in-out"]
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             }
                           },
                           "required": ["type"],
@@ -8163,6 +10375,11 @@
                               "type": "string",
                               "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                               "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                            },
+                            "easing": {
+                              "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                              "type": "string",
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             },
                             "after": {
                               "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -8413,9 +10630,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -8568,9 +10785,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -9238,9 +11455,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -9248,6 +11465,12 @@
                         "description": "Animated entrance for sugar text, with optional timing overrides."
                       }
                     ]
+                  },
+                  "stagger": {
+                    "description": "Seconds between non-empty line entrances, 0..1 (default 0.15). Zero reveals all lines together; the accent follows its line.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
                   },
                   "effect": {
                     "description": "Drop shadow / outline applied to every line for legibility.",
@@ -9656,9 +11879,9 @@
                                   "exclusiveMinimum": 0
                                 },
                                 "easing": {
-                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                   "type": "string",
-                                  "enum": ["linear", "ease-out", "ease-in-out"]
+                                  "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                 }
                               },
                               "required": ["type"],
@@ -9829,9 +12052,9 @@
                                   "exclusiveMinimum": 0
                                 },
                                 "easing": {
-                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                   "type": "string",
-                                  "enum": ["linear", "ease-out", "ease-in-out"]
+                                  "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                 }
                               },
                               "required": ["type"],
@@ -9854,7 +12077,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -10081,9 +12304,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -10106,6 +12329,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -10172,7 +12400,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -10399,9 +12627,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -10424,6 +12652,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -10481,7 +12714,7 @@
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
-                      "description": "Single scalar parameter for simple filters that accept one value.",
+                      "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                       "anyOf": [
                         {
                           "type": "string"
@@ -10708,9 +12941,9 @@
                               "exclusiveMinimum": 0
                             },
                             "easing": {
-                              "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                              "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                               "type": "string",
-                              "enum": ["linear", "ease-out", "ease-in-out"]
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             }
                           },
                           "required": ["type"],
@@ -10733,6 +12966,11 @@
                               "type": "string",
                               "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                               "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                            },
+                            "easing": {
+                              "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                              "type": "string",
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             },
                             "after": {
                               "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -10983,9 +13221,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -11138,9 +13376,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -11937,9 +14175,9 @@
                                   "exclusiveMinimum": 0
                                 },
                                 "easing": {
-                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                   "type": "string",
-                                  "enum": ["linear", "ease-out", "ease-in-out"]
+                                  "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                 }
                               },
                               "required": ["type"],
@@ -11962,7 +14200,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -12189,9 +14427,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -12214,6 +14452,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -12280,7 +14523,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -12507,9 +14750,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -12532,6 +14775,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -12589,7 +14837,7 @@
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
-                      "description": "Single scalar parameter for simple filters that accept one value.",
+                      "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                       "anyOf": [
                         {
                           "type": "string"
@@ -12816,9 +15064,9 @@
                               "exclusiveMinimum": 0
                             },
                             "easing": {
-                              "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                              "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                               "type": "string",
-                              "enum": ["linear", "ease-out", "ease-in-out"]
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             }
                           },
                           "required": ["type"],
@@ -12841,6 +15089,11 @@
                               "type": "string",
                               "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                               "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                            },
+                            "easing": {
+                              "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                              "type": "string",
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             },
                             "after": {
                               "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -13091,9 +15344,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -13246,9 +15499,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -14045,9 +16298,9 @@
                                   "exclusiveMinimum": 0
                                 },
                                 "easing": {
-                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                  "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                   "type": "string",
-                                  "enum": ["linear", "ease-out", "ease-in-out"]
+                                  "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                 }
                               },
                               "required": ["type"],
@@ -14070,7 +16323,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -14297,9 +16550,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -14322,6 +16575,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -14388,7 +16646,7 @@
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
-                            "description": "Single scalar parameter for simple filters that accept one value.",
+                            "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                             "anyOf": [
                               {
                                 "type": "string"
@@ -14615,9 +16873,9 @@
                                     "exclusiveMinimum": 0
                                   },
                                   "easing": {
-                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                                    "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                                     "type": "string",
-                                    "enum": ["linear", "ease-out", "ease-in-out"]
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   }
                                 },
                                 "required": ["type"],
@@ -14640,6 +16898,11 @@
                                     "type": "string",
                                     "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                                     "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                                  },
+                                  "easing": {
+                                    "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                                    "type": "string",
+                                    "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                                   },
                                   "after": {
                                     "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -14697,7 +16960,7 @@
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
-                      "description": "Single scalar parameter for simple filters that accept one value.",
+                      "description": "Single scalar parameter for simple filters. For scale, the LeClap shorthand output preserves aspect and pads the completed scene to videoConfig.scale.",
                       "anyOf": [
                         {
                           "type": "string"
@@ -14924,9 +17187,9 @@
                               "exclusiveMinimum": 0
                             },
                             "easing": {
-                              "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                              "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                               "type": "string",
-                              "enum": ["linear", "ease-out", "ease-in-out"]
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             }
                           },
                           "required": ["type"],
@@ -14949,6 +17212,11 @@
                               "type": "string",
                               "enum": ["none", "fade", "rise", "slide-left", "slide-right"],
                               "description": "Exit style: none, fade, rise (up/out), slide-left, slide-right."
+                            },
+                            "easing": {
+                              "description": "Exit curve (default linear). ease-out-back overshoots travel by about 10%; text alpha stays in 0..1.",
+                              "type": "string",
+                              "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                             },
                             "after": {
                               "description": "Seconds from the section start when the exit begins (default: timed to end at the section end).",
@@ -15199,9 +17467,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -15354,9 +17622,9 @@
                             "exclusiveMinimum": 0
                           },
                           "easing": {
-                            "description": "Progress curve for the entrance (default linear). ease-out decelerates into place; ease-in-out ramps up and settles. Ignored by an overlay fade motion (the fade filter is linear only).",
+                            "description": "Progress curve for the entrance (default linear). ease-out decelerates; ease-in-out ramps up and settles; ease-out-back overshoots travel by about 10% and settles, with text alpha clamped to 0..1. Ignored by an overlay fade motion (the fade filter is linear only).",
                             "type": "string",
-                            "enum": ["linear", "ease-out", "ease-in-out"]
+                            "enum": ["linear", "ease-out", "ease-in-out", "ease-out-back"]
                           }
                         },
                         "required": ["type"],
@@ -16067,5 +18335,38 @@
     }
   },
   "additionalProperties": false,
-  "description": "Root descriptor of a video composition template; all fields are optional so partial descriptors can be validated incrementally."
+  "description": "Root descriptor of a video composition template; all fields are optional so partial descriptors can be validated incrementally.",
+  "$defs": {
+    "__schema0": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema0"
+          }
+        }
+      ]
+    }
+  }
 }

@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "name": "Before / after evidence",
+    "description": "House template for a UI change: the defect on the base branch, the fix on the branch under review. build.py composes every card and panel with ffmpeg and hands them over as project_video sections; LeClap does the watermark, the transitions and the join. Every value the engine would otherwise default is pinned on purpose: an evidence video has to render the same today and on a re-run months later, and a silent default change would alter the artifact a change was approved on. The two deliberate omissions are `look` and `grade`: a colour grade would shift the very UI colours the video exists to prove."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "transition": {
+      "type": "fade",
+      "duration": 0.5
+    },
+    "watermark": {
+      "url": "images/logo.png",
+      "position": "top-left",
+      "scale": 0.05,
+      "opacity": 0.9,
+      "margin": 22
+    },
+    "variables": {
+      "_note": "The house look for the ffmpeg-composed layer. build.py reads these, so a render is reproducible from this file alone. Values are strings because global.variables is record(string, string | string[]). geom.canvas must stay the engine's landscape output size.",
+      "colour.before": "#a4122b",
+      "colour.after": "#085d3a",
+      "colour.neutral": "#565cc4",
+      "colour.surface": "#ffffff",
+      "colour.stage": "#f2f2f5",
+      "colour.ink": "#141416",
+      "colour.inkSubtle": "#4a4a52",
+      "colour.hairline": "#e2e2e8",
+      "colour.onAccent": "#ffffff",
+      "font.display": "ArchivoBlack.ttf",
+      "font.body": "Rubik.ttf",
+      "font.label": "RobotoMono.ttf",
+      "size.kicker": "20",
+      "size.headline": "48",
+      "size.subtitle": "22",
+      "size.panelBadge": "22",
+      "size.panelTitle": "22",
+      "size.panelDesc": "19",
+      "size.introBadge": "22",
+      "size.introDesc": "22",
+      "geom.canvas": ["1280", "720"],
+      "geom.cardMargin": "80",
+      "geom.panelWidth": "320",
+      "geom.panelPad": "40",
+      "geom.badgePad": "11",
+      "geom.card": ["286", "322", "414", "448"],
+      "geom.rule": ["166", "4"],
+      "geom.lineSpacing": "7",
+      "geom.introRule": "334",
+      "geom.introRowY": "390",
+      "geom.introRowGap": "72",
+      "motion.easeOutPow": "3",
+      "motion.springPow": "5",
+      "motion.quick": "0.24",
+      "motion.gentle": "0.28",
+      "motion.slow": "0.40",
+      "motion.stagger": "0.14",
+      "limit.titleLines": "3",
+      "limit.descLines": "6",
+      "limit.badgeVocabulary": ["BEFORE", "AFTER", "AVANT", "APRÈS"]
+    }
+  },
+  "partials": [
+    {
+      "id": "pair",
+      "description": "A state card followed by its capture: the unit an evidence video repeats per side. Referenced once per side with a `prefix`, so the shape is declared once. `prefix` concatenates with NO separator, so `before` + `card` resolves assets/videos/beforecard.mp4.",
+      "sections": [
+        {
+          "name": "card",
+          "type": "project_video",
+          "options": {
+            "duration": 3.6,
+            "forceAspectRatio": true,
+            "muteSection": true,
+            "speed": 1,
+            "countdown": false
+          }
+        },
+        {
+          "name": "clip",
+          "type": "project_video",
+          "options": {
+            "duration": 8,
+            "forceAspectRatio": true,
+            "muteSection": true,
+            "speed": 1,
+            "countdown": false
+          }
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "name": "intro",
+      "type": "project_video",
+      "options": {
+        "duration": 4.2,
+        "forceAspectRatio": true,
+        "muteSection": true,
+        "speed": 1,
+        "countdown": false
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "pair",
+      "prefix": "before"
+    },
+    {
+      "type": "partial",
+      "ref": "pair",
+      "prefix": "after"
+    },
+    {
+      "name": "outro",
+      "type": "project_video",
+      "options": {
+        "duration": 2.8,
+        "forceAspectRatio": true,
+        "muteSection": true,
+        "speed": 1,
+        "countdown": false
+      }
+    }
+  ]
+}

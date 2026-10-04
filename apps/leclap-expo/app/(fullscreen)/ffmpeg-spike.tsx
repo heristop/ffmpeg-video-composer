@@ -8,104 +8,14 @@ import { useVideoPlayer, VideoView } from 'expo-video';
 import { colors, spacing, typography } from '@/src/styles/theme';
 import * as Leclap from '@/modules/leclap-ffmpeg';
 
-/**
- * On-device engine smoke test. Proves the real `leclap-ffmpeg` native engine (Rust + FFmpeg):
- *  1. `getVersion()` loads the native module (JNA → libleclap_ffmpeg_core.so → dlopen FFmpeg .so).
- *  2. `compile()` runs a real decode → avfilter (scale/pad) → encode → mux on a bundled clip.
- * Reachable via deep link `leclap://ffmpeg-spike`.
- */
+import { runNativeSmoke } from '@/src/services/compile/native-smoke';
 
-const toPath = (uri: string): string => uri.replace('file://', '');
-
-async function resolveSampleClip(): Promise<{ inputPath: string; outUri: string; outPath: string }> {
+/** Auto-runs the production JSON pipeline via deep link leclap://ffmpeg-spike. */
+async function resolveSampleClip(): Promise<string> {
   const asset = Asset.fromModule(require('../../assets/sample.mp4'));
   await asset.downloadAsync();
-  const inputPath = toPath(asset.localUri ?? asset.uri);
-  const outUri = `${FileSystem.cacheDirectory}spike-out.mp4`;
 
-  return { inputPath, outUri, outPath: toPath(outUri) };
-}
-
-// Run the on-device pipeline (scale/pad + drawtext, a re-entrant 2nd encode, then a music amix) and probe
-// the output's video codec ('h264' on success). `append` streams each step's result to the on-screen log.
-async function runSpikeSegments(inputPath: string, outPath: string, append: (line: string) => void): Promise<string> {
-  const font = `${toPath(FileSystem.cacheDirectory ?? '')}leclap-build/fonts/Rubik.ttf`;
-  const draw = `drawtext=text='leclap':fontfile='${font}':fontsize=48:fontcolor=white:x=40:y=40`;
-  const enc = [
-    '-c:v',
-    'libopenh264',
-    '-b:v',
-    '4M',
-    '-profile:v',
-    'main',
-    '-pix_fmt',
-    'yuv420p',
-    '-c:a',
-    'aac',
-    '-ac',
-    '2',
-    '-movflags',
-    '+faststart',
-    '-shortest',
-  ];
-
-  // seg1: scale/pad + drawtext → real H.264 video.
-  const r1 = await Leclap.run([
-    '-y',
-    '-i',
-    inputPath,
-    '-vf',
-    `setsar=1/1,scale=1280:720,${draw}`,
-    ...enc,
-    `${outPath}.s1.mp4`,
-  ]);
-  append(`… seg1 (libopenh264 + drawtext) rc=${r1.code}`);
-  // seg2: re-entrant second encode in the same process, different resolution.
-  const r2 = await Leclap.run(['-y', '-i', inputPath, '-vf', `scale=640:360,${draw}`, ...enc, `${outPath}.s2.mp4`]);
-  append(`… seg2 (re-entrant) rc=${r2.code}`);
-  // Music-style amix via filter_complex, muxed with the seg1 H.264 video.
-  const r3 = await Leclap.run([
-    '-y',
-    '-i',
-    `${outPath}.s1.mp4`,
-    '-f',
-    'lavfi',
-    '-i',
-    'anullsrc=channel_layout=stereo:sample_rate=44100',
-    '-filter_complex',
-    '[0:a][1:a]amix=inputs=2:duration=first[a]',
-    '-map',
-    '0:v',
-    '-map',
-    '[a]',
-    '-c:v',
-    'copy',
-    '-c:a',
-    'aac',
-    '-shortest',
-    outPath,
-  ]);
-  append(`… music amix (filter_complex) rc=${r3.code}`);
-
-  // Probe the output: assert it really is an H.264 video stream (proves libopenh264 worked).
-  const probe = await Leclap.probe([
-    '-v',
-    'error',
-    '-select_streams',
-    'v:0',
-    '-show_entries',
-    'stream=codec_name,width,height',
-    '-of',
-    'default=nk=1:nw=1',
-    outPath,
-  ]);
-  const codec = probe.output.split('\n').filter(Boolean)[0] ?? '?';
-  append(`… probe → video codec=${codec}`);
-  console.log(
-    `LECLAP_WF s1=${r1.code} s2=${r2.code} amix=${r3.code} codec=${codec}\nseg1 log:\n${r1.log.split('\n').filter(Boolean).slice(-6).join('\n')}`
-  );
-
-  return codec;
+  return asset.localUri ?? asset.uri;
 }
 
 export default function FFmpegSpikeScreen() {
@@ -116,6 +26,7 @@ export default function FFmpegSpikeScreen() {
 
   const player = useVideoPlayer(outputUri, (p) => {
     p.loop = true;
+    p.play();
   });
 
   const append = useCallback((line: string) => {
@@ -147,21 +58,16 @@ export default function FFmpegSpikeScreen() {
     setLog('Resolving bundled clip…');
 
     try {
-      const { inputPath, outUri, outPath } = await resolveSampleClip();
-      append('Compiling on-device (scale → pad → drawtext, libopenh264)…');
-
-      const codec = await runSpikeSegments(inputPath, outPath, append);
-
+      const inputUri = await resolveSampleClip();
+      append('Compiling JSON on-device (title, footage, motion and music)…');
+      const outUri = await runNativeSmoke(inputUri, append);
       const info = await FileSystem.getInfoAsync(outUri);
-      const ok = info.exists && info.size > 0 && codec === 'h264';
-      append(
-        ok ? `✅ H.264 output ${(info.size / 1024).toFixed(0)} KB — playing below.` : `❌ Bad output (codec=${codec}).`
-      );
 
-      if (ok) {
-        setOutputUri(outUri);
-      }
+      if (!info.exists || info.size === 0) throw new Error('Native output is empty');
+      append(`✅ H.264 output ${(info.size / 1024).toFixed(0)} KB — playing below.`);
+      setOutputUri(outUri);
     } catch (error) {
+      console.error('[native-smoke]', String(error));
       append(`❌ ${String(error)}`);
     } finally {
       setBusy(false);
@@ -186,7 +92,7 @@ export default function FFmpegSpikeScreen() {
         <TouchableOpacity onPress={handleClose} style={styles.iconBtn} accessibilityLabel="Close">
           <Ionicons name="close" size={26} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>On-device engine spike</Text>
+        <Text style={styles.headerTitle}>Native JSON engine check</Text>
         <View style={styles.iconBtn} />
       </View>
 

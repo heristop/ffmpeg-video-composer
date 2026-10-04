@@ -16,19 +16,22 @@ const TYPE_BLURB: Record<string, string> = {
   image_background: 'A still-image backdrop.',
   music: 'A music-only section contributing audio to the final mix.',
   partial: 'Embeds a reusable partial template, optionally with a prefix and overridden variables.',
+  effect:
+    'References a versioned registered effect with JSON props/assets. A trusted backend resolves it into a project_video clip before FFmpeg composition.',
 };
 
 export const DocSections = () => (
   <>
     <Seo
       title="Sections & types — template descriptor"
-      description="The seven LeClap section types, the base fields every section shares, and the full per-section options surface."
+      description="LeClap section types, including registered JSON effects, shared native fields, reusable partials and per-section options."
       path="/doc/sections"
     />
 
     <DocPageHeader kicker="Structure" title="Sections & types">
-      <Code>sections</Code> is an ordered list; each entry becomes one clip, composed top to bottom. Every section
-      shares a common base, then a <Code>type</Code> selects which extra <Code>options</Code> apply.
+      <Code>sections</Code> is an ordered list of visual scenes, audio, form steps and partial references. Native scenes
+      share base fields; a <Code>type</Code> selects their options. Registered effects have their own reference and
+      duration contract and require resolution before composition.
     </DocPageHeader>
 
     <DocSection id="types" title="Section types" kicker="Discriminated union">
@@ -67,7 +70,7 @@ export const DocSections = () => (
         <RefTable
           id="section"
           title="section"
-          summary="The base fields every section shares, whatever its type."
+          summary="Shared section fields. Registered effects also require a name, effect reference and contract-compatible duration."
           rows={docGroups.section()}
         />
         <RefTable
@@ -87,8 +90,9 @@ export const DocSections = () => (
       <Sample code={snippets.captureMode} title="Capture modes on a project_video section" className="mt-6" />
       <Tip className="mt-8">
         Only the fields tagged <span className="font-semibold text-foreground">required</span> must be present —
-        everything else falls back to a schema default, so a minimal section is often just a <Code>type</Code> and its{' '}
-        <Code>options</Code>. Omit what you don't need and add fields as you go.
+        optional fields may have a schema default. Native sections use <Code>type</Code> and <Code>options</Code>;
+        registered effects require their name, versioned reference and duration. Omit what you don&apos;t need and add
+        fields as you go.
       </Tip>
     </DocSection>
   </>

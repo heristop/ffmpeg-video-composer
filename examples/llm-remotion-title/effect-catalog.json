@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "effects": [
+    {
+      "id": "studio.product-reveal",
+      "version": "1.0.0",
+      "compositionId": "LeclapProductReveal",
+      "description": "An asset-free product reveal with bounded headline, accent and spring entrance controls.",
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "headline": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "default": "Make something memorable"
+          },
+          "accent": {
+            "type": "string",
+            "enum": ["lavender", "mint", "coral"],
+            "default": "lavender"
+          },
+          "entranceDurationFrames": {
+            "type": "integer",
+            "minimum": 12,
+            "maximum": 90,
+            "default": 36
+          }
+        },
+        "additionalProperties": false
+      },
+      "assets": {}
+    },
+    {
+      "id": "studio.editorial-type",
+      "version": "1.0.0",
+      "compositionId": "LeclapEditorialType",
+      "description": "Asset-free masked, staggered, highlighted, blur-rise, opposing-slide or elastic editorial typography with bounded frame-time controls.",
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "headline": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "default": "Make your next story",
+            "description": "Headline must contain a non-whitespace character; checked during render preparation because the catalog string subset validates length only."
+          },
+          "kicker": {
+            "type": "string",
+            "maxLength": 32,
+            "default": "CREATIVE DIRECTION"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["masked-rise", "word-stagger", "highlight", "blur-rise", "split-slide", "elastic-stagger"],
+            "default": "masked-rise"
+          },
+          "accent": {
+            "type": "string",
+            "enum": ["lavender", "mint", "orange"],
+            "default": "orange"
+          },
+          "entranceDurationFrames": {
+            "type": "integer",
+            "minimum": 8,
+            "maximum": 40,
+            "default": 18
+          },
+          "staggerFrames": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 8,
+            "default": 3
+          },
+          "travelPx": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 56
+          },
+          "highlightWord": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 15,
+            "default": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "assets": {}
+    }
+  ]
+}

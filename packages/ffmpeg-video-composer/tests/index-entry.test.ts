@@ -7,6 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // with controllable fakes and never reaches real FFmpeg.
 // ---------------------------------------------------------------------------
 
+const createAdapter = vi.fn();
 const fsRead = vi.fn(async (_path: string) => JSON.stringify({ sections: [] }));
 const construct = vi.fn(async () => '/build/out.mp4');
 const configFn = vi.fn(function (this: unknown) {
@@ -26,6 +27,7 @@ const fakeLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(
 vi.mock('@/platform/PlatformBridge', () => {
   class MockPlatformBridge {
     async create(kind: string): Promise<unknown> {
+      createAdapter(kind);
       switch (kind) {
         case 'filesystem':
           return fakeFilesystem;
@@ -84,6 +86,39 @@ describe('index.ts compile / loadConfig', () => {
     construct.mockResolvedValue('/build/out.mp4');
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
     errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
+
+  it('rejects unresolved effects before platform initialization and reports the error', async () => {
+    vi.resetModules();
+    const { compile } = await loadIndex();
+    const onError = vi.fn();
+    const effect = {
+      type: 'effect',
+      name: 'intro',
+      effect: { id: 'leclap.title-reveal', version: '1.0.0', props: {}, assets: {} },
+      options: { duration: 2 },
+    };
+    expect(await compile({ buildDir: '/build' }, { sections: [effect] }, { onError })).toBeNull();
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.stringMatching(/effect_backend_unavailable.*intro/) })
+    );
+    expect(createAdapter).not.toHaveBeenCalled();
+    expect(construct).not.toHaveBeenCalled();
+  });
+
+  it('rejects a variable-produced effect before platform initialization', async () => {
+    const { compile } = await loadIndex();
+    const onError = vi.fn();
+    const descriptor = {
+      sections: [{ type: 'partial', ref: 'title', variables: { kind: 'effect' } }],
+      partials: [{ id: 'title', sections: [{ type: '{{kind}}', name: 'intro' }] }],
+    };
+    expect(await compile({ buildDir: '/build' }, descriptor as never, { onError })).toBeNull();
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.stringContaining('effect_backend_unavailable') })
+    );
+    expect(createAdapter).not.toHaveBeenCalled();
+    expect(construct).not.toHaveBeenCalled();
   });
 
   it('loadConfig reads and parses the config JSON', async () => {

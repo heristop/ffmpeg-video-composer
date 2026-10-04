@@ -12,23 +12,20 @@ import { useClickClap, type ClickClap } from './use-click-clap';
 // reads as a glitch at UI sizes), a brand-tinted shadow that sits on light and dark pages alike, and a frame
 // that holds the whole character, clapper open. Always decorative: the text beside it says what it means.
 
-const OUTLINE = '#5E51AC';
-const PUPIL = '#2a1f55';
-const BOARD_TOP = '#FFA0B7';
-const BOARD_BOTTOM = '#EE6184';
-const STRIPE_YELLOW = '#FEF0A6';
-const STRIPE_PERI = '#8C80D8';
-const DOT = '#FFF6D0';
-const CHEEK = '#FF6F97';
-const HINGE = '140 250';
-
-// The logo's board (x 96–504, y 302–496), puffed: the sides bow out a touch toward a rounder bottom.
-const BOARD =
-  'M136 302 L464 302 C488 302 504 318 506 342 L511 452 C513 488 490 510 454 511 L146 511 C110 510 87 488 89 452 L94 342 C96 318 112 302 136 302 Z';
-
-// The character's frame in the mark's 600 space: the open clapper at the top, the swinging arms at the sides,
-// the feet at the bottom. Only a wound-up stick or a flung arm reaches past it.
-const VIEW = { x: 0, y: 24, width: 600, height: 536 };
+import {
+  OUTLINE,
+  PUPIL,
+  BOARD_TOP,
+  BOARD_BOTTOM,
+  STRIPE_YELLOW,
+  STRIPE_PERI,
+  DOT,
+  CHEEK,
+  HINGE,
+  BOARD,
+  VIEW,
+  ARM,
+} from '@leclap/creative-kit/clappy';
 
 // The row the eyes sit on; the face is drawn around it.
 const EYES_Y = 396;
@@ -241,7 +238,6 @@ const SHOULDER_Y = 344;
 
 // A chubby arm hanging from its shoulder at the origin: slim where it joins the board, swelling into a
 // round mitten at the end, so a raised arm reads as a hand rather than an ear.
-const ARM = 'M-17 -4 C-19 26 -30 46 -29 68 C-28 88 -14 100 0 100 C14 100 28 88 29 68 C30 46 19 26 17 -4 Z';
 
 /**
  * Chubby arms and two little feet, drawn behind the board. Each arm hangs from its shoulder pivot and swings

@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "samples": [
+    {
+      "id": "drink-and-code",
+      "title": "Drink & code",
+      "description": "A complete multi-scene composition from the original example.",
+      "category": "templates",
+      "source": "examples/drink-and-code/drink-and-code.json"
+    },
+    {
+      "id": "type-impact",
+      "title": "Type impact",
+      "description": "Big type. Opposing entrances. A clean final hold.",
+      "category": "typography",
+      "source": "examples/motion-design/type-impact.json"
+    },
+    {
+      "id": "web-app-promo",
+      "title": "Web App Promo",
+      "description": "A cinematic app launch: masked editorial type, an uncluttered 3D screen reveal and a confident closing invitation.",
+      "category": "templates",
+      "source": "packages/leclap-creative-kit/src/templates/web-app-promo.json"
+    },
+    {
+      "id": "square-promo",
+      "title": "Square Promo",
+      "description": "A bold editorial square campaign: contrasting panels, staggered lateral typography, a full-bleed product clip and a graphic closing invitation.",
+      "category": "templates",
+      "source": "packages/leclap-creative-kit/src/templates/square-promo.json"
+    },
+    {
+      "id": "product-launch",
+      "title": "Product Launch",
+      "description": "A minimal vertical reveal: large centred product typography, a clean full-frame shot, and an offer-led closing with fast, staggered motion.",
+      "category": "templates",
+      "source": "packages/leclap-creative-kit/src/templates/product-launch.json"
+    },
+    {
+      "id": "app-tutorial",
+      "title": "App Tutorial",
+      "description": "A screen-first square lesson with numbered steps, calm mint typography and a letterboxed walkthrough.",
+      "category": "templates",
+      "source": "packages/leclap-creative-kit/src/templates/app-tutorial.json"
+    },
+    {
+      "id": "story-reel",
+      "title": "Story Reel",
+      "description": "A full-bleed three-chapter reel with alternating caption anchors, snappy opposing entrances and clean rhythmic cuts.",
+      "category": "templates",
+      "source": "packages/leclap-creative-kit/src/templates/story-reel.json"
+    },
+    {
+      "id": "fast-curious",
+      "title": "Fast & Curious",
+      "description": "Punchy two-tone flash intro \u2014 your name on a bold cut, then your clip.",
+      "category": "templates",
+      "source": "packages/leclap-creative-kit/src/templates/fast-curious.json"
+    },
+    {
+      "id": "interview",
+      "title": "Interview",
+      "description": "An 'on the record' name card, then your answer with a branded lower-third name and title.",
+      "category": "templates",
+      "source": "packages/leclap-creative-kit/src/templates/interview.json"
+    },
+    {
+      "id": "photo-backdrop",
+      "title": "Photo Backdrop",
+      "description": "A photo backdrop with a slow Ken Burns drift and a quote, then your clip graded to match.",
+      "category": "templates",
+      "source": "packages/leclap-creative-kit/src/templates/photo-backdrop.json"
+    },
+    {
+      "id": "present-yourself-portrait",
+      "title": "Present Yourself (Portrait)",
+      "description": "Introduce yourself \u2014 a cinematic title card wipes into your graded clip with your name on a lower third, all rendered on this device.",
+      "category": "templates",
+      "source": "packages/leclap-creative-kit/src/templates/present-yourself-portrait.json"
+    },
+    {
+      "id": "present-yourself",
+      "title": "Present Yourself",
+      "description": "Introduce yourself \u2014 a cinematic title card wipes into your graded clip with your name on a lower third, all rendered on this device.",
+      "category": "templates",
+      "source": "packages/leclap-creative-kit/src/templates/present-yourself.json"
+    },
+    {
+      "id": "editorial-masked-rise",
+      "title": "Masked rise",
+      "description": "Type reveals through a moving mask.",
+      "category": "typography",
+      "source": "examples/llm-remotion-title/editorial-masked-rise.json"
+    },
+    {
+      "id": "editorial-word-stagger",
+      "title": "Word stagger",
+      "description": "A phrase arrives one word at a time.",
+      "category": "typography",
+      "source": "examples/llm-remotion-title/editorial-word-stagger.json"
+    },
+    {
+      "id": "editorial-highlight",
+      "title": "Highlight",
+      "description": "A single word carries the accent.",
+      "category": "typography",
+      "source": "examples/llm-remotion-title/editorial-highlight.json"
+    },
+    {
+      "id": "editorial-blur-rise",
+      "title": "Blur rise",
+      "description": "Soft focus resolves into crisp typography.",
+      "category": "typography",
+      "source": "examples/llm-remotion-title/editorial-blur-rise.json"
+    },
+    {
+      "id": "editorial-split-slide",
+      "title": "Split slide",
+      "description": "Words travel in opposing directions.",
+      "category": "typography",
+      "source": "examples/llm-remotion-title/editorial-split-slide.json"
+    },
+    {
+      "id": "editorial-elastic-stagger",
+      "title": "Elastic stagger",
+      "description": "A spring entrance gives every word weight.",
+      "category": "typography",
+      "source": "examples/llm-remotion-title/editorial-elastic-stagger.json"
+    },
+    {
+      "id": "editorial-type",
+      "title": "Editorial typography",
+      "description": "The configurable editorial composition.",
+      "category": "typography",
+      "source": "examples/llm-remotion-title/editorial-template.json"
+    },
+    {
+      "id": "native-timing",
+      "title": "Arrive. Settle. Hold.",
+      "description": "Native line stagger and eased text departures.",
+      "category": "typography",
+      "source": "examples/motion-design/native-timing.json"
+    },
+    {
+      "id": "title-reveal",
+      "title": "Brand reveal",
+      "description": "A wordmark, a delayed logo and a quiet finish.",
+      "category": "app-demos",
+      "source": "examples/llm-remotion-title/template.json"
+    },
+    {
+      "id": "web-app-effect",
+      "title": "App launch",
+      "description": "A staged screenshot reveal with a shallow camera tilt.",
+      "category": "app-demos",
+      "source": "examples/llm-remotion-title/promo-template.json"
+    },
+    {
+      "id": "product-reveal",
+      "title": "Product reveal",
+      "description": "A configurable spring entrance with a restrained accent.",
+      "category": "app-demos",
+      "source": "examples/llm-remotion-title/custom-template.json"
+    },
+    {
+      "id": "interface-focus",
+      "title": "Interface Focus",
+      "description": "A finite overlay accent, followed by a clear hold.",
+      "category": "overlays",
+      "source": "examples/overlay-effects/preview-template.json",
+      "section": "interface_focus"
+    },
+    {
+      "id": "product-spotlight",
+      "title": "Product Spotlight",
+      "description": "A finite overlay accent, followed by a clear hold.",
+      "category": "overlays",
+      "source": "examples/overlay-effects/preview-template.json",
+      "section": "product_spotlight"
+    },
+    {
+      "id": "celebration-burst",
+      "title": "Celebration Burst",
+      "description": "A finite overlay accent, followed by a clear hold.",
+      "category": "overlays",
+      "source": "examples/overlay-effects/preview-template.json",
+      "section": "celebration_burst"
+    },
+    {
+      "id": "focus-lock",
+      "title": "Focus Lock",
+      "description": "A finite overlay accent, followed by a clear hold.",
+      "category": "overlays",
+      "source": "examples/overlay-effects/preview-template.json",
+      "section": "focus_lock"
+    },
+    {
+      "id": "light-pass",
+      "title": "Light Pass",
+      "description": "A finite overlay accent, followed by a clear hold.",
+      "category": "overlays",
+      "source": "examples/overlay-effects/preview-template.json",
+      "section": "light_pass"
+    },
+    {
+      "id": "frame-reveal",
+      "title": "Frame Reveal",
+      "description": "A finite overlay accent, followed by a clear hold.",
+      "category": "overlays",
+      "source": "examples/overlay-effects/preview-template.json",
+      "section": "frame_reveal"
+    },
+    {
+      "id": "pr-evidence",
+      "title": "Review evidence",
+      "description": "A factual context, capture and review invitation.",
+      "category": "evidence",
+      "source": "examples/agentic-pr-video/template.json"
+    },
+    {
+      "id": "before-after",
+      "title": "Before / after",
+      "description": "Matched captures with clear comparison labels.",
+      "category": "evidence",
+      "source": "examples/agentic-pr-video/before-after.json"
+    },
+    {
+      "id": "house-evidence",
+      "title": "House evidence",
+      "description": "Editorial cards and measured before/after panels.",
+      "category": "evidence",
+      "source": "examples/agentic-pr-video/evidence-skill/template.json"
+    }
+  ]
+}

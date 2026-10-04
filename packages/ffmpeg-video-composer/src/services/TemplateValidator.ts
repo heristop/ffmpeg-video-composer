@@ -142,7 +142,7 @@ export class TemplateValidator {
     for (let index = 0; index < template.sections.length; index++) {
       const section = template.sections[index];
 
-      if (section.options?.useVideoSection) {
+      if (section.type !== 'effect' && section.options?.useVideoSection) {
         const referencedSection = section.options.useVideoSection;
 
         if (!sectionNames.has(referencedSection)) {

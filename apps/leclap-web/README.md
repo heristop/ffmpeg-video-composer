@@ -1,6 +1,16 @@
 # @leclap/web — LeClap web
 
-React 19 + Vite + Tailwind web app for LeClap. It compiles videos **entirely in the browser** via WebAssembly FFmpeg — no server, no upload to a server (2 GB local-file limit) — rendering the same [`@leclap/creative-kit`](../../packages/leclap-creative-kit) templates as the mobile app and CLI.
+React 19 + Vite + Tailwind web app for LeClap. It compiles native JSON scenes **entirely in the browser** via WebAssembly FFmpeg, rendering the same [`@leclap/creative-kit`](../../packages/leclap-creative-kit) templates as the mobile app and CLI. Inputs and intermediates consume WASM memory; the approximate 2 GB input ceiling is not a supported project-size guarantee.
+
+## Engine configuration
+
+The browser host binds media/form values and supplies optional video, encoder-preset and quality-tier
+overrides through `ProjectConfig`. Descriptor `global.orientation` resolves output dimensions and
+`global.fps` wins over host fps. WASM segments render serially and always validate descriptors.
+`BrowserCompileOptions.loadFFmpegCore` configures the initial WASM load; this app serves its pinned
+core locally. Registered React effects use a separately configured Node/Remotion backend; the
+browser can compose its output clips. The showcase plays pre-rendered samples and does not enable
+that backend. See [engine configuration](../../docs/engine-configuration.md) for all defaults and limits.
 
 Key features:
 
@@ -14,7 +24,7 @@ Key features:
 
 ```bash
 pnpm install              # from the repo root
-pnpm playground:web       # dev server   (or: pnpm --filter @leclap/web dev)
+pnpm app:web              # dev server   (or: pnpm --filter @leclap/web dev)
 ```
 
 No backend is required — the compile runs entirely in a Web Worker via `@ffmpeg/ffmpeg`.

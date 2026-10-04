@@ -3,7 +3,7 @@
   "name": "dev.leclap/video",
   "title": "LeClap",
   "description": "Compose and render video from one JSON template. Deterministic, runs locally, no generative model.",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "websiteUrl": "https://leclap.dev",
   "repository": {
     "url": "https://github.com/heristop/leclap",
@@ -15,7 +15,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@leclap/mcp",
-      "version": "0.3.5",
+      "version": "0.4.0",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
@@ -37,21 +37,42 @@
         },
         {
           "name": "LECLAP_MCP_RENDER_TIMEOUT_MS",
-          "description": "Per-render timeout in milliseconds. Defaults to 600000.",
+          "description": "Separate queue, effect-preflight and worker setup/render deadlines in milliseconds, not an end-to-end budget. Defaults to 600000.",
           "format": "number",
           "isRequired": false,
           "isSecret": false
         },
         {
           "name": "LECLAP_MCP_ALLOW_REMOTION",
-          "description": "Opt in to the Remotion clip renderer, which executes local JavaScript. Off by default.",
+          "description": "Enable effect discovery, effect previews and the Remotion clip renderer. Rendering executes local JavaScript. Off by default.",
           "format": "boolean",
           "isRequired": false,
           "isSecret": false
         },
         {
           "name": "LECLAP_MCP_REMOTION_ENTRY",
-          "description": "Path to a Remotion entry point used by render_remotion_clip when it is enabled.",
+          "description": "Path to the operator-configured trusted Remotion entry point for clip rendering and registered JSON effects.",
+          "format": "filepath",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "LECLAP_MCP_REMOTION_BROWSER",
+          "description": "Path to a compatible Chrome executable. If omitted, Remotion sets up its browser.",
+          "format": "filepath",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "LECLAP_MCP_EFFECT_CACHE_MAX_BYTES",
+          "description": "Persistent registered-effect cache budget in bytes. Defaults to 536870912 (512 MiB); 0 disables caching.",
+          "format": "number",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "LECLAP_MCP_EFFECT_CATALOG",
+          "description": "Operator JSON effect catalog loaded and validated once at startup. Restart after catalog edits.",
           "format": "filepath",
           "isRequired": false,
           "isSecret": false
@@ -68,6 +89,14 @@
             "description": "Health check that returns a fixed readiness string."
           },
           {
+            "name": "list_samples",
+            "description": "Discover packaged showcase samples, creative direction, required inputs and native or Remotion setup."
+          },
+          {
+            "name": "get_sample",
+            "description": "Retrieve a sample descriptor with embedded partials and its input requirements, without downloading media or rendering."
+          },
+          {
             "name": "get_template_schema",
             "description": "Return the authoritative template descriptor JSON Schema plus the authoring guide."
           },
@@ -81,15 +110,27 @@
           },
           {
             "name": "probe_media",
-            "description": "Inspect a local media file and report its streams, duration, and dimensions."
+            "description": "Inspect a local media file and report stream codecs, duration, audio sample rate and size."
           },
           {
             "name": "render_remotion_clip",
             "description": "Render a composition from your own Remotion project to an MP4. Gated \u2014 see notes."
+          },
+          {
+            "name": "get_effect_schema",
+            "description": "Discover a registered JSON effect, its strict props and assets, output metadata, and runtime requirements."
+          },
+          {
+            "name": "render_preview",
+            "description": "Preview frames or a short frame range of a registered JSON effect using trusted local Remotion source."
+          },
+          {
+            "name": "patch_template",
+            "description": "Apply effect-prop edits to inline template JSON atomically using an expected revision, returning the updated template."
           }
         ],
         "prompts": ["compose-video"],
-        "notes": "render_remotion_clip is registered only when LECLAP_MCP_ALLOW_REMOTION is set, because it executes caller-supplied local JavaScript."
+        "notes": "Eight tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, patching and rendering; callers cannot select executable source through effect JSON. patch_template remains registered when Remotion is disabled."
       }
     }
   }

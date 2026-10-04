@@ -22,5 +22,9 @@
   "privacy": {
     "title": "Informativa sulla privacy",
     "description": "LeClap elabora i tuoi contenuti sul tuo dispositivo. Niente upload, niente account, nessun tracciamento — ecco esattamente come viene gestita la tua privacy."
+  },
+  "showcase": {
+    "title": "Galleria del movimento",
+    "description": "Guarda tutti gli esempi LeClap, esplora effetti nativi e Remotion, leggi la direzione creativa e scarica modelli JSON modificabili."
   }
 }

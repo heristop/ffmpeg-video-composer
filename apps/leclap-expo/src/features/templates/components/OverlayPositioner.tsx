@@ -14,7 +14,7 @@ import {
   PanResponder,
   type LayoutChangeEvent,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import type { TFunction } from 'i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { FONTS, findFont } from '@leclap/creative-kit/fonts';
@@ -84,147 +84,149 @@ export const OverlayPositioner = ({
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={onClose} accessibilityLabel={t('header.close')} style={styles.iconBtn}>
-            <Ionicons name="close" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('overlay.title')}</Text>
-          <TouchableOpacity onPress={onRemove} accessibilityLabel={t('overlay.remove')} style={styles.iconBtn}>
-            <Ionicons name="trash-outline" size={22} color={colors.error} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.frameWrap}>
-          <View style={[styles.frame, { aspectRatio: aspect }]} onLayout={onLayout} {...responder.panHandlers}>
-            {frame.width > 0 ? (
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.overlayChip,
-                  value.box && { backgroundColor: hexWithAlpha(value.boxcolor, value.boxOpacity) },
-                  { left: left - 1, top: top - 1, transform: [{ translateX: -0.5 }] },
-                ]}
-              >
-                <Text
-                  style={{
-                    color: value.fontcolor,
-                    fontSize: previewSize,
-                    fontWeight: '700',
-                    fontFamily: findFont(value.font)?.cssFamily,
-                  }}
-                  numberOfLines={1}
-                >
-                  {value.text.trim() === '' ? t('overlay.sample') : value.text}
-                </Text>
-              </View>
-            ) : null}
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={onClose} accessibilityLabel={t('header.close')} style={styles.iconBtn}>
+              <Ionicons name="close" size={24} color={colors.text} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>{t('overlay.title')}</Text>
+            <TouchableOpacity onPress={onRemove} accessibilityLabel={t('overlay.remove')} style={styles.iconBtn}>
+              <Ionicons name="trash-outline" size={22} color={colors.error} />
+            </TouchableOpacity>
           </View>
-          <Text style={styles.hint}>{t('overlay.hint')}</Text>
-        </View>
 
-        <View style={styles.controls}>
-          <TextInput
-            style={styles.input}
-            value={value.text}
-            onChangeText={(text) => {
-              onChange({ ...value, text });
-            }}
-            placeholder={t('overlay.placeholder', { token: '{{ firstname }}' })}
-            placeholderTextColor={colors.textSecondary}
-          />
-
-          {variables.length > 0 ? (
-            <View>
-              <Text style={styles.controlLabel}>{t('overlay.insertVariable')}</Text>
-              <View style={styles.varChips}>
-                {variables.map((name) => (
-                  <TouchableOpacity
-                    key={name}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${t('overlay.insertVariable')} ${name}`}
-                    onPress={() => {
-                      onChange({ ...value, text: `${value.text}{{ ${name} }}` });
-                    }}
-                    style={styles.varChip}
-                  >
-                    <Text style={styles.varChipText} numberOfLines={1}>
-                      {name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          ) : null}
-
-          <Slider
-            label={t('overlay.size')}
-            value={value.fontsize}
-            min={16}
-            max={96}
-            step={1}
-            format={(v) => `${Math.round(v)}px`}
-            onChange={(fontsize) => {
-              onChange({ ...value, fontsize });
-            }}
-          />
-
-          <Text style={styles.controlLabel}>{t('overlay.font')}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fontRow}>
-            {FONTS.map((font) => {
-              const active = value.font === font.id;
-
-              return (
-                <TouchableOpacity
-                  key={font.id}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: active }}
-                  accessibilityLabel={`${t('overlay.font')} ${font.label}`}
-                  onPress={() => {
-                    onChange({ ...value, font: font.id });
-                  }}
-                  style={[styles.fontChip, active && styles.fontChipActive]}
+          <View style={styles.frameWrap}>
+            <View style={[styles.frame, { aspectRatio: aspect }]} onLayout={onLayout} {...responder.panHandlers}>
+              {frame.width > 0 ? (
+                <View
+                  pointerEvents="none"
+                  style={[
+                    styles.overlayChip,
+                    value.box && { backgroundColor: hexWithAlpha(value.boxcolor, value.boxOpacity) },
+                    { left: left - 1, top: top - 1, transform: [{ translateX: -0.5 }] },
+                  ]}
                 >
                   <Text
-                    style={[styles.fontChipText, active && styles.fontChipTextActive, { fontFamily: font.cssFamily }]}
+                    style={{
+                      color: value.fontcolor,
+                      fontSize: previewSize,
+                      fontWeight: '700',
+                      fontFamily: findFont(value.font)?.cssFamily,
+                    }}
                     numberOfLines={1}
                   >
-                    {font.label}
+                    {value.text.trim() === '' ? t('overlay.sample') : value.text}
                   </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-
-          <Text style={styles.controlLabel}>{t('overlay.colour')}</Text>
-          <View style={styles.swatchRow}>
-            {TEXT_COLORS.map((c) => (
-              <TouchableOpacity
-                key={c}
-                accessibilityRole="radio"
-                accessibilityState={{ selected: value.fontcolor === c }}
-                accessibilityLabel={`${t('overlay.colour')} ${c}`}
-                onPress={() => {
-                  onChange({ ...value, fontcolor: c });
-                }}
-                style={[styles.swatch, { backgroundColor: c }, value.fontcolor === c && styles.swatchActive]}
-              />
-            ))}
+                </View>
+              ) : null}
+            </View>
+            <Text style={styles.hint}>{t('overlay.hint')}</Text>
           </View>
 
-          <Segmented
-            label={t('overlay.box')}
-            value={value.box ? 'on' : 'off'}
-            options={[
-              { value: 'off', label: t('overlay.boxOff') },
-              { value: 'on', label: t('overlay.boxOn') },
-            ]}
-            onChange={(v) => {
-              onChange({ ...value, box: v === 'on' });
-            }}
-          />
-        </View>
-      </SafeAreaView>
+          <View style={styles.controls}>
+            <TextInput
+              style={styles.input}
+              value={value.text}
+              onChangeText={(text) => {
+                onChange({ ...value, text });
+              }}
+              placeholder={t('overlay.placeholder', { token: '{{ firstname }}' })}
+              placeholderTextColor={colors.textSecondary}
+            />
+
+            {variables.length > 0 ? (
+              <View>
+                <Text style={styles.controlLabel}>{t('overlay.insertVariable')}</Text>
+                <View style={styles.varChips}>
+                  {variables.map((name) => (
+                    <TouchableOpacity
+                      key={name}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t('overlay.insertVariable')} ${name}`}
+                      onPress={() => {
+                        onChange({ ...value, text: `${value.text}{{ ${name} }}` });
+                      }}
+                      style={styles.varChip}
+                    >
+                      <Text style={styles.varChipText} numberOfLines={1}>
+                        {name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            ) : null}
+
+            <Slider
+              label={t('overlay.size')}
+              value={value.fontsize}
+              min={16}
+              max={96}
+              step={1}
+              format={(v) => `${Math.round(v)}px`}
+              onChange={(fontsize) => {
+                onChange({ ...value, fontsize });
+              }}
+            />
+
+            <Text style={styles.controlLabel}>{t('overlay.font')}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fontRow}>
+              {FONTS.map((font) => {
+                const active = value.font === font.id;
+
+                return (
+                  <TouchableOpacity
+                    key={font.id}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: active }}
+                    accessibilityLabel={`${t('overlay.font')} ${font.label}`}
+                    onPress={() => {
+                      onChange({ ...value, font: font.id });
+                    }}
+                    style={[styles.fontChip, active && styles.fontChipActive]}
+                  >
+                    <Text
+                      style={[styles.fontChipText, active && styles.fontChipTextActive, { fontFamily: font.cssFamily }]}
+                      numberOfLines={1}
+                    >
+                      {font.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            <Text style={styles.controlLabel}>{t('overlay.colour')}</Text>
+            <View style={styles.swatchRow}>
+              {TEXT_COLORS.map((c) => (
+                <TouchableOpacity
+                  key={c}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: value.fontcolor === c }}
+                  accessibilityLabel={`${t('overlay.colour')} ${c}`}
+                  onPress={() => {
+                    onChange({ ...value, fontcolor: c });
+                  }}
+                  style={[styles.swatch, { backgroundColor: c }, value.fontcolor === c && styles.swatchActive]}
+                />
+              ))}
+            </View>
+
+            <Segmented
+              label={t('overlay.box')}
+              value={value.box ? 'on' : 'off'}
+              options={[
+                { value: 'off', label: t('overlay.boxOff') },
+                { value: 'on', label: t('overlay.boxOn') },
+              ]}
+              onChange={(v) => {
+                onChange({ ...value, box: v === 'on' });
+              }}
+            />
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
     </Modal>
   );
 };

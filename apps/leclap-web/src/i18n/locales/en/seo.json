@@ -22,5 +22,9 @@
   "privacy": {
     "title": "Privacy Policy",
     "description": "LeClap processes your media on your device. No uploads, no accounts, no tracking — here is exactly how your privacy is handled."
+  },
+  "showcase": {
+    "title": "Motion showcase",
+    "description": "Watch every LeClap sample, explore native and Remotion motion, read the creative direction and download editable JSON templates."
   }
 }

@@ -22,6 +22,17 @@ function captureHandler(): Handler {
 }
 
 describe('compose-video prompt', () => {
+  it('passes the supplied direction into the authoring and preview workflow', () => {
+    const result = captureHandler()({ creativeDirection: '  Quiet editorial. Long readable holds.  ' }) as {
+      messages: { content: { text: string } }[];
+    };
+    const text = result.messages[0].content.text;
+    expect(text).toContain('Quiet editorial. Long readable holds.');
+    expect(text).toContain('meta.creativeDirection');
+    expect(text).toContain('get_effect_schema');
+    expect(text).toContain('render_preview');
+  });
+
   it('primes the schema-first authoring loop', () => {
     const result = captureHandler()({ goal: 'a launch card', orientation: 'landscape' }) as {
       messages: { content: { text: string } }[];

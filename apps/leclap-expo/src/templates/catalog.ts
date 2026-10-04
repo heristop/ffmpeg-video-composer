@@ -24,6 +24,7 @@ export const expandCatalogPartials = (descriptor: TemplateDescriptor): TemplateD
 };
 
 const toTemplate = (entry: CatalogTemplate | UserTemplate): Template => ({
+  id: entry.id,
   name: entry.name,
   content: expandCatalogPartials(entry.descriptor),
   source: entry.source,

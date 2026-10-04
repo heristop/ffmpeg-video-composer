@@ -175,6 +175,7 @@
     "similarity": "Strength"
   },
   "titleCard": {
+    "stagger": "Line delay",
     "hint": "A clean kicker / headline / subtitle card — sized to the orientation.",
     "kicker": "Kicker",
     "kickerPlaceholder": "e.g. INTRODUCING",
@@ -371,7 +372,34 @@
     "mirrorVertical": "Vertical",
     "add": "Add an animation",
     "layer": "Animation {{number}}",
-    "remove": "Remove animation"
+    "remove": "Remove animation",
+    "effects": {
+      "label": "Effect combinations",
+      "interface-focus": {
+        "name": "Interface focus",
+        "description": "Frame a detail with a brief pulse."
+      },
+      "product-spotlight": {
+        "name": "Product spotlight",
+        "description": "A soft orbit and a single shine sweep."
+      },
+      "celebration-burst": {
+        "name": "Celebration burst",
+        "description": "A short confetti and sparkle accent."
+      },
+      "focus-lock": {
+        "name": "Focus lock",
+        "description": "A bracket frame with one soft ring."
+      },
+      "light-pass": {
+        "name": "Light pass",
+        "description": "A brief light wash and a small sparkle."
+      },
+      "frame-reveal": {
+        "name": "Frame reveal",
+        "description": "A fine frame with a single shine sweep."
+      }
+    }
   },
   "overlays": {
     "kind": "Overlays",

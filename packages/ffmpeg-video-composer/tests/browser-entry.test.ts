@@ -101,6 +101,22 @@ describe('browser.ts compileBrowser', () => {
     debugSpy.mockRestore();
   });
 
+  it('rejects unresolved effects before loading the WASM engine', async () => {
+    vi.resetModules();
+    adapterArgs.length = 0;
+    const { compileBrowser } = await loadBrowser();
+    const effect = {
+      type: 'effect',
+      name: 'intro',
+      effect: { id: 'leclap.title-reveal', version: '1.0.0', props: {}, assets: {} },
+      options: { duration: 2 },
+    };
+    await expect(compileBrowser({}, { sections: [effect] })).rejects.toThrow(/effect_backend_unavailable.*intro/);
+    expect(adapterArgs).toHaveLength(0);
+    expect(waitForReady).not.toHaveBeenCalled();
+    expect(construct).not.toHaveBeenCalled();
+  });
+
   it('compiles via the DI container and returns the output path', async () => {
     const { compile } = await loadBrowser();
     const result = await compile({ buildDir: '/build' }, validDescriptor);

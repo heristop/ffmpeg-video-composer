@@ -14,6 +14,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const expo = resolve(root, 'apps/leclap-expo');
 const disc = readFileSync(resolve(root, 'apps/leclap-web/public/favicon.svg'), 'utf8');
 const launcher = readFileSync(resolve(expo, 'assets/icon-source.svg'), 'utf8');
+// Separate Android layers preserve launcher masking, motion, and themed tinting.
+const adaptive = readFileSync(resolve(expo, 'assets/adaptive-foreground.svg'), 'utf8');
+const adaptiveBackground = readFileSync(resolve(expo, 'assets/adaptive-background.svg'), 'utf8');
+const adaptiveMonochrome = readFileSync(resolve(expo, 'assets/adaptive-monochrome.svg'), 'utf8');
 
 if (!existsSync(resolve(expo, 'ios')) && !existsSync(resolve(expo, 'android'))) {
   console.log('No prebuilt ios/android dirs — nothing to refresh (managed workflow).');
@@ -23,7 +27,7 @@ if (!existsSync(resolve(expo, 'ios')) && !existsSync(resolve(expo, 'android'))) 
 // Cache one render per (source, size).
 const cache = new Map<string, Buffer>();
 const png = (svg: string, size: number): Buffer => {
-  const key = `${svg.length}:${size}`;
+  const key = `${size}:${svg}`;
   const cached = cache.get(key);
 
   if (cached) return cached;
@@ -53,7 +57,9 @@ const webpTargets: [number, string, string][] = Object.entries(DENSITIES).flatMa
   ([d, s]): [number, string, string][] => [
     [Math.round(48 * s), `android/app/src/main/res/mipmap-${d}/ic_launcher.webp`, launcher],
     [Math.round(48 * s), `android/app/src/main/res/mipmap-${d}/ic_launcher_round.webp`, launcher],
-    [Math.round(108 * s), `android/app/src/main/res/mipmap-${d}/ic_launcher_foreground.webp`, launcher],
+    [Math.round(108 * s), `android/app/src/main/res/mipmap-${d}/ic_launcher_foreground.webp`, adaptive],
+    [Math.round(108 * s), `android/app/src/main/res/mipmap-${d}/ic_launcher_background.webp`, adaptiveBackground],
+    [Math.round(108 * s), `android/app/src/main/res/mipmap-${d}/ic_launcher_monochrome.webp`, adaptiveMonochrome],
   ]
 );
 
@@ -75,6 +81,21 @@ for (const [size, rel, svg] of webpTargets) {
     { input: png(svg, size) }
   );
   console.log(`${String(size).padStart(4)}px  ${rel}`);
+}
+
+// Keep existing prebuilt resources aligned with Expo's adaptiveIcon configuration.
+const adaptiveXml = `<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+  <background android:drawable="@mipmap/ic_launcher_background"/>
+  <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+  <monochrome android:drawable="@mipmap/ic_launcher_monochrome"/>
+</adaptive-icon>
+`;
+
+for (const name of ['ic_launcher', 'ic_launcher_round']) {
+  const out = resolve(expo, `android/app/src/main/res/mipmap-anydpi-v26/${name}.xml`);
+
+  if (existsSync(out)) writeFileSync(out, adaptiveXml);
 }
 
 console.log(`\nRefreshed ${pngTargets.length} PNG + ${webpTargets.length} webp native icons`);

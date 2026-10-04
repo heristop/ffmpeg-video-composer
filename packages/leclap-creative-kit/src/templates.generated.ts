@@ -10,6 +10,7 @@ import PresentYourself from './templates/present-yourself.json';
 import ProductLaunch from './templates/product-launch.json';
 import SquarePromo from './templates/square-promo.json';
 import StoryReel from './templates/story-reel.json';
+import WebAppPromo from './templates/web-app-promo.json';
 
 export const TEMPLATE_DESCRIPTORS: Record<string, TemplateDescriptor> = {
   'app-tutorial': AppTutorial,
@@ -20,5 +21,6 @@ export const TEMPLATE_DESCRIPTORS: Record<string, TemplateDescriptor> = {
   'present-yourself': PresentYourself as TemplateDescriptor,
   'product-launch': ProductLaunch,
   'square-promo': SquarePromo,
-  'story-reel': StoryReel as TemplateDescriptor,
+  'story-reel': StoryReel,
+  'web-app-promo': WebAppPromo,
 };

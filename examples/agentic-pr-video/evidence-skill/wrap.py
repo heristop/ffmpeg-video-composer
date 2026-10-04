@@ -1,8 +1,8 @@
 """Measure copy on real glyph advances, so build.py refuses to draw text that would leave its box.
 
-drawtext never wraps and never complains: a description longer than its column runs straight off the
-frame, and neither the render nor `leclap validate` says a word. Measuring here, before ffmpeg runs,
-is the only place that mistake can surface.
+drawtext does not wrap copy into the house template's columns. LeClap's geometry advisories can flag
+some risks, but do not prove that copy fits these panels. Measuring here, before ffmpeg runs,
+checks the actual glyph advances against the authored text box.
 
 Standard library only. The four TrueType tables a measure needs (head, hhea, hmtx, cmap) are read
 directly, so the skill adds no Python dependency. Kerning is ignored on purpose: it only ever narrows

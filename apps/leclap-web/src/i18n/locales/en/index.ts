@@ -2,6 +2,7 @@
 // here so they are both registered with i18next and picked up by the typed-key
 // augmentation in src/types/react-i18next.d.ts.
 import common from './common.json';
+import showcase from './showcase.json';
 import home from './home.json';
 import about from './about.json';
 import compare from './compare.json';
@@ -20,6 +21,7 @@ import privacy from './privacy.json';
 
 export const en = {
   common,
+  showcase,
   home,
   about,
   compare,

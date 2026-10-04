@@ -37,6 +37,10 @@
     },
     "./library/*": {
       "default": "./src/library/*"
+    },
+    "./clappy": {
+      "types": "./src/clappy.ts",
+      "default": "./src/clappy.ts"
     }
   },
   "scripts": {

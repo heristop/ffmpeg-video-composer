@@ -30,7 +30,8 @@
     "templates": "Vorlagen",
     "docs": "Docs",
     "about": "Über LeClap",
-    "primaryLabel": "Primär"
+    "primaryLabel": "Primär",
+    "showcase": "Galerie"
   },
   "header": {
     "switchToLight": "Zum hellen Design wechseln",

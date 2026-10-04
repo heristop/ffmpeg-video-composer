@@ -1,13 +1,21 @@
-# Performance findings (ranked)
+# Performance findings (historical measurements)
 
-Generated from `pnpm bench` measurements on the `feat/ffmpeg-effects` branch (Apple Silicon,
-ffmpeg 8.1.1). Reproduce with `pnpm --filter ffmpeg-video-composer bench` and
-`FVC_PERF=1 pnpm compile <fixture>`. See `docs/performance.md` for the tooling.
+Recorded from benchmark work on `feat/ffmpeg-effects` (Apple Silicon, FFmpeg 8.1.1). These tables
+are historical snapshots, not fresh measurements of the current branch. The original raw reports
+and exact benchmark commit are not included here. Parallel rendering, concat folding, and finalize
+fusion are implemented; the original analysis below is retained to explain those decisions.
+
+Build the current core and re-measure with `pnpm --filter ffmpeg-video-composer bench` and
+`FVC_PERF=1 pnpm compile <fixture>`. See [`performance.md`](./performance.md) for the tooling and its
+concurrent-span limitation: reported FFmpeg share is a profiling hint, not a precise wall-time
+fraction under parallel execution.
 
 ## Measured benchmarks (A/B)
 
-Median of 5 runs (1 warmup discarded), Apple Silicon (`J4MPHVYFP0`), ffmpeg 8.1.1. No Rust changes —
-both wins are in the TypeScript orchestration layer. FFmpeg remains 78–98% of wall time.
+Original record: 5 runs with 1 warmup discarded, Apple Silicon (`J4MPHVYFP0`), FFmpeg 8.1.1.
+The harness discards run 0, so `BENCH_RUNS=5` yields 4 measured samples; use `BENCH_RUNS=6` for 5
+measured samples today. The original reported FFmpeg shares were 78–98%, subject to the timer
+limitation above. These optimizations changed TypeScript orchestration, not Rust.
 
 ### 1. Parallel segment render — `fast-and-curious` (3 segments)
 
@@ -50,7 +58,8 @@ Toggle: `FVC_DISABLE_CONCAT_FOLD=1` (two-pass) vs default (folded).
 
 The fold removes the standalone concat-copy pass entirely (here ~69 ms). It's a **stream-copy**, so
 the saving is I/O-bound — small on short native clips, proportional to output size on long-form, and
-larger on WASM/on-device (one fewer full MEMFS write+read + engine invocation). Treat the total-time
+potentially larger on WASM/on-device (one fewer full read/write + engine invocation); those platforms
+were not measured in this table. Treat the total-time
 delta as noisy on this short fixture; the reliable figure is the eliminated `final:assemble` pass.
 
 ### 4. Finalize fusion (xfade + overlay) — DONE
@@ -75,23 +84,23 @@ median of runs, `FVC_PERF=1`:
 Two video re-encodes (537 + 1203 = 1740 ms) become one (1463 ms) — ~280 ms of redundant
 re-encode removed, `director:finalize` −12%. `compile:total` is render-noise-dominated on this
 fixture (segment renders dwarf the delta), so finalize is the reliable measure. Applies only to
-templates with transitions **and** animations; all other paths unchanged. Full e2e suite green.
+templates with non-cut transitions **and** whole-video overlay work (animations or a watermark). The original
+record reports a green e2e suite; that is not a current verification result.
 
 ### 5. Cross-segment remote-asset prefetch — WON'T DO (no measurable headroom)
 
 Gate (static analysis of `AssetManager`): the per-segment fetches are already parallel internally
 (`Promise.all` over assets/fonts/LUTs), and across segments the cost is already near-zero because:
-media assets are **cached cross-segment** in the template singleton (`AssetManager.ts:207-209` — a
-repeated `videoUrl` isn't re-downloaded), fonts are **bundled-first** then disk-cached
-(`resolveBundledFont` → `copy`), and **LUTs are generated locally** (`cubeFor`), never fetched. No
-remote (`https://`) fixtures exist, and a real network benchmark here is flaky/unrepresentative. So
-the only workload with headroom is many segments each pulling a _distinct_ remote video — not the
-common case. Recorded as won't-do; revisit (the up-front parallel prefetch in the plan, Task C2) only
+media assets are **cached cross-segment** in the template singleton (the
+template input cache — a repeated `videoUrl` is not re-downloaded), fonts are **bundled-first** then disk-cached
+(`resolveBundledFont` → `copy`), and **LUTs are generated locally** (`cubeFor`), never fetched. The
+recorded local-fixture benchmark did not measure a remote-heavy workload. Many segments each
+pulling a distinct remote video or font remain a workload to measure before dismissing prefetch. Recorded as won't-do; revisit (the up-front parallel prefetch in the plan, Task C2) only
 if a real remote-heavy template shows `segment:assets`/`segment:fonts` as a meaningful share.
 
-## Headline: FFmpeg dominates; the TS layer is noise
+## Serial baseline: FFmpeg dominated the measured local fixtures
 
-Measured `ffmpeg share` of total compile time:
+Historically reported `ffmpeg share` (summed spans / report elapsed time):
 
 | Fixture                    | segments | ffmpeg:execute calls | total   | ffmpeg share |
 | -------------------------- | -------- | -------------------- | ------- | ------------ |
@@ -101,14 +110,14 @@ Measured `ffmpeg share` of total compile time:
 | `concat-videos-with-music` | 3+       | 5                    | 1208 ms | 95.4%        |
 
 The entire TypeScript orchestration layer — filter-graph assembly, map building, asset/font/LUT
-resolution, formatting — sums to **well under 1 ms per segment** in every fixture
+resolution, formatting — sums to **well under 1 ms per segment** in these measured local fixtures
 (`segment:filters` ≈ 0.3–0.9 ms summed across 3 segments; `segment:maps/inputs/fonts/luts` ≈ 0.0 ms).
 It is three to four orders of magnitude below the ffmpeg cost.
 
-**Conclusion: the "ffmpeg-encode-dominated" prior is confirmed.** Any real wall-time win must come
-from how ffmpeg work is _scheduled_, not from optimizing TS.
+**Historical conclusion:** these fixtures favored changing FFmpeg scheduling and pass structure.
+They do not rule out meaningful TS or asset-fetch costs in other workloads.
 
-## Ranked backlog
+## Implemented optimizations and original analysis
 
 ### 1. Bounded-parallel segment render — DONE (default-on, Node/static)
 
@@ -126,9 +135,14 @@ Measured on `fast-and-curious` (3 segments, median of 2, Apple Silicon, ffmpeg 8
 | parallel (default 3)               | 545 ms | 263 ms          | 80.2%        |
 
 ≈ **40% faster total, ≈50% faster render phase**. Gain scales with segment count and shrinks on
-core-saturated machines (each ffmpeg is already multi-threaded). Full e2e suite stays green.
+core-saturated machines (each ffmpeg is already multi-threaded). The original record reports a green
+e2e suite; no new validation or benchmark run is implied here.
 
-#### Original analysis
+#### Original analysis (before implementation)
+
+The source line references and proposed default below belong to the original analysis. The current
+implementation is in `src/director/render-segments-concurrently.ts` and defaults to **3** on
+Node/static adapters.
 
 `director:render` is the serial per-segment loop (`TemplateDirector.ts:263`). It runs one ffmpeg
 process at a time:
@@ -169,35 +183,37 @@ bounded: each ffmpeg is already multi-threaded, so on a core-saturated machine o
 transitions and animation overlays, which are mandatory frame compositing. The remaining waste was a
 **separate concat-copy pass**: concat wrote the whole assembled video (`-c copy`), then the next
 audio pass moved it aside, re-read it, and rewrote it just to touch audio. When there are no
-transitions and no animations, the director now skips the standalone concat and feeds the concat
+non-cut transitions or whole-video overlays (animations/watermark), and a music mix or normalization
+pass will actually run, the director now skips the standalone concat and feeds the concat
 demuxer (`-f concat … -i <list>`) straight into the single audio pass, which stream-copies video and
 mixes/normalizes audio in one invocation (`appendMusic`/`normalizeAudio` accept a `VideoSource`).
 The music filtergraph's `[0:a]`/`[1:a]` indices are unchanged.
 
 **All platforms** (Node, ffmpeg-static, React Native/on-device, WASM): the fold is one ffmpeg
 invocation; `FFmpegWasmAdapter.execute` already bridges concat-list segments + the music input into
-MEMFS generically, so no virtual-FS gate is needed. (WASM e2e is env-blocked here; WASM correctness
-rests on the adapter's bridging tests + the shared command builder.)
+MEMFS generically, so no virtual-FS gate is needed. (The original run could not exercise WASM e2e; its WASM confidence
+came from bridging tests and the shared command builder.)
 
 **Honest sizing (corrected):** the concat pass is **stream-copy**, not a re-encode — it's I/O-bound.
 Measured on `concat-music-cuts` (3×4s, music, cuts): the standalone concat-copy ran **~60 ms**, and
 folding it away makes `director:finalize` collapse to just `final:music` (~296 ms) with no separate
 `final:assemble`. So the native wall-clock win is **modest and proportional to output size**
-(tens of ms on short clips, more on long-form). It is **proportionally larger on WASM/on-device**,
-where it removes a full extra MEMFS write+read of the assembled video and one engine invocation.
+(tens of ms on short clips, more on long-form). WASM/on-device may benefit from avoiding a full extra assembled-video write/read and one engine
+invocation, but this record contains no timed comparison on those platforms.
 Beyond speed, it's a structural simplification (one fewer pass / temp file).
 
 > Note: an earlier draft mis-attributed a ~1 s `final:assemble` to the concat copy — that figure was
 > the **xfade re-encode** in a transitions fixture (`concat-videos-with-music` carries a global fade),
-> which this fold deliberately does **not** touch. Transition/animation re-encodes remain the large,
-> unavoidable finalize costs; fusing them into a single filtergraph is a separate, higher-risk lever.
+> which this fold deliberately does **not** touch. Transition/animation re-encodes remain large
+> finalize costs; the fusion in A/B finding #4 now combines them when both are present.
 
 ### 3. Overlap independent per-segment fetches — WON'T DO (below noise floor)
 
-`SegmentBuilder.ts:191-195` fetches fonts then LUTs serially. Measured `segment:fonts` and
+The current `SegmentBuilder` fetches fonts then LUTs serially; each `AssetManager` fetch method
+parallelizes its own requests. Measured `segment:fonts` and
 `segment:luts` are **0.0 ms** for the local-asset fixtures. Parallelizing them saves nothing here.
-_Caveat:_ these are network-bound for remote assets — re-measure with a remote-asset descriptor
-before fully dismissing; the local-fixture data cannot speak to that case.
+_Caveat:_ remote fonts/media can be network-bound; built-in LUTs are generated locally with `cubeFor`.
+Re-measure a remote-heavy descriptor before drawing conclusions beyond the local fixtures.
 
 ### 4. TS micro-optimizations — WON'T DO (below noise floor)
 
@@ -216,8 +232,9 @@ These would only matter for a descriptor with hundreds of filters per segment; i
 appears, re-measure `segment:filters`/`segment:maps` first and only then act on the specific span
 that grows.
 
-## Phase 2 recommendation
+## Status of the original Phase 2 recommendation
 
-Implement **only finding #1** (bounded-parallel render) as the first Phase 2 task, verifying the
-`director:render` delta with `pnpm bench`. Treat #2 as a separate, correctness-gated investigation.
-Do not implement #3/#4 — the data does not justify them.
+Bounded-parallel rendering, concat folding, and transition/overlay fusion are already implemented.
+The recommendation to implement findings #1/#2 is therefore historical. Re-run current workloads
+before pursuing fetch overlap or TS micro-optimizations; the local baseline alone does not justify
+them.

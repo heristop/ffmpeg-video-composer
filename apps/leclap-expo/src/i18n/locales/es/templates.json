@@ -13,7 +13,12 @@
   "cardDefaultDescription": "Crea un vídeo con esta plantilla",
   "custom": "Personalizado",
   "search": {
-    "placeholder": "Buscar plantillas..."
+    "placeholder": "Buscar plantillas...",
+    "clear": "Borrar búsqueda",
+    "count_one": "{{count}} plantilla",
+    "count_other": "{{count}} plantillas",
+    "emptyTitle": "No se encontraron plantillas",
+    "emptyBody": "Prueba otro nombre o borra la búsqueda."
   },
   "refresh": {
     "syncWhenOnline": "Desliza para sincronizar al estar en línea",

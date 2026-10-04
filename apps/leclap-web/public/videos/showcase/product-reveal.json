@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "creativeDirection": "Direction: a restrained operator-owned product reveal demonstrating custom effect discovery. Use the lavender accent, one headline and a controlled spring entrance; keep the component frame-driven and its JSON props within the registered contract. Make the reveal feel physical without repeated bouncing. Treat this as an illustrative effect example, not proof of a product feature. Avoid unseeded randomness, CSS timing and adding executable source to JSON. Review entrance, peak travel, settling and final frame through the registered effect preview."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false
+  },
+  "sections": [
+    {
+      "name": "product",
+      "type": "effect",
+      "options": {
+        "duration": 10
+      },
+      "effect": {
+        "id": "studio.product-reveal",
+        "version": "1.0.0",
+        "props": {
+          "headline": "Make something memorable",
+          "accent": "lavender",
+          "entranceDurationFrames": 36
+        },
+        "assets": {}
+      }
+    }
+  ]
+}

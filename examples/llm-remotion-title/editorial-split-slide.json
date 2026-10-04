@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "creativeDirection": "Direction: an editorial study of split-slide. Keep one dominant headline on dark ink with a orange accent. Use a single per-word entrance, then a stable reading hold. Keep motion bounded and opacity between zero and one; preserve every word. Avoid layering different text treatments together. Review early visible glyphs, stagger, travel, longest allowed copy, settling and final fade."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false
+  },
+  "sections": [
+    {
+      "name": "editorial",
+      "type": "effect",
+      "options": {
+        "duration": 10
+      },
+      "effect": {
+        "id": "studio.editorial-type",
+        "version": "1.0.0",
+        "props": {
+          "headline": "Make room for something bold",
+          "kicker": "CREATIVE DIRECTION",
+          "mode": "split-slide",
+          "accent": "orange",
+          "entranceDurationFrames": 22,
+          "staggerFrames": 4,
+          "travelPx": 48,
+          "highlightWord": 0
+        },
+        "assets": {}
+      }
+    }
+  ]
+}

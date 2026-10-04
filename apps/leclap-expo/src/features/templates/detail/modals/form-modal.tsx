@@ -1,6 +1,6 @@
 import { Modal, ScrollView, View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { SafeAreaProvider, SafeAreaView, initialWindowMetrics } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import type { Section, Project } from '@/src/types';
 import FormSection from '@/src/features/editor/components/FormSection';
@@ -23,8 +23,8 @@ export function FormModal({ section, formData, onFormDataChange, onClose, onSubm
 
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <SafeAreaView style={styles.formModalContainer} edges={['top', 'bottom']}>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.formModalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.formHeader}>
             <Text style={styles.formTitle}>{section.title?.en ?? section.name}</Text>
             <PressableScale onPress={onClose} accessibilityLabel={t('actions.done')}>

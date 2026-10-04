@@ -82,6 +82,16 @@ export function importDescriptorJson(text: string, current: EditorState): Import
   }
 
   const descriptor = result.data as TemplateDescriptor;
+
+  // Effect sections have no builder representation yet. Importing them would silently turn the effect
+  // into a camera or upload slot with no effect id, props or assets, so refuse and point at the JSON.
+  if (descriptor.sections?.some((section) => section.type === 'effect')) {
+    return {
+      ok: false,
+      errors: ['Effect sections cannot be edited in the builder yet. Edit this template as JSON instead.'],
+    };
+  }
+
   const state = toEditorState({
     id: current.id,
     name: current.name,

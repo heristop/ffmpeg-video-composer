@@ -175,6 +175,7 @@
     "similarity": "Intensidad"
   },
   "titleCard": {
+    "stagger": "Retraso entre líneas",
     "hint": "Una tarjeta limpia de antetítulo / titular / subtítulo, ajustada a la orientación.",
     "kicker": "Antetítulo",
     "kickerPlaceholder": "p. ej. PRESENTAMOS",
@@ -371,7 +372,34 @@
     "mirrorVertical": "Vertical",
     "add": "Añadir una animación",
     "layer": "Animación {{number}}",
-    "remove": "Eliminar animación"
+    "remove": "Eliminar animación",
+    "effects": {
+      "label": "Combinaciones de efectos",
+      "interface-focus": {
+        "name": "Enfoque de interfaz",
+        "description": "Enmarca un detalle con un breve pulso."
+      },
+      "product-spotlight": {
+        "name": "Producto destacado",
+        "description": "Una órbita suave y un único reflejo."
+      },
+      "celebration-burst": {
+        "name": "Explosión festiva",
+        "description": "Un breve acento de confeti y destellos."
+      },
+      "focus-lock": {
+        "name": "Foco fijo",
+        "description": "Un marco de esquinas con un anillo suave."
+      },
+      "light-pass": {
+        "name": "Paso de luz",
+        "description": "Un breve baño de luz y un pequeño destello."
+      },
+      "frame-reveal": {
+        "name": "Revelado del marco",
+        "description": "Un marco fino con un único barrido de brillo."
+      }
+    }
   },
   "overlays": {
     "kind": "Superposiciones",

@@ -1,11 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { mcpDoc } from './mcpDocs';
+import serverManifest from '../../../../../../packages/leclap-mcp/server.json';
 
 describe('mcpDoc', () => {
   it('documents the MCP authoring and rendering flow', () => {
     expect(mcpDoc.id).toBe('mcp');
     expect(mcpDoc.title).toContain('MCP');
-    expect(mcpDoc.flow).toEqual(['get_template_schema', 'validate_template', 'compose_video']);
+    expect(mcpDoc.flow).toEqual([
+      'list_samples',
+      'get_sample',
+      'get_template_schema',
+      'validate_template',
+      'compose_video',
+    ]);
   });
 
   it('documents the agentic PR evidence recipe without claiming upload support', () => {
@@ -22,14 +29,13 @@ describe('mcpDoc', () => {
   it('includes every tool the server registers', () => {
     const toolNames = mcpDoc.tools.map((tool) => tool.name);
 
-    expect(toolNames).toEqual([
-      'get_template_schema',
-      'validate_template',
-      'compose_video',
-      'probe_media',
-      'render_remotion_clip',
-      'ping',
-    ]);
+    const registered = serverManifest._meta['io.modelcontextprotocol.registry/publisher-provided']['dev.leclap.video'];
+    expect([...toolNames].sort()).toEqual(registered.tools.map((tool) => tool.name).sort());
+  });
+
+  it('documents every published MCP environment setting', () => {
+    const published = serverManifest.packages[0].environmentVariables.map((entry) => entry.name);
+    expect(mcpDoc.config.map((entry) => entry.env).sort()).toEqual(published.sort());
   });
 
   it('no longer documents the removed catalog / storyboard tools', () => {
@@ -40,16 +46,16 @@ describe('mcpDoc', () => {
     expect(toolNames).not.toContain('draft_template_from_remotion_storyboard');
   });
 
-  it('marks render_remotion_clip as the only opt-in tool', () => {
+  it('marks the three Remotion tools as opt-in', () => {
     const optIn = mcpDoc.tools.filter((tool) => tool.optIn).map((tool) => tool.name);
 
-    expect(optIn).toEqual(['render_remotion_clip']);
+    expect(optIn.sort()).toEqual(['get_effect_schema', 'render_preview', 'render_remotion_clip']);
   });
 
   it('names each tool arguments so an agent knows what to pass', () => {
     const compose = mcpDoc.tools.find((tool) => tool.name === 'compose_video');
 
-    expect(compose?.args).toBe('template, fields?, userVideoPaths?, locale?, outputBaseName?');
+    expect(compose?.args).toBe('template, fields?, userVideoPaths?, locale?, outputBaseName?, expectedRevision?');
     expect(mcpDoc.tools.every((tool) => tool.args.length > 0)).toBe(true);
   });
 
