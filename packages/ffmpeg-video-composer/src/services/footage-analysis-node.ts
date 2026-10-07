@@ -10,12 +10,12 @@ import { fileDigest } from './command-inputs-node';
 const silenceCache = new Map<string, Promise<SilenceSpan[]>>();
 const filterLists = new Map<string, Promise<Set<string>>>();
 
-/** Filter names from `ffmpeg -filters` output (` T.C name  A->A  description`). */
+/** Filter names from `ffmpeg -filters` output (` T.C name  A->A  …` to FFmpeg 7, ` TS name  A->A  …` from 8). */
 export function parseFilterList(stdout: string): Set<string> {
   const names = new Set<string>();
 
   for (const line of stdout.split('\n')) {
-    const match = /^\s[.A-Z|]{3}\s+(\w+)\s+\S+->\S+/.exec(line);
+    const match = /^\s[.A-Z|]{2,3}\s+(\w+)\s+\S+->\S+/.exec(line);
 
     if (match) names.add(match[1]);
   }

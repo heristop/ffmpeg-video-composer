@@ -10,7 +10,7 @@ import { reportedTraits } from '../../core/footage/media-traits';
 import { parseCommand } from './parse-command';
 import { FFPROBE_MISSING_MESSAGE, resolveStaticFfprobe } from './resolve-ffprobe';
 import { spawnFailure, tailStderr } from './tail-stderr';
-import { withFilterScripts } from './filter-scripts-node';
+import { optionFileSyntaxOf, withFilterScripts } from './filter-scripts-node';
 import { measureLoudness } from './analyze-node';
 
 const requireModule = createRequire(import.meta.url);
@@ -72,7 +72,11 @@ class FFmpegStaticAdapter extends AbstractFFmpeg {
       // Errors only, as in FFmpegNodeAdapter: the default level buries the reason under the banner and
       // the stream dumps.
       const binary = this.ffmpegPath;
-      await withFilterScripts(['-loglevel', 'error', ...parseCommand(command)], (args) => execFileAsync(binary, args));
+      await withFilterScripts(
+        ['-loglevel', 'error', ...parseCommand(command)],
+        (args) => execFileAsync(binary, args),
+        () => optionFileSyntaxOf(binary)
+      );
 
       return { rc: 0 };
     } catch (error) {

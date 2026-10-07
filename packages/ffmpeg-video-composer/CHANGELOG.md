@@ -217,6 +217,15 @@ Upgrading from v2? See the [migration guide](MIGRATION.md#upgrading-from-v2-to-v
 - `project_video` sections whose audio is shorter than the video no longer lose video frames to
   `-shortest` (the clip's audio is padded).
 - Normalisation now runs when music is enabled but no track resolves.
+- FFmpeg 9 support. A filtergraph longer than 64 KB goes through `-/filter_complex <file>` (and `-/vf`, `-/af`)
+  on FFmpeg 7.0 and later, because FFmpeg 9 removed `-filter_complex_script` and `-filter_script`. FFmpeg 6
+  (`ffmpeg-static`) keeps the script options.
+- FFmpeg 9: a music mix over cut-only sections no longer loses its last 0.1 s of video. FFmpeg 9's
+  `-shortest` ended the stream-copied concat video early, so on FFmpeg 9 the mix reads the assembled file.
+  Version checks now live in `core/ffmpeg-version.ts`.
+- HDR clips are tone-mapped again on FFmpeg 8 and later builds that have `zscale`. The engine's
+  `-filters` parser expected the three-character flag column FFmpeg 7 printed, so it found no filters
+  and logged `hdr_source_sdr_pipeline`.
 
 ## [2.5.0] - 2026-10-03
 

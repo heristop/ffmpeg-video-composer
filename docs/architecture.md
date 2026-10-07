@@ -264,6 +264,14 @@ The architecture is designed to support multiple platforms:
 
 On Node, `FFmpegDetector` checks system `ffmpeg -version` first (`FFmpegNodeAdapter`), then the `ffmpeg-static` package (`FFmpegStaticAdapter`). Both execute commands through `execFile` with parsed argv, without a shell. System detection checks FFmpeg only; `FFmpegNodeAdapter.getInfos()` separately expects `ffprobe` on PATH. The detector's last WASM branch requires `window`, so it is not a fallback for a pure Node environment. Browser hosts load `browser.ts` directly.
 
+Node renders work with FFmpeg 6 (the `ffmpeg-static` build) through 9. What differs between releases is decided in one place, `core/ffmpeg-version.ts`, from the `ffmpeg -version` number the render setup reads:
+
+- Filtergraphs too long for one exec argument go through a file as `-/filter_complex graph.txt` (FFmpeg 7.0 and later; FFmpeg 9 removed `-filter_complex_script` and `-filter_script`), or the script options on FFmpeg 6.
+- On FFmpeg 9, `-shortest` ends a stream-copied concat-demuxer video about 0.1 s early once the concat's own audio is mixed, so the music pass reads the assembled file instead of the segment list. The normalize-only pass, which has no `-shortest`, still reads the list.
+- libx264 colour tags move to `-x264-params` from FFmpeg 7.1 (see [encoder selection](./engine-configuration.md#encoder-selection--tiers)).
+
+A git snapshot (`N-…`) counts as the newest release. An unknown version (the on-device FFmpeg 8.0 engine, the WASM core) keeps the historical behaviour. FFmpeg 9 also ends a transition assembly's audio on the planned length, where FFmpeg 8 overran it by a few hundredths of a second; the music pass's `-shortest` can then drop the video's last frame, within the QC tolerance.
+
 `ffmpeg-static` ships no ffprobe. The static adapter looks for one from the optional `ffprobe-static` package or beside the resolved FFmpeg binary, using only a candidate that exists (`platform/ffmpeg/resolve-ffprobe.ts`). Without one, it sets `probeUnavailableReason`. The director rejects probing templates before the first segment encodes: non-cut transitions, enabled/resolved music, whole-video overlays, and `project_video` sections. `MusicNodeAdapter` probes and loops with the selected adapter's `binaries`, including on the static path.
 
 Browser storage uses IndexedDB, while FFmpeg reads its own in-memory MEMFS. Inputs, concat-list references, and embedded font paths are bridged before execution, and output is copied back. IndexedDB quota does not increase WASM memory capacity; the approximate 2 GB input ceiling does not guarantee a project of that size can render with its intermediate copies. The core pin and default CDN loader live in `platform/ffmpeg/ffmpeg-core.ts`; browser hosts can provide a loader through `BrowserCompileOptions.loadFFmpegCore`. Browser fonts must be bundled font IDs or readable TTF assets; family-based remote font resolution is rejected.

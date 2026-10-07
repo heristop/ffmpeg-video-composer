@@ -234,7 +234,7 @@ Read via `process.env`; these are optional host, asset, and bench/debug controls
 
 ## Encoder selection & tiers
 
-On FFmpeg 7.1 and later, libx264 renders tag Rec.709 with `-x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709:range=tv` instead of `-colorspace`/`-color_primaries`/`-color_trc`/`-color_range`, which from 7.1 can trigger a real colour conversion of untagged frames. The `setparams` frame tagging is unchanged, and unknown FFmpeg versions (WASM, on-device) keep the output flags.
+Node renders support FFmpeg 6 through 9; the version-specific command syntax and behaviour are listed under [cross-platform support](./architecture.md#cross-platform-support). On FFmpeg 7.1 and later, libx264 renders tag Rec.709 with `-x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709:range=tv` instead of `-colorspace`/`-color_primaries`/`-color_trc`/`-color_range`, which from 7.1 can trigger a real colour conversion of untagged frames. The `setparams` frame tagging is unchanged, and unknown FFmpeg versions (WASM, on-device) keep the output flags.
 
 **Shared encoder selection order** (`resolveVideoCodec` / `buildVideoEncoderArgs`):
 

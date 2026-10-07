@@ -1,4 +1,5 @@
 import type { ProjectConfig } from './types';
+import { ffmpegAtLeast } from './ffmpeg-version';
 
 /**
  * Pure encoder-argument helpers shared by the per-section SegmentBuilder and the final
@@ -76,20 +77,8 @@ function usesX264(config: ProjectConfig): boolean {
   return codec === 'h264' || codec === 'libx264';
 }
 
-/**
- * Whether an `ffmpeg -version` number (`7.1`, `n7.1.1`, `8.1-static`) is at least major.minor. An
- * unknown or unparseable version (a git snapshot, the WASM core, the on-device engine) is `false`, so
- * those keep the historical flags.
- */
-export function ffmpegAtLeast(version: string | null | undefined, major: number, minor: number): boolean {
-  const match = /^n?(\d+)\.(\d+)/.exec(version ?? '');
-
-  if (!match) return false;
-
-  const [found, foundMinor] = [Number(match[1]), Number(match[2])];
-
-  return found > major || (found === major && foundMinor >= minor);
-}
+// Re-exported for the callers that predate core/ffmpeg-version.ts.
+export { ffmpegAtLeast };
 
 /**
  * The `setparams` filter that **forces** every colour field — matrix, primaries, transfer and range —

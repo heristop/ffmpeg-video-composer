@@ -167,6 +167,17 @@ describe('probe traits', () => {
 
     expect([...list]).toEqual(['amix', 'zscale']);
   });
+
+  // FFmpeg 8 dropped the command-support column: two flag characters instead of three.
+  it('parses the two-column ffmpeg -filters listing of FFmpeg 8 and 9', () => {
+    const list = parseFilterList(
+      '  T.. = Timeline support\n ------\n .. amix              N->A       Audio mixing.\n' +
+        ' .S tonemap           V->V       Conversion to/from different dynamic ranges.\n' +
+        ' .S zscale            V->V       Apply resizing\n .. nullsrc           |->V       Null video source\n'
+    );
+
+    expect([...list]).toEqual(['amix', 'tonemap', 'zscale', 'nullsrc']);
+  });
 });
 
 describe('silence keep ranges', () => {
