@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "name": "Music over cuts",
+    "description": "Two cut-only 2 s sections (120 frames at 30 fps) under a music track."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": true,
+    "music": {
+      "name": "chill-hip-hop.mp3"
+    },
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "one",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "/assets/backgrounds/pink-sunset.jpg",
+        "duration": 2
+      }
+    },
+    {
+      "name": "two",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "/assets/backgrounds/turquoise-sea.jpg",
+        "duration": 2
+      }
+    }
+  ]
+}

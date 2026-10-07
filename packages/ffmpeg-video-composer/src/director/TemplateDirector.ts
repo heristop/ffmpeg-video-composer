@@ -326,7 +326,6 @@ class TemplateDirector {
       hasAnimations,
       musicEnabled: Boolean(global?.musicEnabled),
       musicWillRun,
-      ffmpegVersion: this.project.ffmpegVersion,
       // Without a music mix, normalisation and sound effects need their own audio pass.
       normalizeWillRun: !musicWillRun && this.musicComposer.hasStandaloneAudioPass(),
       disableFold: Boolean(process.env.FVC_DISABLE_CONCAT_FOLD),

@@ -1,0 +1,14 @@
+# music-cuts.json: two cut-only 2 s sections at 30 fps (plan: 120 frames, 4.0 s) under a music track
+# stream, duration (s), decoded frames
+FFmpeg 8 leclap render:                          video,4.000000,120 audio,4.020136,174
+FFmpeg 9 leclap render, pre-fix (folded concat): video,3.900000,117 audio,4.023220,174
+FFmpeg 9 leclap render, #78 (assembled file):     video,3.900000,117 audio,4.023220,176
+
+# isolation, FFmpeg 9 music mix with -c:v copy over one assembled file
+file assembled by FFmpeg 9, -shortest: video,3.900000,117 audio,4.023220,176
+file assembled by FFmpeg 8, -shortest: video,4.000000,120 audio,4.020136,175
+file assembled by FFmpeg 9, -t 4:      video,4.000000,120 audio,4.000000,175
+
+# fix/ffmpeg-9-music-pass: the mix is bounded by the planned length (-t), no -shortest
+FFmpeg 9 leclap render (segment list, -t 4):     video,4.000000,120
+FFmpeg 8 leclap render (segment list, -t 4):     video,4.000000,120

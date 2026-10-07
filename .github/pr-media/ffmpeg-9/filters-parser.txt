@@ -1,0 +1,9 @@
+FFmpeg 9: sample line " .S tonemap           V->V       Conversion to/from different dynamic ranges."
+  pre-fix parser: 0 filters (tonemap found: false, zscale found: false)
+  fixed parser:   481 filters (tonemap found: true, zscale found: false)
+FFmpeg 8: sample line " .S tonemap           V->V       Conversion to/from different dynamic ranges."
+  pre-fix parser: 0 filters (tonemap found: false, zscale found: false)
+  fixed parser:   502 filters (tonemap found: true, zscale found: false)
+FFmpeg 6 (ffmpeg-static): sample line " .S. tonemap           V->V       Conversion to/from different dynamic ranges."
+  pre-fix parser: 477 filters (tonemap found: true, zscale found: true)
+  fixed parser:   477 filters (tonemap found: true, zscale found: true)

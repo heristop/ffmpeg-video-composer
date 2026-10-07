@@ -1,6 +1,5 @@
 import type { Section } from '@/core/types';
 import type { VideoSource } from '../editor/utils/video-input';
-import { ffmpegCompat } from '../core/ffmpeg-version';
 
 export interface FinalizeContext {
   segments: Section[];
@@ -8,8 +7,6 @@ export interface FinalizeContext {
   hasAnimations: boolean;
   musicEnabled: boolean;
   musicWillRun: boolean;
-  /** The rendering FFmpeg's `-version` number, null when unknown (on-device engine, WASM core). */
-  ffmpegVersion: string | null;
   normalizeWillRun: boolean;
   disableFold: boolean;
   finalPath: string;
@@ -24,12 +21,9 @@ export interface FinalizeContext {
 // Fold the standalone concat-copy pass into the following audio pass when nothing between assembly
 // and that pass needs a re-encode — i.e. no xfade transitions and no overlay animations — and there
 // IS an audio pass to fold into (music mix or audio normalize). `disableFold` is a bench/debug escape
-// hatch (FVC_DISABLE_CONCAT_FOLD) that forces the standard two-pass path. The music pass only folds
-// where -shortest keeps the copied concat video whole (not on FFmpeg 9, see core/ffmpeg-version.ts).
+// hatch (FVC_DISABLE_CONCAT_FOLD) that forces the standard two-pass path.
 function shouldFoldConcat(c: FinalizeContext): boolean {
-  const audioPass = c.musicWillRun ? ffmpegCompat(c.ffmpegVersion).shortestKeepsConcatVideo : c.normalizeWillRun;
-
-  return !c.disableFold && !c.hasTransition && !c.hasAnimations && audioPass;
+  return !c.disableFold && !c.hasTransition && !c.hasAnimations && (c.musicWillRun || c.normalizeWillRun);
 }
 
 // Orchestrate the post-render finalize. Folded path: the single audio pass consumes the concat

@@ -1,0 +1,20 @@
+ffmpeg version 9.0.2 Copyright (c) 2000-2026 the FFmpeg developers
+
+# before this PR (script options, FFmpeg 6 to 8)
+$ ffmpeg -f lavfi -i testsrc2=s=320x180:d=1 -filter_script:v g.txt -frames:v 1 -f null -
+Unrecognized option 'filter_script:v'.
+Error splitting the argument list: Option not found
+exit status 8
+
+$ ffmpeg -f lavfi -i testsrc2=s=320x180:d=1 -filter_complex_script gc.txt -map [v] -frames:v 1 -f null -
+Unrecognized option 'filter_complex_script'.
+Error splitting the argument list: Option not found
+exit status 8
+
+# this PR on FFmpeg 7.0+ (-/option file)
+$ ffmpeg -f lavfi -i testsrc2=s=320x180:d=1 -/vf g.txt -frames:v 1 -f null -
+exit status 0
+
+$ ffmpeg -f lavfi -i testsrc2=s=320x180:d=1 -/filter_complex gc.txt -map [v] -frames:v 1 -f null -
+exit status 0
+

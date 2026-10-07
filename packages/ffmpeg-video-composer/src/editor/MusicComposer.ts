@@ -13,7 +13,7 @@ import { resolveMusicFade } from './utils/music-fade';
 import { finalizeLeg, type PendingLeg } from './utils/music-leg';
 import { formatMusicName, removeExtension } from './utils/music-name';
 import { musicAssetUrl } from '@/core/asset-source';
-import { loudnessTarget, musicMixGraph, normalizeSuffix, sfxOnlyGraph } from './utils/music-mix';
+import { loudnessTarget, musicMixGraph, musicPassBound, normalizeSuffix, sfxOnlyGraph } from './utils/music-mix';
 import { normalizeWithTruePeakGuard } from './utils/true-peak-guard';
 import { descriptorHasSfx, prepareSfxStage, type SfxStage } from './utils/sfx-stage';
 
@@ -329,10 +329,11 @@ class MusicComposer {
     let command = ` -y ${opts.videoInputArgs} -i ${this.project.buildInfos.musicPath}${opts.sfx?.inputArgs ?? ''} `;
     command += ` -filter_complex "${filterComplex}" `;
     // +faststart so the music-mixed final output previews in a browser <video> (moov to the front),
-    // matching the concat/single-file paths. -shortest bounds the muxed output to the (finite, stream-
-    // copied) video stream — without it a longer music tail (e.g. after loopMusic overshoots, or a
-    // music-only graph with no video-derived audio length) would extend the output past the video.
-    command += ` -map 0:v -map "[final]" -c:v copy -c:a aac -ac 2 -movflags +faststart -shortest ${opts.finalVideo} `;
+    // matching the concat/single-file paths. The bound ends the output at the planned timeline length
+    // (the music legs' currentLength, see utils/music-mix.ts musicPassBound) so a longer music tail
+    // (e.g. after loopMusic overshoots, or a music-only graph) never extends it past the video.
+    const bound = musicPassBound(this.project.buildInfos.currentLength);
+    command += ` -map 0:v -map "[final]" -c:v copy -c:a aac -ac 2 -movflags +faststart ${bound} ${opts.finalVideo} `;
 
     return command;
   }

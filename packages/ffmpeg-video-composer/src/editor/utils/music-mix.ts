@@ -73,6 +73,18 @@ export function musicAutomationSuffix(global: TemplateDescriptorGlobal | undefin
   return filter === null ? '' : `,${filter}`;
 }
 
+/**
+ * The music pass's output bound: `-t <planned length>` (to the millisecond), or `-shortest` when no
+ * length was planned. Not `-shortest` when one is known: with `-c:v copy`, FFmpeg 9 ends the copied
+ * video a few frames early under it, and next to `-t` it does the same on FFmpeg 8. `-t` keeps every
+ * frame and still cuts a music tail longer than the video. Shorter music was looped to length before.
+ */
+export function musicPassBound(plannedSeconds: number): string {
+  if (!(plannedSeconds > 0)) return '-shortest';
+
+  return `-t ${Number(plannedSeconds.toFixed(3))}`;
+}
+
 export interface MixGraphInput {
   global: TemplateDescriptorGlobal | undefined;
   /** The per-section music legs (MusicComposer.prepareMusicTrack), joined when there are several. */

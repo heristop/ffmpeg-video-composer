@@ -40,11 +40,6 @@ export function ffmpegOlderThan(version: string | null | undefined, major: numbe
   return found !== null && compare(found, major, minor) < 0;
 }
 
-/** A git snapshot (`N-127141-g…`): newer than every numbered release, so treated as current. */
-function isSnapshot(version: string | null | undefined): boolean {
-  return /^N-\d+/.test(version ?? '');
-}
-
 export interface FFmpegCompat {
   /**
    * How an option's value is read from a file. `slash` is the `-/filter_complex graph.txt` form (FFmpeg
@@ -53,19 +48,11 @@ export interface FFmpegCompat {
    * version gets `slash`.
    */
   optionFiles: 'slash' | 'script';
-  /**
-   * Whether `-shortest` keeps the whole of a stream-copied video read through the concat demuxer while
-   * the concat's own audio is decoded and mixed. FFmpeg 9 ends that video ~0.1s (a few frames) early,
-   * so the music pass reads an assembled file there instead of folding the concat into it. An unknown
-   * version (the on-device 8.0 engine, the WASM core) keeps the historical `true`.
-   */
-  shortestKeepsConcatVideo: boolean;
 }
 
 /** What the `ffmpeg` of `version` accepts and how it behaves where the engine depends on it. */
 export function ffmpegCompat(version: string | null | undefined): FFmpegCompat {
   return {
     optionFiles: ffmpegOlderThan(version, 7, 0) ? 'script' : 'slash',
-    shortestKeepsConcatVideo: !(ffmpegAtLeast(version, 9, 0) || isSnapshot(version)),
   };
 }

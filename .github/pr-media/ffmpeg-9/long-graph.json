@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "name": "FFmpeg 9: long filtergraph",
+    "description": "A text-free photo section stacked with particle and light effects; its filtergraph is past the 64 KB inline limit, so it goes through an option file."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 7,
+    "transition": { "type": "cut" }
+  },
+  "sections": [
+    {
+      "name": "burst",
+      "type": "image_background",
+      "options": { "pictureUrl": "/assets/backgrounds/milky-way.jpg", "duration": 4 },
+      "graphics": [
+        { "type": "fx", "effect": "bokeh", "target": "frame", "at": 0, "duration": 4 },
+        { "type": "fx", "effect": "dust", "target": "frame", "at": 0, "duration": 4 },
+        { "type": "fx", "effect": "confetti", "target": "frame", "at": 0.3, "duration": 2.2 },
+        { "type": "fx", "effect": "confetti", "target": "frame", "at": 1.6, "duration": 2.2 },
+        { "type": "fx", "effect": "glint", "path": "orbit", "target": "frame", "at": 0.5, "duration": 1.4 },
+        { "type": "corners", "at": 0.3, "duration": 0.45, "color": "#FFFFFF" },
+        { "type": "fx", "effect": "leak", "target": "frame", "at": 0.2, "duration": 3 },
+        { "type": "fx", "effect": "vignette-breathe", "target": "frame", "at": 0, "duration": 4 }
+      ]
+    }
+  ]
+}

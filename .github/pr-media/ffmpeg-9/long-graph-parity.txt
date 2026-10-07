@@ -1,0 +1,15 @@
+# long-graph.json, option files the engine passed to FFmpeg
+FFmpeg 9: -/filter_complex graph-0.txt (114217 bytes)
+FFmpeg 8: -/filter_complex graph-0.txt (114217 bytes)
+FFmpeg 6 (ffmpeg-static): -filter_complex_script graph-0.txt (114217 bytes)
+
+# frames (codec, duration, decoded frames)
+FFmpeg 9: video,4.000000,120 audio,4.000000,173
+FFmpeg 8: video,4.000000,120 audio,4.000000,173
+
+# ffmpeg -i long-graph-8.mp4 -i long-graph-9.mp4 -lavfi '[0:v][1:v]psnr' -f null -
+PSNR y:inf u:inf v:inf average:inf min:inf max:inf
+
+# decoded-frame MD5 (-map 0:v -f md5)
+FFmpeg 9: MD5=a7250c0f64259390b6c1b09a6b4fce5a
+FFmpeg 8: MD5=a7250c0f64259390b6c1b09a6b4fce5a

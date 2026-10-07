@@ -849,35 +849,117 @@ describe('MusicComposer.prepareMusicTrack — rendered (declared-vs-probed) dura
   });
 });
 
-describe('MusicComposer.appendMusic — -shortest bound', () => {
-  it('bounds the muxed output to the video stream length so a long music tail never extends it', async () => {
+describe('MusicComposer.appendMusic — planned-length bound', () => {
+  // FFmpeg 9 with `-c:v copy -shortest` drops the last frames of the copied video (117 of 120 on a
+  // 2 s + 2 s cut timeline), and `-shortest` next to `-t` does the same on FFmpeg 8. `-t` at the
+  // planned timeline length keeps them all and still cuts a longer music tail at the video's end.
+  function plannedComposer(sections: Section[] = [], audioCodec: string | null = 'aac') {
     const project = makeProject({ audioConfig: { sampleRate: 48000 } });
     project.buildInfos.musicPath = '/cache/musics/song.mp3';
     const ffmpeg = {
       execute: vi.fn<(cmd: string) => Promise<{ rc: number }>>(async () => ({ rc: 0 })),
-      getInfos: vi.fn(async () => ({ duration: 10, videoCodec: 'h264', audioCodec: 'aac', sampleRate: 48000 })),
+      getInfos: vi.fn(async () => ({ duration: 10, videoCodec: 'h264', audioCodec, sampleRate: 48000 })),
     };
-    const { composer } = makeComposer({ project, ffmpeg });
+    const template = makeTemplate({ sections });
+    const { composer } = makeComposer({ project, ffmpeg, template });
 
-    await composer.appendMusic([{ name: 's1', type: 'video', options: { duration: 4 } }], '/build/output.mp4');
+    return { project, ffmpeg, composer };
+  }
+
+  const cutSections: Section[] = [
+    { name: 's1', type: 'video', options: { duration: 2 } },
+    { name: 's2', type: 'video', options: { duration: 2 } },
+  ];
+
+  it('ends the output at the planned timeline length instead of -shortest', async () => {
+    const { project, ffmpeg, composer } = plannedComposer(cutSections);
+    project.buildInfos.totalSegments = 2;
+    project.buildInfos.transitions = [{ type: 'cut', duration: 0 }];
+    for (const section of cutSections) composer.prepareMusicTrack(section);
+
+    await composer.appendMusic(cutSections, '/build/output.mp4');
 
     const cmd = ffmpeg.execute.mock.calls[0][0];
-    expect(cmd).toContain('-shortest');
+    expect(cmd).toContain('-c:v copy -c:a aac -ac 2 -movflags +faststart -t 4 /build/output.mp4');
+    expect(cmd).not.toContain('-shortest');
   });
 
-  it('bounds the muxed output to the video stream length on the video-only (no source audio) graph too', async () => {
-    const project = makeProject({ audioConfig: { sampleRate: 48000 } });
-    project.buildInfos.musicPath = '/cache/musics/song.mp3';
-    const ffmpeg = {
-      execute: vi.fn<(cmd: string) => Promise<{ rc: number }>>(async () => ({ rc: 0 })),
-      getInfos: vi.fn(async () => ({ duration: 10, videoCodec: 'h264', audioCodec: null, sampleRate: null })),
-    };
-    const { composer } = makeComposer({ project, ffmpeg });
+  it('bounds the folded concat source the same way', async () => {
+    const { project, ffmpeg, composer } = plannedComposer(cutSections);
+    project.buildInfos.totalSegments = 2;
+    project.buildInfos.transitions = [{ type: 'cut', duration: 0 }];
+    for (const section of cutSections) composer.prepareMusicTrack(section);
+
+    await composer.appendMusic(cutSections, '/build/output.mp4', { kind: 'concat', listPath: '/build/segments.list' });
+
+    const cmd = ffmpeg.execute.mock.calls[0][0];
+    expect(cmd).toContain('+faststart -t 4 /build/output.mp4');
+    expect(cmd).not.toContain('-shortest');
+  });
+
+  it('subtracts each cross-dissolve overlap from the bound', async () => {
+    const sections: Section[] = [
+      { name: 's1', type: 'video', options: { duration: 4 } },
+      { name: 's2', type: 'video', options: { duration: 4 } },
+    ];
+    const { project, ffmpeg, composer } = plannedComposer(sections);
+    project.buildInfos.totalSegments = 2;
+    project.buildInfos.transitions = [{ type: 'fade', duration: 0.5 }];
+    for (const section of sections) composer.prepareMusicTrack(section);
+
+    await composer.appendMusic(sections, '/build/output.mp4');
+
+    expect(ffmpeg.execute.mock.calls[0][0]).toContain('+faststart -t 7.5 /build/output.mp4');
+  });
+
+  it('uses the rendered length of a project_video clip shorter than its declared duration', async () => {
+    const sections: Section[] = [{ name: 'clip', type: 'project_video', options: { duration: 6 } }];
+    const { project, ffmpeg, composer } = plannedComposer(sections);
+    project.buildInfos.totalSegments = 1;
+    project.buildInfos.durations.clip = 3.5;
+    composer.prepareMusicTrack(sections[0]);
+
+    await composer.appendMusic(sections, '/build/output.mp4');
+
+    expect(ffmpeg.execute.mock.calls[0][0]).toContain('+faststart -t 3.5 /build/output.mp4');
+  });
+
+  it('formats a fractional length to the millisecond', async () => {
+    const sections: Section[] = [
+      { name: 's1', type: 'video', options: { duration: 10 / 3 } },
+      { name: 's2', type: 'video', options: { duration: 2 } },
+    ];
+    const { project, ffmpeg, composer } = plannedComposer(sections);
+    project.buildInfos.totalSegments = 2;
+    project.buildInfos.transitions = [{ type: 'cut', duration: 0 }];
+    for (const section of sections) composer.prepareMusicTrack(section);
+
+    await composer.appendMusic(sections, '/build/output.mp4');
+
+    expect(ffmpeg.execute.mock.calls[0][0]).toContain('+faststart -t 5.333 /build/output.mp4');
+  });
+
+  it('bounds the video-only (no source audio) graph too', async () => {
+    const { project, ffmpeg, composer } = plannedComposer(cutSections, null);
+    project.buildInfos.totalSegments = 2;
+    project.buildInfos.transitions = [{ type: 'cut', duration: 0 }];
+    for (const section of cutSections) composer.prepareMusicTrack(section);
+
+    await composer.appendMusic(cutSections, '/build/output.mp4');
+
+    const cmd = ffmpeg.execute.mock.calls[0][0];
+    expect(cmd).toContain('+faststart -t 4 /build/output.mp4');
+    expect(cmd).not.toContain('-shortest');
+  });
+
+  it('falls back to -shortest when no section was planned', async () => {
+    const { ffmpeg, composer } = plannedComposer();
 
     await composer.appendMusic([{ name: 's1', type: 'video', options: { duration: 4 } }], '/build/output.mp4');
 
     const cmd = ffmpeg.execute.mock.calls[0][0];
-    expect(cmd).toContain('-shortest');
+    expect(cmd).toContain('+faststart -shortest /build/output.mp4');
+    expect(cmd).not.toContain(' -t ');
   });
 });
 

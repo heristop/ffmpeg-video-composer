@@ -50,15 +50,4 @@ describe('ffmpegCompat', () => {
   it.each(['N-127141-g361174e5ea', null])('assumes a current build for %s', (version) => {
     expect(ffmpegCompat(version).optionFiles).toBe('slash');
   });
-
-  // FFmpeg 9's -shortest ends a stream-copied concat-demuxer video ~0.1s early when the concat's audio
-  // is mixed, so the music pass must not read the segment list directly there.
-  it.each(['9.0.2', '10.0', 'N-127141-g361174e5ea'])('flags the -shortest concat trim on %s', (version) => {
-    expect(ffmpegCompat(version).shortestKeepsConcatVideo).toBe(false);
-  });
-
-  // Unknown (null) is the on-device engine (FFmpeg 8.0) and the WASM core: their historical behaviour.
-  it.each(['8.1.1', '8.0', '6.0', null, 'unknown'])('keeps the concat fold on %s', (version) => {
-    expect(ffmpegCompat(version).shortestKeepsConcatVideo).toBe(true);
-  });
 });

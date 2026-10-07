@@ -1057,41 +1057,23 @@ describe('TemplateDirector.finalizeCompilation concat fold', () => {
     expect(videoEditor.finalize).toHaveBeenCalledWith(expect.anything(), undefined);
   });
 
-  // FFmpeg 9's -shortest ends a stream-copied concat-demuxer video ~0.1s early once the concat's own
-  // audio is mixed, so the music pass reads an assembled file there instead of the segment list.
-  it('does NOT fold the music pass on FFmpeg 9 (concat, then mix the file)', async () => {
+  // The music pass is bounded by the planned length (-t), not -shortest, so FFmpeg 9 keeps every
+  // stream-copied concat frame and the fold no longer depends on the FFmpeg release.
+  it.each(['9.0.2', '8.1.1', 'N-127141-g361174e5ea', null])('folds the music pass on FFmpeg %s', async (version) => {
     const { director, template, videoEditor, project } = makeDirector();
     template.descriptor = { global: { musicEnabled: true }, sections: [] } as never;
-    project.ffmpegVersion = '9.0.2';
+    project.ffmpegVersion = version;
     project.buildInfos.musicPath = '/m/track.mp3';
     project.buildInfos.fileConcatPath = '/build/segments.list';
     project.buildInfos.transitions = cut;
 
     await director.finalizeCompilation([{ name: 'a', type: 'video' }] as never);
 
-    expect(videoEditor.concat).toHaveBeenCalled();
-    expect(videoEditor.finalize).toHaveBeenCalledWith(expect.anything(), undefined);
-  });
-
-  it('still folds the music pass on FFmpeg 8 and the normalize pass on FFmpeg 9', async () => {
-    const music = makeDirector();
-    music.template.descriptor = { global: { musicEnabled: true }, sections: [] } as never;
-    music.project.ffmpegVersion = '8.1.1';
-    music.project.buildInfos.musicPath = '/m/track.mp3';
-    music.project.buildInfos.fileConcatPath = '/build/segments.list';
-    music.project.buildInfos.transitions = cut;
-    await music.director.finalizeCompilation([{ name: 'a', type: 'video' }] as never);
-
-    const normalize = makeDirector();
-    normalize.musicComposer.hasStandaloneAudioPass.mockReturnValue(true);
-    normalize.template.descriptor = { global: { audio: { normalize: 'loudnorm' } }, sections: [] } as never;
-    normalize.project.ffmpegVersion = '9.0.2';
-    normalize.project.buildInfos.fileConcatPath = '/build/segments.list';
-    normalize.project.buildInfos.transitions = cut;
-    await normalize.director.finalizeCompilation([{ name: 'a', type: 'video' }] as never);
-
-    expect(music.videoEditor.concat).not.toHaveBeenCalled();
-    expect(normalize.videoEditor.concat).not.toHaveBeenCalled();
+    expect(videoEditor.concat).not.toHaveBeenCalled();
+    expect(videoEditor.finalize).toHaveBeenCalledWith(expect.anything(), {
+      kind: 'concat',
+      listPath: '/build/segments.list',
+    });
   });
 
   it('does NOT fold when FVC_DISABLE_CONCAT_FOLD is set (bench/debug escape hatch)', async () => {
