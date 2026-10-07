@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `compose_video` and `render_frames` take `fields` as strings, numbers or booleans and refuse a missing
   required or ill-typed value before rendering; `validate_template` lists the declared contract as `fields`
   and reports `field_undefined`, `field_unused`, `field_type_mismatch` and `field_missing_required`.
+- `open_in_builder`: returns a `https://leclap.dev/studio/builder#t=v1.…` link that opens the template in
+  the web builder for a person to edit, with `mediaToRebind` (local paths and uploads the browser cannot
+  read) and `warnings`. The template travels compressed in the URL fragment, which browsers never send to a
+  server; `baseUrl` targets a locale prefix or a local dev server. Nineteen tools are now always registered.
 - `edit_template`: an RFC 6902 JSON Patch over inline template JSON under `expectedRevision` (stale →
   `revision_conflict`), all-or-nothing and validated after applying; returns the template, its new
   `revision` and `changedPaths`. The web builder's WebMCP tools share the name, operations and revision,

@@ -156,6 +156,10 @@
             "description": "Report what the local FFmpeg really renders (drawtext, LUTs, transitions, loudness, encoders), each with a fix."
           },
           {
+            "name": "open_in_builder",
+            "description": "Return a link that opens the template in the LeClap web builder; the template travels in the URL fragment, never uploaded."
+          },
+          {
             "name": "render_remotion_clip",
             "description": "Render a composition from your own Remotion project to an MP4. Gated \u2014 see notes."
           },
@@ -177,7 +181,7 @@
           }
         ],
         "prompts": ["compose-video"],
-        "notes": "Eighteen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, patching and rendering; callers cannot select executable source through effect JSON. patch_template remains registered when Remotion is disabled."
+        "notes": "Nineteen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, patching and rendering; callers cannot select executable source through effect JSON. patch_template remains registered when Remotion is disabled."
       }
     }
   }

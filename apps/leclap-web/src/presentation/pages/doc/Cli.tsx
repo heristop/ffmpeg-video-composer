@@ -145,6 +145,10 @@ export const DocCli = () => (
           label="report which FFmpeg your environment provides and what it can render (--json)"
         />
         <CommandPill command="leclap samples list" label="discover packaged showcase samples and requirements" />
+        <CommandPill
+          command="leclap studio <template>"
+          label="a link that opens the template in the web builder; it rides in the URL fragment, never uploaded (--open)"
+        />
       </CommandList>
       <Prose>
         <p>

@@ -5,6 +5,7 @@ import pc from 'picocolors';
 import { studioFiles } from '../studio-files.js';
 import { passGate, studioStatus, type StudioStatus } from '../studio.js';
 import { fail, heading, hint, step, success } from '../ui.js';
+import { studioOpen } from './studio-open.js';
 
 /** Writes the studio folder (`leclap init --studio <dir>`); refuses a non-empty directory. */
 export async function scaffoldStudio(dir: string, now: Date = new Date()): Promise<string[]> {
@@ -90,6 +91,9 @@ const pass = defineCommand({
 });
 
 export const studio = defineCommand({
-  meta: { name: 'studio', description: 'Production gates of a studio folder (see `leclap init --studio`)' },
-  subCommands: { status, pass },
+  meta: {
+    name: 'studio',
+    description: 'Open a template in the web builder (`leclap studio <template>`), or track a studio folder’s gates',
+  },
+  subCommands: { open: studioOpen, status, pass },
 });

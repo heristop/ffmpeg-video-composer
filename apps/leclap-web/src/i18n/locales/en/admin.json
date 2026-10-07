@@ -1275,5 +1275,30 @@
       "custom": "Current theme: custom",
       "none": "Current theme: LeClap (default)"
     }
+  },
+  "link": {
+    "opening": "Opening the template from your link…",
+    "privacy": "The template travelled inside the link itself: nothing was uploaded.",
+    "rebindTitle": "Some media stayed on the other computer",
+    "rebindBody": "The link carries the template, not its files. Film, upload or pick these again:",
+    "rebindScene": "{{file}} in “{{section}}”",
+    "rebindWhole": "{{file}} (whole video)",
+    "dismiss": "Got it",
+    "errorTitle": "This link could not be opened",
+    "errorHint": "Ask for a fresh link, or export the template as JSON and use Import in the Advanced panel.",
+    "errors": {
+      "empty": "The link carries no template.",
+      "unsupported_version": "The link was made by a newer version of LeClap.",
+      "malformed": "The link is incomplete. It was probably cut off when it was copied.",
+      "too_large": "The template is too large to travel in a link.",
+      "corrupt": "The link is damaged. It was probably cut off when it was copied.",
+      "invalid_json": "The link does not contain a template.",
+      "invalid_template": "The template in the link is not valid.",
+      "invalid_base_url": "The link points at an invalid address."
+    },
+    "replaceTitle": "Open the linked template?",
+    "replaceBody": "It opens as a new draft in place of this one. Save this draft first if you want to keep it.",
+    "replaceConfirm": "Open it",
+    "replaceCancel": "Keep this draft"
   }
 }

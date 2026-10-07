@@ -39,3 +39,5 @@ export {
   type TemplateField,
   type FieldsDeclaration,
 } from './schemas/fields.schemas';
+// Template links: a descriptor in the web builder's URL fragment (leclap studio, MCP open_in_builder).
+export * from './core/template-link';

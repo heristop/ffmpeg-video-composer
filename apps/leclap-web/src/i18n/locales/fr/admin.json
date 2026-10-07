@@ -1276,5 +1276,30 @@
       "custom": "Thème actuel : personnalisé",
       "none": "Thème actuel : LeClap (par défaut)"
     }
+  },
+  "link": {
+    "opening": "Ouverture du modèle depuis ton lien…",
+    "privacy": "Le modèle a voyagé dans le lien lui-même : rien n’a été envoyé en ligne.",
+    "rebindTitle": "Certains médias sont restés sur l’autre ordinateur",
+    "rebindBody": "Le lien transporte le modèle, pas ses fichiers. Filme, importe ou choisis à nouveau :",
+    "rebindScene": "{{file}} dans « {{section}} »",
+    "rebindWhole": "{{file}} (toute la vidéo)",
+    "dismiss": "Compris",
+    "errorTitle": "Impossible d’ouvrir ce lien",
+    "errorHint": "Demande un nouveau lien, ou exporte le modèle en JSON et utilise Importer dans le panneau Avancé.",
+    "errors": {
+      "empty": "Le lien ne contient aucun modèle.",
+      "unsupported_version": "Le lien a été créé par une version plus récente de LeClap.",
+      "malformed": "Le lien est incomplet. Il a sans doute été tronqué lors du copier-coller.",
+      "too_large": "Le modèle est trop volumineux pour tenir dans un lien.",
+      "corrupt": "Le lien est endommagé. Il a sans doute été tronqué lors du copier-coller.",
+      "invalid_json": "Le lien ne contient pas de modèle.",
+      "invalid_template": "Le modèle contenu dans le lien n’est pas valide.",
+      "invalid_base_url": "Le lien pointe vers une adresse invalide."
+    },
+    "replaceTitle": "Ouvrir le modèle du lien ?",
+    "replaceBody": "Il s’ouvre comme un nouveau brouillon à la place de celui-ci. Enregistre d’abord ce brouillon si tu veux le garder.",
+    "replaceConfirm": "L’ouvrir",
+    "replaceCancel": "Garder ce brouillon"
   }
 }

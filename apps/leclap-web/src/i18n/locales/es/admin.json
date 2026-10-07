@@ -1276,5 +1276,30 @@
       "custom": "Tema actual: personalizado",
       "none": "Tema actual: LeClap (predeterminado)"
     }
+  },
+  "link": {
+    "opening": "Abriendo la plantilla de tu enlace…",
+    "privacy": "La plantilla viajó dentro del propio enlace: no se subió nada.",
+    "rebindTitle": "Algunos archivos se quedaron en el otro ordenador",
+    "rebindBody": "El enlace lleva la plantilla, no sus archivos. Graba, sube o elige de nuevo:",
+    "rebindScene": "{{file}} en «{{section}}»",
+    "rebindWhole": "{{file}} (todo el vídeo)",
+    "dismiss": "Entendido",
+    "errorTitle": "No se pudo abrir este enlace",
+    "errorHint": "Pide un enlace nuevo, o exporta la plantilla como JSON y usa Importar en el panel Avanzado.",
+    "errors": {
+      "empty": "El enlace no contiene ninguna plantilla.",
+      "unsupported_version": "El enlace se creó con una versión más reciente de LeClap.",
+      "malformed": "El enlace está incompleto. Seguramente se cortó al copiarlo.",
+      "too_large": "La plantilla es demasiado grande para viajar en un enlace.",
+      "corrupt": "El enlace está dañado. Seguramente se cortó al copiarlo.",
+      "invalid_json": "El enlace no contiene una plantilla.",
+      "invalid_template": "La plantilla del enlace no es válida.",
+      "invalid_base_url": "El enlace apunta a una dirección no válida."
+    },
+    "replaceTitle": "¿Abrir la plantilla del enlace?",
+    "replaceBody": "Se abre como un borrador nuevo en lugar de este. Guarda primero este borrador si quieres conservarlo.",
+    "replaceConfirm": "Abrirla",
+    "replaceCancel": "Conservar este borrador"
   }
 }

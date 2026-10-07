@@ -1276,5 +1276,30 @@
       "custom": "Tema attuale: personalizzato",
       "none": "Tema attuale: LeClap (predefinito)"
     }
+  },
+  "link": {
+    "opening": "Apertura del modello dal tuo link…",
+    "privacy": "Il modello ha viaggiato dentro il link stesso: non è stato caricato nulla.",
+    "rebindTitle": "Alcuni file multimediali sono rimasti sull’altro computer",
+    "rebindBody": "Il link contiene il modello, non i suoi file. Registra, carica o scegli di nuovo:",
+    "rebindScene": "{{file}} in «{{section}}»",
+    "rebindWhole": "{{file}} (tutto il video)",
+    "dismiss": "Ho capito",
+    "errorTitle": "Impossibile aprire questo link",
+    "errorHint": "Chiedi un nuovo link, oppure esporta il modello in JSON e usa Importa nel pannello Avanzato.",
+    "errors": {
+      "empty": "Il link non contiene alcun modello.",
+      "unsupported_version": "Il link è stato creato da una versione più recente di LeClap.",
+      "malformed": "Il link è incompleto. Probabilmente è stato troncato durante la copia.",
+      "too_large": "Il modello è troppo grande per viaggiare in un link.",
+      "corrupt": "Il link è danneggiato. Probabilmente è stato troncato durante la copia.",
+      "invalid_json": "Il link non contiene un modello.",
+      "invalid_template": "Il modello nel link non è valido.",
+      "invalid_base_url": "Il link punta a un indirizzo non valido."
+    },
+    "replaceTitle": "Aprire il modello del link?",
+    "replaceBody": "Si apre come nuova bozza al posto di questa. Salva prima questa bozza se vuoi conservarla.",
+    "replaceConfirm": "Aprilo",
+    "replaceCancel": "Tieni questa bozza"
   }
 }

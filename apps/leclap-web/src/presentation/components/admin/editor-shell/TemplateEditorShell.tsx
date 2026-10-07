@@ -29,6 +29,9 @@ interface TemplateEditorShellProps {
   // When provided, a "Save & film →" CTA is shown that saves the template and immediately
   // launches the Builder wizard — skipping the gallery entirely.
   onSaveAndCompile?: (saved: StoredTemplate) => void;
+  // Open the starter presets on arrival; defaults to a cold start (no initial template). A failed
+  // template link keeps them closed so its notice stays in view.
+  presetsOnStart?: boolean;
 }
 
 // The template-authoring editor re-housed inside the studio shell. Reuses the exact same state hooks as
@@ -55,6 +58,7 @@ export const TemplateEditorShell = ({
   onCancel,
   backLabel,
   onSaveAndCompile,
+  presetsOnStart = initial === null,
 }: TemplateEditorShellProps) => {
   const { t } = useTranslation('admin');
   const history = useEditorHistory(toEditorState(initial));
@@ -63,7 +67,7 @@ export const TemplateEditorShell = ({
   const { patch, patchSection, addSection, removeSection, duplicateSection, reorder, setTransition } = ops;
   const [localPartials] = useState(() => userPartialService.list());
   // Help, starter presets and Generate with AI. Cold start (building from scratch) opens the presets.
-  const modals = useShellModals(initial === null);
+  const modals = useShellModals(presetsOnStart);
 
   // Selection state for the shell (which tool + which scene), clamped to a valid section index; plus
   // the shared text-overlay selection threaded to both the canvas and the inspector, keyed by scene.

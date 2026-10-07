@@ -30,6 +30,7 @@ video models, which sample rather than render.
 | `analyze_music`         | Measure a local music file → `{ bpm, offset, beatsPerBar, confidence, usable, cues, globalBeats }` for `global.beats` and `cue:drop`                                                          |
 | `analyze_sound`         | Render an `sfx[].sound` (composed, or a preset with variations) → length, peak/RMS dBFS, centroid, high/low energy shares, attack, advisories + spectrogram and waveform PNGs                 |
 | `get_capabilities`      | Local FFmpeg capability report (listings + one-frame probes) → each feature yes/no/unknown with a fix                                                                                         |
+| `open_in_builder`       | Template → a `leclap.dev/studio/builder#t=…` link for a person to edit it; the template rides in the URL fragment (never sent to a server) → `{ url, length, mediaToRebind, warnings }`       |
 | `render_remotion_clip`  | _(bonus, opt-in)_ Render a composition from **your own** Remotion project → an mp4 clip for a `project_video` section                                                                         |
 | `ping`                  | Liveness check                                                                                                                                                                                |
 
@@ -200,11 +201,21 @@ time; see the [template reference](../../docs/template-configuration.md#typed-fi
 `render_frames` refuse a missing required value or one that fails its type before rendering; and
 `get_resolved_template` shows the descriptor those `fields` produce.
 
-Eighteen tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`,
+Nineteen tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`,
 `get_motion_catalog`, `report_catalog_gap`, `get_timeline`, `get_resolved_template`, `validate_template`, `compose_video`,
-`render_frames`, `patch_template`, `edit_template`, `probe_media`, `extract_style`, `analyze_music`, `analyze_sound` and `get_capabilities`. Opt-in adds
+`render_frames`, `patch_template`, `edit_template`, `probe_media`, `extract_style`, `analyze_music`, `analyze_sound`, `get_capabilities` and `open_in_builder`. Opt-in adds
 `get_effect_schema`, `render_preview` and `render_remotion_clip`. Patch availability does not bypass
 effect-backend validation.
+
+`open_in_builder` hands a template to a person: it returns
+`https://leclap.dev/studio/builder#t=v1.…` (`baseUrl` for a locale prefix such as `/fr` or a local dev server),
+plus `mediaToRebind` and `warnings`. The template rides compressed in the URL fragment, which browsers never
+send to a server, so nothing is uploaded and no LeClap server exists to receive it. Local paths and `media://`
+uploads cannot travel in a link; the builder opens those scenes empty for the person to fill again. Media
+under a URL scheme the builder does not load (anything but `http(s)`, `data:`, `library://` and `media://`)
+is listed with reason `unsupported_scheme` and dropped the same way. A `baseUrl` on another origin than
+`https://leclap.dev` (a local dev server included) adds a warning: the page served there can read the
+template in the fragment, so the agent should say where the link points before sharing it.
 
 `edit_template` applies a JSON Patch (RFC 6902) to inline template JSON under `expectedRevision`: the
 batch is all-or-nothing and the result must validate. The web template builder exposes the same

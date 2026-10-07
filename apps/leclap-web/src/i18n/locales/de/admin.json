@@ -1275,5 +1275,30 @@
       "custom": "Aktuelles Theme: eigenes",
       "none": "Aktuelles Theme: LeClap (Standard)"
     }
+  },
+  "link": {
+    "opening": "Vorlage aus deinem Link wird geöffnet…",
+    "privacy": "Die Vorlage steckte im Link selbst: Es wurde nichts hochgeladen.",
+    "rebindTitle": "Einige Medien sind auf dem anderen Computer geblieben",
+    "rebindBody": "Der Link enthält die Vorlage, nicht ihre Dateien. Filme, lade hoch oder wähle diese erneut:",
+    "rebindScene": "{{file}} in „{{section}}“",
+    "rebindWhole": "{{file}} (ganzes Video)",
+    "dismiss": "Verstanden",
+    "errorTitle": "Dieser Link lässt sich nicht öffnen",
+    "errorHint": "Bitte um einen neuen Link oder exportiere die Vorlage als JSON und nutze Importieren im Bereich Erweitert.",
+    "errors": {
+      "empty": "Der Link enthält keine Vorlage.",
+      "unsupported_version": "Der Link wurde mit einer neueren LeClap-Version erstellt.",
+      "malformed": "Der Link ist unvollständig. Vermutlich wurde er beim Kopieren abgeschnitten.",
+      "too_large": "Die Vorlage ist zu groß für einen Link.",
+      "corrupt": "Der Link ist beschädigt. Vermutlich wurde er beim Kopieren abgeschnitten.",
+      "invalid_json": "Der Link enthält keine Vorlage.",
+      "invalid_template": "Die Vorlage im Link ist ungültig.",
+      "invalid_base_url": "Der Link verweist auf eine ungültige Adresse."
+    },
+    "replaceTitle": "Verlinkte Vorlage öffnen?",
+    "replaceBody": "Sie öffnet sich als neuer Entwurf anstelle dieses Entwurfs. Speichere diesen Entwurf zuerst, wenn du ihn behalten willst.",
+    "replaceConfirm": "Öffnen",
+    "replaceCancel": "Entwurf behalten"
   }
 }

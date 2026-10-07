@@ -19,6 +19,7 @@ pnpm render                          # runs the scaffolded `leclap render templa
 ```bash
 leclap init [name]        # scaffold a starter project (template.json + assets/ + README + scripts)
 leclap init --studio <dir> # scaffold a production folder (brief, style guide, shot list, gates)
+leclap studio <template>  # a link that opens the template in the web builder (--open, --base <url>, --json)
 leclap studio status [dir] # passed production gates and what the next one needs (also `studio pass <gate>`)
 leclap render <template>  # compile a video from a template JSON
 leclap validate <template> # check a template without rendering (schema + text layout)
@@ -223,6 +224,31 @@ Paste the printed `{ bpm, offset, beatsPerBar }` into `global.beats` and the dro
 section playing at that moment. When the pulse is not reliable (calm or ambient music), pace by phrases
 instead. A template can also ask the Node compile to measure its own track with
 `global.beats: { "analyze": "music" }`; see [time references](../../docs/template-configuration.md#time-references).
+
+## `studio <template>` — open a template in the web builder
+
+```bash
+leclap studio launch.json                              # prints https://leclap.dev/studio/builder#t=v1.…
+leclap studio launch.json --open                       # also opens it in the default browser
+leclap studio launch.json --base https://leclap.dev/fr # the builder in French
+leclap studio launch.json --base http://localhost:5173 # a local `pnpm app:web`
+leclap studio launch.json --json                       # { url, length, mediaToRebind, warnings }
+leclap studio --open --base http://localhost:5173 launch.json # flags may come before the template too
+```
+
+The link carries the whole template, compressed, in its `#fragment`. Browsers never send the fragment to a
+server, so nothing is uploaded: the page loads from the static site and decodes the template locally. The
+builder opens it as a new, unsaved draft. Media only your machine can read (absolute or `./` paths, `file:`
+URLs, `media://` uploads from another browser) cannot travel in a link: the command lists them, and the
+builder opens those scenes empty for the person to film, upload or pick again. Library names, `/assets/…`
+paths and `https://` URLs resolve as usual. Effect sections cannot be edited in the builder yet. Links
+over 8,000 characters still open, but chat apps may truncate them; templates whose link would pass 512 KiB
+are refused (export the JSON and use Import in the builder instead). Media under any other URL scheme
+(`javascript:`, `ftp:`, …) is listed and dropped too. A `--base` other than `https://leclap.dev` adds a
+warning: whatever page that origin serves can read the template in the fragment, so only share such a link
+when you trust it (a local dev server is fine). `leclap studio open <template>` is the explicit form;
+`leclap studio status` and `leclap studio pass` remain the gate commands, so a template file cannot be named
+`status`, `pass` or `open` without the explicit form.
 
 ## `studio` — a production folder
 

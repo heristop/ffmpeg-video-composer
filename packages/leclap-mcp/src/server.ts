@@ -5,10 +5,7 @@ import { loadCustomEffectCatalog } from './effects/custom-effect-catalog.js';
 import type { McpConfig } from './config.js';
 import { registerGetTemplateSchema } from './tools/getTemplateSchema.js';
 import { registerCompose } from './tools/composeVideo.js';
-import { registerProbe } from './tools/probeMedia.js';
-import { registerExtractStyle } from './tools/extractStyle.js';
-import { registerAnalyzeMusic } from './tools/analyzeMusic.js';
-import { registerAnalyzeSound } from './tools/analyzeSound.js';
+import { registerMediaAnalysis } from './tools/media-analysis.js';
 import { registerGetCapabilities } from './tools/getCapabilities.js';
 import { registerValidateTemplate } from './tools/validateTemplate.js';
 import { registerRenderRemotionClip } from './tools/renderRemotionClip.js';
@@ -20,6 +17,7 @@ import { validateEffects } from './effects/title-registry.js';
 import { registerSamples } from './tools/samples.js';
 import { registerComposeGuide } from './prompts/composeGuide.js';
 import { registerInspectTools } from './tools/inspectTools.js';
+import { registerOpenInBuilder } from './tools/open-in-builder.js';
 
 // Each tool group is registered by a small `registerXxx(server, config)` function, called from
 // `createServer`. The surface is authoring-only: schema, validate, compose, probe, the Remotion
@@ -72,12 +70,10 @@ function registerTemplateEdits(server: McpServer, config: McpConfig): void {
   registerEditTemplate(server, effects);
 }
 
-// Media inspection and measurement: probe a file, extract a reference style, time music, hear a sound.
-function registerMediaAnalysis(server: McpServer, config: McpConfig): void {
-  registerProbe(server, config);
-  registerExtractStyle(server, config);
-  registerAnalyzeMusic(server, config);
-  registerAnalyzeSound(server, config);
+// Config-free tools: the local FFmpeg capability report and the builder hand-off link.
+function registerStandaloneTools(server: McpServer): void {
+  registerGetCapabilities(server);
+  registerOpenInBuilder(server);
 }
 
 export function createServer(input: McpConfig): McpServer {
@@ -107,7 +103,7 @@ export function createServer(input: McpConfig): McpServer {
   }
   registerTemplateEdits(server, config);
   registerMediaAnalysis(server, config);
-  registerGetCapabilities(server);
+  registerStandaloneTools(server);
 
   // render_remotion_clip bundles + executes a caller-supplied entry (arbitrary local JS) — an RCE
   // surface. Register it only when the operator explicitly opted in for trusted local design-time use.

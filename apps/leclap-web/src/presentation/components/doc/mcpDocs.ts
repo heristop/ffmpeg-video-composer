@@ -193,6 +193,13 @@ export const mcpDoc: McpDoc = {
       when: 'Use when a render fails on a filter or before relying on text, LUT looks or designed transitions on an unknown machine; validate_template flags the same gaps as featureWarnings.',
     },
     {
+      name: 'open_in_builder',
+      args: 'template, baseUrl?',
+      purpose:
+        'Returns a link that opens the template in the web builder for a person to edit: url, length, mediaToRebind (local paths and uploads the browser cannot read, which open as empty slots) and warnings. The template rides compressed in the URL fragment, which browsers never send to a server, so nothing is uploaded.',
+      when: 'Use to hand a validated template to a person. baseUrl targets a locale (https://leclap.dev/fr) or a local dev server.',
+    },
+    {
       name: 'render_remotion_clip',
       args: 'compositionId, entry?, serveUrl?, inputProps?, outputName?',
       purpose:
