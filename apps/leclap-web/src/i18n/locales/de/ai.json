@@ -1,0 +1,196 @@
+{
+  "open": "Mit KI erstellen",
+  "fromPresets": "Oder beschreiben und mit KI erstellen",
+  "title": "Mit KI erstellen",
+  "subtitle": "Beschreibe das Video. Dein KI-Anbieter schreibt die Vorlage; LeClap prüft sie, bevor sie im Editor öffnet.",
+  "brief": {
+    "label": "Worum soll es im Video gehen?",
+    "placeholder": "Ein 30-Sekunden-Launch für eine Notiz-App. Kräftige, knackige Kinetic Type, endet mit dem Download-Link.",
+    "examples": "Probier ein Beispiel",
+    "tooShort": "Füge noch ein paar Wörter hinzu, damit das Modell weiß, was es erstellen soll.",
+    "hint": "Für wen, in welchem Ton, und wie es endet. Ein bis drei Sätze genügen.",
+    "count_one": "{{count}} Zeichen",
+    "count_other": "{{count}} Zeichen"
+  },
+  "examples": {
+    "launch": "30-s-Produktlaunch für eine Notiz-App, kräftig, knackige Kinetic Type",
+    "tutorial": "Ruhiges Tutorial-Intro, 3 Schritte",
+    "hook": "TikTok-Hook für ein Café, schnelle Schnitte, verspielt",
+    "cinematic": "Cineastischer Markenfilm für einen Wanderausrüster, stimmungsvoll, langsam",
+    "recap": "Jahresrückblick für ein Designstudio, 5 Highlights",
+    "event": "Quadratische Promo für ein Design-Meetup am Wochenende, Datum und Ort am Ende"
+  },
+  "hints": {
+    "orientation": "Format",
+    "duration": "Länge",
+    "auto": "Auto",
+    "landscape": "Querformat",
+    "portrait": "Hochformat",
+    "square": "Quadrat",
+    "seconds": "{{count}} s"
+  },
+  "provider": {
+    "section": "Anbieter & Schlüssel",
+    "summary": "{{provider}} · {{model}}",
+    "label": "Anbieter",
+    "model": "Modell",
+    "modelFree": "Jede Modell-ID deines Kontos funktioniert.",
+    "keySet": "Schlüssel gespeichert",
+    "keyMissing": "Schlüssel hinzufügen"
+  },
+  "key": {
+    "label": "{{provider}}-API-Schlüssel",
+    "show": "Schlüssel zeigen",
+    "hide": "Schlüssel verbergen",
+    "persistFailed": "Dieser Browser blockiert den Speicher, daher gilt der Schlüssel nur für diese Sitzung.",
+    "forget": "Schlüssel vergessen",
+    "forgetAll": "Alle Schlüssel vergessen",
+    "forgotten": "Schlüssel vergessen.",
+    "format": "Das sieht nicht wie ein {{provider}}-Schlüssel aus (erwartet: {{placeholder}}). Du kannst ihn trotzdem ausprobieren.",
+    "getKey": "Schlüssel holen",
+    "privacy": "Nur in diesem Browser gespeichert; nur mit deiner Anfrage an {{provider}} gesendet — nie an LeClap, nie in einer URL, nie protokolliert. Die Nutzung wird deinem Konto berechnet."
+  },
+  "jev": {
+    "section": "Smartes Routing mit Jev (optional)",
+    "about": "Jev wählt aus — es schreibt nicht. Mit einem Jev-Schlüssel wird dein Briefing zuerst eingeordnet (Genre, Format, Energie, beste Startvorlage), damit der Prompt kleiner und treffender wird.",
+    "provider": "Jev",
+    "decisions": "Jevs Einschätzung deines Briefings",
+    "suggestion": "Vorschlag · {{confidence}}",
+    "applied": "{{label}} · {{confidence}}",
+    "route": "Briefing analysieren",
+    "routing": "Jev liest dein Briefing…",
+    "bestMatch": "Mit dem besten Treffer starten",
+    "bestMatchHint": "Öffnet die passendste fertige Vorlage ({{title}}). Jev wählt sie aus; die Texte schreibst du.",
+    "bestMatchNone": "Analysiere das Briefing, um die passendste fertige Vorlage zu finden.",
+    "genre": {
+      "product-launch": "Produktlaunch",
+      "explainer": "Erklärvideo",
+      "social-hook": "Social Hook",
+      "cinematic-trailer": "Cineastischer Trailer",
+      "calm-tutorial": "Ruhiges Tutorial",
+      "other": "Sonstiges"
+    },
+    "platform": {
+      "tiktok": "TikTok",
+      "reels": "Reels",
+      "shorts": "Shorts",
+      "youtube": "YouTube",
+      "x": "X",
+      "linkedin": "LinkedIn",
+      "facebook": "Facebook",
+      "square-feed": "Quadratischer Feed",
+      "none": "Keine Plattform"
+    },
+    "energy": {
+      "0": "Ruhig",
+      "1": "Entspannt",
+      "2": "Ausgewogen",
+      "3": "Knackig",
+      "4": "Explosiv"
+    },
+    "theme": "Theme: {{name}}",
+    "seed": "Beginnt wie „{{title}}“"
+  },
+  "footer": {
+    "needKey": "Zum Erstellen brauchst du deinen {{provider}}-API-Schlüssel.",
+    "needBrief": "Beschreibe das Video, um zu erstellen.",
+    "addKey": "Schlüssel hinzufügen",
+    "ctrlKey": "Strg"
+  },
+  "actions": {
+    "generate": "Erstellen",
+    "cancel": "Abbrechen",
+    "retry": "Erneut versuchen",
+    "open": "Im Editor öffnen",
+    "replace": "Entwurf ersetzen",
+    "keep": "Weiter bearbeiten",
+    "regenerate": "Noch eine erstellen",
+    "details": "Technische Details",
+    "writeTemplate": "Vorlage schreiben",
+    "startOver": "Neu beginnen"
+  },
+  "steps": {
+    "thinking": "Nachdenken",
+    "validating": "Prüfen",
+    "repairing": "Reparieren",
+    "ready": "Fertig",
+    "planning": "Planung",
+    "polishing": "Feinschliff"
+  },
+  "status": {
+    "thinking": "Denkt nach…",
+    "writing": "Schreibt die Vorlage… {{count}} Zeichen",
+    "validating": "Wird geprüft…",
+    "repairing": "Reparatur (Runde {{round}}): behebt {{count}} Problem(e)…",
+    "ready": "Fertig",
+    "cancelled": "Abgebrochen. Nichts wurde geändert.",
+    "planning": "Konzepte und Beats werden geplant…",
+    "planReady": "Plan fertig. Passe ihn bei Bedarf an und schreibe dann die Vorlage.",
+    "polishing": "Feinschliff: {{count}} Art-Direction-Hinweis(e)…"
+  },
+  "result": {
+    "scenes_one": "{{count}} Szene",
+    "scenes_other": "{{count}} Szenen",
+    "footage_one": "{{count}} Clip zum Filmen",
+    "footage_other": "{{count}} Clips zum Filmen",
+    "duration": "{{seconds}} s",
+    "durationEstimate": "~{{seconds}} s + Clips",
+    "effects": "Effekte",
+    "noEffects": "Keine Effekte — harte Schnitte.",
+    "replaceWarning": "Das ersetzt den aktuellen Entwurf. Deine gespeicherten Vorlagen bleiben unberührt, und Rückgängig holt den Entwurf zurück.",
+    "advisories_one": "{{count}} Art-Direction-Hinweis",
+    "advisories_other": "{{count}} Art-Direction-Hinweise",
+    "noAdvisories": "Keine Art-Direction-Hinweise von der Engine."
+  },
+  "errors": {
+    "auth": "{{provider}} hat den Schlüssel abgelehnt. Prüfe, ob er vollständig kopiert wurde und noch aktiv ist.",
+    "rate-limit": "{{provider}} drosselt diesen Schlüssel. Warte eine Minute oder prüfe die Limits deines Tarifs.",
+    "overloaded": "{{provider}} ist gerade überlastet. Versuch es gleich noch einmal.",
+    "network": "{{provider}} ist nicht erreichbar. Prüfe deine Verbindung oder ob eine Erweiterung oder Netzwerkrichtlinie die Anfrage blockiert.",
+    "network-jev": "Jev ist nicht erreichbar. Jevs API akzeptiert Browser-Aufrufe von dieser Seite womöglich noch nicht — die Erstellung funktioniert auch ohne.",
+    "refused": "Das Modell hat dieses Briefing abgelehnt. Formuliere es anders.",
+    "truncated": "Die Antwort brach ab, bevor die Vorlage fertig war. Versuch ein kürzeres Briefing oder weniger Szenen.",
+    "bad-request": "{{provider}} hat die Anfrage abgelehnt. Prüfe, ob die Modell-ID in deinem Konto verfügbar ist.",
+    "bad-response": "{{provider}} hat eine Antwort gesendet, die LeClap nicht lesen konnte. Versuch es erneut.",
+    "http": "{{provider}} hat einen Fehler gemeldet. Versuch es erneut.",
+    "invalid": "Das Modell hat nach {{rounds}} Versuchen keine gültige Vorlage erzeugt. Versuch ein einfacheres oder genaueres Briefing.",
+    "unknown": "Etwas ist schiefgelaufen. Versuch es erneut."
+  },
+  "plan": {
+    "planFirst": "Zuerst planen",
+    "planFirstHint": "Schlägt drei Konzepte und einen Ablauf vor, bevor geschrieben wird. Ein zusätzlicher, kurzer Aufruf.",
+    "review": "Plan prüfen",
+    "reviewHint": "Hält beim Plan an, damit du ihn bearbeiten kannst. Aus: geht direkt weiter.",
+    "title": "Plan",
+    "intro": "Bearbeite Texte, Verben oder Timing oder wähle ein anderes Konzept. Die Vorlage folgt diesem Plan.",
+    "strategy": "Strategie",
+    "concepts": "Konzept",
+    "typicality": {
+      "expected": "Erwartbar",
+      "fresh": "Frisch",
+      "unusual": "Ungewöhnlich"
+    },
+    "beats": "Beats",
+    "role": "Rolle",
+    "verb": "Verb",
+    "onScreen": "Im Bild",
+    "seconds": "Länge",
+    "verbLabel": "Verb von Beat {{row}}",
+    "onScreenLabel": "Text im Bild von Beat {{row}}",
+    "secondsLabel": "Länge von Beat {{row}} in Sekunden",
+    "footage": "Filmmaterial, kein Text",
+    "facts": "Plandetails",
+    "transitions": "Übergänge: {{primary}}",
+    "transitionsWithAccents": "Übergänge: {{primary}} + {{accents}}",
+    "section": "Vor dem Schreiben"
+  },
+  "reference": {
+    "label": "Referenz übernehmen",
+    "hint": "Optional: einen Referenz-Look anhängen. Die Generierung folgt dann verbindlich seiner Palette und seinem Tempo.",
+    "use": "Als Styleguide verwenden",
+    "attached": "Styleguide angehängt: die generierte Vorlage folgt dieser Palette und diesem Tempo.",
+    "detach": "Styleguide entfernen",
+    "summaryNone": "Optional",
+    "summaryAttached": "Angehängt"
+  }
+}

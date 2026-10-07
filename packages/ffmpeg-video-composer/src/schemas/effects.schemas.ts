@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { DESIGNED_TRANSITIONS } from '../core/motion/transitions';
+import { EasingSpecSchema } from './motion.schemas';
+import { GLOBAL_AUDIO_POLISH_FIELDS } from './audio.schemas';
 
 // ── overlay fit ────────────────────────────────────────────────────────────────
 
@@ -140,8 +143,15 @@ export const MAX_TRANSITION_DURATION = 5;
 export const TransitionSchema = z
   .object({
     type: z
-      .union([z.enum(XFADE_TRANSITIONS), z.literal('cut')])
-      .describe('xfade transition name between this section and the next, or "cut" for a hard cut.'),
+      .union([z.enum(XFADE_TRANSITIONS), z.enum(DESIGNED_TRANSITIONS), z.literal('cut')])
+      .describe(
+        'xfade transition name between this section and the next, "cut" for a hard cut, or ' +
+          'a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, ' +
+          'whip-left/right/up/down (a push motion-blurred at peak speed).'
+      ),
+    ease: EasingSpecSchema.optional().describe(
+      'Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.'
+    ),
     duration: z
       .number()
       .positive()
@@ -209,6 +219,7 @@ export const GlobalAudioSchema = z
       .describe(
         'Length in seconds of the music cross-fade between sections, independent of the video transition (default: the global transition duration). Longer values smooth large per-section musicVolume changes.'
       ),
+    ...GLOBAL_AUDIO_POLISH_FIELDS,
   })
   .describe('Global audio mix settings applied across the entire composition.');
 
@@ -219,6 +230,9 @@ export const GlobalAudioSchema = z
 // `effects.schemas` entry point.
 export {
   LOOK_PRESETS,
+  LUT_LOOK_PRESETS,
+  LookSchema,
+  GradeLutSchema,
   GradeSchema,
   MotionEffectSchema,
   BackgroundLayerSchema,

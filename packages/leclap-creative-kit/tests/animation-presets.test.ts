@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { GraphicSchema, type Graphic } from 'ffmpeg-video-composer/src/schemas/graphics.schemas.ts';
+import { TemplateDescriptorSchema } from 'ffmpeg-video-composer/src/schemas/template.schemas.ts';
 import { ANIMATION_EFFECT_PRESETS, animationDefaultsForUrl } from '../src/editor/animation-presets';
 import {
   buildDescriptor,
@@ -7,29 +9,37 @@ import {
   makeTemplateId,
   DEFAULT_AUDIO_MIX,
   DEFAULT_TRANSITION,
+  type EditorSection,
   type EditorState,
   type Orientation,
 } from '../src/editor/templateEditorModel';
 
-const frames: Record<Orientation, [number, number]> = {
-  landscape: [1280, 720],
-  portrait: [720, 1280],
-  square: [1080, 1080],
-};
+const ORIENTATIONS: Orientation[] = ['landscape', 'portrait', 'square'];
 
-const nativeAspects: Record<string, number> = {
-  corner_brackets: 1280 / 720,
-  shine_sweep: 1280 / 720,
-  confetti: 1280 / 720,
-  sparkle: 1280 / 720,
-  tap_pulse: 1,
-  spec_orbit: 720 / 1280,
-  pulse_ring: 1280 / 720,
-  light_leak: 1280 / 720,
-  white_border: 1280 / 720,
-};
+// A title card section with a backdrop layer and one card: the recipes should land on the card.
+function cardSection(): EditorSection {
+  return {
+    ...newSection('color'),
+    layers: [{ color: '#101418' }, { color: '#2A3140', x: 240, y: 160, w: 800, h: 400, radius: 24 }],
+  } as EditorSection;
+}
 
-describe('bundled animation defaults', () => {
+function stateWith(section: EditorSection, orientation: Orientation): EditorState {
+  return {
+    id: makeTemplateId(),
+    name: 'recipes',
+    description: '',
+    orientation,
+    sections: [section],
+    globalVariables: [],
+    audio: { ...DEFAULT_AUDIO_MIX },
+    defaultTransition: { ...DEFAULT_TRANSITION },
+    globalAnimations: [],
+    globalOverlays: [],
+  };
+}
+
+describe('bundled animation defaults (legacy samples)', () => {
   it.each(['tap_pulse', 'shine_sweep', 'confetti', 'sparkle'])(
     'plays %s once without retaining its last frame',
     (name) => {
@@ -65,7 +75,7 @@ describe('bundled animation defaults', () => {
   });
 });
 
-describe('animation effect presets', () => {
+describe('animation effect recipes', () => {
   it('exposes six distinct discoverable recipes', () => {
     expect(ANIMATION_EFFECT_PRESETS.map((preset) => preset.id)).toEqual([
       'interface-focus',
@@ -81,89 +91,87 @@ describe('animation effect presets', () => {
     }
   });
 
-  it.each(Object.keys(frames) as Orientation[])(
-    'fits finite overlays inside the %s frame without distorting artwork',
-    (orientation) => {
-      const [frameW, frameH] = frames[orientation];
+  it.each(ORIENTATIONS)('emits two schema-valid engine graphics per recipe, never an APNG, in %s', (orientation) => {
+    for (const section of [newSection('video'), cardSection()]) {
       for (const preset of ANIMATION_EFFECT_PRESETS) {
-        const layers = preset.build(orientation);
-        expect(layers.length).toBeGreaterThan(0);
-        expect(layers.length).toBeLessThanOrEqual(2);
-        for (const layer of layers) {
-          const [w, h] = layer.scale!.split(':').map(Number);
-          const [x, y] = layer.position!.split(':').map(Number);
-          const filename = layer.url.split('/').at(-1)!.replace('.apng', '');
-          expect(w / h).toBeCloseTo(nativeAspects[filename], 2);
-          expect(layer.fit).toBe('contain');
-          expect(x).toBeGreaterThanOrEqual(0);
-          expect(y).toBeGreaterThanOrEqual(0);
-          expect(x + w).toBeLessThanOrEqual(frameW);
-          expect(y + h).toBeLessThanOrEqual(frameH);
-          expect(layer.persistent).toBe(false);
-          expect(layer.duration).toBeGreaterThan(0);
-          expect(layer.duration).toBeLessThanOrEqual(3);
-          expect(layer.loop).toBeUndefined();
-          expect(layer.loops).toBeUndefined();
+        const graphics = preset.build({ section, orientation });
+
+        expect(graphics).toHaveLength(2);
+        for (const graphic of graphics) {
+          expect(GraphicSchema.safeParse(graphic).success, `${preset.id} ${JSON.stringify(graphic)}`).toBe(true);
+          expect(JSON.stringify(graphic)).not.toContain('.apng');
         }
       }
     }
-  );
+  });
 
-  it('pairs interface brackets with a centered focus pulse and a product orbit with its sweep', () => {
-    const focus = ANIMATION_EFFECT_PRESETS.find((preset) => preset.id === 'interface-focus')!.build('landscape');
-    expect(focus.map((layer) => layer.url)).toEqual([
-      '/assets/animations/corner_brackets.apng',
-      '/assets/animations/tap_pulse.apng',
+  it('anchors every part to the main card of a card section, and to the frame of a video', () => {
+    const anchored = (graphic: Graphic) => (graphic as { target?: unknown }).target;
+
+    for (const preset of ANIMATION_EFFECT_PRESETS) {
+      const onCard = preset.build({ section: cardSection(), orientation: 'landscape' });
+      const onVideo = preset.build({ section: newSection('video'), orientation: 'landscape' });
+
+      for (const graphic of onCard) {
+        if (graphic.type === 'fx' && graphic.effect === 'leak') continue;
+
+        expect(anchored(graphic), preset.id).toBe('layer:1');
+      }
+      for (const graphic of onVideo) {
+        if (graphic.type === 'fx') expect(anchored(graphic)).toBe('frame');
+      }
+    }
+  });
+
+  it('pairs interface brackets with a tap ripple and a product sheen with an orbiting glint', () => {
+    const build = (id: string) =>
+      ANIMATION_EFFECT_PRESETS.find((preset) => preset.id === id)!.build({
+        section: cardSection(),
+        orientation: 'landscape',
+      }) as Array<Record<string, unknown>>;
+
+    expect(build('interface-focus').map((g) => [g.type, g.effect, g.variant])).toEqual([
+      ['corners', undefined, undefined],
+      ['fx', 'ripple', 'tap'],
     ]);
-    const [tapW, tapH] = focus[1].scale!.split(':').map(Number);
-    const [tapX, tapY] = focus[1].position!.split(':').map(Number);
-    expect(Math.abs(tapX + tapW * 0.5 - 640)).toBeLessThanOrEqual(0.5);
-    expect(Math.abs(tapY + tapH * 0.6 - 720 * 0.52)).toBeLessThanOrEqual(0.5);
-    const spotlight = ANIMATION_EFFECT_PRESETS.find((preset) => preset.id === 'product-spotlight')!.build('landscape');
-    expect(spotlight.map((layer) => layer.url)).toContain('/assets/animations/spec_orbit.apng');
+    expect(build('product-spotlight').map((g) => [g.effect, g.path])).toEqual([
+      ['sheen', undefined],
+      ['glint', 'orbit'],
+    ]);
   });
 
-  it('returns independent layers for each application', () => {
-    const preset = ANIMATION_EFFECT_PRESETS[0];
-    const first = preset.build('square');
-    first[0].opacity = 0;
-    first.push({ url: '/custom.apng' });
-    const fresh = preset.build('square');
-    expect(fresh[0].opacity).toBeGreaterThan(0);
-    expect(fresh).toHaveLength(2);
-  });
+  it('gives each part of a recipe its own seed, and the parts land in order', () => {
+    for (const preset of ANIMATION_EFFECT_PRESETS) {
+      const [first, second] = preset.build({ section: cardSection(), orientation: 'portrait' }) as Array<{
+        at?: number;
+        seed?: number;
+      }>;
 
-  it.each(Object.keys(frames) as Orientation[])(
-    'retains preset timing and geometry through JSON editor round-trip in %s',
-    (orientation) => {
-      for (const preset of ANIMATION_EFFECT_PRESETS) {
-        const layers = preset.build(orientation);
-        const state: EditorState = {
-          id: makeTemplateId(),
-          name: preset.id,
-          description: '',
-          orientation,
-          sections: [newSection('video')],
-          globalVariables: [],
-          audio: { ...DEFAULT_AUDIO_MIX },
-          defaultTransition: { ...DEFAULT_TRANSITION },
-          globalAnimations: layers,
-          globalOverlays: [],
-        };
-        const descriptor = buildDescriptor(state);
-        const restored = toEditorState({
-          id: state.id,
-          name: state.name,
-          description: state.description,
-          orientation,
-          descriptor,
-        });
-        expect(restored.globalAnimations).toHaveLength(layers.length);
-        for (let index = 0; index < layers.length; index++) {
-          const { label: _label, id: _id, ...portable } = layers[index];
-          expect(restored.globalAnimations[index]).toMatchObject(portable);
-        }
-      }
+      expect(second.at ?? 0).toBeGreaterThan(first.at ?? 0);
+      if (first.seed !== undefined && second.seed !== undefined) expect(first.seed).not.toBe(second.seed);
     }
-  );
+  });
+
+  it('returns independent graphics for each application', () => {
+    const preset = ANIMATION_EFFECT_PRESETS[0];
+    const first = preset.build({ section: newSection('video'), orientation: 'square' });
+    (first[0] as { at?: number }).at = 9;
+    const fresh = preset.build({ section: newSection('video'), orientation: 'square' });
+    expect((fresh[0] as { at?: number }).at).not.toBe(9);
+  });
+
+  it.each(ORIENTATIONS)('round-trips every recipe through the builder model unchanged in %s', (orientation) => {
+    for (const preset of ANIMATION_EFFECT_PRESETS) {
+      const card = cardSection();
+      const graphics = preset.build({ section: card, orientation });
+      const state = stateWith({ ...card, graphics } as EditorSection, orientation);
+      const descriptor = buildDescriptor(state);
+      const restored = toEditorState({ id: state.id, name: state.name, description: '', orientation, descriptor });
+      const again = buildDescriptor(restored);
+
+      expect(TemplateDescriptorSchema.safeParse(descriptor).success).toBe(true);
+      expect((restored.sections[0] as { graphics?: Graphic[] }).graphics).toEqual(graphics);
+      expect(again).toEqual(descriptor);
+    }
+  });
 });

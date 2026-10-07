@@ -25,6 +25,11 @@ export interface McpConfig {
   remotionEntry?: string;
   /** Optional host Chromium/Chrome executable for registered effect rendering. */
   browserExecutable?: string;
+  /**
+   * JSONL log report_catalog_gap appends to, relative to (and always under) outputDir. Defaults to
+   * `catalog-gaps.jsonl`.
+   */
+  catalogGapLog?: string;
 }
 
 const DEFAULT_RENDER_TIMEOUT_MS = 600_000;
@@ -107,6 +112,12 @@ function nonEmpty(value: string | undefined): string | undefined {
   return value !== undefined && value.trim() !== '' ? value : undefined;
 }
 
+function gapLogConfig(argv: readonly string[]): Pick<McpConfig, 'catalogGapLog'> {
+  const catalogGapLog = nonEmpty(readFlag(argv, '--catalog-gap-log') ?? process.env.LECLAP_MCP_CATALOG_GAP_LOG);
+
+  return catalogGapLog ? { catalogGapLog } : {};
+}
+
 export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
   // An empty value counts as unset: path.resolve('') is the working directory, which would widen the
   // media sandbox to wherever the server was started.
@@ -141,5 +152,6 @@ export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
     ...catalogPathConfig(argv),
     ...(browserExecutable ? { browserExecutable: path.resolve(browserExecutable) } : {}),
     ...(remotionEntry ? { remotionEntry: path.resolve(remotionEntry) } : {}),
+    ...gapLogConfig(argv),
   };
 }

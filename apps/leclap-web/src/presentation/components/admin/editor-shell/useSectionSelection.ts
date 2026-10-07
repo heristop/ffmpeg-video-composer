@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useReducer } from 'react';
 
 // Which element inside the current section is selected. `kind` covers every element a section
-// canvas can surface (background color layers, text/image overlays, animations, and the structured
+// canvas can surface (background color layers, text/image overlays, animations, engine effects (the
+// section's `graphics`), and the structured
 // text sugar) so a single selection state drives the inspector for all of them. The sugar kinds
 // (caption/titleCard/lowerThird) are per-section singletons — their index is always 0.
 export interface ElementRef {
-  kind: 'text' | 'layer' | 'image' | 'animation' | 'caption' | 'titleCard' | 'lowerThird';
+  kind: 'text' | 'layer' | 'image' | 'animation' | 'effect' | 'caption' | 'titleCard' | 'lowerThird';
   index: number;
 }
 

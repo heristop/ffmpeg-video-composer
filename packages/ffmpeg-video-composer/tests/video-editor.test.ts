@@ -10,6 +10,8 @@ function makeLogger() {
 function makeProject() {
   return {
     finalVideo: '',
+    output: { staging: '', final: '' },
+    ffmpegVersion: null,
     errors: [] as string[],
     buildInfos: {
       fileConcatPath: '/build/segments.list',

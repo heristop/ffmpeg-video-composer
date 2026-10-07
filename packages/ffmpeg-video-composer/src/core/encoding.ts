@@ -53,8 +53,42 @@ export function buildPixFmtArg(config: ProjectConfig): string {
  * Output flags alone do **not** rewrite a source's `color_primaries`/`color_trc` (those leak through
  * from the input frames), so they are a floor; `buildColorMetadataFilter` does the full override.
  */
-export function buildColorMetadataArgs(): string {
+export function buildColorMetadataArgs(config?: ProjectConfig, ffmpegVersion?: string | null): string {
+  if (config && usesX264(config) && ffmpegAtLeast(ffmpegVersion, 7, 1)) {
+    return X264_COLOR_PARAMS;
+  }
+
   return '-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv';
+}
+
+/**
+ * The same Rec.709/limited-range tags written by libx264 itself, into the bitstream VUI. From FFmpeg 7.1
+ * the `-colorspace`/`-color_*` output options take part in filtergraph format negotiation, so on a
+ * source tagged differently (or untagged) they insert a real matrix/range conversion instead of only
+ * tagging. The encoder-level tags never touch pixels; `buildColorMetadataFilter` still tags the frames,
+ * which is what the muxer's `colr` box is written from.
+ */
+export const X264_COLOR_PARAMS = '-x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709:range=tv';
+
+function usesX264(config: ProjectConfig): boolean {
+  const codec = resolveVideoCodec(config);
+
+  return codec === 'h264' || codec === 'libx264';
+}
+
+/**
+ * Whether an `ffmpeg -version` number (`7.1`, `n7.1.1`, `8.1-static`) is at least major.minor. An
+ * unknown or unparseable version (a git snapshot, the WASM core, the on-device engine) is `false`, so
+ * those keep the historical flags.
+ */
+export function ffmpegAtLeast(version: string | null | undefined, major: number, minor: number): boolean {
+  const match = /^n?(\d+)\.(\d+)/.exec(version ?? '');
+
+  if (!match) return false;
+
+  const [found, foundMinor] = [Number(match[1]), Number(match[2])];
+
+  return found > major || (found === major && foundMinor >= minor);
 }
 
 /**

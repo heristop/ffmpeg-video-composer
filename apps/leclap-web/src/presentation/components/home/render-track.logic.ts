@@ -1,5 +1,5 @@
 // The render track's scroll maths, pure so it unit-tests without a page: how far the scroll has taken the
-// render, where Clappy stands on the rail, how far his legs have run, and which way he faces.
+// render, how far Clappy's legs have run, and which way he faces.
 import { clamp01 } from '@/presentation/components/kinetic/gradient-meter.logic';
 
 /** Where the track's top sits, as a share of the viewport's height, when the run starts and when it ends. */
@@ -18,10 +18,6 @@ export const trackProgress = (top: number, viewportHeight: number): number => {
 
   return clamp01((START * viewportHeight - top) / ((START - END) * viewportHeight));
 };
-
-/** Clappy's offset along the lane, in px: the rail is the lane less his own width, so he stays on the track. */
-export const railOffset = (progress: number, laneWidth: number, size: number): number =>
-  clamp01(progress) * Math.max(0, laneWidth - size);
 
 /** The run cycle after he covers `dx` px of ground either way: one stride per `strideLength`, capped per frame. */
 export const advanceStride = (stride: number, dx: number, strideLength: number): number =>

@@ -1,0 +1,198 @@
+[
+  {
+    "id": "sheen",
+    "label": "Sheen",
+    "thumb": "sheen.webp",
+    "poster": "sheen.png",
+    "kind": "fx"
+  },
+  {
+    "id": "glint-orbit",
+    "label": "Orbit glint",
+    "thumb": "glint-orbit.webp",
+    "poster": "glint-orbit.png",
+    "kind": "fx"
+  },
+  {
+    "id": "edge-glow",
+    "label": "Edge glow",
+    "thumb": "edge-glow.webp",
+    "poster": "edge-glow.png",
+    "kind": "fx"
+  },
+  {
+    "id": "leak",
+    "label": "Light leak",
+    "thumb": "leak.webp",
+    "poster": "leak.png",
+    "kind": "fx"
+  },
+  {
+    "id": "bloom",
+    "label": "Bloom",
+    "thumb": "bloom.webp",
+    "poster": "bloom.png",
+    "kind": "fx"
+  },
+  {
+    "id": "ripple",
+    "label": "Pulse ring",
+    "thumb": "ripple.webp",
+    "poster": "ripple.png",
+    "kind": "fx"
+  },
+  {
+    "id": "ripple-tap",
+    "label": "Tap",
+    "thumb": "ripple-tap.webp",
+    "poster": "ripple-tap.png",
+    "kind": "fx"
+  },
+  {
+    "id": "resolve",
+    "label": "Resolve",
+    "thumb": "resolve.webp",
+    "poster": "resolve.png",
+    "kind": "fx"
+  },
+  {
+    "id": "glass",
+    "label": "Glass",
+    "thumb": "glass.webp",
+    "poster": "glass.png",
+    "kind": "fx"
+  },
+  {
+    "id": "vignette-breathe",
+    "label": "Breathing vignette",
+    "thumb": "vignette-breathe.webp",
+    "poster": "vignette-breathe.png",
+    "kind": "fx"
+  },
+  {
+    "id": "glint",
+    "label": "Glints",
+    "thumb": "glint.webp",
+    "poster": "glint.png",
+    "kind": "fx"
+  },
+  {
+    "id": "frame",
+    "label": "Frame",
+    "thumb": "frame.webp",
+    "poster": "frame.png",
+    "kind": "graphic"
+  },
+  {
+    "id": "corners",
+    "label": "Corner brackets",
+    "thumb": "corners.webp",
+    "poster": "corners.png",
+    "kind": "graphic"
+  },
+  {
+    "id": "underline",
+    "label": "Underline",
+    "thumb": "underline.webp",
+    "poster": "underline.png",
+    "kind": "graphic"
+  },
+  {
+    "id": "bokeh",
+    "label": "Bokeh",
+    "thumb": "bokeh.webp",
+    "poster": "bokeh.png",
+    "kind": "fx"
+  },
+  {
+    "id": "dust",
+    "label": "Dust",
+    "thumb": "dust.webp",
+    "poster": "dust.png",
+    "kind": "fx"
+  },
+  {
+    "id": "grain",
+    "label": "Grain",
+    "thumb": "grain.webp",
+    "poster": "grain.png",
+    "kind": "fx"
+  },
+  {
+    "id": "confetti",
+    "label": "Confetti",
+    "thumb": "confetti.webp",
+    "poster": "confetti.png",
+    "kind": "fx"
+  },
+  {
+    "id": "shine-sweep",
+    "label": "Shine sweep",
+    "thumb": "sample-shine-sweep.png",
+    "poster": "sample-shine-sweep.png",
+    "kind": "sample"
+  },
+  {
+    "id": "confetti",
+    "label": "Confetti",
+    "thumb": "sample-confetti.png",
+    "poster": "sample-confetti.png",
+    "kind": "sample"
+  },
+  {
+    "id": "sparkle",
+    "label": "Sparkle",
+    "thumb": "sample-sparkle.png",
+    "poster": "sample-sparkle.png",
+    "kind": "sample"
+  },
+  {
+    "id": "corner-brackets",
+    "label": "Corner brackets",
+    "thumb": "sample-corner-brackets.png",
+    "poster": "sample-corner-brackets.png",
+    "kind": "sample"
+  },
+  {
+    "id": "pulse-ring",
+    "label": "Pulse ring",
+    "thumb": "sample-pulse-ring.png",
+    "poster": "sample-pulse-ring.png",
+    "kind": "sample"
+  },
+  {
+    "id": "tap-pulse",
+    "label": "Tap pulse",
+    "thumb": "sample-tap-pulse.png",
+    "poster": "sample-tap-pulse.png",
+    "kind": "sample"
+  },
+  {
+    "id": "light-leak",
+    "label": "Light leak",
+    "thumb": "sample-light-leak.png",
+    "poster": "sample-light-leak.png",
+    "kind": "sample"
+  },
+  {
+    "id": "white-border",
+    "label": "White border",
+    "thumb": "sample-white-border.png",
+    "poster": "sample-white-border.png",
+    "kind": "sample"
+  },
+  {
+    "id": "glow-border",
+    "label": "Glow border",
+    "thumb": "sample-glow-border.png",
+    "poster": "sample-glow-border.png",
+    "kind": "sample"
+  },
+  {
+    "id": "rounded-border",
+    "label": "Rounded border",
+    "thumb": "sample-rounded-border.png",
+    "poster": "sample-rounded-border.png",
+    "kind": "sample"
+  }
+]

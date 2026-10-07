@@ -14,8 +14,9 @@ import { parseOrientation, toDeviceOrientation } from '@/src/features/templates/
 import { colors, spacing, fonts, typography, withAlpha } from '@/src/styles/theme';
 import { PressableScale } from '@/src/components/kinetic/pressable-scale';
 import { useProject, useSaveProject } from '@/src/hooks/useProjects';
-import { useOrientation } from '@/src/hooks/useOrientation';
+import { restoreOrientation, useOrientation } from '@/src/hooks/useOrientation';
 import { useAdaptiveLayout } from '@/src/hooks/use-adaptive-layout';
+import { recorderModeProps } from '@/src/features/editor/components/recorder-modes';
 
 const safeJsonParse = (jsonString: string | undefined | null): unknown => {
   if (!jsonString) return null;
@@ -132,15 +133,15 @@ const buildUpdatedProject = (
 
 const useOrientationLock = (orientation: 'portrait' | 'landscape', enabled: boolean) => {
   // `orientation` here is the DEVICE orientation (square already mapped to portrait by the caller).
-  const { lockOrientation, unlockOrientation } = useOrientation();
+  const { lockOrientation } = useOrientation();
 
   useEffect(() => {
     if (enabled) lockOrientation(orientation).catch(console.error);
 
     return () => {
-      if (enabled) unlockOrientation().catch(console.error);
+      if (enabled) restoreOrientation().catch(console.error);
     };
-  }, [orientation, enabled, lockOrientation, unlockOrientation]);
+  }, [orientation, enabled, lockOrientation]);
 };
 
 const useRecordingTimer = (isRecording: boolean) => {
@@ -323,6 +324,8 @@ const RecordSectionScreen = () => {
           maxDurationSeconds={section.options?.duration}
           framingGuide={section.options?.framingGuide}
           onFinalizingChange={setIsFinalizing}
+          // Both cameras plus a pick from the gallery, unless the template locks the section to fewer modes.
+          {...recorderModeProps(section.options as Parameters<typeof recorderModeProps>[0])}
           fullscreen
         />
       </View>

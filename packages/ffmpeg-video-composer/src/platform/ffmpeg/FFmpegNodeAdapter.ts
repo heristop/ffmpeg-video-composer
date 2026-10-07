@@ -4,8 +4,11 @@ import { promisify } from 'node:util';
 import type { FFMpegInfos } from '../../core/types';
 import AbstractFFmpeg, { type FFmpegBinaries } from './AbstractFFmpeg';
 import { FFmpegError } from '../../core/errors/FFmpegError';
+import { reportedTraits } from '../../core/footage/media-traits';
 import { parseCommand } from './parse-command';
-import { tailStderr } from './tail-stderr';
+import { spawnFailure, tailStderr } from './tail-stderr';
+import { withFilterScripts } from './filter-scripts-node';
+import { measureLoudness } from './analyze-node';
 import { getPerfTimer } from '../../utils/perf-timer';
 
 const execFileAsync = promisify(execFile);
@@ -38,16 +41,21 @@ class FFmpegNodeAdapter extends AbstractFFmpeg {
       // Errors only. At its default level ffmpeg also prints its banner, every input's stream dump, the
       // stream mapping and encoder stats, which bury the line saying why a command failed.
       await getPerfTimer().span('ffmpeg:execute', () =>
-        execFileAsync('ffmpeg', ['-loglevel', 'error', ...parseCommand(command)])
+        withFilterScripts(['-loglevel', 'error', ...parseCommand(command)], (args) => execFileAsync('ffmpeg', args))
       );
 
       return { rc: 0 };
     } catch (error) {
       const execError = error as ExecException & { stderr: string };
 
-      throw new FFmpegError('FFmpeg command failed', tailStderr(execError.stderr));
+      // A spawn failure (E2BIG, ENOENT) never reaches FFmpeg, so there is no stderr: report the system
+      // error instead. Oversized filtergraphs go through script files (filter-scripts-node.ts).
+      throw new FFmpegError('FFmpeg command failed', tailStderr(execError.stderr) || spawnFailure(execError));
     }
   };
+
+  override measureTruePeak = async (file: string): Promise<number | null> =>
+    (await measureLoudness('ffmpeg', file)).truePeak;
 
   getInfos = async (source: string): Promise<FFMpegInfos> => {
     try {
@@ -68,6 +76,7 @@ class FFmpegNodeAdapter extends AbstractFFmpeg {
         videoCodec: videoStream?.codec_name ?? null,
         audioCodec: audioStream?.codec_name ?? null,
         sampleRate: audioStream?.sample_rate ? parseInt(audioStream.sample_rate, 10) : null,
+        ...reportedTraits(videoStream),
       };
     } catch (error) {
       const execError = error as ExecException & { stderr: string };

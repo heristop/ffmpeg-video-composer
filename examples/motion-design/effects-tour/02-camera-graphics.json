@@ -1,0 +1,1665 @@
+{
+  "meta": {
+    "name": "Effects tour: camera and graphics",
+    "description": "Chapter 2 of the effects tour: every virtual camera preset over a bundled photograph (plus hits, seeded shake and keyframed zoom / roll), section motion (Ken Burns, pulse), letterbox, and every animated graphic: flash, bars, underline (round caps), frame (rounded, traced), corners (on a target), panel, wipe, glitch, focus, progress, ticker and bar chart.",
+    "creativeDirection": "One camera idea or one graphic per beat, named in the corner label. Photographs make every camera move readable; graphics sit on ink grounds so their geometry reads. Review: no frame edge ever shows during a move, flashes stay under three per second, text keeps its shadow over photos, and the chart values settle before the cut."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 37,
+    "transition": {
+      "type": "cut"
+    },
+    "motion": {
+      "energy": 1
+    },
+    "overlays": [
+      {
+        "text": {
+          "en": "02  CAMERA & GRAPHICS"
+        },
+        "position": "top-right",
+        "font": "mono",
+        "size": 24,
+        "color": "#C9C6D2",
+        "effect": {
+          "shadow": true
+        }
+      }
+    ]
+  },
+  "sections": [
+    {
+      "name": "camera-push-in",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/neon-alley.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.16,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · push-in"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Push in"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "camera-pull-out",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/turquoise-sea.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "preset": "pull-out",
+        "amount": 0.16,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · pull-out"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Pull out"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "camera-drift-left",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/golden-hour.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "preset": "drift-left",
+        "amount": 0.14,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · drift-left"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Drift left"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "camera-drift-right",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/autumn-leaves.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "preset": "drift-right",
+        "amount": 0.14,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · drift-right"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Drift right"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "camera-drift-up",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/desert-dunes.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "preset": "drift-up",
+        "amount": 0.14,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · drift-up"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Drift up"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "camera-drift-down",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/desk-flatlay.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "preset": "drift-down",
+        "amount": 0.14,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · drift-down"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Drift down"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "camera-orbit",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/milky-way.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "preset": "orbit",
+        "amount": 0.14,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · orbit"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Orbit"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "camera-handheld",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/cafe-table.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "preset": "handheld",
+        "amount": 0.1,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · handheld"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Handheld"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "camera-none",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/golden-hour.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "preset": "none",
+        "hits": [
+          0.5,
+          {
+            "at": 1.3,
+            "strength": 0.08
+          }
+        ],
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · none + hits"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "HIT"
+          },
+          "preset": "impact",
+          "size": 220,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "camera-shake",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/pink-sunset.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "preset": "none",
+        "shake": {
+          "amplitude": 10,
+          "frequency": 1.6,
+          "rotation": 0.8
+        },
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · shake"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Shake"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "camera-zoom",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/monstera-leaves.jpg",
+        "duration": 1.9
+      },
+      "camera": {
+        "zoom": [
+          {
+            "t": 0,
+            "v": 1
+          },
+          {
+            "t": 1.6,
+            "v": 1.25,
+            "ease": "$expo"
+          }
+        ],
+        "rotate": [
+          {
+            "t": 0,
+            "v": 0
+          },
+          {
+            "t": 1.6,
+            "v": 4,
+            "ease": "$smooth"
+          }
+        ],
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "camera · zoom / rotate keys"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Keyframed"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "motion-kenburns",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/golden-hour.jpg",
+        "duration": 2.1
+      },
+      "motion": [
+        {
+          "type": "kenburns",
+          "direction": "left",
+          "intensity": 1.2
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "motion · kenburns"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Ken Burns"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "motion-pulse",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/snowy-peak.jpg",
+        "duration": 2.1
+      },
+      "motion": [
+        {
+          "type": "pulse",
+          "intensity": 1.06,
+          "frequency": 2
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "motion · pulse"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Pulse"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "letterbox",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rainy-window.jpg",
+        "duration": 2.1
+      },
+      "letterbox": {
+        "aspect": 2.39
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "letterbox 2.39"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 110,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Cinemascope"
+          },
+          "preset": "rise",
+          "size": 110,
+          "y": "center",
+          "delay": 0.25,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "graphic-flash",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "graphics": [
+        {
+          "type": "flash",
+          "at": 0.45,
+          "duration": 0.3
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · flash"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "FLASH"
+          },
+          "preset": "impact",
+          "size": 200,
+          "y": "center",
+          "delay": 0.4,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          },
+          "color": "#FF8AAE"
+        }
+      ],
+      "camera": {
+        "hits": [0.45]
+      }
+    },
+    {
+      "name": "graphic-bars",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 2.5
+      },
+      "graphics": [
+        {
+          "type": "bars",
+          "at": 0.1,
+          "aspect": 2.39
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · bars"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "WIDESCREEN"
+          },
+          "preset": "tracking-in",
+          "size": 140,
+          "y": "center",
+          "delay": 0.4,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "graphic-underline",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.8,
+          "x": 390,
+          "y": 430,
+          "width": 500,
+          "origin": "center",
+          "color": "#FFF685",
+          "caps": "round",
+          "settle": 0.03,
+          "exit": "fade",
+          "thickness": 8
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · underline · round caps + settle"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Underlined"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": 280,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "graphic-frame",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "at": 0.1,
+          "inset": 100,
+          "color": "#7C83FD",
+          "radius": 28,
+          "trace": "path",
+          "exit": "fade"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · frame · radius + trace path"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Framed"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": "center",
+          "delay": 0.4,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "graphic-corners",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.1
+      },
+      "graphics": [
+        {
+          "type": "corners",
+          "at": 0.2,
+          "color": "#FF8AAE",
+          "target": {
+            "x": 330,
+            "y": 270,
+            "w": 620,
+            "h": 180
+          },
+          "clearance": 28,
+          "spread": 1.08,
+          "trace": "clockwise",
+          "exit": "expand"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · corners · target + spread"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "In focus"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": "center",
+          "delay": 0.4,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "graphic-panel",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.5
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0.15,
+          "x": 0,
+          "y": 260,
+          "width": 820,
+          "height": 200,
+          "from": "left",
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · panel"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "On a panel"
+          },
+          "preset": "rise",
+          "size": 110,
+          "y": 295,
+          "delay": 0.45,
+          "align": "left",
+          "x": 80,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "graphic-wipe",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "wipe",
+          "at": 1.3,
+          "duration": 0.8,
+          "color": "#FF8AAE",
+          "direction": "left"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · wipe"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Turn the page"
+          },
+          "preset": "rise",
+          "size": 110,
+          "y": "center",
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "graphic-glitch",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 1.8
+      },
+      "graphics": [
+        {
+          "type": "glitch",
+          "at": 0.4,
+          "duration": 0.4,
+          "intensity": 0.8
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · glitch"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "GLITCH"
+          },
+          "preset": "impact",
+          "size": 200,
+          "y": "center",
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "graphic-focus",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.2
+      },
+      "graphics": [
+        {
+          "type": "focus",
+          "at": 0.1,
+          "duration": 1,
+          "amount": 24,
+          "direction": "in"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · focus"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Rack focus"
+          },
+          "preset": "fade",
+          "size": 130,
+          "y": "center",
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "graphic-progress",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "progress",
+          "at": 0.2,
+          "duration": 2.2,
+          "thickness": 12,
+          "track": "#FFFFFF@0.15",
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · progress"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Loading the story"
+          },
+          "preset": "fade",
+          "size": 90,
+          "y": "center",
+          "delay": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "graphic-ticker",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "ticker",
+          "at": 0.1,
+          "text": {
+            "en": "BREAKING  ·  JSON IN, VIDEO OUT  ·  SAME FRAMES EVERY TIME  ·"
+          },
+          "speed": 240,
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · ticker"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Live ticker"
+          },
+          "preset": "rise",
+          "size": 110,
+          "y": 240,
+          "delay": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "graphic-bars-chart",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.2
+      },
+      "graphics": [
+        {
+          "type": "bars-chart",
+          "at": 0.3,
+          "values": [12, 28, 19, 42],
+          "labels": ["Q1", "Q2", "Q3", "Q4"],
+          "x": 300,
+          "y": 170,
+          "width": 680,
+          "height": 380,
+          "suffix": "K",
+          "ease": "$snappy"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "graphics · bars-chart"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    }
+  ]
+}

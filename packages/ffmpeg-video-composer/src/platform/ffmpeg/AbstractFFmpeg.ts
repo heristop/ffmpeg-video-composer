@@ -72,6 +72,12 @@ abstract class AbstractFFmpeg {
     return null;
   }
 
+  /**
+   * True peak (dBTP) of a file's first audio stream, measured by decoding it (ebur128). Only the Node CLI
+   * adapters implement it; the loudness normalisation re-checks its encoded output with it when present.
+   */
+  measureTruePeak?(file: string): Promise<number | null>;
+
   abstract execute(command: string): Promise<{ rc: number }>;
 
   abstract getInfos(source: string): Promise<FFMpegInfos>;

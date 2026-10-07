@@ -1,8 +1,8 @@
 {
   "meta": {
     "name": "Overlay effect recipes",
-    "description": "Synthetic review fixture with adaptive shapes and labels for the shared composited effect presets.",
-    "creativeDirection": "Direction: an honest synthetic test fixture for six composited recipes. Frame an interface detail, reveal a product shape, mark a celebration, lock focus, pass a soft light or reveal a fine frame. Keep labels readable and the focal element visible. Use at most two brief layers per scene and a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
+    "description": "Synthetic review fixture for the six builder recipes: each scene layers two engine primitives (graphics[] fx, frame and corners) anchored to the card.",
+    "creativeDirection": "Direction: an honest synthetic test fixture for six two-part recipes built from engine primitives. Frame an interface detail, light a product card, mark a celebration, lock focus, pass a warm light or reveal a fine frame. Every effect is anchored to the card (target layer:0) and tuned on top of the recipe defaults. Keep labels readable and the focal element visible, with a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
   },
   "global": {
     "orientation": "landscape",
@@ -63,34 +63,25 @@
           }
         }
       ],
-      "inputs": [
+      "graphics": [
         {
-          "name": "effect_0",
-          "type": "animation",
-          "url": "/assets/animations/corner_brackets.apng",
-          "options": {
-            "position": "205:130",
-            "scale": "870:489",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.2,
-            "duration": 1.8,
-            "opacity": 0.5
-          }
+          "type": "corners",
+          "at": 0.15,
+          "target": "layer:0",
+          "clearance": 16,
+          "trace": "clockwise",
+          "exit": "expand",
+          "color": "$color.accent"
         },
         {
-          "name": "effect_1",
-          "type": "animation",
-          "url": "/assets/animations/tap_pulse.apng",
-          "options": {
-            "position": "518:227",
-            "scale": "245:245",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.4,
-            "duration": 2,
-            "opacity": 0.75
-          }
+          "type": "fx",
+          "effect": "ripple",
+          "variant": "tap",
+          "target": "layer:0",
+          "seed": 4031,
+          "at": 0.45,
+          "color": "$color.accent",
+          "dot": 0.18
         }
       ]
     }

@@ -1,0 +1,122 @@
+{
+  "pill": {
+    "label": "Agente",
+    "aria": "Agente del navegador: {{state}}",
+    "states": {
+      "off": "desactivado",
+      "idle": "listo",
+      "working": "trabajando"
+    }
+  },
+  "popover": {
+    "title": "Agente del navegador",
+    "intro": "Un agente de IA integrado en tu navegador puede leer esta plantilla, revisarla y hacer cambios que puedes deshacer. Usa el agente de tu propio navegador: esta página no guarda ninguna clave de API.",
+    "polyfill": "Modo de desarrollo: las herramientas vienen del polyfill de WebMCP.",
+    "close": "Cerrar"
+  },
+  "settings": {
+    "enabled": "Permitir que los agentes del navegador usen este editor",
+    "enabledHelp": "Desactívalo para quitar todas las herramientas a la vez.",
+    "askBeforeEdit": "Preguntar antes de cada cambio",
+    "askBeforeEditHelp": "Cada cambio del agente espera tu aprobación.",
+    "problem": "Algunas herramientas no se pudieron registrar: {{detail}}"
+  },
+  "log": {
+    "title": "Actividad reciente",
+    "emptyTitle": "Todavía no hay actividad",
+    "empty": "Nada todavía. Pide al agente de tu navegador que trabaje en esta plantilla y cada paso aparecerá aquí.",
+    "undo": "Deshacer",
+    "undoLabel": "Deshacer: {{action}}",
+    "note": "Nota del agente: {{note}}",
+    "status": {
+      "ok": "Hecho",
+      "error": "Falló",
+      "declined": "Rechazado"
+    },
+    "changed_one": "{{count}} escena cambiada",
+    "changed_other": "{{count}} escenas cambiadas"
+  },
+  "tools": {
+    "get_template": "Leyó la plantilla",
+    "list_sections": "Listó las escenas",
+    "get_template_schema": "Leyó el esquema de la plantilla",
+    "get_motion_catalog": "Consultó las animaciones",
+    "list_samples": "Exploró los ejemplos",
+    "get_sample": "Leyó un ejemplo",
+    "validate_template": "Revisó la plantilla",
+    "get_timeline": "Leyó la línea de tiempo",
+    "select_section": "Seleccionó una escena",
+    "edit_template": "Editó la plantilla",
+    "add_section": "Añadió una escena",
+    "remove_section": "Eliminó una escena",
+    "move_section": "Movió una escena",
+    "set_texts": "Cambió textos en pantalla",
+    "undo": "Deshizo su último paso",
+    "set_theme": "Cambió el tema",
+    "set_format": "Cambió el formato",
+    "set_music": "Cambió la música",
+    "replace_template": "Reemplazó la plantilla",
+    "load_sample": "Abrió un ejemplo",
+    "render_preview": "Renderizó una vista previa",
+    "render_frames": "Capturó fotogramas de la vista previa",
+    "save_template": "Guardó la plantilla"
+  },
+  "actions": {
+    "edit_template": "editar la plantilla",
+    "add_section": "añadir una escena",
+    "remove_section": "eliminar una escena",
+    "move_section": "mover una escena",
+    "set_texts": "cambiar textos en pantalla",
+    "undo": "deshacer su último paso",
+    "set_theme": "cambiar el tema",
+    "set_format": "cambiar el formato",
+    "set_music": "cambiar la música",
+    "replace_template": "reemplazar esta plantilla",
+    "load_sample": "abrir un ejemplo en lugar de esta plantilla",
+    "render_preview": "renderizar una vista previa",
+    "render_frames": "capturar fotogramas de la vista previa",
+    "save_template": "guardar esta plantilla"
+  },
+  "errors": {
+    "invalid_input": "solicitud no válida",
+    "too_large": "solicitud demasiado grande",
+    "revision_conflict": "la plantilla cambió mientras tanto",
+    "invalid_template": "habría roto la plantilla",
+    "builder_unsupported_section": "no compatible con el editor",
+    "no_effect": "nada que el editor pudiera conservar",
+    "not_found": "no encontrado",
+    "user_declined": "rechazado por ti",
+    "needs_user_attention": "pestaña en segundo plano",
+    "rate_limited": "demasiadas solicitudes",
+    "busy": "otro paso estaba en curso",
+    "disabled": "las herramientas del agente están desactivadas",
+    "aborted": "cancelado",
+    "unavailable": "no disponible",
+    "render_failed": "el renderizado falló",
+    "save_blocked": "aún no se puede guardar"
+  },
+  "confirm": {
+    "title": "¿Permitir esta acción del agente del navegador?",
+    "description": "El agente de tu navegador quiere {{action}}.",
+    "undoable": "Podrás deshacerlo después.",
+    "allow": "Permitir",
+    "deny": "No permitir",
+    "allowSession": "Permitir vistas previas durante el resto de esta sesión",
+    "details": {
+      "replace_template": "Se abre como un borrador nuevo llamado «{{name}}» con {{sections}} escenas; Deshacer recupera tu borrador actual.",
+      "load_sample": "El ejemplo «{{title}}» se abre como un borrador nuevo; Deshacer recupera tu borrador actual.",
+      "render_preview": "Renderiza unos {{duration}} s de vídeo en tu navegador con medios provisionales, unos {{seconds}} s de trabajo, y abre la vista previa aquí.",
+      "save_template": "Guarda «{{name}}» en tu biblioteca de plantillas en este dispositivo; el editor sigue abierto."
+    }
+  },
+  "live": {
+    "changed_one": "El agente del navegador cambió {{count}} escena",
+    "changed_other": "El agente del navegador cambió {{count}} escenas",
+    "settings_one": "El agente del navegador cambió los ajustes de la plantilla",
+    "settings_other": "El agente del navegador cambió los ajustes de la plantilla",
+    "declined_one": "Rechazaste una acción del agente",
+    "declined_other": "Rechazaste {{count}} acciones del agente",
+    "failed_one": "Falló una acción del agente",
+    "failed_other": "Fallaron {{count}} acciones del agente"
+  }
+}

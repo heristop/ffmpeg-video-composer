@@ -2,7 +2,7 @@
   "meta": {
     "name": "Story Reel",
     "description": "A full-bleed three-chapter reel with alternating caption anchors, snappy opposing entrances and clean rhythmic cuts.",
-    "creativeDirection": "Audience: people watching a vertical three-chapter story. Direction: full-bleed footage throughout, with alternating caption anchors and clean rhythmic cuts. Use readable, high-contrast captions as punctuation rather than turning each chapter into a title card. Oppose entrance directions to distinguish chapters; let the footage remain dominant after the short reveal. Avoid a repeated lower-third band, continuous shake and cutting away before the message settles. Review each chapter crop, text against the actual footage, the joins and the last readable frame. Alternate the chapter indicator side and give each caption one small overshoot, then hold the footage without decorative overlays."
+    "creativeDirection": "Audience: people watching a vertical three-chapter story. Direction: full-bleed footage throughout, with alternating caption anchors and clean rhythmic cuts. Use readable, high-contrast captions as punctuation rather than turning each chapter into a title card. Oppose entrance directions to distinguish chapters; let the footage remain dominant after the short reveal. Avoid a repeated lower-third band, continuous shake and cutting away before the message settles. Review each chapter crop, text against the actual footage, the joins and the last readable frame. Alternate the chapter indicator side and give each caption one small overshoot, then hold the footage without decorative overlays. Motion: chapters swipe in like stories; a brief warm leak washes in from the side each new chapter enters, and a fine grain binds the three clips."
   },
   "global": {
     "orientation": "portrait",
@@ -10,7 +10,7 @@
     "music": {
       "name": "indie-rock-dreamy.mp3"
     },
-    "allowedMusic": ["indie-rock-dreamy", "lofi-chill", "lofi-hip-hop", "cafe-jazz", "romantic-piano"],
+    "allowedMusic": ["indie-rock-dreamy", "lofi-chill", "lofi-hip-hop", "cafe-jazz", "dreamy-fall-people"],
     "allowUploadMusic": true,
     "transition": {
       "type": "cut"
@@ -136,6 +136,23 @@
             "easing": "ease-out"
           }
         }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.4
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "grain",
+          "target": "frame",
+          "at": 0,
+          "duration": 4,
+          "size": 1.2,
+          "animated": true,
+          "ramp": 0.3,
+          "intensity": 0.75
+        }
       ]
     },
     {
@@ -210,6 +227,38 @@
             "easing": "ease-out"
           }
         }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.4
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "grain",
+          "target": "frame",
+          "at": 0,
+          "duration": 4,
+          "size": 1.2,
+          "animated": true,
+          "ramp": 0.3,
+          "intensity": 0.75
+        },
+        {
+          "type": "fx",
+          "effect": "leak",
+          "target": "frame",
+          "at": 0.05,
+          "duration": 1.6,
+          "edge": "right",
+          "size": 0.75,
+          "stretch": 1.8,
+          "drift": -0.08,
+          "balance": 0.6,
+          "rise": 0.18,
+          "fall": 0.6,
+          "intensity": 1
+        }
       ]
     },
     {
@@ -277,6 +326,34 @@
             "easing": "ease-out",
             "distance": 24
           }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "grain",
+          "target": "frame",
+          "at": 0,
+          "duration": 4,
+          "size": 1.2,
+          "animated": true,
+          "ramp": 0.3,
+          "intensity": 0.75
+        },
+        {
+          "type": "fx",
+          "effect": "leak",
+          "target": "frame",
+          "at": 0.05,
+          "duration": 1.6,
+          "edge": "top-right",
+          "size": 0.75,
+          "stretch": 1.8,
+          "drift": -0.06,
+          "balance": 0.6,
+          "rise": 0.18,
+          "fall": 0.6,
+          "intensity": 1
         }
       ]
     }

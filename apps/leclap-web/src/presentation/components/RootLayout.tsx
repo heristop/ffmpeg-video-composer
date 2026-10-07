@@ -9,6 +9,7 @@ import { useOnboarding } from '@/hooks/useOnboarding';
 import { useNotFound } from '@/hooks/use-not-found';
 import { useDarkSurface } from '@/hooks/use-dark-surface';
 import { useSmoothScroll } from '@/hooks/use-smooth-scroll';
+import { suspendSmoothScroll } from '@/lib/route-scroll';
 
 // Onboarding pulls in the compile pipeline (and FFmpeg WASM); it only shows on the first studio
 // visit, so lazy-loading it keeps that weight out of the entry chunk and off the landing page.
@@ -18,22 +19,18 @@ const Onboarding = lazy(() =>
 
 // React Router resets the scroll on every page change, and the root's `scroll-behavior: smooth` played that
 // reset as a visible ~800 ms scroll to the top. This snaps it instead: scroll-behavior goes to auto for the
-// navigation's own scroll, and back to smooth on the next frame, for in-page anchors. It must render before
-// <ScrollRestoration />, so its layout effect runs first.
+// navigation's own scroll (reset or back/forward restore), and back to smooth on the next frame, for in-page
+// anchors. It must render before <ScrollRestoration />, so its layout effect runs first.
 const InstantRouteScroll = () => {
   const { key } = useLocation();
 
   useLayoutEffect(() => {
-    const root = document.documentElement;
-    root.style.scrollBehavior = 'auto';
-
-    const frame = requestAnimationFrame(() => {
-      root.style.scrollBehavior = '';
-    });
+    const resume = suspendSmoothScroll(document.documentElement);
+    const frame = requestAnimationFrame(resume);
 
     return () => {
       cancelAnimationFrame(frame);
-      root.style.scrollBehavior = '';
+      resume();
     };
   }, [key]);
 

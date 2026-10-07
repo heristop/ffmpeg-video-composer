@@ -1,0 +1,33 @@
+{
+  "label": "Text shimmer (kinetic fill sweep)",
+  "kind": "kinetic",
+  "window": {
+    "at": 0.6,
+    "duration": 0.9
+  },
+  "section": {
+    "kinetic": [
+      {
+        "id": "title",
+        "text": {
+          "en": "LECLAP"
+        },
+        "preset": "fade",
+        "size": 150,
+        "y": "center",
+        "color": "#9EA3FF",
+        "fill": {
+          "gradient": {
+            "stops": ["#7C83FD", "#C9CBFF", "#7C83FD"],
+            "angle": 90
+          },
+          "sweep": {
+            "duration": "{{duration}}",
+            "delay": "{{at}}",
+            "color": "#FFFFFF@0.85"
+          }
+        }
+      }
+    ]
+  }
+}

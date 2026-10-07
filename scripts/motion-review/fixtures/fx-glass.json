@@ -1,0 +1,23 @@
+{
+  "label": "Glass card (fx, smoked plate under white text)",
+  "kind": "fx",
+  "window": { "at": 0.3, "duration": 2.4 },
+  "backgrounds": ["footage"],
+  "subject": { "x": 0.1, "y": 0.42, "w": 0.8, "h": 0.16, "radius": 0.25 },
+  "moments": [0.25, 0.4, "30%", "60%", "90%", 2.75],
+  "section": {
+    "kinetic": [
+      {
+        "text": { "en": "Alex Morgan, designer" },
+        "preset": "fade",
+        "delay": 0.45,
+        "size": 44,
+        "y": "center",
+        "color": "#FFFFFF"
+      }
+    ],
+    "graphics": [
+      { "type": "fx", "effect": "glass", "target": "{{target}}", "at": "{{at}}", "duration": "{{duration}}" }
+    ]
+  }
+}

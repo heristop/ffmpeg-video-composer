@@ -13,6 +13,8 @@ import {
   Linking,
   AppState,
   type LayoutChangeEvent,
+  type StyleProp,
+  type ViewStyle,
 } from 'react-native';
 import { Camera, useCameraDevice, type VideoFile, type CameraDevice } from 'react-native-vision-camera';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -27,6 +29,7 @@ import type { FramingGuide, Orientation } from '@/src/types';
 import { ASPECT_RATIO } from '@/src/features/templates/orientationMeta';
 import type { CaptureMode } from '@leclap/creative-kit';
 import { fitFrame } from '@/src/styles/adaptive-layout';
+import { uploadFallback } from './recorder-modes';
 
 interface VideoRecorderProps {
   orientation: Orientation;
@@ -43,8 +46,10 @@ interface VideoRecorderProps {
   // Fired when the post-stop "finalizing" freeze begins/ends so the host can disable its own chrome
   // (e.g. the Back button), which lives outside this component's stacking context.
   onFinalizingChange?: (finalizing: boolean) => void;
-  // Ordered list of modes the user can switch to. 'screen' is silently filtered at the call site.
+  // Ordered list of modes the user can switch to (see recorder-modes.ts; 'screen' is never offered).
   allowedModes?: CaptureMode[];
+  // The mode the recorder opens on (default: the first allowed mode).
+  initialMode?: CaptureMode;
 }
 
 // How many seconds before the target duration the end-of-recording warning kicks in.
@@ -592,12 +597,13 @@ function useFinalizingSync(onChange: ((v: boolean) => void) | undefined) {
 
 interface UseCaptureModeParams {
   allowedModes: CaptureMode[];
+  initialMode: CaptureMode | undefined;
   onVideoRecorded: (videoFile: VideoFile, orientation: Orientation) => void;
   orientation: Orientation;
 }
 
-function useCaptureMode({ allowedModes, onVideoRecorded, orientation }: UseCaptureModeParams) {
-  const [activeMode, setActiveMode] = useState<CaptureMode>(allowedModes[0] ?? 'back');
+function useCaptureMode({ allowedModes, initialMode, onVideoRecorded, orientation }: UseCaptureModeParams) {
+  const [activeMode, setActiveMode] = useState<CaptureMode>(initialMode ?? allowedModes.at(0) ?? 'back');
   const [cameraType, setCameraType] = useState<'front' | 'back'>(activeMode === 'front' ? 'front' : 'back');
 
   const handleModeChange = (mode: CaptureMode) => {
@@ -940,6 +946,57 @@ const permissionGate = ({
   return null;
 };
 
+interface RecorderScreenParams {
+  upload: {
+    isUploadMode: boolean;
+    allowedModes: CaptureMode[];
+    activeMode: CaptureMode;
+    showModeBar: boolean;
+    handleModeChange: (mode: CaptureMode) => void;
+    isPortrait: boolean;
+    flipCamera: () => void;
+    pickVideo: () => Promise<void>;
+  };
+  gate: PermissionGateProps;
+  frame: { containerStyle: StyleProp<ViewStyle>; onLayout: (event: LayoutChangeEvent) => void };
+}
+
+// The screen shown instead of the live camera, or null when the camera is ready. Without a usable
+// camera (permission refused, or none at all as on a simulator) the gallery stays reachable: a section
+// that allows an upload opens the upload view rather than a dead end.
+const recorderScreen = ({ upload, gate, frame }: RecorderScreenParams): React.ReactElement | null => {
+  const cameraReady = !gate.isCheckingPermissions && Boolean(gate.hasPermission) && Boolean(gate.device);
+  const galleryOnly = !gate.isCheckingPermissions && uploadFallback(upload.allowedModes, cameraReady);
+
+  if (upload.isUploadMode || galleryOnly) {
+    return (
+      <View style={frame.containerStyle} onLayout={frame.onLayout}>
+        <StatusBar hidden backgroundColor="transparent" translucent />
+        <UploadPlaceholder onPick={upload.pickVideo} />
+        <ModeBarOrFlip
+          showModeBar={upload.showModeBar}
+          allowedModes={upload.allowedModes}
+          activeMode={galleryOnly ? 'upload' : upload.activeMode}
+          onModeChange={upload.handleModeChange}
+          isPortrait={upload.isPortrait}
+          isBusy={false}
+          onFlip={upload.flipCamera}
+        />
+      </View>
+    );
+  }
+
+  const blocking = permissionGate(gate);
+
+  if (!blocking) return null;
+
+  return (
+    <View style={frame.containerStyle} onLayout={frame.onLayout}>
+      {blocking}
+    </View>
+  );
+};
+
 function useRecorderViewport(fullscreen: boolean) {
   const { width, height } = useWindowDimensions();
   const [viewport, setViewport] = useState({ width, height });
@@ -966,6 +1023,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   framingGuide,
   onFinalizingChange,
   allowedModes = DEFAULT_MODES,
+  initialMode,
 }) => {
   const { t } = useTranslation('recording');
   const { viewport, onLayout, isPortrait, containerStyle } = useRecorderViewport(fullscreen);
@@ -973,7 +1031,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   const { isFinalizing, setIsFinalizing } = useFinalizingSync(onFinalizingChange);
   const { showDescription, dismiss: dismissDescription } = useDescriptionOverlay();
   const { activeMode, cameraType, handleModeChange, pickVideo, flipCamera, showModeBar, isUploadMode } = useCaptureMode(
-    { allowedModes, onVideoRecorded, orientation }
+    { allowedModes, initialMode, onVideoRecorded, orientation }
   );
   const cameraRef = useRef<Camera | null>(null);
   const device = useCameraDevice(cameraType);
@@ -996,40 +1054,22 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
     maxDurationSeconds,
   });
 
-  if (isUploadMode) {
-    return (
-      <View style={containerStyle} onLayout={onLayout}>
-        <StatusBar hidden backgroundColor="transparent" translucent />
-        <UploadPlaceholder onPick={pickVideo} />
-        <ModeBarOrFlip
-          showModeBar={showModeBar}
-          allowedModes={allowedModes}
-          activeMode={activeMode}
-          onModeChange={handleModeChange}
-          isPortrait={isPortrait}
-          isBusy={false}
-          onFlip={flipCamera}
-        />
-      </View>
-    );
-  }
-
-  const gate = permissionGate({
-    isCheckingPermissions,
-    hasPermission,
-    blocked,
-    requestAccess,
-    device,
-    t,
+  const screen = recorderScreen({
+    upload: {
+      isUploadMode,
+      allowedModes,
+      activeMode,
+      showModeBar,
+      handleModeChange,
+      isPortrait,
+      flipCamera,
+      pickVideo,
+    },
+    gate: { isCheckingPermissions, hasPermission, blocked, requestAccess, device, t },
+    frame: { containerStyle, onLayout },
   });
 
-  if (gate) {
-    return (
-      <View style={containerStyle} onLayout={onLayout}>
-        {gate}
-      </View>
-    );
-  }
+  if (screen) return screen;
 
   // The gate already covers a missing device; this narrows the type for <Camera> below.
   if (!device) return null;

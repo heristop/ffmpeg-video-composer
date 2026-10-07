@@ -8,7 +8,11 @@
 // LUT library it mirrors, the output is a pure, deterministic function of a small spec — unit-tested to
 // the byte. The catch: the engine also runs on React-Native/Hermes, which has no `Buffer` and no
 // `zlib`, so the PNG is hand-encoded with plain `Uint8Array` math and DEFLATE *stored* (uncompressed)
-// blocks — no npm deps, no Node built-ins.
+// blocks — no npm deps, no Node built-ins (editor/presets/png-encode.ts, shared with the fx sprites).
+
+import { encodePng } from './png-encode';
+
+export { encodePng, type PngImage } from './png-encode';
 
 /** A rounded caption panel: a `width`×`height` box, `radius`-corner, filled with `color` at `opacity`. */
 export interface PanelSpec {
@@ -171,167 +175,31 @@ function cornerCoverage(cx: number, cy: number, spec: PanelSpec): number {
   return clamp(radius - dist + 0.5, 0, 1);
 } // straight alpha, no premultiplication
 
-// Build the raw (unfiltered-minus-filter-byte) RGBA scanlines: one filter-type byte 0 per row, then
-// width*4 straight-alpha RGBA bytes.
+// Re-exported: the drawbox band sampling lives in ./rounded-bands, out of the PNG encoder's module.
+export { roundedBands, type RoundedBand } from './rounded-bands';
+
+// The panel's straight-alpha RGBA pixels, row-major.
 function rawImageBytes(spec: PanelSpec): Uint8Array {
   const { width, height, color, opacity } = spec;
   const r = hexByte(color, 0);
   const g = hexByte(color, 2);
   const b = hexByte(color, 4);
   const baseAlpha = Math.round(clamp(opacity, 0, 1) * 255);
-
-  const stride = width * 4;
-  const raw = new Uint8Array(height * (stride + 1));
+  const data = new Uint8Array(width * height * 4);
 
   for (let y = 0; y < height; y++) {
-    const rowStart = y * (stride + 1);
-    raw[rowStart] = 0;
-    // filter type: None
     for (let x = 0; x < width; x++) {
       const coverage = cornerCoverage(x + 0.5, y + 0.5, spec);
-      const i = rowStart + 1 + x * 4;
-      raw[i] = r;
-      raw[i + 1] = g;
-      raw[i + 2] = b;
-      raw[i + 3] = Math.round(baseAlpha * coverage);
+      const i = (y * width + x) * 4;
+      data[i] = r;
+      data[i + 1] = g;
+      data[i + 2] = b;
+      data[i + 3] = Math.round(baseAlpha * coverage);
     }
   }
 
-  return raw;
+  return data;
 }
-
-// CRC32 table for the standard PNG polynomial 0xEDB88320, built once at module load.
-const CRC_TABLE = (() => {
-  const table = new Uint32Array(256);
-
-  for (let n = 0; n < 256; n++) {
-    let c = n;
-
-    for (let bit = 0; bit < 8; bit++) {
-      const mask = -(c & 1);
-      c = (c >>> 1) ^ (0xedb88320 & mask);
-    }
-    table[n] = c >>> 0;
-  }
-
-  return table;
-})();
-
-function crc32(data: Uint8Array): number {
-  let crc = 0xffffffff;
-
-  for (const byte of data) {
-    crc = CRC_TABLE[(crc ^ byte) & 0xff] ^ (crc >>> 8);
-  }
-
-  return (crc ^ 0xffffffff) >>> 0;
-}
-
-// Adler32 over the raw image bytes — the zlib stream's trailing checksum.
-function adler32(data: Uint8Array): number {
-  const MOD = 65521;
-  let a = 1;
-  let b = 0;
-
-  for (const byte of data) {
-    a = (a + byte) % MOD;
-    b = (b + a) % MOD;
-  }
-
-  return ((b << 16) | a) >>> 0;
-}
-
-// The largest payload a single DEFLATE *stored* block can carry (its LEN field is 16-bit).
-const MAX_STORED_BLOCK = 0xffff;
-
-// Write the DEFLATE *stored* blocks for `raw` into `out` starting at `startPos`; returns the position
-// just past the last block. Each block carries ≤65535 bytes; the final block sets BFINAL.
-function writeStoredBlocks(out: Uint8Array, raw: Uint8Array, startPos: number): number {
-  let pos = startPos;
-
-  for (let offset = 0; offset < raw.length || offset === 0; offset += MAX_STORED_BLOCK) {
-    const len = Math.min(MAX_STORED_BLOCK, raw.length - offset);
-    const isFinal = offset + len >= raw.length;
-    out[pos++] = isFinal ? 1 : 0; // BFINAL, BTYPE=00 (stored)
-    out[pos++] = len & 0xff;
-    out[pos++] = (len >>> 8) & 0xff;
-    const nlen = ~len & 0xffff;
-    out[pos++] = nlen & 0xff;
-    out[pos++] = (nlen >>> 8) & 0xff;
-    out.set(raw.subarray(offset, offset + len), pos);
-    pos += len;
-
-    if (isFinal) {
-      break;
-    }
-  }
-
-  return pos;
-}
-
-// Wrap raw bytes in a minimal zlib stream (0x78 0x01) using DEFLATE *stored* blocks — no compression,
-// so no Hermes zlib dependency.
-function zlibStore(raw: Uint8Array): Uint8Array {
-  const blockCount = Math.max(1, Math.ceil(raw.length / MAX_STORED_BLOCK));
-  // 2 header bytes + per block (1 flag + 2 LEN + 2 NLEN) + payload + 4 adler bytes.
-  const out = new Uint8Array(2 + blockCount * 5 + raw.length + 4);
-  let pos = 0;
-
-  out[pos++] = 0x78;
-  out[pos++] = 0x01;
-
-  pos = writeStoredBlocks(out, raw, pos);
-
-  const checksum = adler32(raw);
-  out[pos++] = (checksum >>> 24) & 0xff;
-  out[pos++] = (checksum >>> 16) & 0xff;
-  out[pos++] = (checksum >>> 8) & 0xff;
-  out[pos++] = checksum & 0xff;
-
-  return out;
-}
-
-// Encode one PNG chunk: length (uint32 BE) + type + data + CRC32(type+data) (uint32 BE).
-function chunk(type: string, data: Uint8Array): Uint8Array {
-  const typeBytes = new Uint8Array(4);
-
-  for (let i = 0; i < 4; i++) {
-    typeBytes[i] = type.codePointAt(i) ?? 0;
-  }
-
-  const typeAndData = new Uint8Array(4 + data.length);
-  typeAndData.set(typeBytes, 0);
-  typeAndData.set(data, 4);
-  const crc = crc32(typeAndData);
-
-  const out = new Uint8Array(12 + data.length);
-  out[0] = (data.length >>> 24) & 0xff;
-  out[1] = (data.length >>> 16) & 0xff;
-  out[2] = (data.length >>> 8) & 0xff;
-  out[3] = data.length & 0xff;
-  out.set(typeAndData, 4);
-  out[8 + data.length] = (crc >>> 24) & 0xff;
-  out[9 + data.length] = (crc >>> 16) & 0xff;
-  out[10 + data.length] = (crc >>> 8) & 0xff;
-  out[11 + data.length] = crc & 0xff;
-
-  return out;
-}
-
-function concat(parts: Uint8Array[]): Uint8Array {
-  const total = parts.reduce((sum, p) => sum + p.length, 0);
-  const out = new Uint8Array(total);
-  let pos = 0;
-
-  for (const part of parts) {
-    out.set(part, pos);
-    pos += part.length;
-  }
-
-  return out;
-}
-
-const PNG_SIGNATURE = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 
 /**
  * Generates the RGBA PNG bytes for a rounded panel — colour type 6, 8-bit depth, straight alpha with
@@ -347,22 +215,5 @@ export function roundedPanelPng(input: PanelSpec): Uint8Array {
   const radius = clamp(Math.floor(input.radius), 0, Math.floor(Math.min(width, height) / 2));
   const spec: PanelSpec = { ...input, width, height, radius };
 
-  const ihdr = new Uint8Array(13);
-  ihdr[0] = (spec.width >>> 24) & 0xff;
-  ihdr[1] = (spec.width >>> 16) & 0xff;
-  ihdr[2] = (spec.width >>> 8) & 0xff;
-  ihdr[3] = spec.width & 0xff;
-  ihdr[4] = (spec.height >>> 24) & 0xff;
-  ihdr[5] = (spec.height >>> 16) & 0xff;
-  ihdr[6] = (spec.height >>> 8) & 0xff;
-  ihdr[7] = spec.height & 0xff;
-  ihdr[8] = 8; // bit depth
-  ihdr[9] = 6; // colour type: RGBA
-  ihdr[10] = 0; // compression: deflate
-  ihdr[11] = 0; // filter: adaptive
-  ihdr[12] = 0; // interlace: none
-
-  const idat = zlibStore(rawImageBytes(spec));
-
-  return concat([PNG_SIGNATURE, chunk('IHDR', ihdr), chunk('IDAT', idat), chunk('IEND', new Uint8Array(0))]);
+  return encodePng({ width, height, channels: 4, data: rawImageBytes(spec) });
 }

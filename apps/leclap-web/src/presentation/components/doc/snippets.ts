@@ -111,7 +111,7 @@ export const snippets = {
   audio: json({
     global: {
       musicEnabled: true,
-      music: { name: 'air-prelude.mp3' },
+      music: { name: 'lofi-jazz-music.mp3' },
       audio: {
         sourceVolume: 1,
         musicVolume: 0.5,

@@ -1,0 +1,206 @@
+{
+  "meta": {
+    "name": "Effects tour: theme paper",
+    "description": "Chapter 6 of the effects tour: the built-in paper theme. Colours and fonts are $color / $font tokens and every animated element declares a motion role, so the same JSON restyles itself per theme.",
+    "creativeDirection": "One theme per template (global.theme is template-wide): a surface panel carries the theme name in its display face, a column of swatches shows the seven palette tokens, and roles decide every curve. Review: no literal colour outside the palette, one accent per beat, the headline lands before the cut."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 53,
+    "transition": {
+      "type": "push-left",
+      "duration": 0.5,
+      "ease": "$role.panel"
+    },
+    "motion": {
+      "energy": 0
+    },
+    "overlays": [
+      {
+        "text": {
+          "en": "06  THEMES"
+        },
+        "position": "top-right",
+        "font": "$font.mono",
+        "size": 24,
+        "color": "$color.muted",
+        "effect": {
+          "shadow": true
+        }
+      }
+    ],
+    "theme": "paper"
+  },
+  "sections": [
+    {
+      "name": "theme-paper",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 3.4
+      },
+      "role": "proof",
+      "purpose": "Show the paper theme: palette, display type and motion feel.",
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0.1,
+          "x": 60,
+          "y": 170,
+          "width": 700,
+          "height": 380,
+          "color": "$color.surface",
+          "from": "left",
+          "role": "panel"
+        },
+        {
+          "type": "panel",
+          "at": 0.35,
+          "x": 840,
+          "y": 170,
+          "width": 380,
+          "height": 46,
+          "color": "$color.bg",
+          "from": "right",
+          "ease": "$theme"
+        },
+        {
+          "type": "panel",
+          "at": 0.41,
+          "x": 840,
+          "y": 224,
+          "width": 380,
+          "height": 46,
+          "color": "$color.fg",
+          "from": "right",
+          "ease": "$snappy"
+        },
+        {
+          "type": "panel",
+          "at": 0.47,
+          "x": 840,
+          "y": 278,
+          "width": 380,
+          "height": 46,
+          "color": "$color.muted",
+          "from": "right",
+          "ease": "$smooth"
+        },
+        {
+          "type": "panel",
+          "at": 0.53,
+          "x": 840,
+          "y": 332,
+          "width": 380,
+          "height": 46,
+          "color": "$color.surface",
+          "from": "right",
+          "ease": "ease-in-out-sine"
+        },
+        {
+          "type": "panel",
+          "at": 0.59,
+          "x": 840,
+          "y": 386,
+          "width": 380,
+          "height": 46,
+          "color": "$color.brand",
+          "from": "right",
+          "ease": "linear"
+        },
+        {
+          "type": "panel",
+          "at": 0.6499999999999999,
+          "x": 840,
+          "y": 440,
+          "width": 380,
+          "height": 46,
+          "color": "$color.accent",
+          "from": "right",
+          "ease": "$anticipate"
+        },
+        {
+          "type": "panel",
+          "at": 0.71,
+          "x": 840,
+          "y": 494,
+          "width": 380,
+          "height": 46,
+          "color": "$color.accent2",
+          "from": "right",
+          "ease": "ease-in-out-cubic"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "global.theme: \"paper\" · energy 0"
+          },
+          "preset": "fade",
+          "font": "$font.mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "$color.muted",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "id": "kicker",
+          "text": {
+            "en": "THEME · PAPER"
+          },
+          "preset": "fade",
+          "role": "micro",
+          "font": "$font.mono",
+          "size": 28,
+          "align": "left",
+          "x": 100,
+          "y": 205,
+          "color": "$color.muted",
+          "delay": 0.3
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Paper guide"
+          },
+          "preset": "cascade",
+          "role": "headline",
+          "font": "$font.display",
+          "size": 104,
+          "align": "left",
+          "x": 100,
+          "y": 260,
+          "maxWidth": 620,
+          "color": "$color.fg",
+          "delay": 0.45,
+          "accent": {
+            "words": "last",
+            "color": "$color.accent"
+          }
+        },
+        {
+          "text": {
+            "en": "Energy 0: fades only"
+          },
+          "preset": "rise",
+          "ease": "$gentle",
+          "font": "$font.mono",
+          "size": 26,
+          "align": "left",
+          "x": 100,
+          "y": 480,
+          "maxWidth": 640,
+          "color": "$color.muted",
+          "delay": "headline.end + 0.1"
+        }
+      ]
+    }
+  ]
+}

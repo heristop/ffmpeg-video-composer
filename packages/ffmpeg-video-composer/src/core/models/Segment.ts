@@ -23,6 +23,9 @@ class Segment {
   public panelsDir = '';
   public inputsAsset: string[] = [];
   public inputsMapCount = 0;
+  // Stream index of each extra `-i` a lowering registered (layout panes, fill textures), by key; read by
+  // `input:<key>` labels in engine sub-graphs (editor/utils/filter-graph.ts).
+  public extraInputs: Record<string, number> = {};
 }
 
 export default Segment;

@@ -1,4 +1,8 @@
 import { findFont, isFontRef, type FontInput } from '@/core/fonts';
+import type { EasingSpec } from '@/core/motion/easing';
+import { alphaRampExpr, easedRamp, num, phaseDuration } from './eased-ramp';
+
+export { easeRampExpr } from './eased-ramp';
 
 export type Translation = Record<string, string | undefined>;
 
@@ -43,7 +47,8 @@ export const REVEAL_TYPES = ['none', 'fade', 'rise', 'slide-left', 'slide-right'
 export type RevealType = (typeof REVEAL_TYPES)[number];
 
 export const REVEAL_EASINGS = ['linear', 'ease-out', 'ease-in-out', 'ease-out-back'] as const;
-export type RevealEasing = (typeof REVEAL_EASINGS)[number];
+/** Any easing spec: the historical names, or springs, beziers, the named set, points. */
+export type RevealEasing = EasingSpec;
 
 export type Reveal = {
   type: RevealType;
@@ -74,46 +79,12 @@ const DEFAULT_DURATION = 0.6;
 const DEFAULT_DISTANCE = 60;
 const STAGGER_STEP = 0.15;
 
-// Minimal decimal rendering: 0.3 → "0.3", 0.9 → "0.9", avoiding 0.1+0.2 → "0.30000000000000004".
-function num(value: number): string {
-  return Number(value.toFixed(4)).toString();
-}
-
 function normalize(input: RevealInput): Reveal {
   if (typeof input === 'string') {
     return { type: input };
   }
 
   return input;
-}
-
-// 0 before `delay`, a linear 0→1 ramp across `duration`, then 1 — the shape of both the alpha
-// fade-in and the motion progress. Unquoted; callers wrap it.
-function ramp(delay: number, duration: number): string {
-  const end = num(delay + duration);
-
-  return `if(lt(t,${num(delay)}),0,if(lt(t,${end}),(t-${num(delay)})/${num(duration)},1))`;
-}
-
-/**
- * Wraps a 0→1 ramp expression `p` in an easing curve: ease-out = 1-(1-p)^3 (decelerates into place),
- * ease-in-out = smoothstep p*p*(3-2p); ease-out-back briefly overshoots travel. This pure expression
- * math adds no filter, so it is LGPL-safe on the on-device build. Linear or unset easing returns
- * the ramp unchanged. Shared with overlayMotionExpr (editor/inputSources.ts)
- * so a caption and a composited overlay with the same reveal settle identically.
- */
-export function easeRampExpr(rampExpr: string, easing: RevealEasing | undefined): string {
-  if (easing === 'ease-out-back') return `(${rampExpr})*(1+((${rampExpr})-1)*(2.70158*((${rampExpr})-1)-1))`;
-
-  if (easing === 'ease-out') return `1-pow(1-(${rampExpr}),3)`;
-
-  if (easing === 'ease-in-out') return `(${rampExpr})*(${rampExpr})*(3-2*(${rampExpr}))`;
-
-  return rampExpr;
-}
-
-function alphaRampExpr(expr: string, easing: RevealEasing | undefined): string {
-  return easing === 'ease-out-back' ? `clip((${expr}),0,1)` : expr;
 }
 
 // A position expression that starts `distance` px off `base` (on the `sign` side) and eases to `base`
@@ -148,9 +119,9 @@ export function revealToExpr(
   }
 
   const delay = reveal.delay ?? DEFAULT_DELAY;
-  const duration = reveal.duration ?? DEFAULT_DURATION;
+  const duration = phaseDuration(reveal.duration, reveal.easing, DEFAULT_DURATION);
   const distance = reveal.distance ?? DEFAULT_DISTANCE;
-  const rampExpr = easeRampExpr(ramp(delay, duration), reveal.easing);
+  const rampExpr = easedRamp(delay, duration, reveal.easing);
   const alpha = `'${alphaRampExpr(rampExpr, reveal.easing)}'`;
 
   if (reveal.type === 'fade') {
@@ -218,7 +189,8 @@ type PhaseTerm = { alpha: string; xTerm?: string; yTerm?: string };
 
 // The entrance phase: alpha ramps 0→1 and any offset eases from `distance` back to 0 (the `1-ramp`).
 function enterTerm(enter: Reveal): PhaseTerm {
-  const r = easeRampExpr(ramp(enter.delay ?? DEFAULT_DELAY, enter.duration ?? DEFAULT_DURATION), enter.easing);
+  const enterDuration = phaseDuration(enter.duration, enter.easing, DEFAULT_DURATION);
+  const r = easedRamp(enter.delay ?? DEFAULT_DELAY, enterDuration, enter.easing);
   const dist = num(enter.distance ?? DEFAULT_DISTANCE);
   const ease = `(1-(${r}))*${dist}`;
   const alpha = `(${alphaRampExpr(r, enter.easing)})`;
@@ -235,8 +207,8 @@ function enterTerm(enter: Reveal): PhaseTerm {
 // The exit phase: alpha fades 1→0 and any offset eases from 0 out to `distance` (the bare `ramp`). The
 // exit is timed to end at the section end when `after` is omitted.
 function exitTerm(ex: Exit, duration: number): PhaseTerm {
-  const exDur = ex.duration ?? DEFAULT_DURATION;
-  const r = easeRampExpr(ramp(ex.after ?? Math.max(0, duration - exDur), exDur), ex.easing);
+  const exDur = phaseDuration(ex.duration, ex.easing, DEFAULT_DURATION);
+  const r = easedRamp(ex.after ?? Math.max(0, duration - exDur), exDur, ex.easing);
   const dist = num(ex.distance ?? DEFAULT_DISTANCE);
   const ease = `(${r})*${dist}`;
   const alpha = `(1-(${alphaRampExpr(r, ex.easing)}))`;
@@ -366,6 +338,21 @@ export function revealEnableExpr(input: RevealInput | undefined): string | undef
   }
 
   return `'gte(t,${num(delay)})'`;
+}
+
+/** A reveal's default delay in seconds, for callers that time against an entrance. */
+export const REVEAL_DEFAULT_DELAY = DEFAULT_DELAY;
+
+/** Seconds a reveal's entrance takes (a spring's settle time when no duration is authored); 0 for none. */
+export function revealSpan(
+  input: RevealType | { type: RevealType; duration?: number; easing?: RevealEasing } | undefined
+): number {
+  if (input === undefined) return 0;
+
+  const reveal: { type: RevealType; duration?: number; easing?: RevealEasing } =
+    typeof input === 'string' ? { type: input } : input;
+
+  return reveal.type === 'none' ? 0 : phaseDuration(reveal.duration, reveal.easing, DEFAULT_DURATION);
 }
 
 // Shifts a reveal's delay by its line index so stacked lines enter in sequence.

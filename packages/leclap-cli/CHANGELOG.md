@@ -5,6 +5,36 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `leclap samples list --category effects`; the catalog now has 46 samples.
+- `leclap render --qc` prints output QC findings and exits non-zero on a failing check (`--json`
+  includes the report); `--cache <dir>` reuses unchanged sections across renders. `--output` is written
+  atomically and refused when it equals the template or a `--video` input.
+- `leclap render --manifest` writes `<output>.manifest.json`. Renders use the deterministic encoder
+  profile by default (`--no-deterministic` turns it off).
+- `leclap verify <manifest> [--rerender]` checks a video against its render manifest, or re-renders the
+  recorded template and compares the template, asset, filtergraph and output digests.
+- `leclap validate` prints a `→ hint` line under each error that has a known fix, plus advisory motion
+  pacing findings that never change the exit code; `--json` includes `hint`, `suggestion`, `kind` and
+  `motionWarnings`.
+- `leclap render --format <name>` renders one composition of a template with `formats`; `--formats all|a,b`
+  renders each to `<output>-<format>.mp4`.
+- `leclap style <image|clip> [--json] [--out style-guide.md]` derives a theme and style guide from a reference.
+- `leclap beats <audio> [--json]` measures tempo, the beat grid, confidence and drop/build/end cues.
+- `leclap init --studio <dir>` scaffolds a production folder; `leclap studio status|pass` tracks its gates.
+- `leclap diagnose` reports which features the FFmpeg build can run, with fixes; `--json` prints the
+  capability report.
+- `leclap snapshot`, `leclap compare` and `leclap timeline [--json]` look at a template's frames, compare
+  variants and list where everything sits; all take `--format`.
+
+### Changed
+
+- Built on `ffmpeg-video-composer` 3: `leclap validate` and `leclap render` reject templates with unknown
+  keys (`unknown_key`) and text a bundled font cannot draw (`font_missing_glyphs`), which 0.3.0 accepted.
+
 ## [0.3.0] - 2026-10-03
 
 ### Added

@@ -16,6 +16,9 @@ export interface EditorHistory {
   canRedo: boolean;
   // Replace the entire history (used by JSON import): the new state becomes an undoable entry.
   reset: (next: EditorState) => void;
+  // The closure's present entry, current even before React re-renders (callers outside render, such as
+  // browser-agent tools, read the state their own last call produced).
+  read: () => { state: EditorState; canUndo: boolean; canRedo: boolean };
 }
 
 interface Mirror {
@@ -59,5 +62,14 @@ export function useEditorHistory(initial: EditorState): EditorHistory {
     setMirror(snapshot(history));
   };
 
-  return { state: mirror.state, set, undo, redo, canUndo: mirror.canUndo, canRedo: mirror.canRedo, reset };
+  return {
+    state: mirror.state,
+    set,
+    undo,
+    redo,
+    canUndo: mirror.canUndo,
+    canRedo: mirror.canRedo,
+    reset,
+    read: () => snapshot(history),
+  };
 }

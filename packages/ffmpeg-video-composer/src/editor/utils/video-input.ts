@@ -1,6 +1,8 @@
 // A video source for the post-render audio passes: either an already-assembled file, or the concat
 // demuxer list (so the audio pass concatenates and stream-copies video in one invocation instead of
 // running a separate concat pass first). See docs/perf-findings.md (fold concat into the audio pass).
+import { uniqueTempSuffix } from '../../utils/temp-suffix';
+
 export type VideoSource = { kind: 'file'; path: string } | { kind: 'concat'; listPath: string };
 
 export function buildVideoInputArgs(source: VideoSource): string {
@@ -48,7 +50,7 @@ export async function resolveVideoInput(
     return { videoInputArgs: buildVideoInputArgs(source), probeTarget: first, tempToClean: null };
   }
 
-  const temp = `${fs.getTempDir()}/${tempPrefix}_${Date.now()}.mp4`;
+  const temp = `${fs.getTempDir()}/${tempPrefix}_${uniqueTempSuffix()}.mp4`;
   await fs.move(source.path, temp);
 
   return { videoInputArgs: buildVideoInputArgs({ kind: 'file', path: temp }), probeTarget: temp, tempToClean: temp };

@@ -15,6 +15,15 @@ const unlockOrientation = async () => {
   await ScreenOrientation.unlockAsync();
 };
 
+/**
+ * Leaving a screen that forced landscape: unlocking alone keeps the landscape layout until the phone
+ * moves, so rotate back to portrait first, then hand rotation back to the device.
+ */
+export const restoreOrientation = async () => {
+  await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+  await ScreenOrientation.unlockAsync();
+};
+
 export const useOrientation = (requiredOrientation?: OrientationType) => {
   const { width, height } = useWindowDimensions();
   const currentOrientation: OrientationType = height >= width ? 'portrait' : 'landscape';

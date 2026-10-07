@@ -130,3 +130,35 @@ describe('reveal easing mirror', () => {
     expect(mid.translateY).toBeCloseTo(30, 5);
   });
 });
+
+// Motion-system easings preview through the engine's own curve functions, so the monitor matches the render.
+describe('motion easing mirror', () => {
+  it('overshoots with a spring and uses its physical settle time when no duration is authored', () => {
+    const reveal = { type: 'rise', delay: 0, distance: 100, easing: 'spring(300, 14)' } as const;
+    const samples = Array.from(
+      { length: 40 },
+      (_, i) => overlayVisibilityAt(reveal, undefined, i * 0.02, 4).translateY
+    );
+
+    expect(Math.min(...samples)).toBeLessThan(-5);
+    expect(overlayVisibilityAt(reveal, undefined, 3, 4).translateY).toBe(0);
+  });
+
+  it('samples a cubic-bezier like CSS', () => {
+    const reveal = { type: 'fade', delay: 0, duration: 1, easing: 'cubic-bezier(0, 0, 1, 1)' } as const;
+
+    expect(overlayVisibilityAt(reveal, undefined, 0.5, 4).opacity).toBeCloseTo(0.5, 3);
+  });
+
+  it('falls back to the signature curve for an unresolved token', () => {
+    const withToken = overlayVisibilityAt(
+      { type: 'fade', delay: 0, duration: 1, easing: '$snappy' },
+      undefined,
+      0.5,
+      4
+    );
+    const unset = overlayVisibilityAt({ type: 'fade', delay: 0, duration: 1 }, undefined, 0.5, 4);
+
+    expect(withToken.opacity).toBe(unset.opacity);
+  });
+});

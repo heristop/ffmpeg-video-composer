@@ -1,0 +1,194 @@
+{
+  "meta": {
+    "name": "Footage editing",
+    "description": "Five recorded clips, five edits: a vertical clip fitted over its own blur, a keyframed focus pan through a wide shot with a user LUT, a trimmed clip on a bullet-time speed ramp, a freeze frame with a flash, and a B-roll cutaway under a LUT look dialled to 60%.",
+    "creativeDirection": "Audience: creators who cut their own footage and want the edit in JSON. Direction: one control per beat, named by a small clean-bar label so the viewer knows what changed. The portrait clip sits whole over a dimmed blur instead of bars; the wide shot pans left to right under a warm print grade; the trimmed clip snaps into 0.2x bullet time then whips out; the zoom freezes on a white flash with a shutter click; the main shot cuts away to B-roll and back while a teal-orange look runs at 60%. Review: no stretched or letterboxed frames, the pan eases at both ends, the ramp's slow section reads on the clip's own clock, the freeze holds under a second, and the cutaway returns to the main shot on time."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 23,
+    "transition": {
+      "type": "cut"
+    },
+    "variables": {
+      "broll": "videos/video_2.mp4",
+      "lut": "luts/warm-print.cube"
+    },
+    "audio": {
+      "sourceVolume": 0.6
+    }
+  },
+  "sections": [
+    {
+      "name": "reframe",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "duration": 2,
+        "fit": "blur",
+        "fill": {
+          "blur": 30,
+          "dim": 0.35,
+          "zoom": 1.1
+        }
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Fit: blur"
+        },
+        "subtitle": {
+          "en": "options.fit"
+        },
+        "style": "clean-bar",
+        "accent": "#FF8AAE",
+        "reveal": {
+          "type": "slide-right",
+          "delay": 0.3
+        }
+      }
+    },
+    {
+      "name": "pan",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "duration": 2.8,
+        "focus": [
+          {
+            "t": 0.2,
+            "x": 0,
+            "y": 0.5
+          },
+          {
+            "t": 2.6,
+            "x": 1,
+            "y": 0.5,
+            "ease": "ease-in-out-sine"
+          }
+        ]
+      },
+      "grade": {
+        "lut": {
+          "url": "{{ lut }}",
+          "strength": 0.85
+        }
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Focus pan + user LUT"
+        },
+        "subtitle": {
+          "en": "options.focus · grade.lut"
+        },
+        "style": "clean-bar",
+        "accent": "#FF8AAE",
+        "reveal": {
+          "type": "slide-right",
+          "delay": 0.3
+        }
+      }
+    },
+    {
+      "name": "ramp",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "duration": 4.2,
+        "clip": {
+          "from": 1,
+          "to": 5
+        },
+        "speedRamp": "bullet",
+        "rampAudio": "mute"
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Clip range + speed ramp"
+        },
+        "subtitle": {
+          "en": "options.clip · speedRamp: bullet"
+        },
+        "style": "clean-bar",
+        "accent": "#FF8AAE",
+        "reveal": {
+          "type": "slide-right",
+          "delay": 0.3
+        }
+      }
+    },
+    {
+      "name": "freeze",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "duration": 3,
+        "clip": {
+          "from": 2,
+          "to": 4.2
+        },
+        "freeze": [
+          {
+            "at": 1.1,
+            "hold": 0.8,
+            "flash": true
+          }
+        ]
+      },
+      "sfx": [
+        {
+          "id": "shutter",
+          "at": 1.1
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Freeze frame"
+        },
+        "subtitle": {
+          "en": "options.freeze · flash"
+        },
+        "style": "clean-bar",
+        "accent": "#FF8AAE",
+        "reveal": {
+          "type": "slide-right",
+          "delay": 0.3
+        }
+      }
+    },
+    {
+      "name": "cutaway",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "duration": 3
+      },
+      "look": {
+        "preset": "teal-orange",
+        "strength": 0.6
+      },
+      "cutaways": [
+        {
+          "url": "{{ broll }}",
+          "at": 0.9,
+          "duration": 1.4
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Cutaway + look at 60%"
+        },
+        "subtitle": {
+          "en": "cutaways · look.strength"
+        },
+        "style": "clean-bar",
+        "accent": "#FF8AAE",
+        "reveal": {
+          "type": "slide-right",
+          "delay": 0.3
+        }
+      }
+    }
+  ]
+}

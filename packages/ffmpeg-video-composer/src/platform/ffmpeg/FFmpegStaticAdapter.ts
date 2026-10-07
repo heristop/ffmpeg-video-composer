@@ -6,9 +6,12 @@ import { promisify } from 'node:util';
 import type { FFMpegInfos } from '@/core/types';
 import AbstractFFmpeg, { type FFmpegBinaries } from './AbstractFFmpeg';
 import { FFmpegError } from '../../core/errors/FFmpegError';
+import { reportedTraits } from '../../core/footage/media-traits';
 import { parseCommand } from './parse-command';
 import { FFPROBE_MISSING_MESSAGE, resolveStaticFfprobe } from './resolve-ffprobe';
-import { tailStderr } from './tail-stderr';
+import { spawnFailure, tailStderr } from './tail-stderr';
+import { withFilterScripts } from './filter-scripts-node';
+import { measureLoudness } from './analyze-node';
 
 const requireModule = createRequire(import.meta.url);
 
@@ -68,15 +71,19 @@ class FFmpegStaticAdapter extends AbstractFFmpeg {
     try {
       // Errors only, as in FFmpegNodeAdapter: the default level buries the reason under the banner and
       // the stream dumps.
-      await execFileAsync(this.ffmpegPath, ['-loglevel', 'error', ...parseCommand(command)]);
+      const binary = this.ffmpegPath;
+      await withFilterScripts(['-loglevel', 'error', ...parseCommand(command)], (args) => execFileAsync(binary, args));
 
       return { rc: 0 };
     } catch (error) {
       const execError = error as ExecException & { stderr: string };
 
-      throw new FFmpegError('FFmpeg command failed (static)', tailStderr(execError.stderr));
+      throw new FFmpegError('FFmpeg command failed (static)', tailStderr(execError.stderr) || spawnFailure(execError));
     }
   };
+
+  override measureTruePeak = async (file: string): Promise<number | null> =>
+    this.ffmpegPath ? (await measureLoudness(this.ffmpegPath, file)).truePeak : null;
 
   getInfos = async (source: string): Promise<FFMpegInfos> => {
     if (!this.ffprobePath) {
@@ -106,6 +113,7 @@ class FFmpegStaticAdapter extends AbstractFFmpeg {
         videoCodec: videoStream?.codec_name ?? null,
         audioCodec: audioStream?.codec_name ?? null,
         sampleRate: audioStream?.sample_rate ? parseInt(audioStream.sample_rate, 10) : null,
+        ...reportedTraits(videoStream),
       };
     } catch (error) {
       const execError = error as ExecException & { stderr: string };

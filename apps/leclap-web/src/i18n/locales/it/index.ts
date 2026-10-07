@@ -18,6 +18,8 @@ import shell from './shell.json';
 import projects from './projects.json';
 import legal from './legal.json';
 import privacy from './privacy.json';
+import ai from './ai.json';
+import agent from './agent.json';
 import type { Resources } from '../en';
 
 type LocaleShape<T> = { [K in keyof T]: T[K] extends string ? string : LocaleShape<T[K]> };
@@ -40,4 +42,6 @@ export const it = {
   projects,
   legal,
   privacy,
+  ai,
+  agent,
 } satisfies LocaleShape<Resources>;

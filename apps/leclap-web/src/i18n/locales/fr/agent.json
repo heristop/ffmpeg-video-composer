@@ -1,0 +1,122 @@
+{
+  "pill": {
+    "label": "Agent",
+    "aria": "Agent du navigateur : {{state}}",
+    "states": {
+      "off": "désactivé",
+      "idle": "prêt",
+      "working": "au travail"
+    }
+  },
+  "popover": {
+    "title": "Agent du navigateur",
+    "intro": "Un agent IA intégré à votre navigateur peut lire ce modèle, le vérifier et y faire des modifications annulables. Il s'appuie sur l'agent de votre navigateur : cette page ne contient aucune clé d'API.",
+    "polyfill": "Mode développement : les outils viennent du polyfill WebMCP.",
+    "close": "Fermer"
+  },
+  "settings": {
+    "enabled": "Autoriser les agents du navigateur à utiliser ce constructeur",
+    "enabledHelp": "Désactivez pour retirer tous les outils d'un coup.",
+    "askBeforeEdit": "Demander avant chaque modification",
+    "askBeforeEditHelp": "Chaque changement de l'agent attend votre accord.",
+    "problem": "Certains outils n'ont pas pu être enregistrés : {{detail}}"
+  },
+  "log": {
+    "title": "Activité récente",
+    "emptyTitle": "Aucune activité pour l’instant",
+    "empty": "Rien pour l'instant. Demandez à l'agent de votre navigateur de travailler sur ce modèle : chaque étape s'affichera ici.",
+    "undo": "Annuler",
+    "undoLabel": "Annuler : {{action}}",
+    "note": "Note de l'agent : {{note}}",
+    "status": {
+      "ok": "Fait",
+      "error": "Échec",
+      "declined": "Refusé"
+    },
+    "changed_one": "{{count}} scène modifiée",
+    "changed_other": "{{count}} scènes modifiées"
+  },
+  "tools": {
+    "get_template": "A lu le modèle",
+    "list_sections": "A listé les scènes",
+    "get_template_schema": "A lu le schéma du modèle",
+    "get_motion_catalog": "A consulté les animations",
+    "list_samples": "A parcouru les exemples",
+    "get_sample": "A lu un exemple",
+    "validate_template": "A vérifié le modèle",
+    "get_timeline": "A lu la timeline",
+    "select_section": "A sélectionné une scène",
+    "edit_template": "A modifié le modèle",
+    "add_section": "A ajouté une scène",
+    "remove_section": "A supprimé une scène",
+    "move_section": "A déplacé une scène",
+    "set_texts": "A changé des textes à l'écran",
+    "undo": "A annulé sa dernière étape",
+    "set_theme": "A changé le thème",
+    "set_format": "A changé le format",
+    "set_music": "A changé la musique",
+    "replace_template": "A remplacé le modèle",
+    "load_sample": "A ouvert un exemple",
+    "render_preview": "A rendu un aperçu",
+    "render_frames": "A capturé des images de l'aperçu",
+    "save_template": "A enregistré le modèle"
+  },
+  "actions": {
+    "edit_template": "modifier le modèle",
+    "add_section": "ajouter une scène",
+    "remove_section": "supprimer une scène",
+    "move_section": "déplacer une scène",
+    "set_texts": "changer des textes à l'écran",
+    "undo": "annuler sa dernière étape",
+    "set_theme": "changer le thème",
+    "set_format": "changer le format",
+    "set_music": "changer la musique",
+    "replace_template": "remplacer ce modèle",
+    "load_sample": "ouvrir un exemple à la place de ce modèle",
+    "render_preview": "rendre un aperçu",
+    "render_frames": "capturer des images de l'aperçu",
+    "save_template": "enregistrer ce modèle"
+  },
+  "errors": {
+    "invalid_input": "requête invalide",
+    "too_large": "requête trop volumineuse",
+    "revision_conflict": "le modèle a changé entre-temps",
+    "invalid_template": "aurait cassé le modèle",
+    "builder_unsupported_section": "non pris en charge par le constructeur",
+    "no_effect": "rien que le constructeur puisse garder",
+    "not_found": "introuvable",
+    "user_declined": "refusé par vous",
+    "needs_user_attention": "onglet en arrière-plan",
+    "rate_limited": "trop de requêtes",
+    "busy": "une autre étape était en cours",
+    "disabled": "les outils de l'agent sont désactivés",
+    "aborted": "annulé",
+    "unavailable": "indisponible",
+    "render_failed": "le rendu a échoué",
+    "save_blocked": "pas encore enregistrable"
+  },
+  "confirm": {
+    "title": "Autoriser cette action de l'agent ?",
+    "description": "L'agent de votre navigateur veut {{action}}.",
+    "undoable": "Vous pourrez l'annuler ensuite.",
+    "allow": "Autoriser",
+    "deny": "Ne pas autoriser",
+    "allowSession": "Autoriser les aperçus pour le reste de cette session",
+    "details": {
+      "replace_template": "Il s’ouvre comme nouveau brouillon nommé « {{name}} » avec {{sections}} scènes ; Annuler restaure votre brouillon actuel.",
+      "load_sample": "L’exemple « {{title}} » s’ouvre comme nouveau brouillon ; Annuler restaure votre brouillon actuel.",
+      "render_preview": "Il rend environ {{duration}} s de vidéo dans votre navigateur avec des médias provisoires, soit à peu près {{seconds}} s de travail, et ouvre l’aperçu ici.",
+      "save_template": "Il enregistre « {{name}} » dans votre bibliothèque de modèles sur cet appareil ; l’éditeur reste ouvert."
+    }
+  },
+  "live": {
+    "changed_one": "L'agent du navigateur a modifié {{count}} scène",
+    "changed_other": "L'agent du navigateur a modifié {{count}} scènes",
+    "settings_one": "L'agent du navigateur a modifié les réglages du modèle",
+    "settings_other": "L'agent du navigateur a modifié les réglages du modèle",
+    "declined_one": "Vous avez refusé une action de l'agent",
+    "declined_other": "Vous avez refusé {{count}} actions de l'agent",
+    "failed_one": "Une action de l'agent a échoué",
+    "failed_other": "{{count}} actions de l'agent ont échoué"
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "name": "Gallery: platform safe zones",
+    "description": "A card composed for portrait, landscape and square, to look at under every platform UI overlay (leclap snapshot --safe), for the docs gallery."
+  },
+  "global": {
+    "orientation": "portrait",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 12,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "card",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "id": "head",
+          "text": {
+            "en": "Keep it in the safe zone"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": {
+            "$format": {
+              "landscape": 110,
+              "portrait": 110,
+              "square": 110
+            }
+          },
+          "maxWidth": {
+            "$format": {
+              "landscape": 1000,
+              "portrait": 460,
+              "square": 860
+            }
+          },
+          "x": {
+            "$format": {
+              "landscape": 640,
+              "portrait": 330,
+              "square": 540
+            }
+          },
+          "y": {
+            "$format": {
+              "landscape": 170,
+              "portrait": 480,
+              "square": 330
+            }
+          },
+          "accent": {
+            "words": "last",
+            "color": "#FFF685"
+          }
+        },
+        {
+          "text": {
+            "en": "Follow for more"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "font": "oswald",
+          "size": {
+            "$format": {
+              "landscape": 44,
+              "portrait": 52,
+              "square": 46
+            }
+          },
+          "x": {
+            "$format": {
+              "landscape": 640,
+              "portrait": 330,
+              "square": 540
+            }
+          },
+          "y": {
+            "$format": {
+              "landscape": 470,
+              "portrait": 860,
+              "square": 700
+            }
+          },
+          "color": "#FF8AAE"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "corners",
+          "at": 0,
+          "duration": 0.01,
+          "color": "#7C83FD",
+          "inset": 30
+        }
+      ]
+    }
+  ],
+  "formats": {
+    "landscape": {
+      "sections": {
+        "card": {
+          "options": {
+            "backgroundColor": "#141416"
+          }
+        }
+      }
+    },
+    "square": {
+      "sections": {
+        "card": {
+          "options": {
+            "backgroundColor": "#0E1A16"
+          }
+        }
+      }
+    }
+  }
+}

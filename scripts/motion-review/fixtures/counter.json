@@ -1,0 +1,23 @@
+{
+  "label": "Counter (tabular, grouped, 3 % overshoot)",
+  "kind": "kinetic",
+  "window": { "at": 0.4, "duration": 1.2 },
+  "moments": [0.35, 0.64, 0.88, 1.12, 1.6, 1.65],
+  "backgrounds": ["dark", "light"],
+  "section": {
+    "kinetic": [
+      {
+        "id": "count",
+        "text": { "en": "" },
+        "preset": "counter",
+        "counter": { "from": 0, "to": 12500, "prefix": "$", "overshoot": 0.03 },
+        "delay": "{{at}}",
+        "duration": "{{duration}}",
+        "ease": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "size": 120,
+        "y": "center",
+        "color": "#141A2A"
+      }
+    ]
+  }
+}

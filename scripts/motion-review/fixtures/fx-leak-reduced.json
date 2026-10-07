@@ -1,0 +1,24 @@
+{
+  "label": "Light leak, reduced motion (fx)",
+  "kind": "fx",
+  "window": {
+    "at": 0.3,
+    "duration": 2.6
+  },
+  "global": {
+    "motion": {
+      "energy": 0
+    }
+  },
+  "section": {
+    "graphics": [
+      {
+        "type": "fx",
+        "effect": "leak",
+        "target": "frame",
+        "at": "{{at}}",
+        "duration": "{{duration}}"
+      }
+    ]
+  }
+}

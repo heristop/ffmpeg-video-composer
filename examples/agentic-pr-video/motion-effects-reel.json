@@ -1,0 +1,1311 @@
+{
+  "meta": {
+    "name": "Motion effects — PR reel",
+    "description": "A review reel for the motion-effects branch: chapter cards in kinetic type intercut with the rendered showcase previews, then the agent tooling shown with its real output.",
+    "creativeDirection": "Audience: reviewers of a large pull request who need the whole change in under two minutes. Direction: a keynote-style reel on the leclap theme. Each chapter opens on a numbered card (mono number, Bebas title, Oswald topics, an underline that draws itself) and then plays two to five showcase previews full frame, each labelled by a small top pill naming the feature and its JSON field. Designed transitions carry the cuts: whips into chapters, pushes and swipes inside them, one iris and one zoom-through. The agent-tooling chapter shows real CLI output (a snapshot contact sheet, timeline lines, the diagnose feature count) as graphics and type rather than screenshots. Sound comes from the bundled effect library (auto whooshes on designed transitions, hits on impacts) plus the previews' own audio. Avoid: labels covering the previews' own copy, more than one accent per card, text outside the 5% title-safe area, and any invented metric. Review: every label is readable, every chapter card lands before the cut, the timeline and MCP lines fit inside the frame, and the close holds."
+  },
+  "global": {
+    "orientation": "landscape",
+    "platform": "youtube",
+    "theme": "leclap",
+    "fps": 30,
+    "seed": 7,
+    "musicEnabled": false,
+    "motion": {
+      "energy": 1
+    },
+    "transition": {
+      "type": "push-left",
+      "duration": 0.4,
+      "ease": "$snappy"
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "musicVolume": 0,
+      "sfx": "auto",
+      "normalize": "loudnorm"
+    },
+    "sfx": [
+      {
+        "id": "riser",
+        "at": "ch1_card.start + 0.3",
+        "volume": 0.4
+      },
+      {
+        "id": "riser",
+        "at": "ch2_card.start + 0.3",
+        "volume": 0.4
+      },
+      {
+        "id": "riser",
+        "at": "ch3_card.start + 0.3",
+        "volume": 0.4
+      },
+      {
+        "id": "riser",
+        "at": "ch4_card.start + 0.3",
+        "volume": 0.4
+      },
+      {
+        "id": "riser",
+        "at": "ch5_card.start + 0.3",
+        "volume": 0.4
+      }
+    ]
+  },
+  "partials": [
+    {
+      "id": "chapter-card",
+      "description": "Numbered chapter card: a mono number, a cascading title, a topics line and a drawn underline.",
+      "variables": {
+        "num": "01",
+        "title": "Chapter",
+        "topics": "topics",
+        "exit": "whip-left"
+      },
+      "envelope": {
+        "in": 1.4,
+        "out": 0
+      },
+      "jobs": ["orient", "bridge"],
+      "sections": [
+        {
+          "name": "card",
+          "type": "color_background",
+          "role": "bridge",
+          "options": {
+            "backgroundColor": "$color.bg",
+            "duration": 2.4
+          },
+          "camera": {
+            "preset": "push-in",
+            "amount": 0.04
+          },
+          "kinetic": [
+            {
+              "id": "num",
+              "text": {
+                "en": "{{ num }}"
+              },
+              "preset": "fade",
+              "font": "mono",
+              "size": 34,
+              "y": 210,
+              "color": "$color.brand"
+            },
+            {
+              "id": "title",
+              "text": {
+                "en": "{{ title }}"
+              },
+              "preset": "cascade",
+              "size": 116,
+              "y": 270,
+              "delay": 0.15
+            },
+            {
+              "text": {
+                "en": "{{ topics }}"
+              },
+              "preset": "fade",
+              "font": "oswald",
+              "size": 32,
+              "y": 470,
+              "color": "$color.muted",
+              "delay": "title.end",
+              "unit": "line"
+            }
+          ],
+          "graphics": [
+            {
+              "type": "underline",
+              "at": 0.5,
+              "x": 520,
+              "y": 440,
+              "width": 240,
+              "thickness": 4,
+              "color": "$color.accent"
+            }
+          ],
+          "sfx": [
+            {
+              "id": "tick",
+              "at": 0.05,
+              "volume": 0.6
+            }
+          ],
+          "transition": {
+            "type": "{{ exit }}",
+            "duration": 0.4
+          }
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "name": "intro",
+      "type": "color_background",
+      "role": "hook",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 4.2
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.06
+      },
+      "graphics": [
+        {
+          "type": "corners",
+          "at": 0.3,
+          "color": "$color.accent"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "feat/motion-effects"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 30,
+          "y": 190,
+          "color": "$color.muted"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "MOTION EFFECTS"
+          },
+          "preset": "tracking-in",
+          "size": 150,
+          "y": 250,
+          "delay": 0.3
+        },
+        {
+          "text": {
+            "en": "A review reel, rendered with LeClap"
+          },
+          "preset": "highlight",
+          "font": "oswald",
+          "size": 44,
+          "y": 450,
+          "delay": "headline.end + 0.1",
+          "accent": {
+            "words": "last"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "boom",
+          "at": "headline.end",
+          "volume": 0.6
+        }
+      ],
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "determinism",
+      "type": "color_background",
+      "role": "problem",
+      "options": {
+        "backgroundColor": "$color.surface",
+        "duration": 4
+      },
+      "camera": {
+        "hits": ["bytes.end"]
+      },
+      "kinetic": [
+        {
+          "id": "same",
+          "text": {
+            "en": "Same JSON. Same seed."
+          },
+          "preset": "cascade",
+          "size": 110,
+          "y": 180,
+          "ease": "$expo"
+        },
+        {
+          "id": "bytes",
+          "text": {
+            "en": "Same bytes."
+          },
+          "preset": "impact",
+          "size": 150,
+          "y": 320,
+          "color": "$color.accent",
+          "delay": "same.end + 0.1"
+        },
+        {
+          "text": {
+            "en": "global.seed  ·  render --manifest  ·  leclap verify --rerender"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 26,
+          "y": 540,
+          "color": "$color.muted",
+          "delay": "bytes.end + 0.2"
+        }
+      ],
+      "transition": {
+        "type": "whip-up",
+        "duration": 0.4
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "chapter-card",
+      "prefix": "ch1_",
+      "duration": 2.6,
+      "variables": {
+        "num": "01",
+        "title": "Motion & type",
+        "topics": "springs · motion tokens · kinetic type · camera · graphics · emoji · RTL",
+        "exit": "push-left"
+      }
+    },
+    {
+      "name": "kinetic-type",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/kinetic-type.mp4",
+        "clip": {
+          "from": 0,
+          "to": 4.6
+        },
+        "duration": 4.6
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Kinetic typography"
+        },
+        "subtitle": {
+          "en": "kinetic[] · 13 presets"
+        },
+        "style": "pill",
+        "position": "top",
+        "accent": "$color.brand"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "springs",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/spring-kinetics.mp4",
+        "clip": {
+          "from": 0.2,
+          "to": 3.8
+        },
+        "duration": 3.6
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Springs & motion tokens"
+        },
+        "subtitle": {
+          "en": "$land · $bouncy · motion.energy"
+        },
+        "style": "pill",
+        "accent": "$color.brand"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "camera",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/camera-and-graphics.mp4",
+        "clip": {
+          "from": 0,
+          "to": 4.6
+        },
+        "duration": 4.6
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Camera rig & graphics"
+        },
+        "subtitle": {
+          "en": "camera.hits · graphics[] · designed transitions"
+        },
+        "style": "pill",
+        "accent": "$color.brand"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.5
+      }
+    },
+    {
+      "name": "emoji",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/emoji-type.mp4",
+        "clip": {
+          "from": 0.3,
+          "to": 3.6
+        },
+        "duration": 3.3
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Emoji in type"
+        },
+        "subtitle": {
+          "en": "global.emoji"
+        },
+        "style": "pill",
+        "position": "top",
+        "accent": "$color.brand"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "rtl",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/rtl-type.mp4",
+        "clip": {
+          "from": 0.2,
+          "to": 3.4
+        },
+        "duration": 3.2
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Arabic & Hebrew"
+        },
+        "subtitle": {
+          "en": "noto-arabic · noto-hebrew · unit: line"
+        },
+        "style": "pill",
+        "position": "top",
+        "accent": "$color.brand"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "chapter-card",
+      "prefix": "ch2_",
+      "duration": 2.6,
+      "variables": {
+        "num": "02",
+        "title": "Effects & compositing",
+        "topics": "FX pack · kinetic fills · split layouts · wipes · word captions",
+        "exit": "push-left"
+      }
+    },
+    {
+      "name": "fx-pack",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/fx-pack.mp4",
+        "clip": {
+          "from": 0,
+          "to": 3.6
+        },
+        "duration": 3.6
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Motion FX pack"
+        },
+        "subtitle": {
+          "en": "glitch · trail · focus · whips"
+        },
+        "style": "pill",
+        "position": "top",
+        "accent": "$color.accent"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "whip-up",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "fx-data",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/fx-pack.mp4",
+        "clip": {
+          "from": 3.75,
+          "to": 8.55
+        },
+        "duration": 4.8
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Data graphics"
+        },
+        "subtitle": {
+          "en": "bars-chart · progress · lower-third styles"
+        },
+        "style": "pill",
+        "accent": "$color.accent"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "fills",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/kinetic-fills.mp4",
+        "clip": {
+          "from": 2.6,
+          "to": 6.4
+        },
+        "duration": 3.8
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Filled type"
+        },
+        "subtitle": {
+          "en": "kinetic[].fill"
+        },
+        "style": "pill",
+        "position": "top",
+        "accent": "$color.accent"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "layouts",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/split-layouts.mp4",
+        "clip": {
+          "from": 3.0,
+          "to": 8.0
+        },
+        "duration": 5
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Split screens & wipes"
+        },
+        "subtitle": {
+          "en": "layout: split · before-after"
+        },
+        "style": "pill",
+        "position": "top",
+        "accent": "$color.accent"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "iris",
+        "duration": 0.5
+      }
+    },
+    {
+      "name": "captions",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/word-captions.mp4",
+        "clip": {
+          "from": 0,
+          "to": 4.2
+        },
+        "duration": 4.2
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Word-timed captions"
+        },
+        "subtitle": {
+          "en": "subtitles · karaoke · crown"
+        },
+        "style": "pill",
+        "position": "top",
+        "accent": "$color.accent"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "chapter-card",
+      "prefix": "ch3_",
+      "duration": 2.6,
+      "variables": {
+        "num": "03",
+        "title": "Footage & audio",
+        "topics": "blur fit · focus · speed ramps · freeze · LUTs · voice · auto sfx · beats",
+        "exit": "push-left"
+      }
+    },
+    {
+      "name": "footage",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/footage-edit.mp4",
+        "clip": {
+          "from": 0,
+          "to": 7.0
+        },
+        "duration": 7.0
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Footage editing"
+        },
+        "subtitle": {
+          "en": "fit · focus · clip · speedRamp · grade.lut"
+        },
+        "style": "pill",
+        "position": "top",
+        "accent": "$color.accent2"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "sound",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/sound-design.mp4",
+        "clip": {
+          "from": 5.0,
+          "to": 10.6
+        },
+        "duration": 5.6
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Sound design from JSON"
+        },
+        "subtitle": {
+          "en": "audio.sfx: auto · voice presets · automation"
+        },
+        "style": "pill",
+        "position": "top",
+        "accent": "$color.accent2"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "beats",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/beat-grid.mp4",
+        "clip": {
+          "from": 0.4,
+          "to": 5.4
+        },
+        "duration": 5
+      },
+      "lowerThird": {
+        "title": {
+          "en": "On the beat"
+        },
+        "subtitle": {
+          "en": "global.beats · beat:n · leclap beats"
+        },
+        "style": "pill",
+        "accent": "$color.accent2"
+      },
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "chapter-card",
+      "prefix": "ch4_",
+      "duration": 2.6,
+      "variables": {
+        "num": "04",
+        "title": "Formats & platforms",
+        "topics": "one story, three compositions · themes · motion roles · safe zones",
+        "exit": "push-left"
+      }
+    },
+    {
+      "name": "formats",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 4.4
+      },
+      "kinetic": [
+        {
+          "id": "head",
+          "text": {
+            "en": "One story. Three compositions."
+          },
+          "preset": "cascade",
+          "size": 72,
+          "y": 70,
+          "accent": {
+            "words": "last"
+          }
+        },
+        {
+          "text": {
+            "en": "leclap render formats.json --formats all"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 24,
+          "y": 610,
+          "color": "$color.muted",
+          "delay": "head.end + 0.6"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "trio",
+          "type": "image",
+          "url": "pictures/formats-row.png",
+          "options": {
+            "position": "27:200",
+            "motion": {
+              "type": "rise",
+              "delay": 0.4,
+              "duration": 0.5,
+              "distance": 40
+            }
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.4,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "theme-roles",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/showcase/theme-roles.mp4",
+        "clip": {
+          "from": 1.8,
+          "to": 6.2
+        },
+        "duration": 4.4
+      },
+      "layout": {
+        "type": "split",
+        "sources": ["theme-roles", "$color.bg"],
+        "ratio": 0.32
+      },
+      "kinetic": [
+        {
+          "id": "theme",
+          "text": {
+            "en": "Theme tokens. Motion roles. Safe zones."
+          },
+          "preset": "cascade",
+          "size": 76,
+          "align": "left",
+          "x": 470,
+          "y": 210,
+          "maxWidth": 720
+        },
+        {
+          "text": {
+            "en": "global.theme: neon · role: headline · platform: tiktok"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 22,
+          "align": "left",
+          "x": 470,
+          "y": 500,
+          "color": "$color.muted",
+          "delay": "theme.end + 0.2"
+        }
+      ],
+      "sfx": [
+        {
+          "id": "swoosh-short",
+          "at": 0.15,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "chapter-card",
+      "prefix": "ch5_",
+      "duration": 2.6,
+      "variables": {
+        "num": "05",
+        "title": "Agent tooling",
+        "topics": "snapshot · timeline · diagnose · output QC · MCP tools · AI builder",
+        "exit": "push-left"
+      }
+    },
+    {
+      "name": "snapshot",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 4.4
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "delay": 0.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "$ leclap snapshot kinetic-type.json --sheet 3x2"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 28,
+          "y": 90,
+          "color": "$color.accent2"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "sheet",
+          "type": "image",
+          "url": "pictures/snapshot-sheet.png",
+          "options": {
+            "position": "60:180",
+            "scale": "1160:-1",
+            "motion": {
+              "type": "rise",
+              "delay": 0.3,
+              "duration": 0.5,
+              "distance": 40
+            }
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "shutter",
+          "at": 0.35,
+          "volume": 0.8
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "timeline",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 4.6
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.4,
+          "x": 70,
+          "y": 110,
+          "width": 1140,
+          "height": 500,
+          "from": "left",
+          "color": "$color.surface",
+          "ease": "ease-in-out-sine"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "$ leclap timeline fx-pack.json"
+          },
+          "preset": "typewriter",
+          "font": "mono",
+          "size": 28,
+          "align": "left",
+          "x": 110,
+          "y": 140,
+          "color": "$color.accent2",
+          "delay": 0.3,
+          "role": "headline"
+        },
+        {
+          "text": {
+            "en": "0.00s - 1.80s  hook  > whip-left 0.4s"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 26,
+          "align": "left",
+          "x": 110,
+          "y": 230,
+          "delay": 1.3,
+          "role": "panel",
+          "ease": "$smooth"
+        },
+        {
+          "text": {
+            "en": "0.15s - 0.50s  kinetic impact"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 26,
+          "align": "left",
+          "x": 170,
+          "y": 290,
+          "color": "$color.muted",
+          "delay": 1.5,
+          "role": "micro"
+        },
+        {
+          "text": {
+            "en": "0.30s - 0.60s  graphic glitch"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 26,
+          "align": "left",
+          "x": 170,
+          "y": 345,
+          "color": "$color.muted",
+          "delay": 1.7,
+          "role": "micro"
+        },
+        {
+          "text": {
+            "en": "1.40s - 4.10s  focus  > whip-up 0.4s"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 26,
+          "align": "left",
+          "x": 110,
+          "y": 415,
+          "delay": 1.9,
+          "role": "panel"
+        },
+        {
+          "text": {
+            "en": "3.70s - 9.10s  data  > push-left 0.5s"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 26,
+          "align": "left",
+          "x": 110,
+          "y": 475,
+          "delay": 2.1,
+          "role": "panel"
+        },
+        {
+          "text": {
+            "en": "Where everything sits, without rendering"
+          },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 32,
+          "y": 640,
+          "color": "$color.brand",
+          "delay": 2.6,
+          "role": "accent"
+        }
+      ],
+      "sfx": [
+        {
+          "id": "click",
+          "at": 1.3,
+          "volume": 0.6
+        },
+        {
+          "id": "click",
+          "at": 1.5,
+          "volume": 0.6
+        },
+        {
+          "id": "click",
+          "at": 1.7,
+          "volume": 0.6
+        },
+        {
+          "id": "click",
+          "at": 1.9,
+          "volume": 0.6
+        },
+        {
+          "id": "click",
+          "at": 2.1,
+          "volume": 0.6
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "diagnose",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 4.2
+      },
+      "graphics": [
+        {
+          "type": "ticker",
+          "at": 0.8,
+          "text": {
+            "en": "DRAWTEXT  ·  TEXT SHAPING  ·  LIBASS  ·  ZSCALE  ·  TONEMAP  ·  LUT3D  ·  XFADE  ·  GBLUR  ·  ALPHAMERGE  ·  LOUDNORM  ·  EBUR128  ·  LIBX264  ·  GPL  ·"
+          },
+          "speed": 200,
+          "color": "$color.brand"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "$ leclap diagnose"
+          },
+          "preset": "typewriter",
+          "font": "mono",
+          "size": 28,
+          "y": 90,
+          "color": "$color.accent2",
+          "caret": false
+        },
+        {
+          "id": "count",
+          "text": {
+            "en": ""
+          },
+          "preset": "counter",
+          "counter": {
+            "from": 0,
+            "to": 13,
+            "suffix": "/14"
+          },
+          "size": 190,
+          "y": 160,
+          "delay": 0.5
+        },
+        {
+          "text": {
+            "en": "FFmpeg features this machine can render, each with a fix"
+          },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 34,
+          "y": 400,
+          "color": "$color.muted",
+          "delay": "count.end + 0.1"
+        }
+      ],
+      "sfx": [
+        {
+          "id": "tick",
+          "at": 0.55,
+          "volume": 0.5
+        },
+        {
+          "id": "tick",
+          "at": 0.7,
+          "volume": 0.5
+        },
+        {
+          "id": "tick",
+          "at": 0.85,
+          "volume": 0.5
+        },
+        {
+          "id": "tick",
+          "at": 1.0,
+          "volume": 0.5
+        },
+        {
+          "id": "tick",
+          "at": 1.15,
+          "volume": 0.5
+        },
+        {
+          "id": "tick",
+          "at": 1.3,
+          "volume": 0.5
+        },
+        {
+          "id": "tick",
+          "at": 1.45,
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "mcp",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "$color.surface",
+        "duration": 4.8
+      },
+      "kinetic": [
+        {
+          "id": "mcp-head",
+          "text": {
+            "en": "Agents drive it over MCP"
+          },
+          "preset": "cascade",
+          "size": 92,
+          "y": 90,
+          "ease": "$expo"
+        },
+        {
+          "id": "tools",
+          "text": {
+            "en": "get_motion_catalog render_frames get_timeline analyze_music extract_style get_capabilities report_catalog_gap"
+          },
+          "preset": "pop",
+          "font": "mono",
+          "size": 32,
+          "y": 270,
+          "maxWidth": 1000,
+          "wrap": "balanced",
+          "lineHeight": 1.5,
+          "color": "$color.brand",
+          "delay": "mcp-head.end"
+        },
+        {
+          "text": {
+            "en": "and Generate with AI in the web builder: your key, a plan first, a reference style"
+          },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 30,
+          "y": 540,
+          "maxWidth": 1000,
+          "color": "$color.muted",
+          "delay": "tools.end + 0.2"
+        }
+      ],
+      "sfx": [
+        {
+          "id": "pop",
+          "at": "tools.start + 0.00",
+          "volume": 0.5
+        },
+        {
+          "id": "pop",
+          "at": "tools.start + 0.12",
+          "volume": 0.5
+        },
+        {
+          "id": "pop",
+          "at": "tools.start + 0.24",
+          "volume": 0.5
+        },
+        {
+          "id": "pop",
+          "at": "tools.start + 0.36",
+          "volume": 0.5
+        }
+      ],
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "outro",
+      "type": "color_background",
+      "role": "outro",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 4
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.05
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "at": 0.2,
+          "duration": 0.9,
+          "color": "$color.brand"
+        },
+        {
+          "type": "flash",
+          "at": "close.end",
+          "duration": 0.25,
+          "intensity": 0.4
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "close",
+          "text": {
+            "en": "JSON in. Video out."
+          },
+          "preset": "split",
+          "size": 140,
+          "y": 220
+        },
+        {
+          "text": {
+            "en": "feat/motion-effects · made with LeClap"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 28,
+          "y": 440,
+          "color": "$color.accent2",
+          "delay": "close.end + 0.3"
+        }
+      ],
+      "sfx": [
+        {
+          "id": "hit",
+          "at": "close.end",
+          "volume": 0.5
+        },
+        {
+          "id": "ding",
+          "at": "close.end",
+          "volume": 0.7
+        }
+      ]
+    }
+  ]
+}

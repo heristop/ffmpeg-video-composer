@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { TranslationSchema } from './global.schemas';
-import { RevealSchema, ExitSchema } from './effects.schemas';
+import { TimedRevealSchema, TimedExitSchema } from './reveal.schemas';
+import { AnimateSchema, MotionRoleSchema } from './motion.schemas';
+import { ElementIdSchema } from './time.schemas';
 
 // ── filter schemas ─────────────────────────────────────────────────────────────
 
@@ -81,11 +83,18 @@ export const FilterSchema = z
       ),
     values: FilterValuesSchema.optional().describe('Structured parameters for multi-argument filters.'),
     range: z.string().optional().describe('Time range over which the filter is active, as "start:end" in seconds.'),
-    reveal: RevealSchema.optional().describe(
+    id: ElementIdSchema.optional().describe(
+      'Id of a drawtext filter for time references: "<id>.start" is its reveal delay, "<id>.end" when its entrance has landed.'
+    ),
+    reveal: TimedRevealSchema.optional().describe(
       'Animated entrance for a drawtext filter; baked to alpha + kinetic x/y at compile.'
     ),
-    exit: ExitSchema.optional().describe(
+    exit: TimedExitSchema.optional().describe(
       'Animated exit for a drawtext filter; baked alongside the entrance at compile.'
+    ),
+    animate: AnimateSchema.optional(),
+    role: MotionRoleSchema.optional().describe(
+      'Motion role of a drawtext filter: fills reveal/exit easing (and duration) and animate key eases it leaves unset.'
     ),
   })
   .describe('A single FFmpeg filter applied to the section or input stream.');

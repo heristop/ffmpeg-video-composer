@@ -29,6 +29,15 @@ export function readDeviceFilters(): Set<string> {
   return parseEnabledFilters(fs.readFileSync(commonShPath, 'utf8'));
 }
 
+/** The external libraries the device build links (`--enable-libfribidi` → `fribidi`), from common.sh. */
+export function parseEnabledLibraries(source: string): Set<string> {
+  return new Set([...source.matchAll(/--enable-lib([a-z0-9_]+)/g)].map((match) => match[1]));
+}
+
+export function readDeviceLibraries(): Set<string> {
+  return parseEnabledLibraries(fs.readFileSync(commonShPath, 'utf8'));
+}
+
 /** Compat rules keyed by the filter type their remap consumes (derived by probing each rule). */
 function compatRuleFor(filterType: string): string | null {
   // deviceFilters: null here is deliberate — this "via compat" column reflects REWRITE rules only
@@ -40,6 +49,7 @@ function compatRuleFor(filterType: string): string | null {
     colorkey: true,
     textShaping: false,
     deviceFilters: null,
+    missingFilters: null,
   };
 
   for (const rule of FILTER_COMPAT) {

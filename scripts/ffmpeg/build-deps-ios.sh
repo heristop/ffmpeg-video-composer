@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Cross-build the FFmpeg drawtext deps (libfreetype + libharfbuzz, static) for iOS slices, mirroring
+# Cross-build the FFmpeg drawtext deps (libfreetype + libharfbuzz + libfribidi, static) for iOS slices, mirroring
 # build-deps.sh's Android recipe but with the Xcode toolchain. Output:
 #   scripts/ffmpeg/deps/ios/<slice>/{lib,include} + pkg-config files build-ios.sh points configure at.
 # Slices: device (arm64/iphoneos), sim-arm64, sim-x86_64. openh264 is intentionally omitted — drawtext
@@ -15,6 +15,7 @@ FT_DOTTED="$(echo "$FREETYPE_VERSION" | sed 's/^VER-//; s/-/./g')"
 FT_SRC="$WORK_DIR/freetype-$FT_DOTTED"
 HB_SRC="$WORK_DIR/harfbuzz-$HARFBUZZ_VERSION"
 LIBVPX_SRC="$WORK_DIR/libvpx-$LIBVPX_VERSION"
+FRIBIDI_SRC="$WORK_DIR/fribidi-$FRIBIDI_VERSION"
 
 # slice → (sdk, arch, autotools host triple, min-version flag)
 slice_sdk()  { case "$1" in device) echo iphoneos;; sim-arm64|sim-x86_64) echo iphonesimulator;; esac; }
@@ -30,6 +31,10 @@ fetch_freetype() {
 fetch_harfbuzz() {
   [ -f "$HB_SRC/CMakeLists.txt" ] || curl -fsSL \
     "https://github.com/harfbuzz/harfbuzz/releases/download/$HARFBUZZ_VERSION/harfbuzz-$HARFBUZZ_VERSION.tar.xz" | tar -xJ -C "$WORK_DIR"
+}
+fetch_fribidi() {
+  [ -f "$FRIBIDI_SRC/configure" ] || curl -fsSL \
+    "https://github.com/fribidi/fribidi/releases/download/v$FRIBIDI_VERSION/fribidi-$FRIBIDI_VERSION.tar.xz" | tar -xJ -C "$WORK_DIR"
 }
 fetch_libvpx() {
   [ -f "$LIBVPX_SRC/configure" ] || git clone --depth 1 --branch "v$LIBVPX_VERSION" \
@@ -121,10 +126,35 @@ build_libvpx() {
   echo "[libvpx][ios:$SLICE] installed → $PREFIX"
 }
 
+# libfribidi (static, LGPL-2.1, pure C) — drawtext `text_shaping` (bidi reordering), mirroring
+# build-deps.sh: autotools like freetype, library subdir only, fribidi.pc into the per-slice prefix.
+build_fribidi() {
+  local SLICE="$1" SDK ARCH HOST MIN SYSROOT CC PREFIX
+  SDK="$(slice_sdk "$SLICE")"; ARCH="$(slice_arch "$SLICE")"; HOST="$(slice_host "$SLICE")"; MIN="$(slice_min "$SLICE")"
+  SYSROOT="$(xcrun --sdk "$SDK" --show-sdk-path)"; CC="$(xcrun --sdk "$SDK" --find clang)"
+  PREFIX="$DEPS_DIR/ios/$SLICE"
+  echo "[fribidi][ios:$SLICE] configure ($ARCH/$SDK) ..."
+  ( cd "$FRIBIDI_SRC" && make distclean >/dev/null 2>&1 || true
+    ./configure \
+      --host="$HOST" --prefix="$PREFIX" \
+      --enable-static --disable-shared --with-pic --disable-debug --disable-deprecated \
+      CC="$CC" \
+      CFLAGS="-arch $ARCH $MIN -isysroot $SYSROOT -fPIC -O2" \
+      LDFLAGS="-arch $ARCH $MIN -isysroot $SYSROOT"
+    make -j"$(sysctl -n hw.ncpu)" -C lib
+    make -C lib install
+    make install-pkgconfigDATA ) || { echo "[fribidi][ios:$SLICE] BUILD FAILED"; exit 1; }
+  [ -f "$PREFIX/lib/libfribidi.a" ] || { echo "[fribidi][ios:$SLICE] libfribidi.a not installed"; exit 1; }
+  echo "[fribidi][ios:$SLICE] installed → $PREFIX"
+}
+
 fetch_freetype
 fetch_harfbuzz
 fetch_libvpx
+fetch_fribidi
 SLICES=("$@")
 [ ${#SLICES[@]} -eq 0 ] && SLICES=(device sim-arm64 sim-x86_64)
-for slice in "${SLICES[@]}"; do build_freetype "$slice"; build_harfbuzz "$slice"; build_libvpx "$slice"; done
-echo "[deps] ios deps complete (freetype + harfbuzz + libvpx): ${SLICES[*]}"
+for slice in "${SLICES[@]}"; do
+  build_freetype "$slice"; build_harfbuzz "$slice"; build_libvpx "$slice"; build_fribidi "$slice"
+done
+echo "[deps] ios deps complete (freetype + harfbuzz + libvpx + fribidi): ${SLICES[*]}"

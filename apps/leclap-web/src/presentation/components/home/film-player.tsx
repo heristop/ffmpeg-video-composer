@@ -5,6 +5,7 @@ import { playWithSound, readSound, tellVideo } from '@/lib/landing-sound';
 import { FilmScreen, FilmStage, useFilmSound } from '@/presentation/components/film-frame';
 import { FilmPlaybackControls, FilmFeedback, type FilmPlayerLabels } from './film-player-controls';
 import { useFilmCaptions, useFilmVisibility } from './use-film-captions';
+import { OptionalSeekBar, activeSeekLabels, type SeekLabels } from './seek-bar';
 import type { FilmAsset } from './films';
 
 interface FilmPlayerProps {
@@ -21,6 +22,8 @@ interface FilmPlayerProps {
   /** Landing films play on view; showcase samples wait for a visitor request. */
   playback?: 'ambient' | 'requested';
   startRequested?: boolean;
+  /** Show a seek bar along the bottom edge (showcase samples); the landing films keep the plain pill. */
+  seekLabels?: SeekLabels;
 }
 
 // Nothing streams before the frame nears the viewport, even where the element already exists (reduced motion).
@@ -48,6 +51,7 @@ export const FilmPlayer = ({
   className,
   playback = 'ambient',
   startRequested = false,
+  seekLabels,
 }: FilmPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const reduced = useReducedMotion();
@@ -181,7 +185,13 @@ export const FilmPlayer = ({
 
   return (
     <FilmStage frameRef={setFrameRef} className={className}>
-      <FilmScreen badge={badge} control={control} controlLabel={title} paused={paused}>
+      <FilmScreen
+        badge={badge}
+        control={control}
+        controlLabel={title}
+        paused={paused}
+        raised={activeSeekLabels(seekLabels, reduced, mounted) !== undefined}
+      >
         {!mounted && (
           <img
             src={film.poster}
@@ -241,6 +251,11 @@ export const FilmPlayer = ({
           </video>
         )}
         <FilmFeedback waiting={waiting} failed={failed} labels={labels} cue={cue} captions={captions && !reduced} />
+        <OptionalSeekBar
+          videoRef={videoRef}
+          mounted={mounted}
+          labels={activeSeekLabels(seekLabels, reduced, mounted)}
+        />
       </FilmScreen>
     </FilmStage>
   );

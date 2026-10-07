@@ -1,0 +1,567 @@
+{
+  "meta": {
+    "name": "WebMCP — PR reel",
+    "description": "A preview reel for the builder's WebMCP tools: chapter cards in kinetic type intercut with real builder footage of a browser agent calling the tools, then the 23 tools by kind.",
+    "creativeDirection": "Audience: reviewers and users who need the WebMCP feature in about a minute. Direction: the leclap theme, keynote pacing. A title card, then five numbered chapter cards (mono number, cascading title, topics line, a drawn underline), each followed by screen recordings of the builder at 1280x720 CSS pixels. The recordings carry their own caption pill naming each tool call and its outcome, so the reel adds no labels over them, except one pill on the rendered preview. Designed transitions carry the cuts. The outro lists every tool grouped as read, edit and consequential, and points to /doc/webmcp. Sound comes only from the bundled effect library. Avoid: covering the recorded captions or dialogs, text outside the title-safe area, any invented claim."
+  },
+  "global": {
+    "orientation": "landscape",
+    "platform": "youtube",
+    "theme": "leclap",
+    "fps": 30,
+    "seed": 11,
+    "musicEnabled": false,
+    "motion": {
+      "energy": 1
+    },
+    "transition": {
+      "type": "push-left",
+      "duration": 0.4,
+      "ease": "$snappy"
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "musicVolume": 0,
+      "sfx": "auto",
+      "normalize": "loudnorm"
+    },
+    "sfx": [
+      {
+        "id": "riser",
+        "at": "ch1_card.start + 0.3",
+        "volume": 0.35
+      },
+      {
+        "id": "riser",
+        "at": "ch2_card.start + 0.3",
+        "volume": 0.35
+      },
+      {
+        "id": "riser",
+        "at": "ch3_card.start + 0.3",
+        "volume": 0.35
+      },
+      {
+        "id": "riser",
+        "at": "ch4_card.start + 0.3",
+        "volume": 0.35
+      },
+      {
+        "id": "riser",
+        "at": "ch5_card.start + 0.3",
+        "volume": 0.35
+      }
+    ]
+  },
+  "partials": [
+    {
+      "id": "chapter-card",
+      "description": "Numbered chapter card: a mono number, a cascading title, a topics line and a drawn underline.",
+      "variables": {
+        "num": "01",
+        "title": "Chapter",
+        "topics": "topics",
+        "exit": "whip-left"
+      },
+      "envelope": {
+        "in": 1.4,
+        "out": 0
+      },
+      "jobs": ["orient", "bridge"],
+      "sections": [
+        {
+          "name": "card",
+          "type": "color_background",
+          "role": "bridge",
+          "options": {
+            "backgroundColor": "$color.bg",
+            "duration": 2.4
+          },
+          "camera": {
+            "preset": "push-in",
+            "amount": 0.04
+          },
+          "kinetic": [
+            {
+              "id": "num",
+              "text": {
+                "en": "{{ num }}"
+              },
+              "preset": "fade",
+              "font": "mono",
+              "size": 34,
+              "y": 210,
+              "color": "$color.brand"
+            },
+            {
+              "id": "title",
+              "text": {
+                "en": "{{ title }}"
+              },
+              "preset": "cascade",
+              "size": 116,
+              "y": 270,
+              "delay": 0.15
+            },
+            {
+              "text": {
+                "en": "{{ topics }}"
+              },
+              "preset": "fade",
+              "font": "oswald",
+              "size": 32,
+              "y": 470,
+              "color": "$color.muted",
+              "delay": "title.end",
+              "unit": "line"
+            }
+          ],
+          "graphics": [
+            {
+              "type": "underline",
+              "at": 0.5,
+              "x": 520,
+              "y": 440,
+              "width": 240,
+              "thickness": 4,
+              "color": "$color.accent"
+            }
+          ],
+          "sfx": [
+            {
+              "id": "tick",
+              "at": 0.05,
+              "volume": 0.6
+            }
+          ],
+          "transition": {
+            "type": "{{ exit }}",
+            "duration": 0.4
+          }
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "name": "intro",
+      "type": "color_background",
+      "role": "hook",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 4.6
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.06
+      },
+      "graphics": [
+        {
+          "type": "corners",
+          "at": 0.3,
+          "color": "$color.accent"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "browser agents · /studio/builder"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 28,
+          "y": 140,
+          "color": "$color.muted"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "WebMCP"
+          },
+          "preset": "tracking-in",
+          "font": "oswald",
+          "size": 150,
+          "y": 225,
+          "delay": 0.3
+        },
+        {
+          "id": "sub",
+          "text": {
+            "en": "in the LeClap builder"
+          },
+          "preset": "highlight",
+          "font": "oswald",
+          "size": 56,
+          "y": 440,
+          "delay": "headline.end + 0.1",
+          "accent": {
+            "words": "last"
+          }
+        },
+        {
+          "text": {
+            "en": "23 tools · your browser's own agent · no API key in the page"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 24,
+          "y": 560,
+          "color": "$color.accent2",
+          "delay": "sub.end + 0.2"
+        }
+      ],
+      "sfx": [
+        {
+          "id": "boom",
+          "at": "headline.end",
+          "volume": 0.6
+        }
+      ],
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "chapter-card",
+      "prefix": "ch1_",
+      "duration": 2.5,
+      "variables": {
+        "num": "01",
+        "title": "The Agent button",
+        "topics": "navigator.modelContext · 23 tools · read tools change nothing",
+        "exit": "push-left"
+      }
+    },
+    {
+      "name": "agent",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/webmcp/01-agent.mp4",
+        "clip": {
+          "from": 0.2,
+          "to": 6.6
+        },
+        "duration": 6.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "chapter-card",
+      "prefix": "ch2_",
+      "duration": 2.5,
+      "variables": {
+        "num": "02",
+        "title": "Edits you can undo",
+        "topics": "expectedRevision · one history step each · Ctrl+Z",
+        "exit": "push-left"
+      }
+    },
+    {
+      "name": "edits",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/webmcp/02-edit.mp4",
+        "clip": {
+          "from": 0.2,
+          "to": 10.1
+        },
+        "duration": 9.9
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "chapter-card",
+      "prefix": "ch3_",
+      "duration": 2.5,
+      "variables": {
+        "num": "03",
+        "title": "Check, then review",
+        "topics": "validate_template · recent activity · Undo",
+        "exit": "push-left"
+      }
+    },
+    {
+      "name": "review",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/webmcp/03-review.mp4",
+        "clip": {
+          "from": 0.2,
+          "to": 7.6
+        },
+        "duration": 7.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "chapter-card",
+      "prefix": "ch4_",
+      "duration": 2.5,
+      "variables": {
+        "num": "04",
+        "title": "You allow what matters",
+        "topics": "load_sample declined · render_preview allowed",
+        "exit": "push-left"
+      }
+    },
+    {
+      "name": "confirm",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/webmcp/04-confirm.mp4",
+        "clip": {
+          "from": 0.2,
+          "to": 10.8
+        },
+        "duration": 10.6
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "preview-dialog",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/webmcp/05-preview.mp4",
+        "clip": {
+          "from": 0.1,
+          "to": 3.9
+        },
+        "duration": 3.8
+      },
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "preview-output",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/webmcp/preview-render.mp4",
+        "clip": {
+          "from": 0.3,
+          "to": 4.3
+        },
+        "duration": 4.0
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.4
+      },
+      "lowerThird": {
+        "title": {
+          "en": "The preview the page rendered"
+        },
+        "subtitle": {
+          "en": "render_preview · ffmpeg.wasm · placeholder clips"
+        },
+        "style": "pill",
+        "accent": "$color.brand"
+      }
+    },
+    {
+      "type": "partial",
+      "ref": "chapter-card",
+      "prefix": "ch5_",
+      "duration": 2.5,
+      "variables": {
+        "num": "05",
+        "title": "The off switch",
+        "topics": "Let browser agents use this builder · every tool removed",
+        "exit": "push-left"
+      }
+    },
+    {
+      "name": "off",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/webmcp/06-off.mp4",
+        "clip": {
+          "from": 0.2,
+          "to": 8.2
+        },
+        "duration": 8.0
+      },
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "outro",
+      "type": "color_background",
+      "role": "outro",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 8
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "at": 0.2,
+          "duration": 0.9,
+          "color": "$color.brand"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "tools",
+          "text": {
+            "en": "23 tools, three kinds"
+          },
+          "preset": "cascade",
+          "size": 64,
+          "y": 80,
+          "ease": "$anticipate"
+        },
+        {
+          "id": "read-head",
+          "text": {
+            "en": "READ · 9"
+          },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 30,
+          "align": "left",
+          "x": 120,
+          "y": 196,
+          "color": "$color.accent2",
+          "delay": 0.6,
+          "ease": "$smooth"
+        },
+        {
+          "text": {
+            "en": "get_template\nlist_sections\nget_template_schema\nget_motion_catalog\nlist_samples\nget_sample\nvalidate_template\nget_timeline\nselect_section"
+          },
+          "preset": "cascade",
+          "unit": "line",
+          "font": "mono",
+          "size": 23,
+          "lineHeight": 1.32,
+          "align": "left",
+          "x": 120,
+          "y": 246,
+          "delay": 0.75,
+          "stagger": 0.05,
+          "ease": "$snappy"
+        },
+        {
+          "id": "edit-head",
+          "text": {
+            "en": "EDIT · 9"
+          },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 30,
+          "align": "left",
+          "x": 500,
+          "y": 196,
+          "color": "$color.brand",
+          "delay": 1.1,
+          "ease": "$expo"
+        },
+        {
+          "text": {
+            "en": "edit_template\nadd_section\nremove_section\nmove_section\nset_texts\nundo\nset_theme\nset_format\nset_music"
+          },
+          "preset": "cascade",
+          "unit": "line",
+          "font": "mono",
+          "size": 23,
+          "lineHeight": 1.32,
+          "align": "left",
+          "x": 500,
+          "y": 246,
+          "delay": 1.25,
+          "stagger": 0.05,
+          "ease": "$gentle"
+        },
+        {
+          "id": "consequential-head",
+          "text": {
+            "en": "CONSEQUENTIAL · 5"
+          },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 30,
+          "align": "left",
+          "x": 880,
+          "y": 196,
+          "color": "$color.accent",
+          "delay": 1.6,
+          "ease": "$juicy"
+        },
+        {
+          "text": {
+            "en": "replace_template\nload_sample\nrender_preview\nrender_frames\nsave_template"
+          },
+          "preset": "cascade",
+          "unit": "line",
+          "font": "mono",
+          "size": 23,
+          "lineHeight": 1.32,
+          "align": "left",
+          "x": 880,
+          "y": 246,
+          "delay": 1.75,
+          "stagger": 0.05,
+          "ease": "$bouncy"
+        },
+        {
+          "text": {
+            "en": "Guide: leclap.dev/doc/webmcp"
+          },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 34,
+          "y": 600,
+          "color": "$color.accent2",
+          "delay": 3.0
+        }
+      ],
+      "sfx": [
+        {
+          "id": "tick",
+          "at": 0.6,
+          "volume": 0.5
+        },
+        {
+          "id": "tick",
+          "at": 1.1,
+          "volume": 0.5
+        },
+        {
+          "id": "tick",
+          "at": 1.6,
+          "volume": 0.5
+        },
+        {
+          "id": "ding",
+          "at": 3.0,
+          "volume": 0.6
+        }
+      ]
+    }
+  ]
+}

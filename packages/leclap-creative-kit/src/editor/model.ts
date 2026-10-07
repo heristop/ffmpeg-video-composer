@@ -6,20 +6,20 @@ import type { TemplateDescriptor, Letterbox } from 'ffmpeg-video-composer/src/co
 // Re-export the core descriptor type so both apps can pin their stored-template shapes to the
 // exact descriptor buildDescriptor emits / toEditorState consumes — keeping the editor in lock-step.
 export type { TemplateDescriptor, Letterbox } from 'ffmpeg-video-composer/src/core/types.d.ts';
-import {
-  DEFAULT_TRANSITION_DURATION,
-  type GradeSchema,
-  type MotionEffectSchema,
-  type BackgroundLayerSchema,
-  type FramingGuideSchema,
-  type OverlayFitSchema,
-  type OverlayFlipSchema,
-  type RevealSchema,
-  type ExitSchema,
-  type TextEffectSchema,
-  type ChromaKeySchema,
-  type DuckingSchema,
+import type {
+  GradeSchema,
+  MotionEffectSchema,
+  BackgroundLayerSchema,
+  FramingGuideSchema,
+  OverlayFitSchema,
+  OverlayFlipSchema,
+  RevealSchema,
+  ExitSchema,
+  TextEffectSchema,
+  ChromaKeySchema,
+  DuckingSchema,
 } from 'ffmpeg-video-composer/src/schemas/effects.schemas.ts';
+import type { TimedRevealSchema, TimedExitSchema } from 'ffmpeg-video-composer/src/schemas/reveal.schemas.ts';
 // CaptureModeSchema is a value import (not type-only): ALL_CAPTURE_MODES reads .options off it at
 // runtime, so it can't join the `import type` group above it.
 import {
@@ -29,6 +29,19 @@ import {
   type ShapeSpecSchema,
   CaptureModeSchema,
 } from 'ffmpeg-video-composer/src/schemas/section.schemas.ts';
+import type {
+  AudioMixPassthrough,
+  EditorFormats,
+  EditorMeta,
+  EditorMotion,
+  FootageEdits,
+  MotionBlocks,
+} from './motion-passthrough';
+import type { DefaultTransition, SectionTransition } from './transition-types';
+export { DEFAULT_TRANSITION, type DefaultTransition, type SectionTransition } from './transition-types';
+export type { EditorMotion, FootageEdits, MotionBlocks } from './motion-passthrough';
+import type { VisualAudio } from './visual-audio';
+export type { AudioEffect, AudioFadeSide, SectionAudioFade, VisualAudio } from './visual-audio';
 import type {
   Orientation,
   GlobalTextOverlaySchema,
@@ -56,6 +69,9 @@ export type CaptionAlign = NonNullable<DescriptorCaption['align']>;
 // shape and build/import is a pass-through (the same approach as Grade/MotionEffect above).
 export type Reveal = z.infer<typeof RevealSchema>;
 export type Exit = z.infer<typeof ExitSchema>;
+// Drawtext overlays also accept time references ("title.end + 0.2") in reveal.delay / exit.after.
+export type OverlayReveal = z.infer<typeof TimedRevealSchema>;
+export type OverlayExit = z.infer<typeof TimedExitSchema>;
 export type TextEffect = z.infer<typeof TextEffectSchema>;
 export type ChromaKey = z.infer<typeof ChromaKeySchema>;
 // How an overlay maps into its "w:h" scale box: stretch (default, may distort) / contain / cover.
@@ -80,21 +96,16 @@ export type CaptureMode = z.infer<typeof CaptureModeSchema>;
 // Every capture mode, in display order — the recorder default when a template doesn't restrict them.
 export const ALL_CAPTURE_MODES: readonly CaptureMode[] = CaptureModeSchema.options;
 
-// Voice effect applied to the section's own audio (descriptor options.audioEffect): echo (aecho),
-// telephone (band-pass), or muffled (low-pass). Hand-modeled rather than schema-inferred (like
-// SectionFit below) since SectionOptionsSchema keeps every option flattened on one object with no
-// standalone exported enum to `z.infer` from.
-export type AudioEffect = 'echo' | 'telephone' | 'muffled';
-
 // How a section's SOURCE footage maps into the output frame (descriptor options.forceAspectRatio /
-// forceOriginalAspectRatio, lowered by SegmentBuilder.prependScaleFilters — scale/crop/pad only,
-// LGPL-safe). 'cover' (default, omitted) fills the frame and centre-crops the overflow; 'letterbox'
-// keeps the whole frame visible with pad bars (forceOriginalAspectRatio: true); 'off' skips the
-// conform scaling entirely (forceAspectRatio: false) for sources that already match the output.
-export type SectionFit = 'cover' | 'letterbox' | 'off';
+// forceOriginalAspectRatio / fit, lowered by the engine's reframe step — scale/crop/pad, LGPL-safe).
+// 'cover' (default, omitted) fills the frame and crops the overflow; 'letterbox' keeps the whole frame
+// visible with pad bars (forceOriginalAspectRatio: true); 'blur' keeps the whole frame over a blurred,
+// dimmed copy of itself (options.fit: 'blur'); 'off' skips the conform scaling entirely
+// (forceAspectRatio: false) for sources that already match the output.
+export type SectionFit = 'cover' | 'letterbox' | 'blur' | 'off';
 
 // Every fit mode, in display order — shared by the builder UIs' segmented control.
-export const SECTION_FIT_MODES: readonly SectionFit[] = ['cover', 'letterbox', 'off'];
+export const SECTION_FIT_MODES: readonly SectionFit[] = ['cover', 'letterbox', 'blur', 'off'];
 
 // --- Editor-friendly section model (flattened; compiled to a descriptor on save) ---
 export type FormField = { name: string; label: string; maxLength: number };
@@ -121,10 +132,10 @@ export interface TextOverlay extends VideoOverlaySlot {
   // option, which FilterManager.bakeTextAnimation overwrites with the reveal/exit expression.
   textOpacity?: number;
   // Animated entrance (rise/slide/fade); the engine bakes it onto the drawtext at compile.
-  reveal?: Reveal;
+  reveal?: OverlayReveal;
   // Animated exit (rise/slide/fade out) after a delay, timed against the section duration; the engine
   // bakes it alongside the entrance at compile.
-  exit?: Exit;
+  exit?: OverlayExit;
   // Drop shadow / outline for legibility over busy footage; lowered to drawtext
   // shadowx/shadowy/shadowcolor + borderw/bordercolor keys (see overlayFilters).
   effect?: TextEffect;
@@ -133,31 +144,6 @@ export interface TextOverlay extends VideoOverlaySlot {
   // geometry (a 6em underline below the text); an AccentBar object adds position/length/thickness/
   // align knobs. Omitted = no bar.
   accent?: string | AccentBar;
-}
-
-// A transition emitted after a visual section (maps to section.transition).
-export interface SectionTransition {
-  type: string;
-  duration?: number;
-}
-
-// Per-section audio fade: applied to the music track at the start / end of a section.
-export interface AudioFadeSide {
-  duration: number;
-  curve?: string;
-}
-
-export interface SectionAudioFade {
-  in?: AudioFadeSide;
-  out?: AudioFadeSide;
-}
-
-// Visual-section audio extras: per-section music-volume override, fade-in/out, and voice effect.
-// Co-located with look/grade/motion because they all ride on visual sections only.
-export interface VisualAudio {
-  musicVolume?: number;
-  audioFade?: SectionAudioFade;
-  audioEffect?: AudioEffect;
 }
 
 // Per-section playback tempo (descriptor options.speed, engine FormatterManager). NOTE the descriptor
@@ -184,6 +170,9 @@ export interface EditorCaption {
   reveal?: Reveal;
   // Drop shadow / outline for legibility; stored as the descriptor shape (pass-through).
   effect?: TextEffect;
+  // Opt-in wrapping to the frame (greedy / balanced) and shrink-to-fit; carried through untouched.
+  wrap?: DescriptorCaption['wrap'];
+  fit?: DescriptorCaption['fit'];
 }
 
 export interface VisualCaption {
@@ -274,10 +263,11 @@ export interface WatermarkChoice {
   margin?: number;
 }
 
-export interface VisualAnimation {
+export interface VisualAnimation extends MotionBlocks {
   // Animated overlays composited over the section, in array order (later entries paint on top).
   // Author-set; empty/absent means none.
   animations?: AnimationOverlay[];
+  // kinetic / camera / graphics come from MotionBlocks (motion-passthrough.ts).
 }
 
 export type EditorSection =
@@ -323,6 +313,8 @@ export type EditorSection =
       images?: ImageOverlay[];
       // How the recorded clip / fixed video maps into the output frame; omitted = 'cover'.
       fit?: SectionFit;
+      // Footage edits without builder controls (pass-through, see FootageEdits).
+      footage?: FootageEdits;
     } & VisualAudio &
       VisualPlayback &
       VisualCaption &
@@ -369,6 +361,8 @@ export type EditorSection =
       images?: ImageOverlay[];
       // How the picked/uploaded background image maps into the output frame; omitted = 'cover'.
       fit?: SectionFit;
+      // Blur-fill tuning / crop focus without builder controls (pass-through, see FootageEdits).
+      footage?: FootageEdits;
     } & VisualAudio &
       VisualPlayback &
       VisualCaption &
@@ -380,7 +374,7 @@ export type { Orientation };
 // (sourceVolume) vs the background music (musicVolume), each 0..1. normalize/ducking are
 // finishing options surfaced by the builder. `ducking` mirrors the descriptor union: false = off,
 // true = engine defaults, object = fine-tuned threshold/ratio/attack/release (DuckingSchema).
-export interface AudioMix {
+export interface AudioMix extends AudioMixPassthrough {
   sourceVolume: number;
   musicVolume: number;
   normalize?: 'loudnorm' | 'dynaudnorm';
@@ -389,23 +383,17 @@ export interface AudioMix {
 
 export const DEFAULT_AUDIO_MIX: AudioMix = { sourceVolume: 1, musicVolume: 0.5, ducking: false };
 
-// Default cross-section transition (maps to global.transition).
-export interface DefaultTransition {
-  type: string;
-  duration: number;
-}
-
-// The duration mirrors the ENGINE fallback (DEFAULT_TRANSITION_DURATION) so a descriptor that
-// leaves the duration unset re-hydrates — and re-emits — exactly what the engine renders.
-export const DEFAULT_TRANSITION: DefaultTransition = { type: 'cut', duration: DEFAULT_TRANSITION_DURATION };
-
 // Opacity used for a framing-guide silhouette when none is authored. Shared by the authoring
 // pickers (web + expo) and the live recording overlays so an unspecified guide renders exactly as
 // a freshly-added one. The guide is a recording aid only — never burned into the video.
 export const DEFAULT_FRAMING_OPACITY = 0.45;
 
-export interface EditorState extends Pick<NonNullable<TemplateDescriptor['meta']>, 'creativeDirection'> {
+export interface EditorState extends EditorMeta {
   id: string;
+  // Motion settings (global.seed, global.motion); absent when the template sets none.
+  motion?: EditorMotion;
+  // Per-format compositions (descriptor.formats), carried verbatim; absent when the template declares none.
+  formats?: EditorFormats;
   name: string;
   description: string;
   orientation: Orientation;

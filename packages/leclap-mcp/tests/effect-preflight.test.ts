@@ -4,10 +4,22 @@ import path from 'node:path';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { validateEffects, type EffectConfig } from '../src/effects/title-registry.js';
 import { acquireEffectJobPermit } from '../src/effects/effect-job-budget.js';
-import { probeMedia } from '../src/tools/probeMedia.js';
+import { probeMedia, type ProbeInfos } from '../src/tools/probeMedia.js';
 
 vi.mock('../src/tools/probeMedia.js', () => ({ probeMedia: vi.fn() }));
-const infos = { durationSeconds: 10, videoCodec: 'h264', audioCodec: null, sampleRate: null, sizeBytes: 4 };
+const infos: ProbeInfos = {
+  durationSeconds: 10,
+  videoCodec: 'h264',
+  audioCodec: null,
+  sampleRate: null,
+  sizeBytes: 4,
+  hdr: null,
+  colorPrimaries: null,
+  colorTransfer: null,
+  bitDepth: null,
+  vfr: false,
+  rotation: 0,
+};
 let directory: string;
 let config: EffectConfig;
 

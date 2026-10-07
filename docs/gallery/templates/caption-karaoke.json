@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "name": "Gallery: karaoke modes and crown",
+    "description": "subtitles.karaoke false, word, fill and pop on the loud DNA, then a crowned payoff line (crown: auto), for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 5,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "karaoke-false",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "loud",
+        "karaoke": false,
+        "position": "center",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "caption",
+            "start": 0.55,
+            "end": 1.0
+          },
+          {
+            "text": "follows",
+            "start": 1.05,
+            "end": 1.45
+          },
+          {
+            "text": "the",
+            "start": 1.5,
+            "end": 1.6
+          },
+          {
+            "text": "voice.",
+            "start": 1.65,
+            "end": 2.2
+          }
+        ]
+      }
+    },
+    {
+      "name": "karaoke-word",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "loud",
+        "karaoke": "word",
+        "position": "center",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "caption",
+            "start": 0.55,
+            "end": 1.0
+          },
+          {
+            "text": "follows",
+            "start": 1.05,
+            "end": 1.45
+          },
+          {
+            "text": "the",
+            "start": 1.5,
+            "end": 1.6
+          },
+          {
+            "text": "voice.",
+            "start": 1.65,
+            "end": 2.2
+          }
+        ]
+      }
+    },
+    {
+      "name": "karaoke-fill",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "loud",
+        "karaoke": "fill",
+        "position": "center",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "caption",
+            "start": 0.55,
+            "end": 1.0
+          },
+          {
+            "text": "follows",
+            "start": 1.05,
+            "end": 1.45
+          },
+          {
+            "text": "the",
+            "start": 1.5,
+            "end": 1.6
+          },
+          {
+            "text": "voice.",
+            "start": 1.65,
+            "end": 2.2
+          }
+        ]
+      }
+    },
+    {
+      "name": "karaoke-pop",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "loud",
+        "karaoke": "pop",
+        "position": "center",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "caption",
+            "start": 0.55,
+            "end": 1.0
+          },
+          {
+            "text": "follows",
+            "start": 1.05,
+            "end": 1.45
+          },
+          {
+            "text": "the",
+            "start": 1.5,
+            "end": 1.6
+          },
+          {
+            "text": "voice.",
+            "start": 1.65,
+            "end": 2.2
+          }
+        ]
+      }
+    },
+    {
+      "name": "crown",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 4.4
+      },
+      "subtitles": {
+        "style": "loud",
+        "position": "center",
+        "crown": "auto",
+        "words": [
+          {
+            "text": "Ship",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "it",
+            "start": 0.55,
+            "end": 0.7
+          },
+          {
+            "text": "today.",
+            "start": 0.75,
+            "end": 1.2
+          },
+          {
+            "text": "Same",
+            "start": 2.0,
+            "end": 2.3
+          },
+          {
+            "text": "frames",
+            "start": 2.35,
+            "end": 2.7
+          },
+          {
+            "text": "everywhere!",
+            "start": 2.75,
+            "end": 3.4
+          }
+        ]
+      }
+    }
+  ]
+}

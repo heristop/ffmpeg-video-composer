@@ -8,6 +8,8 @@
   "loading": "Vorschau wird geladen",
   "videoError": "Die Vorschau konnte nicht geladen werden. Erneut versuchen.",
   "retry": "Erneut versuchen",
+  "seek": "In der Vorschau springen",
+  "position": "{{current}} von {{total}}",
   "native": "Natives JSON",
   "downloadJson": "JSON herunterladen",
   "retrySource": "Quelle erneut laden",
@@ -35,6 +37,7 @@
     "all": "Alle Beispiele",
     "templates": "Vorlagen",
     "typography": "Typografie",
+    "effects": "Effekte & Schnitt",
     "overlays": "Overlays",
     "app-demos": "App-Demos",
     "evidence": "Review-Nachweise"

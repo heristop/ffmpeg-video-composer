@@ -4,7 +4,8 @@ import { useInView } from '@/hooks/useInView';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { Clappy, clappyHeight } from '@/presentation/components/clappy';
 import { RUN_CADENCE, runnerFrame } from '@/presentation/components/clappy/clappy.logic';
-import { advanceStride, facingAfter, railOffset, trackProgress } from './render-track.logic';
+import { railLeft } from '@/presentation/components/clappy/clappy-rail.logic';
+import { advanceStride, facingAfter, trackProgress } from './render-track.logic';
 
 /** Clappy's width in px: a size up from the loader's runner, since here the run is the whole moment. */
 const SIZE = 80;
@@ -26,7 +27,7 @@ interface TrackFrame {
   idle: boolean;
 }
 
-const AT_THE_LINE: TrackFrame = { progress: 0, x: 0, width: 0, stride: 0, facing: 1, idle: true };
+const AT_THE_LINE: TrackFrame = { progress: 0, x: -SIZE / 2, width: 0, stride: 0, facing: 1, idle: true };
 
 const sameFrame = (a: TrackFrame, b: TrackFrame): boolean =>
   a.progress === b.progress &&
@@ -63,7 +64,7 @@ export const RenderTrack = () => {
 
       const rect = lane.getBoundingClientRect();
       const progress = trackProgress(rect.top, globalThis.innerHeight);
-      const x = railOffset(progress, rect.width, SIZE);
+      const x = railLeft(progress, rect.width, SIZE);
       const onTheTrack = progress > 0 && progress < 1;
 
       setFrame((previous) => {
@@ -123,8 +124,9 @@ export const RenderTrack = () => {
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-4xl">
           <div ref={laneRef} className="relative" style={{ height: clappyHeight(SIZE) }}>
-            {/* The rail is the lane less Clappy's own width (render-track.logic.ts), so he stays on the track;
-                under reduced motion he simply stands at the finish. */}
+            {/* He stands on the fill's leading edge, as in the loader (clappy-rail.logic.ts): his back half
+                behind the line at the start, pulled up inside the lane at the finish. Under reduced motion he
+                simply stands at the finish. */}
             <div
               className={cn('absolute bottom-0 will-change-transform', reduced ? 'right-0' : 'left-0')}
               style={{ width: SIZE, transform: reduced ? undefined : `translateX(${frame.x}px)` }}

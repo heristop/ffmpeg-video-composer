@@ -1,0 +1,957 @@
+{
+  "meta": {
+    "name": "Effects tour: type",
+    "description": "Chapter 1 of the effects tour: every kinetic preset, exits, glyph units, gradient / texture / shimmer fills, echo trails, balanced wrapping and colour emoji in type.",
+    "creativeDirection": "One preset per beat, each named in a small mono label so the viewer learns the vocabulary while it moves. Ink and plum grounds, white Bebas, pink / yellow / lavender accents only. Review: every block lands before the cut and holds long enough to read, the label never collides with the headline, and fills read as the letters themselves."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 31,
+    "transition": {
+      "type": "cut"
+    },
+    "motion": {
+      "energy": 1
+    },
+    "overlays": [
+      {
+        "text": {
+          "en": "01  TYPE"
+        },
+        "position": "top-right",
+        "font": "mono",
+        "size": 24,
+        "color": "#C9C6D2",
+        "effect": {
+          "shadow": true
+        }
+      }
+    ]
+  },
+  "sections": [
+    {
+      "name": "kinetic-cascade",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 1.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · cascade"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Words cascade"
+          },
+          "preset": "cascade",
+          "size": 110,
+          "y": "center",
+          "delay": 0.15,
+          "accent": {
+            "words": "last",
+            "color": "#FFF685"
+          }
+        }
+      ]
+    },
+    {
+      "name": "kinetic-rise",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 1.9
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · rise"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Rise up"
+          },
+          "preset": "rise",
+          "size": 110,
+          "y": "center",
+          "delay": 0.15
+        }
+      ]
+    },
+    {
+      "name": "kinetic-drop",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 1.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · drop"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Drop from above"
+          },
+          "preset": "drop",
+          "size": 110,
+          "y": "center",
+          "delay": 0.15,
+          "accent": {
+            "words": "last",
+            "color": "#FF8AAE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "kinetic-slide",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 1.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · slide"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Slide in sideways"
+          },
+          "preset": "slide",
+          "size": 110,
+          "y": "center",
+          "delay": 0.15,
+          "direction": "left"
+        }
+      ]
+    },
+    {
+      "name": "kinetic-pop",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 1.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · pop"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Pop it!"
+          },
+          "preset": "pop",
+          "size": 150,
+          "y": "center",
+          "delay": 0.15
+        }
+      ]
+    },
+    {
+      "name": "kinetic-impact",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 1.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · impact"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "IMPACT"
+          },
+          "preset": "impact",
+          "size": 220,
+          "y": "center",
+          "delay": 0.15,
+          "color": "#FF8AAE"
+        }
+      ]
+    },
+    {
+      "name": "kinetic-tracking-in",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.55
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · tracking-in"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "TRACKING IN"
+          },
+          "preset": "tracking-in",
+          "size": 160,
+          "y": "center",
+          "delay": 0.15
+        }
+      ]
+    },
+    {
+      "name": "kinetic-typewriter",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.1
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · typewriter"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Typed one key at a time"
+          },
+          "preset": "typewriter",
+          "size": 54,
+          "y": "center",
+          "delay": 0.15,
+          "font": "mono"
+        }
+      ]
+    },
+    {
+      "name": "kinetic-scramble",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 2.1
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · scramble"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "DECODING SIGNAL"
+          },
+          "preset": "scramble",
+          "size": 84,
+          "y": "center",
+          "delay": 0.15,
+          "font": "mono",
+          "color": "#7C83FD"
+        }
+      ]
+    },
+    {
+      "name": "kinetic-wave",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.1
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · wave"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Riding the wave"
+          },
+          "preset": "wave",
+          "size": 120,
+          "y": "center",
+          "delay": 0.15
+        }
+      ]
+    },
+    {
+      "name": "kinetic-highlight",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 1.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · highlight"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Point at one word"
+          },
+          "preset": "highlight",
+          "size": 110,
+          "y": "center",
+          "delay": 0.15,
+          "accent": {
+            "words": "last"
+          }
+        }
+      ]
+    },
+    {
+      "name": "kinetic-counter",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 2.1
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · counter"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": ""
+          },
+          "preset": "counter",
+          "size": 200,
+          "y": "center",
+          "delay": 0.15,
+          "counter": {
+            "from": 0,
+            "to": 98.6,
+            "decimals": 1,
+            "suffix": "%"
+          },
+          "color": "#FFF685"
+        }
+      ]
+    },
+    {
+      "name": "kinetic-split",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.0
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · split"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Split. Settle."
+          },
+          "preset": "split",
+          "size": 110,
+          "y": "center",
+          "delay": 0.15
+        }
+      ]
+    },
+    {
+      "name": "kinetic-fade",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 1.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · fade"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "A calm, quiet fade"
+          },
+          "preset": "fade",
+          "size": 84,
+          "y": "center",
+          "delay": 0.15,
+          "font": "oswald"
+        }
+      ]
+    },
+    {
+      "name": "exits",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.7
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · exit: shrink / slide / cascade"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Shrink away"
+          },
+          "preset": "rise",
+          "size": 90,
+          "y": 170,
+          "delay": 0.1,
+          "ease": "$snappy",
+          "exit": {
+            "preset": "shrink",
+            "at": 1.8
+          }
+        },
+        {
+          "text": {
+            "en": "Slide away"
+          },
+          "preset": "rise",
+          "size": 90,
+          "y": 310,
+          "delay": 0.25,
+          "ease": "$expo",
+          "exit": {
+            "preset": "slide",
+            "at": 2.05
+          }
+        },
+        {
+          "text": {
+            "en": "Cascade away"
+          },
+          "preset": "rise",
+          "size": 90,
+          "y": 450,
+          "delay": 0.4,
+          "ease": "$gentle",
+          "exit": {
+            "preset": "cascade",
+            "at": 2.3
+          }
+        }
+      ]
+    },
+    {
+      "name": "units",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · unit: glyph · order: random"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "GLYPH BY GLYPH"
+          },
+          "preset": "rise",
+          "unit": "glyph",
+          "order": "random",
+          "stagger": 0.04,
+          "size": 140,
+          "y": "center",
+          "delay": 0.15
+        }
+      ]
+    },
+    {
+      "name": "fill-gradient",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · fill.gradient"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Colour in motion"
+          },
+          "preset": "cascade",
+          "font": "anton",
+          "size": 150,
+          "y": "center",
+          "delay": 0.15,
+          "color": "#FF8AAE",
+          "fill": {
+            "gradient": {
+              "from": "#FF8AAE",
+              "to": "#7C83FD",
+              "angle": 90
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fill-texture",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#0B0B0D",
+        "duration": 2.4
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.05
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · fill.texture"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "GOLDEN HOUR"
+          },
+          "preset": "rise",
+          "font": "anton",
+          "size": 220,
+          "y": "center",
+          "delay": 0.15,
+          "color": "#F2B866",
+          "fill": {
+            "texture": "backgrounds/golden-hour.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "fill-shimmer",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · fill.sweep (shimmer)"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "LECLAP"
+          },
+          "preset": "tracking-in",
+          "size": 210,
+          "y": "center",
+          "delay": 0.1,
+          "color": "#9EA3FF",
+          "fill": {
+            "gradient": {
+              "stops": ["#7C83FD", "#C9CBFF", "#7C83FD"],
+              "angle": 90
+            },
+            "sweep": {
+              "duration": 0.8,
+              "delay": 1.0,
+              "every": 1.2,
+              "color": "#FFFFFF@0.85"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "trail",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.0
+      },
+      "camera": {
+        "hits": [0.45]
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · trail (echoes)"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "SMEAR"
+          },
+          "preset": "impact",
+          "size": 230,
+          "y": "center",
+          "delay": 0.2,
+          "color": "#F5F3F7",
+          "trail": {
+            "echoes": 4,
+            "delta": 0.04,
+            "fade": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "name": "wrap",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 3.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "kinetic · wrap: greedy vs balanced"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "greedy"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 26,
+          "align": "left",
+          "x": 80,
+          "y": 120,
+          "color": "#FF8AAE",
+          "delay": 0.1,
+          "ease": "$expo"
+        },
+        {
+          "text": {
+            "en": "Wrap long lines without an orphan"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 64,
+          "align": "left",
+          "x": 80,
+          "y": 160,
+          "maxWidth": 660,
+          "wrap": "greedy",
+          "delay": 0.2,
+          "ease": "$snappy"
+        },
+        {
+          "text": {
+            "en": "balanced"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 26,
+          "align": "left",
+          "x": 80,
+          "y": 390,
+          "color": "#FFF685",
+          "delay": 0.5,
+          "ease": "linear"
+        },
+        {
+          "text": {
+            "en": "Wrap long lines without an orphan"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 64,
+          "align": "left",
+          "x": 80,
+          "y": 430,
+          "maxWidth": 660,
+          "wrap": "balanced",
+          "delay": 0.6,
+          "ease": "$gentle"
+        }
+      ]
+    },
+    {
+      "name": "emoji",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.3
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "emoji in type"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "id": "row",
+          "text": {
+            "en": "Ship it 🚀 🔥"
+          },
+          "preset": "drop",
+          "font": "anton",
+          "size": 150,
+          "y": "center",
+          "delay": 0.15,
+          "stagger": 0.12
+        }
+      ]
+    }
+  ]
+}

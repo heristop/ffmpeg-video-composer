@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { advanceStride, facingAfter, railOffset, trackProgress } from './render-track.logic';
+import { advanceStride, facingAfter, trackProgress } from './render-track.logic';
 
 describe('trackProgress', () => {
   const vh = 1000;
@@ -21,18 +21,6 @@ describe('trackProgress', () => {
 
   it('reads a missing viewport as the start line', () => {
     expect(trackProgress(100, 0)).toBe(0);
-  });
-});
-
-describe('railOffset', () => {
-  it('keeps the runner on the track: the rail is the lane less his width', () => {
-    expect(railOffset(0, 900, 80)).toBe(0);
-    expect(railOffset(1, 900, 80)).toBe(820);
-    expect(railOffset(0.5, 900, 80)).toBe(410);
-  });
-
-  it('never runs backwards off a lane narrower than the runner', () => {
-    expect(railOffset(1, 60, 80)).toBe(0);
   });
 });
 

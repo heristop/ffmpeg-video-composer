@@ -1,0 +1,26 @@
+{
+  "label": "Pulse ring (legacy APNG)",
+  "kind": "legacy",
+  "window": {
+    "at": 0.3,
+    "duration": 1.6
+  },
+  "section": {
+    "inputs": [
+      {
+        "name": "effect",
+        "type": "animation",
+        "url": "/assets/animations/pulse_ring.apng",
+        "options": {
+          "position": "{{squarePosition}}",
+          "scale": "{{squareScale}}",
+          "fit": "contain",
+          "persistent": false,
+          "start": "{{at}}",
+          "duration": "{{duration}}",
+          "opacity": 0.6
+        }
+      }
+    ]
+  }
+}

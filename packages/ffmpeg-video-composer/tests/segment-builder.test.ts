@@ -680,11 +680,11 @@ describe('SegmentBuilder structured-sugar injection', () => {
     expect(eqFilters).not.toContain('eq=contrast=1.2:saturation=1.3');
   });
 
-  it('calibrates Ken Burns on a project_video over the probed clip length with d=1 (no stretch)', async () => {
+  it('calibrates Ken Burns on a project_video over the probed clip length, one frame per frame (no stretch)', async () => {
     const segment = makeSegment();
     const managers = makeManagers();
     // Probed clip length 9s while the declared options.duration is 45s: the curve must use the
-    // probed 9s (frames=270 → step 0.000556) and d=1 so the clip is never time-stretched.
+    // probed 9s and map frames 1:1 (d=1) so the clip is never time-stretched.
     const project = makeProject({ videoConfig: { scale: '1280:720', setsar: '1/1' } }, { clip: 9 });
     const { builder } = makeBuilder({ segment, project, managers });
     builder.hydrate({ name: 'clip', type: 'project_video' });
@@ -703,7 +703,7 @@ describe('SegmentBuilder structured-sugar injection', () => {
     expect(zoompan).toBeDefined();
     expect(zoompan).toContain(':d=1:'); // one output frame per input frame — no slow-motion
     expect(zoompan).not.toContain(':d=270:');
-    expect(zoompan).toContain('zoom+0.000556'); // step (1.15-1)/270 → calibrated over probed 9s, not declared 45s
+    expect(zoompan).toContain('1+0.15*min(it/9,1)'); // calibrated over the probed 9s, not the declared 45s
   });
 
   it('does not inject sugar filters when look/grade/motion/layers are all absent', async () => {
@@ -722,9 +722,9 @@ describe('SegmentBuilder structured-sugar injection', () => {
     await builder.buildFilters();
 
     const types = (segment.filtersList as string[]).map((s) => s.split('=')[0]);
-    // The authored filter, then the always-on Rec.709 colour-normalisation tag — but no sugar filters
-    // (no drawbox, no zoompan, etc.). setparams is colour metadata, not structured sugar.
-    expect(types).toEqual(['hflip', 'setparams']);
+    // The CFR frame-grid conform, the authored filter, then the always-on Rec.709 colour-normalisation
+    // tag — but no sugar filters (no drawbox, no zoompan, etc.). Neither fps nor setparams is sugar.
+    expect(types).toEqual(['fps', 'hflip', 'setparams']);
   });
 });
 

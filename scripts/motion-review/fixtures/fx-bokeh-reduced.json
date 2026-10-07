@@ -1,0 +1,10 @@
+{
+  "label": "Bokeh under reduced motion (absent)",
+  "kind": "fx",
+  "window": { "at": 0.2, "duration": 5 },
+  "global": { "motion": { "energy": 0 } },
+  "formats": ["landscape"],
+  "section": {
+    "graphics": [{ "type": "fx", "effect": "bokeh", "target": "frame", "at": "{{at}}", "duration": "{{duration}}" }]
+  }
+}

@@ -83,6 +83,7 @@ export const FilmScreen = ({
   control,
   controlLabel,
   paused = false,
+  raised = false,
   children,
 }: {
   /** The label pill, if any. */
@@ -93,6 +94,8 @@ export const FilmScreen = ({
   controlLabel?: string;
   /** Whether the video is stopped: the sprocket holes stop with it, like film in a projector. */
   paused?: boolean;
+  /** Lift the control pill clear of a seek bar along the bottom edge. */
+  raised?: boolean;
   children: ReactNode;
 }) => (
   <div className="relative aspect-video overflow-hidden rounded-[inherit] bg-black [clip-path:inset(0_round_0.75rem)] sm:[clip-path:inset(0_round_1rem)]">
@@ -111,7 +114,10 @@ export const FilmScreen = ({
       <div
         role="group"
         aria-label={controlLabel}
-        className="absolute bottom-3 right-3 flex items-center gap-3 rounded-full bg-black/60 px-1.5 py-1 ring-1 ring-white/15 backdrop-blur-sm"
+        className={cn(
+          'absolute right-3 flex items-center gap-3 rounded-full bg-black/60 px-1.5 py-1 ring-1 ring-white/15 backdrop-blur-sm',
+          raised ? 'bottom-10' : 'bottom-3'
+        )}
       >
         {control}
       </div>

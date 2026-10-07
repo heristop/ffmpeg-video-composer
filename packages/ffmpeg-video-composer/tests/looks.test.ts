@@ -300,8 +300,13 @@ describe('letterboxToFilters', () => {
 // ---------------------------------------------------------------------------
 
 const CTX_6S = { duration: 6, scale: '1280:720', fps: 30 };
-// frames = round(6 * 30) = 180
-// step (default intensity=1.15) = (1.15-1)/180 = 0.000833...rounded to 6dp = 0.000833
+
+// The exact sub-pixel zoom (core/motion/zoom-exact.ts): restamp, per-frame scale, 4:4:4, zoompan d=1.
+const ZOOM_SHAPE = ['setpts', 'scale', 'format', 'zoompan', 'format'];
+
+function zoompanOf(filters: Filter[]): string {
+  return String(filters.find((f) => f.type === 'zoompan')?.value);
+}
 
 describe('motionToFilters', () => {
   it('returns [] for undefined', () => {
@@ -313,117 +318,60 @@ describe('motionToFilters', () => {
   });
 
   describe('kenburns in', () => {
-    it('emits pre-upscale + zoompan with min(zoom+step,intensity)', () => {
+    it('lowers to the exact zoom: one frame per frame, zoom linear over the duration', () => {
       const filters = motionToFilters([{ type: 'kenburns', direction: 'in', intensity: 1.15 }], CTX_6S);
-      expect(filters).toHaveLength(2);
+      expect(filters.map((f) => f.type)).toEqual(ZOOM_SHAPE);
+      expect(filters[0]).toEqual<Filter>({ type: 'setpts', value: 'N/(30*TB)' });
+      expect(String(filters[1].value)).toContain(':eval=frame:flags=bicubic');
 
-      const [upscale, zp] = filters;
-      expect(upscale).toEqual<Filter>({ type: 'scale', value: '2560:-2' });
-
-      expect(zp.type).toBe('zoompan');
-      const val = String(zp.value);
-      expect(val).toContain("z='min(zoom+0.000833,1.15)'");
-      expect(val).toContain("x='iw/2-(iw/zoom/2)'");
-      expect(val).toContain("y='ih/2-(ih/zoom/2)'");
-      expect(val).toContain(':d=180:s=1280x720:fps=30');
+      const val = zoompanOf(filters);
+      expect(val).toContain('max(1,1+0.15*min(it/6,1))');
+      expect(val).toContain(':d=1:s=1280x720:fps=30');
+      // No whole-pixel pre-upscale any more.
+      expect(filters.some((f) => f.value === '2560:-2')).toBe(false);
     });
 
     it('uses default intensity 1.15 and direction in when both omitted', () => {
-      const filters = motionToFilters([{ type: 'kenburns' }], CTX_6S);
-      const zp = filters[1];
-      expect(String(zp.value)).toContain("z='min(zoom+0.000833,1.15)'");
+      expect(zoompanOf(motionToFilters([{ type: 'kenburns' }], CTX_6S))).toContain('1+0.15*min(it/6,1)');
     });
   });
 
   describe('kenburns out', () => {
-    it('emits zoompan with if(eq(on,1),intensity,...) pattern', () => {
-      const filters = motionToFilters([{ type: 'kenburns', direction: 'out', intensity: 1.15 }], CTX_6S);
-      expect(filters).toHaveLength(2);
-
-      const [upscale, zp] = filters;
-      expect(upscale).toEqual<Filter>({ type: 'scale', value: '2560:-2' });
-
-      const val = String(zp.value);
-      expect(val).toContain("z='if(eq(on,1),1.15,max(zoom-0.000833,1.0))'");
-      expect(val).toContain(':d=180:s=1280x720:fps=30');
+    it('starts at the intensity and settles to 1', () => {
+      const val = zoompanOf(motionToFilters([{ type: 'kenburns', direction: 'out', intensity: 1.15 }], CTX_6S));
+      expect(val).toContain('max(1,1.15-0.15*min(it/6,1))');
     });
   });
 
-  describe('kenburns left', () => {
-    it('emits zoompan with x panning left-to-right (increasing x)', () => {
-      const filters = motionToFilters([{ type: 'kenburns', direction: 'left', intensity: 1.15 }], CTX_6S);
-      const zp = filters[1];
-      const val = String(zp.value);
-      expect(val).toContain("z='1.15'");
-      expect(val).toContain("x='(iw-iw/zoom)*(on/180)'");
-      expect(val).toContain("y='ih/2-(ih/zoom/2)'");
-      expect(val).toContain(':d=180:s=1280x720:fps=30');
+  describe('kenburns pans', () => {
+    // The view centre travels the whole overscan, W*(intensity-1)/2 each side, in output px.
+    it.each([
+      ['left', 'x', '96*(2*min(it/6,1)-1)'],
+      ['right', 'x', '96*(1-2*min(it/6,1))'],
+      ['up', 'y', '54*(2*min(it/6,1)-1)'],
+      ['down', 'y', '54*(1-2*min(it/6,1))'],
+    ] as const)('%s pans %s at a held zoom', (direction, axis, pan) => {
+      const val = zoompanOf(motionToFilters([{ type: 'kenburns', direction, intensity: 1.15 }], CTX_6S));
+      expect(val).toContain(`${axis}='round((${axis === 'x' ? 640 : 360}+(${pan})/(max(1,1.15)))`);
     });
   });
 
-  describe('kenburns right', () => {
-    it('emits zoompan with x panning right-to-left (decreasing x)', () => {
-      const filters = motionToFilters([{ type: 'kenburns', direction: 'right', intensity: 1.15 }], CTX_6S);
-      const zp = filters[1];
-      const val = String(zp.value);
-      expect(val).toContain("z='1.15'");
-      expect(val).toContain("x='(iw-iw/zoom)*(1-on/180)'");
-      expect(val).toContain("y='ih/2-(ih/zoom/2)'");
-    });
-  });
+  // Video sections must not be time-stretched: an fps conform first, then the zoom maps frames 1:1,
+  // calibrated over the clip's real (probed) length.
+  describe('kenburns on video', () => {
+    const CTX_VIDEO = { duration: 9, scale: '1280:720', fps: 30, isVideo: true };
 
-  describe('kenburns up', () => {
-    it('emits zoompan with y panning upward (increasing y offset)', () => {
-      const filters = motionToFilters([{ type: 'kenburns', direction: 'up', intensity: 1.15 }], CTX_6S);
-      const zp = filters[1];
-      const val = String(zp.value);
-      expect(val).toContain("y='(ih-ih/zoom)*(on/180)'");
-    });
-  });
-
-  describe('kenburns down', () => {
-    it('emits zoompan with y panning downward (decreasing y offset)', () => {
-      const filters = motionToFilters([{ type: 'kenburns', direction: 'down', intensity: 1.15 }], CTX_6S);
-      const zp = filters[1];
-      const val = String(zp.value);
-      expect(val).toContain("y='(ih-ih/zoom)*(1-on/180)'");
-    });
-  });
-
-  // Video sections must not be time-stretched by zoompan: d=1 emits exactly one output frame per
-  // input frame, while `frames` still calibrates the zoom/pan curve over the clip's real (probed)
-  // length. Stills keep d=frames (the blocks above). See kenburnsToFilters / injectSugarFilters.
-  describe('kenburns on video (isVideo → d=1)', () => {
-    const CTX_VIDEO = { duration: 9, scale: '1280:720', fps: 30, isVideo: true }; // frames = 270
-
-    it('conforms fps, then pre-upscales, then a d=1 zoompan calibrated over the real frame count', () => {
+    it('conforms fps, then the exact zoom calibrated over the real length', () => {
       const filters = motionToFilters([{ type: 'kenburns', direction: 'in', intensity: 1.2 }], CTX_VIDEO);
-      expect(filters).toHaveLength(3);
-
-      // fps conform first so a non-30fps clip keeps real time under the d=1 1:1 frame mapping.
+      expect(filters.map((f) => f.type)).toEqual(['fps', ...ZOOM_SHAPE]);
       expect(filters[0]).toEqual<Filter>({ type: 'fps', value: '30' });
-      expect(filters[1]).toEqual<Filter>({ type: 'scale', value: '2560:-2' });
-
-      const zp = filters[2];
-      expect(zp.type).toBe('zoompan');
-      const val = String(zp.value);
-      expect(val).toContain("z='min(zoom+0.000741,1.2)'"); // step = (1.2-1)/270
-      expect(val).toContain(':d=1:s=1280x720:fps=30');
-      expect(val).not.toContain(':d=270:');
+      expect(zoompanOf(filters)).toContain('1+0.2*min(it/9,1)');
     });
 
-    it('pans over the real frame count with d=1 (left)', () => {
-      const filters = motionToFilters([{ type: 'kenburns', direction: 'left', intensity: 1.2 }], CTX_VIDEO);
-      const zp = filters.find((f) => f.type === 'zoompan');
-      const val = String(zp?.value);
-      expect(val).toContain("x='(iw-iw/zoom)*(on/270)'");
-      expect(val).toContain(':d=1:');
-    });
-
-    it('stills are unaffected: the same effect without isVideo keeps d=frames', () => {
+    it('stills skip the conform (their stream is already on the frame clock)', () => {
       const stillCtx = { duration: 9, scale: '1280:720', fps: 30 };
-      const val = String(motionToFilters([{ type: 'kenburns', direction: 'in', intensity: 1.2 }], stillCtx)[1].value);
-      expect(val).toContain(':d=270:');
+      const filters = motionToFilters([{ type: 'kenburns', direction: 'in', intensity: 1.2 }], stillCtx);
+      expect(filters.map((f) => f.type)).toEqual(ZOOM_SHAPE);
     });
   });
 
@@ -507,53 +455,23 @@ describe('motionToFilters', () => {
     });
   });
 
-  // pulse: rhythmic zoompan oscillation around the frame centre, mirroring kenburnsToFilters's
-  // pre-upscale + isVideo (d=1 vs d=frames) handling. The zoompan `s=` param already outputs at
-  // ctx.scale, so — unlike shake — no separate trailing scale filter is required.
+  // pulse: a rhythmic zoom around the frame centre through the same exact zoom (output at ctx.scale).
   describe('pulse', () => {
-    it('emits pre-upscale + zoompan with default intensity=1.08, frequency=1 (still: d=frames)', () => {
+    it('oscillates between 1 and the intensity (defaults 1.08, 1 Hz)', () => {
       const filters = motionToFilters([{ type: 'pulse' }], CTX_6S);
-      expect(filters).toHaveLength(2);
-
-      const [upscale, zp] = filters;
-      expect(upscale).toEqual<Filter>({ type: 'scale', value: '2560:-2' });
-
-      expect(zp.type).toBe('zoompan');
-      const val = String(zp.value);
-      expect(val).toContain("z='1+0.080*0.5*(1+sin(2*PI*1*on/30))'");
-      expect(val).toContain("x='iw/2-(iw/zoom/2)'");
-      expect(val).toContain("y='ih/2-(ih/zoom/2)'");
-      expect(val).toContain(':d=180:s=1280x720:fps=30');
+      expect(filters.map((f) => f.type)).toEqual(ZOOM_SHAPE);
+      expect(zoompanOf(filters)).toContain('1+0.080*0.5*(1+sin(2*PI*1*it))');
+      expect(zoompanOf(filters)).toContain(':d=1:s=1280x720:fps=30');
     });
 
     it('honours explicit intensity and frequency', () => {
       const filters = motionToFilters([{ type: 'pulse', intensity: 1.2, frequency: 0.5 }], CTX_6S);
-      const zp = filters[1];
-      expect(String(zp.value)).toContain("z='1+0.200*0.5*(1+sin(2*PI*0.5*on/30))'");
+      expect(zoompanOf(filters)).toContain('1+0.200*0.5*(1+sin(2*PI*0.5*it))');
     });
 
-    describe('on video (isVideo → d=1)', () => {
-      const CTX_VIDEO = { duration: 9, scale: '1280:720', fps: 30, isVideo: true }; // frames = 270
-
-      it('conforms fps, then pre-upscales, then a d=1 zoompan', () => {
-        const filters = motionToFilters([{ type: 'pulse' }], CTX_VIDEO);
-        expect(filters).toHaveLength(3);
-
-        expect(filters[0]).toEqual<Filter>({ type: 'fps', value: '30' });
-        expect(filters[1]).toEqual<Filter>({ type: 'scale', value: '2560:-2' });
-
-        const zp = filters[2];
-        const val = String(zp.value);
-        expect(val).toContain("z='1+0.080*0.5*(1+sin(2*PI*1*on/30))'");
-        expect(val).toContain(':d=1:s=1280x720:fps=30');
-        expect(val).not.toContain(':d=270:');
-      });
-
-      it('stills are unaffected: the same effect without isVideo keeps d=frames', () => {
-        const stillCtx = { duration: 9, scale: '1280:720', fps: 30 };
-        const val = String(motionToFilters([{ type: 'pulse' }], stillCtx)[1].value);
-        expect(val).toContain(':d=270:');
-      });
+    it('conforms fps first on video', () => {
+      const filters = motionToFilters([{ type: 'pulse' }], { ...CTX_6S, isVideo: true });
+      expect(filters.map((f) => f.type)).toEqual(['fps', ...ZOOM_SHAPE]);
     });
   });
 
@@ -568,16 +486,13 @@ describe('motionToFilters', () => {
     expect(filters[1].type).toBe('rotate');
   });
 
-  it('kenburns + flip emits 3 filters total (upscale, zoompan, hflip)', () => {
+  it('kenburns + flip emits the zoom then hflip', () => {
     const motion: MotionEffect[] = [
       { type: 'kenburns', direction: 'in' },
       { type: 'flip', axis: 'horizontal' },
     ];
     const filters = motionToFilters(motion, CTX_6S);
-    expect(filters).toHaveLength(3);
-    expect(filters[0].type).toBe('scale');
-    expect(filters[1].type).toBe('zoompan');
-    expect(filters[2].type).toBe('hflip');
+    expect(filters.map((f) => f.type)).toEqual([...ZOOM_SHAPE, 'hflip']);
   });
 });
 

@@ -46,6 +46,10 @@ build_abi() {
   local FT_PREFIX="$SCRIPT_DIR/deps/android/$ABI"
   [ -f "$FT_PREFIX/lib/pkgconfig/freetype2.pc" ] || {
     echo "[ffmpeg][$ABI] missing libfreetype — run scripts/ffmpeg/build-deps.sh $ABI first"; exit 1; }
+  # --enable-libfribidi (FF_COMMON) resolves fribidi.pc from the same prefix; a deps tree built before
+  # fribidi was added fails configure with "fribidi not found" — rebuild the deps instead.
+  [ -f "$FT_PREFIX/lib/pkgconfig/fribidi.pc" ] || {
+    echo "[ffmpeg][$ABI] missing libfribidi — run scripts/ffmpeg/build-deps.sh $ABI first"; exit 1; }
   export PKG_CONFIG_PATH="$FT_PREFIX/lib/pkgconfig"
 
   # Rename the fftools `main` → ffmpeg_main/ffprobe_main (+ re-entrancy reset) so the CLI can be

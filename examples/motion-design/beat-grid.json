@@ -1,0 +1,147 @@
+{
+  "meta": {
+    "name": "On the beat",
+    "description": "A 120 BPM beat grid drives everything: section lengths in bars, entrances on beat:n, camera hits and flashes on every downbeat, and a click track of bundled sound effects placed on the same grid.",
+    "creativeDirection": "Audience: editors cutting to music who want motion locked to the tempo without measuring frames. Direction: a count-in where each number pops exactly on its beat, a build whose headline arrives just ahead of the bar while a riser climbs into the drop, a two-bar drop that punches the camera on every beat and flashes on each downbeat, and a one-bar close. The audible click (tick on beats, hit on downbeats) proves the sync. Review: every pop and hit lands on its click, entrances lead the beat slightly rather than trail it, the riser ends exactly on the drop, and no section ends off the bar line."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 4,
+    "transition": { "type": "cut" },
+    "beats": { "bpm": 120, "offset": 0, "beatsPerBar": 4 },
+    "sfx": [
+      { "id": "hit", "at": "bar:1", "volume": 0.55 },
+      { "id": "tick", "at": "beat:2" },
+      { "id": "tick", "at": "beat:3" },
+      { "id": "tick", "at": "beat:4" },
+      { "id": "hit", "at": "bar:2", "volume": 0.55 },
+      { "id": "tick", "at": "beat:6" },
+      { "id": "tick", "at": "beat:7" },
+      { "id": "tick", "at": "beat:8" },
+      { "id": "riser", "at": "bar:3", "volume": 0.45 },
+      { "id": "boom", "at": "bar:3", "volume": 0.7 },
+      { "id": "tick", "at": "beat:10" },
+      { "id": "tick", "at": "beat:11" },
+      { "id": "tick", "at": "beat:12" },
+      { "id": "hit", "at": "bar:4", "volume": 0.6 },
+      { "id": "tick", "at": "beat:14" },
+      { "id": "tick", "at": "beat:15" },
+      { "id": "tick", "at": "beat:16" },
+      { "id": "hit", "at": "bar:5", "volume": 0.55 },
+      { "id": "ding", "at": "beat:19", "volume": 0.4 }
+    ]
+  },
+  "sections": [
+    {
+      "name": "count-in",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": { "bars": 1 } },
+      "kinetic": [
+        {
+          "text": { "en": "1" },
+          "preset": "pop",
+          "role": "accent",
+          "size": 200,
+          "x": 340,
+          "y": "center",
+          "delay": "beat:1 + 0.05",
+          "color": "#FF8AAE"
+        },
+        {
+          "text": { "en": "2" },
+          "preset": "rise",
+          "role": "micro",
+          "size": 200,
+          "x": 540,
+          "y": "center",
+          "delay": "beat:2 - 0.06"
+        },
+        {
+          "text": { "en": "3" },
+          "preset": "rise",
+          "role": "micro",
+          "ease": "$expo",
+          "size": 200,
+          "x": 740,
+          "y": "center",
+          "delay": "beat:3 - 0.06"
+        },
+        {
+          "text": { "en": "4" },
+          "preset": "rise",
+          "role": "micro",
+          "ease": "$smooth",
+          "size": 200,
+          "x": 940,
+          "y": "center",
+          "delay": "beat:4 - 0.06"
+        }
+      ]
+    },
+    {
+      "name": "build",
+      "type": "color_background",
+      "options": { "backgroundColor": "#1B1830", "duration": { "bars": 1 } },
+      "camera": { "preset": "push-in", "amount": 0.08 },
+      "kinetic": [
+        {
+          "id": "title",
+          "text": { "en": "Cut on time" },
+          "preset": "cascade",
+          "size": 150,
+          "y": "center",
+          "delay": "beat:5 + 0.1",
+          "accent": { "words": "last", "color": "#FFF685" }
+        }
+      ]
+    },
+    {
+      "name": "drop",
+      "type": "color_background",
+      "options": { "backgroundColor": "#7C83FD", "duration": { "bars": 2 } },
+      "camera": {
+        "hits": ["beat:9", "beat:10", "beat:11", "beat:12", "beat:13", "beat:14", "beat:15", "beat:16"]
+      },
+      "graphics": [
+        { "type": "flash", "at": "bar:3", "duration": 0.25, "intensity": 0.6 },
+        { "type": "flash", "at": "bar:4", "duration": 0.25, "intensity": 0.5 },
+        {
+          "type": "progress",
+          "at": "bar:3",
+          "duration": 4,
+          "thickness": 10,
+          "color": "#141416",
+          "track": "#141416@0.2"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": { "en": "DROP" },
+          "preset": "impact",
+          "size": 260,
+          "y": "center",
+          "color": "#141416",
+          "delay": "beat:9 + 0.1",
+          "trail": { "echoes": 3, "delta": 0.04, "fade": 0.45 }
+        }
+      ]
+    },
+    {
+      "name": "close",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": { "bars": 1 } },
+      "kinetic": [
+        {
+          "text": { "en": "Locked in." },
+          "preset": "split",
+          "size": 110,
+          "y": "center",
+          "delay": "bar:5 + 0.1",
+          "accent": { "words": "first", "color": "#FF8AAE" }
+        }
+      ]
+    }
+  ]
+}

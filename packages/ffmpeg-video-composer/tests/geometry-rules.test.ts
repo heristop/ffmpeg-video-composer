@@ -169,6 +169,15 @@ describe('collisionWarnings', () => {
     expect(collisionWarnings([a, b])).toEqual([]);
   });
 
+  it('treats back-to-back windows that differ by float rounding as touching', () => {
+    // A global overlay repeated on consecutive sections: 2.1 + 2.1 + 2.1 accumulates to 6.300000000000001.
+    const end = 2.1 + 2.1 + 2.1;
+    const a = box({ path: 'global.overlays[0]', startSec: 4.2, endSec: end });
+    const b = box({ path: 'global.overlays[0]', startSec: 6.3 - 1e-9, endSec: 8.4 });
+
+    expect(collisionWarnings([a, b])).toEqual([]);
+  });
+
   it('says nothing about simultaneous boxes that do not overlap in space', () => {
     const a = box({ path: 'sections[0].caption', x: 0, y: 100, startSec: 0, endSec: 5 });
     const b = box({ path: 'sections[1].caption', x: 0, y: 600, startSec: 0, endSec: 5 });

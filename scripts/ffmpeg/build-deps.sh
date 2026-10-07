@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Cross-build libfreetype (static) for Android — the only external dep FFmpeg needs for `drawtext`.
+# Cross-build the FFmpeg external deps (static) for Android: libfreetype + libharfbuzz + libfribidi
+# (drawtext), libopenh264 (encoder) and libvpx (VP9-alpha decoder).
 # Output: scripts/ffmpeg/deps/android/<abi>/{lib,include} with a pkg-config file freetype2.pc that
 # build-android.sh points FFmpeg's configure at (via PKG_CONFIG_PATH). Usage: build-deps.sh [abi ...]
 set -euo pipefail
@@ -35,6 +36,7 @@ abi_to_host() {
 OH264_SRC="$WORK_DIR/openh264"
 HB_SRC="$WORK_DIR/harfbuzz-$HARFBUZZ_VERSION"
 LIBVPX_SRC="$WORK_DIR/libvpx-$LIBVPX_VERSION"
+FRIBIDI_SRC="$WORK_DIR/fribidi-$FRIBIDI_VERSION"
 
 fetch_freetype() {
   mkdir -p "$WORK_DIR"
@@ -73,6 +75,43 @@ fetch_libvpx() {
   else
     echo "[libvpx] source present at $LIBVPX_SRC"
   fi
+}
+
+# The release tarball ships a ready autotools `configure` and pre-generated Unicode tables (lib/*.tab.i),
+# so the cross-build needs no host generator run — the same recipe as freetype.
+fetch_fribidi() {
+  if [ ! -f "$FRIBIDI_SRC/configure" ]; then
+    echo "[fribidi] fetching $FRIBIDI_VERSION ..."
+    curl -fsSL "https://github.com/fribidi/fribidi/releases/download/v$FRIBIDI_VERSION/fribidi-$FRIBIDI_VERSION.tar.xz" \
+      | tar -xJ -C "$WORK_DIR"
+  else
+    echo "[fribidi] source present at $FRIBIDI_SRC"
+  fi
+}
+
+# Cross-build libfribidi (static, pure C, LGPL-2.1) — enables drawtext's `text_shaping` (bidi reordering of
+# Arabic/Hebrew lines; HarfBuzz does the glyph shaping). Only the library is built (`make -C lib`: no
+# bin/doc/test, so no c2man or host-run tests); fribidi.pc lands in the shared per-abi prefix that
+# build-android.sh already has on PKG_CONFIG_PATH, and its Cflags carry -DFRIBIDI_LIB_STATIC.
+build_fribidi_abi() {
+  local ABI="$1" TRIPLE HOST CC PREFIX
+  TRIPLE="$(abi_to_triple "$ABI")"
+  HOST="$(abi_to_host "$ABI")"
+  CC="$TOOLCHAIN/bin/${TRIPLE}${ANDROID_API}-clang"
+  PREFIX="$DEPS_DIR/android/$ABI"
+  echo "[fribidi][$ABI] configure ..."
+  ( cd "$FRIBIDI_SRC" && make distclean >/dev/null 2>&1 || true
+    ./configure \
+      --host="$HOST" --prefix="$PREFIX" \
+      --enable-static --disable-shared --with-pic --disable-debug --disable-deprecated \
+      CC="$CC" \
+      AR="$TOOLCHAIN/bin/llvm-ar" RANLIB="$TOOLCHAIN/bin/llvm-ranlib" \
+      CFLAGS="-O2 -fPIC -DANDROID -D__ANDROID_API__=$ANDROID_API"
+    make -j"$(sysctl -n hw.ncpu)" -C lib
+    make -C lib install
+    make install-pkgconfigDATA ) || { echo "[fribidi][$ABI] BUILD FAILED"; exit 1; }
+  [ -f "$PREFIX/lib/libfribidi.a" ] || { echo "[fribidi][$ABI] libfribidi.a not installed"; exit 1; }
+  echo "[fribidi][$ABI] installed → $PREFIX"
 }
 
 # Cross-build libharfbuzz (static, WITH freetype) — drawtext in FFmpeg 8.0 needs both. Uses the NDK's
@@ -204,10 +243,13 @@ fetch_freetype
 fetch_openh264
 fetch_harfbuzz
 fetch_libvpx
+fetch_fribidi
 ABIS=("$@")
 [ ${#ABIS[@]} -eq 0 ] && read -ra ABIS <<< "$ANDROID_ABIS"
-# Order matters: freetype first, then harfbuzz (needs freetype), then openh264 + libvpx (independent).
+# Order matters: freetype first, then harfbuzz (needs freetype), then openh264 + libvpx + fribidi
+# (independent).
 for abi in "${ABIS[@]}"; do
   build_abi "$abi"; build_harfbuzz_abi "$abi"; build_openh264_abi "$abi"; build_libvpx_abi "$abi"
+  build_fribidi_abi "$abi"
 done
-echo "[deps] android deps complete (freetype + harfbuzz + openh264 + libvpx): ${ABIS[*]}"
+echo "[deps] android deps complete (freetype + harfbuzz + openh264 + libvpx + fribidi): ${ABIS[*]}"

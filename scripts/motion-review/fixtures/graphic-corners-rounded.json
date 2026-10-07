@@ -1,0 +1,19 @@
+{
+  "label": "Corners: rounded elbows, white with auto contrast (shadow), fade exit",
+  "kind": "graphic",
+  "window": { "at": 0.3, "duration": 1.3 },
+  "moments": [0.25, 0.36, 0.5, 0.9, 1.45, 1.65],
+  "section": {
+    "graphics": [
+      {
+        "type": "corners",
+        "at": "{{at}}",
+        "until": 1.6,
+        "target": "{{target}}",
+        "radius": 14,
+        "exit": "fade",
+        "color": "#FFFFFF"
+      }
+    ]
+  }
+}

@@ -15,13 +15,14 @@
     "orientation": "landscape",
     "musicEnabled": true,
     "music": {
-      "name": "future-bass-energy.mp3"
+      "name": "chill-hip-hop.mp3"
     },
-    "allowedMusic": ["future-bass-energy", "upbeat-electronic", "lofi-hip-hop", "party-dance", "indie-rock-dreamy"],
+    "allowedMusic": ["chill-hip-hop", "lofi-study", "lofi-hip-hop", "party-dance", "indie-rock-dreamy"],
     "allowUploadMusic": true,
     "transition": {
-      "type": "fade",
-      "duration": 0.2
+      "type": "push-left",
+      "duration": 0.35,
+      "ease": "$snappy"
     },
     "audio": {
       "sourceVolume": 1,
@@ -40,10 +41,6 @@
     {
       "name": "intro",
       "type": "color_background",
-      "transition": {
-        "type": "fade",
-        "duration": 0.4
-      },
       "titleCard": {
         "kicker": {
           "en": "FAST & CURIOUS"
@@ -64,6 +61,10 @@
       "options": {
         "backgroundColor": "#141416",
         "duration": 3.5
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.09
       }
     },
     {
@@ -164,6 +165,19 @@
             "color": "#141416"
           }
         }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "grain",
+          "target": "frame",
+          "at": 0,
+          "duration": 12,
+          "size": 1.6,
+          "animated": true,
+          "ramp": 0.3,
+          "intensity": 0.8
+        }
       ]
     },
     {
@@ -242,6 +256,19 @@
           "values": {
             "color": "#141416"
           }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "grain",
+          "target": "frame",
+          "at": 0,
+          "duration": 12,
+          "size": 1.6,
+          "animated": true,
+          "ramp": 0.3,
+          "intensity": 0.8
         }
       ]
     },
@@ -322,6 +349,19 @@
             "color": "#141416"
           }
         }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "grain",
+          "target": "frame",
+          "at": 0,
+          "duration": 12,
+          "size": 1.6,
+          "animated": true,
+          "ramp": 0.3,
+          "intensity": 0.8
+        }
       ]
     },
     {
@@ -348,6 +388,10 @@
       "options": {
         "backgroundColor": "#141416",
         "duration": 4
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.09
       }
     },
     {

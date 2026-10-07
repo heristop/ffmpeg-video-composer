@@ -43,7 +43,7 @@ describe('needsMediaStep', () => {
   it('returns true when both music and background options are present', () => {
     expect(
       needsMediaStep({
-        allowedMusic: ['americana', 'arcadia'],
+        allowedMusic: ['lofi-cafe', 'once-in-paris'],
         allowUploadMusic: true,
         allowedBackgrounds: ['forest-sea'],
         allowUploadBackground: false,

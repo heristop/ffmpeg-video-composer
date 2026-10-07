@@ -8,19 +8,14 @@ import DefaultConfig from '../../core/default.config';
 import type { Filter, FilterValues } from '@/core/types';
 import type VariableManager from './VariableManager';
 import { isFontRef, fontRefSlug, type FontInput } from '@/core/fonts';
-
-// Reserved FFmpeg drawtext characters and their escaped replacements.
-const TEXT_ESCAPES: Record<string, string> = {
-  ':': '\\\u003A',
-  "'": '\u2019',
-  '%': '\\\\\\\u0025',
-};
+import { escapeDrawtextText } from '@/core/drawtext-text';
+import { lutFileStem } from '../presets/lut-spec';
 
 // The whole filtergraph is emitted as one double-quoted `-vf "…"` argv token, and parseCommand
 // toggles its quote state on any inner `"`. So a literal `"` (or a NUL) in a filter type/value would
 // close the token and let extra ffmpeg arguments be injected. Neither is ever valid filter syntax,
 // so strip them from every value interpolated into a filter. (Display text neutralises `"` to a
-// curly quote in formatText instead, so authored captions can still contain quote marks.)
+// curly quote in escapeDrawtextText instead, so authored captions can still contain quote marks.)
 function stripFilterUnsafe(value: string): string {
   return value.replaceAll('"', '').replaceAll(String.fromCodePoint(0), '');
 }
@@ -89,16 +84,17 @@ class FormatterManager {
     return `scale=${scale}:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=${scale}:(ow-iw)/2:(oh-ih)/2,setsar=1`;
   }
 
-  // A LUT look carries the LUT *name* as its value (e.g. "teal-orange"). Register it for staging (same
-  // role as tempFonts) and rewrite it to a lut3d reading the generated `.cube` from the build FS.
+  // A LUT look carries a LUT spec as its value (e.g. "teal-orange", "teal-orange@0.6", "url:…@1", see
+  // presets/lut-spec.ts). Register it for staging (same role as tempFonts) and rewrite it to a lut3d
+  // reading the staged `.cube` from the build FS; a bare preset name keeps its historical file name.
   private formatLut3d(name: string): string {
-    const safeName = stripFilterUnsafe(name);
+    const spec = stripFilterUnsafe(name);
 
-    if (!this.segment.tempLuts.includes(safeName)) {
-      this.segment.tempLuts.push(safeName);
+    if (!this.segment.tempLuts.includes(spec)) {
+      this.segment.tempLuts.push(spec);
     }
 
-    return `lut3d=file='${this.segment.lutsDir}/${safeName}.cube'`;
+    return `lut3d=file='${this.segment.lutsDir}/${lutFileStem(spec)}.cube'`;
   }
 
   private formatTextValue(key: string, values: ExtendedFilterValues): string | null {
@@ -235,6 +231,12 @@ class FormatterManager {
         this.pushIfPresent(parts, this.formatTextValue(key, filterValues));
         break;
 
+      // Engine-generated drawtext text that carries `%{…}` expansions (kinetic counters): emitted as
+      // authored by the lowering, which escapes its literal parts itself. Never reachable from JSON.
+      case 'textExpr':
+        parts.push(`text='${stripFilterUnsafe(String(filterValues.textExpr))}'`);
+        break;
+
       case 'duration':
       case 'd':
         this.pushIfPresent(parts, this.formatDurationValue(key, filterValues, duration));
@@ -268,14 +270,6 @@ class FormatterManager {
     // Replace form fields
     result = this.variableManager.mapFields(result);
 
-    // Manage reserved keywords or special characters
-    // (', %, :)
-    result = result.replace(/[:'%]/g, (char: string) => TEXT_ESCAPES[char] ?? char);
-
-    // Neutralise the double quote so authored text can't close the enclosing `-vf "…"` argv token
-    // and inject extra ffmpeg arguments (see TEXT_ESCAPES / stripFilterUnsafe).
-    result = result.replace(/"/g, '”');
-
     // Upper case
     if (this.segment.currentSection?.options?.upperCase) {
       result = result.toUpperCase();
@@ -286,7 +280,10 @@ class FormatterManager {
       result = result.toLowerCase();
     }
 
-    return result;
+    // Escape for the quoted `text='…'` value: `:` `%` `\` survive FFmpeg's parsers, and quotes become
+    // typographic so authored text can't close the value or the `-vf "…"` argv token (see
+    // core/drawtext-text.ts).
+    return escapeDrawtextText(result);
   }
 
   /**

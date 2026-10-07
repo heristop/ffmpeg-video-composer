@@ -38,6 +38,8 @@ export default defineConfig({
       '**/.expo/**',
       '**/e2e/**',
       '**/playwright.config.ts',
+      // PR media recorders: one-off Playwright drivers, like the e2e specs.
+      '.github/pr-media/**',
       'scripts/ffmpeg/.work/**',
       // Optional adapter requires an operator-staged private companion repository.
       'examples/llm-remotion-title/remotion/BrandMotionPromo.tsx',

@@ -1,0 +1,208 @@
+{
+  "meta": {
+    "name": "Camera and graphics",
+    "description": "Motion system effects: designed transitions, a virtual camera with hits and shake, and animated graphics.",
+    "creativeDirection": "Audience: creators who want a trailer feel from JSON alone. Direction: each beat has one camera idea and one graphic idea. A punch beat (impact type, camera hits, a flash on the downbeat, viewfinder corners), a slow dolly with a tracing frame and an underline, a cinema beat with bars and a handheld drift, a colour wipe that turns the page, and a calm close. Transitions are designed, not stock: push on a spring, zoom-through, iris, swipe. Review: no edge ever shows during camera moves, flashes never exceed three per second, text stays readable at every hit, every transition settles before the next beat's first entrance."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 5,
+    "motion": {
+      "energy": 1
+    }
+  },
+  "sections": [
+    {
+      "name": "punch",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "camera": {
+        "hits": [
+          0.3,
+          {
+            "at": 1.2,
+            "strength": 0.06
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "flash",
+          "at": 0.3,
+          "duration": 0.25
+        },
+        {
+          "type": "corners",
+          "at": 0.5,
+          "color": "#FF8AAE"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "DROP."
+          },
+          "preset": "impact",
+          "size": 260,
+          "delay": 0.2,
+          "color": "#F5F3F7"
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.6,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "dolly",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.8
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.14
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "at": 0.1,
+          "inset": 40
+        },
+        {
+          "type": "underline",
+          "at": 0.9,
+          "x": 400,
+          "y": 420,
+          "width": 480,
+          "origin": "center",
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Slow is smooth."
+          },
+          "preset": "rise",
+          "size": 110,
+          "y": 280,
+          "delay": 0.3
+        }
+      ],
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.7
+      }
+    },
+    {
+      "name": "cinema",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 2.8
+      },
+      "camera": {
+        "preset": "drift-left",
+        "amount": 0.1,
+        "shake": {
+          "amplitude": 4,
+          "frequency": 0.6,
+          "rotation": 0.4
+        }
+      },
+      "graphics": [
+        {
+          "type": "bars",
+          "aspect": 2.39
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "WIDESCREEN"
+          },
+          "preset": "tracking-in",
+          "size": 150,
+          "delay": 0.4
+        }
+      ],
+      "transition": {
+        "type": "iris",
+        "duration": 0.7
+      }
+    },
+    {
+      "name": "page",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.6
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0.2,
+          "x": 0,
+          "y": 250,
+          "width": 760,
+          "height": 190,
+          "from": "left"
+        },
+        {
+          "type": "wipe",
+          "at": 1.7,
+          "duration": 0.8,
+          "color": "#FF8AAE",
+          "direction": "left"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Turn the page."
+          },
+          "preset": "cascade",
+          "size": 96,
+          "align": "left",
+          "x": 80,
+          "y": 290,
+          "delay": 0.45
+        }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "close",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "camera": {
+        "preset": "pull-out",
+        "amount": 0.08
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "Same JSON. Every screen."
+          },
+          "preset": "fade",
+          "size": 84,
+          "delay": 0.3
+        }
+      ]
+    }
+  ]
+}

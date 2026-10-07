@@ -14,24 +14,26 @@ const partialsDir = path.resolve(here, '../src/partials');
 const outFile = path.resolve(here, '../src/partials.generated.ts');
 
 const toCamel = (id: string) => id.replace(/[-_](.)/g, (_, c: string) => c.toUpperCase());
+const META_KEYS = ['envelope', 'syncPoints', 'jobs', 'useWhen', 'avoidWhen'];
 
 const entries = readdirSync(partialsDir)
   .filter((f) => f.endsWith('.json'))
   .sort()
   .map((file) => {
     const id = file.replace(/\.json$/, '');
-    const json = JSON.parse(readFileSync(path.join(partialsDir, file), 'utf8')) as {
-      variables?: unknown;
-      description?: unknown;
-    };
+    const json = JSON.parse(readFileSync(path.join(partialsDir, file), 'utf8')) as Record<string, unknown>;
 
     const variables = json.variables && typeof json.variables === 'object' ? json.variables : undefined;
+    // Timing and catalog metadata (envelope, sync points, rhetorical jobs, when to use / avoid) travel
+    // with the registry so editors and agents can choose and re-time a partial without loading it.
+    const meta = Object.fromEntries(META_KEYS.flatMap((key) => (json[key] === undefined ? [] : [[key, json[key]]])));
 
     return {
       id,
       varName: toCamel(id),
       description: typeof json.description === 'string' ? json.description : id,
       variables,
+      meta,
     };
   });
 
@@ -39,8 +41,11 @@ const imports = entries.map((e) => `import ${e.varName} from './partials/${e.id}
 const rows = entries
   .map((e) => {
     const vars = e.variables ? `variables: ${JSON.stringify(e.variables)}, ` : '';
+    const meta = Object.entries(e.meta)
+      .map(([key, value]) => `${key}: ${JSON.stringify(value)}, `)
+      .join('');
 
-    return `  { id: ${JSON.stringify(e.id)}, description: ${JSON.stringify(e.description)}, ${vars}sections: (${e.varName} as RawPartial).sections },`;
+    return `  { id: ${JSON.stringify(e.id)}, description: ${JSON.stringify(e.description)}, ${vars}${meta}sections: (${e.varName} as RawPartial).sections },`;
   })
   .join('\n');
 

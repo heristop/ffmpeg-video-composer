@@ -1,4 +1,6 @@
-import type { Filter } from '@/core/types';
+import type { Filter, LookInput } from '@/core/types';
+import { quantizeStrength } from '@/core/footage/lut-cube';
+import { presetLutValue, urlLutValue } from './lut-spec';
 import type { Grade, BackgroundLayer } from '../../schemas/template.schemas';
 import { revealEnableExpr } from './text';
 import { parseScale, motionToFilters } from './motion';
@@ -67,12 +69,25 @@ const LOOK_TABLE: Record<string, LookEntry> = {
  * Translates a named look preset into an array of Filter objects.
  * Returns [] for undefined or unknown look (Zod rejects unknown values upstream).
  */
-export function lookToFilters(look?: string): Filter[] {
+export function lookToFilters(look?: LookInput): Filter[] {
   if (!look) {
     return [];
   }
 
-  return (LOOK_TABLE[look] ?? []).map((filter) => ({ ...filter }));
+  // `{ preset, strength }` blends a LUT look toward identity inside its generated `.cube` (still one
+  // lut3d; strength 0 drops it). The string form and strength 1 lower exactly as before. Strength on a
+  // non-LUT preset is rejected by validation (look_strength_unsupported) and ignored here.
+  const { preset, strength } = typeof look === 'string' ? { preset: look, strength: undefined } : look;
+  const filters = (LOOK_TABLE[preset] ?? []).map((filter) => ({ ...filter }));
+  const amount = quantizeStrength(strength);
+
+  if (amount === 1 || !filters.every((filter) => filter.type === 'lut3d')) {
+    return filters;
+  }
+
+  return amount === 0
+    ? []
+    : filters.map((filter) => ({ ...filter, value: presetLutValue(String(filter.value), amount) }));
 }
 
 // ---------------------------------------------------------------------------
@@ -164,7 +179,9 @@ export function gradeToFilters(grade?: Grade): Filter[] {
     return [];
   }
 
-  const filters: Filter[] = [];
+  // A user LUT (camera Log → Rec.709, a colourist's cube) converts the footage first, so the eq/balance/
+  // curves adjustments below work on display-referred pixels.
+  const filters: Filter[] = grade.lut ? [{ type: 'lut3d', value: urlLutValue(grade.lut.url, grade.lut.strength) }] : [];
   const eqParts = buildEqParts(grade);
 
   if (eqParts.length > 0) {

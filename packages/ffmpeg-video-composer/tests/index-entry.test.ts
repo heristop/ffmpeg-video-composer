@@ -20,6 +20,7 @@ const fakeFilesystem = {
   setBuildDir: vi.fn(),
   setAssetsDir: vi.fn(),
   getBuildPath: vi.fn(async (d: string) => `/build/${d}`),
+  getTempDir: vi.fn(() => '/tmp'),
 };
 
 const fakeLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };

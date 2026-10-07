@@ -1,5 +1,10 @@
-import type { AnimationOverlay, Orientation } from './templateEditorModel';
+import type { Graphic } from 'ffmpeg-video-composer/src/schemas/graphics.schemas.ts';
+import type { AnimationOverlay } from './templateEditorModel';
+import { findEngineEntry } from './animation-library';
+import { draftGraphic, type DraftContext } from './fx-draft';
 
+// Playback for the legacy APNG samples: they keep rendering as authored (existing descriptors are never
+// rewritten), and a sample picked from the builder's Samples group gets these defaults.
 const BUNDLED_DEFAULTS: Record<string, Partial<AnimationOverlay>> = {
   'tap_pulse.apng': { loop: false, loops: 1, persistent: false, opacity: 0.8, fit: 'contain' },
   'shine_sweep.apng': { loop: false, loops: 1, persistent: false, opacity: 0.5, fit: 'contain' },
@@ -22,163 +27,68 @@ export interface AnimationEffectPreset {
   id: string;
   nameKey: string;
   descriptionKey: string;
-  build: (orientation: Orientation) => AnimationOverlay[];
+  /** The graphics the recipe adds to the section: engine primitives anchored to its default target. */
+  build: (context: DraftContext) => Graphic[];
 }
 
-const FRAME_SIZE: Record<Orientation, [number, number]> = {
-  landscape: [1280, 720],
-  portrait: [720, 1280],
-  square: [1080, 1080],
-};
+/** One part of a recipe: a library entry and what the recipe sets on top of the drafted placement. */
+type RecipePart = [entryId: string, overrides?: Record<string, unknown>];
 
-const NATIVE_ASPECTS: Record<string, number> = {
-  corner_brackets: 1280 / 720,
-  shine_sweep: 1280 / 720,
-  confetti: 1280 / 720,
-  sparkle: 1280 / 720,
-  tap_pulse: 1,
-  spec_orbit: 720 / 1280,
-  pulse_ring: 1280 / 720,
-  light_leak: 1280 / 720,
-  white_border: 1280 / 720,
-};
+function graphicsOf(section: DraftContext['section']): Graphic[] {
+  return ('graphics' in section ? section.graphics : undefined) ?? [];
+}
 
-// Fit the asset's actual canvas inside the recipe region without distorting circular or drawn shapes.
-function centeredLayer(
-  orientation: Orientation,
-  filename: string,
-  region: { width: number; height: number; centerY: number; artworkCenterY?: number },
-  playback: { start: number; duration: number; opacity: number }
-): AnimationOverlay {
-  const [frameW, frameH] = FRAME_SIZE[orientation];
-  const ratio = NATIVE_ASPECTS[filename];
-  const w = Math.round(Math.min(frameW * region.width, frameH * region.height * ratio));
-  const h = Math.round(w / ratio);
+// Draft each part against the section as it grows, so every part gets its own seed and the context
+// (target, size, section length) a library pick would have given it.
+function composeRecipe(parts: RecipePart[], context: DraftContext): Graphic[] {
+  const added: Graphic[] = [];
 
+  for (const [entryId, overrides] of parts) {
+    const entry = findEngineEntry(entryId);
+
+    if (!entry) continue;
+
+    const section = { ...context.section, graphics: [...graphicsOf(context.section), ...added] };
+
+    added.push({ ...draftGraphic(entry, { ...context, section }), ...overrides });
+  }
+
+  return added;
+}
+
+function recipe(id: string, parts: RecipePart[]): AnimationEffectPreset {
   return {
-    url: `/assets/animations/${filename}.apng`,
-    position: `${Math.round((frameW - w) / 2)}:${Math.round(frameH * region.centerY - h * (region.artworkCenterY ?? 0.5))}`,
-    scale: `${w}:${h}`,
-    fit: 'contain',
-    persistent: false,
-    ...playback,
+    id,
+    nameKey: `animation.effects.${id}.name`,
+    descriptionKey: `animation.effects.${id}.description`,
+    build: (context) => composeRecipe(parts, context),
   };
 }
 
-/** Portable recipes: existing APNG assets and JSON controls, with at most two finite overlay layers. */
+/**
+ * Two-part recipes composed from engine primitives (at most two layered effects per beat). Each part lands
+ * on the section's default target with context-derived parameters; the author then tunes it like any pick.
+ */
 export const ANIMATION_EFFECT_PRESETS: AnimationEffectPreset[] = [
-  {
-    id: 'interface-focus',
-    nameKey: 'animation.effects.interface-focus.name',
-    descriptionKey: 'animation.effects.interface-focus.description',
-    build: (orientation) => [
-      centeredLayer(
-        orientation,
-        'corner_brackets',
-        { width: 0.86, height: 0.68, centerY: 0.52 },
-        { start: 0.2, duration: 1.8, opacity: 0.5 }
-      ),
-      centeredLayer(
-        orientation,
-        'tap_pulse',
-        { width: 0.36, height: 0.34, centerY: 0.52, artworkCenterY: 0.6 },
-        { start: 0.4, duration: 2, opacity: 0.75 }
-      ),
-    ],
-  },
-  {
-    id: 'product-spotlight',
-    nameKey: 'animation.effects.product-spotlight.name',
-    descriptionKey: 'animation.effects.product-spotlight.description',
-    build: (orientation) => [
-      centeredLayer(
-        orientation,
-        'shine_sweep',
-        { width: 0.94, height: 0.76, centerY: 0.52 },
-        { start: 0.25, duration: 2.52, opacity: 0.5 }
-      ),
-      centeredLayer(
-        orientation,
-        'spec_orbit',
-        { width: 0.5, height: 0.7, centerY: 0.52 },
-        { start: 0.1, duration: 2, opacity: 0.55 }
-      ),
-    ],
-  },
-  {
-    id: 'celebration-burst',
-    nameKey: 'animation.effects.celebration-burst.name',
-    descriptionKey: 'animation.effects.celebration-burst.description',
-    build: (orientation) => [
-      centeredLayer(
-        orientation,
-        'confetti',
-        { width: 1, height: 0.85, centerY: 0.5 },
-        { start: 0.18, duration: 2.52, opacity: 0.85 }
-      ),
-      centeredLayer(
-        orientation,
-        'sparkle',
-        { width: 0.68, height: 0.6, centerY: 0.5 },
-        { start: 0.65, duration: 2, opacity: 0.7 }
-      ),
-    ],
-  },
-  {
-    id: 'focus-lock',
-    nameKey: 'animation.effects.focus-lock.name',
-    descriptionKey: 'animation.effects.focus-lock.description',
-    build: (orientation) => [
-      centeredLayer(
-        orientation,
-        'corner_brackets',
-        { width: 0.76, height: 0.64, centerY: 0.52 },
-        { start: 0.08, duration: 1.8, opacity: 0.45 }
-      ),
-      centeredLayer(
-        orientation,
-        'pulse_ring',
-        { width: 0.48, height: 0.4, centerY: 0.52 },
-        { start: 0.2, duration: 2, opacity: 0.4 }
-      ),
-    ],
-  },
-  {
-    id: 'light-pass',
-    nameKey: 'animation.effects.light-pass.name',
-    descriptionKey: 'animation.effects.light-pass.description',
-    build: (orientation) => [
-      centeredLayer(
-        orientation,
-        'light_leak',
-        { width: 1, height: 0.88, centerY: 0.5 },
-        { start: 0.04, duration: 2, opacity: 0.2 }
-      ),
-      centeredLayer(
-        orientation,
-        'sparkle',
-        { width: 0.46, height: 0.44, centerY: 0.5 },
-        { start: 0.35, duration: 2, opacity: 0.35 }
-      ),
-    ],
-  },
-  {
-    id: 'frame-reveal',
-    nameKey: 'animation.effects.frame-reveal.name',
-    descriptionKey: 'animation.effects.frame-reveal.description',
-    build: (orientation) => [
-      centeredLayer(
-        orientation,
-        'white_border',
-        { width: 0.88, height: 0.72, centerY: 0.52 },
-        { start: 0.06, duration: 1.8, opacity: 0.35 }
-      ),
-      centeredLayer(
-        orientation,
-        'shine_sweep',
-        { width: 0.88, height: 0.72, centerY: 0.52 },
-        { start: 0.18, duration: 2.52, opacity: 0.3 }
-      ),
-    ],
-  },
+  recipe('interface-focus', [
+    ['corners', { at: 0.15 }],
+    ['ripple-tap', { at: 0.45 }],
+  ]),
+  recipe('product-spotlight', [
+    ['sheen', { at: 0.3 }],
+    ['glint-orbit', { at: 0.9 }],
+  ]),
+  recipe('celebration-burst', [
+    ['confetti', { at: 0.2 }],
+    ['glint', { at: 0.7 }],
+  ]),
+  recipe('focus-lock', [
+    ['corners', { at: 0.1, trace: 'together' }],
+    ['ripple', { at: 0.35 }],
+  ]),
+  recipe('light-pass', [['leak'], ['glint', { at: 0.6, path: 'scatter' }]]),
+  recipe('frame-reveal', [
+    ['frame', { at: 0.1 }],
+    ['sheen', { at: 0.75 }],
+  ]),
 ];

@@ -23,6 +23,8 @@ export interface GradeConfig {
   blur?: number;
   grain?: number;
   curvesPreset?: string;
+  /** User 3D .cube LUT, applied first (presets/lut-spec.ts). */
+  lut?: { url: string; strength?: number };
 }
 
 export interface Letterbox {

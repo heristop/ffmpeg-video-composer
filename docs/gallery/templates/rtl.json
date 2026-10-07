@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "name": "Gallery: right-to-left scripts",
+    "description": "Arabic and Hebrew kinetic type, title card and lower third with the bundled Noto fonts, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 13,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "arabic",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "ar": "قصتك في حركة"
+          },
+          "preset": "rise",
+          "font": "noto-arabic",
+          "unit": "line",
+          "size": 130,
+          "color": "#F5F3F7"
+        }
+      ]
+    },
+    {
+      "name": "hebrew",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "he": "הסיפור שלך בתנועה"
+          },
+          "preset": "rise",
+          "font": "noto-hebrew",
+          "unit": "line",
+          "size": 120,
+          "color": "#C9CBFF"
+        }
+      ]
+    },
+    {
+      "name": "mixed",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "ar": "مرحبا"
+          },
+          "preset": "fade",
+          "font": "noto-arabic",
+          "unit": "line",
+          "size": 120,
+          "x": 360,
+          "y": 180,
+          "color": "#FF8AAE"
+        },
+        {
+          "text": {
+            "he": "שלום"
+          },
+          "preset": "fade",
+          "font": "noto-hebrew",
+          "unit": "line",
+          "size": 120,
+          "x": 920,
+          "y": 180,
+          "color": "#C9CBFF"
+        },
+        {
+          "text": {
+            "en": "Every script, joined"
+          },
+          "preset": "fade",
+          "size": 90,
+          "y": 440,
+          "accent": {
+            "words": "last",
+            "color": "#FFF685"
+          }
+        }
+      ]
+    },
+    {
+      "name": "caption",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2.4
+      },
+      "caption": {
+        "text": {
+          "he": "כל שפה, אותה תנועה"
+        },
+        "font": "noto-hebrew",
+        "fontsize": 64,
+        "reveal": {
+          "type": "fade",
+          "delay": 0.1,
+          "duration": 0.2
+        }
+      }
+    }
+  ]
+}

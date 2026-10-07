@@ -15,13 +15,14 @@
   },
   "showcase": {
     "eyebrow": "Guardalo in azione",
-    "title": "Creato interamente nel tuo browser",
-    "subtitle": "Niente upload, niente server — questa clip è stata composta sul dispositivo da un modello con transizioni, musica, effetti, testo e animazioni, poi renderizzata con FFmpeg WebAssembly.",
-    "badge": "Render di esempio · nel browser",
-    "videoAria": "Un video di esempio composto in LeClap, riprodotto in loop",
+    "title": "Ogni effetto sta in un modello",
+    "subtitle": "Bagliori, scintille, cornici, movimenti di camera e tagli a tempo: ognuno è una riga di modello, e appare uguale nel browser, sul computer e sul telefono.",
+    "badge": "Reel degli effetti · fatto con LeClap",
+    "videoAria": "Un reel degli effetti di movimento di LeClap, riprodotto in loop",
     "play": "Riproduci il render",
     "pause": "Metti in pausa il render",
     "cta": "Crea il tuo",
+    "viewShowcase": "Vai alla galleria",
     "browseTemplates": "Esplora i modelli",
     "readDocs": "Leggi la documentazione"
   },
@@ -65,7 +66,16 @@
     },
     "badge": "Sul dispositivo · nessun upload",
     "phoneAria": "Un telefono con l’app LeClap",
-    "cta": "Prova i modelli nel browser"
+    "cta": "Prova i modelli nel browser",
+    "screen": {
+      "title": "Il tuo video prende vita",
+      "preparing": "Preparazione delle scene…",
+      "private": "Il video viene creato solo sul tuo dispositivo",
+      "cancel": "Annulla creazione",
+      "readyTitle": "Il tuo video è pronto",
+      "readyBody": "Salva una copia o condividi la tua storia.",
+      "share": "Condividi"
+    }
   },
   "agentic": {
     "eyebrow": "Per lo sviluppo agentico",

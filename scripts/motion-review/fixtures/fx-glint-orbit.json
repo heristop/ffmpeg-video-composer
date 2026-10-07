@@ -1,0 +1,17 @@
+{
+  "label": "Glint (orbit path, formerly spec orbit)",
+  "kind": "fx",
+  "window": { "at": 0.3, "duration": 1.1 },
+  "section": {
+    "graphics": [
+      {
+        "type": "fx",
+        "effect": "glint",
+        "path": "orbit",
+        "target": "{{target}}",
+        "at": "{{at}}",
+        "duration": "{{duration}}"
+      }
+    ]
+  }
+}

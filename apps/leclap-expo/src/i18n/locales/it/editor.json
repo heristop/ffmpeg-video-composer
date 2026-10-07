@@ -370,9 +370,9 @@
     "mirror": "Specchia",
     "mirrorHorizontal": "Orizzontale",
     "mirrorVertical": "Verticale",
-    "add": "Aggiungi un'animazione",
-    "layer": "Animazione {{number}}",
-    "remove": "Rimuovi animazione",
+    "add": "Aggiungi un file di animazione",
+    "layer": "File di animazione {{number}}",
+    "remove": "Rimuovi il file di animazione",
     "effects": {
       "label": "Combinazioni di effetti",
       "interface-focus": {
@@ -399,11 +399,59 @@
         "name": "Rivelazione della cornice",
         "description": "Una cornice sottile con un unico riflesso luminoso."
       }
-    }
+    },
+    "library": {
+      "sheen": "Riflesso",
+      "glint-orbit": "Bagliore in orbita",
+      "edge-glow": "Bagliore sul bordo",
+      "leak": "Light leak",
+      "bloom": "Alone luminoso",
+      "ripple": "Onda",
+      "ripple-tap": "Tocco",
+      "resolve": "Messa a fuoco",
+      "glass": "Vetro",
+      "vignette-breathe": "Vignettatura viva",
+      "confetti": "Coriandoli",
+      "glint": "Scintille",
+      "frame": "Cornice",
+      "corners": "Angoli",
+      "underline": "Sottolineatura",
+      "bokeh": "Bokeh",
+      "dust": "Polvere",
+      "grain": "Grana",
+      "shine-sweep": "Passata di luce",
+      "sparkle": "Scintillio",
+      "corner-brackets": "Angoli",
+      "pulse-ring": "Anello pulsante",
+      "tap-pulse": "Impulso di tocco",
+      "light-leak": "Light leak",
+      "white-border": "Bordo bianco",
+      "glow-border": "Bordo luminoso",
+      "rounded-border": "Bordo arrotondato",
+      "spec-orbit": "Orbita speculare",
+      "animation-icons": "Icone animate"
+    },
+    "groups": {
+      "light": "Luce",
+      "focus": "Focus",
+      "celebrate": "Festa",
+      "frames": "Cornici",
+      "ambient": "Atmosfera",
+      "samples": "Esempi",
+      "samplesHint": "Overlay di serie, identici in ogni modello. Meglio un effetto qui sopra: lo disegna il motore, su misura per questa scena."
+    },
+    "engine": {
+      "engineLabel": "Effetti",
+      "engineHelp": "Disegnati da LeClap e adattati a questa scena. Regolali nell’editor web.",
+      "added": "Effetti di questa scena",
+      "removeEffect": "Rimuovi {{label}}",
+      "addEffect": "Aggiungi {{label}}"
+    },
+    "sampleBadge": "Esempio"
   },
   "overlays": {
     "kind": "Sovrimpressioni",
-    "animation": "Animazione",
+    "animation": "File di animazione",
     "image": "Immagine"
   },
   "watermark": {

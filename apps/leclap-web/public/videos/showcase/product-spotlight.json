@@ -1,8 +1,8 @@
 {
   "meta": {
     "name": "Overlay effect recipes",
-    "description": "Synthetic review fixture with adaptive shapes and labels for the shared composited effect presets.",
-    "creativeDirection": "Direction: an honest synthetic test fixture for six composited recipes. Frame an interface detail, reveal a product shape, mark a celebration, lock focus, pass a soft light or reveal a fine frame. Keep labels readable and the focal element visible. Use at most two brief layers per scene and a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
+    "description": "Synthetic review fixture for the six builder recipes: each scene layers two engine primitives (graphics[] fx, frame and corners) anchored to the card.",
+    "creativeDirection": "Direction: an honest synthetic test fixture for six two-part recipes built from engine primitives. Frame an interface detail, light a product card, mark a celebration, lock focus, pass a warm light or reveal a fine frame. Every effect is anchored to the card (target layer:0) and tuned on top of the recipe defaults. Keep labels readable and the focal element visible, with a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
   },
   "global": {
     "orientation": "landscape",
@@ -63,34 +63,26 @@
           }
         }
       ],
-      "inputs": [
+      "graphics": [
         {
-          "name": "effect_0",
-          "type": "animation",
-          "url": "/assets/animations/shine_sweep.apng",
-          "options": {
-            "position": "154:101",
-            "scale": "973:547",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.25,
-            "duration": 2.52,
-            "opacity": 0.5
-          }
+          "type": "fx",
+          "effect": "sheen",
+          "target": "layer:0",
+          "seed": 874,
+          "at": 0.3,
+          "direction": "right",
+          "width": 0.18,
+          "profile": "specular"
         },
         {
-          "name": "effect_1",
-          "type": "animation",
-          "url": "/assets/animations/spec_orbit.apng",
-          "options": {
-            "position": "499:123",
-            "scale": "283:503",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.1,
-            "duration": 2,
-            "opacity": 0.55
-          }
+          "type": "fx",
+          "effect": "glint",
+          "path": "orbit",
+          "target": "layer:0",
+          "seed": 4317,
+          "at": 0.9,
+          "count": 2,
+          "size": 30
         }
       ]
     }

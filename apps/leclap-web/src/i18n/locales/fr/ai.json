@@ -1,0 +1,196 @@
+{
+  "open": "Générer avec l'IA",
+  "fromPresets": "Ou décrivez-le et générez-le avec l'IA",
+  "title": "Générer avec l'IA",
+  "subtitle": "Décrivez la vidéo. Votre fournisseur d'IA écrit le modèle ; LeClap le vérifie avant de l'ouvrir dans l'éditeur.",
+  "brief": {
+    "label": "Que doit montrer la vidéo ?",
+    "placeholder": "Un lancement de 30 secondes pour une appli de prise de notes. Typo cinétique audacieuse et percutante, fin sur le lien de téléchargement.",
+    "examples": "Essayez un exemple",
+    "tooShort": "Ajoutez quelques mots pour que le modèle sache quoi créer.",
+    "hint": "Pour qui, sur quel ton, et comment ça se termine. Une à trois phrases suffisent.",
+    "count_one": "{{count}} caractère",
+    "count_other": "{{count}} caractères"
+  },
+  "examples": {
+    "launch": "Lancement produit de 30 s pour une appli de notes, audacieux, typo cinétique percutante",
+    "tutorial": "Intro de tutoriel calme, 3 étapes",
+    "hook": "Accroche TikTok pour un coffee shop, coupes rapides, ludique",
+    "cinematic": "Film de marque cinématographique pour un fabricant d'équipement de randonnée, sombre, lent",
+    "recap": "Rétrospective de l'année pour un studio de design, 5 temps forts",
+    "event": "Promo carrée pour un meetup design du week-end, date et lieu à la fin"
+  },
+  "hints": {
+    "orientation": "Format",
+    "duration": "Durée",
+    "auto": "Auto",
+    "landscape": "Paysage",
+    "portrait": "Portrait",
+    "square": "Carré",
+    "seconds": "{{count}} s"
+  },
+  "provider": {
+    "section": "Fournisseur et clé",
+    "summary": "{{provider}} · {{model}}",
+    "label": "Fournisseur",
+    "model": "Modèle",
+    "modelFree": "Tout identifiant de modèle de votre compte fonctionne.",
+    "keySet": "Clé enregistrée",
+    "keyMissing": "Ajoutez une clé"
+  },
+  "key": {
+    "label": "Clé API {{provider}}",
+    "show": "Afficher la clé",
+    "hide": "Masquer la clé",
+    "persistFailed": "Ce navigateur bloque le stockage : la clé ne vaut que pour cette session.",
+    "forget": "Oublier la clé",
+    "forgetAll": "Oublier toutes les clés",
+    "forgotten": "Clé oubliée.",
+    "format": "Cela ne ressemble pas à une clé {{provider}} (attendu : {{placeholder}}). Vous pouvez tout de même l'essayer.",
+    "getKey": "Obtenir une clé",
+    "privacy": "Stockée uniquement dans ce navigateur ; envoyée uniquement à {{provider}} avec votre requête — jamais à LeClap, jamais dans une URL, jamais journalisée. L'usage est facturé sur votre compte."
+  },
+  "jev": {
+    "section": "Routage intelligent avec Jev (facultatif)",
+    "about": "Jev choisit — il n'écrit pas. Avec une clé Jev, votre brief est d'abord classé (genre, format, énergie, meilleur modèle de départ) pour un prompt plus court et plus juste.",
+    "provider": "Jev",
+    "decisions": "La lecture de votre brief par Jev",
+    "suggestion": "Suggéré · {{confidence}}",
+    "applied": "{{label}} · {{confidence}}",
+    "route": "Analyser le brief",
+    "routing": "Jev lit votre brief…",
+    "bestMatch": "Partir du plus proche",
+    "bestMatchHint": "Ouvre le modèle prêt à l'emploi le plus proche ({{title}}). Jev le choisit ; vous écrivez les textes.",
+    "bestMatchNone": "Analysez le brief pour trouver le modèle prêt à l'emploi le plus proche.",
+    "genre": {
+      "product-launch": "Lancement produit",
+      "explainer": "Explication",
+      "social-hook": "Accroche sociale",
+      "cinematic-trailer": "Bande-annonce cinématographique",
+      "calm-tutorial": "Tutoriel calme",
+      "other": "Autre"
+    },
+    "platform": {
+      "tiktok": "TikTok",
+      "reels": "Reels",
+      "shorts": "Shorts",
+      "youtube": "YouTube",
+      "x": "X",
+      "linkedin": "LinkedIn",
+      "facebook": "Facebook",
+      "square-feed": "Fil carré",
+      "none": "Aucune plateforme"
+    },
+    "energy": {
+      "0": "Calme",
+      "1": "Détendu",
+      "2": "Équilibré",
+      "3": "Percutant",
+      "4": "Explosif"
+    },
+    "theme": "Thème : {{name}}",
+    "seed": "Démarre comme « {{title}} »"
+  },
+  "footer": {
+    "needKey": "La génération nécessite votre clé API {{provider}}.",
+    "needBrief": "Décrivez la vidéo pour générer.",
+    "addKey": "Ajouter la clé",
+    "ctrlKey": "Ctrl"
+  },
+  "actions": {
+    "generate": "Générer",
+    "cancel": "Annuler",
+    "retry": "Réessayer",
+    "open": "Ouvrir dans l'éditeur",
+    "replace": "Remplacer le brouillon",
+    "keep": "Continuer l'édition",
+    "regenerate": "En générer un autre",
+    "details": "Détails techniques",
+    "writeTemplate": "Écrire le modèle",
+    "startOver": "Recommencer"
+  },
+  "steps": {
+    "thinking": "Réflexion",
+    "validating": "Validation",
+    "repairing": "Réparation",
+    "ready": "Prêt",
+    "planning": "Plan",
+    "polishing": "Finitions"
+  },
+  "status": {
+    "thinking": "Réflexion…",
+    "writing": "Écriture du modèle… {{count}} caractères",
+    "validating": "Validation…",
+    "repairing": "Réparation (passe {{round}}) : correction de {{count}} problème(s)…",
+    "ready": "Prêt",
+    "cancelled": "Annulé. Rien n'a été modifié.",
+    "planning": "Concepts et séquences en préparation…",
+    "planReady": "Plan prêt. Ajustez-le si besoin, puis écrivez le modèle.",
+    "polishing": "Finitions : {{count}} remarque(s) de direction artistique…"
+  },
+  "result": {
+    "scenes_one": "{{count}} scène",
+    "scenes_other": "{{count}} scènes",
+    "footage_one": "{{count}} plan à filmer",
+    "footage_other": "{{count}} plans à filmer",
+    "duration": "{{seconds}} s",
+    "durationEstimate": "~{{seconds}} s + plans",
+    "effects": "Effets",
+    "noEffects": "Aucun effet — coupes franches.",
+    "replaceWarning": "Cela remplace le brouillon actuel. Vos modèles enregistrés ne sont pas touchés, et Annuler rétablit le brouillon.",
+    "advisories_one": "{{count}} remarque de direction artistique",
+    "advisories_other": "{{count}} remarques de direction artistique",
+    "noAdvisories": "Aucune remarque de direction artistique du moteur."
+  },
+  "errors": {
+    "auth": "{{provider}} a refusé la clé. Vérifiez qu'elle a été copiée en entier et qu'elle est toujours active.",
+    "rate-limit": "{{provider}} limite le débit de cette clé. Patientez une minute ou vérifiez les limites de votre offre.",
+    "overloaded": "{{provider}} est surchargé pour le moment. Réessayez dans un instant.",
+    "network": "Impossible de joindre {{provider}}. Vérifiez votre connexion, ou si une extension ou une règle réseau bloque la requête.",
+    "network-jev": "Impossible de joindre Jev. Son API n'accepte peut-être pas encore les appels navigateur depuis ce site — la génération fonctionne sans lui.",
+    "refused": "Le modèle a décliné ce brief. Essayez de le reformuler.",
+    "truncated": "La réponse a été coupée avant la fin du modèle. Essayez un brief plus court ou moins de scènes.",
+    "bad-request": "{{provider}} a refusé la requête. Vérifiez que l'identifiant du modèle est disponible sur votre compte.",
+    "bad-response": "{{provider}} a renvoyé une réponse illisible pour LeClap. Réessayez.",
+    "http": "{{provider}} a renvoyé une erreur. Réessayez.",
+    "invalid": "Le modèle n'a pas produit de modèle valide après {{rounds}} tentatives. Essayez un brief plus simple ou plus précis.",
+    "unknown": "Un problème est survenu. Réessayez."
+  },
+  "plan": {
+    "planFirst": "Planifier d'abord",
+    "planFirstHint": "Propose trois concepts et un découpage avant l'écriture. Un appel de plus, rapide.",
+    "review": "Relire le plan",
+    "reviewHint": "S'arrête sur le plan pour le modifier. Désactivé : enchaîne directement.",
+    "title": "Plan",
+    "intro": "Modifiez les textes, les verbes ou le rythme, ou choisissez un autre concept. Le modèle suit ce plan.",
+    "strategy": "Stratégie",
+    "concepts": "Concept",
+    "typicality": {
+      "expected": "Attendu",
+      "fresh": "Original",
+      "unusual": "Inattendu"
+    },
+    "beats": "Séquences",
+    "role": "Rôle",
+    "verb": "Verbe",
+    "onScreen": "À l’écran",
+    "seconds": "Durée",
+    "verbLabel": "Verbe de la séquence {{row}}",
+    "onScreenLabel": "Texte à l’écran de la séquence {{row}}",
+    "secondsLabel": "Durée de la séquence {{row}} en secondes",
+    "footage": "Vidéo, sans texte",
+    "facts": "Détails du plan",
+    "transitions": "Transitions : {{primary}}",
+    "transitionsWithAccents": "Transitions : {{primary}} + {{accents}}",
+    "section": "Avant la rédaction"
+  },
+  "reference": {
+    "label": "S’inspirer d’une référence",
+    "hint": "Facultatif : joignez une référence visuelle. La génération suit alors sa palette et son rythme comme règles impératives.",
+    "use": "Utiliser comme guide de style",
+    "attached": "Guide de style joint : le modèle généré suit cette palette et ce rythme.",
+    "detach": "Retirer le guide de style",
+    "summaryNone": "Facultatif",
+    "summaryAttached": "Jointe"
+  }
+}

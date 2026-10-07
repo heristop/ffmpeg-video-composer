@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { execFile } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -60,4 +62,67 @@ describe('CLI bundle (dist/index.js)', () => {
     expect(result.error).toContain('definitelynotafilter');
     expect(code).toBe(1);
   }, 90_000);
+
+  // P0 exit criterion through the shipped CLI: render with a manifest, verify the file against it, then
+  // re-render the recorded template and match every digest (template, assets, graph, output).
+  it('renders with --manifest and verifies it, including a byte-identical re-render', async () => {
+    const work = fs.mkdtempSync(path.join(os.tmpdir(), 'leclap-verify-'));
+    const video = path.join(work, 'out.mp4');
+    const fixture = path.join(here, 'fixtures/cli-deterministic.json');
+    const rendered = await runCli([
+      'render',
+      fixture,
+      '--output',
+      video,
+      '--manifest',
+      '--build',
+      path.join(work, 'build'),
+    ]);
+
+    expect(rendered.code).toBe(0);
+    expect(fs.existsSync(`${video}.manifest.json`)).toBe(true);
+
+    const verified = await runCli([
+      'verify',
+      `${video}.manifest.json`,
+      '--rerender',
+      '--json',
+      '--build',
+      path.join(work, 'again'),
+    ]);
+    const result = JSON.parse(verified.stdout) as { ok: boolean; checks: Array<{ check: string; ok: boolean }> };
+
+    expect(result.checks.map((check) => check.check)).toEqual(['output', 'template', 'assets', 'graph', 'output']);
+    expect(result.ok).toBe(true);
+    expect(verified.code).toBe(0);
+
+    fs.appendFileSync(video, 'tampered');
+    const tampered = await runCli(['verify', `${video}.manifest.json`, '--json']);
+
+    expect(JSON.parse(tampered.stdout)).toMatchObject({ ok: false });
+    expect(tampered.code).toBe(1);
+  }, 180_000);
+
+  it('checks the output with --qc and reuses sections with --cache', async () => {
+    const work = fs.mkdtempSync(path.join(os.tmpdir(), 'leclap-qc-'));
+    const fixture = path.join(here, 'fixtures/cli-deterministic.json');
+    const args = ['render', fixture, '--qc', '--json', '--cache', path.join(work, 'cache')];
+    const first = await runCli([...args, '--build', path.join(work, 'build')]);
+    const result = JSON.parse(first.stdout) as {
+      ok: boolean;
+      qc: { verified: boolean; findings: Array<{ check: string; status: string }> };
+    };
+
+    expect(first.code).toBe(0);
+    expect(result.ok).toBe(true);
+    expect(result.qc.verified).toBe(true);
+    expect(result.qc.findings.map((finding) => finding.check)).toContain('black_frames');
+    expect(fs.readdirSync(path.join(work, 'cache')).length).toBeGreaterThan(0);
+
+    const clip = path.join(work, 'build', 'output.mp4');
+    const clobber = await runCli(['render', fixture, '--json', '--video', `intro=${clip}`, '--output', clip]);
+
+    expect(clobber.code).toBe(1);
+    expect(JSON.parse(clobber.stdout)).toMatchObject({ ok: false, error: expect.stringMatching(/is also an input/) });
+  }, 180_000);
 });

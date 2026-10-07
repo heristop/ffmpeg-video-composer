@@ -5,6 +5,219 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+Upgrading from v2? See the [migration guide](MIGRATION.md#upgrading-from-v2-to-v3).
+
+### Added
+
+- `applyJsonPatch(doc, operations, { maxOps })` and `parsePointer(pointer)` (Node entry): RFC 6902 JSON
+  Patch (`add`, `remove`, `replace`, `move`, `copy`, `test`) over RFC 6901 pointers (`-` append, `~0`/`~1`
+  escapes). Atomic (runs on a copy, the input is never mutated); rejects `__proto__`/`prototype`/`constructor`
+  segments and keys and anything deeper than 64 levels; failures throw a `JsonPatchError` with a `code`, the
+  failing operation's `index` and its `path`.
+- `templateRevision(template)`: stable SHA-256 of a template's canonical JSON (object key order ignored),
+  synchronous and platform-neutral; matches a `node:crypto` digest of the same JSON byte for byte.
+- `findingLine`, `invalidTemplateText` and `summarizeErrors` (Node entry): the plain-text renderings of
+  validation findings `@leclap/mcp` uses, now shared with other agent surfaces.
+- Effects tour (`examples/motion-design/effects-tour.json`): a six-minute tour of every motion effect in ten chapters (chapter 5 now shows every fx primitive), first in the Effects & editing showcase (47 samples).
+- `samples`: new `effects` category with 11 native samples (FX pack, word captions, formats, kinetic fills, split layouts, right-to-left type, emoji type, beat grid, theme/roles/safe zones, footage editing, sound design).
+- Determinism contract. `global.seed` roots every procedural effect. A deterministic encoder profile
+  (bit-exact muxing, pinned libx264 threads) is applied to every command through one adapter tap; it is on
+  by default and `ProjectConfig.deterministic: false` opts out. A render manifest is delivered through
+  `CompileReporter.onManifest`. Raw filters that read the wall clock or `random()` raise the advisory
+  `nondeterministic_expression` (their renders are not reproducible).
+- Motion system: physical springs, cubic-bezier, the named curve set,
+  `steps()` and point curves, all lowered to piecewise polynomials in `t` within 0.1%. `global.motion`
+  tokens (springs, curves, durations, energy) and built-ins mirror the app's motion curves. `animate`
+  keyframe tracks (`x`, `y`, `opacity`, `scale`) on positioned `drawtext`. The energy dial scales every
+  travel distance. Each section chain is conformed to CFR and `noise` filters are seeded.
+- Kinetic typography (`sections[].kinetic`): 14 presets (cascade, rise, drop, slide, pop,
+  impact, tracking-in, typewriter, scramble, wave, highlight, counter, split, fade) laid out with real
+  metrics of the bundled fonts (generated advance table) and animated per word, glyph or line as native
+  `drawtext`. Accents, highlight markers, carets, seeded scramble/random order, exits, energy scaling, a
+  shared baseline, and automatic wrapping and alignment. `motionCatalog()` exposes presets, defaults and
+  art-direction rules for agents.
+- Effects: a section `camera` (push-in, pull-out, drift, orbit, handheld presets; zoom/x/y/
+  rotate tracks; beat `hits`; seeded shake; over-scanned so edges never show), animated `graphics` (flash,
+  bars, underline, frame, corners, wipe, panel; frame-exact boxes), and designed transitions (`push-*`,
+  `swipe-*`, `zoom-through`, `iris`, eased or spring-driven) composed from per-frame filters on the xfade
+  timeline.
+- Exports: `core/determinism` (hashing, seeds, manifest), `core/motion` (curves, easing, tokens, tracks),
+  `ENGINE_VERSION`, `digestRenderedFile`.
+- Agent-grade validation: findings carry optional `hint`, `suggestion` and `kind` (`format` = safe to
+  auto-apply, `judgement` = ask the author first). Unknown keys are reported as `unknown_key` with a
+  "did you mean" suggestion, including on objects that used to drop them silently; enum and unknown-type
+  errors suggest the nearest value; schema and rule findings come back together, deduplicated.
+- Time references: time fields accept `"<id>.start"`, `"<id>.end"`, `"50%"`, `"end - 0.5"`, `"beat:12"`,
+  `"bar:3"` and `"cue:drop"`, resolved to seconds at compile time. Optional `id` on kinetic blocks,
+  graphics and drawtext filters; `sections[].cues`; `global.beats` (`{ bpm, offset?, beatsPerBar? }` or
+  `{ times }`). Codes `unknown_time_ref`, `circular_time_ref`, `unresolvable_time_ref`, `negative_time`,
+  `duplicate_time_id`.
+- Motion feedback: `motionTimeline()` and `TemplateValidator.getMotionWarnings()` (advisory
+  `ease_monotony`, `front_loaded`, `stagger_too_long`, `starts_at_zero`, `transition_monotony`,
+  `exit_before_transition`, `dead_air`, `tempo_flat`, each with a hint). Section `assert` (`visibleBy`,
+  `before`, `inFrame`, `keepsMoving`) fails validation with `assertion_failed`. `motionCatalog()` adds a
+  doctrine per genre, 10 validated scene blueprints, and a verb / `useWhen` / `avoidWhen` / `pairsWith`
+  on every preset, transition and graphic.
+- `global.theme`: twelve built-in themes (leclap, midnight, editorial, bold, neon, paper, sunset, ocean, mono,
+  candy, retro, corporate; `fg` and `muted` at WCAG AA on `bg`, accents at 3:1) or
+  `{ extends, colors, fonts, radius, motion }`; `$color.<name>[@alpha]` / `$font.<name>` resolve before
+  lowering, so a themed template renders exactly like its literal version. `unknown_theme`,
+  `unknown_theme_token`, advisory `accent_overuse`; `themeCatalog()`.
+- `global.platform` (tiktok, reels, shorts, youtube, x, linkedin, facebook, square-feed, plus aliases):
+  default orientation, captions lifted above the app's bottom UI, `loudnorm` aimed at -14 LUFS / -1 dBTP,
+  and advisory `platform_ui_overlap`, `platform_duration_exceeded`, `platform_fps_mismatch`,
+  `platform_orientation_mismatch`. `platformCatalog()`.
+- Glyph coverage: text drawn with a bundled font that lacks glyphs fails validation with
+  `font_missing_glyphs` (listing the characters and a bundled font that covers them). `pnpm generate:font-advances` also writes a per-font coverage table.
+  The advance tables cover General Punctuation (curly quotes and apostrophes, dashes, ellipsis, bullet,
+  primes, guillemets) and the euro sign; a character the kinetic font really lacks is reported as
+  `kinetic_glyph_unmeasurable` instead of the block vanishing.
+
+- Output QC (`ProjectConfig.qc`, `CompileReporter.onQc`, manifest `qc`): format checks (duration, frame
+  count, A/V drift, pixel format, colour tags, audio present) and an optional content pass (black, frozen,
+  silence, loudness, true peak) with a `verified` verdict; unmeasurable checks report "not checked".
+- Render manifest `planHash`, and a Node per-section render cache (`ProjectConfig.cacheDir`, manifest
+  `cache`) whose warm renders are byte-identical to cold ones.
+- `loudnorm` re-checks the true peak after AAC encoding and retries with a lower ceiling (manifest
+  `loudness`); it targets the delivery platform's loudness when `global.platform` is set.
+- Final output on the Node/static adapters is published atomically; a render whose output is one of its
+  inputs is refused.
+
+- Per-format compositions: top-level `formats` overrides (deep-merge patches, `byId`, `remove`) and
+  `{ "$format": { … } }` responsive values, resolved right after partial expansion. `ProjectConfig.format`
+  picks one; validation runs per declared format, with advisories `format_crop_only` and
+  `format_story_diverges`. Exports `resolveFormat`, `declaredFormats`, `usesFormats`, `FORMAT_NAMES`.
+- Footage editing on `video` / `project_video`: `fit` (`cover`, `letterbox`, `blur`, `off`) with `fill` and
+  cover `focus` (anchors, points, keyframed pans), `clip` in/out points, `speedRamp` presets or keys with
+  `rampAudio`, `freeze` frames with an optional flash, `trimSilence` (Node `silencedetect`) and explicit
+  `keep` windows, and `cutaways[]` B-roll with `a`/`b`/`mix` audio. Edited lengths drive the timeline,
+  transitions, music and QC. New validation codes (including `take_edit_combination`) and advisories;
+  `motionCatalog().footage`.
+- `look: { preset, strength }` dials a LUT look toward the untouched footage, and `grade.lut: { url, strength? }`
+  applies a user `.cube` (single `lut3d`, parsing errors name the line).
+- Media probes report HDR (`pq`, `hlg`, `dolby-vision`), colour primaries and transfer, bit depth, VFR and
+  rotation; HDR clips are tone-mapped to SDR on Node when the build has `zscale` and `tonemap`, otherwise
+  the render logs `hdr_source_sdr_pipeline`.
+- Word-timed `sections[].subtitles` from words, cues or SRT/WebVTT: phrase grouping, fit-then-balanced
+  wrapping, splitting, platform safe zones, six caption styles (`clean`, `loud`, `keynote`, `documentary`,
+  `boxed`, `neon`), karaoke `word` / `fill` / `pop` and a crown line, lowered to `drawtext` / `drawbox`.
+  Errors `invalid_srt`, `invalid_word_timings`, `invalid_subtitle_cue`, `subtitle_font_unmeasurable`;
+  advisories `caption_split`, `caption_shrunk`, `subtitle_past_end`, `caption_crown_repeated`;
+  `motionCatalog().captions`. Opt-in `caption.wrap` / `caption.fit` and `kinetic[].wrap: "balanced"`.
+- Audio polish: `options.voice` presets (`clean`, `broadcast`, `warm`, `rumble-cut`, `room-gate`),
+  `options.audioAutomation` and `global.audio.automation` (music bed, before ducking), section and global
+  `sfx` from ten bundled sounds, `global.audio.sfx: "auto"` (whooshes, hits and risers from the motion),
+  whole-video time references for global fields, and `motionCatalog().audio`.
+- Beat analysis: `analyzeBeats`, `analyzeMusicFile` and `applyMusicAnalysis` measure tempo, the downbeat, a
+  confidence and drop/build/end cues. `global.beats: { analyze: "music" }` is measured during the Node
+  compile (`beats_analysis_unavailable` elsewhere); section `options.duration` accepts `{ beats }` /
+  `{ bars }` (`beat_duration_needs_bpm`); advisory `beat_grid_low_confidence`.
+- Motion roles: `global.motion.roles` (`micro`, `panel`, `camera`, `headline`, `accent`, `mascot`) with
+  built-in defaults, `$role.<name>` tokens and `role` on kinetic blocks, graphics, drawtext filters, title
+  cards, lower thirds and the camera; advisories `overshoot_overuse` and `headline_hold_short`;
+  `motionCatalog().roles`.
+- Section `purpose` / `role` metadata, and `meta.brief` / `meta.requirePurpose` opting into the advisory
+  `section_without_purpose`.
+- Motion FX: kinetic `trail` echoes, `whip-left|right|up|down` designed transitions, `glitch`, `focus`,
+  `progress`, `ticker` and `bars-chart` graphics, and `lowerThird.style` (`clean-bar`, `side-rule`,
+  `kicker`, `stack-bars`, `pill`); `motionCatalog().lowerThirds` and `kinetic.trail`.
+- Compositing: `kinetic[].fill` (gradient, texture or shimmer inside the letters, through `alphamerge`) and
+  `sections[].layout` split screens and before/after wipes; errors `unknown_layout_source`,
+  `layout_unsupported_section`, `layout_wipe_out_of_range`; advisory `mask_unavailable`;
+  `motionCatalog().compositing`.
+- Right-to-left and complex scripts: `text_shaping` follows the real build (libfribidi), such kinetic text
+  animates per line (`kinetic_unit_coarsened`, `rtl_unshaped`), and the bundled `noto-arabic` /
+  `noto-hebrew` fonts.
+- Colour emoji in drawn text render as bundled image overlays that share the text's timing, motion and fade;
+  `global.emoji` (`image`, `strip`, or `error` to fail with `emoji_unsupported`) and advisories `emoji_missing_asset`, `emoji_overlay_cap`,
+  `emoji_stripped`; `resolveBundledEmoji` filesystem hook.
+- Reference style: `analyzeStyle` / `analyzeStyleFile` derive a theme and style guide (palette roles with
+  WCAG AA contrast, grain, pacing, motion energy, genre) from an image or clip, deterministically.
+- Advisory `palette_drift` (off-palette hex colours, more than two font families) with `global.theme` set;
+  `findPaletteDrift`.
+- Capability doctor: `probeCapabilities()` probes the Node FFmpeg (listings plus one-frame renders, cached
+  per binary and version); renders drop unusable filters with a warning and fall back to cuts without
+  xfade; `TemplateValidator.getCapabilityWarnings()` returns `feature_unavailable`. `FVC_CAPABILITY_PROBE=0`
+  skips the probe.
+- Elastic partials: `envelope`, `syncPoints`, `jobs` / `useWhen` / `avoidWhen` on definitions, and ref
+  `duration` and `align`; sync points become cues; advisory `partial_compressed`;
+  `motionCatalog().partials` and `partialCatalog()`.
+- Inspection (Node): `renderSnapshots`, `compareSnapshots` and `lookSnapshots` save PNG frames at
+  whole-video time references, at transitions or once each section settles, with contact sheets,
+  platform safe-zone shading, crops, variant and look grids, and per-format rendering. `videoTimeline()`
+  places sections, motion events, beats and cues on video seconds; `searchMotionCatalog()` ranks catalog
+  entries, including captions, sound effects, voice, footage, roles, compositing, lower thirds and formats.
+- On-device engine: `acompressor`, `adelay`, `agate`, `alimiter`, `equalizer` and `alphamerge` join the
+  filter allowlist and the build links libfribidi (rebuild the engine).
+
+- Light and effects: `graphics[]` entries with `type: "fx"`, 13 procedural primitives lowered at output
+  resolution and clipped to a `target` (`"frame"`, `"pane:<i>"`, `"layer:<i>"`, `"text:<i>"` or a
+  `{ x, y, w, h, radius }` rectangle in px or frame fractions). Light: `sheen`, `leak`, `edge-glow`, `bloom`.
+  Marks: `ripple` (`ring` / `tap`), `glint` (`scatter` / `corners` / `orbit`), `confetti`. Ambient (≤ 0.12,
+  absent at `global.motion.energy: 0`): `bokeh`, `dust`, `vignette-breathe`, `grain`. Surfaces: `glass`,
+  `resolve`. Shared fields `at`, `duration` (≤ 30 s), `ease`, `until`, `repeat`, `every`, `color` (theme
+  tokens), `intensity` (0–1 of the primitive's ceiling), `seed` and `above`; omitted parameters derive from the
+  target size, the theme accent, the motion energy and the seed, deterministically. Every primitive uses
+  on-device filters with fallbacks (compile-time sprites without `gradients`), has a reduced-motion form, and
+  is skipped with `fx_target`, `mask_unavailable` or `fx_skipped` when it cannot render. `motionCatalog().fx`
+  (and `searchMotionCatalog` kind `fx`) lists each primitive's parameters, defaults and design intent from
+  `FX_DOCS`; that prose is loaded lazily, outside the browser's eager load.
+- Strokes: `frame`, `corners` and `underline` draw even-pixel strokes that trace from the top-left with a head
+  fade and leave before `until`, and take `target`, `clearance` (24), `radius`, `trace`, `exit`,
+  `exitDuration` and `contrast` (`auto` | `shadow` | `none`); `corners` adds `spread`, `underline` adds round
+  `caps` and `settle`.
+- Kinetic `counter`: tabular digits, locale grouping and decimal marks (`locale`, `grouping`), `overshoot`,
+  an exact landing on `to`, and `to` read from the first number of the block text (`"{{ form_price }}"`) when
+  omitted. Without a duration the roll lasts 0.6–1.6 s by range.
+- Sameness lint on the motion feedback channel: `fx_untuned`, `effect_repeated`, `library_animation_sample`,
+  `effect_off_theme`, `decor_overload`. `motionCatalog().samples` maps each library APNG to the primitives
+  that replace it.
+- Packaged samples: the six effect recipes (interface-focus, product-spotlight, celebration-burst,
+  focus-lock, light-pass, frame-reveal) are built from engine primitives instead of APNG overlays.
+
+### Changed
+
+- **Breaking:** validation is stricter, so some templates that passed in 2.5.0 now fail:
+  - keys that strip objects used to drop silently (section options, transitions, discriminated unions) are
+    reported as `unknown_key` errors; remove or rename them (the finding suggests the nearest key);
+  - text drawn with a bundled font that lacks its glyphs fails with `font_missing_glyphs`.
+- **Breaking:** renders are no longer byte-identical to 2.5.0: the deterministic encoder profile is on by
+  default (`ProjectConfig.deterministic: false` restores the previous encoder settings), every section is
+  conformed to CFR, zooms are rendered at sub-pixel precision and `above: true` graphics change their
+  draw order (below). Pin golden files again after upgrading.
+- `above: true` graphics are drawn after the section's own authored `filters` and masks, so an authored mask
+  or a text plate no longer hides them. An `underline` and an fx on a `text:<i>` target default to above.
+- Whip transitions model a 144° shutter: the blur follows the push's real speed, ramps in and out with the
+  ease (no threshold), is centred on its frame and is capped at 4.5 % of the travel axis. Defaults peak at
+  the same blur as before.
+- Browser entry: `zod` is no longer inlined into `dist/browser.js`. It is imported from the `zod`
+  runtime dependency (like `tslib`), so the host's bundler shares one copy with the app. Validation
+  also no longer loads the background sugar presets or the rounded-panel PNG encoder at startup.
+  Together these cut the eager load from 806 KB to 587 KB, and `Template` still validates synchronously.
+
+### Fixed
+
+- Zooms and pans (camera rig, Ken Burns, pulse, `resolve`, `zoom-through`) no longer stutter: `zoompan`
+  cropped a whole-pixel window, so a slow push-in held for one to four frames and then jumped by up to a
+  pixel, sometimes backwards. Every zoom now lowers to an exact sub-pixel zoom with the same on-device
+  filters, at about the same cost.
+- Eased camera, Ken Burns and pulse zooms no longer hold their first and last frames still before a half-pixel jump: a moving exact zoom rests at a 1.5 px over-scan that fades out by zoom 1.05.
+- `leak`, `bloom` and `vignette-breathe` no longer band after H.264 encoding: their soft-light dither is a fine static grain that survives libx264 at crf 23. Only renders using these effects change; their files grow somewhat.
+- A cut between sections that also use designed transitions is joined with `concat`: the 0.001 s xfade shorter than a frame ended the output early on FFmpeg 6.x.
+- A command FFmpeg cannot start (E2BIG, ENOENT) reports the system error instead of an empty failure.
+- No false text-collision warning for a global overlay on back-to-back sections (sub-millisecond overlaps are ignored).
+- Node renders pass a filtergraph longer than 64 KB through a script file (`-filter_script:v`, `-filter_complex_script`): a long stepped or per-frame graph no longer fails to spawn with E2BIG, and a spawn failure now reports its reason instead of an empty error.
+- FFmpeg 8 no longer crashes on animated text sizes: a drawtext whose `fontsize` changes over time (kinetic scale presets, the karaoke word pop, `animate.scale`) is drawn as one constant-size drawtext per run of frames.
+- A footage-edited clip pads its audio only up to the edited length (`apad=whole_dur`), so `-shortest` no longer lets the audio overrun the picture on FFmpeg 8.
+- Backslashes in drawtext text (captions, title cards, overlays, kinetic counter prefix/suffix) render
+  literally instead of being swallowed; escaping is shared and verified against a real FFmpeg.
+- FFmpeg 7.1+: Rec.709 tags are set through libx264 parameters, avoiding an unintended colour conversion.
+- `project_video` sections whose audio is shorter than the video no longer lose video frames to
+  `-shortest` (the clip's audio is padded).
+- Normalisation now runs when music is enabled but no track resolves.
+
 ## [2.5.0] - 2026-10-03
 
 ### Added

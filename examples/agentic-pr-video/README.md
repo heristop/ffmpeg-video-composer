@@ -79,6 +79,29 @@ Mapping two clips needs a `@leclap/cli` release newer than 0.2.4; earlier versio
 
 For a real change, point the same two walkthroughs at your app on the base branch and on your branch, then attach `./build/pr-evidence.mp4` to the PR/MR like the single-walkthrough video.
 
+## Feature reel for a large pull request
+
+When a branch adds many features, one walkthrough is not enough. [`motion-effects-reel.json`](./motion-effects-reel.json) cuts already-rendered sample previews into a chaptered reel of about 100 s:
+
+- An intro and a determinism card.
+- Five numbered chapter cards. They come from one inline `chapter-card` partial with an `envelope`, so each ref's `duration` stretches only the hold.
+- The previews as `video` sections, each trimmed with `options.clip` and labelled by a top `pill` lower third.
+- An agent-tooling chapter that shows real CLI output: a `leclap snapshot --sheet` contact sheet, `leclap timeline` lines and the `leclap diagnose` feature count.
+
+Designed transitions join the sections. `global.audio.sfx: "auto"` adds whooshes and hits, and authored `sfx` cues add the rest. The template validates with no findings.
+
+It reads its media from an assets folder: `videos/showcase/*.mp4` from `apps/leclap-web/public` and two pictures, `pictures/snapshot-sheet.png` and `pictures/formats-row.png`. [`.github/pr-media/motion-effects/make-media.sh`](../../.github/pr-media/motion-effects/make-media.sh) stages that folder, renders the reel and makes the PR snapshots:
+
+```bash
+npx @leclap/cli validate motion-effects-reel.json
+npx @leclap/cli render motion-effects-reel.json --assets ../../build/pr/assets --qc -o ../../build/pr/motion-effects.mp4
+npx @leclap/cli snapshot motion-effects-reel.json --at-transitions --per-section --sheet 4x3 --assets ../../build/pr/assets
+```
+
+For another branch, keep the partial and the label pattern, and swap in that branch's clips and chapter titles.
+
+[`motion-polish-reel.json`](./motion-polish-reel.json) reuses the same `chapter-card` partial (its underline switched to round caps) for a 43 s reel of the `fx` primitives: four chapters, then one labelled beat per primitive, each effect authored in the template itself on stand-in footage or theme cards rather than cut from previews. [`.github/pr-media/motion-polish/make-media.sh`](../../.github/pr-media/motion-polish/make-media.sh) generates the stand-in clips and renders it.
+
 ## Evidence-video agent skill
 
 [`evidence-skill/`](./evidence-skill) turns the before/after idea into an agent skill a team can copy into `.agents/skills/evidence-video/` of the app under review. `before-after.json` lets LeClap draw its own badges and lower thirds; the skill's `build.py` composes every card and panel with ffmpeg first, then hands them to LeClap for the crossfades, the watermark and the render. That buys three things:

@@ -1,0 +1,1162 @@
+{
+  "meta": {
+    "name": "Effects tour: compositing and light",
+    "description": "Chapter 5 of the effects tour: section layouts with bundled photographs (a three-pane horizontal split with gaps, a stacked vertical split with a divider, a before/after wipe), then every fx primitive (graphics[].type \"fx\") in its family: light (sheen, edge-glow, leak, bloom), marks (ripple, glint, confetti), ambient (bokeh, dust, vignette-breathe, grain) and surfaces (glass, resolve).",
+    "creativeDirection": "Comparison as composition, then light as material: the triptych names its shores on a backing panel, the stacked pair labels each pane on its own side, and the wipe uncovers the tidy desk. Each fx beat shows one primitive anchored to what it decorates (a card, a button, a title, the photo) and tuned for it. Review: panes stay cover-fitted, dividers are crisp, light never greys or floats outside its target, ambient textures stay faint, and type never straddles a pane boundary."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 47,
+    "transition": {
+      "type": "cut"
+    },
+    "motion": {
+      "energy": 1
+    },
+    "overlays": [
+      {
+        "text": {
+          "en": "05  COMPOSITING & LIGHT"
+        },
+        "position": "top-right",
+        "font": "mono",
+        "size": 24,
+        "color": "#C9C6D2",
+        "effect": {
+          "shadow": true
+        }
+      }
+    ]
+  },
+  "sections": [
+    {
+      "name": "split-horizontal",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.2
+      },
+      "layout": {
+        "type": "split",
+        "sources": ["backgrounds/rocky-coast.jpg", "backgrounds/forest-sea.jpg", "backgrounds/green-forest.jpg"],
+        "gap": 12
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0.15,
+          "x": 0,
+          "y": 580,
+          "width": 1280,
+          "height": 140,
+          "color": "#141416@0.75",
+          "from": "bottom"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "layout · split · horizontal · 3 panes · gap"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Three shores, one frame"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 56,
+          "y": 612,
+          "delay": 0.4,
+          "accent": {
+            "words": "last",
+            "color": "#FFF685"
+          }
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "split-vertical",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.2
+      },
+      "layout": {
+        "type": "split",
+        "direction": "vertical",
+        "sources": ["backgrounds/laptop-desk.jpg", "backgrounds/desk-flatlay.jpg"],
+        "divider": {
+          "color": "#FFF685",
+          "width": 6
+        }
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "layout · split · vertical · divider"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "WIDE"
+          },
+          "preset": "slide",
+          "direction": "left",
+          "size": 80,
+          "align": "right",
+          "x": 1220,
+          "y": 230,
+          "delay": 0.35,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        },
+        {
+          "text": {
+            "en": "OVERHEAD"
+          },
+          "preset": "slide",
+          "direction": "left",
+          "size": 80,
+          "align": "right",
+          "x": 1220,
+          "y": 590,
+          "delay": 0.6,
+          "color": "#FFF685",
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          },
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "before-after",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.8
+      },
+      "layout": {
+        "type": "before-after",
+        "before": "backgrounds/laptop-desk.jpg",
+        "after": "backgrounds/desk-flatlay.jpg",
+        "wipe": {
+          "at": 0.9,
+          "duration": 1.4,
+          "direction": "right",
+          "ease": "ease-in-out-cubic"
+        },
+        "divider": {
+          "color": "#FFFFFF",
+          "width": 5
+        }
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "layout · before-after · wipe"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 640,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "BEFORE"
+          },
+          "preset": "fade",
+          "size": 76,
+          "align": "right",
+          "x": 1220,
+          "y": 100,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          },
+          "exit": {
+            "preset": "fade",
+            "at": 1.7
+          }
+        },
+        {
+          "text": {
+            "en": "AFTER"
+          },
+          "preset": "rise",
+          "size": 76,
+          "align": "left",
+          "x": 60,
+          "y": 100,
+          "delay": 1.5,
+          "color": "#FFF685",
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "fx-sheen",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "layers": [
+          {
+            "color": "#2A2238",
+            "x": 340,
+            "y": 200,
+            "w": 600,
+            "h": 320
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "sheen",
+          "target": "layer:0",
+          "at": 0.6,
+          "profile": "specular",
+          "width": 0.12,
+          "tilt": 20,
+          "duration": 0.8,
+          "seed": 3
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · sheen · light family"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Light on glass"
+          },
+          "preset": "rise",
+          "size": 72,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-edge-glow",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "layers": [
+          {
+            "color": "#2A2238",
+            "x": 340,
+            "y": 200,
+            "w": 600,
+            "h": 320
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "edge-glow",
+          "target": "layer:0",
+          "at": 0,
+          "duration": 2.4,
+          "glow": "#7C83FD",
+          "spread": 18,
+          "intensity": 0.9,
+          "seed": 5
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · edge-glow"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Edge light"
+          },
+          "preset": "rise",
+          "size": 72,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-leak",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rainy-window.jpg",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        },
+        {
+          "type": "fx",
+          "effect": "leak",
+          "at": 0.1,
+          "duration": 2.2,
+          "edge": "top-right",
+          "size": 0.6,
+          "drift": 0.08,
+          "intensity": 1,
+          "seed": 7
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · leak"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Warm leak"
+          },
+          "preset": "rise",
+          "size": 96,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-bloom",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/warm-bokeh.jpg",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        },
+        {
+          "type": "fx",
+          "effect": "bloom",
+          "at": 0,
+          "duration": 2.4,
+          "threshold": 0.62,
+          "radius": 0.02,
+          "intensity": 1,
+          "seed": 9
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · bloom"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Halation"
+          },
+          "preset": "rise",
+          "size": 96,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-ripple",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "layers": [
+          {
+            "color": "#2A2238",
+            "x": 340,
+            "y": 200,
+            "w": 600,
+            "h": 320
+          },
+          {
+            "color": "#7C83FD",
+            "x": 560,
+            "y": 410,
+            "w": 160,
+            "h": 64
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "ripple",
+          "variant": "tap",
+          "target": "layer:1",
+          "at": 0.6,
+          "color": "#FFF685",
+          "seed": 11
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · ripple · marks family"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Tap"
+          },
+          "preset": "rise",
+          "size": 72,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-glint",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "layers": [
+          {
+            "color": "#2A2238",
+            "x": 340,
+            "y": 200,
+            "w": 600,
+            "h": 320
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "glint",
+          "target": "layer:0",
+          "at": 0.5,
+          "path": "scatter",
+          "count": 4,
+          "size": 48,
+          "seed": 13
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · glint"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Polished"
+          },
+          "preset": "rise",
+          "size": 72,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-confetti",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "layers": [
+          {
+            "color": "#2A2238",
+            "x": 340,
+            "y": 200,
+            "w": 600,
+            "h": 320
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "confetti",
+          "at": 0.3,
+          "origin": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "angle": -90,
+          "spread": 110,
+          "speed": 2.6,
+          "colors": ["#7C83FD", "#FF8AAE", "#FFF685", "#F5F3F7"],
+          "seed": 17
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · confetti"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Launch day"
+          },
+          "preset": "rise",
+          "size": 72,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-bokeh",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4,
+        "layers": []
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "bokeh",
+          "at": 0,
+          "duration": 2.4,
+          "count": 9,
+          "color": "#FFF685",
+          "intensity": 1,
+          "seed": 19
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · bokeh · ambient family"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Soft depth"
+          },
+          "preset": "rise",
+          "size": 72,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-dust",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        },
+        {
+          "type": "fx",
+          "effect": "dust",
+          "at": 0,
+          "duration": 2.4,
+          "count": 30,
+          "size": 3,
+          "intensity": 1,
+          "seed": 23
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · dust"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Air"
+          },
+          "preset": "rise",
+          "size": 96,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-vignette-breathe",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/concrete-lines.jpg",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        },
+        {
+          "type": "fx",
+          "effect": "vignette-breathe",
+          "at": 0,
+          "duration": 2.4,
+          "angle": 0.8,
+          "swing": 0.1,
+          "period": 2.4,
+          "intensity": 1,
+          "seed": 29
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · vignette-breathe"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Quiet focus"
+          },
+          "preset": "rise",
+          "size": 96,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-grain",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/woodshop.jpg",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        },
+        {
+          "type": "fx",
+          "effect": "grain",
+          "at": 0,
+          "duration": 2.4,
+          "size": 2,
+          "intensity": 1,
+          "seed": 31
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · grain"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Film grain"
+          },
+          "preset": "rise",
+          "size": 96,
+          "y": "center",
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-glass",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        },
+        {
+          "type": "fx",
+          "effect": "glass",
+          "target": {
+            "x": 160,
+            "y": 470,
+            "w": 960,
+            "h": 170,
+            "radius": 28
+          },
+          "at": 0.1,
+          "duration": 2.2,
+          "tone": "dark",
+          "frost": 0.12,
+          "seed": 37
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · glass · surfaces family"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "A frosted plate"
+          },
+          "preset": "cascade",
+          "size": 72,
+          "y": 508,
+          "delay": 0.4,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fx-resolve",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "resolve",
+          "target": "text:1",
+          "at": 0.5,
+          "duration": 0.8,
+          "blur": 0.06,
+          "scale": 1.05,
+          "seed": 41
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "fx · resolve"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "LECLAP"
+          },
+          "preset": "fade",
+          "size": 170,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.2,
+          "color": "#F5F3F7"
+        }
+      ]
+    }
+  ]
+}

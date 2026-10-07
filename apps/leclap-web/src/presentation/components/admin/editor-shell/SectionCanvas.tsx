@@ -22,21 +22,13 @@ import { clampFraction, fontSizeFromResize } from '../overlayGeometry';
 import { BackgroundLayerBoxes } from '../BackgroundLayerBoxes';
 import { combinedLookGradeFilter } from '../editor/lookFilters';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
+import { FRAME_FIT_CLASS } from './frame-fit';
 import { OverlayBox } from './sectionCanvasBox';
 import { AnimationOverlayItem, ImageOverlayItem } from './sectionCanvasMediaItems';
 import { SugarPreviewLayer } from './SugarPreviewLayer';
 import type { DropPayload, DropPoint } from './canvasDrop';
 import { useCanvasDropTarget } from './useCanvasDropTarget';
-
-// Preview-surface aspect classes per orientation (portrait 9:16, square 1:1, landscape 16:9).
-// Height-driven, aspect-correct sizing: tall formats fill the stage HEIGHT (width derives from the
-// aspect ratio); landscape fills the WIDTH. `max-h-full`/`max-w-full` keep the frame inside the
-// stage, and the parent grid centers it on both axes.
-const previewAspectClass: Record<Orientation, string> = {
-  portrait: 'aspect-[9/16] h-full max-h-full w-auto max-w-full',
-  square: 'aspect-square h-full max-h-full w-auto max-w-full',
-  landscape: 'aspect-video w-full max-w-full h-auto max-h-full',
-};
+import { LazyFxPreview, type FxPreviewLayerProps } from './fx-preview/LazyFxPreview';
 
 const clamp01 = (value: number): number => Math.min(1, Math.max(0, value));
 
@@ -60,11 +52,13 @@ type MediaPatch = { position: string } | { scale: string } | { rotation: number 
 
 // CSS approximation of the section's source-footage fit (SegmentBuilder.prependScaleFilters):
 // cover = scale+crop (object-cover), letterbox = scale+pad with black bars (object-contain on a
-// black element box — ffmpeg's pad default is black), off = no conform scaling at all, so the frame
+// black element box — ffmpeg's pad default is black; blur previews the same way), off = no conform scaling at all, so the frame
 // simply follows the source; filling the preview frame is the closest static approximation.
 const backdropFitClass: Record<SectionFit, string> = {
   cover: 'object-cover',
   letterbox: 'bg-black object-contain',
+  // The blurred fill is approximated by a contained frame on the dark backdrop.
+  blur: 'bg-black object-contain',
   off: 'object-fill',
 };
 
@@ -156,6 +150,8 @@ interface SectionCanvasProps {
   onChangeImages?: (images: ImageOverlay[]) => void;
   onChangeAnimations?: (animations: AnimationOverlay[]) => void;
   onCanvasDrop?: (payload: DropPayload, point: DropPoint) => void;
+  // The selected engine effect, drawn live by the browser (lazy layer): an approximation of the render.
+  fx?: FxPreviewLayerProps;
 }
 
 // Read the active index for a given element kind from the shared selection (null when another kind,
@@ -224,6 +220,7 @@ export const SectionCanvas = ({
   onChangeImages,
   onChangeAnimations,
   onCanvasDrop,
+  fx,
 }: SectionCanvasProps) => {
   const { t } = useTranslation('admin');
   const frameRef = useRef<HTMLDivElement>(null);
@@ -297,7 +294,7 @@ export const SectionCanvas = ({
       className={cn(
         'relative touch-none overflow-hidden rounded-xl border border-foreground/10 select-none',
         drop.dragOver && 'ring-2 ring-brand-500/60',
-        previewAspectClass[orientation]
+        FRAME_FIT_CLASS[orientation]
       )}
     >
       {/* Backdrop group: everything the engine grades (the base frame) lives under one CSS filter.
@@ -351,6 +348,8 @@ export const SectionCanvas = ({
           onDelete={removeAnimation}
         />
       ))}
+      {/* The selected engine effect, live: drawn over the composited media, below the editable text. */}
+      {fx ? <LazyFxPreview {...fx} annotate /> : null}
       {/* Text sugar draws above the composited media, below the draggable overlays — the engine's
           z-order (overlay-class sugar chains onto the final map; authored drawtext comes after). */}
       <SugarPreviewLayer

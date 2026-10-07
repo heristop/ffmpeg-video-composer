@@ -10,6 +10,7 @@ describe('mcpDoc', () => {
       'list_samples',
       'get_sample',
       'get_template_schema',
+      'get_motion_catalog',
       'validate_template',
       'compose_video',
     ]);

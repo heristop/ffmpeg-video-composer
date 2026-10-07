@@ -29,6 +29,8 @@
     "test:scripts": "bash scripts/ci/test-media-pipeline.sh",
     "gen:icons": "node scripts/gen-icons.ts",
     "gen:icons:native": "node scripts/gen-expo-native-icons.ts",
+    "gen:emoji": "node scripts/gen-emoji.ts",
+    "gen:animation-thumbs": "pnpm --filter @leclap/creative-kit gen:animation-thumbs",
     "sync:repo-meta": "node scripts/sync-repo-metadata.ts",
     "deps:check": "depcruise packages/ffmpeg-video-composer/src",
     "deps:dot": "depcruise packages/ffmpeg-video-composer/src --output-type dot > docs/graph.dot",
@@ -41,7 +43,9 @@
     "app:android": "pnpm --filter @leclap/expo run android",
     "mcp:dev": "pnpm --filter ffmpeg-video-composer build && pnpm --filter @leclap/mcp build && node packages/leclap-mcp/dist/index.js",
     "docs:effects": "pnpm --filter @leclap/mcp exec tsx scripts/generate-effect-docs.ts",
-    "docs:effects:check": "pnpm --filter @leclap/mcp exec tsx scripts/generate-effect-docs.ts --check"
+    "docs:effects:check": "pnpm --filter @leclap/mcp exec tsx scripts/generate-effect-docs.ts --check",
+    "motion:review": "node scripts/motion-review/review.ts",
+    "motion:review:templates": "node scripts/motion-review/review.ts --templates-only"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",

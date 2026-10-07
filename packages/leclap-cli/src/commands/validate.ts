@@ -7,6 +7,7 @@ import {
   nodeGeometryWarnings,
   renderedGeometryWarnings,
   type GeometryWarning,
+  type MotionWarning,
 } from 'ffmpeg-video-composer';
 import { setEngineLogLevel } from '../log.js';
 import { resolveAssetsDir } from '../resolve-assets-dir.js';
@@ -19,6 +20,11 @@ interface ValidationError {
   path: string;
   message: string;
   code?: string;
+  // How to fix it, when the validator knows: one sentence, a replacement value for `path`, and whether
+  // that fix is mechanical (`format`) or a creative call (`judgement`). `--json` emits them unchanged.
+  hint?: string;
+  suggestion?: unknown;
+  kind?: 'format' | 'judgement';
 }
 
 // The engine's type itself, not a hand-written mirror. A mirror that made `code`/`severity`/`approx`
@@ -39,6 +45,9 @@ interface ValidationResult {
   success: boolean;
   errors?: ValidationError[];
   warnings?: ValidationWarning[];
+  // Advisory pacing findings from the motion timeline (and assertions it could not measure); like
+  // geometry they never decide `success`.
+  motionWarnings?: MotionWarning[];
   render?: RenderSummary;
 }
 
@@ -58,7 +67,15 @@ function plural(count: number, noun: string): string {
 // read as a contradiction. Each finding's message already names the section, so the path follows it
 // dimmed rather than leading it a second time. picocolors honours NO_COLOR.
 export function formatValidation(result: ValidationResult): string[] {
-  return [...formatFindings(result), ...renderLines(result.render)];
+  return [...formatFindings(result), ...motionLines(result.motionWarnings), ...renderLines(result.render)];
+}
+
+// One line per motion finding, its hint dimmed beneath it: what a motion director would change.
+function motionLines(warnings: MotionWarning[] | undefined): string[] {
+  return (warnings ?? []).flatMap((w) => [
+    step(`${pc.cyan('~')} ${w.message} ${pc.dim(`${w.path} ${w.code}`)}`),
+    ...(w.hint ? [hint(`      ${w.hint}`)] : []),
+  ]);
 }
 
 function renderLines(render: RenderSummary | undefined): string[] {
@@ -78,7 +95,8 @@ function renderLines(render: RenderSummary | undefined): string[] {
 function formatFindings(result: ValidationResult): string[] {
   const found = result.warnings ?? [];
   const warnings = found.map((w) => step(`${pc.yellow('!')} ${w.message}${geometryApproxNote(w)} ${pc.dim(w.path)}`));
-  const warned = found.length > 0 ? ` — ${plural(found.length, 'warning')}` : '';
+  const count = found.length + (result.motionWarnings?.length ?? 0);
+  const warned = count > 0 ? ` — ${plural(count, 'warning')}` : '';
 
   if (result.success) {
     return [success(`Template is valid${warned}`), ...warnings];
@@ -90,9 +108,16 @@ function formatFindings(result: ValidationResult): string[] {
     return [fail(`Template is invalid${warned}`), ...warnings];
   }
 
-  const lines = errors.map((e) => step(`${pc.red('✗')} ${pc.bold(bracketPath(e.path))} — ${e.message}`));
+  const lines = errors.flatMap(errorLines);
 
   return [fail(`Template is invalid (${plural(errors.length, 'problem')})${warned}`), ...lines, ...warnings];
+}
+
+// One line per error, plus a dimmed `→ hint` line under it when the validator knows the fix.
+function errorLines(error: ValidationError): string[] {
+  const line = step(`${pc.red('✗')} ${pc.bold(bracketPath(error.path))} — ${error.message}`);
+
+  return error.hint ? [line, hint(`      → ${error.hint}`)] : [line];
 }
 
 // The exit code is driven solely by `success`; geometry (and any other) warnings must never flip it,
@@ -151,7 +176,21 @@ async function runValidation(templatePath: string, json: boolean, render: boolea
     return { success: false, errors: [{ path: templatePath, message, code: 'load_error' }] };
   }
 
-  return attachGeometryWarnings(new TemplateValidator(), data, render);
+  const validator = new TemplateValidator();
+
+  return attachMotionWarnings(validator, data, await attachGeometryWarnings(validator, data, render));
+}
+
+// Render-free and synchronous; only for a parsed descriptor (a schema failure has nothing to time).
+// Absent, not empty, when there is nothing to say — the same zero-token rule as geometry.
+function attachMotionWarnings(validator: TemplateValidator, data: unknown, result: ValidationResult): ValidationResult {
+  if (!result.success) {
+    return result;
+  }
+
+  const motionWarnings = validator.getMotionWarnings(data);
+
+  return motionWarnings.length > 0 ? { ...result, motionWarnings } : result;
 }
 
 type GeometryDescriptor = Parameters<typeof nodeGeometryWarnings>[0];

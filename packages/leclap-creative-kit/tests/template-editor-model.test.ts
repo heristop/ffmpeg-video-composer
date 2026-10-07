@@ -23,7 +23,7 @@ import { TemplateDescriptorSchema } from 'ffmpeg-video-composer/src/schemas/temp
 
 // Id-agnostic literals — the model never resolves them, so we avoid app media catalogs.
 const music1 = 'point-being';
-const music2 = 'americana';
+const music2 = 'lofi-cafe';
 const bg1 = 'forest-sea';
 const bg2 = 'golden-hour';
 

@@ -44,7 +44,7 @@ function formatDetail(sample: SampleDetail): string {
 const list = defineCommand({
   meta: { name: 'list', description: 'Discover packaged showcase samples and their required inputs' },
   args: {
-    category: { type: 'string', description: 'templates, typography, app-demos, overlays or evidence' },
+    category: { type: 'string', description: 'templates, typography, effects, app-demos, overlays or evidence' },
     backend: { type: 'string', description: 'native or remotion' },
     query: { type: 'string', description: 'Search ID, title, description and creative direction' },
     json: { type: 'boolean', description: 'Emit sample metadata as JSON', default: false },

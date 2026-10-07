@@ -1,0 +1,122 @@
+{
+  "pill": {
+    "label": "Agent",
+    "aria": "Browser-Agent: {{state}}",
+    "states": {
+      "off": "aus",
+      "idle": "bereit",
+      "working": "arbeitet"
+    }
+  },
+  "popover": {
+    "title": "Browser-Agent",
+    "intro": "Ein in deinen Browser eingebauter KI-Agent kann diese Vorlage lesen, prüfen und Änderungen vornehmen, die du rückgängig machen kannst. Er nutzt den Agenten deines Browsers: Diese Seite enthält keinen API-Schlüssel.",
+    "polyfill": "Entwicklungsmodus: Die Tools stammen aus dem WebMCP-Polyfill.",
+    "close": "Schließen"
+  },
+  "settings": {
+    "enabled": "Browser-Agenten diesen Editor nutzen lassen",
+    "enabledHelp": "Ausschalten entfernt alle Tools auf einmal.",
+    "askBeforeEdit": "Vor jeder Änderung fragen",
+    "askBeforeEditHelp": "Jede Änderung des Agenten wartet auf dein OK.",
+    "problem": "Einige Tools konnten nicht registriert werden: {{detail}}"
+  },
+  "log": {
+    "title": "Letzte Aktivität",
+    "emptyTitle": "Noch keine Aktivität",
+    "empty": "Noch nichts. Bitte den Agenten deines Browsers, an dieser Vorlage zu arbeiten – jeder Schritt erscheint hier.",
+    "undo": "Rückgängig",
+    "undoLabel": "Rückgängig: {{action}}",
+    "note": "Notiz des Agenten: {{note}}",
+    "status": {
+      "ok": "Erledigt",
+      "error": "Fehlgeschlagen",
+      "declined": "Abgelehnt"
+    },
+    "changed_one": "{{count}} Szene geändert",
+    "changed_other": "{{count}} Szenen geändert"
+  },
+  "tools": {
+    "get_template": "Vorlage gelesen",
+    "list_sections": "Szenen aufgelistet",
+    "get_template_schema": "Vorlagenschema gelesen",
+    "get_motion_catalog": "Animationen nachgeschlagen",
+    "list_samples": "Beispiele durchsucht",
+    "get_sample": "Beispiel gelesen",
+    "validate_template": "Vorlage geprüft",
+    "get_timeline": "Zeitleiste gelesen",
+    "select_section": "Szene ausgewählt",
+    "edit_template": "Vorlage bearbeitet",
+    "add_section": "Szene hinzugefügt",
+    "remove_section": "Szene entfernt",
+    "move_section": "Szene verschoben",
+    "set_texts": "Bildschirmtexte geändert",
+    "undo": "Letzten Schritt rückgängig gemacht",
+    "set_theme": "Theme geändert",
+    "set_format": "Format geändert",
+    "set_music": "Musik geändert",
+    "replace_template": "Vorlage ersetzt",
+    "load_sample": "Beispiel geöffnet",
+    "render_preview": "Vorschau gerendert",
+    "render_frames": "Vorschaubilder aufgenommen",
+    "save_template": "Vorlage gespeichert"
+  },
+  "actions": {
+    "edit_template": "die Vorlage bearbeiten",
+    "add_section": "eine Szene hinzufügen",
+    "remove_section": "eine Szene entfernen",
+    "move_section": "eine Szene verschieben",
+    "set_texts": "Bildschirmtexte ändern",
+    "undo": "seinen letzten Schritt rückgängig machen",
+    "set_theme": "das Theme ändern",
+    "set_format": "das Format ändern",
+    "set_music": "die Musik ändern",
+    "replace_template": "diese Vorlage ersetzen",
+    "load_sample": "statt dieser Vorlage ein Beispiel öffnen",
+    "render_preview": "eine Vorschau rendern",
+    "render_frames": "Bilder aus der Vorschau aufnehmen",
+    "save_template": "diese Vorlage speichern"
+  },
+  "errors": {
+    "invalid_input": "ungültige Anfrage",
+    "too_large": "Anfrage zu groß",
+    "revision_conflict": "Vorlage hat sich inzwischen geändert",
+    "invalid_template": "hätte die Vorlage beschädigt",
+    "builder_unsupported_section": "vom Editor nicht unterstützt",
+    "no_effect": "nichts, was der Editor behalten kann",
+    "not_found": "nicht gefunden",
+    "user_declined": "von dir abgelehnt",
+    "needs_user_attention": "Tab im Hintergrund",
+    "rate_limited": "zu viele Anfragen",
+    "busy": "ein anderer Schritt lief noch",
+    "disabled": "Agent-Tools sind aus",
+    "aborted": "abgebrochen",
+    "unavailable": "nicht verfügbar",
+    "render_failed": "das Rendern ist fehlgeschlagen",
+    "save_blocked": "noch nicht speicherbar"
+  },
+  "confirm": {
+    "title": "Diese Aktion des Browser-Agenten erlauben?",
+    "description": "Der Agent deines Browsers möchte {{action}}.",
+    "undoable": "Du kannst es danach rückgängig machen.",
+    "allow": "Erlauben",
+    "deny": "Nicht erlauben",
+    "allowSession": "Vorschauen für den Rest dieser Sitzung erlauben",
+    "details": {
+      "replace_template": "Er öffnet sich als neuer Entwurf „{{name}}“ mit {{sections}} Szenen; Rückgängig holt deinen aktuellen Entwurf zurück.",
+      "load_sample": "Das Beispiel „{{title}}“ öffnet sich als neuer Entwurf; Rückgängig holt deinen aktuellen Entwurf zurück.",
+      "render_preview": "Er rendert etwa {{duration}} s Video in deinem Browser mit Platzhalter-Medien, rund {{seconds}} s Arbeit, und öffnet die Vorschau hier.",
+      "save_template": "Er speichert „{{name}}“ in deiner Vorlagenbibliothek auf diesem Gerät; der Editor bleibt offen."
+    }
+  },
+  "live": {
+    "changed_one": "Der Browser-Agent hat {{count}} Szene geändert",
+    "changed_other": "Der Browser-Agent hat {{count}} Szenen geändert",
+    "settings_one": "Der Browser-Agent hat die Vorlageneinstellungen geändert",
+    "settings_other": "Der Browser-Agent hat die Vorlageneinstellungen geändert",
+    "declined_one": "Du hast eine Aktion des Agenten abgelehnt",
+    "declined_other": "Du hast {{count}} Aktionen des Agenten abgelehnt",
+    "failed_one": "Eine Aktion des Agenten ist fehlgeschlagen",
+    "failed_other": "{{count}} Aktionen des Agenten sind fehlgeschlagen"
+  }
+}

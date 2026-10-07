@@ -97,9 +97,9 @@ export function segmentOutputPath(buildDir: string | undefined, sectionName: str
   return `${buildDir}/${assertSafeSegmentName(sectionName)}_output.mp4`;
 }
 
-// Resolve a section's clip source (user recording, else the assets-dir fallback) and read its media
-// info, falling back to the declared duration when the probe can't.
-export async function fetchSectionInfos(deps: SectionInfosDeps, section: Section): Promise<FFMpegInfos> {
+// Resolve a section's clip source: the user recording, else the assets-dir fallback (staging the catalog
+// demo clip there when needed). Also used by the footage plan to analyse the same file it probes.
+export async function resolveSectionSource(deps: SectionInfosDeps, section: Section): Promise<string> {
   const userPaths = deps.config.userVideoPaths;
   deps.logger.info(`[fetchSectionInfos] Processing section ${section.name} (${section.type})`, {
     userVideoPaths: userPaths ? Object.keys(userPaths).join(', ') : 'none',
@@ -118,5 +118,11 @@ export async function fetchSectionInfos(deps: SectionInfosDeps, section: Section
     await stageDemoClip(deps, section, source);
   }
 
-  return probeWithFallback(deps, section, source);
+  return source;
+}
+
+// Resolve a section's clip source and read its media info, falling back to the declared duration when
+// the probe can't.
+export async function fetchSectionInfos(deps: SectionInfosDeps, section: Section): Promise<FFMpegInfos> {
+  return probeWithFallback(deps, section, await resolveSectionSource(deps, section));
 }

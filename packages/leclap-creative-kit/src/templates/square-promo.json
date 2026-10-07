@@ -2,7 +2,7 @@
   "meta": {
     "name": "Square Promo",
     "description": "A bold editorial square campaign: contrasting panels, staggered lateral typography, a full-bleed product clip and a graphic closing invitation.",
-    "creativeDirection": "Audience: people scanning a square social campaign. Direction: a graphic editorial invitation, with contrasting lime and dark panels, staggered lateral typography and a full-bleed product clip. Alternate the dominant element between headline, footage and invitation; keep one focal point per scene. Use one brief light pass on the footage and opposing overshoot motion to make transitions punchy, with a settled hold before the next cut. Avoid reproducing the tutorial layout, identical cards, excess subheadings and text over the product focal point. Review the opening hierarchy, clip crop, text bounds and final invitation at feed size."
+    "creativeDirection": "Audience: people scanning a square social campaign. Direction: a graphic editorial invitation, with contrasting lime and dark panels, staggered lateral typography and a full-bleed product clip. Alternate the dominant element between headline, footage and invitation; keep one focal point per scene. Use one brief lime light leak on the footage and opposing overshoot motion to make transitions punchy, with a settled hold before the next cut. Avoid reproducing the tutorial layout, identical cards, excess subheadings and text over the product focal point. Review the opening hierarchy, clip crop, text bounds and final invitation at feed size. Motion: panels push up in sequence; a lime leak pours across the clip as it lands; brackets close in on the closing invitation."
   },
   "global": {
     "orientation": "square",
@@ -11,9 +11,9 @@
     },
     "musicEnabled": true,
     "music": {
-      "name": "upbeat-electronic.mp3"
+      "name": "lofi-study.mp3"
     },
-    "allowedMusic": ["upbeat-electronic", "future-bass-energy", "party-dance", "lofi-hip-hop", "indie-rock-dreamy"],
+    "allowedMusic": ["lofi-study", "chill-hip-hop", "party-dance", "lofi-hip-hop", "indie-rock-dreamy"],
     "allowUploadMusic": true,
     "transition": {
       "type": "cut"
@@ -183,7 +183,12 @@
             "distance": 32
           }
         }
-      ]
+      ],
+      "transition": {
+        "type": "push-up",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
     },
     {
       "name": "video_1",
@@ -224,20 +229,29 @@
           "shadow": true
         }
       },
-      "inputs": [
+      "transition": {
+        "type": "push-up",
+        "duration": 0.45,
+        "ease": "$snappy"
+      },
+      "graphics": [
         {
-          "name": "light_pass",
-          "type": "animation",
-          "url": "/assets/animations/light_leak.apng",
-          "options": {
-            "position": "0:236",
-            "scale": "1080:608",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.04,
-            "duration": 2,
-            "opacity": 0.14
-          }
+          "type": "fx",
+          "effect": "leak",
+          "target": "frame",
+          "at": 0.05,
+          "duration": 2.2,
+          "edge": "top-left",
+          "size": 1.0,
+          "stretch": 1.5,
+          "drift": 0.12,
+          "color": "#ffffff",
+          "secondary": "#e6ff72",
+          "balance": 0.35,
+          "spread": 0.8,
+          "rise": 0.22,
+          "fall": 0.55,
+          "intensity": 1
         }
       ]
     },
@@ -324,6 +338,26 @@
             "easing": "ease-out",
             "distance": 24
           }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "corners",
+          "at": 0.5,
+          "target": {
+            "x": 64,
+            "y": 64,
+            "w": 952,
+            "h": 952
+          },
+          "clearance": 0,
+          "length": 56,
+          "thickness": 6,
+          "color": "#ffffff",
+          "spread": 1.04,
+          "trace": "clockwise",
+          "ease": "$expo",
+          "exit": "none"
         }
       ]
     }

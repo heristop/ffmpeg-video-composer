@@ -1,14 +1,21 @@
 import { z } from 'zod';
+import { MAX_SEED } from '../core/determinism/contract';
+import { EMOJI_MODES } from '../core/emoji-assets';
+import { MotionTokensSchema } from './motion.schemas';
+import { ThemeSchema } from './theme.schemas';
+import { BeatsSchema } from './time.schemas';
+import { GlobalSfxSchema } from './audio.schemas';
 import {
   TransitionSchema,
   GlobalAudioSchema,
   GradeSchema,
-  LOOK_PRESETS,
+  LookSchema,
   OverlayFitSchema,
   OverlayFlipSchema,
   RevealSchema,
   TextEffectSchema,
 } from './effects.schemas';
+import { PLATFORM_NAMES } from '../core/platforms';
 
 export const TranslationSchema = z
   .record(z.string(), z.string())
@@ -179,12 +186,49 @@ export const OrientationSchema = z
 
 export type Orientation = z.infer<typeof OrientationSchema>;
 
+export const PlatformSchema = z
+  .enum(PLATFORM_NAMES)
+  .describe(
+    'Delivery platform the video is made for: tiktok, reels (aliases ig, instagram), shorts (aliases ' +
+      'yt-shorts, youtube-shorts), youtube, x (alias twitter), linkedin, facebook or square-feed. Sets the ' +
+      'default orientation when global.orientation is omitted (portrait for tiktok/reels/shorts, square for ' +
+      'square-feed, landscape otherwise); validation then warns about text under the app UI (per-edge safe ' +
+      'zones, e.g. the bottom 22% under TikTok captions), a timeline longer than the platform accepts and an ' +
+      'unusual fps; the default caption position is lifted clear of the bottom UI; and loudnorm targets the ' +
+      'platform loudness (-14 LUFS, -1 dBTP). Rendering is otherwise unchanged.'
+  );
+
 export const GlobalConfigSchema = z
   .object({
     variables: VariablesSchema.optional().describe(
       'Template-wide variable definitions referenced via {{ varName }} syntax.'
     ),
     orientation: OrientationSchema.optional(),
+    platform: PlatformSchema.optional(),
+    emoji: z
+      .enum(EMOJI_MODES)
+      .optional()
+      .describe(
+        'How colour emoji in drawn text render (drawtext itself only draws monochrome outlines). "image" ' +
+          '(default): each emoji leaves the text, a measured gap takes its place and a bundled colour image ' +
+          "(~250 common emoji, skin tones and flags included) is composited there, sharing the text's timing, " +
+          'motion and fades; an emoji with no bundled image is stripped with an emoji_missing_asset warning, and ' +
+          'at most 24 images are composited per section. "strip": remove emoji silently (warning only). "error": ' +
+          'fail validation with emoji_unsupported.'
+      ),
+    seed: z
+      .number()
+      .int()
+      .min(0)
+      .max(MAX_SEED)
+      .optional()
+      .describe(
+        'Root seed (uint32, default 0) for every procedural effect: each element derives its own stream as ' +
+          'hash(seed, element path), so the same seed always renders the same shake, grain and scramble.'
+      ),
+    motion: MotionTokensSchema.optional(),
+    theme: ThemeSchema.optional(),
+    beats: BeatsSchema.optional(),
     fps: z
       .number()
       .int()
@@ -204,6 +248,7 @@ export const GlobalConfigSchema = z
       'Default transition applied between sections when no per-section transition is set.'
     ),
     audio: GlobalAudioSchema.optional().describe('Global audio mix settings (volumes, normalisation, ducking).'),
+    sfx: GlobalSfxSchema.optional(),
     music: MusicConfigSchema.optional().describe('Default background music track for the template.'),
     animations: z
       .array(GlobalAnimationSchema)
@@ -216,10 +261,9 @@ export const GlobalConfigSchema = z
     watermark: WatermarkSchema.optional().describe(
       'A still-image watermark (e.g. a logo) composited over the whole video, authored once per template.'
     ),
-    look: z
-      .enum(LOOK_PRESETS)
-      .optional()
-      .describe('Colour-grade preset applied across every section (whole-video look).'),
+    look: LookSchema.optional().describe(
+      'Colour-grade preset applied across every section (whole-video look); string or { preset, strength }.'
+    ),
     grade: GradeSchema.optional().describe('Fine-grained colour grade applied across every section.'),
     allowedMusic: z
       .array(z.string())

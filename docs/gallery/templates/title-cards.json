@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "name": "Gallery: title cards",
+    "description": "titleCard variants: left and centre alignment, with and without an accent and kicker, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 6,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "left",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "titleCard": {
+        "kicker": {
+          "en": "ON THE RECORD"
+        },
+        "headline": {
+          "en": "Ada Lovelace"
+        },
+        "subtitle": {
+          "en": "Mathematician, first programmer"
+        },
+        "accent": "#7C83FD",
+        "reveal": {
+          "type": "rise",
+          "delay": 0.1,
+          "duration": 0.4,
+          "distance": 30,
+          "easing": "ease-out"
+        }
+      }
+    },
+    {
+      "name": "center",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "titleCard": {
+        "kicker": {
+          "en": "CHAPTER ONE"
+        },
+        "headline": {
+          "en": "The engine"
+        },
+        "subtitle": {
+          "en": "Same JSON, same frames"
+        },
+        "accent": "#FF8AAE",
+        "align": "center",
+        "reveal": {
+          "type": "rise",
+          "delay": 0.1,
+          "duration": 0.4,
+          "distance": 30,
+          "easing": "ease-out"
+        }
+      }
+    },
+    {
+      "name": "plain",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#0E1A16",
+        "duration": 2.4
+      },
+      "titleCard": {
+        "headline": {
+          "en": "Just a headline"
+        },
+        "subtitle": {
+          "en": "no kicker, no accent"
+        },
+        "reveal": {
+          "type": "rise",
+          "delay": 0.1,
+          "duration": 0.4,
+          "distance": 30,
+          "easing": "ease-out"
+        }
+      }
+    }
+  ]
+}

@@ -48,9 +48,9 @@ export async function runFinalize(ctx: FinalizeContext): Promise<string> {
 
   const finalPath = await ctx.assemble();
 
-  // No-music path: normalize in place (no-op unless global.audio.normalize). With music, the mix
-  // handles normalization instead.
-  if (!ctx.musicEnabled) {
+  // No-music path: the standalone audio pass in place (no-op unless global.audio.normalize or sound
+  // effects ask for one). With a music mix, the mix handles both instead.
+  if (!ctx.musicWillRun) {
     await ctx.normalizeAudio(ctx.getFinalVideo());
   }
 

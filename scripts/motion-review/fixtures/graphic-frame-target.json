@@ -1,0 +1,21 @@
+{
+  "label": "Frame: around the subject, split trace, retract exit, white + auto contrast",
+  "kind": "graphic",
+  "window": { "at": 0.3, "duration": 1.3 },
+  "moments": [0.25, 0.34, 0.42, 0.9, 1.45, 1.65],
+  "section": {
+    "graphics": [
+      {
+        "type": "frame",
+        "at": "{{at}}",
+        "duration": 0.6,
+        "until": 1.6,
+        "target": "{{target}}",
+        "radius": 20,
+        "trace": "split",
+        "exit": "retract",
+        "color": "#FFFFFF"
+      }
+    ]
+  }
+}

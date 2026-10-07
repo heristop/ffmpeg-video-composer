@@ -117,8 +117,8 @@
       "label": "Réglages avancés",
       "summary": "Mixage audio · Variables",
       "wholeVideo": {
-        "label": "Animations sur toute la vidéo",
-        "hint": "Des incrustations qui couvrent toute la vidéo, sur chaque section."
+        "label": "Fichiers d’animation sur toute la vidéo",
+        "hint": "Des fichiers d’animation joués tels quels sur toute la vidéo, sur chaque section. Les effets s’ajoutent scène par scène."
       },
       "wholeVideoLook": {
         "label": "Look et étalonnage de toute la vidéo",
@@ -562,9 +562,9 @@
     "upload": "Importer",
     "uploadHint": "Importe un fichier .apng ou .webm",
     "uploaded": "Importé",
-    "dropAnimation": "Dépose une animation ou clique pour parcourir",
+    "dropAnimation": "Dépose un fichier d’animation ou clique pour parcourir",
     "animationFormats": "APNG, WebM · conservé en ligne dans le modèle",
-    "removeUpload": "Supprimer l’animation importée",
+    "removeUpload": "Supprimer le fichier d’animation importé",
     "invalidType": "Choisis un fichier .apng ou .webm.",
     "previewBg": "Arrière-plan de l’aperçu",
     "bgChecker": "Damier",
@@ -630,7 +630,173 @@
         "name": "Révélation du cadre",
         "description": "Un cadre fin et un unique reflet lumineux."
       }
-    }
+    },
+    "library": {
+      "sheen": "Reflet",
+      "glint-orbit": "Éclat en orbite",
+      "edge-glow": "Halo de bord",
+      "leak": "Fuite de lumière",
+      "bloom": "Halo lumineux",
+      "ripple": "Onde",
+      "ripple-tap": "Toucher",
+      "resolve": "Mise au point",
+      "glass": "Verre dépoli",
+      "vignette-breathe": "Vignette vivante",
+      "confetti": "Confettis",
+      "glint": "Scintillements",
+      "frame": "Cadre",
+      "corners": "Coins de visée",
+      "underline": "Soulignement",
+      "bokeh": "Bokeh",
+      "dust": "Poussière",
+      "grain": "Grain",
+      "shine-sweep": "Balayage brillant",
+      "sparkle": "Étincelles",
+      "corner-brackets": "Coins de cadrage",
+      "pulse-ring": "Anneau pulsé",
+      "tap-pulse": "Impulsion de toucher",
+      "light-leak": "Fuite de lumière",
+      "white-border": "Bordure blanche",
+      "glow-border": "Bordure lumineuse",
+      "rounded-border": "Bordure arrondie",
+      "spec-orbit": "Orbite spéculaire",
+      "animation-icons": "Icônes animées"
+    },
+    "groups": {
+      "light": "Lumière",
+      "focus": "Focus",
+      "celebrate": "Célébration",
+      "frames": "Cadres",
+      "ambient": "Ambiance",
+      "samples": "Fichiers prêts à l’emploi",
+      "samplesHint": "Des fichiers tout faits, identiques dans chaque modèle."
+    },
+    "picker": {
+      "sampleLabel": "Fichier d’animation : {{label}} ({{format}})",
+      "addLabel": "Ajouter l’effet {{label}} (dessiné par le moteur, réglable)",
+      "upgrade": "Utiliser l’effet",
+      "upgradeHint": "Un fichier joué tel quel. L’effet {{label}} reprend la même idée, ajustée à cette scène."
+    },
+    "fx": {
+      "timing": "Minutage",
+      "auto": "Auto",
+      "reroll": "Nouvelle variante",
+      "remove": "Retirer l’effet",
+      "target": "S’applique à",
+      "targetFrame": "Toute l’image",
+      "targetLayer": "Calque {{n}}",
+      "targetCustom": "Zone personnalisée",
+      "resetParam": "Remettre {{label}} en auto",
+      "custom": "Personnalisée",
+      "previewHint": "Aperçu en direct sur le canevas. Le rendu exact apparaît dans « Aperçu du rendu ».",
+      "notTunable": "Ce graphisme n’a pas encore de réglages ici. Modifiez-le dans l’éditeur JSON.",
+      "token": {
+        "accent": "Accent",
+        "accent2": "Accent 2",
+        "fg": "Texte",
+        "bg": "Fond"
+      },
+      "livePreview": "Aperçu en direct · rendu exact dans Aperçu du rendu",
+      "livePreviewStill": "Aperçu figé (mouvement réduit) · effet complet dans Aperçu du rendu",
+      "livePreviewNone": "Rien à dessiner sur cette cible · voir Aperçu du rendu",
+      "renderScene": "Rendre cette scène",
+      "renderSceneHint": "Un brouillon rapide de cette scène seule, avec l’effet exact."
+    },
+    "param": {
+      "at": "Début (s)",
+      "duration": "Durée (s)",
+      "intensity": "Intensité",
+      "color": "Couleur",
+      "repeat": "Passages",
+      "ease": "Courbe",
+      "profile": "Profil",
+      "width": "Largeur",
+      "tilt": "Inclinaison (°)",
+      "direction": "Direction",
+      "bloom": "Halo",
+      "variant": "Variante",
+      "radius": "Rayon",
+      "rings": "Anneaux",
+      "stagger": "Décalage (s)",
+      "start": "Taille de départ",
+      "stroke": "Trait",
+      "halo": "Halo",
+      "dot": "Point",
+      "press": "Pression",
+      "path": "Trajet",
+      "count": "Nombre",
+      "size": "Taille",
+      "spin": "Rotation",
+      "trail": "Traînée",
+      "speed": "Vitesse",
+      "angle": "Angle",
+      "spread": "Étendue",
+      "gravity": "Gravité",
+      "drag": "Freinage",
+      "sway": "Balancement",
+      "discs": "Disques",
+      "depth": "Profondeur",
+      "fade": "Fondu",
+      "softness": "Douceur",
+      "drift": "Dérive",
+      "clear": "Centre dégagé",
+      "flicker": "Scintillement",
+      "tone": "Teinte",
+      "frost": "Givre",
+      "saturation": "Saturation",
+      "highlight": "Reflet",
+      "ramp": "Montée (s)",
+      "blur": "Flou",
+      "scale": "Échelle",
+      "edge": "Bord",
+      "stretch": "Étirement",
+      "secondary": "Seconde couleur",
+      "balance": "Équilibre",
+      "shadows": "Préserver les ombres",
+      "rise": "Montée",
+      "fall": "Retombée",
+      "line": "Liseré",
+      "lineWidth": "Épaisseur du liseré",
+      "glow": "Couleur du halo",
+      "breathe": "Respiration",
+      "period": "Période (s)",
+      "threshold": "Seuil",
+      "knee": "Transition",
+      "swing": "Amplitude",
+      "animated": "Animé",
+      "inset": "Retrait",
+      "thickness": "Épaisseur",
+      "exit": "Sortie",
+      "exitDuration": "Durée de sortie (s)",
+      "clearance": "Marge",
+      "contrast": "Contraste",
+      "trace": "Tracé",
+      "length": "Longueur",
+      "x": "X",
+      "y": "Y",
+      "origin": "Origine",
+      "caps": "Extrémités",
+      "settle": "Rebond"
+    },
+    "kind": {
+      "switch": "Effets ou fichiers d’animation",
+      "effect": {
+        "name": "Effet",
+        "title": "Effets",
+        "badge": "Moteur · réglable",
+        "subtitle": "Dessiné par LeClap et adapté à cette scène",
+        "adjustable": "Réglable une fois ajouté"
+      },
+      "file": {
+        "name": "Fichier d’animation",
+        "title": "Fichiers d’animation",
+        "badge": "Fichier",
+        "subtitle": "Un clip joué tel quel par-dessus la scène",
+        "detail": "joué tel quel",
+        "source": "Source du fichier d’animation"
+      }
+    },
+    "urlPlaceholder": "https://example.com/overlay.webm"
   },
   "element": {
     "resize": "Redimensionner l’élément",
@@ -641,7 +807,7 @@
     "addBackgroundImage": "Image d’arrière-plan",
     "addText": "Texte",
     "addImageOverlay": "Image / logo",
-    "addAnimation": "Animation",
+    "addAnimation": "Fichier d’animation",
     "addShapeRect": "Rectangle",
     "addShapeEllipse": "Cercle",
     "empty": "Ajoute ton premier élément",
@@ -653,7 +819,7 @@
     "layer": "Arrière-plan",
     "image": "Image",
     "shape": "Forme",
-    "animation": "Animation",
+    "animation": "Fichier d’animation",
     "backgroundImage": "Image d’arrière-plan",
     "titleCard": "Carte de titre",
     "lowerThird": "Bandeau",
@@ -664,7 +830,13 @@
     "addTitleCard": "Carte de titre",
     "addLowerThird": "Bandeau",
     "sugarGroup": "Textes prêts à l'emploi",
-    "reorderHint": "Les éléments se superposent par type. Réorganisez les éléments d'un même type avec les flèches ou par glisser-déposer."
+    "reorderHint": "Les éléments se superposent par type. Réorganisez les éléments d'un même type avec les flèches ou par glisser-déposer.",
+    "effect": "Effet",
+    "addEffect": "Effet",
+    "effectAddHint": "Dessiné par le moteur · réglable",
+    "animationAddHint": "APNG ou WebM · joué tel quel",
+    "animationPending": "Effet ou fichier",
+    "kindLabel": "{{kind}} : {{name}}"
   },
   "shape": {
     "kind": "Forme",
@@ -759,11 +931,11 @@
     "count_other": "{{count}} images"
   },
   "animationOverlay": {
-    "add": "Ajouter une animation",
-    "label": "Animation",
-    "remove": "Supprimer l’animation",
-    "count_one": "{{count}} animation",
-    "count_other": "{{count}} animations"
+    "add": "Ajouter un fichier d’animation",
+    "label": "Fichier d’animation",
+    "remove": "Supprimer le fichier d’animation",
+    "count_one": "{{count}} fichier d’animation",
+    "count_other": "{{count}} fichiers d’animation"
   },
   "summaryChip": {
     "none": "Aucun",
@@ -850,8 +1022,9 @@
     "label": "Cadrage",
     "cover": "Remplir",
     "letterbox": "Letterbox",
+    "blur": "Flou",
     "off": "Désactivé",
-    "hint": "Remplir recadre l'image pour remplir le cadre ; Letterbox garde tout visible avec des bandes ; Désactivé utilise le fichier tel quel, sans l'ajuster au cadre."
+    "hint": "Remplir recadre l'image pour remplir le cadre ; Letterbox garde tout visible avec des bandes ; Flou garde tout visible sur une copie floutée au lieu des bandes ; Désactivé utilise le fichier tel quel, sans l'ajuster au cadre."
   },
   "musicSection": {
     "pickTracks": "Choisis les pistes proposées aux spectateurs.",
@@ -1053,5 +1226,55 @@
     "notes": "Notes de scène",
     "notesHint": "Notes privées pour les collaborateurs — jamais affichées dans la vidéo.",
     "notesPlaceholder": "p. ex. Remplacer ce clip après le lancement…"
+  },
+  "styleReference": {
+    "label": "S’inspirer d’une référence",
+    "hint": "Importez une image, et éventuellement un court clip. Sa palette, sa texture et son rythme deviennent un thème ; les sujets, logos et textes ne sont jamais copiés.",
+    "image": "Image de référence",
+    "clip": "Clip de référence (facultatif)",
+    "remove": "Retirer {{name}}",
+    "analyse": "Analyser la référence",
+    "analysing": "Lecture de la palette, de la texture et du rythme…",
+    "error": "Impossible d’analyser cette référence : {{message}}",
+    "roles": {
+      "bg": "Fond",
+      "fg": "Texte",
+      "muted": "Atténué",
+      "surface": "Surface",
+      "brand": "Marque",
+      "accent": "Accent",
+      "accent2": "Accent 2"
+    },
+    "source": {
+      "extracted": "issu de la référence",
+      "adjusted": "ajusté pour le contraste",
+      "derived": "dérivé"
+    },
+    "contrast": {
+      "aa": "AA {{ratio}}:1",
+      "aaLarge": "AA grand {{ratio}}:1",
+      "fail": "Faible {{ratio}}:1"
+    },
+    "level": {
+      "aa": "conforme WCAG AA",
+      "aaLarge": "conforme AA pour le grand texte uniquement",
+      "fail": "sous le seuil WCAG AA"
+    },
+    "contrastLabel": "Contraste sur le fond {{ratio}} pour 1, {{level}}",
+    "swatches": "Couleurs du thème dérivé",
+    "pacing": "Plans de {{avgShot}} s · {{cpm}} coupes/min · énergie {{energy}}",
+    "texture": {
+      "grain": "grain ≈ {{grain}}",
+      "none": "net, sans grain"
+    },
+    "genre": "genre suggéré : {{genre}}",
+    "confidence": "confiance {{value}} %",
+    "apply": "Appliquer comme thème",
+    "applied": "Thème appliqué à global.theme. Annuler le retire.",
+    "current": {
+      "named": "Thème actuel : {{name}}",
+      "custom": "Thème actuel : personnalisé",
+      "none": "Thème actuel : LeClap (par défaut)"
+    }
   }
 }

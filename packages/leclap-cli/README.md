@@ -18,12 +18,20 @@ pnpm render                          # runs the scaffolded `leclap render templa
 
 ```bash
 leclap init [name]        # scaffold a starter project (template.json + assets/ + README + scripts)
+leclap init --studio <dir> # scaffold a production folder (brief, style guide, shot list, gates)
+leclap studio status [dir] # passed production gates and what the next one needs (also `studio pass <gate>`)
 leclap render <template>  # compile a video from a template JSON
 leclap validate <template> # check a template without rendering (schema + text layout)
 leclap samples list       # discover showcase samples (also --category, --backend, --query, --json)
 leclap samples show <id>  # inspect direction and requirements (also --json)
 leclap samples export <id> # raw descriptor JSON to stdout (or --output <new-file>)
-leclap diagnose           # check your FFmpeg setup
+leclap verify <manifest>  # check a video against its render manifest (--rerender to re-render and compare)
+leclap style <reference>  # derive a theme + style guide from an image or clip (--json, --out style-guide.md)
+leclap beats <audio>      # tempo, beat grid, confidence and drop/build cues for global.beats (--json)
+leclap snapshot <template> # render and save still frames (PNG) of chosen moments, contact sheets
+leclap compare <a> <b>    # the same moment of several templates in one labelled grid
+leclap timeline <template> # sections, motion events, beats and cues on video seconds (--json)
+leclap diagnose           # check your FFmpeg setup and what it can render (--json for the report)
 leclap --help             # usage (per-command help with `leclap <command> --help`)
 leclap --version
 ```
@@ -45,7 +53,44 @@ leclap render template.json \
 Use the descriptor's effective section and field names. Repeat `--video` and `--field` to bind
 multiple inputs; later values win for the same key. All relative file/directory paths resolve from
 the working directory. `--orientation` overrides `template.global.orientation`, while frame rate
-comes from `global.fps`. `--output` copies the finished video after successful compilation.
+comes from `global.fps`. `--output` copies the finished video atomically after successful compilation,
+and refuses a path that is the template or a `--video` clip.
+
+Renders use the deterministic encoder profile by default (bit-exact muxing, pinned encoder threads):
+the same template, assets and FFmpeg build always produce the same bytes. `--no-deterministic` turns
+it off. `--manifest` writes `<output>.manifest.json` next to the video, with the template, asset,
+filtergraph and output digests.
+
+```bash
+leclap render template.json --output out.mp4 --manifest
+leclap verify out.mp4.manifest.json             # is out.mp4 still that render?
+leclap verify out.mp4.manifest.json --rerender  # render the recorded template again; compare every digest
+```
+
+A template with [`formats`](../../docs/template-configuration.md#formats-one-story-several-compositions)
+renders one composition with `--format landscape|portrait|square`, or several with `--formats`:
+
+```bash
+leclap render story.json --format portrait -o story-vertical.mp4
+leclap render story.json --formats all -o story.mp4    # story-landscape.mp4, story-portrait.mp4, story-square.mp4
+```
+
+`--formats all` renders every declared format (or list them: `--formats landscape,portrait`), each to
+`<output>-<format>.mp4` (`<template>-<format>.mp4` without `-o`). With `--json` it prints
+`{ ok, outputs: [{ format, output, bytes }], durationMs }`. `--formats` ignores `--watch`.
+
+`--qc` checks the finished file (duration, frame count, A/V drift, pixel format, colour tags, audio,
+black and frozen frames, silence, loudness and true peak), prints a findings table and exits non-zero
+when a check fails. `--cache <dir>` reuses sections whose command, inputs and FFmpeg build are
+unchanged, so iterating on one scene re-encodes only that scene.
+
+```bash
+leclap render template.json --output out.mp4 --qc --cache .leclap-cache
+```
+
+`verify --rerender` takes `--assets`, `--build` and repeatable `--input section=path` for
+`project_video` clips. It exits 1 on any mismatch and prints the first filtergraph command that
+differs. Use `--json` for machine-readable checks.
 
 Codec, quality tier and segment concurrency are configured through the library's `ProjectConfig`;
 the published CLI has no flags for those fields. MCP server flags belong to `leclap-mcp`, not
@@ -54,8 +99,8 @@ platform constraints and environment-variable scope.
 
 ## `samples` — discover and adapt a showcase
 
-The installed CLI includes the same 32 samples as the [web showcase](https://leclap.dev/showcase/):
-22 native and 10 registered Remotion examples. Discovery and export work without a repository checkout,
+The installed CLI includes the same 47 samples as the [web showcase](https://leclap.dev/showcase/):
+37 native and 10 registered Remotion examples. Discovery and export work without a repository checkout,
 FFmpeg or Remotion, and do not download media or render effects.
 
 ```bash
@@ -120,6 +165,78 @@ with first — a build without libfreetype has no `drawtext` — and without one
 render-free findings and says why it skipped. Text over a user recording (`project_video`) is not
 measured — the recording does not exist yet — and over template footage one frame is only one
 frame, so that finding keeps the render-free one beside it.
+
+## `snapshot` — look at the result
+
+`snapshot` renders a template (through the per-section cache, so a second look costs a copy, not an
+encode) and saves still frames as PNGs. Moments are seconds or time references read on the whole
+video: a section edge (`intro.end`), an element id (`title.end + 0.2`), `50%`, `end`, `beat:8`, `bar:2`,
+`cue:drop`.
+
+```bash
+leclap snapshot template.json --at 1.5,intro.end      # explicit moments (comma-separated or repeated)
+leclap snapshot template.json --at-transitions        # each cut, 0.1 s before and 0.2 s after
+leclap snapshot template.json --per-section           # each section once its entrances have landed (default)
+leclap snapshot template.json --at-transitions --sheet 3x2 --safe tiktok --out frames/
+leclap snapshot template.json --at 4 --zoom 0.5,0,0.5,0.5   # crop x,y,w,h (fractions, or pixels)
+leclap snapshot template.json --at 2 --looks          # the section at 2 s, once per LOOK preset, in one grid
+leclap compare a.json b.json --at 3                   # the same moment of each template, labelled
+leclap timeline template.json --json                  # where everything sits, without rendering
+leclap snapshot template.json --format portrait       # one format of a template with `formats` (default: its own)
+```
+
+`--sheet COLSxROWS` tiles the frames into labelled contact sheets (time and section on each tile);
+`--safe <platform>` shades that platform's UI zones in translucent red, so text hiding under the
+caption block or the action buttons is obvious. `--cache <dir>` names the section cache (default: a
+shared temp directory); `--json` prints every frame's path, time, section and size. Frames land in
+`./frames` unless `--out` says otherwise.
+
+## `style` — match a reference look
+
+```bash
+leclap style reference.mp4                       # roles, contrast, pacing and the global.theme snippet
+leclap style poster.png --out style-guide.md     # also writes style-guide.md + style-guide.theme.json
+leclap style reference.mp4 --json                # the full analysis: { theme, styleGuide, confidence }
+```
+
+FFmpeg decodes the reference into small frames (every 0.25 s for clips, at most 240). The palette is
+clustered in OKLab and assigned to theme roles, with `fg` and `muted` moved to WCAG AA (4.5:1) on `bg`
+when they fall short; clips add the average shot length, cuts per minute, motion energy and a
+suggested genre. Only the palette, texture and pacing carry over — subjects, logos and text in the
+reference are never copied. The same reference (and `--seed`) always gives the same theme.
+
+## `beats` — measure a music track
+
+```bash
+leclap beats track.mp3                  # BPM, beat 1, confidence, build/drop/end cues and the global.beats block
+leclap beats track.mp3 --json           # the full analysis, including every beat time
+leclap beats waltz.mp3 --beatsPerBar 3  # bar length for the downbeat estimate (default 4)
+```
+
+Paste the printed `{ bpm, offset, beatsPerBar }` into `global.beats` and the drop into the `cues` of the
+section playing at that moment. When the pulse is not reliable (calm or ambient music), pace by phrases
+instead. A template can also ask the Node compile to measure its own track with
+`global.beats: { "analyze": "music" }`; see [time references](../../docs/template-configuration.md#time-references).
+
+## `studio` — a production folder
+
+```bash
+leclap init --studio launch-film        # brief.md, style-guide.md, shotlist.md, template.json, assets/, reviews/, out/, studio.json
+leclap studio status launch-film        # passed gates with their time, the next gate and its missing artifacts
+leclap studio pass assets-approved launch-film   # record a gate once its artifacts exist (--force to override)
+```
+
+The scaffolded `template.json` has one section per beat, each with a `purpose`, a `role` and a headline,
+and sets `meta.brief`, so validation flags a section that loses its purpose. Gates pass in order:
+assets-approved, style-approved, stills-checked, rough-cut, repaired, delivered. `--studio` refuses a
+non-empty directory.
+
+## `diagnose` — what your FFmpeg can render
+
+`leclap diagnose` reports the FFmpeg it found and probes what that build can actually do (drawtext and
+text shaping, LUTs, tone-mapping, blur, alpha masks, transitions, loudness, encoders), with a fix for each
+missing feature. `leclap diagnose --json` prints the capability report; see
+[FFmpeg capability probe](../../docs/engine-configuration.md#ffmpeg-capability-probe).
 
 ## `init` — scaffold a project
 

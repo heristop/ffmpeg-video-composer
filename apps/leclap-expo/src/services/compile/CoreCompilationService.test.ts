@@ -52,6 +52,7 @@ jest.mock('expo-asset', () => ({
 jest.mock('@/src/data/mediaCatalog', () => ({
   MUSIC_ASSETS: { 'point-being.mp3': 42 },
   FONT_ASSETS: { 'BebasNeue.ttf': 7 },
+  EMOJI_ASSETS: { '1f525.png': 11 },
   VIDEO_ASSETS: { 'leclap_bumper.mp4': 99 },
   BACKGROUND_ASSETS: { 'desk-flatlay.jpg': 55 },
   findBackground: (id: string) => (id === 'desk-flatlay' ? { id, file: 'desk-flatlay.jpg' } : undefined),
@@ -129,6 +130,8 @@ describe('CoreCompilationService bundled-asset staging', () => {
     await new CoreCompilationService().compile(withMusic);
 
     expect(copiedTo()).toContain('file:///cache/leclap-assets/fonts/BebasNeue.ttf');
+    // Emoji in drawn text composite as these images; the engine resolves them under assetsDir/emoji.
+    expect(copiedTo()).toContain('file:///cache/leclap-assets/emoji/1f525.png');
     expect(copiedTo()).toContain('file:///cache/leclap-assets/musics/point-being.mp3');
     // The brand bumper must be staged so the core resolves it locally instead of downloading its
     // canonical URL (which 404s on-device → AVERROR_INVALIDDATA).

@@ -7,6 +7,7 @@ export type CompileFailureKind =
   | 'unreadableClip'
   | 'assemblyFailed'
   | 'engineUnavailable'
+  | 'appUpdated'
   | 'stopped'
   | 'unknown';
 
@@ -19,6 +20,10 @@ export interface CompileFailure {
 // The engine never got its ffmpeg.wasm core (offline on first use, say): the load failed, or the engine gave
 // up waiting for it.
 const ENGINE_UNAVAILABLE = /Failed to initialize FFmpeg WebAssembly|Timeout waiting for FFmpeg WebAssembly to load/i;
+// A deploy replaced the code chunks this tab was built against: the render's lazily loaded engine chunk is
+// gone (the host answers with its HTML page). A reload picks up the new build; nothing is wrong with the template.
+const APP_UPDATED =
+  /failed to fetch dynamically imported module|error loading dynamically imported module|importing a module script failed/i;
 // A clip FFmpeg couldn't open once it was staged into the WASM filesystem: missing, damaged, or in a
 // container this build can't demux.
 const UNREADABLE_CLIP =
@@ -42,6 +47,8 @@ export const classifyCompileFailure = (error: unknown): CompileFailure => {
   if (error instanceof CompileError) return error.failure;
 
   const raw = error instanceof Error ? error.message : String(error);
+
+  if (APP_UPDATED.test(raw)) return { kind: 'appUpdated', detail: '' };
 
   if (ENGINE_UNAVAILABLE.test(raw)) return { kind: 'engineUnavailable', detail: '' };
 

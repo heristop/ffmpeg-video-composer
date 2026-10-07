@@ -9,6 +9,13 @@
       "source": "examples/drink-and-code/drink-and-code.json"
     },
     {
+      "id": "effects-tour",
+      "title": "Effects tour",
+      "description": "Every motion effect in one guided tour, chapter by chapter: kinetic type, camera and graphics, transitions, captions, compositing, themes, looks, footage editing, sound and music, each effect named on screen.",
+      "category": "effects",
+      "source": "examples/motion-design/effects-tour.json"
+    },
+    {
       "id": "type-impact",
       "title": "Type impact",
       "description": "Big type. Opposing entrances. A clean final hold.",
@@ -53,7 +60,7 @@
     {
       "id": "fast-curious",
       "title": "Fast & Curious",
-      "description": "Punchy two-tone flash intro \u2014 your name on a bold cut, then your clip.",
+      "description": "Punchy two-tone flash intro — your name on a bold cut, then your clip.",
       "category": "templates",
       "source": "packages/leclap-creative-kit/src/templates/fast-curious.json"
     },
@@ -74,14 +81,14 @@
     {
       "id": "present-yourself-portrait",
       "title": "Present Yourself (Portrait)",
-      "description": "Introduce yourself \u2014 a cinematic title card wipes into your graded clip with your name on a lower third, all rendered on this device.",
+      "description": "Introduce yourself — a cinematic title card wipes into your graded clip with your name on a lower third, all rendered on this device.",
       "category": "templates",
       "source": "packages/leclap-creative-kit/src/templates/present-yourself-portrait.json"
     },
     {
       "id": "present-yourself",
       "title": "Present Yourself",
-      "description": "Introduce yourself \u2014 a cinematic title card wipes into your graded clip with your name on a lower third, all rendered on this device.",
+      "description": "Introduce yourself — a cinematic title card wipes into your graded clip with your name on a lower third, all rendered on this device.",
       "category": "templates",
       "source": "packages/leclap-creative-kit/src/templates/present-yourself.json"
     },
@@ -140,6 +147,27 @@
       "description": "Native line stagger and eased text departures.",
       "category": "typography",
       "source": "examples/motion-design/native-timing.json"
+    },
+    {
+      "id": "kinetic-type",
+      "title": "Kinetic type",
+      "description": "Every kinetic preset, natively: cascade, highlight, typewriter, counter, scramble and more.",
+      "category": "typography",
+      "source": "examples/motion-design/kinetic-type.json"
+    },
+    {
+      "id": "spring-kinetics",
+      "title": "Spring kinetics",
+      "description": "Physical springs, brand curves and keyframe tracks instead of timings.",
+      "category": "typography",
+      "source": "examples/motion-design/spring-kinetics.json"
+    },
+    {
+      "id": "camera-and-graphics",
+      "title": "Camera and graphics",
+      "description": "Designed transitions, a virtual camera with hits and shake, and graphics that animate on a curve.",
+      "category": "typography",
+      "source": "examples/motion-design/camera-and-graphics.json"
     },
     {
       "id": "title-reveal",
@@ -230,6 +258,83 @@
       "description": "Editorial cards and measured before/after panels.",
       "category": "evidence",
       "source": "examples/agentic-pr-video/evidence-skill/template.json"
+    },
+    {
+      "id": "fx-pack",
+      "title": "Motion FX pack",
+      "description": "A glitch hook with an echo-trailed punch word, a rack-focus title, a bar chart counting up under a progress bar, a looping ticker and whip transitions on the beat.",
+      "category": "effects",
+      "source": "examples/motion-design/fx-pack.json"
+    },
+    {
+      "id": "word-captions",
+      "title": "Word captions",
+      "description": "Speech-to-text word timings turned into designed captions: a calm karaoke highlight, then loud popping capitals with a crowned payoff line.",
+      "category": "effects",
+      "source": "examples/motion-design/word-captions.json"
+    },
+    {
+      "id": "formats",
+      "title": "One story, three formats",
+      "description": "The 16:9 cut of a launch story authored once for landscape, portrait and square: each format is recomposed, not cropped.",
+      "category": "effects",
+      "source": "examples/motion-design/formats.json"
+    },
+    {
+      "id": "kinetic-fills",
+      "title": "Filled type",
+      "description": "Letters filled with a gradient, a photograph seen through a heavy title, and a shimmer band sweeping across a brand word.",
+      "category": "effects",
+      "source": "examples/motion-design/kinetic-fills.json"
+    },
+    {
+      "id": "split-layouts",
+      "title": "Split screens & wipes",
+      "description": "A three-photo triptych, a stacked comparison with a divider, and a before/after wipe that uncovers the second picture.",
+      "category": "effects",
+      "source": "examples/motion-design/split-layouts.json"
+    },
+    {
+      "id": "rtl-type",
+      "title": "Right-to-left type",
+      "description": "Arabic and Hebrew headlines shaped, joined and animated a line at a time, each with a Latin gloss, then both scripts side by side.",
+      "category": "effects",
+      "source": "examples/motion-design/rtl-type.json"
+    },
+    {
+      "id": "emoji-type",
+      "title": "Emoji in type",
+      "description": "Colour emoji inside kinetic words, an emoji row that pops one by one and a title card, each one landing with its line.",
+      "category": "effects",
+      "source": "examples/motion-design/emoji-type.json"
+    },
+    {
+      "id": "beat-grid",
+      "title": "On the beat",
+      "description": "A 120 BPM grid sets section lengths in bars, pops a count-in on each beat, punches the camera through the drop and plays a click track on the same beats.",
+      "category": "effects",
+      "source": "examples/motion-design/beat-grid.json"
+    },
+    {
+      "id": "theme-roles",
+      "title": "Theme, roles & safe zones",
+      "description": "A vertical TikTok promo styled by the neon theme tokens, moved by motion roles instead of hand-picked eases, and kept clear of the platform's on-screen buttons.",
+      "category": "effects",
+      "source": "examples/motion-design/theme-roles.json"
+    },
+    {
+      "id": "footage-edit",
+      "title": "Footage editing",
+      "description": "A vertical clip fitted over its own blur, a focus pan with a user LUT, a bullet-time speed ramp, a freeze frame with a flash, and a B-roll cutaway under a 60% look.",
+      "category": "effects",
+      "source": "examples/motion-design/footage-edit.json"
+    },
+    {
+      "id": "sound-design",
+      "title": "Sound design",
+      "description": "Sound effects placed on motion events, automatic whooshes and hits, a riser into the drop, a voice preset and volume automation on a recorded line.",
+      "category": "effects",
+      "source": "examples/motion-design/sound-design.json"
     }
   ]
 }

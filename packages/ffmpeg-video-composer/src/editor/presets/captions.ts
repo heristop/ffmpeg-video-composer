@@ -1,4 +1,5 @@
 import type { Filter } from '@/core/types';
+import { resolvePlatform } from '@/core/platforms';
 import type { Caption } from '../../schemas/section.schemas';
 import {
   CAPTION_ALIGN_MARGIN,
@@ -9,9 +10,12 @@ import {
   CAPTION_DEFAULT_BOX_OPACITY,
   CAPTION_DEFAULT_POSITION,
   captionStyleValues,
+  platformCaptionOffset,
   type CaptionStyleValues,
 } from './caption-layout';
 import { applyReveal, applyTextEffect, hasText, resolveFontFile } from './text';
+import { wrappedCaptionFilters } from './caption-wrap';
+import type { SugarContext } from './sugar-context';
 
 // ---------------------------------------------------------------------------
 // captionToFilters
@@ -64,6 +68,21 @@ function resolveBox(caption: Caption, preset: CaptionStyleValues): Record<string
   return { box: 1, boxcolor, boxborderw: preset.boxborderw ?? CAPTION_DEFAULT_BOX_BORDER };
 }
 
+// The default caption sits `lower-third`, 110px off the bottom — inside TikTok's caption block on a
+// portrait frame. With a delivery platform and no authored `position`, it is lifted clear of the
+// platform's bottom UI instead. An authored position is left exactly where the author put it, and so
+// is every caption of a template without `global.platform` (its filtergraph is unchanged).
+function captionY(caption: Caption, ctx: Pick<SugarContext, 'scale' | 'platform'> | undefined): string {
+  const bottom = caption.position === undefined ? resolvePlatform(ctx?.platform)?.safe.bottom : undefined;
+  const height = Number(ctx?.scale.split(':').at(1));
+
+  if (bottom === undefined || !Number.isFinite(height)) {
+    return expressionFor(POSITION_Y, caption.position, CAPTION_DEFAULT_POSITION);
+  }
+
+  return `(h-text_h)-${platformCaptionOffset(height, bottom)}`;
+}
+
 /**
  * Translates a Caption descriptor into a single styled drawtext Filter.
  * Returns [] when undefined or when the text has no non-blank translation.
@@ -75,13 +94,21 @@ function resolveBox(caption: Caption, preset: CaptionStyleValues): Record<string
  * The Translation `text` is emitted untouched onto `values.text` — FormatterManager
  * resolves the active locale, substitutes {{ variables }}, and escapes the string
  * downstream (the same text path every drawtext filter goes through).
+ *
+ * `ctx` (output scale + `global.platform`) only matters to the default position: see captionY. With
+ * `wrap` / `fit`, the caption is wrapped to the frame instead, one drawtext per line (caption-wrap.ts),
+ * which needs the motion context's text resolution; it falls back to the single line when it can't
+ * measure the font.
  */
-export function captionToFilters(caption?: Caption): Filter[] {
+export function captionToFilters(
+  caption?: Caption,
+  ctx?: Pick<SugarContext, 'scale' | 'platform'> & Partial<Pick<SugarContext, 'motion'>>
+): Filter[] {
   if (!caption || !hasText(caption.text)) {
     return [];
   }
 
-  const y = expressionFor(POSITION_Y, caption.position, CAPTION_DEFAULT_POSITION);
+  const y = captionY(caption, ctx);
   const x = expressionFor(ALIGN_X, caption.align, CAPTION_DEFAULT_ALIGN);
   const preset = captionStyleValues(caption.style);
 
@@ -94,6 +121,13 @@ export function captionToFilters(caption?: Caption): Filter[] {
     fontcolor: caption.color ?? preset.fontcolor,
     ...resolveBox(caption, preset),
   };
+
+  if (caption.wrap !== undefined || caption.fit !== undefined) {
+    const { text: _text, y: _y, ...shared } = values;
+    const wrapped = wrappedCaptionFilters(caption, ctx, { values: shared, x, size: values.fontsize as number });
+
+    if (wrapped) return wrapped;
+  }
 
   applyTextEffect(values, caption.effect);
 

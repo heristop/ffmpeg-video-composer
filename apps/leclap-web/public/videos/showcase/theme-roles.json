@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "name": "Theme, roles and safe zones",
+    "description": "A vertical TikTok promo built on the neon theme: colours and fonts come from $color / $font tokens, every animated element declares a motion role instead of an ease, and the copy stays inside the platform's safe zones.",
+    "creativeDirection": "Audience: social teams who brand many short videos and need them to move with one vocabulary. Direction: the neon theme sets the deep green ink, lime accent and bouncy pacing; roles decide every curve (the headline lands with $expo and holds, the accent underline snaps, panels settle without overshoot, the mascot emoji is the one thing that bounces). Copy sits clear of the TikTok tab bar, caption block and action buttons. Review: no literal hex colours outside the palette, one accent per beat, the headline holds before each cut, and nothing lands under the right-hand buttons or the bottom caption block."
+  },
+  "global": {
+    "orientation": "portrait",
+    "platform": "tiktok",
+    "theme": "neon",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 19,
+    "transition": {
+      "type": "push-up",
+      "duration": 0.45,
+      "ease": "$role.panel"
+    }
+  },
+  "sections": [
+    {
+      "name": "hook",
+      "type": "color_background",
+      "role": "hook",
+      "purpose": "Stop the scroll with one bold promise.",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 2.8
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.05,
+        "role": "camera"
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 1,
+          "x": 127,
+          "y": 880,
+          "width": 400,
+          "color": "$color.accent",
+          "role": "accent"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "headline",
+          "text": {
+            "en": "Brand once. Post everywhere."
+          },
+          "preset": "cascade",
+          "role": "headline",
+          "font": "$font.display",
+          "size": 116,
+          "maxWidth": 560,
+          "x": 327,
+          "y": 470,
+          "color": "$color.fg",
+          "accent": {
+            "words": "last",
+            "color": "$color.accent"
+          }
+        }
+      ]
+    },
+    {
+      "name": "proof",
+      "type": "color_background",
+      "role": "proof",
+      "purpose": "Show that the theme carries colour, type and pacing.",
+      "options": {
+        "backgroundColor": "$color.surface",
+        "duration": 3.6
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0.2,
+          "x": 60,
+          "y": 520,
+          "width": 520,
+          "height": 300,
+          "color": "$color.bg@0.8",
+          "from": "left",
+          "role": "panel"
+        },
+        {
+          "type": "corners",
+          "at": 0.5,
+          "color": "$color.accent",
+          "inset": 120,
+          "role": "micro"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "THEME: NEON"
+          },
+          "preset": "fade",
+          "role": "micro",
+          "font": "$font.mono",
+          "size": 34,
+          "x": 327,
+          "y": 570,
+          "color": "$color.muted",
+          "delay": 0.4
+        },
+        {
+          "id": "stat",
+          "text": {
+            "en": ""
+          },
+          "preset": "counter",
+          "role": "headline",
+          "counter": {
+            "from": 0,
+            "to": 6,
+            "suffix": " roles"
+          },
+          "font": "$font.display",
+          "size": 150,
+          "x": 327,
+          "y": 640,
+          "color": "$color.accent",
+          "delay": "kicker.end + 0.1"
+        },
+        {
+          "text": {
+            "en": "🦄"
+          },
+          "preset": "pop",
+          "role": "mascot",
+          "size": 120,
+          "x": 327,
+          "y": 860,
+          "delay": "stat.end + 0.1"
+        }
+      ]
+    },
+    {
+      "name": "cta",
+      "type": "color_background",
+      "role": "cta",
+      "purpose": "Invite the viewer to try it, inside the safe zone.",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 3.2
+      },
+      "camera": {
+        "preset": "drift-up",
+        "amount": 0.03,
+        "role": "camera"
+      },
+      "kinetic": [
+        {
+          "id": "close",
+          "text": {
+            "en": "Pick a theme"
+          },
+          "preset": "rise",
+          "role": "headline",
+          "font": "$font.display",
+          "size": 140,
+          "x": 327,
+          "y": 600,
+          "color": "$color.fg"
+        },
+        {
+          "text": {
+            "en": "global.theme = neon"
+          },
+          "preset": "fade",
+          "role": "micro",
+          "font": "$font.mono",
+          "size": 32,
+          "x": 327,
+          "y": 800,
+          "color": "$color.accent",
+          "delay": "close.end + 0.2"
+        }
+      ]
+    }
+  ]
+}

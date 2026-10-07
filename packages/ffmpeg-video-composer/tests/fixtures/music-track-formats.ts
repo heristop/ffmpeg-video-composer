@@ -8,9 +8,9 @@ function tone(seconds: number): string[] {
 }
 
 /**
- * The two kinds of `.mp3` in the bundled library that are more than a bare MP3 stream: an MP4 container
- * holding MP3 audio (pop.mp3, point-being.mp3, future-bass-energy.mp3), and an MP3 whose ID3 tag carries a
- * PNG cover, which demuxes as an attached-picture video stream (air-prelude.mp3, anxiety.mp3, arcadia.mp3).
+ * The two kinds of `.mp3` that are more than a bare MP3 stream: an MP4 container holding MP3 audio (pop.mp3
+ * and point-being.mp3 in the bundled library), and an MP3 whose ID3 tag carries a PNG cover, which demuxes
+ * as an attached-picture video stream (any user upload with embedded art).
  * Suites generate them as a 440 Hz tone, since the library's own are tracked files.
  */
 export const MUSIC_TRACK_FORMATS = [

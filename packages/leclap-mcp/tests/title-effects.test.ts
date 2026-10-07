@@ -52,6 +52,12 @@ beforeEach(async () => {
     audioCodec: null,
     sampleRate: null,
     sizeBytes: 4,
+    hdr: null,
+    colorPrimaries: null,
+    colorTransfer: null,
+    bitDepth: null,
+    vfr: false,
+    rotation: 0,
   });
 });
 afterEach(async () => {
@@ -108,6 +114,12 @@ describe('registered title effect preflight', () => {
       audioCodec: null,
       sampleRate: null,
       sizeBytes: 4,
+      hdr: null,
+      colorPrimaries: null,
+      colorTransfer: null,
+      bitDepth: null,
+      vfr: false,
+      rotation: 0,
     });
     await expect(validateEffects(template, config)).rejects.toThrow(/10/);
   });

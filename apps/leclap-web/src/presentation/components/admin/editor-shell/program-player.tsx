@@ -5,13 +5,18 @@
 //     transform, transition blend styles, all written straight to refs — zero re-renders per frame.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { EditorState } from '../templateEditorModel';
+import { editableExit, editableReveal } from './overlay-timing';
 import { sceneClockAt, transitionAt, kenburnsTransformAt, type Segment } from './program-timeline.logic';
 import { overlayVisibilityAt, type OverlayVisibility } from './overlay-visibility.logic';
-import { imageVisibilityAt, layerVisibilityAt } from './element-visibility.logic';
+import { animationVisibilityAt, imageVisibilityAt, layerVisibilityAt } from './element-visibility.logic';
+import { sceneAnimations } from './program-animations';
 import { transitionBlendAt, type BlendLayerStyle } from './transition-blend.logic';
 import { useFrameHeight } from './SugarPreviewLayer';
 import { ProgramScene, sceneImages, sceneLayers, type ProgramSceneHandles, type VisualSection } from './program-scene';
 import type { ProgramClock } from './use-program-clock';
+import { previewEnvOf } from './fx-preview/preview-env';
+import { FRAME_FIT_CLASS, FRAME_STAGE_CLASS } from './frame-fit';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 interface Mounted {
   active: number; // original section index under the playhead
@@ -57,12 +62,25 @@ function paintScene(
 
     if (!el) continue;
 
-    writeVisibility(el, overlayVisibilityAt(overlay.reveal, overlay.exit, localT, duration));
+    writeVisibility(
+      el,
+      overlayVisibilityAt(editableReveal(overlay.reveal), editableExit(overlay.exit), localT, duration)
+    );
   }
 
+  paintMedia(handles, section, localT, duration);
+}
+
+// The scene's non-text elements: stills, animation files and background layers.
+function paintMedia(handles: ProgramSceneHandles, section: VisualSection, localT: number, duration: number): void {
   // Still-image / shape overlays: show window + `motion` entrance (element-visibility.logic).
   for (const [i, image] of sceneImages(section).entries()) {
     writeVisibility(handles.images[i] ?? null, imageVisibilityAt(image, localT, duration));
+  }
+
+  // Animation files: delayed by `start`, cut after `duration` (element-visibility.logic).
+  for (const [i, animation] of sceneAnimations(section).entries()) {
+    writeVisibility(handles.animations[i] ?? null, animationVisibilityAt(animation, localT, duration));
   }
 
   // Background layers: gradient layers animate their reveal; solid layers pop at the delay.
@@ -106,12 +124,15 @@ function paintTick(
   writeBlend(refs.containers.get(want.incoming) ?? null, blend.incoming);
 }
 
-// Monitor frame aspect per template orientation.
-const ORIENTATION_ASPECT: Record<EditorState['orientation'], string> = {
-  landscape: 'aspect-video',
-  portrait: 'aspect-[9/16] max-h-full w-auto h-full',
-  square: 'aspect-square max-h-full',
-};
+// Feeds one mounted scene's effect layer its local time while that scene is the one under the playhead.
+function sceneTime(clock: ProgramClock, timeline: Segment[], index: number) {
+  return (paint: (t: number) => void) =>
+    clock.subscribe((t) => {
+      const at = sceneClockAt(timeline, t);
+
+      if (at?.index === index) paint(at.localT);
+    });
+}
 
 interface ProgramPlayerProps {
   state: EditorState;
@@ -122,6 +143,7 @@ interface ProgramPlayerProps {
 export const ProgramPlayer = ({ state, clock, timeline }: ProgramPlayerProps) => {
   const frameRef = useRef<HTMLDivElement>(null);
   const previewH = useFrameHeight(frameRef);
+  const reduced = useReducedMotion();
   const [mounted, setMounted] = useState<Mounted>(() => ({
     active: timeline[0]?.index ?? -1,
     incoming: null,
@@ -167,10 +189,10 @@ export const ProgramPlayer = ({ state, clock, timeline }: ProgramPlayerProps) =>
   if (timeline.length === 0) return null;
 
   return (
-    <div className="grid h-full place-items-center overflow-hidden p-4 sm:p-6">
+    <div className={`${FRAME_STAGE_CLASS} overflow-hidden`}>
       <div
         ref={frameRef}
-        className={`relative w-full max-w-full overflow-hidden rounded-xl border border-foreground/10 bg-black ${ORIENTATION_ASPECT[state.orientation]}`}
+        className={`relative overflow-hidden rounded-xl border border-foreground/10 bg-black ${FRAME_FIT_CLASS[state.orientation]}`}
       >
         {/* Incoming (second entry) stacks above the active scene for the blend window. */}
         {scenes.map(({ index, section }) => (
@@ -190,6 +212,7 @@ export const ProgramPlayer = ({ state, clock, timeline }: ProgramPlayerProps) =>
               frameRef={frameRef}
               previewH={previewH}
               globalTreatment={{ look: state.globalLook, grade: state.globalGrade }}
+              fx={{ env: previewEnvOf(state, section, reduced), subscribe: sceneTime(clock, timeline, index) }}
             />
           </div>
         ))}

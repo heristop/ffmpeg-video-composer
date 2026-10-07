@@ -8,11 +8,13 @@ import {
   container,
   type AbstractFFmpeg,
   type ProjectConfig,
+  type QcReport,
   type TemplateDescriptor,
 } from 'ffmpeg-video-composer';
 
 import { isGeometryJob, runGeometryJob, type GeometryJob, type GeometryJobResult } from './geometry-job.js';
 import { createProgressReporter, type ProgressMessage } from './progress-reporter.js';
+import { isSnapshotJob, runSnapshotJob, type SnapshotJob, type SnapshotJobResult } from './snapshot-job.js';
 
 // Job sent from the parent over the IPC channel. The parent never reads this process's
 // stdout/stderr for the result — that fd is polluted by the core's console.log/pino — so the
@@ -22,14 +24,16 @@ interface RenderJob {
   template: TemplateDescriptor;
 }
 
-type WorkerResult = { ok: true; outputPath: string; infos: unknown; sizeBytes: number } | { ok: false; error?: string };
+type WorkerResult =
+  | { ok: true; outputPath: string; infos: unknown; sizeBytes: number; qc?: QcReport }
+  | { ok: false; error?: string };
 
 // process.send is asynchronous: the message is queued on the IPC channel and flushed on the next
 // tick. Exiting immediately after (as a `finally { process.exit(0) }` would) can truncate that flush,
 // so the parent sees only 'exit' and reports a successful render as a failure. Exit ONLY from the
 // send callback (fired once the channel has accepted the message); fall back to a plain exit when
 // there is no IPC channel (worker run standalone).
-function sendAndExit(message: WorkerResult | GeometryJobResult): void {
+function sendAndExit(message: WorkerResult | GeometryJobResult | SnapshotJobResult): void {
   if (!process.send) {
     process.exit(0);
   }
@@ -53,19 +57,22 @@ function sendProgress(message: ProgressMessage): void {
 
 async function runJob(job: RenderJob): Promise<WorkerResult> {
   // compile() resolves null on failure and hands the cause (e.g. which section failed) to onError.
-  const failure: { error?: Error } = {};
+  const failure: { error?: Error; qc?: QcReport } = {};
   const outputPath = await compile(job.projectConfig, job.template, {
     onProgress: createProgressReporter(sendProgress),
     onError: (error) => {
       failure.error = error;
     },
+    onQc: (report) => (failure.qc = report),
   });
 
   if (typeof outputPath !== 'string' || outputPath.length === 0) {
     return { ok: false, error: failure.error?.message };
   }
 
-  return describeOutput(outputPath);
+  const described = await describeOutput(outputPath);
+
+  return described.ok && failure.qc ? { ...described, qc: failure.qc } : described;
 }
 
 async function resolveResult(job: RenderJob): Promise<WorkerResult> {
@@ -76,9 +83,15 @@ async function resolveResult(job: RenderJob): Promise<WorkerResult> {
   }
 }
 
-async function handleMessage(job: RenderJob | GeometryJob): Promise<void> {
+async function handleMessage(job: RenderJob | GeometryJob | SnapshotJob): Promise<void> {
   if (isGeometryJob(job)) {
     sendAndExit(await runGeometryJob(job));
+
+    return;
+  }
+
+  if (isSnapshotJob(job)) {
+    sendAndExit(await runSnapshotJob(job));
 
     return;
   }
@@ -86,6 +99,6 @@ async function handleMessage(job: RenderJob | GeometryJob): Promise<void> {
   sendAndExit(await resolveResult(job));
 }
 
-process.on('message', (job: RenderJob | GeometryJob) => {
+process.on('message', (job: RenderJob | GeometryJob | SnapshotJob) => {
   handleMessage(job).catch(() => process.exit(1));
 });

@@ -328,10 +328,18 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
   override resolveBundledFont = (fontFile: string): Promise<string | null> =>
     this.resolveBundledAsset('fonts', fontFile, creativeKitCandidates);
 
+  // Find a bundled colour-emoji image, walking up to the creative kit like the fonts (plain blobs, read only).
+  override resolveBundledEmoji = (file: string): Promise<string | null> =>
+    this.resolveBundledAsset('emoji', file, creativeKitCandidates);
+
   // Find a bundled music track so `global.music` resolves offline on Node (server/MCP/library)
   // instead of requiring a network download.
   override resolveBundledMusic = (musicFile: string): Promise<string | null> =>
     this.resolveBundledAsset('musics', musicFile, sourceLayoutCandidates);
+
+  // Sound effects are small plain blobs (not Git-LFS) that are only ever read, so they walk up like fonts.
+  override resolveBundledSfx = (sfxFile: string): Promise<string | null> =>
+    this.resolveBundledAsset('sfx', sfxFile, creativeKitCandidates);
 
   // A font downloaded by an earlier render, kept OUTSIDE the build dir (which is wiped between runs)
   // so a repeat render of the same resolved font needs no network. Overridable with FVC_FONT_CACHE_DIR

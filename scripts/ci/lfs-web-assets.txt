@@ -9,35 +9,6 @@
 #   bash scripts/ci/update-media-manifest.sh
 #   bash scripts/ci/publish-media-bundles.sh web
 
-# Creative-kit music
-106e739dbb4188c24ac08c4d554eb31426931f139f3d79277b5ec65395b097c2  packages/leclap-creative-kit/src/library/musics/air-prelude.mp3
-2634ce328b35137cda5321141de480a2a8eaa5d3d3ceac64f3964dbe61b11df2  packages/leclap-creative-kit/src/library/musics/americana.mp3
-5597129b18b021853800e448b392e114700f44f7d9dbe4a697430a7391ef7211  packages/leclap-creative-kit/src/library/musics/anxiety.mp3
-f311e0dccaebabf08d62f41f72a5fa5a7d598333cd27736e608bf4584ebacdc0  packages/leclap-creative-kit/src/library/musics/arcadia.mp3
-8582645aba64c524163314f0678d929ddb65d61ded4a556e69ef1bf5c96b0991  packages/leclap-creative-kit/src/library/musics/autumn-day.mp3
-59daa6423c9d61238dd9c31f7139606267238b6e448dc42e12e0d6d77d663b8e  packages/leclap-creative-kit/src/library/musics/brain-dance.mp3
-16c90af764a047052228e5c1c96952a86ca382d2e564e90f43bb8fbbac8b2335  packages/leclap-creative-kit/src/library/musics/cafe-bossa-nova.mp3
-7f5abc44caa2c025a3ac37e2c35086e64e24a9a7db209f11ef27a565021b0de2  packages/leclap-creative-kit/src/library/musics/cafe-jazz.mp3
-8433b770a630d9b1594fd484442c677907ece899a4d149954cd2e74fd733e311  packages/leclap-creative-kit/src/library/musics/carefree.mp3
-cb23b1833c35e391de10d998d6a40cfc760565ce31d23014c86025523ca8239b  packages/leclap-creative-kit/src/library/musics/fluffing-a-duck.mp3
-89e742776f02eba2ceaf7b9d8145cc657f67dc26de2bd7887e64cd4ee96a23cf  packages/leclap-creative-kit/src/library/musics/future-bass-energy.mp3
-ff05341afbfe8b9184c9818239771f20deb0c14046c4c4ae1606ef10f746dfb1  packages/leclap-creative-kit/src/library/musics/indie-rock-dreamy.mp3
-8c46b44e65324bc339fbbc3e770611d671f6c74a40f3ec8dd50332c082b25cc9  packages/leclap-creative-kit/src/library/musics/local-forecast-elevator.mp3
-d46759241e0e890449cb67000134189f2b75fcd2baa8e99d603ff18d12fdbcc0  packages/leclap-creative-kit/src/library/musics/lofi-chill.mp3
-52b49d9ba88ae265115b53a3c4c0ec274a1bc269b58ece0d909650cbb85151d8  packages/leclap-creative-kit/src/library/musics/lofi-hip-hop.mp3
-1dcbefd551553386a9e5b08c52af33a556af4b62e92d7849698d2c4fe88ce923  packages/leclap-creative-kit/src/library/musics/lofi-sentimental-jazz.mp3
-a5bb345c23849ad0786aa0bc5157a9f2d4039660fe00282e55754d475f36dc14  packages/leclap-creative-kit/src/library/musics/monkeys-spinning-monkeys.mp3
-c02f8808315b302a52653a79127fc893b39241e1749d83cce564b4aa847c6f61  packages/leclap-creative-kit/src/library/musics/party-dance.mp3
-889fd6f06fd077689d512d4169a0efc4a61b717af73ac64ecca361eb5a4c4b7d  packages/leclap-creative-kit/src/library/musics/pixelland.mp3
-b81b6effca2f04d7432589140c63b5a6da5f4091d977b15a7e736ca2652de0dc  packages/leclap-creative-kit/src/library/musics/point-being.mp3
-718f6dae61e700056ef4e4ab787c3e8dc1f95646694d74771a48867be4571277  packages/leclap-creative-kit/src/library/musics/pop.mp3
-87a68b3aae0888dbdcd24b317cc2ac9654cffef4c932d9af238ea8ccaaff72a9  packages/leclap-creative-kit/src/library/musics/romantic-piano.mp3
-78d76f6d29f3611b13b028444776438f99f827dab7a049878b76084dcad30069  packages/leclap-creative-kit/src/library/musics/silence-1-min.mp3
-db1710333d68a215277f77e4e17e1a64bf4ed38f87c70f8d0f56b16b6aa4f884  packages/leclap-creative-kit/src/library/musics/sneaky-snitch.mp3
-e77d43a14ddf81c675d7171833ee3196a8bf8f7717039af6d48cc4f849b60577  packages/leclap-creative-kit/src/library/musics/the-builder.mp3
-4b1a72f5a29702d30dab074bd47a104c8e6b6bd63f327afad4da0d082992bbef  packages/leclap-creative-kit/src/library/musics/tropical-cocktail.mp3
-c82bb5a7970730639e08eb8259dae9aba9eddb19a0cafe07b2de240f031a55a1  packages/leclap-creative-kit/src/library/musics/upbeat-electronic.mp3
-
 # Creative-kit animation overlays
 c42ff84648e785a0062b322564dd1fd7c22e09b0053bed9e37a36267e6107572  packages/leclap-creative-kit/src/library/animations/animation_icons.apng
 ff4769788ab0e323e1f84a9f067c627504186ecfc8f1f01d278e5fff606966c2  packages/leclap-creative-kit/src/library/animations/confetti.apng

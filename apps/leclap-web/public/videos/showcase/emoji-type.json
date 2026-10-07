@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "name": "Emoji in type",
+    "description": "Colour emoji inside drawn text: kinetic words, an emoji-only row, a caption and a title card, each emoji composited as a bundled image in the measured gap of its line.",
+    "creativeDirection": "Audience: social creators whose copy already carries emoji. Direction: playful but tidy. The hook drops a two-word line whose fire emoji lands with the words; the routine beat pops three emoji one by one over a calm caption; the close is a title card where the party emoji sits inside the headline. Review: every emoji is in colour (never a tofu box or a monochrome glyph), sits on the text baseline in its own gap, animates with its word, and no beat carries more than three emoji."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 17,
+    "transition": {
+      "type": "swipe-left",
+      "duration": 0.5,
+      "ease": "$snappy"
+    },
+    "motion": {
+      "energy": 1.1
+    }
+  },
+  "sections": [
+    {
+      "name": "hook",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.8
+      },
+      "camera": {
+        "hits": [0.75]
+      },
+      "kinetic": [
+        {
+          "id": "title",
+          "text": {
+            "en": "So good 🔥"
+          },
+          "preset": "drop",
+          "font": "anton",
+          "size": 170,
+          "y": "center",
+          "accent": {
+            "words": "last",
+            "color": "#FF8AAE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "routine",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 3.8
+      },
+      "kinetic": [
+        {
+          "id": "row",
+          "text": {
+            "en": "☕ 💻 🚀"
+          },
+          "preset": "pop",
+          "size": 150,
+          "y": 170,
+          "stagger": 0.22
+        },
+        {
+          "text": {
+            "en": "Coffee, code, launch."
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 56,
+          "y": 430,
+          "color": "#C9CBFF",
+          "delay": "row.end + 0.15"
+        }
+      ]
+    },
+    {
+      "name": "close",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.2
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.05
+      },
+      "titleCard": {
+        "kicker": {
+          "en": "RELEASE NOTES"
+        },
+        "headline": {
+          "en": "Launch day 🎉"
+        },
+        "subtitle": {
+          "en": "Emoji stay in colour ✅"
+        },
+        "accent": "#FF8AAE",
+        "align": "center",
+        "stagger": 0.12,
+        "reveal": {
+          "type": "rise",
+          "delay": 0.15,
+          "duration": 0.4,
+          "distance": 30,
+          "easing": "ease-out"
+        }
+      }
+    }
+  ]
+}

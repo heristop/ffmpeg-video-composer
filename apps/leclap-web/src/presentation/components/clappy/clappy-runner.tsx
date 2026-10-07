@@ -1,10 +1,11 @@
+import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useAnimationClock } from '@/hooks/use-animation-clock';
 import { kineticMotion } from '@/presentation/components/kinetic';
-import { barPct } from '@/presentation/components/kinetic/gradient-meter.logic';
 import { Clappy, clappyHeight } from './clappy';
 import { runnerFrame } from './clappy.logic';
+import { railLeft } from './clappy-rail.logic';
 
 export interface ClappyRunnerProps {
   /** How far along the track Clappy has run, 0..1: the progress of the bar under him. */
@@ -38,16 +39,19 @@ export function ClappyRunner({
   const seconds = useAnimationClock(!done && !reduced);
   const { pose, bob, lean } = runnerFrame(seconds, { done, still: reduced });
   const squash = bob * 0.03;
+  const laneRef = useRef<HTMLDivElement>(null);
+  const laneWidth = useLaneWidth(laneRef);
 
   return (
-    <div aria-hidden="true" className={cn('relative', className)} style={{ height: clappyHeight(size) }}>
-      {/* The rail is the lane less Clappy's own width, so a percentage along it keeps him on the track from
-          start to finish. He moves on the meter's own transition, keeping pace with the fill. */}
-      <div className="absolute inset-y-0 left-0" style={{ right: size }}>
+    <div ref={laneRef} aria-hidden="true" className={cn('relative', className)} style={{ height: clappyHeight(size) }}>
+      {/* He stands on the fill's leading edge (clappy-rail.logic.ts): his back half behind the line at the
+          start, pulled up inside the lane at the finish. He moves on the meter's own transition, from the
+          line as the fill grows from empty, so he keeps pace with the edge. Placed once the lane is measured. */}
+      {laneWidth > 0 && (
         <motion.div
-          className="absolute bottom-0"
-          initial={{ left: '0%' }}
-          animate={{ left: `${barPct(progress)}%` }}
+          className="absolute bottom-0 left-0"
+          initial={{ x: railLeft(0, laneWidth, size) }}
+          animate={{ x: railLeft(progress, laneWidth, size) }}
           transition={{ duration: reduced ? 0 : kineticMotion.duration.ring, ease: [0.16, 1, 0.3, 1] }}
         >
           {pose.stride !== undefined && <Dust size={size} stride={pose.stride} />}
@@ -60,9 +64,36 @@ export function ClappyRunner({
             <Clappy size={size} {...pose} followPointer={followPointer && done} clapOnClick={clapOnClick} />
           </div>
         </motion.div>
-      </div>
+      )}
     </div>
   );
+}
+
+/** The lane's width in px, kept current as it resizes; 0 until it is laid out. */
+function useLaneWidth(laneRef: RefObject<HTMLDivElement | null>): number {
+  const [width, setWidth] = useState(0);
+
+  useLayoutEffect(() => {
+    const lane = laneRef.current;
+
+    if (!lane) return () => {};
+
+    const measure = () => {
+      setWidth(lane.clientWidth);
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+
+    observer.observe(lane);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [laneRef]);
+
+  return width;
 }
 
 /** Three puffs kicked up behind the runner, each drifting back and fading over one stride. */

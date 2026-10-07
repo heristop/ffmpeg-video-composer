@@ -1,37 +1,28 @@
 import type { Filter, Section, TemplateDescriptorGlobal } from '@/core/types';
 import { layersToFilters, motionToFilters, gradeToFilters, lookToFilters, letterboxToFilters } from './looks';
-import { captionToFilters } from './captions';
-import { titleCardToFilters, lowerThirdToFilters, globalTextOverlayToFilters } from './text-blocks';
+import { globalTextOverlayToFilters } from './text-blocks';
+import { sectionLayoutFilters } from './layout';
+import { cameraBackground } from './camera';
+import { OVERLAY_SUGAR_COMPILERS, type SugarCompiler, type SugarLayer } from './overlay-sugars';
 
-// Context a sugar compiler needs to lower time/space-dependent effects (motion calibrates its
-// Ken Burns curve over the clip length and scale). Built once per section by SegmentBuilder.
-export type SugarContext = {
-  duration: number;
-  /** Output scale as 'W:H', e.g. '1280:720'. */
-  scale: string;
-  fps: number;
-  /** True for real footage (project_video/video) so motion advances one output frame per input frame. */
-  isVideo: boolean;
-};
+export type { SugarContext, KineticSugarContext } from './sugar-context';
+export type { SugarCompiler, SugarLayer } from './overlay-sugars';
+export { compositingContext, createExtraInputs } from './compositing';
+// Emoji leave the lowered text right after the sugar compiles (editor/emoji); re-exported so the builder
+// stages both from one place.
+export { createEmojiPlan, type EmojiPlan } from '../emoji/EmojiPlan';
+import type { SugarContext } from './sugar-context';
 
-// Where a sugar's filters sit relative to an animation/gradient overlay graph:
-// - 'background' bakes into the video before overlays (colour grade, motion, layers).
-// - 'overlay' draws on top of the composited frame (text: caption, titleCard, lowerThird) so it is
-//   visible above an animation overlay rather than buried under it.
-export type SugarLayer = 'background' | 'overlay';
-
-// A single structured-sugar field (look/grade/motion/caption/…) and how it lowers to raw filters.
-// `order` fixes its position in the section's filter chain; lower runs first. Registering a new
-// sugar is one entry here — SegmentBuilder reads the registry rather than hardcoding the set/order.
-export type SugarCompiler = {
-  key: string;
-  order: number;
-  layer: SugarLayer;
-  compile: (section: Section, ctx: SugarContext) => Filter[];
-};
-
-// Order preserves the previous hardcoded chain: layers → motion → grade → look → letterbox → caption.
-export const SUGAR_COMPILERS: SugarCompiler[] = [
+// The background sugars bake into the video before overlays. The overlay sugars (caption onward) live in
+// overlay-sugars.ts so validation can lower them without loading these.
+const BACKGROUND_SUGAR_COMPILERS: SugarCompiler[] = [
+  {
+    // Split screen / before-after: composes the frame first, so everything below grades the whole.
+    key: 'layout',
+    order: 5,
+    layer: 'background',
+    compile: (section, ctx) => sectionLayoutFilters(section, ctx),
+  },
   {
     key: 'layers',
     order: 10,
@@ -43,6 +34,12 @@ export const SUGAR_COMPILERS: SugarCompiler[] = [
     order: 20,
     layer: 'background',
     compile: (section, ctx) => motionToFilters(section.motion, ctx),
+  },
+  {
+    key: 'camera',
+    order: 25,
+    layer: 'background',
+    compile: (section, ctx) => cameraBackground(section, ctx),
   },
   {
     key: 'grade',
@@ -62,40 +59,28 @@ export const SUGAR_COMPILERS: SugarCompiler[] = [
     layer: 'background',
     compile: (section, ctx) => letterboxToFilters(section.letterbox, ctx),
   },
-  {
-    key: 'caption',
-    order: 50,
-    layer: 'overlay',
-    compile: (section) => captionToFilters(section.caption),
-  },
-  {
-    key: 'titleCard',
-    order: 55,
-    layer: 'overlay',
-    compile: (section, ctx) =>
-      titleCardToFilters(section.titleCard, { scale: ctx.scale, backgroundColor: section.options?.backgroundColor }),
-  },
-  {
-    key: 'lowerThird',
-    order: 58,
-    layer: 'overlay',
-    compile: (section, ctx) => lowerThirdToFilters(section.lowerThird, { scale: ctx.scale }),
-  },
 ];
+
+// Order preserves the previous hardcoded chain: layers → motion → grade → look → letterbox → caption.
+export const SUGAR_COMPILERS: SugarCompiler[] = [...BACKGROUND_SUGAR_COMPILERS, ...OVERLAY_SUGAR_COMPILERS];
 
 /**
  * Lowers the section's structured-sugar fields into raw filters, split by layer and sorted by each
  * compiler's `order`. `background` filters bake into the video before overlays; `overlay` filters
- * (text) draw on top — the caller routes them onto the final map when an overlay graph exists.
+ * (text) draw on top — the caller routes them onto the final map when an overlay graph exists; `top`
+ * filters draw last, after the section's authored chain (its masks and filters) too.
  */
-export function compileSugarLayers(section: Section, ctx: SugarContext): { background: Filter[]; overlay: Filter[] } {
+export function compileSugarLayers(
+  section: Section,
+  ctx: SugarContext
+): { background: Filter[]; overlay: Filter[]; top: Filter[] } {
   const sorted = [...SUGAR_COMPILERS].sort((a, b) => a.order - b.order);
 
   function select(layer: SugarLayer): Filter[] {
     return sorted.filter((compiler) => compiler.layer === layer).flatMap((compiler) => compiler.compile(section, ctx));
   }
 
-  return { background: select('background'), overlay: select('overlay') };
+  return { background: select('background'), overlay: select('overlay'), top: select('top') };
 }
 
 /**

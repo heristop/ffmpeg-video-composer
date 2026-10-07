@@ -38,6 +38,7 @@ build_slice() {
   PREFIX="$IOS_OUT/slices/$SLICE"
   DEPS="$DEPS_DIR/$SLICE"
   [ -f "$DEPS/lib/pkgconfig/harfbuzz.pc" ] || { echo "missing iOS deps for $SLICE at $DEPS (run build-deps-ios.sh $SLICE)"; exit 1; }
+  [ -f "$DEPS/lib/pkgconfig/fribidi.pc" ] || { echo "missing iOS libfribidi for $SLICE at $DEPS (run build-deps-ios.sh $SLICE)"; exit 1; }
   [ "$ARCH" = "x86_64" ] && EXTRA="--disable-x86asm"
 
   echo "[ffmpeg][ios:$SLICE] configure ($ARCH/$SDK) ..."

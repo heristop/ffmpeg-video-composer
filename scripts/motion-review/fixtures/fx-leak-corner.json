@@ -1,0 +1,21 @@
+{
+  "label": "Light leak (fx), size 1.1 from the top-left corner",
+  "kind": "fx",
+  "window": {
+    "at": 0.3,
+    "duration": 2.6
+  },
+  "section": {
+    "graphics": [
+      {
+        "type": "fx",
+        "effect": "leak",
+        "target": "frame",
+        "at": "{{at}}",
+        "duration": "{{duration}}",
+        "edge": "top-left",
+        "size": 1.1
+      }
+    ]
+  }
+}

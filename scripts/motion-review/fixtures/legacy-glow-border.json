@@ -1,0 +1,26 @@
+{
+  "label": "Glow border (legacy APNG)",
+  "kind": "legacy",
+  "window": {
+    "at": 0.3,
+    "duration": 3.0
+  },
+  "section": {
+    "inputs": [
+      {
+        "name": "effect",
+        "type": "animation",
+        "url": "/assets/animations/glow_border.apng",
+        "options": {
+          "position": "{{position}}",
+          "scale": "{{scale}}",
+          "fit": "contain",
+          "persistent": false,
+          "start": "{{at}}",
+          "duration": "{{duration}}",
+          "opacity": 0.28
+        }
+      }
+    ]
+  }
+}

@@ -6,7 +6,7 @@
 //     and the motion clock stays scene-relative (both `t`s are the section timestamp).
 //   - a SOLID layer lowers to a drawbox timeline gate (drawbox has no alpha expression) → it POPS
 //     at the reveal delay; only gradient layers (overlaid lavfi legs) get the full fade/slide.
-import type { BackgroundLayer, ImageOverlay, Reveal } from '../templateEditorModel';
+import type { AnimationOverlay, BackgroundLayer, ImageOverlay, Reveal } from '../templateEditorModel';
 import { overlayVisibilityAt, REVEAL_DEFAULTS, type OverlayVisibility } from './overlay-visibility.logic';
 
 const HIDDEN: OverlayVisibility = { phase: 'before', progress: 0, opacity: 0, translateX: 0, translateY: 0 };
@@ -40,6 +40,26 @@ export function imageVisibilityAt(
   if (image.end !== undefined && image.end > 0 && localT >= image.end) return HIDDEN;
 
   return overlayVisibilityAt(image.motion, undefined, localT, duration);
+}
+
+/**
+ * Where an animation file sits at `localT`: the engine delays its input by `start` (-itsoffset) and cuts it
+ * after `duration` seconds (-t), unless `persistent` holds its last frame; its `motion` entrance runs on the
+ * scene clock like an image's.
+ */
+export function animationVisibilityAt(
+  animation: Pick<AnimationOverlay, 'motion' | 'start' | 'duration' | 'persistent'>,
+  localT: number,
+  duration: number
+): OverlayVisibility {
+  const start = animation.start ?? 0;
+  const cut = animation.duration !== undefined && animation.duration > 0 && !animation.persistent;
+
+  return imageVisibilityAt(
+    { motion: animation.motion, start, end: cut ? start + (animation.duration ?? 0) : undefined },
+    localT,
+    duration
+  );
 }
 
 /**

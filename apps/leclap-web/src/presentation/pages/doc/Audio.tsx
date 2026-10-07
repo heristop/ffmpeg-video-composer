@@ -1,4 +1,6 @@
 import { AFADE_CURVES } from 'ffmpeg-video-composer/src/schemas/template.schemas.ts';
+import { SFX_IDS } from 'ffmpeg-video-composer/src/core/audio/sfx-library.ts';
+import { VOICE_PRESETS } from 'ffmpeg-video-composer/src/core/audio/voice-presets.ts';
 import { Seo } from '@/presentation/components/Seo';
 import { DocSection, Prose, Code, ChipList, Tip, RefTable, Sample } from '@/presentation/components/doc/DocBlocks';
 import { docGroups } from '@/presentation/components/doc/schemaFields';
@@ -59,6 +61,29 @@ export const DocAudio = () => (
         <Code>tri</Code> (linear) is the safe default for music. Reach for <Code>exp</Code> or <Code>log</Code> when you
         want a gentler, more gradual fade — handy under voice-over where an abrupt cut is noticeable.
       </Tip>
+    </DocSection>
+
+    <DocSection id="voice-and-sfx" title="Voice, automation and sound effects" kicker="`options.voice` · `sfx`">
+      <Prose className="mb-5">
+        <p>
+          On <Code>video</Code> and <Code>project_video</Code> sections, <Code>options.voice</Code> cleans up recorded
+          speech and <Code>options.audioAutomation</Code> keys the clip&apos;s volume over time;{' '}
+          <Code>global.audio.automation</Code> does the same for the music bed, before ducking. Section <Code>sfx</Code>{' '}
+          and <Code>global.sfx</Code> place bundled sounds at a time or a time reference, and{' '}
+          <Code>global.audio.sfx: &quot;auto&quot;</Code> adds them from the motion (whooshes on designed transitions,
+          hits on impacts, a riser into each drop).
+        </p>
+      </Prose>
+      <div className="space-y-5">
+        <div>
+          <h3 className="mb-2 font-mono text-sm font-semibold text-foreground">voice</h3>
+          <ChipList items={VOICE_PRESETS} />
+        </div>
+        <div>
+          <h3 className="mb-2 font-mono text-sm font-semibold text-foreground">sfx ids</h3>
+          <ChipList items={SFX_IDS} />
+        </div>
+      </div>
     </DocSection>
   </>
 );

@@ -1,4 +1,5 @@
 import { compositeOver, contrastRatio, parseColor } from '@/core/color-contrast';
+import type { ResolvedPlatform, SafeEdge } from '@/core/platforms';
 import type { Box, Canvas, Panel } from './geometry-types';
 
 // Why a finding is an estimate. `font`: no metrics for the typeface, so widths are guessed;
@@ -84,7 +85,43 @@ function describeExcess(sides: Excess, edge: string): string | null {
   return over(worst) ? `extends ${about(worst)} past the ${edge}` : null;
 }
 
-export function overflowWarnings(boxes: Box[], canvas: Canvas): GeometryWarning[] {
+// With a delivery platform the inset is the app's own UI, one fraction per edge, and every side is
+// judged: the caption block covers a preset-pinned lower third exactly as it covers an authored one.
+// The worst edge is named with what covers it, so the fix (move it up, pull it in) is obvious.
+function platformOverlap(box: Box, canvas: Canvas, platform: ResolvedPlatform): GeometryWarning | null {
+  const { safe } = platform;
+  const sides: Record<SafeEdge, number> = {
+    top: canvas.height * safe.top - box.y,
+    bottom: box.y + box.height - canvas.height * (1 - safe.bottom),
+    left: canvas.width * safe.left - box.x,
+    right: box.x + box.width - canvas.width * (1 - safe.right),
+  };
+  const [edge, depth] = Object.entries(sides).reduce((worst, side) => (side[1] > worst[1] ? side : worst));
+
+  if (!over(depth)) {
+    return null;
+  }
+
+  const name = edge as SafeEdge;
+  const share = `${name} ${Math.round(safe[name] * 100)}%`;
+
+  return warn(
+    box,
+    'platform_ui_overlap',
+    `${box.label} reaches ${about(depth)} into the ${share} of the frame — the ${share} is covered by ` +
+      `${platform.title}'s ${platform.ui[name]}; move it away from that edge or shorten it`
+  );
+}
+
+function titleSafeOverflow(box: Box, canvas: Canvas): GeometryWarning | null {
+  const insetX = canvas.width * SAFE_MARGIN_RATIO;
+  const insetY = canvas.height * SAFE_MARGIN_RATIO;
+  const unsafe = describeExcess(excess(box, canvas, insetX, insetY, box.verticalPositionAuthored), 'title-safe area');
+
+  return unsafe ? warn(box, 'text_overflow', `${box.label} ${unsafe} — shorten it or reduce the size`) : null;
+}
+
+export function overflowWarnings(boxes: Box[], canvas: Canvas, platform?: ResolvedPlatform): GeometryWarning[] {
   const warnings: GeometryWarning[] = [];
 
   for (const box of boxes) {
@@ -97,12 +134,10 @@ export function overflowWarnings(boxes: Box[], canvas: Canvas): GeometryWarning[
       continue;
     }
 
-    const insetX = canvas.width * SAFE_MARGIN_RATIO;
-    const insetY = canvas.height * SAFE_MARGIN_RATIO;
-    const unsafe = describeExcess(excess(box, canvas, insetX, insetY, box.verticalPositionAuthored), 'title-safe area');
+    const unsafe = platform ? platformOverlap(box, canvas, platform) : titleSafeOverflow(box, canvas);
 
     if (unsafe) {
-      warnings.push(warn(box, 'text_overflow', `${box.label} ${unsafe} — shorten it or reduce the size`));
+      warnings.push(unsafe);
     }
   }
 
@@ -189,6 +224,10 @@ interface Timed {
   height: number;
 }
 
+// Windows that merely touch (one ends as the next starts) can disagree by a float rounding error when
+// section start times are accumulated, e.g. a global overlay repeated on back-to-back sections.
+const TOUCH_EPSILON_SEC = 1e-3;
+
 function overlapsInTime(a: Timed, b: Timed): number {
   return Math.min(a.endSec, b.endSec) - Math.max(a.startSec, b.startSec);
 }
@@ -220,7 +259,7 @@ export function collisionWarnings(boxes: Box[], limit = Number.POSITIVE_INFINITY
 
       const shared = overlapsInTime(a, b);
 
-      if (shared <= 0 || !overlapsInSpace(a, b)) {
+      if (shared <= TOUCH_EPSILON_SEC || !overlapsInSpace(a, b)) {
         continue;
       }
 

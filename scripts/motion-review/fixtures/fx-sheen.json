@@ -1,0 +1,11 @@
+{
+  "label": "Sheen (fx)",
+  "kind": "fx",
+  "window": { "at": 0.4, "duration": 0.75 },
+  "moments": [0.35, 0.51, 0.66, 0.775, 0.89, 1.2],
+  "section": {
+    "graphics": [
+      { "type": "fx", "effect": "sheen", "target": "{{target}}", "at": "{{at}}", "duration": "{{duration}}" }
+    ]
+  }
+}

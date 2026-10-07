@@ -7,9 +7,9 @@
     "orientation": "landscape",
     "musicEnabled": true,
     "music": {
-      "name": "romantic-piano.mp3"
+      "name": "dreamy-fall-people.mp3"
     },
-    "allowedMusic": ["romantic-piano", "cafe-bossa-nova", "lofi-sentimental-jazz", "cafe-jazz", "lofi-chill"],
+    "allowedMusic": ["dreamy-fall-people", "lofi-cafe", "lofi-sentimental-jazz", "cafe-jazz", "lofi-chill"],
     "allowUploadMusic": true,
     "transition": {
       "type": "dissolve",
@@ -106,6 +106,34 @@
             "color": "#000000"
           }
         }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "bloom",
+          "target": "frame",
+          "at": 0,
+          "duration": 4,
+          "threshold": 0.7,
+          "knee": 0.16,
+          "radius": 0.018,
+          "ramp": 0.8,
+          "color": "#f7e2c4",
+          "intensity": 0.9
+        },
+        {
+          "type": "frame",
+          "at": 0.3,
+          "until": 3.35,
+          "above": true,
+          "inset": 36,
+          "thickness": 6,
+          "color": "#F5F3F7",
+          "trace": "path",
+          "contrast": "shadow",
+          "exit": "fade",
+          "exitDuration": 0.3
+        }
       ]
     },
     {
@@ -186,6 +214,20 @@
   "partials": [
     {
       "id": "logo-bumper",
+      "description": "LeClap logo sting (landscape): the 2.4 s bumper clip framed by brand-coloured rules, faded in and out.",
+      "envelope": {
+        "in": 0.5,
+        "out": 0.5
+      },
+      "syncPoints": [
+        {
+          "id": "logo",
+          "offset": 0.5
+        }
+      ],
+      "jobs": ["brand", "close"],
+      "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
+      "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
       "sections": [
         {
           "name": "logo_bumper",

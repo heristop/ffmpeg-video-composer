@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { oxcReactCompiler } from './vite/oxc-react-compiler.ts';
+import { webMcpOriginTrial } from './vite/webmcp-origin-trial.ts';
 
 const projectDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -28,6 +29,8 @@ export default defineConfig({
     oxcReactCompiler(),
     react(),
     tailwindcss(),
+    // The WebMCP origin-trial meta tag, only when VITE_WEBMCP_OT_TOKEN is set.
+    webMcpOriginTrial(),
     nodePolyfills({
       // Enable polyfills for specific globals and modules
       globals: {

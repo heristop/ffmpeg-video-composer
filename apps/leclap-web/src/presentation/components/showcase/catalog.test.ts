@@ -26,9 +26,13 @@ describe('showcase catalog', () => {
 
   it('recovers unknown URL values without a broken player', () => {
     expect(validCategory('missing')).toBe('all');
-    expect(selectedSample(null).id).toBe('drink-and-code');
-    expect(selectedSample('missing').id).toBe('drink-and-code');
+    expect(selectedSample(null).id).toBe('effects-tour');
+    expect(selectedSample('missing').id).toBe('effects-tour');
     expect(selectedSample('square-promo').id).toBe('square-promo');
+  });
+
+  it('lists the effects tour second, after Drink & Code', () => {
+    expect(SHOWCASE_SAMPLES.slice(0, 2).map((sample) => sample.id)).toEqual(['drink-and-code', 'effects-tour']);
   });
 
   it('renders forms without options and keeps fixture values within authoring limits', () => {
@@ -83,13 +87,14 @@ describe('showcase catalog', () => {
     }
   });
 
-  it('keeps the promo scene timing at the authored 11.6 seconds', () => {
+  // 2.2 + 6.4 + 3 s of sections, less the 0.6 s zoom-through and 0.5 s push-up that overlap them.
+  it('keeps the promo scene timing at the authored 10.5 seconds', () => {
     const manifest = JSON.parse(
       readFileSync(path.join(root, 'apps/leclap-web/public/videos/showcase/manifest.json'), 'utf8')
     );
     const promo = manifest.samples.find((sample: { id: string }) => sample.id === 'web-app-promo');
-    expect(promo.duration).toBeGreaterThanOrEqual(11.5);
-    expect(promo.duration).toBeLessThan(11.7);
+    expect(promo.duration).toBeGreaterThanOrEqual(10.4);
+    expect(promo.duration).toBeLessThan(10.6);
     expect(existsSync(path.join(root, promo.mediaSource))).toBe(true);
   });
 

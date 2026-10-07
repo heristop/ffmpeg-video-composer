@@ -139,11 +139,11 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      # build-host.sh statically links FFmpeg + freetype/harfbuzz/openh264/libvpx via pkg-config (full
+      # build-host.sh statically links FFmpeg + freetype/harfbuzz/fribidi/openh264/libvpx via pkg-config (full
       # build with drawtext + WebM/VP9-alpha decode). On the macOS runner those libraries come from
       # Homebrew; each ships a .pc on the default pkg-config path (libvpx is not keg-only).
       - name: Install FFmpeg build deps (Homebrew)
-        run: brew install pkg-config freetype harfbuzz openh264 libvpx
+        run: brew install pkg-config freetype harfbuzz fribidi openh264 libvpx
 
       # Cache the FFmpeg source checkout + the built host libs so FFmpeg isn't recompiled from source
       # on every run. Keyed on the version pins + build scripts; the generated .pc prefixes are

@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "name": "Gallery: theme sunset",
+    "description": "The same card on the sunset theme: every colour and font is a $color / $font token, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 19,
+    "transition": {
+      "type": "cut"
+    },
+    "theme": "sunset"
+  },
+  "sections": [
+    {
+      "name": "card",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 2.6
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.01,
+          "x": 80,
+          "y": 450,
+          "width": 1120,
+          "height": 190,
+          "color": "$color.surface",
+          "from": "left"
+        },
+        {
+          "type": "underline",
+          "at": 0,
+          "duration": 0.01,
+          "x": 120,
+          "y": 410,
+          "width": 300,
+          "thickness": 10,
+          "color": "$color.brand"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "THEME · SUNSET"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "font": "$font.body",
+          "size": 34,
+          "align": "left",
+          "x": 120,
+          "y": 90,
+          "color": "$color.muted"
+        },
+        {
+          "text": {
+            "en": "Brand once, post everywhere"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "font": "$font.display",
+          "size": 110,
+          "align": "left",
+          "x": 120,
+          "y": 150,
+          "maxWidth": 1040,
+          "color": "$color.fg",
+          "accent": {
+            "words": "last",
+            "color": "$color.accent"
+          }
+        },
+        {
+          "text": {
+            "en": "palette, type stack and motion feel"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "font": "$font.body",
+          "size": 48,
+          "align": "left",
+          "x": 130,
+          "y": 485,
+          "color": "$color.fg"
+        },
+        {
+          "text": {
+            "en": "accent2 · surface panel"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "font": "$font.body",
+          "size": 34,
+          "align": "left",
+          "x": 130,
+          "y": 570,
+          "color": "$color.accent2"
+        }
+      ]
+    }
+  ]
+}

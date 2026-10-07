@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "name": "Gallery: LUT look strength",
+    "description": "LUT-backed looks dialled to 25%, 50% and 100% (look.strength), for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 2,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "teal-orange-0.25",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 1.6
+      },
+      "look": {
+        "preset": "teal-orange",
+        "strength": 0.25
+      }
+    },
+    {
+      "name": "teal-orange-0.5",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 1.6
+      },
+      "look": {
+        "preset": "teal-orange",
+        "strength": 0.5
+      }
+    },
+    {
+      "name": "teal-orange-1",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 1.6
+      },
+      "look": {
+        "preset": "teal-orange",
+        "strength": 1
+      }
+    },
+    {
+      "name": "mono-film-0.25",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 1.6
+      },
+      "look": {
+        "preset": "mono-film",
+        "strength": 0.25
+      }
+    },
+    {
+      "name": "mono-film-0.5",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 1.6
+      },
+      "look": {
+        "preset": "mono-film",
+        "strength": 0.5
+      }
+    },
+    {
+      "name": "mono-film-1",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 1.6
+      },
+      "look": {
+        "preset": "mono-film",
+        "strength": 1
+      }
+    }
+  ]
+}

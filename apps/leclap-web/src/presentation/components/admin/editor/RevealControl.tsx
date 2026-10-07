@@ -4,33 +4,26 @@
 // object once any timing is overridden — so it round-trips through buildDescriptor unchanged.
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { REVEAL_TYPES, REVEAL_EASINGS } from 'ffmpeg-video-composer/src/schemas/effects.schemas.ts';
+import { REVEAL_TYPES } from 'ffmpeg-video-composer/src/schemas/effects.schemas.ts';
+import type { EasingSpec } from 'ffmpeg-video-composer/src/core/motion/easing.ts';
+import { CUSTOM_EASING, easingChoice, easingLabel, easingOptions } from './easingOptions';
 import type { Reveal } from '../templateEditorModel';
 import { SegmentedControl, RangeSlider, type SegmentOption } from './controls';
 import { SectionDisclosure } from './SectionDisclosure';
 
 type RevealType = (typeof REVEAL_TYPES)[number];
-type RevealEasing = (typeof REVEAL_EASINGS)[number];
 type RevealObject = {
   type: RevealType;
   delay?: number;
   duration?: number;
   distance?: number;
-  easing?: RevealEasing;
+  easing?: EasingSpec;
 };
 
 const MOVING: RevealType[] = ['rise', 'slide-left', 'slide-right'];
 const DEFAULT_DELAY = 0.3;
 const DEFAULT_DURATION = 0.6;
 const DEFAULT_DISTANCE = 60;
-
-// value → locale key suffix for the easing labels (flat keys, matching the reveal.* namespace).
-const EASING_LABEL_KEYS: Record<RevealEasing, string> = {
-  linear: 'easingLinear',
-  'ease-out': 'easingEaseOut',
-  'ease-in-out': 'easingEaseInOut',
-  'ease-out-back': 'easingEaseOutBack',
-};
 
 // Store a slider value equal to the engine default as "unset" so descriptors stay minimal and the
 // timing summary/reset affordance stay honest.
@@ -43,7 +36,7 @@ function timingSummary(t: TFunction<'admin'>, current: RevealObject): string {
     current.delay === undefined ? null : `${t('reveal.delay')} ${current.delay}s`,
     current.duration === undefined ? null : `${t('reveal.duration')} ${current.duration}s`,
     current.distance === undefined ? null : `${t('reveal.distance')} ${current.distance}px`,
-    current.easing === undefined ? null : t(`reveal.${EASING_LABEL_KEYS[current.easing]}`),
+    current.easing === undefined ? null : easingLabel(t, current.easing),
   ].filter((part): part is string => part !== null);
 
   return parts.length > 0 ? parts.join(' · ') : t('reveal.summaryDefault');
@@ -138,9 +131,12 @@ export const RevealControl = ({ reveal, onChange }: RevealControlProps) => {
           <div>
             <SegmentedControl
               label={t('reveal.easing')}
-              value={current.easing ?? 'linear'}
-              options={REVEAL_EASINGS.map((value) => ({ value, label: t(`reveal.${EASING_LABEL_KEYS[value]}`) }))}
+              value={easingChoice(current.easing)}
+              options={easingOptions(t, current.easing)}
               onChange={(easing) => {
+                // The authored curve is already selected; re-picking it changes nothing.
+                if (easing === CUSTOM_EASING) return;
+
                 // Linear is the engine default — emit it as "unset" so descriptors stay minimal.
                 set({ easing: easing === 'linear' ? undefined : easing });
               }}

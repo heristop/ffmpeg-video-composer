@@ -1,4 +1,4 @@
-import { TemplateValidator } from '../services/TemplateValidator';
+import { BaseTemplateValidator } from '../services/BaseTemplateValidator';
 import type { EffectReference, EffectSection, TemplateDescriptor } from '../schemas/template.schemas';
 import type { JsonValue } from '../schemas/effect-reference.schema';
 
@@ -32,7 +32,7 @@ export interface ResolvedTemplateEffects {
 const VISUAL_TYPES = new Set(['video', 'project_video', 'color_background', 'image_background', 'effect']);
 
 function validatedDescriptor(template: unknown): TemplateDescriptor {
-  const validator = new TemplateValidator();
+  const validator = new BaseTemplateValidator();
   const validation = validator.validateTemplate(template);
 
   if (!validation.success) throw new Error(validator.getValidationSummary(validation));

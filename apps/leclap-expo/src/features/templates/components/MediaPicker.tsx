@@ -1,7 +1,13 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { MUSIC_LIBRARY, BACKGROUND_LIBRARY, backgroundAsset, type MediaCredit } from '@/src/data/mediaCatalog';
+import {
+  MUSIC_LIBRARY,
+  BACKGROUND_LIBRARY,
+  backgroundAsset,
+  musicCover,
+  type MediaCredit,
+} from '@/src/data/mediaCatalog';
 import { colors, spacing, typography } from '@/src/styles/theme';
 
 export interface MediaPickerProps {
@@ -45,6 +51,8 @@ interface CardBaseProps {
 }
 
 function MusicCard({ item, selected, onPress }: CardBaseProps) {
+  const cover = musicCover(item.id);
+
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -55,7 +63,11 @@ function MusicCard({ item, selected, onPress }: CardBaseProps) {
       style={[styles.card, selected && styles.cardSelected]}
     >
       <View style={styles.musicArt}>
-        <Ionicons name="musical-notes" size={28} color={selected ? colors.primary : colors.textSecondary} />
+        {cover ? (
+          <Image source={cover} style={styles.thumbImage} resizeMode="cover" accessibilityIgnoresInvertColors />
+        ) : (
+          <Ionicons name="musical-notes" size={28} color={selected ? colors.primary : colors.textSecondary} />
+        )}
         {selected && (
           <View style={styles.checkBadge}>
             <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
@@ -135,6 +147,7 @@ const styles = StyleSheet.create({
   musicArt: {
     height: 72,
     borderRadius: 8,
+    overflow: 'hidden',
     backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',

@@ -75,7 +75,7 @@ describe('all templates compile (Node smoke)', () => {
         assetsDir: libDir,
         currentLocale: 'en',
         audioConfig: { sampleRate: 44100, channelLayout: 'stereo' },
-        // Always the landscape base scale: TemplateDirector.applyOrientationToScale swaps W:H itself
+        // Always the landscape base scale: the director (resolveBuildVideoConfig) swaps W:H itself
         // for a portrait descriptor (pre-swapping here would double-swap back to landscape).
         videoConfig: { orientation: portrait ? 'portrait' : 'landscape', scale: '1280:720' },
         fields: FIELDS,
@@ -112,7 +112,7 @@ describe('templates compile with a video-only (no-audio) clip', () => {
         assetsDir: libDir,
         currentLocale: 'en',
         audioConfig: { sampleRate: 44100, channelLayout: 'stereo' },
-        // Always the landscape base scale: TemplateDirector.applyOrientationToScale swaps W:H itself
+        // Always the landscape base scale: the director (resolveBuildVideoConfig) swaps W:H itself
         // for a portrait descriptor (pre-swapping here would double-swap back to landscape).
         videoConfig: { orientation: portrait ? 'portrait' : 'landscape', scale: '1280:720' },
         fields: FIELDS,

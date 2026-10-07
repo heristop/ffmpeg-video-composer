@@ -1,0 +1,19 @@
+{
+  "label": "Ripple (tap)",
+  "kind": "fx",
+  "window": { "at": 0.3, "duration": 0.88 },
+  "moments": [0.25, 0.34, 0.42, 0.6, 0.85, 1.23],
+  "subject": { "x": 0.4, "y": 0.42, "w": 0.2, "h": 0.16, "radius": 0.3 },
+  "section": {
+    "graphics": [
+      {
+        "type": "fx",
+        "effect": "ripple",
+        "variant": "tap",
+        "target": "{{target}}",
+        "at": "{{at}}",
+        "duration": "{{duration}}"
+      }
+    ]
+  }
+}

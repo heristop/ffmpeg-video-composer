@@ -1,5 +1,7 @@
 import { parseFontMetrics, type FontMetrics } from '@/core/font-metrics';
 import { expandPartialsSafe } from '@/core/partials';
+import { effectiveOrientation, resolvePlatform } from '@/core/platforms';
+import { resolveThemeDescriptor } from '@/core/theme/resolve';
 import type { TemplateDescriptor } from '../../schemas/template.schemas';
 import {
   canvasFor,
@@ -20,6 +22,7 @@ import {
   overflowWarnings,
   type GeometryWarning,
 } from './rules';
+import { platformWarnings } from './platform-rules';
 // FontLoader lives in bundled-font-loader.ts, not here, so this barrel only ever imports *from* that
 // module — never the reverse — keeping the re-export of `createBundledFontLoader` below cycle-free.
 import type { FontLoader } from './bundled-font-loader';
@@ -31,15 +34,20 @@ export { createBundledFontLoader, type FontLoader } from './bundled-font-loader'
 // are the ones worth acting on.
 const MAX_WARNINGS = 20;
 
-// Worst first, so the cut above keeps the findings worth acting on. Text off the frame edge is
-// simply not on screen; a collision is two things fighting for one place; an overflow only risks a
-// crop; the rest are legibility hints, a contrast measured from rendered pixels ahead of one computed
-// from colour tokens. Anything unranked sorts last rather than throwing the order away.
+// Worst first, so the cut above keeps the findings worth acting on. A video longer than its delivery
+// platform accepts cannot be posted at all; text off the frame edge is simply not on screen; a
+// collision is two things fighting for one place; text under an app's UI is hidden for every viewer;
+// an overflow only risks a crop; the rest are legibility hints, a contrast measured from rendered
+// pixels ahead of one computed from colour tokens. Anything unranked sorts last rather than throwing the order away.
 const SEVERITY_ORDER = [
+  'platform_duration_exceeded',
   'text_out_of_frame',
   'text_collision',
   'text_covered',
+  'platform_ui_overlap',
   'text_overflow',
+  'platform_orientation_mismatch',
+  'platform_fps_mismatch',
   'text_low_contrast_rendered',
   'text_low_contrast',
   'text_too_small',
@@ -96,10 +104,11 @@ async function parseOne(loadFont: FontLoader, file: string): Promise<FontMetrics
 // measuring the raw descriptor reported a clean bill of health for everything the partial contains —
 // and six of the nine bundled templates are partial-based. An unexpandable descriptor is measured
 // as-is: this channel is advisory, and `validateTemplate` is what reports the broken ref.
+// Theme tokens are resolved too, so `$color.fg` is measured as the colour it renders.
 function expanded(template: TemplateDescriptor): TemplateDescriptor {
   const expansion = expandPartialsSafe(template);
 
-  return expansion.ok ? (expansion.data as TemplateDescriptor) : template;
+  return expansion.ok ? resolveThemeDescriptor(expansion.data as TemplateDescriptor) : template;
 }
 
 interface LoosePartialRef {
@@ -215,7 +224,7 @@ export interface MeasuredTemplate {
 
 export async function measureTemplate(raw: TemplateDescriptor, loadFont?: FontLoader): Promise<MeasuredTemplate> {
   const template = expanded(raw);
-  const canvas = canvasFor(template.global?.orientation);
+  const canvas = canvasFor(effectiveOrientation(template.global));
   const origins = authoredPaths(raw, Array.isArray(template.sections) ? template.sections.length : 0);
   const lowered = lowerTemplate(template, canvas, origins);
   const metrics = await loadMetrics(lowered, loadFont);
@@ -225,9 +234,12 @@ export async function measureTemplate(raw: TemplateDescriptor, loadFont?: FontLo
 }
 
 // Every finding the static model supports, before de-duplication, ordering and the cut.
-export function staticFindings({ boxes, panels, canvas }: MeasuredTemplate): GeometryWarning[] {
+export function staticFindings({ template, lowered, boxes, panels, canvas }: MeasuredTemplate): GeometryWarning[] {
+  const platform = resolvePlatform(template.global?.platform);
+
   return [
-    ...overflowWarnings(boxes, canvas),
+    ...platformWarnings(lowered, template.global, platform),
+    ...overflowWarnings(boxes, canvas, platform),
     ...legibilityWarnings(boxes, canvas),
     ...contrastWarnings(boxes),
     ...footageLegibilityWarnings(boxes),

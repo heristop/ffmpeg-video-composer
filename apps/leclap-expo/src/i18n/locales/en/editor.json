@@ -370,9 +370,9 @@
     "mirror": "Mirror",
     "mirrorHorizontal": "Horizontal",
     "mirrorVertical": "Vertical",
-    "add": "Add an animation",
-    "layer": "Animation {{number}}",
-    "remove": "Remove animation",
+    "add": "Add an animation file",
+    "layer": "Animation file {{number}}",
+    "remove": "Remove animation file",
     "effects": {
       "label": "Effect combinations",
       "interface-focus": {
@@ -399,11 +399,59 @@
         "name": "Frame reveal",
         "description": "A fine frame with a single shine sweep."
       }
-    }
+    },
+    "library": {
+      "sheen": "Sheen",
+      "glint-orbit": "Orbit glint",
+      "edge-glow": "Edge glow",
+      "leak": "Light leak",
+      "bloom": "Bloom",
+      "ripple": "Pulse ring",
+      "ripple-tap": "Tap",
+      "resolve": "Resolve",
+      "glass": "Glass",
+      "vignette-breathe": "Breathing vignette",
+      "confetti": "Confetti",
+      "glint": "Glints",
+      "frame": "Frame",
+      "corners": "Corner brackets",
+      "underline": "Underline",
+      "bokeh": "Bokeh",
+      "dust": "Dust",
+      "grain": "Grain",
+      "shine-sweep": "Shine sweep",
+      "sparkle": "Sparkle",
+      "corner-brackets": "Corner brackets",
+      "pulse-ring": "Pulse ring",
+      "tap-pulse": "Tap pulse",
+      "light-leak": "Light leak",
+      "white-border": "White border",
+      "glow-border": "Glow border",
+      "rounded-border": "Rounded border",
+      "spec-orbit": "Spec orbit",
+      "animation-icons": "Animation icons"
+    },
+    "groups": {
+      "light": "Light",
+      "focus": "Focus",
+      "celebrate": "Celebrate",
+      "frames": "Frames",
+      "ambient": "Ambient",
+      "samples": "Samples",
+      "samplesHint": "Stock overlays that look the same in every template. Prefer an effect above: it is drawn by the engine and tuned to this scene."
+    },
+    "engine": {
+      "engineLabel": "Effects",
+      "engineHelp": "Drawn by LeClap and tuned to this scene. Adjust them in the web builder.",
+      "added": "Effects in this scene",
+      "removeEffect": "Remove {{label}}",
+      "addEffect": "Add {{label}}"
+    },
+    "sampleBadge": "Sample"
   },
   "overlays": {
     "kind": "Overlays",
-    "animation": "Animation",
+    "animation": "Animation file",
     "image": "Image"
   },
   "watermark": {

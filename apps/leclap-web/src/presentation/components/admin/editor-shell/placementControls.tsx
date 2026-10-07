@@ -6,10 +6,22 @@
 // so nothing duplicates the placement column or the animation panes.
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import type { ImageOverlay, AnimationOverlay, Orientation, Reveal } from '../templateEditorModel';
+import {
+  legacyEquivalent,
+  libraryLabelKey,
+  type AnimationEffectPreset,
+  type AnimationOverlay,
+  type EngineLibraryEntry,
+  type ImageOverlay,
+  type Orientation,
+  type Reveal,
+} from '../templateEditorModel';
+import { Button } from '@/presentation/components/ui';
+import { Sparkles } from '@/presentation/components/icons';
 import { MediaPicker } from '../MediaPicker';
 import { PlacementFields, type OverlayPlacementValue } from '../editor/placementFields';
-import { AnimationSource, AnimationPlayback, NumberRow } from '../editor/animationSource';
+import { AnimationSource, AnimationPlayback, NumberRow, type AnimationPickMode } from '../editor/animationSource';
+import { FileElementHeader } from '../editor/animationKinds';
 import { RevealControl } from '../editor/RevealControl';
 import { SectionDisclosure } from '../editor/SectionDisclosure';
 import { showWindowSeconds } from '../editor/SectionFields/image-show-window';
@@ -87,6 +99,12 @@ interface AnimationVariant {
   orientation: Orientation;
   value: AnimationOverlay;
   onChange: (patch: Partial<AnimationOverlay>) => void;
+  /** Replace this overlay with an engine primitive (the picker's engine cards, the sample upgrade). */
+  onPickEngine?: (entry: EngineLibraryEntry) => void;
+  /** Replace this overlay with a two-part recipe. */
+  onPickRecipe?: (preset: AnimationEffectPreset) => void;
+  /** The picker side an empty slot opens on (the add menu's "Effect" vs "Animation file"). */
+  initialMode?: AnimationPickMode;
 }
 
 export type PlacementControlsProps = ImageVariant | AnimationVariant;
@@ -96,7 +114,15 @@ export const PlacementControls = (props: PlacementControlsProps) => {
     return <ImagePlacement value={props.value} orientation={props.orientation} onChange={props.onChange} />;
   }
 
-  return <AnimationPlacement value={props.value} onChange={props.onChange} />;
+  return (
+    <AnimationPlacement
+      value={props.value}
+      onChange={props.onChange}
+      onPickEngine={props.onPickEngine}
+      onPickRecipe={props.onPickRecipe}
+      initialMode={props.initialMode}
+    />
+  );
 };
 
 // The shared "Placement" disclosure: numeric fine-tuning stays one click away while the canvas
@@ -204,18 +230,69 @@ const ImagePlacement = ({ value, orientation, onChange }: ImagePlacementProps) =
 interface AnimationPlacementProps {
   value: AnimationOverlay;
   onChange: (patch: Partial<AnimationOverlay>) => void;
+  onPickEngine?: (entry: EngineLibraryEntry) => void;
+  onPickRecipe?: (preset: AnimationEffectPreset) => void;
+  initialMode?: AnimationPickMode;
 }
 
-// Source tabs + numeric placement + playback. The source picker may yield a fresh overlay (url/label); merge
-// it into the current overlay via onChange. Playback tucks under a disclosure like Placement so the
-// essentials (the source) lead; its summary mirrors the extent + start so nothing hides silently.
-const AnimationPlacement = ({ value, onChange }: AnimationPlacementProps) => {
+// A legacy stock sample offers its engine replacement: the same idea, tuned to this section.
+const SampleUpgrade = ({ url, onPick }: { url: string; onPick: (entry: EngineLibraryEntry) => void }) => {
   const { t } = useTranslation('admin');
+  const entry = legacyEquivalent(url);
+
+  if (!entry) return null;
+
+  const label = t(libraryLabelKey(entry.id));
+
+  return (
+    <div className="flex flex-col items-start gap-2 rounded-lg border border-brand-500/25 bg-brand-500/[0.07] px-2.5 py-2">
+      <p className="text-xs leading-snug text-gray-600 dark:text-gray-300">
+        {t('animation.picker.upgradeHint', { label })}
+      </p>
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        onClick={() => {
+          onPick(entry);
+        }}
+      >
+        <Sparkles className="h-3.5 w-3.5 text-brand-500" aria-hidden />
+        {t('animation.picker.upgrade')}
+      </Button>
+    </div>
+  );
+};
+
+// Source tabs + numeric placement + playback. The source picker may yield a fresh overlay (url/label); merge
+// it into the current overlay via onChange, or (an engine card) hand the pick to the host, which swaps this
+// overlay for the primitive. Placement and playback only show once a source is set; they tuck under
+// disclosures so the essentials (the source) lead, with summaries so nothing hides silently.
+const AnimationPlacement = ({ value, onChange, onPickEngine, onPickRecipe, initialMode }: AnimationPlacementProps) => {
+  const { t } = useTranslation('admin');
+
+  if (!value.url) {
+    return (
+      <AnimationSource
+        value={undefined}
+        onPickEngine={onPickEngine}
+        onPickRecipe={onPickRecipe}
+        initialMode={initialMode}
+        onChange={(next) => {
+          if (next) onChange(next);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="space-y-3">
+      <FileElementHeader url={value.url} label={value.label} />
+      {onPickEngine ? <SampleUpgrade url={value.url} onPick={onPickEngine} /> : null}
       <AnimationSource
         value={value}
+        onPickEngine={onPickEngine}
+        onPickRecipe={onPickRecipe}
         onChange={(next) => {
           if (next) onChange(next);
         }}

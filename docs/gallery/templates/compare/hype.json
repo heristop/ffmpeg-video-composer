@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "name": "Gallery: compare hype",
+    "description": "One beat at motion energy 1.5 on the bold theme, compared side by side with leclap compare, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 31,
+    "transition": {
+      "type": "cut"
+    },
+    "theme": "bold",
+    "motion": {
+      "energy": 1.5
+    }
+  },
+  "sections": [
+    {
+      "name": "beat",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 2.4
+      },
+      "camera": {
+        "hits": [0.4]
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "Same beat, three energies"
+          },
+          "preset": "cascade",
+          "font": "$font.display",
+          "size": 120,
+          "y": 200,
+          "color": "$color.fg",
+          "accent": {
+            "words": "last",
+            "color": "$color.accent"
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.3,
+          "x": 340,
+          "y": 470,
+          "width": 600,
+          "thickness": 10,
+          "color": "$color.brand"
+        }
+      ]
+    }
+  ]
+}

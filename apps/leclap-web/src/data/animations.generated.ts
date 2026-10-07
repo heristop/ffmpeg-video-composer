@@ -15,3 +15,214 @@ export const ANIMATION_FILES: string[] = [
   'tap_pulse.apng',
   'white_border.apng',
 ];
+
+export interface AnimationThumb {
+  id: string;
+  /** English fallback label (the picker shows the i18n label `animation.library.<id>`). */
+  label: string;
+  kind: 'fx' | 'graphic' | 'sample';
+  /** Looping preview (an animated WebP for engine entries, the poster for samples). */
+  thumb: string;
+  /** Still frame at the effect's peak (prefers-reduced-motion, and while the thumb loads). */
+  poster: string;
+}
+
+// Engine-rendered picker thumbnails, served from /public/assets/animation-thumbs.
+export const ANIMATION_THUMBS: AnimationThumb[] = [
+  {
+    id: 'sheen',
+    label: 'Sheen',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/sheen.webp',
+    poster: '/assets/animation-thumbs/sheen.png',
+  },
+  {
+    id: 'glint-orbit',
+    label: 'Orbit glint',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/glint-orbit.webp',
+    poster: '/assets/animation-thumbs/glint-orbit.png',
+  },
+  {
+    id: 'edge-glow',
+    label: 'Edge glow',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/edge-glow.webp',
+    poster: '/assets/animation-thumbs/edge-glow.png',
+  },
+  {
+    id: 'leak',
+    label: 'Light leak',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/leak.webp',
+    poster: '/assets/animation-thumbs/leak.png',
+  },
+  {
+    id: 'bloom',
+    label: 'Bloom',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/bloom.webp',
+    poster: '/assets/animation-thumbs/bloom.png',
+  },
+  {
+    id: 'ripple',
+    label: 'Pulse ring',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/ripple.webp',
+    poster: '/assets/animation-thumbs/ripple.png',
+  },
+  {
+    id: 'ripple-tap',
+    label: 'Tap',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/ripple-tap.webp',
+    poster: '/assets/animation-thumbs/ripple-tap.png',
+  },
+  {
+    id: 'resolve',
+    label: 'Resolve',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/resolve.webp',
+    poster: '/assets/animation-thumbs/resolve.png',
+  },
+  {
+    id: 'glass',
+    label: 'Glass',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/glass.webp',
+    poster: '/assets/animation-thumbs/glass.png',
+  },
+  {
+    id: 'vignette-breathe',
+    label: 'Breathing vignette',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/vignette-breathe.webp',
+    poster: '/assets/animation-thumbs/vignette-breathe.png',
+  },
+  {
+    id: 'glint',
+    label: 'Glints',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/glint.webp',
+    poster: '/assets/animation-thumbs/glint.png',
+  },
+  {
+    id: 'frame',
+    label: 'Frame',
+    kind: 'graphic',
+    thumb: '/assets/animation-thumbs/frame.webp',
+    poster: '/assets/animation-thumbs/frame.png',
+  },
+  {
+    id: 'corners',
+    label: 'Corner brackets',
+    kind: 'graphic',
+    thumb: '/assets/animation-thumbs/corners.webp',
+    poster: '/assets/animation-thumbs/corners.png',
+  },
+  {
+    id: 'underline',
+    label: 'Underline',
+    kind: 'graphic',
+    thumb: '/assets/animation-thumbs/underline.webp',
+    poster: '/assets/animation-thumbs/underline.png',
+  },
+  {
+    id: 'bokeh',
+    label: 'Bokeh',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/bokeh.webp',
+    poster: '/assets/animation-thumbs/bokeh.png',
+  },
+  {
+    id: 'dust',
+    label: 'Dust',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/dust.webp',
+    poster: '/assets/animation-thumbs/dust.png',
+  },
+  {
+    id: 'grain',
+    label: 'Grain',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/grain.webp',
+    poster: '/assets/animation-thumbs/grain.png',
+  },
+  {
+    id: 'confetti',
+    label: 'Confetti',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/confetti.webp',
+    poster: '/assets/animation-thumbs/confetti.png',
+  },
+  {
+    id: 'shine-sweep',
+    label: 'Shine sweep',
+    kind: 'sample',
+    thumb: '/assets/animation-thumbs/sample-shine-sweep.png',
+    poster: '/assets/animation-thumbs/sample-shine-sweep.png',
+  },
+  {
+    id: 'confetti',
+    label: 'Confetti',
+    kind: 'sample',
+    thumb: '/assets/animation-thumbs/sample-confetti.png',
+    poster: '/assets/animation-thumbs/sample-confetti.png',
+  },
+  {
+    id: 'sparkle',
+    label: 'Sparkle',
+    kind: 'sample',
+    thumb: '/assets/animation-thumbs/sample-sparkle.png',
+    poster: '/assets/animation-thumbs/sample-sparkle.png',
+  },
+  {
+    id: 'corner-brackets',
+    label: 'Corner brackets',
+    kind: 'sample',
+    thumb: '/assets/animation-thumbs/sample-corner-brackets.png',
+    poster: '/assets/animation-thumbs/sample-corner-brackets.png',
+  },
+  {
+    id: 'pulse-ring',
+    label: 'Pulse ring',
+    kind: 'sample',
+    thumb: '/assets/animation-thumbs/sample-pulse-ring.png',
+    poster: '/assets/animation-thumbs/sample-pulse-ring.png',
+  },
+  {
+    id: 'tap-pulse',
+    label: 'Tap pulse',
+    kind: 'sample',
+    thumb: '/assets/animation-thumbs/sample-tap-pulse.png',
+    poster: '/assets/animation-thumbs/sample-tap-pulse.png',
+  },
+  {
+    id: 'light-leak',
+    label: 'Light leak',
+    kind: 'sample',
+    thumb: '/assets/animation-thumbs/sample-light-leak.png',
+    poster: '/assets/animation-thumbs/sample-light-leak.png',
+  },
+  {
+    id: 'white-border',
+    label: 'White border',
+    kind: 'sample',
+    thumb: '/assets/animation-thumbs/sample-white-border.png',
+    poster: '/assets/animation-thumbs/sample-white-border.png',
+  },
+  {
+    id: 'glow-border',
+    label: 'Glow border',
+    kind: 'sample',
+    thumb: '/assets/animation-thumbs/sample-glow-border.png',
+    poster: '/assets/animation-thumbs/sample-glow-border.png',
+  },
+  {
+    id: 'rounded-border',
+    label: 'Rounded border',
+    kind: 'sample',
+    thumb: '/assets/animation-thumbs/sample-rounded-border.png',
+    poster: '/assets/animation-thumbs/sample-rounded-border.png',
+  },
+];

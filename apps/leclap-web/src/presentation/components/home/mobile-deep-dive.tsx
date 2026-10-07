@@ -8,18 +8,21 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { ArrowRight } from '@/presentation/components/icons';
 import { Button } from '@/presentation/components/ui';
 import { ChapterList, PINNED_QUERY, useActiveChapter } from './scroll-chapters';
+import { RenderScreen } from './render-screen';
 import { SectionHeading } from './section-heading';
 
 // The mobile deep dive: four chapters of the on-device story scroll past a pinned phone whose screen follows
-// them — the real app capture (pick, render), Alex's real take (shoot), and the real on-device render of it
-// (result), each a small muted loop under public/videos/home. 9:16 footage fits the screen's width over a
+// them — the real app capture (pick), Alex's real take (shoot), the app's render screen live and scrubbed by
+// the scroll (render, render-screen.tsx), and the real on-device render of the take (result); the clips are
+// small muted loops under public/videos/home. 9:16 footage fits the screen's width over a
 // blurred copy of itself instead of being cropped; app captures fill the screen (see PhoneClip). Only the
 // layout on screen is mounted — the pinned phone from `lg`, one phone per chapter below it — so no clip is
 // fetched or decoded twice, and a phone only plays while it is in view.
 
 interface PhoneClip {
   key: 'pick' | 'shoot' | 'render' | 'result';
-  clip: string;
+  /** The loop under public/videos/home; null for the live render screen. */
+  clip: string | null;
   /**
    * App captures are cut to the screen (460x1000) with a status strip in the app header's own colour baked
    * above the header, clear of the island and the rounded corners; the status bar's ink is drawn over that
@@ -29,18 +32,32 @@ interface PhoneClip {
 }
 
 const CLIPS: readonly PhoneClip[] = [
-  { key: 'pick', clip: 'mobile-pick', statusBar: 'light' },
+  { key: 'pick', clip: 'mobile-pick', statusBar: 'dark' },
   { key: 'shoot', clip: 'mobile-shoot' },
-  { key: 'render', clip: 'mobile-render', statusBar: 'dark' },
+  { key: 'render', clip: null, statusBar: 'light' },
   { key: 'result', clip: 'mobile-result' },
 ];
 
 const clipUrl = (clip: string, ext: 'webm' | 'mp4' | 'webp'): string => `/videos/home/${clip}.${ext}`;
 
+const RENDER_CHAPTER = CLIPS.findIndex(({ key }) => key === 'render');
+
 export const MobileDeepDive = () => {
   const { t } = useTranslation('home');
   const { active, register } = useActiveChapter(CLIPS.length);
   const pinned = useMediaQuery(PINNED_QUERY);
+  // The pinned phone's render follows its chapter's text down the page (render-screen.tsx).
+  const renderText = useRef<HTMLElement | null>(null);
+  const registerChapter = (index: number) => {
+    const report = register(index);
+
+    if (index !== RENDER_CHAPTER) return report;
+
+    return (node: HTMLElement | null) => {
+      report(node);
+      renderText.current = node;
+    };
+  };
   // Clips start loading as the section approaches, not with the page.
   const [nearRef, near] = useInView<HTMLElement>({ rootMargin: '600px 0px' });
   const chapters = CLIPS.map(({ key }) => ({
@@ -62,7 +79,7 @@ export const MobileDeepDive = () => {
         <ChapterList
           chapters={chapters}
           active={active}
-          register={register}
+          register={registerChapter}
           mediaAside
           media={(index) =>
             pinned ? null : (
@@ -82,6 +99,7 @@ export const MobileDeepDive = () => {
                 active={active}
                 load={near}
                 label={t('mobile.phoneAria')}
+                anchor={renderText}
                 className="w-full max-w-[min(340px,calc(36.5vh_+_11px))]"
               />
             </div>
@@ -115,12 +133,15 @@ const Phone = ({
   active,
   load,
   label,
+  anchor = null,
   className,
 }: {
   clips: readonly PhoneClip[];
   active: number;
   load: boolean;
   label: string;
+  /** What the live render screen follows: the pinned phone's chapter text, or null for the phone itself. */
+  anchor?: RefObject<HTMLElement | null> | null;
   className?: string;
 }) => {
   const [viewRef, inView] = useInView<HTMLElement>({ once: false, threshold: 0.2, rootMargin: '0px' });
@@ -137,9 +158,19 @@ const Phone = ({
     >
       {/* The app captures' own 460:1000, so they fill the screen uncropped. */}
       <div className="relative aspect-[460/1000] w-full overflow-hidden rounded-[2.4rem] bg-black">
-        {clips.map((clip, index) => (
-          <PhoneScreen key={clip.key} clip={clip} visible={index === active} playing={inView} load={load} />
-        ))}
+        {clips.map((clip, index) =>
+          clip.clip === null ? (
+            <LiveScreen key={clip.key} visible={index === active} live={inView} load={load} anchor={anchor} />
+          ) : (
+            <PhoneScreen
+              key={clip.key}
+              clip={{ ...clip, clip: clip.clip }}
+              visible={index === active}
+              playing={inView}
+              load={load}
+            />
+          )
+        )}
         <span
           aria-hidden="true"
           className="absolute left-1/2 top-2.5 h-5 w-20 -translate-x-1/2 rounded-full bg-black"
@@ -149,13 +180,42 @@ const Phone = ({
   );
 };
 
+/**
+ * The render chapter's screen: the app's render screen, live (render-screen.tsx). It is mounted as the section
+ * approaches and runs only while it is the screen showing and its phone is in view; until then the screen's
+ * own dark surface holds its place.
+ */
+const LiveScreen = ({
+  visible,
+  live,
+  load,
+  anchor,
+}: {
+  visible: boolean;
+  /** Whether the phone is on screen. */
+  live: boolean;
+  load: boolean;
+  anchor: RefObject<HTMLElement | null> | null;
+}) => (
+  <div
+    aria-hidden={!visible}
+    className={cn(
+      'absolute inset-0 bg-[#17142B] transition-opacity duration-500',
+      visible ? 'opacity-100' : 'opacity-0'
+    )}
+  >
+    {load && <RenderScreen anchor={anchor} live={live && visible} />}
+    <StatusBar ink="light" />
+  </div>
+);
+
 const PhoneScreen = ({
   clip,
   visible,
   playing,
   load,
 }: {
-  clip: PhoneClip;
+  clip: PhoneClip & { clip: string };
   visible: boolean;
   /** Whether the phone is on screen: a visible screen rests while its phone is scrolled away. */
   playing: boolean;
@@ -229,7 +289,7 @@ const ClipVideo = ({
   fit,
   videoRef,
 }: {
-  clip: PhoneClip;
+  clip: PhoneClip & { clip: string };
   load: boolean;
   fit: 'cover' | 'contain';
   videoRef: RefObject<HTMLVideoElement | null>;

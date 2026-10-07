@@ -5,8 +5,10 @@ import type { Media, MapAnimationInput, SectionOptions } from '@/core/types';
 import type Template from '../../core/models/Template';
 import type Segment from '../../core/models/Segment';
 import type VariableManager from './VariableManager';
-import { cubeFor } from '../presets/lut-library';
-import { parsePanelUrl, panelFileName, roundedPanelPng } from '../presets/rounded-panel';
+import { lutCubeText } from '../presets/lut-staging';
+import { lutFileStem } from '../presets/lut-spec';
+import { cutawayMedia } from '../footage/cutaway-media';
+import { generatedImage } from '../presets/generated-images';
 import { findFontByFile, DEFAULT_FONT_WEIGHT, type FontRef } from '@/core/fonts';
 import { googleCssUrl, extractTtfUrl, GOOGLE_FONTS_USER_AGENT } from '@/core/google-fonts';
 import { fontAssetUrl } from '@/core/asset-source';
@@ -103,6 +105,8 @@ class AssetManager {
           this.logger.info(`[${currentSection.name}][Assets] ${animationItem.name}`);
         })
       );
+      // B-roll cutaway clips are plain media: staged here, read back by the segment (editor/footage/).
+      await Promise.all(cutawayMedia(currentSection).map((media) => this.fetchMedia(media)));
     } catch (error) {
       this.logger.error(error instanceof Error ? error.message : String(error));
 
@@ -309,21 +313,30 @@ class AssetManager {
     return true;
   };
 
-  // Stage every LUT referenced by a lut3d look (collected into tempLuts by the FormatterManager).
+  // Stage every LUT referenced by a lut3d look/grade (collected into tempLuts by the FormatterManager):
+  // generated presets (optionally strength-blended) and user `.cube` files (presets/lut-staging.ts).
   fetchLuts = async (): Promise<void> => {
     await Promise.all(
-      this.segment.tempLuts.map(async (name) => {
-        const staged = await this.stageGenerated(`${this.segment.lutsDir}/${name}.cube`, `${name}.cube`, 'LUT', () => {
-          const cube = cubeFor(name);
-
-          return cube ? new TextEncoder().encode(cube) : null;
-        });
+      this.segment.tempLuts.map(async (spec) => {
+        const file = `${lutFileStem(spec)}.cube`;
+        const cube = await lutCubeText(spec, this.readLutSource);
+        const staged = await this.stageGenerated(`${this.segment.lutsDir}/${file}`, file, 'LUT', () =>
+          cube ? new TextEncoder().encode(cube) : null
+        );
 
         if (!staged) {
-          this.logger.error(`[${this.segment.currentSection?.name}][LUT] unknown LUT ${name}`);
+          this.logger.error(`[${this.segment.currentSection?.name}][LUT] unknown LUT ${spec}`);
         }
       })
     );
+  };
+
+  // A user LUT is read from a local staged copy when present (offline-first, like fetchMedia), else fetched.
+  private readonly readLutSource = async (url: string): Promise<string> => {
+    const mapped = this.variableManager.mapVariables(url);
+    const local = await this.filesystemAdapter.resolveLocalAsset(mapped);
+
+    return this.filesystemAdapter.read(local ?? (await this.filesystemAdapter.fetch(mapped)));
   };
 
   fetchMedia = async (media: Media, frame = 0): Promise<void> => {
@@ -334,15 +347,16 @@ class AssetManager {
       return;
     }
 
-    // A `panel:` URL is a generated rounded-rect overlay, not a fetchable asset: build the PNG on the
-    // fly and stage it to the build FS (uniform on Node, Expo and browser/WASM), mirroring fetchLuts.
-    const panelSpec = parsePanelUrl(url);
+    // A `panel:` / `sprite:` URL is a generated image (rounded-rect overlay, fx sprite), not a fetchable
+    // asset: build the PNG on the fly and stage it to the build FS (uniform on Node, Expo and
+    // browser/WASM), mirroring fetchLuts.
+    const generated = generatedImage(url);
 
-    if (panelSpec) {
-      const panelPath = `${this.segment.panelsDir}/${panelFileName(panelSpec)}`;
+    if (generated) {
+      const path = `${this.segment.panelsDir}/${generated.name}`;
 
-      await this.stageGenerated(panelPath, panelFileName(panelSpec), 'Panel', () => roundedPanelPng(panelSpec));
-      cache[url] = panelPath;
+      await this.stageGenerated(path, generated.name, generated.label, generated.produce);
+      cache[url] = path;
 
       return;
     }

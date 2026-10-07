@@ -7,21 +7,23 @@ import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Circle, Image, Square, Type } from '@/presentation/components/icons';
 import { PlusIcon } from '@/presentation/components/icons/plus';
-import { SparklesIcon } from '@/presentation/components/icons/sparkles';
 import { Button } from '@/presentation/components/ui';
 import { useIconHover } from '@/presentation/components/icons/useIconHover';
 import { cn } from '@/lib/utils';
 import type { EditorSection } from '../templateEditorModel';
 import { canAddElement, type AddableKind } from './sectionElements';
+import { FAMILY_ICON, FAMILY_TONE, type AnimationFamily } from '../editor/animationKinds';
 
-// Canonical add order: background layer → text → image overlay → shapes → animation → structured
-// text sugar. The shape entries (rectangle/circle) lower to image overlays carrying a shape recipe.
+// Canonical add order: background layer → text → image overlay → shapes → effect → animation file →
+// structured text sugar. The shape entries (rectangle/circle) lower to image overlays carrying a shape
+// recipe. "Effect" and "Animation file" are two distinct entries: both open the picker, on its own side.
 const ADD_ORDER: ReadonlyArray<AddableKind> = [
   'layer',
   'text',
   'image',
   'shapeRect',
   'shapeEllipse',
+  'effect',
   'animation',
   'caption',
   'titleCard',
@@ -40,7 +42,8 @@ const KIND_ICON: Record<AddableKind, ComponentType<{ className?: string }>> = {
   image: Image,
   shapeRect: Square,
   shapeEllipse: Circle,
-  animation: SparklesIcon,
+  effect: FAMILY_ICON.effect,
+  animation: FAMILY_ICON.file,
   caption: Type,
   titleCard: Type,
   lowerThird: Type,
@@ -52,11 +55,16 @@ const KIND_LABEL: Record<AddableKind, string> = {
   image: 'element.addImageOverlay',
   shapeRect: 'element.addShapeRect',
   shapeEllipse: 'element.addShapeEllipse',
+  effect: 'element.addEffect',
   animation: 'element.addAnimation',
   caption: 'element.addCaption',
   titleCard: 'element.addTitleCard',
   lowerThird: 'element.addLowerThird',
 };
+
+// The two animation entries carry their family's tone and a one-line hint, so "drawn by the engine and
+// adjustable" vs "a file played as-is" is clear before anything is added.
+const FAMILY_OF: Partial<Record<AddableKind, AnimationFamily>> = { effect: 'effect', animation: 'file' };
 
 // The structured text-sugar kinds render after a labelled divider ("Ready-made text") so the nine
 // otherwise-flat entries scan as two groups: free elements vs auto-laid-out text blocks.
@@ -182,7 +190,7 @@ export const AddElementMenu = ({ section, onAdd }: AddElementMenuProps) => {
                   }}
                   className="tap flex min-h-11 w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm text-foreground transition-colors hover:bg-brand-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500/40"
                 >
-                  <Icon className="h-3.5 w-3.5 text-gray-400" aria-hidden /> {t(KIND_LABEL[kind])}
+                  <MenuItemLabel kind={kind} Icon={Icon} />
                 </button>
               </div>
             );
@@ -190,5 +198,28 @@ export const AddElementMenu = ({ section, onAdd }: AddElementMenuProps) => {
         </div>
       )}
     </div>
+  );
+};
+
+const MenuItemLabel = ({ kind, Icon }: { kind: AddableKind; Icon: ComponentType<{ className?: string }> }) => {
+  const { t } = useTranslation('admin');
+  const family = FAMILY_OF[kind];
+
+  if (!family) {
+    return (
+      <>
+        <Icon className="h-3.5 w-3.5 text-gray-400" aria-hidden /> {t(KIND_LABEL[kind])}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Icon className={cn('h-3.5 w-3.5 shrink-0', FAMILY_TONE[family].text)} aria-hidden />
+      <span className="flex min-w-0 flex-col leading-tight">
+        <span>{t(KIND_LABEL[kind])}</span>
+        <span className="text-[0.65rem] text-gray-500 dark:text-gray-400">{t(`element.${kind}AddHint`)}</span>
+      </span>
+    </>
   );
 };

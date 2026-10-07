@@ -105,6 +105,8 @@
     "unreadableClip": "No se pudo leer uno de tus clips: puede que esté dañado o en un formato que este navegador no sabe abrir.",
     "assemblyFailed": "No se pudieron unir las escenas en un solo vídeo.",
     "engineUnavailable": "No se pudo descargar el motor de vídeo. Vuelve a conectarte e inténtalo de nuevo.",
+    "appUpdated": "LeClap se actualizó desde que abriste esta página. Guarda tu trabajo, recarga la página y vuelve a renderizar.",
+    "reload": "Recargar",
     "stopped": "Se ha detenido el render.",
     "unknown": "El motor de render ha devuelto un error."
   }

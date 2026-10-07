@@ -30,6 +30,7 @@ describe('addableKinds', () => {
       'image',
       'shapeRect',
       'shapeEllipse',
+      'effect',
       'animation',
       'caption',
       'lowerThird',
@@ -43,6 +44,7 @@ describe('addableKinds', () => {
       'image',
       'shapeRect',
       'shapeEllipse',
+      'effect',
       'animation',
       'caption',
       'titleCard',
@@ -55,6 +57,7 @@ describe('addableKinds', () => {
       'image',
       'shapeRect',
       'shapeEllipse',
+      'effect',
       'animation',
       'caption',
     ]);

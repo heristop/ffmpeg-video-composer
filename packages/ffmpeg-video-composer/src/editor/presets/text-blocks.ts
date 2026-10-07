@@ -11,6 +11,7 @@ import {
   staggered,
 } from './text';
 import { accentBar, parseScale, pushLine, round } from './text-blocks-helpers';
+import type { LowerThirdStyle } from '../../schemas/text.schemas';
 
 const DEFAULT_FADE_COLOR = '#000000';
 const BAND_COLOR = '#0a0f14';
@@ -232,6 +233,8 @@ export type LowerThird = {
   reveal?: RevealInput;
   /** Drop shadow / outline applied to the title + subtitle for legibility. */
   effect?: TextEffect;
+  /** Layout and animation preset (lower-third-styles.ts); unset keeps the full-width band. */
+  style?: LowerThirdStyle;
 };
 
 export type LowerThirdContext = {

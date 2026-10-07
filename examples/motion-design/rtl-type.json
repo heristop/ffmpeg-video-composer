@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "name": "Right-to-left type",
+    "description": "Arabic and Hebrew kinetic typography: shaped, joined letters animated a line at a time in the bundled Noto Sans Arabic and Noto Sans Hebrew, with Latin glosses.",
+    "creativeDirection": "Audience: creators publishing in Arabic and Hebrew who need native, correctly joined type rather than broken isolated letters. Direction: each script gets its own beat and colour. The Arabic headline rises line by line, the Hebrew line slides in from the right (its reading start), and a small Oswald gloss translates each one after it lands. The close sets both scripts together under one Latin line. Review: Arabic letters join, both scripts read right to left, no line animates letter by letter, and the gloss never competes with the headline."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 13,
+    "transition": { "type": "push-left", "duration": 0.5, "ease": "$snappy" }
+  },
+  "sections": [
+    {
+      "name": "arabic",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 3.4 },
+      "camera": { "preset": "push-in", "amount": 0.04 },
+      "kinetic": [
+        {
+          "id": "headline",
+          "text": { "ar": "قصتك في حركة" },
+          "preset": "rise",
+          "font": "noto-arabic",
+          "unit": "line",
+          "size": 120,
+          "maxWidth": 1120,
+          "y": 200,
+          "color": "#F5F3F7"
+        },
+        {
+          "text": { "en": "Arabic · your story, in motion" },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 34,
+          "y": 425,
+          "color": "#9A98A6",
+          "delay": "headline.end + 0.2"
+        }
+      ],
+      "graphics": [
+        { "type": "underline", "at": 0.9, "x": 440, "y": 395, "width": 400, "color": "#FF8AAE", "origin": "right" }
+      ]
+    },
+    {
+      "name": "hebrew",
+      "type": "color_background",
+      "options": { "backgroundColor": "#1B1830", "duration": 3.4 },
+      "camera": { "preset": "drift-left", "amount": 0.03 },
+      "kinetic": [
+        {
+          "id": "headline",
+          "text": { "he": "הסיפור שלך בתנועה" },
+          "preset": "slide",
+          "direction": "left",
+          "font": "noto-hebrew",
+          "unit": "line",
+          "size": 120,
+          "y": 210,
+          "color": "#C9CBFF"
+        },
+        {
+          "text": { "en": "Hebrew · your story, in motion" },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 34,
+          "y": 470,
+          "color": "#9A98A6",
+          "delay": "headline.end + 0.2"
+        }
+      ]
+    },
+    {
+      "name": "together",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 4 },
+      "kinetic": [
+        {
+          "id": "ar",
+          "text": { "ar": "مرحبا" },
+          "preset": "fade",
+          "font": "noto-arabic",
+          "unit": "line",
+          "size": 110,
+          "x": 360,
+          "y": 170,
+          "color": "#FF8AAE"
+        },
+        {
+          "id": "he",
+          "text": { "he": "שלום" },
+          "preset": "fade",
+          "font": "noto-hebrew",
+          "unit": "line",
+          "size": 110,
+          "x": 920,
+          "y": 170,
+          "color": "#C9CBFF",
+          "delay": "ar.end + 0.1"
+        },
+        {
+          "text": { "en": "Every script, joined" },
+          "preset": "split",
+          "size": 84,
+          "y": 430,
+          "delay": "he.end + 0.2",
+          "accent": { "words": "last", "color": "#FFF685" }
+        }
+      ]
+    }
+  ]
+}

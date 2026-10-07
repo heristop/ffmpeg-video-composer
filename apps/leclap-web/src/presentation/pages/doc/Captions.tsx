@@ -4,6 +4,8 @@ import {
   CAPTION_POSITIONS,
   CAPTION_ALIGNS,
 } from 'ffmpeg-video-composer/src/schemas/template.schemas.ts';
+import { SUBTITLE_KARAOKE } from 'ffmpeg-video-composer/src/schemas/subtitles.schemas.ts';
+import { CAPTION_DNA_IDS } from 'ffmpeg-video-composer/src/core/captions/dna.ts';
 import { Seo } from '@/presentation/components/Seo';
 import { DocSection, Prose, Code, ChipList, RefTable, Sample } from '@/presentation/components/doc/DocBlocks';
 import { docGroups } from '@/presentation/components/doc/schemaFields';
@@ -73,6 +75,32 @@ export const DocCaptions = () => (
         <div>
           <h3 className="mb-2 font-mono text-sm font-semibold text-foreground">align</h3>
           <ChipList items={CAPTION_ALIGNS} />
+        </div>
+      </div>
+    </DocSection>
+
+    <DocSection id="subtitles" title="Word-timed subtitles" kicker="`subtitles`">
+      <Prose className="mb-5">
+        <p>
+          A section&apos;s <Code>subtitles</Code> turns speech-to-text <Code>words</Code>, authored <Code>cues</Code> or
+          an inline <Code>srt</Code> into designed captions. Words are grouped into phrases at pauses, sentence ends and
+          commas, each phrase is fitted to balanced lines with the bundled font, and the spoken word can light up
+          (karaoke). A <Code>crown</Code> line is drawn larger once per video. Everything lowers to plain{' '}
+          <Code>drawtext</Code> filters, so it renders the same everywhere. See the{' '}
+          <a href="https://github.com/heristop/leclap/blob/main/docs/template-configuration.md#subtitles-word-timed-captions">
+            subtitles reference
+          </a>
+          .
+        </p>
+      </Prose>
+      <div className="space-y-5">
+        <div>
+          <h3 className="mb-2 font-mono text-sm font-semibold text-foreground">style (caption DNA)</h3>
+          <ChipList items={CAPTION_DNA_IDS} />
+        </div>
+        <div>
+          <h3 className="mb-2 font-mono text-sm font-semibold text-foreground">karaoke</h3>
+          <ChipList items={SUBTITLE_KARAOKE} />
         </div>
       </div>
     </DocSection>

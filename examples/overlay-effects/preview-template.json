@@ -1,8 +1,8 @@
 {
   "meta": {
     "name": "Overlay effect recipes",
-    "description": "Synthetic review fixture with adaptive shapes and labels for the shared composited effect presets.",
-    "creativeDirection": "Direction: an honest synthetic test fixture for six composited recipes. Frame an interface detail, reveal a product shape, mark a celebration, lock focus, pass a soft light or reveal a fine frame. Keep labels readable and the focal element visible. Use at most two brief layers per scene and a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
+    "description": "Synthetic review fixture for the six builder recipes: each scene layers two engine primitives (graphics[] fx, frame and corners) anchored to the card.",
+    "creativeDirection": "Direction: an honest synthetic test fixture for six two-part recipes built from engine primitives. Frame an interface detail, light a product card, mark a celebration, lock focus, pass a warm light or reveal a fine frame. Every effect is anchored to the card (target layer:0) and tuned on top of the recipe defaults. Keep labels readable and the focal element visible, with a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
   },
   "global": {
     "orientation": "landscape",
@@ -63,34 +63,25 @@
           }
         }
       ],
-      "inputs": [
+      "graphics": [
         {
-          "name": "effect_0",
-          "type": "animation",
-          "url": "/assets/animations/corner_brackets.apng",
-          "options": {
-            "position": "205:130",
-            "scale": "870:489",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.2,
-            "duration": 1.8,
-            "opacity": 0.5
-          }
+          "type": "corners",
+          "at": 0.15,
+          "target": "layer:0",
+          "clearance": 16,
+          "trace": "clockwise",
+          "exit": "expand",
+          "color": "$color.accent"
         },
         {
-          "name": "effect_1",
-          "type": "animation",
-          "url": "/assets/animations/tap_pulse.apng",
-          "options": {
-            "position": "518:227",
-            "scale": "245:245",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.4,
-            "duration": 2,
-            "opacity": 0.75
-          }
+          "type": "fx",
+          "effect": "ripple",
+          "variant": "tap",
+          "target": "layer:0",
+          "seed": 4031,
+          "at": 0.45,
+          "color": "$color.accent",
+          "dot": 0.18
         }
       ]
     },
@@ -145,34 +136,26 @@
           }
         }
       ],
-      "inputs": [
+      "graphics": [
         {
-          "name": "effect_0",
-          "type": "animation",
-          "url": "/assets/animations/shine_sweep.apng",
-          "options": {
-            "position": "154:101",
-            "scale": "973:547",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.25,
-            "duration": 2.52,
-            "opacity": 0.5
-          }
+          "type": "fx",
+          "effect": "sheen",
+          "target": "layer:0",
+          "seed": 874,
+          "at": 0.3,
+          "direction": "right",
+          "width": 0.18,
+          "profile": "specular"
         },
         {
-          "name": "effect_1",
-          "type": "animation",
-          "url": "/assets/animations/spec_orbit.apng",
-          "options": {
-            "position": "499:123",
-            "scale": "283:503",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.1,
-            "duration": 2,
-            "opacity": 0.55
-          }
+          "type": "fx",
+          "effect": "glint",
+          "path": "orbit",
+          "target": "layer:0",
+          "seed": 4317,
+          "at": 0.9,
+          "count": 2,
+          "size": 30
         }
       ]
     },
@@ -227,34 +210,28 @@
           }
         }
       ],
-      "inputs": [
+      "graphics": [
         {
-          "name": "effect_0",
-          "type": "animation",
-          "url": "/assets/animations/confetti.apng",
-          "options": {
-            "position": "96:54",
-            "scale": "1088:612",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.18,
-            "duration": 2.52,
-            "opacity": 0.85
-          }
+          "type": "fx",
+          "effect": "confetti",
+          "target": "layer:0",
+          "seed": 7460,
+          "at": 0.2,
+          "origin": {
+            "x": 0.5,
+            "y": 0.6
+          },
+          "count": 24
         },
         {
-          "name": "effect_1",
-          "type": "animation",
-          "url": "/assets/animations/sparkle.apng",
-          "options": {
-            "position": "256:144",
-            "scale": "768:432",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.65,
-            "duration": 2,
-            "opacity": 0.7
-          }
+          "type": "fx",
+          "effect": "glint",
+          "target": "layer:0",
+          "seed": 7045,
+          "at": 0.7,
+          "path": "corners",
+          "count": 3,
+          "size": 22
         }
       ]
     },
@@ -309,34 +286,26 @@
           }
         }
       ],
-      "inputs": [
+      "graphics": [
         {
-          "name": "effect_0",
-          "type": "animation",
-          "url": "/assets/animations/corner_brackets.apng",
-          "options": {
-            "position": "230:144",
-            "scale": "819:461",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.08,
-            "duration": 1.8,
-            "opacity": 0.45
-          }
+          "type": "corners",
+          "at": 0.1,
+          "target": "layer:0",
+          "clearance": 16,
+          "trace": "together",
+          "exit": "expand",
+          "color": "$color.accent"
         },
         {
-          "name": "effect_1",
-          "type": "animation",
-          "url": "/assets/animations/pulse_ring.apng",
-          "options": {
-            "position": "384:230",
-            "scale": "512:288",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.2,
-            "duration": 2,
-            "opacity": 0.4
-          }
+          "type": "fx",
+          "effect": "ripple",
+          "variant": "ring",
+          "target": "layer:0",
+          "seed": 5614,
+          "at": 0.35,
+          "color": "$color.accent",
+          "rings": 2,
+          "radius": 0.6
         }
       ]
     },
@@ -391,34 +360,28 @@
           }
         }
       ],
-      "inputs": [
+      "graphics": [
         {
-          "name": "effect_0",
-          "type": "animation",
-          "url": "/assets/animations/light_leak.apng",
-          "options": {
-            "position": "77:44",
-            "scale": "1126:633",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.04,
-            "duration": 2,
-            "opacity": 0.2
-          }
+          "type": "fx",
+          "effect": "leak",
+          "target": "frame",
+          "seed": 7269,
+          "at": 0,
+          "duration": 2.6,
+          "edge": "top-right",
+          "size": 0.62,
+          "shadows": 0.55,
+          "intensity": 1
         },
         {
-          "name": "effect_1",
-          "type": "animation",
-          "url": "/assets/animations/sparkle.apng",
-          "options": {
-            "position": "358:202",
-            "scale": "563:317",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.35,
-            "duration": 2,
-            "opacity": 0.35
-          }
+          "type": "fx",
+          "effect": "glint",
+          "target": "layer:0",
+          "seed": 1043,
+          "at": 0.6,
+          "path": "scatter",
+          "count": 3,
+          "size": 30
         }
       ]
     },
@@ -473,34 +436,25 @@
           }
         }
       ],
-      "inputs": [
+      "graphics": [
         {
-          "name": "effect_0",
-          "type": "animation",
-          "url": "/assets/animations/white_border.apng",
-          "options": {
-            "position": "179:115",
-            "scale": "922:519",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.06,
-            "duration": 1.8,
-            "opacity": 0.35
-          }
+          "type": "frame",
+          "at": 0.1,
+          "target": "layer:0",
+          "clearance": 16,
+          "trace": "path",
+          "exit": "fade",
+          "color": "$color.fg"
         },
         {
-          "name": "effect_1",
-          "type": "animation",
-          "url": "/assets/animations/shine_sweep.apng",
-          "options": {
-            "position": "179:115",
-            "scale": "922:519",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.18,
-            "duration": 2.52,
-            "opacity": 0.3
-          }
+          "type": "fx",
+          "effect": "sheen",
+          "target": "layer:0",
+          "seed": 6201,
+          "at": 0.75,
+          "direction": "right",
+          "width": 0.18,
+          "profile": "specular"
         }
       ]
     }

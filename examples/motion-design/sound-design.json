@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "name": "Sound design",
+    "description": "Audio polish from JSON: bundled sound effects placed on motion events, automatic whooshes, hits and a riser derived from the edit, a voice preset on a recorded clip and volume automation shaping its level.",
+    "creativeDirection": "Audience: editors who want every cut to sound finished without opening a DAW. Direction: one sound per visual event, on its frame. The hook's impact word lands on an automatic hit; designed transitions carry automatic whooshes; the recorded line is cleaned by the clean voice preset and faded up then out by automation; a riser climbs into the drop cue where an authored boom and a flash land together; the close rings once. Review: no sound before its picture, at most one sound per second on average, the riser ends exactly on the drop, the voice stays clear without pumping, and the final ding is the only one."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 29,
+    "transition": { "type": "push-left", "duration": 0.45, "ease": "$snappy" },
+    "audio": { "sfx": "auto", "sourceVolume": 1 }
+  },
+  "sections": [
+    {
+      "name": "hook",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 2.4 },
+      "camera": { "hits": [{ "at": "title.end", "strength": 0.3 }] },
+      "kinetic": [
+        {
+          "id": "title",
+          "text": { "en": "LISTEN." },
+          "preset": "impact",
+          "size": 230,
+          "y": "center",
+          "delay": 0.2,
+          "color": "#F5F3F7"
+        }
+      ]
+    },
+    {
+      "name": "voice",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "duration": 3.6,
+        "voice": "clean",
+        "audioAutomation": [
+          { "at": 0, "volume": 0.2 },
+          { "at": 0.8, "volume": 1, "ease": "ease-in-out" },
+          { "at": 2.9, "volume": 1 },
+          { "at": 3.6, "volume": 0, "ease": "ease-in-out" }
+        ]
+      },
+      "kinetic": [
+        {
+          "text": { "en": "Voice: clean" },
+          "preset": "rise",
+          "size": 120,
+          "y": 200,
+          "delay": 0.25,
+          "accent": { "words": "last", "color": "#FFF685" }
+        },
+        {
+          "text": { "en": "options.voice · audioAutomation" },
+          "preset": "fade",
+          "font": "mono",
+          "size": 30,
+          "y": 400,
+          "color": "#9A98A6",
+          "delay": 0.9
+        }
+      ]
+    },
+    {
+      "name": "build",
+      "type": "color_background",
+      "options": { "backgroundColor": "#1B1830", "duration": 3.4 },
+      "cues": { "drop": 1.9 },
+      "camera": { "preset": "push-in", "amount": 0.1, "hits": ["cue:drop"] },
+      "graphics": [{ "type": "flash", "at": "cue:drop", "duration": 0.3, "intensity": 0.6 }],
+      "sfx": [{ "id": "boom", "at": "cue:drop" }],
+      "kinetic": [
+        {
+          "id": "rise",
+          "text": { "en": "Build up" },
+          "preset": "fade",
+          "size": 110,
+          "y": 250,
+          "delay": 0.2,
+          "color": "#9A98A6",
+          "exit": { "preset": "fade", "at": "cue:drop - 0.1" }
+        },
+        {
+          "text": { "en": "DROP" },
+          "preset": "impact",
+          "size": 240,
+          "y": "center",
+          "delay": "cue:drop",
+          "color": "#FF8AAE",
+          "trail": { "echoes": 3, "delta": 0.04 }
+        }
+      ]
+    },
+    {
+      "name": "close",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 2.6 },
+      "sfx": [{ "id": "ding", "at": "title.end", "volume": 0.4 }],
+      "kinetic": [
+        {
+          "id": "title",
+          "text": { "en": "Every cut, scored." },
+          "preset": "cascade",
+          "size": 120,
+          "y": "center",
+          "delay": 0.2,
+          "accent": { "words": "last", "color": "#7C83FD" }
+        }
+      ]
+    }
+  ]
+}

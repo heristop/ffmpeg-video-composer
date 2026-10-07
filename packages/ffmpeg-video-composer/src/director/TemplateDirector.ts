@@ -8,15 +8,30 @@ import type { IEventEmitter } from '../platform/AbstractEventManager';
 import type VideoEditor from '../editor/VideoEditor';
 import type MusicComposer from '../editor/MusicComposer';
 import type { FFMpegInfos, ProjectConfig, Section, TemplateDescriptor } from '@/core/types';
-import { DEFAULT_TRANSITION_DURATION } from '../schemas/effects.schemas';
 import { fetchSectionInfos, segmentOutputPath } from './section-infos';
+import { applyTakePlans, recordProbe, type FootagePlanDeps } from './footage-plan';
 import { getPerfTimer } from '../utils/perf-timer';
 import { renderSegments } from './render-segments-concurrently';
 import { runFinalize } from './finalize-concat-fold';
-import { resolveOrientationScale, resolveFps } from './resolve-video-config';
+import {
+  awaitsBeatsAnalysis,
+  boundaryTransitions,
+  discardOutput,
+  expandForBuild,
+  logVideoPaths,
+  prepareMeasuredMotion,
+  prepareMotion,
+  publishOutput,
+  qcExpectations,
+  recordBuildCommands,
+  resolveBuildVideoConfig,
+  resolveOutputPaths,
+  timingOptions,
+  type TimingOptions,
+} from './prepare-build';
 import { assertCanProbe, renderNeeds } from './render-needs';
+import { recordSectionLengths } from './footage-durations';
 import { VIDEO_SEGMENT_TYPES } from '../editor/utils/section-types';
-import { expandPartialsSafe, assertEffectsResolved } from '@/core/partials';
 import type Project from '../core/models/Project';
 import type Template from '../core/models/Template';
 import type TemplateConcreteBuilder from './TemplateConcreteBuilder';
@@ -58,6 +73,9 @@ class TemplateDirector {
   private readonly logger: AbstractLogger;
   private readonly ffmpegAdapter: AbstractFFmpeg;
   private readonly filesystemAdapter: AbstractFilesystem;
+  // Set when global.beats asks for a music analysis: the time references resolve in init(), once the
+  // music track is on disk and measured (beats-analysis.ts).
+  private pendingTiming: TimingOptions | null = null;
 
   constructor(
     @inject('eventManager') private readonly eventManager: AbstractEventManager,
@@ -85,23 +103,10 @@ class TemplateDirector {
   }
 
   config = (projectConfig: ProjectConfig, templateDescriptor: TemplateDescriptor): this => {
-    // Deep-clone the descriptor: section.filters are mutated in place during builds (sugar/scale prepend
-    // preset filters), so compiling the same descriptor twice would double-apply them (Ken Burns twice,
-    // contrast squared). JSON round-trip matches the repo's deep-clone (Hermes/WASM-safe plain JSON).
-    const clonedDescriptor = structuredClone(templateDescriptor);
-    // Expand `{ type:'partial', ref }` sections into real sections here, the single point where the
-    // descriptor used for compilation is set. Callers pass the raw descriptor (Node `compile` never
-    // validates; the browser path validates into the template but this assignment would overwrite it),
-    // so without this every partial — logo bumper, flash-card — is dropped downstream by the
-    // rendering-type filter. Idempotent: re-expanding an already-expanded descriptor is a no-op.
-    const expansion = expandPartialsSafe(clonedDescriptor);
-
-    if (!expansion.ok) {
-      // Unknown ref: keep the clone (the stray partial is skipped by compileVideoSegments, as before).
-      this.logger.warn(`[Director] partial expansion failed: ${expansion.error.message}`);
-    }
-
-    this.template.descriptor = assertEffectsResolved(expansion.ok ? expansion.data : clonedDescriptor);
+    // The clone the build compiles: partials expanded, then the requested format's composition, before
+    // any other pass (prepare-build.ts, core/formats).
+    const expanded = expandForBuild(templateDescriptor, this.logger, projectConfig.format);
+    this.template.descriptor = expanded;
     this.project.config = projectConfig;
 
     // Reset ALL build-accumulated state at the start of every compile() (config() runs first), so
@@ -113,60 +118,56 @@ class TemplateDirector {
     this.filesystemAdapter.setAssetsDir(this.project.config.assetsDir ?? 'assets');
 
     this.project.applyDefault();
-    this.applyOrientationToScale();
-    this.applyFpsToConfig();
-
-    const paths = this.project.config.userVideoPaths;
-    this.logger.info(
-      paths
-        ? `TemplateDirector received userVideoPaths for sections: ${Object.keys(paths).join(', ')}`
-        : 'TemplateDirector: No userVideoPaths provided in config'
+    // Resolve orientation + fps ONCE, here — the single point where the descriptor and the project config meet.
+    this.project.config.videoConfig = resolveBuildVideoConfig(
+      this.project.config.videoConfig,
+      this.template.descriptor
     );
+    // Resolve $tokens, energy and time references once, before any lowering, against the resolved
+    // frame, locale and fields (prepare-build.ts) — after the music analysis when the beats await one.
+    const timing = timingOptions(this.project.config);
+    this.pendingTiming = awaitsBeatsAnalysis(expanded) ? timing : null;
+    this.template.descriptor = this.pendingTiming ? expanded : prepareMotion(expanded, timing);
+
+    logVideoPaths(this.project.config, this.logger);
 
     return this;
   };
 
-  // Resolve orientation + fps ONCE, here — the single point where the descriptor and the project
-  // config meet. Pure resolution lives in resolve-video-config (line-budget + testability); replaces
-  // the old per-SegmentBuilder orientation swap, which mutated the shared config per segment and
-  // alternated orientation across them.
-  private readonly applyOrientationToScale = (): void => {
-    this.project.config.videoConfig = resolveOrientationScale(
-      this.project.config.videoConfig,
-      this.template.descriptor.global?.orientation
-    );
-  };
-
-  private readonly applyFpsToConfig = (): void => {
-    this.project.config.videoConfig = resolveFps(this.project.config.videoConfig, this.template.descriptor.global?.fps);
-  };
-
   construct = async (): Promise<string | null> => {
+    // Deterministic encoder profile + command record for the render manifest (director/prepare-build.ts).
+    const restoreAdapter = recordBuildCommands(this.ffmpegAdapter, this.project);
+
     try {
       await getPerfTimer().span('director:init', () => this.init());
 
       const finalPath = await this.compileVideoSegments();
 
       if (!this.stopBuild) {
-        return finalPath;
+        return await publishOutput(this.filesystemAdapter, this.project.output, finalPath);
       }
     } catch (error) {
       this.fireError(error);
-
-      return null;
     } finally {
+      restoreAdapter();
       // The browser / React Native event manager hands every compile the SAME emitter, so drop this
       // director's listener once its build settles — otherwise each render leaks the director through it.
       this.emitter.off?.('task-cancelled', this.onTaskCancelled);
     }
+
+    // Failed or cancelled: never leave a half-written output behind (director/output-staging.ts).
+    await discardOutput(this.filesystemAdapter, this.project.output);
 
     return null;
   };
 
   init = async (): Promise<void> => {
     this.project.buildInfos.fileConcatPath = `${this.filesystemAdapter.getBuildDir()}/segments.list`;
+    this.project.output = resolveOutputPaths(this.filesystemAdapter.getBuildDir() ?? 'build', this.ffmpegAdapter);
 
     await this.musicComposer.loadMusic();
+
+    if (this.pendingTiming) await prepareMeasuredMotion(this.template, this.project, this.pendingTiming);
 
     await this.filesystemAdapter.write(this.project.buildInfos.fileConcatPath);
 
@@ -194,6 +195,9 @@ class TemplateDirector {
     assertCanProbe(this.ffmpegAdapter, needs, videoSegments);
     await timer.span('director:calculateTotalLength', () => this.calculateTotalLength(videoSegments));
 
+    const { global } = this.template.descriptor;
+    const fps = this.project.config.videoConfig?.fps ?? 30;
+    this.project.qcExpectations = qcExpectations(videoSegments, this.project.buildInfos, global, fps);
     this.logger.info(`[TemplateDirection] Length: ${this.project.buildInfos.totalLength}`);
     this.project.buildInfos.totalSegments = videoSegments.length;
 
@@ -214,41 +218,26 @@ class TemplateDirector {
    * consumed by MusicComposer (xfade-aware windows) and the final-assembly path selection.
    */
   private readonly buildTransitions = (segments: Section[]): void => {
-    const globalTransition = this.template.descriptor.global?.transition;
-    const transitions = this.project.buildInfos.transitions;
-    transitions.length = 0;
-
-    for (let i = 0; i < segments.length - 1; i++) {
-      const declared = segments[i].transition ?? globalTransition;
-
-      if (!declared || declared.type === 'cut') {
-        transitions.push({ type: 'cut', duration: 0 });
-
-        continue;
-      }
-
-      const duration = declared.duration ?? globalTransition?.duration ?? DEFAULT_TRANSITION_DURATION;
-      transitions.push({ type: declared.type, duration });
-    }
+    const declared = this.template.descriptor.global?.transition;
+    const crossfade = this.project.engineFeatures?.missingFilters?.has('xfade') !== true;
+    this.project.buildInfos.transitions.splice(0, Infinity, ...boundaryTransitions(segments, declared, crossfade));
   };
 
   calculateTotalLength = async (segments: Section[]): Promise<void> => {
-    const resolveDuration = async (segment: Section): Promise<number> => {
-      if (segment.type === 'project_video') {
-        return this.getVideoSectionDuration(segment);
-      }
+    const buildInfos = this.project.buildInfos;
+    const sourceDurations = (buildInfos.sourceDurations ??= {});
+    const probes = segments.filter((segment) => segment.type === 'project_video');
+    const probed = await Promise.all(probes.map((segment) => this.getVideoSectionDuration(segment)));
 
-      return segment.options?.duration ?? 0;
-    };
+    for (const [index, segment] of probes.entries()) sourceDurations[segment.name] = probed[index];
 
-    const durations = await Promise.all(segments.map(resolveDuration));
-    const durMap = this.project.buildInfos.durations;
-
-    for (const [index, segment] of segments.entries()) {
-      const duration = durations[index] ?? 0;
-      this.project.buildInfos.totalLength += duration;
-      durMap[segment.name] = duration;
-    }
+    // Order: probed source → clip range / ramp / freeze (director/footage-durations.ts) → keep windows /
+    // trimSilence / HDR tone-map (director/footage-plan.ts). The two edit families never share a section.
+    const fps = this.project.config.videoConfig?.fps ?? 30;
+    recordSectionLengths(segments, buildInfos, fps, (note) => {
+      this.logger.warn(note);
+    });
+    await applyTakePlans(this.footageDeps(), segments, buildInfos);
 
     // Each non-cut boundary cross-dissolves, overlapping its two clips and shortening the rendered
     // timeline by the transition duration. Cut boundaries subtract 0.
@@ -265,6 +254,7 @@ class TemplateDirector {
     // Record whether the source clip carries audio so ProjectVideoSegment can add a silent track for a
     // video-only upload — otherwise the transition acrossfade later references a missing `[k:a]`.
     this.project.buildInfos.sourceHasAudio[segment.name] = sectionInfos.audioCodec !== null;
+    recordProbe(this.project.buildInfos, segment.name, sectionInfos);
 
     return sectionInfos.duration;
   };
@@ -336,9 +326,10 @@ class TemplateDirector {
       hasAnimations,
       musicEnabled: Boolean(global?.musicEnabled),
       musicWillRun,
-      normalizeWillRun: !global?.musicEnabled && this.musicComposer.hasNormalization(),
+      // Without a music mix, normalisation and sound effects need their own audio pass.
+      normalizeWillRun: !musicWillRun && this.musicComposer.hasStandaloneAudioPass(),
       disableFold: Boolean(process.env.FVC_DISABLE_CONCAT_FOLD),
-      finalPath: `${buildDir}/output.mp4`,
+      finalPath: this.project.output.staging || `${buildDir}/output.mp4`,
       listPath: this.project.buildInfos.fileConcatPath,
       setFinalVideo: (path) => {
         this.project.finalVideo = path;
@@ -369,16 +360,16 @@ class TemplateDirector {
 
   // Resolve a section's clip source and read its media info, falling back to the declared duration when
   // the probe can't (see sectionInfos.ts). Kept as a method so the director's tests exercise it directly.
-  fetchSectionInfos = (section: Section): Promise<FFMpegInfos> =>
-    fetchSectionInfos(
-      {
-        config: this.project.config,
-        ffmpegAdapter: this.ffmpegAdapter,
-        filesystemAdapter: this.filesystemAdapter,
-        logger: this.logger,
-      },
-      section
-    );
+  fetchSectionInfos = (section: Section): Promise<FFMpegInfos> => fetchSectionInfos(this.footageDeps(), section);
+
+  private readonly footageDeps = (): FootagePlanDeps => ({
+    config: this.project.config,
+    ffmpegAdapter: this.ffmpegAdapter,
+    filesystemAdapter: this.filesystemAdapter,
+    logger: this.logger,
+    mediaCache: this.template.assets.inputs as unknown as Record<string, string>,
+    analyzer: this.project.footageAnalyzer,
+  });
 
   addToQueue = async (section: Section): Promise<void> => {
     const { segment } = await this.concreteBuilder.build(section, this.project.config);

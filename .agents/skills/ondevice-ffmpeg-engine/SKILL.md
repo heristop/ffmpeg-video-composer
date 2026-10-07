@@ -41,7 +41,9 @@ rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-and
 cargo install cargo-ndk            # android (also needs NDK 27.1 — see versions.env)
 ```
 
-Host build for `cargo test` (real run/probe/cancel/re-entrancy/drawtext) — on macOS, starting at the repository root. The host build resolves freetype, harfbuzz, openh264, and libvpx through system pkg-config; `build.rs` also uses Homebrew library paths on macOS:
+External libraries (all static, LGPL-compatible) come from `build-deps.sh` (Android) / `build-deps-ios.sh` (iOS): freetype, harfbuzz and **fribidi** for `drawtext` (fribidi 1.0.16, `--enable-libfribidi`: the drawtext `text_shaping` option, i.e. bidi reordering of Arabic/Hebrew lines), openh264 (Android encoder) and libvpx (VP9-alpha decoder). A deps tree built before fribidi was added fails `build-android.sh` / `build-ios.sh` with "missing libfribidi" — rerun the deps script. The engine reads the `--enable-lib*` flags of `FF_COMMON` (generated `DEVICE_LIBRARIES`) to advertise `textShaping` on device.
+
+Host build for `cargo test` (real run/probe/cancel/re-entrancy/drawtext) — on macOS, starting at the repository root. The host build resolves freetype, harfbuzz, fribidi, openh264, and libvpx through system pkg-config (`brew install fribidi` too); `build.rs` also uses Homebrew library paths on macOS:
 
 ```bash
 bash scripts/ffmpeg/build-host.sh   # builds scripts/ffmpeg/dist/host/lib/libfftools.a
@@ -73,6 +75,8 @@ Copy `bindings/uniffi/leclap_ffmpeg_core/leclap_ffmpeg_core.kt` to `apps/leclap-
 - **Host link:** the macOS host links Homebrew openh264 and libvpx dynamically in `build.rs`; Android embeds both statically, and iOS embeds libvpx but replaces openh264 encoding with VideoToolbox.
 - Pins that exist for a reason: **NDK 27.1** (`apps/leclap-expo/plugins/withNdkVersion.js`, for `std::format`), **JNA 5.17** (page alignment), self-contained `.so` (uniffi's JNA dlopen namespace can't resolve transitive FFmpeg `.so`s → everything is statically linked).
 - Codecs: Android `libopenh264` (LGPL software), iOS `h264_videotoolbox` (hardware) — set in `CoreCompilationService` `codecConfig`; the LGPL build has **no libx264**.
+
+- **Filter allowlist:** `FF_COMMON --enable-filter=` in `scripts/ffmpeg/common.sh` is the only filter set on device. Adding one = common.sh + `pnpm --filter ffmpeg-video-composer generate:capabilities` (rewrites `device-filters.generated.ts` and `docs/runtime-capabilities.md`) + `ENGINE_EMITTED_FILTERS` / `tests/lgpl-filter-audit.test.ts`, LGPL only. Features that need a filter must gate on `hasFilter(engineCapabilities(...), name)` so an engine built before the change degrades instead of dying (e.g. `alphamerge` for kinetic fills: solid text + `[mask_unavailable]` warning). `bash scripts/ffmpeg/verify-filters.sh` checks a configured tree.
 
 ## Common mistakes
 

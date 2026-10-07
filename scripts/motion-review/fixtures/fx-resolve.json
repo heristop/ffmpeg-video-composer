@@ -1,0 +1,12 @@
+{
+  "label": "Resolve (fx, a title resolves out of its glow)",
+  "kind": "fx",
+  "window": { "at": 0.4, "duration": 0.7 },
+  "moments": [0.3, "8%", "20%", "40%", "65%", 1.2],
+  "section": {
+    "kinetic": [
+      { "text": { "en": "LECLAP" }, "preset": "fade", "duration": 0.12, "y": "center", "size": 96, "color": "#141A26" }
+    ],
+    "graphics": [{ "type": "fx", "effect": "resolve", "target": "text:0", "at": "{{at}}", "duration": "{{duration}}" }]
+  }
+}

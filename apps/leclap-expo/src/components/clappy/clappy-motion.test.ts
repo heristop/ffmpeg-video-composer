@@ -5,14 +5,15 @@ declare const jest: {
   fn(): () => void;
   requireActual(name: string): unknown;
   clearAllMocks(): void;
-  mocked<T>(fn: T): T & { mockReturnValue(value: unknown): void };
+  mocked<T>(fn: T): T & { mockReturnValue(value: unknown): void; mock: { calls: unknown[][] } };
 };
 import React, { act } from 'react';
 import TestRenderer from 'react-test-renderer';
 import { Clappy } from './Clappy';
 import { PressableScale } from '../kinetic/pressable-scale';
 import { useMotionPreferences } from '@/src/hooks/use-motion-preferences';
-import { cancelAnimation, withSequence, withTiming } from 'react-native-reanimated';
+import { cancelAnimation, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import { CHEER_MS, LOOP_MS } from './clappy-working-motion';
 
 jest.mock('react-native', () => ({ View: 'View', Pressable: 'Pressable' }));
 jest.mock('react-native-svg', () => ({
@@ -62,12 +63,14 @@ jest.mock('react-native-reanimated', () => {
         },
       }).current,
     useAnimatedStyle: (style: () => unknown) => style(),
+    useDerivedValue: (derive: () => unknown) => ({ get: derive }),
     withTiming: jest.fn((value: unknown) => value),
     withSpring: jest.fn((value: unknown) => value),
     withSequence: jest.fn((...values: unknown[]) => values.at(-1)),
+    withRepeat: jest.fn((value: unknown) => value),
     cancelAnimation: jest.fn(),
     interpolate: (_value: unknown, _input: unknown, output: unknown[]) => output.at(-1),
-    Easing: { out: (v: unknown) => v, inOut: (v: unknown) => v, quad: 'quad', cubic: 'cubic' },
+    Easing: { out: (v: unknown) => v, inOut: (v: unknown) => v, quad: 'quad', cubic: 'cubic', linear: 'linear' },
   };
 });
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -82,9 +85,61 @@ const mount = (element: React.ReactElement) =>
     tree = TestRenderer.create(element);
   });
 
-it('does not schedule mascot motion while the engine works', () => {
+const cheers = () =>
+  jest
+    .mocked(withTiming)
+    .mock.calls.filter(([, config]: unknown[]) => (config as { duration?: number } | undefined)?.duration === CHEER_MS);
+it('runs in place on one UI-thread clock while the engine works, without a state reaction', () => {
   mount(React.createElement(Clappy, { state: 'working' }));
+  expect(withSequence).not.toHaveBeenCalled();
+  expect(withRepeat).toHaveBeenCalledTimes(1);
+  expect(withRepeat).toHaveBeenCalledWith(1, -1, false, undefined, 'never');
+  expect(withTiming).toHaveBeenCalledWith(1, expect.objectContaining({ duration: LOOP_MS, easing: 'linear' }));
+});
+it('cheers once per new progress milestone, never on a timer', () => {
+  mount(React.createElement(Clappy, { state: 'working', cheer: 0 }));
+  expect(cheers()).toHaveLength(0);
+  act(() => tree.update(React.createElement(Clappy, { state: 'working', cheer: 1 })));
+  expect(cheers()).toHaveLength(1);
+  act(() => tree.update(React.createElement(Clappy, { state: 'working', cheer: 1 })));
+  expect(cheers()).toHaveLength(1);
+  act(() => tree.update(React.createElement(Clappy, { state: 'working', cheer: 2 })));
+  expect(cheers()).toHaveLength(2);
+  act(() => tree.update(React.createElement(Clappy, { state: 'working', cheer: 3, active: false })));
+  expect(cheers()).toHaveLength(2);
+});
+it('keeps the working mascot still when hidden, backgrounded or under reduced motion', () => {
+  mount(React.createElement(Clappy, { state: 'working', active: false }));
+  jest.mocked(useMotionPreferences).mockReturnValue({ reducedMotion: false, appActive: false });
+  act(() => tree.update(React.createElement(Clappy, { state: 'working', cheer: 1 })));
+  jest.mocked(useMotionPreferences).mockReturnValue({ reducedMotion: true, appActive: true });
+  act(() => tree.update(React.createElement(Clappy, { state: 'working', cheer: 2 })));
+  expect(withRepeat).not.toHaveBeenCalled();
   expect(withTiming).not.toHaveBeenCalled();
+});
+it('slows to a stop and stands when the render ends or is cancelled', () => {
+  mount(React.createElement(Clappy, { state: 'working' }));
+  act(() => tree.update(React.createElement(Clappy, { state: 'working', active: false })));
+  expect(withTiming).toHaveBeenLastCalledWith(
+    0,
+    expect.objectContaining({ reduceMotion: 'never' }),
+    expect.any(Function)
+  );
+  expect(withRepeat).toHaveBeenCalledTimes(1);
+});
+const puffs = () =>
+  tree.root.findAll(
+    (node) => (node.type as unknown) === 'AnimatedView' && JSON.stringify(node.props.style).includes('"bottom":0')
+  );
+it('kicks up the run dust while working, and draws none under reduced motion', () => {
+  mount(React.createElement(Clappy, { state: 'working' }));
+  expect(puffs()).toHaveLength(3);
+  jest.mocked(useMotionPreferences).mockReturnValue({ reducedMotion: true, appActive: true });
+  act(() => tree.update(React.createElement(Clappy, { state: 'working' })));
+  expect(puffs()).toHaveLength(0);
+  jest.mocked(useMotionPreferences).mockReturnValue({ reducedMotion: false, appActive: true });
+  act(() => tree.update(React.createElement(Clappy, { state: 'welcome' })));
+  expect(puffs()).toHaveLength(0);
 });
 it('does not animate a hidden sheet mascot or background screen', () => {
   mount(React.createElement(Clappy, { state: 'success', active: false }));

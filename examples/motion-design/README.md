@@ -23,9 +23,114 @@ This study applies motion design principles to LeClap's existing native JSON and
 
 The underlying people, locations and physical props are source footage. LeClap can compose that footage with typography and overlays; these motion controls do not generate it.
 
+## Effects tour
+
+[`effects-tour.json`](./effects-tour.json) is a six-minute product demo of the whole motion vocabulary, in ten chapters. Every beat names its effect in a small mono label (top left) and its chapter (top right):
+
+| Chapter                                                        | What it shows                                                                                                                                                                                                                                                                                      |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [01 Type](./effects-tour/01-type.json)                         | The 14 kinetic presets, exits, glyph units in random order, gradient / texture / shimmer fills, an echo trail, greedy vs balanced wrap, colour emoji                                                                                                                                               |
+| [02 Camera & graphics](./effects-tour/02-camera-graphics.json) | The 8 camera moves over photographs, hits, seeded shake, keyframed zoom and roll, Ken Burns and pulse motion, letterbox, and the 12 graphics (flash, bars, underline, frame, corners, panel, wipe, glitch, focus, progress, ticker, chart; underline, frame and corners with their stroke options) |
+| [03 Transitions](./effects-tour/03-transitions.json)           | cut, fade, fadeblack, dissolve, the 12 designed transitions (push, swipe, zoom-through, iris, whips) and two xfade names, each beat naming the transition that ends it, so the name is on screen as it plays                                                                                       |
+| [04 Captions](./effects-tour/04-captions.json)                 | Title cards, the six lower-third looks, the caption styles with balanced wrapping, and word-timed subtitles in all six caption DNAs (word / fill / pop karaoke, an SRT cue, a crowned line)                                                                                                        |
+| [05 Compositing & light](./effects-tour/05-compositing.json)   | A horizontal three-pane split, a vertical split with a divider, a before/after wipe, then the 13 `fx` primitives: sheen, edge-glow, leak, bloom, ripple, glint, confetti, bokeh, dust, vignette-breathe, grain, glass and resolve                                                                  |
+| [06 Themes](./effects-tour/)                                   | One template per built-in theme (`06-theme-*.json`: leclap, midnight, editorial, bold at energy 1.5, neon, paper at energy 0, sunset, ocean, mono, candy, retro, corporate), styled only with `$color.*` / `$font.*` tokens, plus a beat showing each motion role                                  |
+| [07 Looks & grade](./effects-tour/07-looks.json)               | The 17 look presets, a LUT look at strength 1 and 0.35, a hand grade, a user `.cube` LUT                                                                                                                                                                                                           |
+| [08 Footage](./effects-tour/08-footage.json)                   | Fit blur / letterbox / cover with a focus anchor, a keyframed focus pan, a clip range, the five speed-ramp presets, a freeze with a flash, a B-roll cutaway                                                                                                                                        |
+| [09 Sound](./effects-tour/09-sound.json)                       | A 120 BPM `global.beats` grid with a click track of placed sounds, automatic hits and whooshes, every bundled sound effect on its event, the five voice presets with a volume fade-up                                                                                                              |
+| [10 Music](./effects-tour/10-music.json)                       | A music bed fading in with `audio.automation`, per-section `musicVolume`, a volume swell, `audio.ducking` under a voice, and cuts on the beat of the analysed track (`global.beats: { analyze: "music" }`)                                                                                         |
+
+`global.theme` is template-wide, so each chapter is its own standalone template and `effects-tour.json` strings their renders together as `video` sections, between ink chapter cards, with designed transitions and automatic whooshes. [`effects-tour.sh`](./effects-tour.sh) stages the bundled assets, generates the footage clips (the bundled photographs set in motion under a running clock, with lavfi audio), renders every chapter with the CLI and then the tour:
+
+```bash
+pnpm --filter ffmpeg-video-composer build && pnpm --filter @leclap/cli build
+bash examples/motion-design/effects-tour.sh          # chapters, then the tour
+bash examples/motion-design/effects-tour.sh 04 07    # re-render two chapters, then the tour
+```
+
+The delivery encode lands in `build/effects-tour/effects-tour.mp4`. Watch it in the web app at `/showcase?sample=effects-tour`.
+
 ## Type impact
 
 [`type-impact.json`](./type-impact.json) is a new three-scene native typography study: opposing headline arrivals, a pink counterpoint and a stable final invitation. Its creative direction calls for fast entrances followed by readable holds. Configure `reveal` / `exit` duration, distance, easing and delay on each text filter; the final title card exposes line stagger. It uses bundled Bebas Neue and Oswald fonts and needs no footage. Watch it in the web app at `/showcase?sample=type-impact`.
+
+## Spring kinetics
+
+[`spring-kinetics.json`](./spring-kinetics.json) is a two-scene study of the motion system. The headline lands on an authored `$land` spring while its `scale` track settles on `$bouncy`. The support line slides in on `$snappy` with no duration authored, so the spring's own settle time sets it. The counterpoint enters on the app's `$expo` curve and leaves with `ease-in-back` anticipation. `global.motion` defines the tokens and the energy dial, and `global.seed` fixes the grain. It is asset-free (bundled Bebas Neue) and renders byte-identically on a given platform:
+
+```bash
+leclap render examples/motion-design/spring-kinetics.json \
+  --assets packages/leclap-creative-kit/src/library --output spring-kinetics.mp4 --manifest
+leclap verify spring-kinetics.mp4.manifest.json --rerender --assets packages/leclap-creative-kit/src/library
+```
+
+Set `global.motion.energy` to `0` for the reduced-motion cut (fades only) or `1.5` for more travel. See [motion system](../../docs/template-configuration.md#motion-system).
+
+## Kinetic type
+
+[`kinetic-type.json`](./kinetic-type.json) runs every kinetic preset across five beats:
+
+- A cascade headline with an accent word, over a highlight marker sweep.
+- A tracking-in brand title over a typewriter line.
+- A counter rolling to 98.6% under a fade label.
+- impact, pop, scramble and wave.
+- A split statement and a drop with an accented first word.
+
+It is asset-free (bundled fonts), deterministic, and renders on every backend. See [kinetic typography](../../docs/template-configuration.md#kinetic-typography).
+
+## Word captions
+
+[`word-captions.json`](./word-captions.json) turns speech-to-text word timings into designed captions, in two scenes:
+
+- `clean`: white Rubik with a soft shadow; the spoken word lights up in yellow (`word` karaoke). Phrases break on sentence ends, commas followed by a pause, and pauses.
+- `loud`: Anton capitals with a thick outline; each word pops in pink (`pop` karaoke), at most three words per phrase, and the closing exclamation is crowned larger (`"crown": "auto"`).
+
+Each phrase is fitted to at most two balanced lines, held for at least a second, and drawn with plain `drawtext` / `drawbox` filters gated by `enable` windows. It needs no footage, and the same JSON renders the same bytes on every run.
+
+## Motion FX pack
+
+[`fx-pack.json`](./fx-pack.json) strings five beats together with whip transitions: a glitch hook whose punch word smears in on a kinetic `trail`, a rack-focus title framed by corners, a bar chart that grows and counts up under a progress bar, a looping ticker, and a close that shows the lower-third styles (`side-rule`, `clean-bar`, `kicker`, `stack-bars`, `pill`). Asset-free. Watch it at `/showcase?sample=fx-pack`.
+
+## One story, three formats
+
+[`formats.json`](./formats.json) is one launch story composed for 16:9, 9:16 and 1:1. `$format` markers set per-format sizes, positions and holds; `formats.portrait` / `formats.square` patch sections by element id (the square cut drops the proof beat). Render every format with `leclap render formats.json --formats all` (one file per format); the showcase previews the landscape cut.
+
+```bash
+leclap render examples/motion-design/formats.json --formats all \
+  --assets packages/leclap-creative-kit/src/library -o formats.mp4
+```
+
+## Filled type
+
+[`kinetic-fills.json`](./kinetic-fills.json) fills kinetic letters instead of colouring them: a two-colour `gradient`, the bundled golden-hour photograph as a `texture`, and a brand word with a three-stop gradient and a repeating shimmer `sweep`. Each block keeps a solid `color` as the fallback for engines without `alphamerge`.
+
+## Split screens and wipes
+
+[`split-layouts.json`](./split-layouts.json) uses `sections[].layout` with bundled photos: three panes side by side with a gap, two stacked panes with a divider, and a `before-after` wipe whose BEFORE and AFTER labels sit on either side of the moving edge.
+
+## Right-to-left type
+
+[`rtl-type.json`](./rtl-type.json) animates Arabic (`noto-arabic`) and Hebrew (`noto-hebrew`) headlines a line at a time (`unit: "line"`), so letters stay joined and shaped (`text_shaping` on FFmpeg builds with libfribidi). Each beat carries a small Latin gloss; the close sets both scripts side by side.
+
+## Emoji in type
+
+[`emoji-type.json`](./emoji-type.json) puts colour emoji in a kinetic headline, in an emoji-only row that pops one by one, and in a title card. Each emoji is composited as a bundled image in the measured gap of its line and animates with its word.
+
+## On the beat
+
+[`beat-grid.json`](./beat-grid.json) declares `global.beats` (120 BPM, 4/4). Sections last `{ "bars": 1 }` or `{ "bars": 2 }`, entrances use `beat:n` / `bar:n` references, the drop punches the camera on every beat and flashes on each downbeat, and `global.sfx` lays a click track (tick on beats, hit on downbeats, a riser and a boom into the drop) on the same grid. It needs no music file.
+
+## Theme, roles and safe zones
+
+[`theme-roles.json`](./theme-roles.json) is a portrait promo for `global.platform: "tiktok"` on the `neon` theme. Colours and fonts are `$color.*` / `$font.*` tokens; every animated element declares a motion `role` (headline, accent, panel, micro, camera, mascot) instead of an ease, and sections declare their narrative `role` and `purpose`. All copy stays inside TikTok's safe zones, so validation reports no `platform_ui_overlap`.
+
+## Footage editing
+
+[`footage-edit.json`](./footage-edit.json) shows one footage control per recorded scene: `fit: "blur"` for a vertical clip in a landscape frame, a keyframed `focus` pan with a user LUT (`grade.lut`), a `clip` range on the `bullet` speed ramp, a `freeze` with a flash and a shutter sound, and a B-roll `cutaways` entry under a LUT look at `strength: 0.6`. The B-roll and LUT are `{{ broll }}` / `{{ lut }}` variables: point them at your own clip and `.cube` file. The showcase preview records the scenes with generated clips (see the [showcase README](../showcase/README.md#effects--editing)).
+
+## Sound design
+
+[`sound-design.json`](./sound-design.json) scores an edit from JSON: `global.audio.sfx: "auto"` adds a hit on the impact landing and whooshes on the designed transitions, a `drop` cue gets an automatic riser plus an authored boom and flash, the recorded line uses the `clean` voice preset and `audioAutomation` to fade in and out, and the close rings once. Every sound comes from the bundled library.
 
 ## Native controls
 

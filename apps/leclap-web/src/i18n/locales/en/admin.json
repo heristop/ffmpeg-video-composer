@@ -117,8 +117,8 @@
       "label": "Advanced settings",
       "summary": "Audio mix · Variables",
       "wholeVideo": {
-        "label": "Whole-video animations",
-        "hint": "Overlays that span the entire video, across every section."
+        "label": "Whole-video animation files",
+        "hint": "Animation files played as-is over the entire video, across every section. Effects are added per scene."
       },
       "wholeVideoLook": {
         "label": "Whole-video look & grade",
@@ -562,9 +562,9 @@
     "upload": "Upload",
     "uploadHint": "Upload .apng or .webm",
     "uploaded": "Uploaded",
-    "dropAnimation": "Drop an animation or click to browse",
+    "dropAnimation": "Drop an animation file or click to browse",
     "animationFormats": "APNG, WebM · kept inline in the template",
-    "removeUpload": "Remove uploaded animation",
+    "removeUpload": "Remove uploaded animation file",
     "invalidType": "Please choose an .apng or .webm file.",
     "previewBg": "Preview background",
     "bgChecker": "Checkerboard",
@@ -630,7 +630,173 @@
         "name": "Frame reveal",
         "description": "A fine frame with a single shine sweep."
       }
-    }
+    },
+    "library": {
+      "sheen": "Sheen",
+      "glint-orbit": "Orbit glint",
+      "edge-glow": "Edge glow",
+      "leak": "Light leak",
+      "bloom": "Bloom",
+      "ripple": "Pulse ring",
+      "ripple-tap": "Tap",
+      "resolve": "Resolve",
+      "glass": "Glass",
+      "vignette-breathe": "Breathing vignette",
+      "confetti": "Confetti",
+      "glint": "Glints",
+      "frame": "Frame",
+      "corners": "Corner brackets",
+      "underline": "Underline",
+      "bokeh": "Bokeh",
+      "dust": "Dust",
+      "grain": "Grain",
+      "shine-sweep": "Shine sweep",
+      "sparkle": "Sparkle",
+      "corner-brackets": "Corner brackets",
+      "pulse-ring": "Pulse ring",
+      "tap-pulse": "Tap pulse",
+      "light-leak": "Light leak",
+      "white-border": "White border",
+      "glow-border": "Glow border",
+      "rounded-border": "Rounded border",
+      "spec-orbit": "Spec orbit",
+      "animation-icons": "Animation icons"
+    },
+    "groups": {
+      "light": "Light",
+      "focus": "Focus",
+      "celebrate": "Celebrate",
+      "frames": "Frames",
+      "ambient": "Ambient",
+      "samples": "Stock files",
+      "samplesHint": "Ready-made files that look the same in every template."
+    },
+    "picker": {
+      "sampleLabel": "Animation file: {{label}} ({{format}})",
+      "addLabel": "Add the {{label}} effect (drawn by the engine, adjustable)",
+      "upgrade": "Use the effect",
+      "upgradeHint": "A file played as-is. The {{label}} effect draws the same idea, tuned to this scene."
+    },
+    "fx": {
+      "timing": "Timing",
+      "auto": "Auto",
+      "reroll": "New variation",
+      "remove": "Remove effect",
+      "target": "Applies to",
+      "targetFrame": "Whole frame",
+      "targetLayer": "Layer {{n}}",
+      "targetCustom": "Custom area",
+      "resetParam": "Set {{label}} back to auto",
+      "custom": "Custom",
+      "previewHint": "Previewed live on the canvas. The exact look renders in “Preview render”.",
+      "notTunable": "This graphic has no controls here yet. Edit it in the JSON editor.",
+      "token": {
+        "accent": "Accent",
+        "accent2": "Accent 2",
+        "fg": "Text",
+        "bg": "Background"
+      },
+      "livePreview": "Live preview · exact look in Preview render",
+      "livePreviewStill": "Still preview (reduced motion) · full effect in Preview render",
+      "livePreviewNone": "Nothing to draw on this target · see Preview render",
+      "renderScene": "Render this scene",
+      "renderSceneHint": "A quick draft of this scene only, with the exact effect."
+    },
+    "param": {
+      "at": "Starts at (s)",
+      "duration": "Duration (s)",
+      "intensity": "Intensity",
+      "color": "Color",
+      "repeat": "Passes",
+      "ease": "Easing",
+      "profile": "Profile",
+      "width": "Width",
+      "tilt": "Tilt (°)",
+      "direction": "Direction",
+      "bloom": "Bloom",
+      "variant": "Variant",
+      "radius": "Radius",
+      "rings": "Rings",
+      "stagger": "Stagger (s)",
+      "start": "Start size",
+      "stroke": "Stroke",
+      "halo": "Halo",
+      "dot": "Dot",
+      "press": "Press",
+      "path": "Path",
+      "count": "Count",
+      "size": "Size",
+      "spin": "Spin",
+      "trail": "Trail",
+      "speed": "Speed",
+      "angle": "Angle",
+      "spread": "Spread",
+      "gravity": "Gravity",
+      "drag": "Drag",
+      "sway": "Sway",
+      "discs": "Discs",
+      "depth": "Depth",
+      "fade": "Fade",
+      "softness": "Softness",
+      "drift": "Drift",
+      "clear": "Clear center",
+      "flicker": "Flicker",
+      "tone": "Tone",
+      "frost": "Frost",
+      "saturation": "Saturation",
+      "highlight": "Highlight",
+      "ramp": "Ramp (s)",
+      "blur": "Blur",
+      "scale": "Scale",
+      "edge": "Edge",
+      "stretch": "Stretch",
+      "secondary": "Second color",
+      "balance": "Balance",
+      "shadows": "Keep shadows",
+      "rise": "Rise",
+      "fall": "Fall",
+      "line": "Line",
+      "lineWidth": "Line width",
+      "glow": "Glow color",
+      "breathe": "Breathe",
+      "period": "Period (s)",
+      "threshold": "Threshold",
+      "knee": "Knee",
+      "swing": "Swing",
+      "animated": "Animated",
+      "inset": "Inset",
+      "thickness": "Thickness",
+      "exit": "Exit",
+      "exitDuration": "Exit duration (s)",
+      "clearance": "Clearance",
+      "contrast": "Contrast",
+      "trace": "Trace",
+      "length": "Length",
+      "x": "X",
+      "y": "Y",
+      "origin": "Origin",
+      "caps": "Caps",
+      "settle": "Settle"
+    },
+    "kind": {
+      "switch": "Effects or animation files",
+      "effect": {
+        "name": "Effect",
+        "title": "Effects",
+        "badge": "Engine · adjustable",
+        "subtitle": "Drawn by LeClap and tuned to this scene",
+        "adjustable": "Adjustable once added"
+      },
+      "file": {
+        "name": "Animation file",
+        "title": "Animation files",
+        "badge": "File",
+        "subtitle": "A clip played as-is on top of the scene",
+        "detail": "played as-is",
+        "source": "Animation file source"
+      }
+    },
+    "urlPlaceholder": "https://example.com/overlay.webm"
   },
   "element": {
     "resize": "Resize element",
@@ -641,7 +807,7 @@
     "addBackgroundImage": "Background image",
     "addText": "Text",
     "addImageOverlay": "Image / logo",
-    "addAnimation": "Animation",
+    "addAnimation": "Animation file",
     "addShapeRect": "Rectangle",
     "addShapeEllipse": "Circle",
     "empty": "Add your first element",
@@ -653,7 +819,7 @@
     "layer": "Background",
     "image": "Image",
     "shape": "Shape",
-    "animation": "Animation",
+    "animation": "Animation file",
     "backgroundImage": "Background image",
     "titleCard": "Title card",
     "lowerThird": "Lower third",
@@ -664,7 +830,13 @@
     "addTitleCard": "Title card",
     "addLowerThird": "Lower third",
     "sugarGroup": "Ready-made text",
-    "reorderHint": "Elements layer by type. Reorder items of the same type with the arrows or by dragging."
+    "reorderHint": "Elements layer by type. Reorder items of the same type with the arrows or by dragging.",
+    "effect": "Effect",
+    "addEffect": "Effect",
+    "effectAddHint": "Drawn by the engine · adjustable",
+    "animationAddHint": "APNG or WebM · played as-is",
+    "animationPending": "Effect or file",
+    "kindLabel": "{{kind}}: {{name}}"
   },
   "shape": {
     "kind": "Shape",
@@ -759,11 +931,11 @@
     "count_other": "{{count}} images"
   },
   "animationOverlay": {
-    "add": "Add an animation",
-    "label": "Animation",
-    "remove": "Remove animation",
-    "count_one": "{{count}} animation",
-    "count_other": "{{count}} animations"
+    "add": "Add an animation file",
+    "label": "Animation file",
+    "remove": "Remove animation file",
+    "count_one": "{{count}} animation file",
+    "count_other": "{{count}} animation files"
   },
   "summaryChip": {
     "none": "None",
@@ -850,8 +1022,9 @@
     "label": "Frame fit",
     "cover": "Fill",
     "letterbox": "Letterbox",
+    "blur": "Blur",
     "off": "Off",
-    "hint": "Fill crops the footage to fill the frame; Letterbox keeps it all visible with bars; Off uses the file as-is, without fitting it to the frame."
+    "hint": "Fill crops the footage to fill the frame; Letterbox keeps it all visible with bars; Blur keeps it all visible over a blurred copy instead of bars; Off uses the file as-is, without fitting it to the frame."
   },
   "musicSection": {
     "pickTracks": "Pick the tracks viewers can choose from.",
@@ -1052,5 +1225,55 @@
     "notes": "Scene notes",
     "notesHint": "Private notes for collaborators — never shown in the video.",
     "notesPlaceholder": "e.g. Swap this clip after the launch…"
+  },
+  "styleReference": {
+    "label": "Match a reference",
+    "hint": "Upload an image, and optionally a short clip. Its palette, texture and pacing become a theme; subjects, logos and text are never copied.",
+    "image": "Reference image",
+    "clip": "Reference clip (optional)",
+    "remove": "Remove {{name}}",
+    "analyse": "Analyse reference",
+    "analysing": "Reading palette, texture and pacing…",
+    "error": "This reference could not be analysed: {{message}}",
+    "roles": {
+      "bg": "Background",
+      "fg": "Text",
+      "muted": "Muted",
+      "surface": "Surface",
+      "brand": "Brand",
+      "accent": "Accent",
+      "accent2": "Accent 2"
+    },
+    "source": {
+      "extracted": "from reference",
+      "adjusted": "adjusted for contrast",
+      "derived": "derived"
+    },
+    "contrast": {
+      "aa": "AA {{ratio}}:1",
+      "aaLarge": "AA large {{ratio}}:1",
+      "fail": "Low {{ratio}}:1"
+    },
+    "level": {
+      "aa": "passes WCAG AA",
+      "aaLarge": "passes AA for large text only",
+      "fail": "below WCAG AA"
+    },
+    "contrastLabel": "Contrast on background {{ratio}} to 1, {{level}}",
+    "swatches": "Derived theme colours",
+    "pacing": "Shots of {{avgShot}} s · {{cpm}} cuts/min · energy {{energy}}",
+    "texture": {
+      "grain": "film grain ≈ {{grain}}",
+      "none": "clean, no grain"
+    },
+    "genre": "suggested genre: {{genre}}",
+    "confidence": "confidence {{value}}%",
+    "apply": "Apply as theme",
+    "applied": "Theme applied to global.theme. Undo reverts it.",
+    "current": {
+      "named": "Current theme: {{name}}",
+      "custom": "Current theme: custom",
+      "none": "Current theme: LeClap (default)"
+    }
   }
 }

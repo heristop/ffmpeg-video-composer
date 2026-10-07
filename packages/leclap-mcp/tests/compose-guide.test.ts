@@ -42,6 +42,10 @@ describe('compose-video prompt', () => {
     expect(text).toContain('get_template_schema');
     expect(text).toContain('validate_template');
     expect(text).toContain('compose_video');
+    expect(text).toContain('render_frames after validate to look at the result');
+    expect(text).toContain('check safe zones');
+    expect(text).toContain('get_timeline');
+    expect(text).toContain('report_catalog_gap');
   });
 
   it('points to render_remotion_clip for an animated intro fed via userVideoPaths', () => {
@@ -53,5 +57,16 @@ describe('compose-video prompt', () => {
     expect(text).toContain('render_remotion_clip');
     expect(text).toContain('project_video');
     expect(text).toContain('userVideoPaths');
+  });
+
+  it('primes the motion pacing rules checked by validate_template', () => {
+    const result = captureHandler()({ goal: 'a launch film' }) as { messages: { content: { text: string } }[] };
+    const text = result.messages[0].content.text;
+
+    expect(text).toContain('One primary transition plus 1–2 accents');
+    expect(text).toContain('The transition is the exit');
+    expect(text).toContain("Don't start at 0");
+    expect(text).toContain('at least 3× the fastest');
+    expect(text).toContain('motionWarnings');
   });
 });

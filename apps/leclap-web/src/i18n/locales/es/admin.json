@@ -117,8 +117,8 @@
       "label": "Ajustes avanzados",
       "summary": "Mezcla de audio · Variables",
       "wholeVideo": {
-        "label": "Animaciones de todo el vídeo",
-        "hint": "Superposiciones que abarcan todo el vídeo, en cada sección."
+        "label": "Archivos de animación de todo el vídeo",
+        "hint": "Archivos de animación que se reproducen tal cual sobre todo el vídeo, en cada sección. Los efectos se añaden por escena."
       },
       "wholeVideoLook": {
         "label": "Look y etalonaje de todo el vídeo",
@@ -562,9 +562,9 @@
     "upload": "Subir",
     "uploadHint": "Sube un archivo .apng o .webm",
     "uploaded": "Subido",
-    "dropAnimation": "Suelta una animación o haz clic para explorar",
+    "dropAnimation": "Suelta un archivo de animación o haz clic para explorar",
     "animationFormats": "APNG, WebM · se mantiene incrustada en la plantilla",
-    "removeUpload": "Quitar la animación subida",
+    "removeUpload": "Quitar el archivo de animación subido",
     "invalidType": "Elige un archivo .apng o .webm.",
     "previewBg": "Fondo de la vista previa",
     "bgChecker": "Cuadrícula",
@@ -630,7 +630,173 @@
         "name": "Revelado del marco",
         "description": "Un marco fino con un único barrido de brillo."
       }
-    }
+    },
+    "library": {
+      "sheen": "Destello",
+      "glint-orbit": "Destello en órbita",
+      "edge-glow": "Brillo de borde",
+      "leak": "Fuga de luz",
+      "bloom": "Resplandor",
+      "ripple": "Onda",
+      "ripple-tap": "Toque",
+      "resolve": "Enfoque",
+      "glass": "Cristal",
+      "vignette-breathe": "Viñeta que respira",
+      "confetti": "Confeti",
+      "glint": "Destellos",
+      "frame": "Marco",
+      "corners": "Esquinas",
+      "underline": "Subrayado",
+      "bokeh": "Bokeh",
+      "dust": "Polvo",
+      "grain": "Grano",
+      "shine-sweep": "Barrido brillante",
+      "sparkle": "Chispas",
+      "corner-brackets": "Esquinas",
+      "pulse-ring": "Anillo de pulso",
+      "tap-pulse": "Pulso de toque",
+      "light-leak": "Fuga de luz",
+      "white-border": "Borde blanco",
+      "glow-border": "Borde luminoso",
+      "rounded-border": "Borde redondeado",
+      "spec-orbit": "Órbita especular",
+      "animation-icons": "Iconos animados"
+    },
+    "groups": {
+      "light": "Luz",
+      "focus": "Enfoque",
+      "celebrate": "Celebrar",
+      "frames": "Marcos",
+      "ambient": "Ambiente",
+      "samples": "Archivos de serie",
+      "samplesHint": "Archivos listos para usar que se ven igual en cada plantilla."
+    },
+    "picker": {
+      "sampleLabel": "Archivo de animación: {{label}} ({{format}})",
+      "addLabel": "Añadir el efecto {{label}} (dibujado por el motor, ajustable)",
+      "upgrade": "Usar el efecto",
+      "upgradeHint": "Un archivo que se reproduce tal cual. El efecto {{label}} dibuja la misma idea, ajustada a esta escena."
+    },
+    "fx": {
+      "timing": "Tiempos",
+      "auto": "Auto",
+      "reroll": "Nueva variación",
+      "remove": "Quitar efecto",
+      "target": "Se aplica a",
+      "targetFrame": "Todo el cuadro",
+      "targetLayer": "Capa {{n}}",
+      "targetCustom": "Área personalizada",
+      "resetParam": "Volver {{label}} a auto",
+      "custom": "Personalizado",
+      "previewHint": "Vista previa en directo en el lienzo. El aspecto exacto se ve en «Renderizar vista previa».",
+      "notTunable": "Este gráfico aún no tiene controles aquí. Edítalo en el editor JSON.",
+      "token": {
+        "accent": "Acento",
+        "accent2": "Acento 2",
+        "fg": "Texto",
+        "bg": "Fondo"
+      },
+      "livePreview": "Vista previa en directo · aspecto exacto en Renderizar vista previa",
+      "livePreviewStill": "Vista fija (movimiento reducido) · efecto completo en Renderizar vista previa",
+      "livePreviewNone": "Nada que dibujar en este destino · ver Renderizar vista previa",
+      "renderScene": "Renderizar esta escena",
+      "renderSceneHint": "Un borrador rápido solo de esta escena, con el efecto exacto."
+    },
+    "param": {
+      "at": "Empieza (s)",
+      "duration": "Duración (s)",
+      "intensity": "Intensidad",
+      "color": "Color",
+      "repeat": "Pasadas",
+      "ease": "Curva",
+      "profile": "Perfil",
+      "width": "Ancho",
+      "tilt": "Inclinación (°)",
+      "direction": "Dirección",
+      "bloom": "Resplandor",
+      "variant": "Variante",
+      "radius": "Radio",
+      "rings": "Anillos",
+      "stagger": "Escalonado (s)",
+      "start": "Tamaño inicial",
+      "stroke": "Trazo",
+      "halo": "Halo",
+      "dot": "Punto",
+      "press": "Presión",
+      "path": "Trayectoria",
+      "count": "Cantidad",
+      "size": "Tamaño",
+      "spin": "Giro",
+      "trail": "Estela",
+      "speed": "Velocidad",
+      "angle": "Ángulo",
+      "spread": "Dispersión",
+      "gravity": "Gravedad",
+      "drag": "Resistencia",
+      "sway": "Balanceo",
+      "discs": "Discos",
+      "depth": "Profundidad",
+      "fade": "Fundido",
+      "softness": "Suavidad",
+      "drift": "Deriva",
+      "clear": "Centro despejado",
+      "flicker": "Parpadeo",
+      "tone": "Tono",
+      "frost": "Escarcha",
+      "saturation": "Saturación",
+      "highlight": "Brillo",
+      "ramp": "Rampa (s)",
+      "blur": "Desenfoque",
+      "scale": "Escala",
+      "edge": "Borde",
+      "stretch": "Estiramiento",
+      "secondary": "Segundo color",
+      "balance": "Equilibrio",
+      "shadows": "Conservar sombras",
+      "rise": "Subida",
+      "fall": "Caída",
+      "line": "Línea",
+      "lineWidth": "Grosor de línea",
+      "glow": "Color del brillo",
+      "breathe": "Respiración",
+      "period": "Periodo (s)",
+      "threshold": "Umbral",
+      "knee": "Transición",
+      "swing": "Amplitud",
+      "animated": "Animado",
+      "inset": "Margen",
+      "thickness": "Grosor",
+      "exit": "Salida",
+      "exitDuration": "Duración de salida (s)",
+      "clearance": "Separación",
+      "contrast": "Contraste",
+      "trace": "Trazado",
+      "length": "Longitud",
+      "x": "X",
+      "y": "Y",
+      "origin": "Origen",
+      "caps": "Extremos",
+      "settle": "Asentamiento"
+    },
+    "kind": {
+      "switch": "Efectos o archivos de animación",
+      "effect": {
+        "name": "Efecto",
+        "title": "Efectos",
+        "badge": "Motor · ajustable",
+        "subtitle": "Dibujado por LeClap y adaptado a esta escena",
+        "adjustable": "Ajustable una vez añadido"
+      },
+      "file": {
+        "name": "Archivo de animación",
+        "title": "Archivos de animación",
+        "badge": "Archivo",
+        "subtitle": "Un clip que se reproduce tal cual sobre la escena",
+        "detail": "se reproduce tal cual",
+        "source": "Origen del archivo de animación"
+      }
+    },
+    "urlPlaceholder": "https://example.com/overlay.webm"
   },
   "element": {
     "resize": "Redimensionar elemento",
@@ -641,7 +807,7 @@
     "addBackgroundImage": "Imagen de fondo",
     "addText": "Texto",
     "addImageOverlay": "Imagen / logotipo",
-    "addAnimation": "Animación",
+    "addAnimation": "Archivo de animación",
     "addShapeRect": "Rectángulo",
     "addShapeEllipse": "Círculo",
     "empty": "Añade tu primer elemento",
@@ -653,7 +819,7 @@
     "layer": "Fondo",
     "image": "Imagen",
     "shape": "Forma",
-    "animation": "Animación",
+    "animation": "Archivo de animación",
     "backgroundImage": "Imagen de fondo",
     "titleCard": "Tarjeta de título",
     "lowerThird": "Rótulo",
@@ -664,7 +830,13 @@
     "addTitleCard": "Tarjeta de título",
     "addLowerThird": "Rótulo",
     "sugarGroup": "Textos prediseñados",
-    "reorderHint": "Los elementos se superponen por tipo. Reordena los elementos del mismo tipo con las flechas o arrastrándolos."
+    "reorderHint": "Los elementos se superponen por tipo. Reordena los elementos del mismo tipo con las flechas o arrastrándolos.",
+    "effect": "Efecto",
+    "addEffect": "Efecto",
+    "effectAddHint": "Dibujado por el motor · ajustable",
+    "animationAddHint": "APNG o WebM · se reproduce tal cual",
+    "animationPending": "Efecto o archivo",
+    "kindLabel": "{{kind}}: {{name}}"
   },
   "shape": {
     "kind": "Forma",
@@ -759,11 +931,11 @@
     "count_other": "{{count}} imágenes"
   },
   "animationOverlay": {
-    "add": "Añadir una animación",
-    "label": "Animación",
-    "remove": "Quitar animación",
-    "count_one": "{{count}} animación",
-    "count_other": "{{count}} animaciones"
+    "add": "Añadir un archivo de animación",
+    "label": "Archivo de animación",
+    "remove": "Quitar archivo de animación",
+    "count_one": "{{count}} archivo de animación",
+    "count_other": "{{count}} archivos de animación"
   },
   "summaryChip": {
     "none": "Ninguno",
@@ -850,8 +1022,9 @@
     "label": "Encuadre",
     "cover": "Rellenar",
     "letterbox": "Letterbox",
+    "blur": "Desenfoque",
     "off": "Desactivado",
-    "hint": "Rellenar recorta el material para llenar el cuadro; Letterbox lo muestra entero con bandas; Desactivado usa el archivo tal cual, sin ajustarlo al cuadro."
+    "hint": "Rellenar recorta el material para llenar el cuadro; Letterbox lo muestra entero con bandas; Desenfoque lo muestra entero sobre una copia desenfocada en lugar de bandas; Desactivado usa el archivo tal cual, sin ajustarlo al cuadro."
   },
   "musicSection": {
     "pickTracks": "Elige las pistas entre las que pueden elegir los espectadores.",
@@ -1053,5 +1226,55 @@
     "notes": "Notas de escena",
     "notesHint": "Notas privadas para colaboradores; nunca se muestran en el vídeo.",
     "notesPlaceholder": "p. ej. Cambiar este clip tras el lanzamiento…"
+  },
+  "styleReference": {
+    "label": "Inspirarse en una referencia",
+    "hint": "Sube una imagen y, si quieres, un clip corto. Su paleta, textura y ritmo se convierten en un tema; los sujetos, logos y textos nunca se copian.",
+    "image": "Imagen de referencia",
+    "clip": "Clip de referencia (opcional)",
+    "remove": "Quitar {{name}}",
+    "analyse": "Analizar referencia",
+    "analysing": "Leyendo paleta, textura y ritmo…",
+    "error": "No se pudo analizar esta referencia: {{message}}",
+    "roles": {
+      "bg": "Fondo",
+      "fg": "Texto",
+      "muted": "Atenuado",
+      "surface": "Superficie",
+      "brand": "Marca",
+      "accent": "Acento",
+      "accent2": "Acento 2"
+    },
+    "source": {
+      "extracted": "de la referencia",
+      "adjusted": "ajustado por contraste",
+      "derived": "derivado"
+    },
+    "contrast": {
+      "aa": "AA {{ratio}}:1",
+      "aaLarge": "AA grande {{ratio}}:1",
+      "fail": "Bajo {{ratio}}:1"
+    },
+    "level": {
+      "aa": "cumple WCAG AA",
+      "aaLarge": "cumple AA solo para texto grande",
+      "fail": "por debajo de WCAG AA"
+    },
+    "contrastLabel": "Contraste sobre el fondo {{ratio}} a 1, {{level}}",
+    "swatches": "Colores del tema derivado",
+    "pacing": "Planos de {{avgShot}} s · {{cpm}} cortes/min · energía {{energy}}",
+    "texture": {
+      "grain": "grano ≈ {{grain}}",
+      "none": "limpio, sin grano"
+    },
+    "genre": "género sugerido: {{genre}}",
+    "confidence": "confianza {{value}} %",
+    "apply": "Aplicar como tema",
+    "applied": "Tema aplicado a global.theme. Deshacer lo revierte.",
+    "current": {
+      "named": "Tema actual: {{name}}",
+      "custom": "Tema actual: personalizado",
+      "none": "Tema actual: LeClap (predeterminado)"
+    }
   }
 }

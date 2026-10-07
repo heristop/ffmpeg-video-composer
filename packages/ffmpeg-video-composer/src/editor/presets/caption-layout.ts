@@ -66,6 +66,18 @@ export const CAPTION_ANCHOR_Y: Record<string, CaptionAnchorY> = {
   'lower-third': { edge: 'bottom', offset: 110 },
 };
 
+// Extra pixels kept between a platform's bottom safe zone and the default caption's text, so the box
+// padding (`boxborderw`, 18px for the bar style) also clears the app UI.
+export const CAPTION_PLATFORM_CLEARANCE = 24;
+
+// The default (`lower-third`) caption's distance from the bottom edge once a delivery platform covers
+// `bottomFraction` of a frame `height` px tall: the preset's own offset, or enough to clear the UI.
+export function platformCaptionOffset(height: number, bottomFraction: number): number {
+  const preset = CAPTION_ANCHOR_Y[CAPTION_DEFAULT_POSITION].offset;
+
+  return Math.max(preset, Math.ceil(height * bottomFraction) + CAPTION_PLATFORM_CLEARANCE);
+}
+
 // `Object.hasOwn` rather than `TABLE[key] ?? fallback`: a plain object inherits `toString`,
 // `constructor` and `__proto__`, all of which are truthy, so `??` never reaches the fallback — it
 // hands back a Function, and every coordinate derived from it becomes NaN. NaN then fails every

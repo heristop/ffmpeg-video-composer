@@ -45,4 +45,12 @@ describe('ExitControl easing authoring', () => {
     expect(onChange).not.toHaveBeenCalled();
     expect(overlayVisibilityAt(undefined, 'fade', 3.7, 4).opacity).toBeCloseTo(0.03125, 5);
   });
+
+  it('keeps an authored spring when the author re-picks its own segment', () => {
+    const onChange = vi.fn();
+    renderToStaticMarkup(<ExitControl exit={{ type: 'rise', easing: 'spring(300, 14)' }} onChange={onChange} />);
+    controls.get('exit.easing')?.('custom');
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

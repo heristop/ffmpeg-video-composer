@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import Lenis from 'lenis';
 import { subscribe } from '@/lib/ticker';
 
@@ -26,9 +26,15 @@ export function isSmoothScrollRoute(pathname: string): boolean {
  *
  * Left off entirely (Lenis never constructed) under reduced motion and on coarse pointers, where the
  * platform's own inertia is better than anything we'd impose on top of it.
+ *
+ * A layout effect, not a passive one: React Router resets the scroll in a layout effect, and a Lenis
+ * torn down only in the passive phase is still easing toward the landing's position for the frames in
+ * between — its next tick writes that position back onto the page just opened, which then lands
+ * mid-page. Torn down here, it is gone before the reset (layout cleanups all run before any layout
+ * effect mounts), and the next route's instance starts from the scroll the router settled on.
  */
 export function useSmoothScroll(pathname: string): void {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isSmoothScrollRoute(pathname)) return () => {};
 
     if (prefers('(prefers-reduced-motion: reduce)') || prefers('(pointer: coarse)')) return () => {};

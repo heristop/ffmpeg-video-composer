@@ -14,7 +14,7 @@ describe('packaged sample catalog', () => {
   it('matches every canonical entry and preserves its authored descriptor', async () => {
     const catalog = await readJson('examples/showcase/catalog.json');
     expect(listSamples().map(({ id }) => id)).toEqual(catalog.samples.map(({ id }: { id: string }) => id));
-    expect(listSamples()).toHaveLength(32);
+    expect(listSamples()).toHaveLength(47);
     for (const sample of catalog.samples) {
       const detail = getSample(sample.id);
       const authored = await readJson(sample.source);
@@ -50,7 +50,7 @@ describe('packaged sample catalog', () => {
   it('filters categories, backends and case-insensitive search together', () => {
     expect(SAMPLE_CATEGORIES).toContain('evidence');
     expect(SAMPLE_BACKENDS).toEqual(['native', 'remotion']);
-    expect(listSamples({ backend: 'native' })).toHaveLength(22);
+    expect(listSamples({ backend: 'native' })).toHaveLength(37);
     expect(listSamples({ backend: 'remotion' })).toHaveLength(10);
     expect(listSamples({ category: 'evidence' }).map(({ id }) => id)).toEqual([
       'pr-evidence',
@@ -60,7 +60,25 @@ describe('packaged sample catalog', () => {
     expect(listSamples({ category: 'typography', backend: 'native' }).map(({ id }) => id)).toEqual([
       'type-impact',
       'native-timing',
+      'kinetic-type',
+      'spring-kinetics',
+      'camera-and-graphics',
     ]);
+    expect(listSamples({ category: 'effects' }).map(({ id }) => id)).toEqual([
+      'effects-tour',
+      'fx-pack',
+      'word-captions',
+      'formats',
+      'kinetic-fills',
+      'split-layouts',
+      'rtl-type',
+      'emoji-type',
+      'beat-grid',
+      'theme-roles',
+      'footage-edit',
+      'sound-design',
+    ]);
+    expect(listSamples({ category: 'effects', backend: 'remotion' })).toEqual([]);
     expect(listSamples({ query: 'WoRd StAgGeR' }).map(({ id }) => id)).toEqual(['editorial-word-stagger']);
     expect(listSamples({ category: 'evidence', query: 'BEFORE' }).map(({ id }) => id)).toEqual([
       'before-after',
@@ -110,7 +128,7 @@ describe('packaged sample catalog', () => {
       expect.objectContaining({ name: 'form_1_app', placeholders: ['{{ form_1_app }}'] })
     );
     expect(app.requirements.assets).toContainEqual(
-      expect.objectContaining({ reference: 'upbeat-electronic.mp3', kind: 'music' })
+      expect.objectContaining({ reference: 'lofi-study.mp3', kind: 'music' })
     );
     expect(getSample('house-evidence').requirements.projectVideos.map(({ name }) => name)).toEqual([
       'intro',
@@ -123,7 +141,11 @@ describe('packaged sample catalog', () => {
     expect(getSample('before-after').requirements.variables).toContainEqual(
       expect.objectContaining({ name: 'change', default: 'Describe the change', placeholders: ['{{ change }}'] })
     );
+    // Its glow is a procedural fx now: the bumper clip of its partial is the asset it references.
     expect(getSample('present-yourself').requirements.assets).toContainEqual(
+      expect.objectContaining({ kind: 'video', path: 'sections[3].options.videoUrl' })
+    );
+    expect(getSample('present-yourself').requirements.assets).not.toContainEqual(
       expect.objectContaining({ reference: '/assets/animations/glow_border.apng' })
     );
     expect(getSample('drink-and-code').requirements.assets).toContainEqual(

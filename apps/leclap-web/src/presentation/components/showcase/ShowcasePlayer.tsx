@@ -20,6 +20,10 @@ export function ShowcasePlayer({ sample, requested }: { sample: ShowcaseSample; 
         error: t('videoError'),
         retry: t('retry'),
       }}
+      seekLabels={{
+        seek: t('seek'),
+        position: (current, total) => t('position', { current, total }),
+      }}
     />
   );
 }

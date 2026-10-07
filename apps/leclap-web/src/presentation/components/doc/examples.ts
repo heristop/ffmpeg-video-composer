@@ -12,7 +12,7 @@ const simple = {
   global: {
     orientation: 'landscape',
     musicEnabled: true,
-    music: { name: 'air-prelude.mp3' },
+    music: { name: 'lofi-jazz-music.mp3' },
     audio: { sourceVolume: 1, musicVolume: 0.5 },
   },
   sections: [
@@ -51,7 +51,7 @@ const rich = {
   global: {
     orientation: 'landscape',
     musicEnabled: true,
-    music: { name: 'air-prelude.mp3' },
+    music: { name: 'lofi-jazz-music.mp3' },
     transition: { type: 'fade', duration: 0.4 },
     audio: {
       sourceVolume: 1,

@@ -1,13 +1,14 @@
 import { z } from 'zod';
 import { EffectReferenceSchema } from './effect-reference.schema';
-import { TemplatePartialSchema } from './partial.schemas';
+import { PARTIAL_REF_TIMING_FIELDS, TemplatePartialSchema } from './partial.schemas';
+import { FormatsSchema } from './formats.schemas';
 import {
   AudioFadeSchema,
   BackgroundLayerSchema,
   ChromaKeySchema,
   FramingGuideSchema,
   GradeSchema,
-  LOOK_PRESETS,
+  LookSchema,
   MotionEffectSchema,
   TransitionSchema,
 } from './effects.schemas';
@@ -15,6 +16,14 @@ import { TranslationSchema, GlobalConfigSchema } from './global.schemas';
 import { FilterSchema, MapSchema } from './filter.schemas';
 import { CaptionSchema, TitleCardSchema, LowerThirdSchema } from './text.schemas';
 import { InputSchema, FieldSchema } from './section-media.schemas';
+import { MOTION_SECTION_FIELDS } from './motion-section.schemas';
+import { SectionLayoutSchema } from './layout.schemas';
+import { CLIP_AUDIO_OPTION_FIELDS } from './audio.schemas';
+import { SECTION_INTENT_FIELDS } from './section-intent.schemas';
+import { TemplateMetaSchema } from './template-meta.schemas';
+export { TemplateMetaSchema } from './template-meta.schemas';
+import { CutawaysSchema, FIT_OPTION_FIELDS, FOOTAGE_OPTION_FIELDS } from './footage.schemas';
+import { BeatDurationSchema } from './time.schemas';
 
 export {
   CAPTION_STYLES,
@@ -30,6 +39,17 @@ export {
 // importers keep a single `section.schemas` entry point, and Input/Field imported back for the
 // section option/base schemas below.
 export { InputOptionsSchema, ShapeSpecSchema, InputSchema, FieldSchema } from './section-media.schemas';
+
+// A section length in seconds or on the beat grid. Typed as seconds: the time-reference pass turns a beat
+// length into seconds before anything reads it as a number (core/timing/durations.ts), and the code that
+// runs earlier (validation rules, motion timeline) checks `typeof duration === 'number'` first.
+const SectionDurationSchema = z
+  .union([z.number().positive(), BeatDurationSchema])
+  .optional()
+  .describe(
+    'Fixed duration of the section in seconds, or on the beat grid as { beats: n } / { bars: n } (needs ' +
+      'global.beats with a bpm); overrides clip length.'
+  ) as unknown as z.ZodOptional<z.ZodNumber>;
 
 // ── section options ────────────────────────────────────────────────────────────
 
@@ -49,11 +69,7 @@ export const BaseSectionOptionsSchema = z
       .describe(
         'Name of a project_video section whose recorded clip is reused in this section instead of capturing a new one.'
       ),
-    duration: z
-      .number()
-      .positive()
-      .optional()
-      .describe('Fixed duration of the section in seconds; overrides clip length.'),
+    duration: SectionDurationSchema,
     musicVolume: z
       .number()
       .min(0)
@@ -80,7 +96,10 @@ export const BaseSectionOptionsSchema = z
     muteSection: z
       .boolean()
       .optional()
-      .describe('When true, the source audio of this section is silenced (default false).'),
+      .describe(
+        'When true, the source audio of this section is silenced. Default: false for project_video (the recording is heard); ' +
+          'video sections stay silent unless this is set to false.'
+      ),
     countdown: z
       .boolean()
       .optional()
@@ -106,6 +125,7 @@ export const BaseSectionOptionsSchema = z
       .boolean()
       .optional()
       .describe('Preserve original aspect ratio via letterboxing (no crop); overrides cover-crop (default false).'),
+    ...FIT_OPTION_FIELDS,
   })
   .strict()
   .describe('Common options shared by all section types; variant-specific options are added via extend.');
@@ -133,10 +153,11 @@ export const BaseSectionSchema = z
     ),
     caption: CaptionSchema.optional().describe('Styled on-screen caption rendered as a drawtext filter.'),
     lowerThird: LowerThirdSchema.optional().describe('Title/subtitle band composited over the section clip.'),
-    look: z
-      .enum(LOOK_PRESETS)
-      .optional()
-      .describe('Named colour-grade preset applied to the section video (default: none).'),
+    ...MOTION_SECTION_FIELDS,
+    ...SECTION_INTENT_FIELDS,
+    look: LookSchema.optional().describe(
+      'Named colour-grade preset applied to the section video (default: none); string or { preset, strength }.'
+    ),
     grade: GradeSchema.optional().describe('Fine-grained colour-grade settings applied to the section video.'),
     letterbox: z
       .object({
@@ -153,6 +174,7 @@ export const BaseSectionSchema = z
     chromaKey: ChromaKeySchema.optional().describe(
       'Background removal: key out a solid screen colour and composite over a solid background.'
     ),
+    layout: SectionLayoutSchema.optional(),
   })
   .describe('Base fields shared by all section variants.');
 
@@ -160,7 +182,12 @@ export const BaseSectionSchema = z
 
 export const VideoSectionSchema = BaseSectionSchema.extend({
   type: z.literal('video').describe('Section type: renders a pre-recorded or asset-backed video clip.'),
-  options: BaseSectionOptionsSchema.optional().describe('Playback and compositing options for the video section.'),
+  options: BaseSectionOptionsSchema.extend(CLIP_AUDIO_OPTION_FIELDS)
+    .extend(FOOTAGE_OPTION_FIELDS)
+    .strict()
+    .optional()
+    .describe('Playback, footage editing and compositing options for the video section.'),
+  cutaways: CutawaysSchema.optional(),
 }).describe('A section that plays a pre-recorded video clip or a user-uploaded video asset.');
 
 export const EffectSectionSchema = BaseSectionSchema.extend({
@@ -183,16 +210,19 @@ export type CaptureMode = z.infer<typeof CaptureModeSchema>;
 export const ProjectVideoSectionSchema = BaseSectionSchema.extend({
   type: z.literal('project_video').describe('Section type: captures a new video clip from the device camera.'),
   options: BaseSectionOptionsSchema.extend({
+    ...CLIP_AUDIO_OPTION_FIELDS,
     framingGuide: FramingGuideSchema.optional().describe('Camera framing guide overlay shown in the recording UI.'),
     captureMode: CaptureModeSchema.optional().describe('Recorder mode: front/back/screen/upload (default: front).'),
     allowedCaptureModes: z
       .array(CaptureModeSchema)
       .optional()
       .describe('Modes available to the user; omit for all four. A single element locks to one mode.'),
+    ...FOOTAGE_OPTION_FIELDS,
   })
     .strict()
     .optional()
     .describe('Recording and compositing options for the project_video section.'),
+  cutaways: CutawaysSchema.optional(),
 }).describe('A section that records a new clip from the device camera; supports a framing guide overlay.');
 
 export const FormSectionSchema = BaseSectionSchema.extend({
@@ -256,6 +286,7 @@ export const PartialSectionSchema = BaseSectionSchema.extend({
     .record(z.string(), z.string())
     .optional()
     .describe('Values substituted into the partial’s `{{ key }}` placeholders, so one partial serves many slots.'),
+  ...PARTIAL_REF_TIMING_FIELDS,
 }).describe('A reference to a reusable partial (by `ref`) or an inline one (`sections`), expanded before compilation.');
 
 export const SectionSchema = z.discriminatedUnion('type', [
@@ -268,25 +299,6 @@ export const SectionSchema = z.discriminatedUnion('type', [
   MusicSectionSchema,
   PartialSectionSchema,
 ]);
-
-export const TemplateMetaSchema = z
-  .object({
-    name: z.string().optional().describe('Human-readable template name for catalogs and editors.'),
-    description: z.string().optional().describe('Short human-readable template summary for catalogs and agents.'),
-    creativeDirection: z
-      .string()
-      .trim()
-      .min(1)
-      .max(4000)
-      .optional()
-      .describe(
-        'Authoring brief (1..4000 characters): audience, visual hierarchy, typography, palette, motion, pacing, ' +
-          'avoidances and review criteria. Guides humans/agents; never interpreted or executed by the renderer. ' +
-          'Implement the direction explicitly in sections, filters and effect props.'
-      ),
-  })
-  .strict()
-  .describe('Optional human-facing metadata embedded in the descriptor; behavioral catalog fields are derived.');
 
 export const TemplateDescriptorSchema = z
   .object({
@@ -302,6 +314,7 @@ export const TemplateDescriptorSchema = z
       .array(TemplatePartialSchema)
       .optional()
       .describe('Reusable partials referenced by `{ type: "partial", ref }` sections; expanded before compilation.'),
+    formats: FormatsSchema.optional(),
   })
   .describe(
     'Root descriptor of a video composition template; all fields are optional so partial descriptors can be validated incrementally.'

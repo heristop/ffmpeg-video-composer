@@ -9,15 +9,16 @@ import { Button } from '@/presentation/components/ui';
 import { FilmScreen, FilmStage, FrameButton, SoundControl, useFilmSound } from '@/presentation/components/film-frame';
 import { SectionHeading } from '@/presentation/components/home/section-heading';
 
-// The clip is an actual LeClap render (1280x720), shipped under public/videos. It plays as an
+// The clip is a 19-second highlight reel cut from the effects tour (examples/motion-design/effects-tour.json),
+// an actual LeClap render (1280x720) under public/videos/home, over a bundled lo-fi track. It plays as an
 // ambient loop to show the product's output up front, with the landing's one sound: muted until the
 // visitor turns it on, here or anywhere else on the page. The corner pill turns the sound on and
 // pauses it (as on the films, a visitor's pause sticks). Served VP9/WebM first (smaller) with an
 // H.264/MP4 fallback for older Safari/iOS. The file is lazy-mounted only as the frame nears the
 // viewport, so it never costs an above-the-fold visitor. Reduced-motion users get a paused player
 // with native controls.
-const VIDEO_SRC_WEBM = '/videos/drink-and-coffee.webm?v1';
-const VIDEO_SRC_MP4 = '/videos/drink-and-coffee.mp4?v1';
+const VIDEO_SRC_WEBM = '/videos/home/effects-reel.webm';
+const VIDEO_SRC_MP4 = '/videos/home/effects-reel.mp4';
 
 export const HomeShowcase = () => {
   const { t } = useTranslation('home');
@@ -103,8 +104,8 @@ export const HomeShowcase = () => {
       <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
         {/* The page's one frame (film-frame.tsx), on its stage: same size and scroll entrance as the films. */}
         <FilmStage frameRef={setFrameRef} className="mt-12 sm:mt-16">
+          {/* No corner badge: the reel's own top-left labels name each effect, and a pill there would cover them. */}
           <FilmScreen
-            badge={t('showcase.badge')}
             controlLabel={t('showcase.badge')}
             paused={paused}
             control={
@@ -169,8 +170,8 @@ export const HomeShowcase = () => {
           </FilmScreen>
         </FilmStage>
 
-        {/* CTA cluster: the one filled primary, then the two ways to look around as lavender text links with a
-            chevron (the brand's link colour), so the render's call to action doesn't split three ways. On
+        {/* CTA cluster: the one filled primary, then the three ways to look around as lavender text links with a
+            chevron (the brand's link colour), so the render keeps a single call to action. On
             phones the links share a row under it. */}
         <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-5">
           <Button
@@ -184,6 +185,12 @@ export const HomeShowcase = () => {
             </Link>
           </Button>
           <div className="flex flex-wrap justify-center gap-x-2">
+            <Button asChild variant="link" className="group gap-1 px-3 [&_svg]:size-4">
+              <Link to="/showcase">
+                {t('showcase.viewShowcase')}
+                <ChevronRight className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </Button>
             <Button asChild variant="link" className="group gap-1 px-3 [&_svg]:size-4">
               <Link to="/templates">
                 {t('showcase.browseTemplates')}

@@ -15,6 +15,7 @@ A template is a Zod-validated JSON descriptor: a `global` block plus an ordered 
 - [On-device compilation](https://raw.githubusercontent.com/heristop/leclap/main/docs/on-device-compilation.md): the serverless Expo / React Native compile pipeline.
 - [AGENTS.md — repo conventions](https://raw.githubusercontent.com/heristop/leclap/main/AGENTS.md): repo layout, commands, and conventions for contributors and AI agents.
 - [LeClap vs Remotion](https://leclap.dev/compare/remotion): the side-by-side against the closest neighbour — where each one wins, the per-platform determinism caveats, and when to pick Remotion instead. Every claim is sourced to Remotion's own docs.
+- [Browser agents (WebMCP)](https://leclap.dev/doc/webmcp): the web template builder registers 23 tools with the agent built into the browser — 9 read (inspect, validate, timeline, samples), 9 undoable edits (JSON Patch `edit_template`, scenes, texts, theme/format/music, `undo`) and 5 consequential actions (replace the draft, load a sample, render a preview and its frames, save) confirmed in the page; names shared with `@leclap/mcp` mean the same; repo copy in [docs/webmcp.md](https://raw.githubusercontent.com/heristop/leclap/main/docs/webmcp.md).
 - [Agentic development](https://leclap.dev/#agentic): turn implementation evidence into a deterministic review video and attach it to a pull or merge request.
 - [Agentic PR video example](https://raw.githubusercontent.com/heristop/leclap/main/examples/agentic-pr-video/README.md): a reusable template and commands for rendering a review-ready artifact.
 
@@ -35,7 +36,7 @@ The descriptor field tables come from the engine's Zod schema. Runtime requireme
 - [Registered effects](https://leclap.dev/doc/effects): all built-in and example catalog props, asset slots, output constraints and authoring workflow.
 - [Creative direction](https://leclap.dev/doc/creative-direction): implement a visual brief with explicit native settings or registered effect props.
 - [Engine configuration](https://leclap.dev/doc/engine): host configuration, encoder tiers, platform requirements and MCP runtime settings.
-- [Animations & images](https://leclap.dev/doc/animations): overlay playback/placement, whole-video animation and six composited APNG recipe configurations.
+- [Animations & images](https://leclap.dev/doc/animations): overlay playback/placement, whole-video animation and the six effect recipes, each two engine primitives (`graphics[]` fx and v2 strokes) anchored to the scene's card. The bundled APNGs are samples: compose motion with the motion engine instead.
 - [Examples](https://leclap.dev/doc/examples): copy-paste descriptors that render with `leclap render`.
 - [JSON Schema](https://leclap.dev/doc/schema): the full machine-readable schema for tooling and validation.
 
@@ -56,7 +57,7 @@ The descriptor field tables come from the engine's Zod schema. Runtime requireme
 
 ## Sample discovery
 
-Start with `list_samples` to discover packaged showcase templates, then `get_sample` for the descriptor, creative direction, input requirements and backend setup. The CLI also provides `leclap samples list`, `show` and `export`. Media and preview videos are not bundled in the sample catalog.
+Start with `list_samples` to discover packaged showcase templates, then `get_sample` for the descriptor, creative direction, input requirements and backend setup. The CLI also provides `leclap samples list`, `show` and `export`. Media and preview videos are not bundled in the sample catalog. In the web builder, a browser agent reaches the same catalog through WebMCP and can open an `openable` sample with `load_sample` once the user allows it.
 
 ## Use it from an AI agent
 
@@ -66,7 +67,9 @@ Add the MCP server to any MCP-capable client:
 { "mcpServers": { "leclap": { "command": "npx", "args": ["-y", "@leclap/mcp"] } } }
 ```
 
-Eight tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`, `validate_template`, `patch_template`, `compose_video`, `probe_media`. Opting into Remotion adds `get_effect_schema`, `render_preview` and `render_remotion_clip`. No LLM sits in the output path: the agent authors JSON and the engine renders it.
+Sixteen tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`, `get_motion_catalog`, `report_catalog_gap`, `get_timeline`, `validate_template`, `patch_template`, `edit_template`, `compose_video`, `render_frames`, `probe_media`, `extract_style`, `analyze_music`, `get_capabilities`. Opting into Remotion adds `get_effect_schema`, `render_preview` and `render_remotion_clip`. No LLM sits in the output path: the agent authors JSON and the engine renders it.
+
+Compose motion, don't pick it. Derive the motion from the creative direction (audience, brand, energy), write a motion intent per section, and build it from the motion engine: kinetic typography, `animate` tracks with ease tokens or springs, the camera, designed transitions, `graphics`, and the parametric `type: "fx"` light primitives. There are 13 fx primitives in four families, each anchored to a `target` (the frame, a pane, a layer, a kinetic block or a rectangle) and clipped to it: light (`sheen`, `leak`, `edge-glow`, `bloom`), marks (`ripple`, `glint`, `confetti`), ambient textures (`bokeh`, `dust`, `vignette-breathe`, `grain`) and surfaces (`glass`, `resolve`); `get_motion_catalog` with `kind: "fx"` lists their parameters and design intent ([reference](https://raw.githubusercontent.com/heristop/leclap/main/docs/template-configuration.md)). Tune their parameters, because untuned defaults look the same in every video. Keep one or two signature moves per video. The library animation overlays (`animations/*.apng`) are samples: use one only as a last resort. `get_motion_catalog` lists them under `samples`, together with the primitives that replace each one. `validate_template` flags stock motion as `fx_untuned`, `effect_repeated`, `library_animation_sample`, `effect_off_theme` and `decor_overload`.
 
 Registered JSON effects can use trusted, operator-configured Remotion components on Node.js. Inspect the effect schema, preview selected frames, and patch props with a revision guard before composing. Remotion rendering requires operator opt-in; JSON cannot select executable source. Generated effects become video clips before the cross-platform FFmpeg engine runs.
 
@@ -88,6 +91,7 @@ For PR or MR evidence: collect a real walkthrough and review focus, author the t
 | `--remotion-browser` | `LECLAP_MCP_REMOTION_BROWSER` | Remotion-managed browser |
 | `--effect-catalog` | `LECLAP_MCP_EFFECT_CATALOG` | Builtin contracts |
 | `--effect-cache-max-bytes` | `LECLAP_MCP_EFFECT_CACHE_MAX_BYTES` | `536870912` bytes (512 MiB) |
+| `--catalog-gap-log` | `LECLAP_MCP_CATALOG_GAP_LOG` | `catalog-gaps.jsonl` under the output dir |
 
 The CLI supports repeatable `--video section=path` and `--field key=value`, plus `--assets`, `--build`, `--locale`, `--orientation` and `--output`. Codec, quality and concurrency overrides use the library API. `FVC_RENDER_CONCURRENCY` belongs to the monorepo dev script. Node detects system FFmpeg, then `ffmpeg-static`; it has no pure-Node WASM fallback. Probing requires a separate ffprobe binary on the static path.
 

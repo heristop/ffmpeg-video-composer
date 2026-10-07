@@ -19,6 +19,7 @@ Key features:
 - **Export panel** — after compile: download the MP4, copy a blob URL, or share via the Web Share API.
 - **Visual template editor** — author and preview templates in-browser (admin route `/admin`).
 - **First-run onboarding** — guided intro for new users.
+- **Browser agents (WebMCP)** — the template builder registers 23 tools with the agent built into the browser: reads, undoable edits, and consequential actions (replace, sample, preview, save) confirmed in the page. An **Agent** drawer in the titlebar holds the on/off switch, "Ask before every edit" and the activity log with Undo. See [docs/webmcp.md](../../docs/webmcp.md).
 
 ## Run
 
@@ -38,6 +39,31 @@ No backend is required — the compile runs entirely in a Web Worker via `@ffmpe
   `@ffmpeg/core` into `public/ffmpeg-core/<version>/` on dev/build, with the wasm gzipped to fit Cloudflare Pages'
   25 MiB file limit. The trim/crop pass and the engine both load it (`src/infrastructure/ffmpeg-core.ts`), and the
   service worker keeps it for offline use. Bumping it means bumping the engine's `FFMPEG_CORE_VERSION` too.
+
+## Browser agents (WebMCP)
+
+The builder registers its tools on `document.modelContext` only when the browser provides it (Chrome's
+origin trial, or `chrome://flags/#enable-webmcp-testing`). The tool layer is a lazy chunk loaded on idle,
+never with the entry (`tests/webmcp-bundle.test.ts` checks a production build).
+
+| Setting                | Effect                                                                                                                                                                                   |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `?webmcp=polyfill`     | Dev and e2e only: loads the WebMCP polyfill when the browser has no native API. Allowed in a dev build or one built with `VITE_WEBMCP_POLYFILL=1`; a production build never contains it. |
+| `VITE_WEBMCP_OT_TOKEN` | Build-time origin-trial token; every page gets the trial's `<meta http-equiv="origin-trial">` tag (`vite/webmcp-origin-trial.ts`). Unset, no tag is added.                               |
+| `VITE_WEBMCP=0`        | Removes the feature from the build.                                                                                                                                                      |
+| `Permissions-Policy`   | `public/_headers` sends `tools=(self)`, so only this origin's frames can register tools.                                                                                                 |
+
+### End-to-end tests
+
+The Playwright suite reuses a running dev server at `E2E_BASE_URL` (default `http://localhost:5174`), so
+start one there (`pnpm --filter @leclap/web dev --port 5174`) or point `E2E_BASE_URL` at yours. Set
+`E2E_CHROMIUM_PATH` to use a preinstalled Chromium when `playwright install` is not available. `e2e/webmcp-builder.spec.ts` drives the builder through `?webmcp=polyfill` and its
+`navigator.modelContextTesting` shim, without WASM by default:
+
+```bash
+pnpm --filter @leclap/web exec playwright test e2e/webmcp-builder.spec.ts
+E2E_WASM=1 pnpm --filter @leclap/web exec playwright test e2e/webmcp-builder.spec.ts   # adds render_preview / render_frames
+```
 
 ## Deploy — Cloudflare Pages (leclap.dev)
 

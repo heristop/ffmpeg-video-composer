@@ -1,0 +1,122 @@
+{
+  "pill": {
+    "label": "Agent",
+    "aria": "Browser agent: {{state}}",
+    "states": {
+      "off": "off",
+      "idle": "ready",
+      "working": "working"
+    }
+  },
+  "popover": {
+    "title": "Browser agent",
+    "intro": "An AI agent built into your browser can read this template, check it and make changes you can undo. It uses your browser's own agent: this page holds no API key.",
+    "polyfill": "Development mode: tools come from the WebMCP polyfill.",
+    "close": "Close"
+  },
+  "settings": {
+    "enabled": "Let browser agents use this builder",
+    "enabledHelp": "Turn off to remove every tool at once.",
+    "askBeforeEdit": "Ask before every edit",
+    "askBeforeEditHelp": "Each change the agent makes waits for your OK.",
+    "problem": "Some tools could not be registered: {{detail}}"
+  },
+  "log": {
+    "title": "Recent activity",
+    "emptyTitle": "No activity yet",
+    "empty": "Nothing yet. Ask your browser's agent to work on this template, and each step shows up here.",
+    "undo": "Undo",
+    "undoLabel": "Undo: {{action}}",
+    "note": "Agent's note: {{note}}",
+    "status": {
+      "ok": "Done",
+      "error": "Failed",
+      "declined": "Declined"
+    },
+    "changed_one": "{{count}} scene changed",
+    "changed_other": "{{count}} scenes changed"
+  },
+  "tools": {
+    "get_template": "Read the template",
+    "list_sections": "Listed the scenes",
+    "get_template_schema": "Read the template schema",
+    "get_motion_catalog": "Looked up motion presets",
+    "list_samples": "Browsed the samples",
+    "get_sample": "Read a sample",
+    "validate_template": "Checked the template",
+    "get_timeline": "Read the timeline",
+    "select_section": "Selected a scene",
+    "edit_template": "Edited the template",
+    "add_section": "Added a scene",
+    "remove_section": "Removed a scene",
+    "move_section": "Moved a scene",
+    "set_texts": "Changed on-screen text",
+    "undo": "Undid its last step",
+    "set_theme": "Changed the theme",
+    "set_format": "Changed the format",
+    "set_music": "Changed the music",
+    "replace_template": "Replaced the template",
+    "load_sample": "Opened a sample",
+    "render_preview": "Rendered a preview",
+    "render_frames": "Captured preview frames",
+    "save_template": "Saved the template"
+  },
+  "actions": {
+    "edit_template": "edit the template",
+    "add_section": "add a scene",
+    "remove_section": "remove a scene",
+    "move_section": "move a scene",
+    "set_texts": "change on-screen text",
+    "undo": "undo its last step",
+    "set_theme": "change the theme",
+    "set_format": "change the format",
+    "set_music": "change the music",
+    "replace_template": "replace this template",
+    "load_sample": "open a sample in place of this template",
+    "render_preview": "render a preview",
+    "render_frames": "capture frames from the preview",
+    "save_template": "save this template"
+  },
+  "errors": {
+    "invalid_input": "invalid request",
+    "too_large": "request too large",
+    "revision_conflict": "template changed meanwhile",
+    "invalid_template": "would break the template",
+    "builder_unsupported_section": "not supported by the builder",
+    "no_effect": "nothing the builder could keep",
+    "not_found": "not found",
+    "user_declined": "declined by you",
+    "needs_user_attention": "tab in the background",
+    "rate_limited": "too many requests",
+    "busy": "another step was running",
+    "disabled": "agent tools are off",
+    "aborted": "cancelled",
+    "unavailable": "unavailable",
+    "render_failed": "the render failed",
+    "save_blocked": "cannot be saved yet"
+  },
+  "confirm": {
+    "title": "Allow this browser agent action?",
+    "description": "Your browser's agent wants to {{action}}.",
+    "undoable": "You can undo it afterwards.",
+    "allow": "Allow",
+    "deny": "Don't allow",
+    "allowSession": "Allow previews for the rest of this session",
+    "details": {
+      "replace_template": "It opens as a new draft named “{{name}}” with {{sections}} scenes; Undo brings your current draft back.",
+      "load_sample": "The sample “{{title}}” opens as a new draft; Undo brings your current draft back.",
+      "render_preview": "It renders about {{duration}} s of video in your browser with placeholder media, roughly {{seconds}} s of work, and opens the preview here.",
+      "save_template": "It saves “{{name}}” to your template library on this device; the builder stays open."
+    }
+  },
+  "live": {
+    "changed_one": "Browser agent changed {{count}} scene",
+    "changed_other": "Browser agent changed {{count}} scenes",
+    "settings_one": "Browser agent changed the template settings",
+    "settings_other": "Browser agent changed the template settings",
+    "declined_one": "You declined a browser agent action",
+    "declined_other": "You declined {{count}} browser agent actions",
+    "failed_one": "A browser agent action failed",
+    "failed_other": "{{count}} browser agent actions failed"
+  }
+}

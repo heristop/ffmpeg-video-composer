@@ -116,7 +116,6 @@ export const StyleAudioStep = ({ state, t, onPatch }: StyleAudioStepProps) => {
       <Text style={[styles.label, { marginTop: spacing.l }]}>{t('style.wholeVideoAnimations')}</Text>
       <Text style={styles.help}>{t('style.wholeVideoAnimationsHelp')}</Text>
       <AnimationFieldsList
-        orientation={state.orientation}
         value={state.globalAnimations}
         onChange={(globalAnimations) => {
           onPatch({ globalAnimations: globalAnimations ?? [] });

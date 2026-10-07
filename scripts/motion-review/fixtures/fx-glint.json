@@ -1,0 +1,10 @@
+{
+  "label": "Glint (scatter)",
+  "kind": "fx",
+  "window": { "at": 0.3, "duration": 0.9 },
+  "section": {
+    "graphics": [
+      { "type": "fx", "effect": "glint", "target": "{{target}}", "at": "{{at}}", "duration": "{{duration}}" }
+    ]
+  }
+}

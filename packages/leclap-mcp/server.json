@@ -76,6 +76,13 @@
           "format": "filepath",
           "isRequired": false,
           "isSecret": false
+        },
+        {
+          "name": "LECLAP_MCP_CATALOG_GAP_LOG",
+          "description": "JSONL log report_catalog_gap appends to, relative to and always under the output dir. Defaults to catalog-gaps.jsonl.",
+          "format": "filepath",
+          "isRequired": false,
+          "isSecret": false
         }
       ]
     }
@@ -101,6 +108,18 @@
             "description": "Return the authoritative template descriptor JSON Schema plus the authoring guide."
           },
           {
+            "name": "get_motion_catalog",
+            "description": "Return the motion catalog: kinetic presets, camera moves, graphics, designed transitions, easing grammar, motion tokens, themes, delivery platforms and art-direction rules, or ranked matches for a query."
+          },
+          {
+            "name": "report_catalog_gap",
+            "description": "Record a motion need the catalog could not answer to a JSONL log under the output dir."
+          },
+          {
+            "name": "get_timeline",
+            "description": "Return the template timeline on video seconds: sections, motion events, beats and cues, without rendering."
+          },
+          {
             "name": "validate_template",
             "description": "Validate a template without rendering and report the clips and fields compose_video will require."
           },
@@ -109,8 +128,24 @@
             "description": "Render a template to an MP4 with FFmpeg and return the output path."
           },
           {
+            "name": "render_frames",
+            "description": "Render a native template and return still frames as PNG images: chosen moments, cuts, contact sheets, safe zones, comparisons."
+          },
+          {
             "name": "probe_media",
             "description": "Inspect a local media file and report stream codecs, duration, audio sample rate and size."
+          },
+          {
+            "name": "extract_style",
+            "description": "Derive a global.theme and a style guide from a reference image or clip: palette roles with WCAG contrast, texture, pacing and motion energy."
+          },
+          {
+            "name": "analyze_music",
+            "description": "Measure a local music file: tempo, beat grid, confidence and drop/build/end cues for global.beats."
+          },
+          {
+            "name": "get_capabilities",
+            "description": "Report what the local FFmpeg really renders (drawtext, LUTs, transitions, loudness, encoders), each with a fix."
           },
           {
             "name": "render_remotion_clip",
@@ -127,10 +162,14 @@
           {
             "name": "patch_template",
             "description": "Apply effect-prop edits to inline template JSON atomically using an expected revision, returning the updated template."
+          },
+          {
+            "name": "edit_template",
+            "description": "Apply a JSON Patch (RFC 6902) to inline template JSON atomically using an expected revision; the result must validate."
           }
         ],
         "prompts": ["compose-video"],
-        "notes": "Eight tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, patching and rendering; callers cannot select executable source through effect JSON. patch_template remains registered when Remotion is disabled."
+        "notes": "Sixteen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, patching and rendering; callers cannot select executable source through effect JSON. patch_template remains registered when Remotion is disabled."
       }
     }
   }

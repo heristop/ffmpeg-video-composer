@@ -41,8 +41,15 @@ export const mcpDoc: McpDoc = {
   id: 'mcp',
   title: 'MCP for agents',
   intro:
-    'The LeClap MCP server exposes this same descriptor engine to local AI agents. The agent authors a JSON descriptor from the schema, the server validates it, and compose_video renders a deterministic MP4 through the FFmpeg pipeline. The packaged catalog includes 32 samples with creative direction and input requirements. Registered JSON effects use a configured trusted Node/Remotion backend; render_remotion_clip also accepts your own Remotion composition.',
-  flow: ['list_samples', 'get_sample', 'get_template_schema', 'validate_template', 'compose_video'],
+    'The LeClap MCP server exposes this same descriptor engine to local AI agents. The agent authors a JSON descriptor from the schema, the server validates it, and compose_video renders a deterministic MP4 through the FFmpeg pipeline. The packaged catalog includes 47 samples with creative direction and input requirements. Registered JSON effects use a configured trusted Node/Remotion backend; render_remotion_clip also accepts your own Remotion composition.',
+  flow: [
+    'list_samples',
+    'get_sample',
+    'get_template_schema',
+    'get_motion_catalog',
+    'validate_template',
+    'compose_video',
+  ],
   agenticReview: {
     intro:
       'For a pull or merge request, the development agent can turn a real walkthrough into a short evidence video before handing the change to a reviewer.',
@@ -76,6 +83,26 @@ export const mcpDoc: McpDoc = {
       when: 'Use before authoring or modifying descriptor JSON.',
     },
     {
+      name: 'get_motion_catalog',
+      args: 'query?, kind?',
+      purpose:
+        'Returns the motion catalog: kinetic presets, camera moves, graphics, designed transitions, the easing and time-reference grammar, motion tokens, themes, delivery platforms, genre doctrine and validated scene blueprints. With a query, returns ranked matches instead (optionally one kind).',
+      when: 'Use before authoring animated copy, camera moves, graphics or designed transitions. An empty search carries a gap: report it with report_catalog_gap.',
+    },
+    {
+      name: 'report_catalog_gap',
+      args: 'query, wanted',
+      purpose: 'Appends what the catalog could not answer to a JSONL log under the output dir.',
+      when: 'Use when get_motion_catalog returns a gap for a need.',
+    },
+    {
+      name: 'get_timeline',
+      args: 'template, format?',
+      purpose:
+        'Returns the timeline on whole-video seconds, render-free: sections with absolute start/end, every motion event, the beat grid and cues.',
+      when: 'Use to pick render_frames moments and to align hits with beats.',
+    },
+    {
       name: 'validate_template',
       args: 'template, render?',
       purpose:
@@ -104,6 +131,13 @@ export const mcpDoc: McpDoc = {
       when: 'Use expanded section names. Registry partial edits materialize only the selected instance; rendering/backend validation still requires opt-in.',
     },
     {
+      name: 'edit_template',
+      args: 'template, expectedRevision, operations',
+      purpose:
+        'Applies a JSON Patch (RFC 6902) atomically; the result must validate. Returns updated JSON, revision and changedPaths.',
+      when: "Use for any descriptor change with the revision validate_template returned. The builder's browser tools (WebMCP) expose the same name and contract.",
+    },
+    {
       name: 'compose_video',
       args: 'template, fields?, userVideoPaths?, locale?, outputBaseName?, expectedRevision?',
       purpose:
@@ -111,10 +145,38 @@ export const mcpDoc: McpDoc = {
       when: 'Use after validation succeeds and every project_video section has a clip in userVideoPaths.',
     },
     {
+      name: 'render_frames',
+      args: 'template, at?, atTransitions?, perSection?, sheet?, safe?, zoom?, variants?, looks?, fields?, userVideoPaths?, locale?, format?',
+      purpose:
+        'Renders a native template (through the section cache) and returns still frames as PNG image content plus their paths: chosen moments, both sides of every cut, each settled section; contact sheets, platform safe-zone shading, crops, variant and LOOK comparison grids.',
+      when: 'Use after validate_template to look at the result and check safe zones before the final compose_video.',
+    },
+    {
       name: 'probe_media',
       args: 'path',
       purpose: 'Inspects a local media file and reports codecs, duration, sample rate, and size.',
       when: 'Use to check a user-supplied clip before composing. The path must resolve inside the media dir.',
+    },
+    {
+      name: 'extract_style',
+      args: 'path, seed?',
+      purpose:
+        'Derives a global.theme object and a style guide from a reference image or clip: palette roles with area shares and WCAG contrast, grain texture, and for clips the average shot length, cuts per minute, motion energy and a suggested genre.',
+      when: 'Use to match a reference look. Palette and pacing only: subjects, logos and text are never copied. The path must resolve inside the media dir.',
+    },
+    {
+      name: 'analyze_music',
+      args: 'path, beatsPerBar?, includeTimes?',
+      purpose:
+        'Measures a music file: BPM, beat 1 offset, beats per bar, confidence, usable, and build/drop/end cues, plus globalBeats to paste into global.beats.',
+      when: 'Use before timing cuts and hits to the music ("beat:n", "bar:n", "cue:drop"). When usable is false (calm or ambient music), pace by phrases instead.',
+    },
+    {
+      name: 'get_capabilities',
+      args: 'no arguments',
+      purpose:
+        'Reports what the local FFmpeg really renders — drawtext with a bundled font, text shaping, libass, zscale/tonemap, lut3d, xfade, gblur, alphamerge, loudnorm, ebur128, libx264 — each usable yes/no/unknown with a fix, plus fonts and encoders. Same JSON as leclap diagnose --json.',
+      when: 'Use when a render fails on a filter or before relying on text, LUT looks or designed transitions on an unknown machine; validate_template flags the same gaps as featureWarnings.',
     },
     {
       name: 'render_remotion_clip',
@@ -193,6 +255,14 @@ export const mcpDoc: McpDoc = {
       fallback: '536870912 (512 MiB)',
       detail:
         'Artifact cache under <media-dir>/.leclap-effects/cache-v1, with at most 256 entries. Zero disables lookup/publication; invalid values use the default.',
+    },
+    {
+      label: 'Catalog gap log',
+      flag: '--catalog-gap-log',
+      env: 'LECLAP_MCP_CATALOG_GAP_LOG',
+      fallback: 'catalog-gaps.jsonl',
+      detail:
+        'JSONL file report_catalog_gap appends to, relative to the output dir. Paths that resolve outside the output dir are refused.',
     },
   ],
   // Mirrors the one-click editor deep-links in docMarkdown.ts, which install via npx. Env values are

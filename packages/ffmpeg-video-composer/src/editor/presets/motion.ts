@@ -1,5 +1,7 @@
 import type { Filter } from '@/core/types';
 import type { MotionEffect } from '../../schemas/template.schemas';
+import { fmt } from '@/core/motion/hermite';
+import { exactZoomFilterObjects, ZOOM_TIME, type ZoomMove } from '@/core/motion/zoom-exact';
 
 // motionToFilters — split out of looks.ts to keep that file under the max-lines budget; re-exported
 // from looks.ts so importers (registry.ts, tests) keep a single `@/editor/presets/looks` entry point.
@@ -14,10 +16,11 @@ export type MotionContext = {
   scale: string;
   fps: number;
   /**
-   * True for real footage (project_video/video). zoompan must then advance one output frame per
-   * input frame (`d=1`) so it never time-stretches the clip; stills (undefined/false) synthesize
-   * `frames` output frames from the single input frame (`d=frames`). `duration` should be the
-   * clip's real (probed) length for video so the zoom/pan curve completes across the footage.
+   * True for real footage (project_video/video): the zoom is then preceded by an fps conform so it
+   * runs one output frame per input frame without retiming the clip. Every section stream (looped
+   * still, colour source, footage) carries one frame per output frame, so the zoom always maps frames
+   * 1:1. `duration` should be the clip's real (probed) length for video so the zoom/pan curve
+   * completes across the footage.
    */
   isVideo?: boolean;
 };
@@ -41,92 +44,41 @@ type FlipEffect = Extract<MotionEffect, { type: 'flip' }>;
 type ShakeEffect = Extract<MotionEffect, { type: 'shake' }>;
 type PulseEffect = Extract<MotionEffect, { type: 'pulse' }>;
 
-type KenBurnsExpressions = {
-  z: string;
-  x: string;
-  y: string;
-};
+/** The exact zoom filters, after an fps conform for real footage (one frame per frame). */
+function exactZoom(move: ZoomMove, ctx: MotionContext): Filter[] {
+  const { w, h } = parseScale(ctx.scale);
+  const filters = exactZoomFilterObjects(move, { width: w, height: h, fps: ctx.fps });
+
+  // Conform real footage to the target fps first, so the zoom runs on the output frame clock without
+  // retiming the clip (a 25 fps source would otherwise play its frames 1:1 at 30 fps, ~20% fast).
+  return ctx.isVideo ? [{ type: 'fps', value: `${ctx.fps}` }, ...filters] : filters;
+}
 
 /**
- * Builds Ken Burns zoompan filters.
- * Convention: "left" means the camera pans left-to-right across the image
- * (i.e., x offset increases over time), so the viewer sees the image drift left.
- * "right" is the reverse. "up" increases y offset so the viewer sees the image
- * drift upward. "down" is the reverse.
- *
- * Two filters are emitted per kenburns effect:
- * (a) a pre-upscale to 2*W:-2 to reduce zoompan jitter
- * (b) the zoompan filter
+ * Ken Burns: a linear zoom or pan over the clip (`duration`, the real probed length for footage), lowered
+ * to the exact sub-pixel zoom (core/motion/zoom-exact.ts) so slow moves never step by whole pixels.
+ * Convention: "left" means the camera pans left-to-right across the image (the view moves right), so the
+ * viewer sees the image drift left; "right" is the reverse; "up" moves the view down (the image drifts
+ * up); "down" is the reverse. Pans hold the zoom at `intensity` and travel the whole overscan.
  */
 function kenburnsToFilters(effect: KenBurnsEffect, ctx: MotionContext): Filter[] {
   const { w, h } = parseScale(ctx.scale);
-  const frames = Math.round(ctx.duration * ctx.fps);
   const intensity = effect.intensity ?? 1.15;
-  const direction = effect.direction ?? 'in';
-  const sizeStr = `${w}x${h}`;
-
-  // Pre-upscale to reduce zoompan jitter while bounding memory usage
-  const preUpscale: Filter = { type: 'scale', value: `${w * 2}:-2` };
-
-  const step = parseFloat(((intensity - 1) / frames).toFixed(6));
-  // Stills synthesize `frames` output frames from one input frame; video must advance one output
-  // per input frame (d=1) or zoompan slow-motions the clip. `frames` still scales the zoom/pan
-  // curve (step, on/frames) across the clip's real length in both cases.
-  const d = ctx.isVideo ? 1 : frames;
-  const baseZoompanSuffix = `:d=${d}:s=${sizeStr}:fps=${ctx.fps}`;
-  const centerX = `iw/2-(iw/zoom/2)`;
-  const centerY = `ih/2-(ih/zoom/2)`;
-
-  const DIRECTION_EXPRS: Record<string, KenBurnsExpressions> = {
-    in: {
-      z: `min(zoom+${step},${intensity})`,
-      x: centerX,
-      y: centerY,
-    },
-    out: {
-      z: `if(eq(on,1),${intensity},max(zoom-${step},1.0))`,
-      x: centerX,
-      y: centerY,
-    },
-    left: {
-      z: `${intensity}`,
-      x: `(iw-iw/zoom)*(on/${frames})`,
-      y: centerY,
-    },
-    right: {
-      z: `${intensity}`,
-      x: `(iw-iw/zoom)*(1-on/${frames})`,
-      y: centerY,
-    },
-    up: {
-      z: `${intensity}`,
-      x: centerX,
-      // y increases: viewer sees image drift upward
-      y: `(ih-ih/zoom)*(on/${frames})`,
-    },
-    down: {
-      z: `${intensity}`,
-      x: centerX,
-      // y decreases: viewer sees image drift downward
-      y: `(ih-ih/zoom)*(1-on/${frames})`,
-    },
+  const span = Math.max(1, Math.round(ctx.duration * ctx.fps)) / ctx.fps;
+  const p = `min(${ZOOM_TIME}/${fmt(span)},1)`;
+  const reachX = fmt((w * (intensity - 1)) / 2);
+  const reachY = fmt((h * (intensity - 1)) / 2);
+  const grow = fmt(intensity - 1);
+  const moves: Record<string, ZoomMove> = {
+    in: { zoom: `1+${grow}*${p}` },
+    out: { zoom: `${fmt(intensity)}-${grow}*${p}` },
+    left: { zoom: fmt(intensity), panX: `${reachX}*(2*${p}-1)` },
+    right: { zoom: fmt(intensity), panX: `${reachX}*(1-2*${p})` },
+    up: { zoom: fmt(intensity), panY: `${reachY}*(2*${p}-1)` },
+    down: { zoom: fmt(intensity), panY: `${reachY}*(1-2*${p})` },
   };
 
-  const exprs = DIRECTION_EXPRS[direction] ?? DIRECTION_EXPRS.in;
-
-  const zp: Filter = {
-    type: 'zoompan',
-    value: `z='${exprs.z}':x='${exprs.x}':y='${exprs.y}'${baseZoompanSuffix}`,
-  };
-
-  if (ctx.isVideo) {
-    // Conform to the target fps BEFORE zoompan so d=1 maps frames 1:1 without retiming the clip:
-    // a 25fps source fed straight into a 30fps d=1 zoompan replays its frames 1:1 at 30fps and runs
-    // ~20% fast (9.1s → 7.6s). The fps filter resamples to CFR 30 first, preserving real time.
-    return [{ type: 'fps', value: `${ctx.fps}` }, preUpscale, zp];
-  }
-
-  return [preUpscale, zp];
+  return exactZoom(moves[effect.direction ?? 'in'] ?? moves.in, ctx);
 }
 
 function rotateToFilters(effect: RotateEffect): Filter[] {
@@ -171,37 +123,15 @@ function shakeToFilters(effect: ShakeEffect, ctx: MotionContext): Filter[] {
 }
 
 /**
- * Rhythmic zoom pulse: a zoompan whose zoom factor oscillates around 1 at `frequency` Hz, centred on
- * the frame (reusing kenburnsToFilters's centre expressions). Mirrors kenburnsToFilters's
- * pre-upscale-then-zoompan shape and its isVideo handling (fps-conform + d=1 for real footage so the
- * clip isn't time-stretched; d=frames for stills). Unlike shake, zoompan's own `s=` output-size param
- * already restores `ctx.scale`, so no separate trailing scale filter is needed here.
+ * Rhythmic zoom pulse: the zoom factor oscillates between 1 and `intensity` at `frequency` Hz, centred on
+ * the frame, through the same exact sub-pixel zoom as Ken Burns (fps conform first for real footage).
  */
 function pulseToFilters(effect: PulseEffect, ctx: MotionContext): Filter[] {
-  const { w, h } = parseScale(ctx.scale);
-  const frames = Math.round(ctx.duration * ctx.fps);
   const intensity = effect.intensity ?? 1.08;
   const frequency = effect.frequency ?? 1;
-  const sizeStr = `${w}x${h}`;
-
-  const preUpscale: Filter = { type: 'scale', value: `${w * 2}:-2` };
-  const d = ctx.isVideo ? 1 : frames;
   const amplitude = (intensity - 1).toFixed(3);
-  const z = `1+${amplitude}*0.5*(1+sin(2*PI*${frequency}*on/${ctx.fps}))`;
-  const centerX = `iw/2-(iw/zoom/2)`;
-  const centerY = `ih/2-(ih/zoom/2)`;
 
-  const zp: Filter = {
-    type: 'zoompan',
-    value: `z='${z}':x='${centerX}':y='${centerY}':d=${d}:s=${sizeStr}:fps=${ctx.fps}`,
-  };
-
-  if (ctx.isVideo) {
-    // See kenburnsToFilters: conform fps BEFORE zoompan so d=1 maps frames 1:1 without retiming the clip.
-    return [{ type: 'fps', value: `${ctx.fps}` }, preUpscale, zp];
-  }
-
-  return [preUpscale, zp];
+  return exactZoom({ zoom: `1+${amplitude}*0.5*(1+sin(2*PI*${frequency}*${ZOOM_TIME}))` }, ctx);
 }
 
 const MOTION_HANDLERS: Record<string, (effect: MotionEffect, ctx: MotionContext) => Filter[]> = {

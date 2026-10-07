@@ -1,0 +1,442 @@
+{
+  "meta": {
+    "name": "Gallery: designed transitions",
+    "description": "Thirteen alternating A/B sections joined by every designed transition (push, swipe, zoom-through, iris, whip), for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 3,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "s00",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#FF8AAE",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "A"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s01",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#7C83FD",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "B"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "push-right",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s02",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#FF8AAE",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "A"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "push-up",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s03",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#7C83FD",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "B"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "push-down",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s04",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#FF8AAE",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "A"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s05",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#7C83FD",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "B"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "swipe-right",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s06",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#FF8AAE",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "A"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s07",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#7C83FD",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "B"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "iris",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s08",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#FF8AAE",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "A"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s09",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#7C83FD",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "B"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "whip-right",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s10",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#FF8AAE",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "A"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "whip-up",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s11",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#7C83FD",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "B"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ],
+      "transition": {
+        "type": "whip-down",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "s12",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#FF8AAE",
+        "duration": 1.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "A"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 300,
+          "color": "#141416"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 40,
+          "thickness": 10,
+          "color": "#141416"
+        }
+      ]
+    }
+  ]
+}

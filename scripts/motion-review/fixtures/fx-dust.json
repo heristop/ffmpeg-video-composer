@@ -1,0 +1,8 @@
+{
+  "label": "Dust motes (fx, ambient)",
+  "kind": "fx",
+  "window": { "at": 0.2, "duration": 5 },
+  "section": {
+    "graphics": [{ "type": "fx", "effect": "dust", "target": "frame", "at": "{{at}}", "duration": "{{duration}}" }]
+  }
+}

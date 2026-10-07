@@ -6,7 +6,8 @@ import { View, Text, TextInput, TouchableOpacity, Switch, ScrollView, Image, Sty
 import type { TFunction } from 'i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography } from '@/src/styles/theme';
-import { ANIMATION_LIBRARY, BACKGROUND_LIBRARY, backgroundAsset } from '@/src/data/mediaCatalog';
+import { SAMPLE_LIBRARY, BACKGROUND_LIBRARY, backgroundAsset } from '@/src/data/mediaCatalog';
+import { EngineEffectsField } from './EngineEffectsField';
 import { OVERLAY_FITS } from 'ffmpeg-video-composer/src/schemas/effects.schemas.ts';
 import { MediaPicker } from './MediaPicker';
 import { PartialFields } from './PartialFields';
@@ -14,7 +15,6 @@ import { SpeedField } from './speed-field';
 import { Slider, Segmented } from './EditorControls';
 import {
   makeTemplateId,
-  ANIMATION_EFFECT_PRESETS,
   animationDefaultsForUrl,
   hasFlipAxis,
   toggleFlipAxis,
@@ -151,7 +151,6 @@ export const SceneBasics = ({
           </FieldRow>
         ) : null}
         <OverlaysField
-          orientation={orientation}
           animations={section.animations}
           images={section.images}
           onChangeAnimations={(animations) => {
@@ -159,6 +158,15 @@ export const SceneBasics = ({
           }}
           onChangeImages={(images) => {
             onChange({ images });
+          }}
+          t={t}
+        />
+        <EngineEffectsField
+          section={section}
+          orientation={orientation}
+          salt={index}
+          onChange={(graphics) => {
+            onChange({ graphics });
           }}
           t={t}
         />
@@ -200,10 +208,18 @@ export const SceneBasics = ({
           }}
         />
         <AnimationFieldsList
-          orientation={orientation}
           value={section.animations}
           onChange={(animations) => {
             onChange({ animations });
+          }}
+          t={t}
+        />
+        <EngineEffectsField
+          section={section}
+          orientation={orientation}
+          salt={index}
+          onChange={(graphics) => {
+            onChange({ graphics });
           }}
           t={t}
         />
@@ -422,14 +438,12 @@ const formatPair = (a: string, b: string): string | undefined =>
 type OverlayKind = 'animation' | 'image';
 
 export const OverlaysField = ({
-  orientation,
   animations,
   images,
   onChangeAnimations,
   onChangeImages,
   t,
 }: {
-  orientation: Orientation;
   animations: AnimationOverlay[] | undefined;
   images: ImageOverlay[] | undefined;
   onChangeAnimations: (animations: AnimationOverlay[] | undefined) => void;
@@ -444,13 +458,13 @@ export const OverlaysField = ({
         label={t('overlays.kind')}
         value={kind}
         options={[
-          { value: 'animation', label: t('overlays.animation'), icon: 'sparkles-outline' },
+          { value: 'animation', label: t('overlays.animation'), icon: 'film-outline' },
           { value: 'image', label: t('overlays.image'), icon: 'image-outline' },
         ]}
         onChange={setKind}
       />
       {kind === 'animation' ? (
-        <AnimationFieldsList orientation={orientation} value={animations} onChange={onChangeAnimations} t={t} />
+        <AnimationFieldsList value={animations} onChange={onChangeAnimations} t={t} />
       ) : (
         <ImageFieldsList value={images} onChange={onChangeImages} t={t} />
       )}
@@ -462,12 +476,10 @@ export const OverlaysField = ({
 // remove control, plus a trailing picker to append more. Mirrors the web AnimationOverlayField; writes
 // section.animations.
 export const AnimationFieldsList = ({
-  orientation,
   value,
   onChange,
   t,
 }: {
-  orientation: Orientation;
   value: AnimationOverlay[] | undefined;
   onChange: (animations: AnimationOverlay[] | undefined) => void;
   t: TFunction<'editor'>;
@@ -490,27 +502,6 @@ export const AnimationFieldsList = ({
 
   return (
     <View>
-      <Text style={[styles.fieldLabel, { marginTop: spacing.m }]}>{t('animation.effects.label')}</Text>
-      {ANIMATION_EFFECT_PRESETS.map((preset) => (
-        <TouchableOpacity
-          key={preset.id}
-          accessibilityRole="button"
-          accessibilityLabel={t(preset.nameKey)}
-          testID={`animation-effect-${preset.id}`}
-          style={styles.effectPreset}
-          onPress={() => {
-            const added = preset.build(orientation).map((animation) => ({ ...animation, id: makeTemplateId() }));
-            onChange([...animations, ...added]);
-          }}
-        >
-          <View style={styles.effectPresetHeading}>
-            <Ionicons name="sparkles-outline" size={16} color={colors.primary} />
-            <Text style={styles.effectPresetTitle}>{t(preset.nameKey)}</Text>
-            <Ionicons name="add" size={18} color={colors.primary} />
-          </View>
-          <Text style={styles.effectPresetDescription}>{t(preset.descriptionKey)}</Text>
-        </TouchableOpacity>
-      ))}
       {animations.map((animation, index) => (
         <View key={animation.id ?? `animation-${index}`} style={styles.animLayer}>
           <View style={styles.animLayerHead}>
@@ -721,15 +712,15 @@ export const AnimationFields = ({
           }}
           icon="ban-outline"
         />
-        {ANIMATION_LIBRARY.map((animation) => (
+        {SAMPLE_LIBRARY.map((animation) => (
           <AnimCard
             key={animation.id}
-            label={animation.label}
+            label={t(animation.labelKey)}
             active={value?.url === animation.url}
             onPress={() => {
               onChange({ ...animationDefaultsForUrl(animation.url), url: animation.url, label: animation.label });
             }}
-            source={animation.module}
+            source={animation.poster ?? animation.module}
           />
         ))}
       </ScrollView>

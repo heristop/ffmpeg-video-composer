@@ -1,0 +1,255 @@
+{
+  "meta": {
+    "name": "Motion FX pack",
+    "description": "Motion effects pack: kinetic echo trails, whip transitions, glitch and focus hits, data and broadcast graphics (progress, ticker, bar chart) and lower-third styles. Asset-free.",
+    "creativeDirection": "Audience: creators who want broadcast and social polish from JSON alone. Direction: a glitched hook whose punch word smears in, a rack-focus title, a data beat where bars grow and count up under a progress bar, a ticker beat, and a close that shows the lower-third styles. Whips carry the energy between beats. Review: the glitch never lasts longer than a beat, echoes vanish once the word lands, every number is readable once it settles, the ticker loops cleanly, and lower thirds stay inside the title-safe area."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 11,
+    "motion": {
+      "energy": 1
+    }
+  },
+  "sections": [
+    {
+      "name": "hook",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 1.8
+      },
+      "camera": {
+        "hits": [0.35]
+      },
+      "graphics": [
+        {
+          "type": "glitch",
+          "at": 0.3,
+          "duration": 0.3,
+          "intensity": 0.7
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "GLITCH."
+          },
+          "preset": "impact",
+          "size": 220,
+          "delay": 0.15,
+          "trail": {
+            "echoes": 3,
+            "delta": 0.04,
+            "fade": 0.5
+          }
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Signal lost"
+        },
+        "subtitle": {
+          "en": "graphics[].glitch"
+        },
+        "style": "side-rule",
+        "accent": "#FF8AAE",
+        "effect": {
+          "shadow": true
+        },
+        "reveal": {
+          "type": "slide-right",
+          "delay": 0.7
+        }
+      },
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "focus",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.7
+      },
+      "graphics": [
+        {
+          "type": "corners",
+          "at": 0.2,
+          "color": "#FF8AAE"
+        },
+        {
+          "type": "focus",
+          "at": 0.1,
+          "duration": 0.9,
+          "amount": 20,
+          "direction": "in"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "PULL FOCUS"
+          },
+          "preset": "tracking-in",
+          "size": 140,
+          "delay": 0.25
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Rack focus"
+        },
+        "subtitle": {
+          "en": "graphics[].focus"
+        },
+        "style": "clean-bar",
+        "accent": "#FF8AAE",
+        "reveal": {
+          "type": "slide-right",
+          "delay": 0.9
+        }
+      },
+      "transition": {
+        "type": "whip-up",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "data",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 5.4
+      },
+      "graphics": [
+        {
+          "type": "bars-chart",
+          "at": 0.3,
+          "values": [12, 28, 19, 42],
+          "labels": ["Q1", "Q2", "Q3", "Q4"],
+          "x": 300,
+          "y": 140,
+          "width": 680,
+          "height": 360,
+          "suffix": "K",
+          "ease": "$snappy"
+        },
+        {
+          "type": "progress",
+          "at": 0.2,
+          "duration": 5,
+          "thickness": 10,
+          "track": "#FFFFFF@0.15"
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Revenue"
+        },
+        "subtitle": {
+          "en": "BY QUARTER"
+        },
+        "style": "kicker",
+        "position": "top",
+        "reveal": {
+          "type": "rise",
+          "delay": 0.15
+        }
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "ticker",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 2.6
+      },
+      "graphics": [
+        {
+          "type": "ticker",
+          "at": 0.2,
+          "text": {
+            "en": "BREAKING  ·  JSON IN, VIDEO OUT  ·  SAME FRAMES ON EVERY SCREEN  ·"
+          },
+          "speed": 220,
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Live from JSON"
+          },
+          "preset": "slide",
+          "size": 110,
+          "y": 220,
+          "delay": 0.3,
+          "trail": {
+            "echoes": 4,
+            "delta": 0.03
+          }
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Ada Lovelace"
+        },
+        "subtitle": {
+          "en": "@ada"
+        },
+        "style": "stack-bars",
+        "position": "top",
+        "reveal": {
+          "type": "slide-right",
+          "delay": 0.8
+        }
+      },
+      "transition": {
+        "type": "whip-right",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "close",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "Pick a style."
+          },
+          "preset": "rise",
+          "size": 96,
+          "y": 200,
+          "delay": 0.2
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "LeClap"
+        },
+        "subtitle": {
+          "en": "Motion FX pack"
+        },
+        "style": "pill",
+        "reveal": {
+          "type": "fade",
+          "delay": 0.6
+        }
+      }
+    }
+  ]
+}

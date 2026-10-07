@@ -103,3 +103,13 @@ describe('CompileError', () => {
     );
   });
 });
+
+describe('a stale build', () => {
+  it('reads a missing lazily loaded chunk as an app update, not an engine error', () => {
+    const error = new Error(
+      'Browser video compilation failed: Failed to fetch dynamically imported module: https://leclap.dev/assets/browser-compile-x.js'
+    );
+
+    expect(classifyCompileFailure(error)).toEqual({ kind: 'appUpdated', detail: '' });
+  });
+});

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Build FFmpeg + fftools statically for the HOST (macOS) so the engine crate can link and run on the
 # desktop — used for `cargo test` (real run/probe execution + re-entrancy) and uniffi binding
-# generation. Mirrors build-android.sh minus the NDK cross-compile + mediacodec. Host libfreetype is
-# resolved from the system pkg-config. Output: scripts/ffmpeg/dist/host/{lib,include}.
+# generation. Mirrors build-android.sh minus the NDK cross-compile + mediacodec. Host libfreetype,
+# libharfbuzz and libfribidi are resolved from the system pkg-config (`brew install freetype harfbuzz
+# fribidi`). Output: scripts/ffmpeg/dist/host/{lib,include}.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091

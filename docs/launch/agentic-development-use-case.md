@@ -80,3 +80,57 @@ LeClap renders the local artifact. It does not upload to GitHub or GitLab; keep 
 - Link the canonical landing page and runnable example.
 - Confirm the example still validates before publication.
 - Review the final copy manually; never auto-publish.
+
+## Campaign angle — the feature ships its own proof
+
+Status: review draft. Hold publication until the supporting feature branch and its PR media are public.
+
+Verified proof on `feat/motion-effects`:
+
+- a browser agent operates the real LeClap builder through its browser tools;
+- the interaction is captured as real screen recordings;
+- a LeClap JSON template composes those recordings into a PR reel;
+- the branch keeps the rendered MP4, selected stills, template, and regeneration scripts together;
+- validation, render QC, and review snapshots happen before the artifact is attached by the surrounding workflow.
+
+### LinkedIn
+
+Most feature PRs explain what changed. This one shows what happened.
+
+While building browser-agent controls for LeClap, the workflow recorded the agent operating the real builder: editing a template, undoing a change, requesting confirmation, rendering a preview, and turning agent access off.
+
+LeClap then composed those recordings into the review reel for the same change.
+
+The branch carries the template, the finished video, selected stills, and the scripts that regenerate them. A reviewer can watch the behavior first, then inspect the implementation with the right context.
+
+That is the agentic-development use case in practice: implementation evidence becomes a structured, reproducible review artifact. LeClap renders it locally; the surrounding workflow keeps publication explicit.
+
+Don't just describe the change. Show it.
+
+### X thread
+
+**1/5** A coding agent should not hand a reviewer only a diff and a summary. When the change is visual, it should ship the visible proof too.
+
+**2/5** For a LeClap feature branch, a browser agent was recorded operating the real builder: editing, undoing, requesting confirmation, rendering a preview, and switching agent access off.
+
+**3/5** Those real captures became the inputs to a LeClap JSON template. LeClap composed them into the PR reel; it did not invent the footage.
+
+**4/5** The branch keeps the template, rendered MP4, selected stills, and regeneration scripts together. The review artifact is part of the change, not an unrelated demo assembled later.
+
+**5/5** LeClap renders locally and leaves attachment or publication to the surrounding workflow. The result: show the behavior, then review the code.
+
+### GitHub / GitLab announcement
+
+#### Reproducible video evidence for an agent-driven UI change
+
+This feature branch includes its own review media. A browser agent operates the real LeClap builder while the workflow records the interaction. A LeClap JSON template then turns those recordings into a structured PR reel.
+
+The branch keeps the review inputs and outputs together:
+
+- real interaction captures;
+- the LeClap reel template;
+- the rendered MP4 and selected stills;
+- scripts to regenerate the media;
+- validation, render QC, and review-snapshot steps.
+
+This makes the video evidence inspectable and repeatable alongside the implementation. LeClap creates the local artifact; uploading or attaching it remains an explicit action in the GitHub or GitLab workflow.

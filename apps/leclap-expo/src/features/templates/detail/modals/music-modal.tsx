@@ -1,10 +1,10 @@
-import { Modal, ScrollView, View, Text } from 'react-native';
+import { Image, Modal, ScrollView, View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import type { Section } from '@/src/types';
 import { colors } from '@/src/styles/theme';
-import { MUSIC_LIBRARY, findMusic } from '@/src/data/mediaCatalog';
+import { MUSIC_LIBRARY, findMusic, musicCover } from '@/src/data/mediaCatalog';
 import { PressableScale } from '@/src/components/kinetic/pressable-scale';
 import { styles } from '@/src/features/templates/detail/detail.styles';
 
@@ -23,6 +23,7 @@ function MusicSectionPicker({ allowed, selectedId, onSelect }: MusicSectionPicke
       {ids.map((id) => {
         const track = findMusic(id);
         const selected = selectedId === id;
+        const cover = musicCover(id);
 
         return (
           <PressableScale
@@ -35,7 +36,11 @@ function MusicSectionPicker({ allowed, selectedId, onSelect }: MusicSectionPicke
             }}
             style={[styles.musicRow, selected && styles.musicRowActive]}
           >
-            <Ionicons name="musical-note" size={18} color={selected ? colors.primary : colors.textSecondary} />
+            {cover ? (
+              <Image source={cover} style={styles.musicRowCover} accessibilityIgnoresInvertColors />
+            ) : (
+              <Ionicons name="musical-note" size={18} color={selected ? colors.primary : colors.textSecondary} />
+            )}
             <View style={styles.musicRowText}>
               <Text style={styles.musicRowTitle}>{track?.title ?? id}</Text>
               {track?.author ? <Text style={styles.musicRowAuthor}>{track.author}</Text> : null}

@@ -105,6 +105,8 @@
     "unreadableClip": "Non è stato possibile leggere una delle tue clip: forse è danneggiata, o in un formato che questo browser non sa aprire.",
     "assemblyFailed": "Non è stato possibile unire le scene in un unico video.",
     "engineUnavailable": "Non è stato possibile scaricare il motore video. Riconnettiti, poi riprova.",
+    "appUpdated": "LeClap è stato aggiornato da quando hai aperto questa pagina. Salva il tuo lavoro, ricarica la pagina, poi avvia di nuovo il rendering.",
+    "reload": "Ricarica",
     "stopped": "Il render è stato interrotto.",
     "unknown": "Il motore di render ha segnalato un errore."
   }

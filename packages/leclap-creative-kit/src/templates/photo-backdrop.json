@@ -7,9 +7,9 @@
     "orientation": "landscape",
     "musicEnabled": true,
     "music": {
-      "name": "romantic-piano.mp3"
+      "name": "dreamy-fall-people.mp3"
     },
-    "allowedMusic": ["romantic-piano", "cafe-bossa-nova", "lofi-sentimental-jazz", "cafe-jazz", "lofi-chill"],
+    "allowedMusic": ["dreamy-fall-people", "lofi-cafe", "lofi-sentimental-jazz", "cafe-jazz", "lofi-chill"],
     "allowUploadMusic": true,
     "transition": {
       "type": "dissolve",
@@ -20,7 +20,12 @@
       "musicVolume": 0.25,
       "musicFade": 0.8,
       "normalize": "loudnorm",
-      "ducking": { "threshold": 0.05, "ratio": 8, "attack": 20, "release": 400 }
+      "ducking": {
+        "threshold": 0.05,
+        "ratio": 8,
+        "attack": 20,
+        "release": 400
+      }
     }
   },
   "sections": [
@@ -100,6 +105,34 @@
             "st": "{{ transitionStartTime }}",
             "color": "#000000"
           }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "bloom",
+          "target": "frame",
+          "at": 0,
+          "duration": 4,
+          "threshold": 0.7,
+          "knee": 0.16,
+          "radius": 0.018,
+          "ramp": 0.8,
+          "color": "#f7e2c4",
+          "intensity": 0.9
+        },
+        {
+          "type": "frame",
+          "at": 0.3,
+          "until": 3.35,
+          "above": true,
+          "inset": 36,
+          "thickness": 6,
+          "color": "#F5F3F7",
+          "trace": "path",
+          "contrast": "shadow",
+          "exit": "fade",
+          "exitDuration": 0.3
         }
       ]
     },

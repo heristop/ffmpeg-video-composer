@@ -9,7 +9,7 @@
     "music": {
       "name": "lofi-sentimental-jazz.mp3"
     },
-    "allowedMusic": ["lofi-sentimental-jazz", "cafe-jazz", "lofi-chill", "cafe-bossa-nova", "romantic-piano"],
+    "allowedMusic": ["lofi-sentimental-jazz", "cafe-jazz", "lofi-chill", "lofi-cafe", "dreamy-fall-people"],
     "allowUploadMusic": true,
     "transition": {
       "type": "fade",
@@ -68,8 +68,8 @@
       "name": "intro",
       "type": "color_background",
       "transition": {
-        "type": "fade",
-        "duration": 0.6
+        "type": "zoom-through",
+        "duration": 0.5
       },
       "options": {
         "backgroundColor": "#0d1b2a",
@@ -188,8 +188,8 @@
       "name": "question",
       "type": "color_background",
       "transition": {
-        "type": "slideleft",
-        "duration": 0.8
+        "type": "swipe-left",
+        "duration": 0.5
       },
       "titleCard": {
         "kicker": {
@@ -278,17 +278,6 @@
           "values": {
             "x": 0,
             "y": 566,
-            "w": 840,
-            "h": 116,
-            "c": "#0d1b2a@0.62",
-            "t": "fill"
-          }
-        },
-        {
-          "type": "drawbox",
-          "values": {
-            "x": 0,
-            "y": 566,
             "w": 8,
             "h": 116,
             "c": "#7C83FD@1",
@@ -334,6 +323,47 @@
           "values": {
             "color": "#0d1b2a"
           }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "glass",
+          "target": {
+            "x": 0,
+            "y": 566,
+            "w": 840,
+            "h": 116
+          },
+          "at": 0.2,
+          "duration": 14.8,
+          "tone": "dark",
+          "frost": 0.12,
+          "saturation": 0.45,
+          "highlight": 0.7,
+          "ramp": 0.5,
+          "color": "#0d1b2a",
+          "intensity": 0.6
+        },
+        {
+          "type": "corners",
+          "at": 0.6,
+          "until": 14.4,
+          "above": true,
+          "target": {
+            "x": 40,
+            "y": 40,
+            "w": 1200,
+            "h": 502
+          },
+          "clearance": 0,
+          "length": 64,
+          "thickness": 4,
+          "color": "#F5F3F7",
+          "contrast": "shadow",
+          "spread": 1.04,
+          "trace": "clockwise",
+          "exit": "expand"
         }
       ]
     },

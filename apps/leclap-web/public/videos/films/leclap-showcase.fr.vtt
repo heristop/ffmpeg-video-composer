@@ -9,11 +9,11 @@ Et si cette idée devenait un modèle ?
 00:00:06.800 --> 00:00:09.544
 LeClap. Un seul modèle. Tous les écrans.
 
-00:00:10.500 --> 00:00:17.808
-Décrivez votre vidéo une seule fois, dans un modèle JSON. Le moteur FFmpeg de LeClap en fait un vrai film.
+00:00:10.500 --> 00:00:14.940
+Décrivez votre vidéo une seule fois, dans un modèle. LeClap en fait un vrai film.
 
-00:00:18.300 --> 00:00:22.298
-Le même modèle tourne sous Node, dans votre navigateur, et jusque sur votre téléphone.
+00:00:18.300 --> 00:00:22.484
+Le même modèle fonctionne sur votre ordinateur, dans votre navigateur, et jusque sur votre téléphone.
 
 00:00:24.300 --> 00:00:31.635
 Sur ordinateur : choisissez un modèle. Déposez vos vidéos. Gardez la meilleure prise. Montez vos scènes dans le navigateur.

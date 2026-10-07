@@ -36,7 +36,7 @@ export function maxMusicFadeFromSections(sections: unknown, durations: Record<st
  * entirely consumed by the crossfade, with 0.05s as an absolute floor.
  */
 export function resolveMusicFade(
-  descriptor: TemplateDescriptor,
+  descriptor: Pick<TemplateDescriptor, 'global'> & { sections?: unknown },
   transitionDuration: number,
   durations: Record<string, number> = {}
 ): number {

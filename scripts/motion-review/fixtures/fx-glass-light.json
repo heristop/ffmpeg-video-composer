@@ -1,0 +1,31 @@
+{
+  "label": "Glass card, light tone (fx, milk plate under dark text)",
+  "kind": "fx",
+  "window": { "at": 0.3, "duration": 2.4 },
+  "backgrounds": ["footage"],
+  "subject": { "x": 0.1, "y": 0.42, "w": 0.8, "h": 0.16, "radius": 0.25 },
+  "moments": [0.25, 0.4, "30%", "60%", "90%", 2.75],
+  "section": {
+    "kinetic": [
+      {
+        "text": { "en": "Alex Morgan, designer" },
+        "preset": "fade",
+        "delay": 0.45,
+        "size": 44,
+        "y": "center",
+        "color": "#1A1A1A"
+      }
+    ],
+    "graphics": [
+      {
+        "type": "fx",
+        "effect": "glass",
+        "tone": "light",
+        "frost": 0.2,
+        "target": "{{target}}",
+        "at": "{{at}}",
+        "duration": "{{duration}}"
+      }
+    ]
+  }
+}

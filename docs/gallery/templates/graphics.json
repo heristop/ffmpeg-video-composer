@@ -1,0 +1,332 @@
+{
+  "meta": {
+    "name": "Gallery: graphics",
+    "description": "One section per graphics[] type, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 9,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "flash",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "flash",
+          "at": 0.8,
+          "duration": 0.5,
+          "intensity": 0.8
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "HIT"
+          },
+          "preset": "fade",
+          "size": 110,
+          "delay": 0
+        }
+      ]
+    },
+    {
+      "name": "bars",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "bars",
+          "at": 0.1,
+          "aspect": 2.39
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "WIDESCREEN"
+          },
+          "preset": "fade",
+          "size": 110,
+          "delay": 0
+        }
+      ]
+    },
+    {
+      "name": "underline",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.2,
+          "x": 390,
+          "y": 440,
+          "width": 500,
+          "thickness": 10,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Underline"
+          },
+          "preset": "fade",
+          "size": 110,
+          "delay": 0
+        }
+      ]
+    },
+    {
+      "name": "frame",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "at": 0.1,
+          "inset": 70,
+          "thickness": 8,
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Framed"
+          },
+          "preset": "fade",
+          "size": 110,
+          "delay": 0
+        }
+      ]
+    },
+    {
+      "name": "corners",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "corners",
+          "at": 0.1,
+          "inset": 70,
+          "thickness": 8,
+          "color": "#FF8AAE"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Focus here"
+          },
+          "preset": "fade",
+          "size": 110,
+          "delay": 0
+        }
+      ]
+    },
+    {
+      "name": "wipe",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "wipe",
+          "at": 0.6,
+          "duration": 1.2,
+          "color": "#FF8AAE",
+          "direction": "left"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Turn the page"
+          },
+          "preset": "fade",
+          "size": 110,
+          "delay": 0
+        }
+      ]
+    },
+    {
+      "name": "panel",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0.1,
+          "x": 0,
+          "y": 250,
+          "width": 820,
+          "height": 220,
+          "from": "left",
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": []
+    },
+    {
+      "name": "glitch",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "glitch",
+          "at": 0.5,
+          "duration": 0.8,
+          "intensity": 0.9
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "SIGNAL LOST"
+          },
+          "preset": "fade",
+          "size": 110,
+          "delay": 0
+        }
+      ]
+    },
+    {
+      "name": "focus",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "focus",
+          "at": 0.8,
+          "duration": 1.2,
+          "amount": 24,
+          "direction": "in"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "PULL FOCUS"
+          },
+          "preset": "fade",
+          "size": 110,
+          "delay": 0
+        }
+      ]
+    },
+    {
+      "name": "progress",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "progress",
+          "at": 0.1,
+          "duration": 2,
+          "thickness": 16,
+          "track": "#FFFFFF@0.15",
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Loading"
+          },
+          "preset": "fade",
+          "size": 110,
+          "delay": 0
+        }
+      ]
+    },
+    {
+      "name": "ticker",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "ticker",
+          "at": 0.1,
+          "text": {
+            "en": "BREAKING  ·  JSON IN, VIDEO OUT  ·  SAME FRAMES EVERYWHERE  ·"
+          },
+          "speed": 220,
+          "height": 90,
+          "size": 46,
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Live"
+          },
+          "preset": "fade",
+          "size": 110,
+          "delay": 0
+        }
+      ]
+    },
+    {
+      "name": "bars-chart",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "bars-chart",
+          "at": 0.1,
+          "values": [12, 28, 19, 42],
+          "labels": ["Q1", "Q2", "Q3", "Q4"],
+          "x": 240,
+          "y": 110,
+          "width": 800,
+          "height": 480,
+          "suffix": "K"
+        }
+      ]
+    }
+  ]
+}

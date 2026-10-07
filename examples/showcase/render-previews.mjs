@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { bundledVideoFor, fieldsFor, videoFor } from './fixtures.ts';
 import { previewVideoArgs } from './preview-export.ts';
 import { loadDescriptor } from './load-descriptor.ts';
+import { prepareSynthetic, prerenderedFor, previewMedia, withVariables } from './synthetic-media.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const catalog = JSON.parse(await fs.readFile(path.join(root, 'examples/showcase/catalog.json'), 'utf8'));
@@ -41,6 +42,23 @@ function ffmpeg(args) {
 function probe(file) {
   return JSON.parse(run('ffprobe', ['-v', 'error', '-show_streams', '-show_format', '-of', 'json', file]));
 }
+// Poster frame per sample (seconds), when the default 1.4 s lands mid-motion.
+const POSTER_AT = {
+  'product-launch': 3.4,
+  'kinetic-type': 2.4,
+  'fx-pack': 0.4,
+  'word-captions': 1,
+  formats: 1.5,
+  'kinetic-fills': 1.6,
+  'split-layouts': 1.6,
+  'rtl-type': 1.8,
+  'emoji-type': 1.2,
+  'beat-grid': 1.8,
+  'theme-roles': 2,
+  'footage-edit': 1,
+  'sound-design': 3.3,
+  'effects-tour': 2.2,
+};
 const fields = {
   form_1_name: 'KILN',
   form_1_tagline: 'Made for everyday rituals',
@@ -200,6 +218,13 @@ async function nativeInputs(sample, template) {
   const clips = {};
 
   if (sample.category === 'evidence') return evidenceInputs(sample, template);
+  const prerendered = prerenderedFor(sample.id);
+
+  if (prerendered) {
+    run('bash', [prerendered.script, '--chapters-only']);
+
+    return { template, assetRoot: path.join(root, prerendered.assets), clips, sampleFields: fields };
+  }
   const expanded = validatedDescriptor(template, sample.id);
   const sampleFields = fieldsFor(
     expanded,
@@ -209,13 +234,17 @@ async function nativeInputs(sample, template) {
   );
   const bundled = bundledVideoFor(sample.id);
   const capture = bundled ? path.join(root, bundled) : { 'app-tutorial': appCapture }[sample.id];
+  const synthetic = await prepareSynthetic(sample.id, { library, work, ffmpeg });
   let index = 0;
 
   for (const section of expanded.sections.filter((section) => section.type === 'project_video')) {
-    clips[section.name] = capture ?? path.join(library, 'videos', videoFor(expanded.global.orientation, index++));
+    clips[section.name] =
+      synthetic.clips[section.name] ??
+      capture ??
+      path.join(library, 'videos', videoFor(expanded.global.orientation, index++));
   }
 
-  return { template, assetRoot: library, clips, sampleFields };
+  return { template: withVariables(template, synthetic.variables), assetRoot: library, clips, sampleFields };
 }
 async function renderOutput(sample, template, registered) {
   if (registered) {
@@ -254,7 +283,7 @@ async function renderSample(sample) {
   ffmpeg(previewVideoArgs(output, video));
   const metadata = probe(video);
   const duration = Number(metadata.format.duration);
-  const posterTime = Math.min(sample.id === 'product-launch' ? 3.4 : 1.4, duration / 3);
+  const posterTime = Math.min(POSTER_AT[sample.id] ?? 1.4, duration / 3);
   const poster = path.join(publicDir, `${sample.id}.webp`);
   ffmpeg(['-ss', String(posterTime), '-i', video, '-frames:v', '1', '-vf', 'scale=720:405', '-quality', '85', poster]);
   // Optional local provenance tool; the portable manifest below always records the render source.
@@ -267,10 +296,6 @@ async function renderSample(sample) {
     ]);
   }
   await fs.writeFile(path.join(publicDir, `${sample.id}.json`), `${JSON.stringify(original, null, 2)}\n`);
-  const portraitSource =
-    original.global.orientation === 'portrait'
-      ? 'packages/leclap-creative-kit/src/library/videos/video_portrait.mp4'
-      : undefined;
   const record = {
     id: sample.id,
     source: sample.source,
@@ -283,11 +308,7 @@ async function renderSample(sample) {
       .update(await fs.readFile(video))
       .digest('hex'),
     templateSha256: createHash('sha256').update(JSON.stringify(original)).digest('hex'),
-    mediaSource: bundledVideoFor(sample.id) ?? portraitSource,
-    media:
-      sample.category === 'evidence'
-        ? 'Synthetic demo-shop captures and house cards'
-        : 'Bundled catalog / demo app fixtures',
+    ...previewMedia(sample, expanded, bundledVideoFor(sample.id)),
     bytes: (await fs.stat(video)).size,
   };
   byId.set(sample.id, record);

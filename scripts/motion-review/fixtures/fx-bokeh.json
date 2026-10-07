@@ -1,0 +1,9 @@
+{
+  "label": "Bokeh (fx, ambient discs behind a title)",
+  "kind": "fx",
+  "window": { "at": 0.2, "duration": 5 },
+  "section": {
+    "kinetic": [{ "text": { "en": "Present yourself" }, "preset": "fade", "y": "center", "color": "#FFFFFF" }],
+    "graphics": [{ "type": "fx", "effect": "bokeh", "target": "frame", "at": "{{at}}", "duration": "{{duration}}" }]
+  }
+}

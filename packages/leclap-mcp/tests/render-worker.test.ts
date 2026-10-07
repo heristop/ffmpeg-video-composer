@@ -49,4 +49,38 @@ describe('render worker', () => {
     });
     await vi.waitFor(() => expect(exit).toHaveBeenCalledWith(0));
   });
+
+  it('sends the engine QC report with a successful render', async () => {
+    const fs = await import('node:fs');
+    const os = await import('node:os');
+    const path = await import('node:path');
+    const output = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'leclap-worker-')), 'output.mp4');
+    fs.writeFileSync(output, 'mp4');
+    const qc = { verified: true, content: false, findings: [] };
+    // The first test already loaded the worker; load it again so its IPC listener is registered anew.
+    vi.resetModules();
+    const { container } = await import('ffmpeg-video-composer');
+    vi.mocked(container.resolve).mockReturnValue({ getInfos: async () => ({ duration: 1 }) } as never);
+    compileMock.mockImplementation(
+      async (_config: unknown, _template: unknown, reporter?: { onQc?: (report: unknown) => void }) => {
+        reporter?.onQc?.(qc);
+
+        return output;
+      }
+    );
+    vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
+    const sent = new Promise<unknown>((resolve) => {
+      process.send = ((message: unknown, _handle: unknown, _options: unknown, callback?: () => void) => {
+        callback?.();
+        resolve(message);
+
+        return true;
+      }) as typeof process.send;
+    });
+
+    await import('../src/worker/renderWorker');
+    process.emit('message', { projectConfig: {}, template: {} } as never, undefined);
+
+    await expect(sent).resolves.toMatchObject({ ok: true, outputPath: output, sizeBytes: 3, qc });
+  });
 });

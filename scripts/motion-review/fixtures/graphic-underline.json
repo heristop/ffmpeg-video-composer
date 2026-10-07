@@ -1,0 +1,21 @@
+{
+  "label": "Underline (graphics)",
+  "kind": "graphic",
+  "window": {
+    "at": 0.3,
+    "duration": 0.5
+  },
+  "section": {
+    "graphics": [
+      {
+        "type": "underline",
+        "at": "{{at}}",
+        "duration": "{{duration}}",
+        "x": "{{x}}",
+        "y": "{{cy}}",
+        "width": "{{w}}",
+        "color": "#FFFFFF"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "label": "Confetti",
+  "kind": "fx",
+  "window": { "at": 0.3, "duration": 2.2 },
+  "section": {
+    "graphics": [
+      { "type": "fx", "effect": "confetti", "target": "{{target}}", "at": "{{at}}", "duration": "{{duration}}" }
+    ]
+  }
+}

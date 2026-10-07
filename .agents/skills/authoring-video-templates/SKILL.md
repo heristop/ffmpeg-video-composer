@@ -81,9 +81,37 @@ Keep an optional `meta.creativeDirection` brief (trimmed, 1–4000 characters) w
 - **Audio polish** — `global.audio`: `sourceVolume`, `musicVolume`, `normalize` (`loudnorm`/`dynaudnorm`), `ducking` (bool or fine-grained). Per-section `options.audioFade` (`in`/`out`, `afade`) and `options.musicVolume`. `options.audioEffect` (`echo`/`telephone`/`muffled`) appends a voice preset (`aecho`/`highpass+lowpass`/`lowpass`) to the `-af` chain before any fade, skipped entirely when `muteSection` is true.
 - **Layers** — `color_background` `options.layers[]`: solid/opacity/gradient boxes composited over the base colour.
 - **Framing guide** — `project_video` `options.framingGuide` (`silhouette`): a **recording-UI overlay only**, never rendered into the video.
-- **Animation & image inputs** — one input per overlay: an `.apng`/`.webp`/`.gif`/`.webm` animation **or** a still `image` (PNG/JPG). `options.loop` → `stream_loop`, `options.persistent` → `eof_action=repeat`, `options.rotation` (deg), `options.motion` (an animated entrance reusing the `reveal` vocabulary → `overlay` x/y time-expressions).
+- **Animation & image inputs** — (the bundled `animations/*.apng` are samples, a last resort; see below) one input per overlay: an `.apng`/`.webp`/`.gif`/`.webm` animation **or** a still `image` (PNG/JPG). `options.loop` → `stream_loop`, `options.persistent` → `eof_action=repeat`, `options.rotation` (deg), `options.motion` (an animated entrance reusing the `reveal` vocabulary → `overlay` x/y time-expressions).
 - **Text sugar** — prefer these over hand-positioned `drawtext`: `caption` (styled overlay), section `titleCard` on `color_background` (kicker/headline/subtitle/accent/fade — collapses ~80-line intros), section `lowerThird` on any visual section (title/subtitle/badge band, composites above animations). On any of them: `reveal` (`none`/`fade`/`rise`/`slide-left`/`slide-right`, bare string or `{type,delay,duration,distance,easing}`) for an entrance, and `effect: { shadow?, outline? }` (`TextEffect`) for drop-shadow/outline legibility. A title card takes optional `stagger` (seconds 0..1, default .15) between non-empty lines; zero starts them together and its accent follows its associated line. A positioned `drawtext` filter also takes `exit` (same vocabulary + an `after` start time, defaulting to end-at-section-end). Entrance and exit `easing` is `linear` (default), `ease-out`, `ease-in-out`, or `ease-out-back`; it curves text alpha and travel. Back easing overshoots travel by about 10% while clamping text alpha to 0..1. Overlay fade motion uses the linear fade filter. No `exit` field exists on caption/titleCard/lowerThird blocks. Sized from the output scale, so they render in any orientation.
 - **Global decorations** — authored once in `global`, applied to every section (sibling of `global.animations`): `global.overlays[]` (whole-video text/brand watermark, with `position` anchor + optional `sections` subset), `global.look` / `global.grade` (whole-video colour). Removes per-section `{{ brand }}` repetition.
+
+## Motion system: kinetic typography (for "wow" templates)
+
+Use section `kinetic` blocks for animated copy. Each block lays its copy out with real font metrics and animates each word or glyph natively, on every backend:
+
+```json
+{ "text": { "en": "Make every word land." }, "preset": "cascade", "accent": { "words": "last" }, "exit": "cascade" }
+```
+
+- **Presets:** cascade, rise, drop, slide, pop, impact, tracking-in, typewriter, scramble, wave, highlight, counter, split, fade. Every other field has a preset default: unit, order, stagger, delay, ease, distance, size, align, x, y (`top`/`center`/`bottom`), maxWidth, accent, effect, exit.
+- **Easing:** prefer springs (`$snappy`, `$bouncy`, `$gentle`, or `spring(k, c)`) and omit `duration` so physics decides; use `$expo`/`$smooth` for controlled moves.
+- **Intensity:** `global.motion.energy` scales every travel (0 reduced motion, 1.5 hype). `global.seed` fixes random order and scramble glyphs.
+- **Fonts:** word/glyph units need a bundled font (`kinetic_font_unmeasurable` otherwise). One dominant block per beat, one accent word per line, and vary presets between beats.
+- **Camera, graphics, transitions:** a section `camera` (push-in, drift, orbit, handheld; `hits` on the beats), `graphics` (flash, bars, underline, frame, corners, wipe, panel) and designed transitions (`push-*`, `swipe-*`, `zoom-through`, `iris`, with `ease`). Use one camera idea and one graphic idea per beat.
+- **fx primitives:** `graphics[]` entries `{ type: "fx", effect, target, ... }` are parametric light primitives (e.g. `sheen`) clipped to a target. Tune the profile, width, tilt, direction, colour (`"$color.accent"`), intensity, duration/ease and repeat for the template.
+- **Discovery:** `get_motion_catalog` (MCP) or `motionCatalog()` lists presets with defaults, art-direction rules and a starter.
+
+### Compose motion, don't pick stock animations
+
+Generated templates should look authored, not assembled. Follow this workflow:
+
+1. **Creative direction:** audience, brand and energy (`meta.creativeDirection`, `global.motion.energy`).
+2. **Motion intent per section:** one line about what moves, why, and how it should feel.
+3. **Engine primitives:** kinetic, `animate` tracks with ease tokens or springs, camera, designed transitions, graphics and fx, roles, and beats and cues for timing.
+4. **Tune the parameters:** never ship all defaults.
+5. **At most 1–2 signature moves** per video.
+
+The creative-kit library animations (`packages/leclap-creative-kit/src/library/animations/*.apng`: shine sweep, confetti, light leak…) are **samples**. Use one only as a last resort. `motionCatalog().samples` maps each one to the primitives that replace it. `getMotionWarnings` reports `fx_untuned`, `effect_repeated`, `library_animation_sample`, `effect_off_theme` and `decor_overload` with hints (`services/sameness-lint.ts`). See [`examples/motion-design/kinetic-type.json`](../../../examples/motion-design/kinetic-type.json).
 
 ## Variables, filters, maps
 

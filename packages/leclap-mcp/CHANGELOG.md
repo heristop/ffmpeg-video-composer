@@ -5,6 +5,56 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `edit_template`: an RFC 6902 JSON Patch over inline template JSON under `expectedRevision` (stale →
+  `revision_conflict`), all-or-nothing and validated after applying; returns the template, its new
+  `revision` and `changedPaths`. The web builder's WebMCP tools share the name, operations and revision,
+  along with `get_template_schema`, `get_motion_catalog`, `list_samples`, `get_sample`, `validate_template`,
+  `get_timeline` and `render_frames`. Sixteen tools are now always registered.
+- `list_samples` accepts `category: "effects"`; 46 packaged samples.
+- `compose_video` runs the engine's output QC and returns it in `structuredContent.qc` with a one-line
+  verdict.
+- `get_motion_catalog` returns the engine's motion catalog: kinetic typography presets with
+  defaults, exits, stagger orders, the easing grammar, built-in tokens, art-direction rules and a starter.
+  `get_template_schema` and the `compose-video` prompt point agents at it.
+- `compose_video` renders with the deterministic encoder profile.
+- `validate_template` returns every finding with its hint (`structuredContent.errors` with `hint`,
+  `suggestion`, `kind`) and advisory `motionWarnings`; failing section assertions are validation errors.
+- `get_motion_catalog` also returns genre doctrine, scene blueprints, per-preset verbs and guidance,
+  built-in themes, delivery platforms and the time-reference grammar; the registry manifest lists it.
+- `get_template_schema` describes `global.platform`; the `compose-video` prompt adds motion pacing rules.
+- New always-registered tools: `extract_style` (theme and style guide from a reference under the media
+  dir), `analyze_music` (beat grid and cues), `get_capabilities` (local FFmpeg capability report),
+  `render_frames` (PNG frames, contact sheets, safe zones, variant and look grids), `get_timeline` and
+  `report_catalog_gap`.
+- `get_motion_catalog` accepts `{ query, kind? }` and returns ranked matches, with a pointer to
+  `report_catalog_gap` when nothing matches; `--catalog-gap-log` / `LECLAP_MCP_CATALOG_GAP_LOG` sets the log.
+- `compose_video`, `render_frames` and `get_timeline` accept `format`; the template is resolved to that
+  format before validation, the sandbox guard and the render.
+- `validate_template` adds `featureWarnings` from the local capability probe and reports
+  `partial_compressed`; `get_sample` adds a `partialCatalog` summary.
+- `probe_media` reports `hdr`, `colorPrimaries`, `colorTransfer`, `bitDepth`, `vfr` and `rotation`.
+- The `get_template_schema` guide covers formats, footage editing, subtitles, voice/automation/sfx, music
+  timing, motion roles and section purpose, trails, the new graphics, whips, lower-third styles, fills,
+  layouts, right-to-left text and emoji.
+- `get_motion_catalog` lists the `type: "fx"` primitives (parameters, defaults, design intent, reduced
+  motion) under `fx`, and the library APNGs under `samples` with the primitives that replace them; `kind:
+"fx"` searches them. `get_template_schema` and the `compose-video` prompt steer agents to compose motion
+  from these primitives, tuned to the brief, and `validate_template` returns the sameness lint
+  (`fx_untuned`, `effect_repeated`, `library_animation_sample`, `effect_off_theme`, `decor_overload`).
+
+### Changed
+
+- Template revisions (`expectedRevision` / `revision`) and the validation finding text now come from the
+  engine (`templateRevision`, `invalidTemplateText`), so other surfaces compute the same revision for the
+  same JSON; values are unchanged.
+- Built on `ffmpeg-video-composer` 3: `validate_template`, `edit_template` and `compose_video` reject
+  templates with unknown keys (`unknown_key`) and text a bundled font cannot draw (`font_missing_glyphs`),
+  which 0.4.0 accepted.
+
 ## [0.4.0] - 2026-10-03
 
 ### Added

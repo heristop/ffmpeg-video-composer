@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, it, expect } from 'vitest';
 import type { BackgroundLayer, ImageOverlay } from '../templateEditorModel';
-import { imageVisibilityAt, layerVisibilityAt } from './element-visibility.logic';
+import { animationVisibilityAt, imageVisibilityAt, layerVisibilityAt } from './element-visibility.logic';
 
 const image = (extra: Partial<ImageOverlay> = {}): ImageOverlay => ({
   id: 'i1',
@@ -79,5 +79,17 @@ describe('layerVisibilityAt', () => {
 
     expect(layerVisibilityAt(late, 1.4, 5).opacity).toBe(0);
     expect(layerVisibilityAt(late, 1.6, 5).opacity).toBe(1);
+  });
+});
+
+describe('animationVisibilityAt', () => {
+  it('shows a file from its start for its duration, or holds it when persistent', () => {
+    const file = { start: 1, duration: 2 };
+
+    expect(animationVisibilityAt(file, 0.5, 6).opacity).toBe(0);
+    expect(animationVisibilityAt(file, 2, 6).opacity).toBe(1);
+    expect(animationVisibilityAt(file, 3.5, 6).opacity).toBe(0);
+    expect(animationVisibilityAt({ ...file, persistent: true }, 3.5, 6).opacity).toBe(1);
+    expect(animationVisibilityAt({}, 5, 6).opacity).toBe(1);
   });
 });

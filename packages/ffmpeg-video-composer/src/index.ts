@@ -11,8 +11,7 @@ import type AbstractLogger from './platform/logging/AbstractLogger';
 import TeeLogAdapter from './platform/logging/TeeLogAdapter';
 import { attachCompilationListeners } from './platform/compilation-listeners';
 import type { CompileReporter, ProjectConfig, TemplateDescriptor } from './core/types';
-import { getPerfTimer, resetPerfTimer } from './utils/perf-timer';
-import { formatPerfReport } from './utils/perf-report';
+import { resetPerfTimer } from './utils/perf-timer';
 import { FFmpegDetector } from './platform/ffmpeg/FFmpegDetector';
 import { selectVideoCodec } from './platform/ffmpeg/select-video-codec';
 import { TemplateValidator } from './services/TemplateValidator';
@@ -20,6 +19,7 @@ import type { TemplateDescriptor as SchemaTemplateDescriptor } from './schemas/t
 import { hasDrawtext } from './services/geometry/drawtext-probe';
 import { nodeFontLoader } from './services/geometry/node-geometry';
 import { runRenderCheck, type RenderCheckOptions, type RenderedGeometry } from './services/geometry/render-check';
+import { prepareRegisteredRender, runCompileEpilogue } from './services/compile-epilogue-node';
 
 let isInitialized = false;
 let initializationPromise: Promise<void> | null = null;
@@ -101,41 +101,6 @@ export async function loadConfig(configPath: string): Promise<TemplateDescriptor
   }
 }
 
-// Log the per-run perf table and persist it next to the build output. No-op when FVC_PERF is
-// disabled (the timer reports totalMs 0). Never throws — perf reporting must not break a compile.
-async function emitPerfReport(
-  logger: AbstractLogger,
-  buildDir: string,
-  templateDescriptor: TemplateDescriptor
-): Promise<void> {
-  const report = getPerfTimer().report();
-
-  if (report.totalMs <= 0) {
-    return;
-  }
-
-  logger.info(`\n${formatPerfReport(report)}`);
-
-  try {
-    const fileSystem = container.resolve<AbstractFilesystem>('filesystemAdapter');
-    const data = new TextEncoder().encode(JSON.stringify(report, null, 2));
-    // FVC_PERF_OUT lets a caller (the bench harness) pin an exact output path per run so reports
-    // don't collide across fixtures that share a meta.name; otherwise name it from the descriptor.
-    const explicit = process.env.FVC_PERF_OUT;
-
-    if (explicit) {
-      await fileSystem.writeFile(explicit, data);
-
-      return;
-    }
-    const buildPath = await fileSystem.getBuildPath(buildDir);
-    const name = (templateDescriptor.meta?.name ?? 'run').replace(/[^a-z0-9_-]+/gi, '_');
-    await fileSystem.writeFile(`${buildPath}/perf-${name}.json`, data);
-  } catch (error) {
-    logger.info(`perf report write skipped: ${error instanceof Error ? error.message : String(error)}`);
-  }
-}
-
 // Universal gate for the Node compile path: every descriptor is schema-validated before it reaches
 // the director, so a malformed template fails fast with a structured summary instead of failing late
 // (or silently rendering wrong) inside the engine. `skipValidation` is a trusted-caller opt-out
@@ -146,7 +111,7 @@ function assertValidDescriptor(projectConfig: ProjectConfig, templateDescriptor:
   }
 
   const validator = new TemplateValidator();
-  const validation = validator.validateTemplate(templateDescriptor);
+  const validation = validator.validateTemplate(templateDescriptor, { format: projectConfig.format });
 
   if (!validation.success) {
     throw new Error(validator.getValidationSummary(validation));
@@ -221,9 +186,11 @@ async function runConstruction(
   const listeners = attachCompilationListeners(director.events, reporter?.onProgress);
 
   try {
+    // Output-is-input guard, FFmpeg version, section cache (services/render-setup-node.ts).
+    const context = await prepareRegisteredRender(projectConfig, templateDescriptor);
     const output = await timer.span('compile:total', () => director.construct());
 
-    await emitPerfReport(logger, projectConfig.buildDir ?? '', templateDescriptor);
+    await runCompileEpilogue({ logger, projectConfig, templateDescriptor, output, reporter, context });
 
     // The director reports a failed build through `task-stopped` and resolves null; rethrow the cause
     // so compile() hands it to the reporter instead of failing without saying which section broke.
@@ -291,8 +258,11 @@ export function renderedGeometryWarnings(
   return runRenderCheck(descriptor, { ...options, loadFont: options.loadFont ?? nodeFontLoader() }, engine);
 }
 
-export { TemplateDirector };
-export { VideoEditor };
+// Node entry only: frame snapshots and comparisons (services/snapshot-api-node.ts) render through this
+// engine's compile(), handed over through the container so the snapshot modules never import this entry.
+container.registerInstance('snapshotEngine', { compile });
+
+export { TemplateDirector, VideoEditor };
 export { default as FFmpegNodeAdapter } from './platform/ffmpeg/FFmpegNodeAdapter';
 export {
   default as FFmpegWasmAdapter,
@@ -328,13 +298,14 @@ export {
   partialsById,
   type PartialExpansion,
 } from './core/partials';
-export type { ProjectConfig, TemplateDescriptor, CompileReporter } from './core/types';
+export type { ProjectConfig, TemplateDescriptor, CompileReporter, MediaTraits } from './core/types';
 export {
   TemplateValidator,
   type ValidationResult,
   type ValidationError,
   type GeometryWarning,
   type FontLoader,
+  type MotionWarning,
 } from './services/TemplateValidator';
 // From the loader module, not the geometry barrel. The barrel statically imports font-metrics, the
 // colour math, caption-layout, text-boxes and the rules, so re-exporting through it pulled that whole
@@ -388,3 +359,33 @@ export type {
   ResolvedEffectProvenance,
   ResolvedTemplateEffects,
 } from './core/resolve-template-effects';
+export * from './core/determinism';
+export { ENGINE_VERSION } from './core/version';
+// Node entry only: digest a rendered file for `leclap verify`.
+export { digestRenderedFile } from './services/render-manifest-node';
+export * from './core/motion';
+export * from './core/platforms';
+export * from './core/theme';
+// Reference-style analysis (pure) and its Node frame decoder: palette, texture and pacing as a theme.
+export * from './core/style';
+export {
+  analyzeStyleFile,
+  extractStyleFrames,
+  resolveStyleFfmpeg,
+  STYLE_FRAME_WIDTH,
+  STYLE_MAX_FRAMES,
+  STYLE_SAMPLE_INTERVAL,
+  type StyleFrames,
+  type StyleFramesOptions,
+} from './services/style-frames-node';
+export {
+  motionTimeline,
+  type MotionBox,
+  type MotionEvent,
+  type MotionKind,
+  type MotionTimeline,
+  type SectionTimeline,
+} from './core/motion/timeline';
+export { kineticCatalog, KINETIC_PRESET_DEFAULTS } from './core/kinetic/presets';
+export * from './node-extras';
+export { layoutKinetic, measureBundled } from './core/kinetic/layout';

@@ -1,0 +1,108 @@
+{
+  "meta": {
+    "name": "Kinetic type",
+    "description": "Kinetic typography: every preset, natively, per word and per glyph.",
+    "creativeDirection": "Audience: people deciding whether a tool feels premium. Direction: Apple-keynote confidence with a juicy edge. One idea per beat, copy as the hero, ink canvas, white Bebas Neue, lavender marker, pastel-yellow accents. Motion is physical (springs) and never decorative: every entrance lands before the next begins, every beat holds long enough to read. Review: no unit leaves the title-safe area at its overshoot peak, accent words read first, and the stat lands on its final value before it holds."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 11,
+    "transition": { "type": "cut" },
+    "motion": { "energy": 1 }
+  },
+  "sections": [
+    {
+      "name": "hook",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 3 },
+      "kinetic": [
+        {
+          "text": { "en": "Make every word land." },
+          "preset": "cascade",
+          "size": 104,
+          "y": 230,
+          "accent": { "words": "last" },
+          "exit": "cascade"
+        },
+        {
+          "text": { "en": "Physics, not keyframes" },
+          "preset": "highlight",
+          "font": "oswald",
+          "size": 46,
+          "y": 400,
+          "delay": 0.7,
+          "exit": "fade"
+        }
+      ]
+    },
+    {
+      "name": "keynote",
+      "type": "color_background",
+      "options": { "backgroundColor": "#0E0E12", "duration": 3.2 },
+      "kinetic": [
+        { "text": { "en": "LECLAP" }, "preset": "tracking-in", "size": 170, "y": 210, "exit": "fade" },
+        {
+          "text": { "en": "Deterministic video, by prompt." },
+          "preset": "typewriter",
+          "font": "mono",
+          "size": 34,
+          "y": 430,
+          "delay": 1.1,
+          "exit": "fade"
+        }
+      ]
+    },
+    {
+      "name": "stat",
+      "type": "color_background",
+      "options": { "backgroundColor": "#1B1830", "duration": 2.8 },
+      "kinetic": [
+        {
+          "text": { "en": "" },
+          "preset": "counter",
+          "counter": { "from": 0, "to": 98.6, "decimals": 1, "suffix": "%" },
+          "size": 190,
+          "y": 170,
+          "color": "#FFF685"
+        },
+        {
+          "text": { "en": "of renders match byte for byte" },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 40,
+          "y": 430,
+          "delay": 1.2
+        }
+      ]
+    },
+    {
+      "name": "energy",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 3.2 },
+      "kinetic": [
+        { "text": { "en": "BIG." }, "preset": "impact", "size": 220, "y": 90, "color": "#FF8AAE" },
+        { "text": { "en": "Springy." }, "preset": "pop", "size": 120, "y": 340, "delay": 0.5 },
+        { "text": { "en": "DECODED" }, "preset": "scramble", "font": "mono", "size": 60, "y": 500, "delay": 0.9 },
+        { "text": { "en": "and alive" }, "preset": "wave", "size": 64, "y": 600, "delay": 1.4 }
+      ]
+    },
+    {
+      "name": "outro",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 2.8 },
+      "kinetic": [
+        { "text": { "en": "Same JSON. Same frames." }, "preset": "split", "size": 96, "y": 250 },
+        {
+          "text": { "en": "Everywhere." },
+          "preset": "drop",
+          "size": 96,
+          "y": 380,
+          "delay": 0.7,
+          "accent": { "words": "first" }
+        }
+      ]
+    }
+  ]
+}

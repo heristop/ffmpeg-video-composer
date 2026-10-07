@@ -8,6 +8,11 @@
     "colorB": "#f5f5f0",
     "textColor": "#f5f5f0"
   },
+  "envelope": { "in": 0.4, "out": 0 },
+  "syncPoints": [{ "id": "swap", "offset": 0.4 }],
+  "jobs": ["compare", "ask"],
+  "useWhen": "A this-or-that question, poll or A/B choice that should feel loud and playful.",
+  "avoidWhen": "Calm, premium or accessibility-sensitive pacing: the colour swap strobes every 0.4 s.",
   "sections": [
     {
       "name": "flash",

@@ -6,14 +6,19 @@ import type { McpConfig } from './config.js';
 import { registerGetTemplateSchema } from './tools/getTemplateSchema.js';
 import { registerCompose } from './tools/composeVideo.js';
 import { registerProbe } from './tools/probeMedia.js';
+import { registerExtractStyle } from './tools/extractStyle.js';
+import { registerAnalyzeMusic } from './tools/analyzeMusic.js';
+import { registerGetCapabilities } from './tools/getCapabilities.js';
 import { registerValidateTemplate } from './tools/validateTemplate.js';
 import { registerRenderRemotionClip } from './tools/renderRemotionClip.js';
 import { registerGetEffectSchema } from './tools/getEffectSchema.js';
 import { registerRenderPreview } from './tools/renderPreview.js';
 import { registerPatchTemplate } from './tools/patchTemplate.js';
+import { registerEditTemplate } from './tools/editTemplate.js';
 import { validateEffects } from './effects/title-registry.js';
 import { registerSamples } from './tools/samples.js';
 import { registerComposeGuide } from './prompts/composeGuide.js';
+import { registerInspectTools } from './tools/inspectTools.js';
 
 // Each tool group is registered by a small `registerXxx(server, config)` function, called from
 // `createServer`. The surface is authoring-only: schema, validate, compose, probe, the Remotion
@@ -55,6 +60,17 @@ export function snapshotEffectConfig(input: McpConfig): Readonly<McpConfig> {
       : {}),
   });
 }
+// Revision-guarded template edits: patch_template (registered effect props) and edit_template (JSON Patch).
+// Both stay registered without Remotion; effect sections they produce still pass effect-backend validation.
+function registerTemplateEdits(server: McpServer, config: McpConfig): void {
+  async function effects(template: Record<string, unknown>, signal?: AbortSignal): Promise<void> {
+    await validateEffects(template, config, signal);
+  }
+
+  registerPatchTemplate(server, effects);
+  registerEditTemplate(server, effects);
+}
+
 export function createServer(input: McpConfig): McpServer {
   const config = snapshotEffectConfig(input);
   const server = new McpServer(
@@ -74,15 +90,17 @@ export function createServer(input: McpConfig): McpServer {
   registerGetTemplateSchema(server);
   registerValidateTemplate(server, config);
   registerCompose(server, config);
+  registerInspectTools(server, config);
 
   if (config.allowRemotion) {
     registerGetEffectSchema(server, config);
     registerRenderPreview(server, config);
   }
-  registerPatchTemplate(server, async (template, signal) => {
-    await validateEffects(template, config, signal);
-  });
+  registerTemplateEdits(server, config);
   registerProbe(server, config);
+  registerExtractStyle(server, config);
+  registerAnalyzeMusic(server, config);
+  registerGetCapabilities(server);
 
   // render_remotion_clip bundles + executes a caller-supplied entry (arbitrary local JS) — an RCE
   // surface. Register it only when the operator explicitly opted in for trusted local design-time use.

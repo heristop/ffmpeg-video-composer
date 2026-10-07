@@ -126,6 +126,43 @@ describe('compose_video handler', () => {
     expect(job.projectConfig.buildDir?.startsWith(outputDir)).toBe(true);
   });
 
+  it('asks the engine for the output QC and returns its report', async () => {
+    const qc = {
+      verified: false,
+      content: true,
+      findings: [
+        { check: 'duration', status: 'pass', value: 4, expected: 4, reason: 'ok', kind: 'format' },
+        {
+          check: 'color_tags',
+          status: 'warn',
+          value: 'bt709/unknown/bt709',
+          expected: 'x',
+          reason: 'untagged',
+          kind: 'format',
+        },
+      ],
+    };
+    runRenderMock.mockResolvedValue({
+      ok: true,
+      outputPath: '/tmp/leclap-compose-test/out.mp4',
+      durationSeconds: 4,
+      sizeBytes: 1,
+      videoCodec: 'h264',
+      audioCodec: 'aac',
+      qc,
+    } as never);
+
+    const result = (await setup()({ template: clipTemplate, userVideoPaths: await stageClip() })) as {
+      content: Array<{ type: string; text?: string }>;
+      structuredContent?: Record<string, unknown>;
+    };
+    const job = runRenderMock.mock.calls.at(-1)?.[0] as { projectConfig: { qc?: unknown } };
+
+    expect(job.projectConfig.qc).toEqual({ content: true });
+    expect(result.structuredContent?.qc).toEqual(qc);
+    expect(result.content[0].text).toContain('QC not verified (color_tags warn: untagged).');
+  });
+
   it('surfaces a render failure (with log tail) as an error result', async () => {
     runRenderMock.mockResolvedValue({
       ok: false,

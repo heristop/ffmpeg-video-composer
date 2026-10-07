@@ -23,6 +23,7 @@ export {
   DialogTitle,
   DialogDescription,
 } from './dialog';
+export { Sheet, SheetTrigger, SheetClose, SheetContent, SheetTitle, SheetDescription, type SheetSide } from './sheet';
 export { Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectItem } from './select';
 export { Checkbox } from './checkbox';
 export { ColorPicker, type ColorPickerProps } from './color-picker';

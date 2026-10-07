@@ -8,6 +8,8 @@
   "loading": "Chargement de l’aperçu",
   "videoError": "Impossible de charger cet aperçu. Réessayez.",
   "retry": "Réessayer",
+  "seek": "Se déplacer dans l’aperçu",
+  "position": "{{current}} sur {{total}}",
   "native": "JSON natif",
   "downloadJson": "Télécharger le JSON",
   "retrySource": "Recharger la source",
@@ -35,6 +37,7 @@
     "all": "Tous les exemples",
     "templates": "Modèles",
     "typography": "Typographie",
+    "effects": "Effets et montage",
     "overlays": "Incrustations",
     "app-demos": "Démos d’apps",
     "evidence": "Preuves de revue"

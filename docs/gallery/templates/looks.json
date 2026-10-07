@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "name": "Gallery: looks",
+    "description": "A colourful photograph with a headline, to tile under every LOOK preset with leclap snapshot --looks, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 2,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "photo",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/golden-hour.jpg",
+        "duration": 2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "Golden hour"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 150,
+          "y": 480,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    }
+  ]
+}

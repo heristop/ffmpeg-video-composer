@@ -1,3 +1,100 @@
+# Upgrading from v2 to v3
+
+v3 keeps the same API and entry points: `compile(projectConfig, template)`, `loadConfig(path)`, the
+`/browser`, `/reactnative` and `/samples` exports, and every name they exported in v2.5 are unchanged. Two
+things are breaking: validation is stricter, so `compile()` can reject a template that v2.5 rendered, and
+renders are no longer byte-identical to v2.5. Everything else in the release is additive (see the
+[changelog](./CHANGELOG.md)).
+
+## TL;DR
+
+- **Validate your templates before upgrading** with `new TemplateValidator().validateTemplate(template)`
+  or `leclap validate <template.json>`. `compile()` validates by default (the browser and React Native
+  entries always do), so a template that fails validation now fails to compile.
+- **Stray keys are errors now.** A key the schema does not declare is reported as `unknown_key`, even on
+  objects that v2.5 silently trimmed. Most are typos; the finding names the key to use instead.
+- **Text in a bundled font must be drawable by that font.** Missing characters fail with
+  `font_missing_glyphs` instead of rendering as empty boxes.
+- **Re-pin goldens and checksums.** The deterministic encoder profile is on by default and several
+  renderers changed (below), so output bytes differ from v2.5 even for unchanged templates.
+- **No Node or dependency change** for consumers: still Node `>=24.11.0`, and `zod` is still a regular
+  dependency.
+
+## Stricter validation
+
+### Unknown keys (`unknown_key`)
+
+v2.5 rejected unknown keys on strict objects but let many others through: discriminated unions such as
+`sections[]` options, transitions, wrappers and pipes trimmed them silently, so a typo simply did
+nothing. v3 walks the schema and reports every one of them:
+
+```jsonc
+// v2.5: `length` was dropped silently and the transition used its default duration.
+// v3:   unknown_key at sections.0.transition.length, suggestion "duration".
+"transition": { "type": "fade", "length": 0.5 }
+```
+
+Each finding carries a `suggestion` (the closest allowed key at that path) and a `kind`. `format`
+findings are mechanical renames that are safe to apply as-is; `judgement` findings (for instance when the
+suggested key is already set) need a person to decide. Keys starting with `$` or `_` are treated as
+comments, and free-form maps (translations, `global.variables`, effect `props`/`assets`, motion tokens,
+raw filter `values`) are never checked. See [validation findings](../../docs/template-configuration.md#validation-findings).
+
+To list what to fix in a batch of templates:
+
+```ts
+import { TemplateValidator } from 'ffmpeg-video-composer';
+
+const result = new TemplateValidator().validateTemplate(template);
+
+for (const error of result.errors ?? []) {
+  console.log(error.code, error.path, error.suggestion ?? '', error.kind ?? '');
+}
+```
+
+### Missing glyphs (`font_missing_glyphs`)
+
+Text drawn with a bundled font (captions, title cards, lower thirds, `drawtext` filters, global overlays,
+kinetic blocks) is checked against the font's character coverage for every locale. A character the font
+cannot draw now fails validation, with a `hint` naming a bundled font that covers it (or a font family to
+use instead, for scripts no bundled font covers). See [glyph coverage](../../docs/template-configuration.md#glyph-coverage-font_missing_glyphs-emoji_unsupported).
+
+### Opting out
+
+On Node, `compile({ ...projectConfig, skipValidation: true }, template)` still renders without
+validating. Keep it for trusted, generated templates you cannot change yet: an unknown key is ignored
+exactly as before, and a missing glyph renders as an empty box.
+
+### Raw filters that read the clock or `random()`
+
+These are **not** errors. Raw `filters[]` using `%{localtime}`, `%{gmtime}`, `time(…)` or `random(…)`
+render as before and raise the advisory `nondeterministic_expression` from
+`TemplateValidator.getMotionWarnings()`: two renders of such a template differ, so the preview may not
+match the export and the section cache and `leclap verify` cannot vouch for it.
+
+## Different render output
+
+Nothing to change in templates, but expect different bytes, and in a few places a different picture:
+
+| Change                                      | Effect                                                                                                                                    | Opt out                                                                |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Deterministic encoder profile on by default | Bit-exact muxing, pinned libx264 threads, no inherited metadata: the same template renders to the same bytes on a given platform          | `ProjectConfig.deterministic: false` (`--no-deterministic` in the CLI) |
+| Constant frame rate per section             | Each section chain is conformed to CFR, so animation times land on exact frames and phone footage with a variable frame rate cannot drift | —                                                                      |
+| Sub-pixel zooms                             | Ken Burns and pulse zooms no longer step a pixel at a time                                                                                | —                                                                      |
+
+If you compare renders against stored goldens or checksums, render each template once with v3 and store
+the new output. With the deterministic profile on, later renders on the same platform match it byte for
+byte.
+
+## Still the same
+
+- `compile`, `loadConfig` and every v2.5 export, with the same signatures.
+- The `{ global, sections }` descriptor shape. Every new field in v3 is optional.
+- The browser and React Native entries, and their adapters.
+- Node `>=24.11.0`.
+
+---
+
 # Upgrading from v1 to v2
 
 The npm package name is **unchanged** — you still install `ffmpeg-video-composer`.

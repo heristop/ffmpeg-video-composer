@@ -10,6 +10,8 @@ function makeLogger() {
 function makeProject(config: ProjectConfig = {}) {
   return {
     finalVideo: '',
+    output: { staging: '', final: '' },
+    ffmpegVersion: null,
     errors: [] as string[],
     config: {
       audioConfig: { sampleRate: 48000, channelLayout: 'stereo' },
@@ -203,13 +205,15 @@ describe('VideoEditor.assembleWithTransitions', () => {
     expect(command).toContain('xfade=transition=fadeslow:duration=0.4:offset=8.1');
   });
 
-  it('renders a cut boundary as a near-zero fade', async () => {
+  it('joins a cut boundary with concat (a sub-frame xfade ends the output early on FFmpeg 6)', async () => {
     const { editor, ffmpeg } = makeEditor();
 
     await editor.assembleWithTransitions(['/build/s0.mp4', '/build/s1.mp4'], [{ type: 'cut', duration: 0 }]);
 
     const command = ffmpeg.execute.mock.calls[0][0] as string;
-    expect(command).toContain('xfade=transition=fade:duration=0.001');
+    expect(command).toContain('[vs0][vs1]concat=n=2:v=1:a=0[vout]');
+    expect(command).toContain('[0:a][1:a]concat=n=2:v=0:a=1[aout]');
+    expect(command).not.toContain('xfade');
   });
 
   it('throws when the transitions list length does not equal segments-1', async () => {

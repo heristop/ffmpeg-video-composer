@@ -1,0 +1,155 @@
+{
+  "meta": {
+    "name": "Gallery: kinetic fills, trail and wrap",
+    "description": "Kinetic fills (gradient, texture, sweep), a trail of echoes, and greedy versus balanced wrap, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 21,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "gradient",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "Colour in motion"
+          },
+          "preset": "cascade",
+          "font": "anton",
+          "size": 150,
+          "fill": {
+            "gradient": {
+              "from": "#FF8AAE",
+              "to": "#7C83FD",
+              "angle": 90
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "texture",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#0B0B0D",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "GOLDEN HOUR"
+          },
+          "preset": "rise",
+          "font": "anton",
+          "size": 220,
+          "color": "#F2B866",
+          "fill": {
+            "texture": "backgrounds/golden-hour.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "sweep",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 3
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "LECLAP"
+          },
+          "preset": "fade",
+          "size": 230,
+          "color": "#7C83FD",
+          "fill": {
+            "sweep": {
+              "duration": 1.6,
+              "delay": 0.6,
+              "width": 260,
+              "color": "#FFFFFF@0.95"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "trail",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "WHOOSH"
+          },
+          "preset": "slide",
+          "direction": "left",
+          "size": 200,
+          "color": "#FF8AAE",
+          "duration": 0.9,
+          "trail": {
+            "echoes": 5,
+            "delta": 0.05,
+            "fade": 0.55
+          }
+        }
+      ]
+    },
+    {
+      "name": "greedy",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "Balanced wrap evens the lines of a long headline for a calmer read"
+          },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 76,
+          "maxWidth": 1000,
+          "wrap": "greedy"
+        }
+      ]
+    },
+    {
+      "name": "balanced",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "Balanced wrap evens the lines of a long headline for a calmer read"
+          },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 76,
+          "maxWidth": 1000,
+          "wrap": "balanced"
+        }
+      ]
+    }
+  ]
+}

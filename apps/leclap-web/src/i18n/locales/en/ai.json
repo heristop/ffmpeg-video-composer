@@ -1,0 +1,196 @@
+{
+  "open": "Generate with AI",
+  "fromPresets": "Or describe it and generate with AI",
+  "title": "Generate with AI",
+  "subtitle": "Describe the video. Your AI provider writes the template; LeClap checks it before it opens in the builder.",
+  "brief": {
+    "label": "What should the video be?",
+    "placeholder": "A 30-second launch for a note-taking app. Bold, punchy kinetic type, ends on the download link.",
+    "examples": "Try an example",
+    "tooShort": "Add a few more words so the model knows what to make.",
+    "hint": "Say who it's for, the tone, and how it ends. One to three sentences is plenty.",
+    "count_one": "{{count}} character",
+    "count_other": "{{count}} characters"
+  },
+  "examples": {
+    "launch": "30s product launch for a note-taking app, bold, punchy kinetic type",
+    "tutorial": "Calm tutorial intro, 3 steps",
+    "hook": "TikTok hook for a coffee shop, fast cuts, playful",
+    "cinematic": "Cinematic brand film for a hiking gear company, moody, slow",
+    "recap": "Year-in-review recap for a design studio, 5 highlights",
+    "event": "Square promo for a weekend design meetup, date and venue at the end"
+  },
+  "hints": {
+    "orientation": "Format",
+    "duration": "Length",
+    "auto": "Auto",
+    "landscape": "Landscape",
+    "portrait": "Portrait",
+    "square": "Square",
+    "seconds": "{{count}} s"
+  },
+  "provider": {
+    "section": "Provider & key",
+    "summary": "{{provider}} · {{model}}",
+    "label": "Provider",
+    "model": "Model",
+    "modelFree": "Any model id from your account works.",
+    "keySet": "Key set",
+    "keyMissing": "Add a key"
+  },
+  "key": {
+    "label": "{{provider}} API key",
+    "show": "Show key",
+    "hide": "Hide key",
+    "persistFailed": "This browser blocked storage, so the key lasts for this session only.",
+    "forget": "Forget key",
+    "forgetAll": "Forget all keys",
+    "forgotten": "Key forgotten.",
+    "format": "This doesn't look like a {{provider}} key (expected {{placeholder}}). You can still try it.",
+    "getKey": "Get a key",
+    "privacy": "Stored only in this browser; sent only to {{provider}} with your request — never to LeClap, never in a URL, never logged. Usage is billed to your account."
+  },
+  "jev": {
+    "section": "Smart routing with Jev (optional)",
+    "about": "Jev picks — it doesn't write. With a Jev key, your brief is classified first (genre, format, energy, best starting template) so the prompt is smaller and more on target.",
+    "provider": "Jev",
+    "decisions": "Jev's read of your brief",
+    "suggestion": "Suggested · {{confidence}}",
+    "applied": "{{label}} · {{confidence}}",
+    "route": "Analyse brief",
+    "routing": "Jev is reading your brief…",
+    "bestMatch": "Start from the best match",
+    "bestMatchHint": "Opens the closest ready-made template ({{title}}). Jev picks it; you write the copy.",
+    "bestMatchNone": "Analyse the brief to find the closest ready-made template.",
+    "genre": {
+      "product-launch": "Product launch",
+      "explainer": "Explainer",
+      "social-hook": "Social hook",
+      "cinematic-trailer": "Cinematic trailer",
+      "calm-tutorial": "Calm tutorial",
+      "other": "Other"
+    },
+    "platform": {
+      "tiktok": "TikTok",
+      "reels": "Reels",
+      "shorts": "Shorts",
+      "youtube": "YouTube",
+      "x": "X",
+      "linkedin": "LinkedIn",
+      "facebook": "Facebook",
+      "square-feed": "Square feed",
+      "none": "No platform"
+    },
+    "energy": {
+      "0": "Calm",
+      "1": "Relaxed",
+      "2": "Balanced",
+      "3": "Punchy",
+      "4": "Explosive"
+    },
+    "theme": "Theme: {{name}}",
+    "seed": "Starts like “{{title}}”"
+  },
+  "footer": {
+    "needKey": "Generating needs your {{provider}} API key.",
+    "needBrief": "Describe the video to generate.",
+    "addKey": "Add key",
+    "ctrlKey": "Ctrl"
+  },
+  "actions": {
+    "generate": "Generate",
+    "cancel": "Cancel",
+    "retry": "Try again",
+    "open": "Open in builder",
+    "replace": "Replace draft",
+    "keep": "Keep editing",
+    "regenerate": "Generate another",
+    "details": "Technical details",
+    "writeTemplate": "Write template",
+    "startOver": "Start over"
+  },
+  "steps": {
+    "thinking": "Thinking",
+    "validating": "Validating",
+    "repairing": "Repairing",
+    "ready": "Ready",
+    "planning": "Planning",
+    "polishing": "Polishing"
+  },
+  "status": {
+    "thinking": "Thinking…",
+    "writing": "Writing the template… {{count}} characters",
+    "validating": "Validating…",
+    "repairing": "Repairing (round {{round}}): fixing {{count}} issue(s)…",
+    "ready": "Ready",
+    "cancelled": "Cancelled. Nothing was changed.",
+    "planning": "Planning concepts and beats…",
+    "planReady": "Plan ready. Adjust it if you like, then write the template.",
+    "polishing": "Polishing {{count}} art-direction note(s)…"
+  },
+  "result": {
+    "scenes_one": "{{count}} scene",
+    "scenes_other": "{{count}} scenes",
+    "footage_one": "{{count}} clip to film",
+    "footage_other": "{{count}} clips to film",
+    "duration": "{{seconds}} s",
+    "durationEstimate": "~{{seconds}} s + clips",
+    "effects": "Effects",
+    "noEffects": "No effects — straight cuts.",
+    "replaceWarning": "This replaces the current draft. Your saved templates are untouched, and Undo brings the draft back.",
+    "advisories_one": "{{count}} art-direction note",
+    "advisories_other": "{{count}} art-direction notes",
+    "noAdvisories": "No art-direction notes from the engine."
+  },
+  "errors": {
+    "auth": "{{provider}} rejected the key. Check it was copied in full and is still active.",
+    "rate-limit": "{{provider}} is rate-limiting this key. Wait a minute, or check your plan's limits.",
+    "overloaded": "{{provider}} is overloaded right now. Try again in a moment.",
+    "network": "Couldn't reach {{provider}}. Check your connection, or whether an extension or network policy blocks the request.",
+    "network-jev": "Couldn't reach Jev. Jev's API may not accept browser calls from this origin yet — generation still works without it.",
+    "refused": "The model declined this brief. Try rephrasing it.",
+    "truncated": "The reply was cut off before the template was complete. Try a shorter brief or fewer scenes.",
+    "bad-request": "{{provider}} refused the request. Check the model id is available on your account.",
+    "bad-response": "{{provider}} sent a response LeClap couldn't read. Try again.",
+    "http": "{{provider}} returned an error. Try again.",
+    "invalid": "The model couldn't produce a valid template after {{rounds}} attempts. Try a simpler or more specific brief.",
+    "unknown": "Something went wrong. Try again."
+  },
+  "plan": {
+    "planFirst": "Plan first",
+    "planFirstHint": "Pitch three concepts and a beat sheet before writing. One extra, quick call.",
+    "review": "Review the plan",
+    "reviewHint": "Pause on the plan so you can edit it. Off: carry straight on.",
+    "title": "Plan",
+    "intro": "Edit the copy, verbs or timing, or pick another concept. The template follows this plan.",
+    "strategy": "Strategy",
+    "concepts": "Concept",
+    "typicality": {
+      "expected": "Expected",
+      "fresh": "Fresh",
+      "unusual": "Unusual"
+    },
+    "beats": "Beats",
+    "role": "Role",
+    "verb": "Verb",
+    "onScreen": "On screen",
+    "seconds": "Length",
+    "verbLabel": "Beat {{row}} verb",
+    "onScreenLabel": "Beat {{row}} on-screen copy",
+    "secondsLabel": "Beat {{row}} length in seconds",
+    "footage": "Footage, no copy",
+    "facts": "Plan details",
+    "transitions": "Transitions: {{primary}}",
+    "transitionsWithAccents": "Transitions: {{primary}} + {{accents}}",
+    "section": "Before writing"
+  },
+  "reference": {
+    "label": "Match a reference",
+    "hint": "Optional: attach a reference look. Generation then follows its palette and pacing as binding rules.",
+    "use": "Use as style guide",
+    "attached": "Style guide attached: the generated template follows this palette and pacing.",
+    "detach": "Detach style guide",
+    "summaryNone": "Optional",
+    "summaryAttached": "Attached"
+  }
+}

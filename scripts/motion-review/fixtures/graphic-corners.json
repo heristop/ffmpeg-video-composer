@@ -1,0 +1,18 @@
+{
+  "label": "Corner brackets (graphics)",
+  "kind": "graphic",
+  "window": {
+    "at": 0.3,
+    "duration": 0.45
+  },
+  "section": {
+    "graphics": [
+      {
+        "type": "corners",
+        "at": "{{at}}",
+        "duration": "{{duration}}",
+        "color": "#FFFFFF"
+      }
+    ]
+  }
+}

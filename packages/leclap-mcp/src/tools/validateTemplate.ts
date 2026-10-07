@@ -1,12 +1,15 @@
 import fs from 'node:fs/promises';
 import type { McpServer, ServerContext } from '@modelcontextprotocol/server';
 import {
+  invalidTemplateText,
+  effectiveOrientation,
   geometryApproxNote,
   nodeGeometryWarnings,
   type GeometryWarning,
   type RenderedGeometry,
   type TemplateDescriptor,
   type TemplateDescriptorSchema,
+  type ValidationError,
 } from 'ffmpeg-video-composer';
 import { z } from 'zod';
 
@@ -16,6 +19,9 @@ import type { McpConfig } from '../config.js';
 import { assertDescriptorSafe } from '../compose/descriptorGuard.js';
 import { runGeometryCheck } from '../compose/renderRunner.js';
 import { validateTemplate } from '../compose/validation.js';
+import { motionNote, motionWarnings, motionWarningsSchema } from './motionWarnings.js';
+import { capabilityWarnings } from '../compose/capabilities.js';
+import { featureNote, featureWarningsSchema } from './featureWarnings.js';
 
 const inputSchema = z.object({
   template: z.record(z.string(), z.unknown()),
@@ -47,6 +53,25 @@ const outputSchema = z.object({
         'be too small, lack contrast, or sit over footage with no box/outline/shadow — one line per finding ' +
         'saying what to change, present only when there is something to fix; check this before rendering.'
     ),
+  motionWarnings: motionWarningsSchema,
+  featureWarnings: featureWarningsSchema,
+  // Present only on an invalid template (with isError): every finding at once, with fixes when known.
+  errors: z
+    .array(
+      z.object({
+        path: z.string(),
+        message: z.string(),
+        code: z.string(),
+        hint: z.string().optional(),
+        suggestion: z.unknown().optional(),
+        kind: z.enum(['format', 'judgement']).optional(),
+      })
+    )
+    .optional()
+    .describe(
+      'Invalid template only: every finding. `suggestion` is a replacement value for `path` (a key name for ' +
+        'unknown_key); kind "format" is safe to apply as-is, "judgement" changes creative content — ask first.'
+    ),
   // Present only when `render: true` was asked for.
   render: z
     .object({ measured: z.number(), seconds: z.number(), unavailable: z.string().optional() })
@@ -57,7 +82,11 @@ const outputSchema = z.object({
 type ValidateArgs = { template: Record<string, unknown>; render?: boolean };
 type RenderSummary = { measured: number; seconds: number; unavailable?: string };
 type RenderConfig = Pick<McpConfig, 'mediaDir' | 'outputDir' | 'renderTimeoutMs'> & EffectConfig;
-type ToolError = { isError: true; content: [{ type: 'text'; text: string }] };
+type ToolError = {
+  isError: true;
+  content: [{ type: 'text'; text: string }];
+  structuredContent?: { valid: false; errors: ValidationError[] };
+};
 type DescriptorResult = { ok: true; descriptor: TemplateDescriptor } | ToolError;
 
 function errorResult(text: string): ToolError {
@@ -69,7 +98,11 @@ function resolveDescriptor(args: ValidateArgs): DescriptorResult {
   const result = validateTemplate(args.template);
 
   if (!result.ok) {
-    return errorResult(result.message);
+    const text = invalidTemplateText(result);
+
+    return result.errors
+      ? { ...errorResult(text), structuredContent: { valid: false, errors: result.errors } }
+      : errorResult(text);
   }
 
   return { ok: true, descriptor: result.descriptor };
@@ -264,13 +297,16 @@ async function summary(
   config: RenderConfig
 ) {
   const sectionCount = descriptor.sections?.length ?? 0;
-  const orientation = descriptor.global?.orientation ?? null;
+  // The authored orientation, else the one global.platform implies.
+  const orientation = effectiveOrientation(descriptor.global) ?? null;
   const clips = requiredClips(descriptor);
   const fields = formFields(descriptor);
   const hasEffects = (descriptor.sections ?? []).some((section) => section.type === 'effect');
   const { geometry, render } = hasEffects
     ? await effectFindings(descriptor, authored, request)
     : await findings(descriptor, authored, request);
+  const motion = motionWarnings(authored);
+  const features = await capabilityWarnings(authored);
   const needs = [
     clips.length > 0 ? `clips: ${clips.join(', ')}` : 'no clips',
     fields.length > 0 ? `fields: ${fields.join(', ')}` : 'no fields',
@@ -280,7 +316,7 @@ async function summary(
     content: [
       {
         type: 'text' as const,
-        text: `Valid template — ${sectionCount} section(s), ${orientation ?? 'default'} orientation. Requires ${needs}.${renderNote(render)}${geometryNote(geometry)}`,
+        text: `Valid template — ${sectionCount} section(s), ${orientation ?? 'default'} orientation. Requires ${needs}.${renderNote(render)}${geometryNote(geometry)}${motionNote(motion)}${featureNote(features)}`,
       },
     ],
     structuredContent: {
@@ -292,6 +328,8 @@ async function summary(
       requiredClips: clips,
       formFields: fields,
       geometry,
+      motionWarnings: motion,
+      featureWarnings: features,
       render,
     },
   };
@@ -325,7 +363,11 @@ export function registerValidateTemplate(server: McpServer, config: RenderConfig
         'project_video clip sections and the form fields. Use this to iterate on a descriptor in ' +
         'milliseconds before the slower compose_video render. Also catches, render-free, text that ' +
         'runs off the frame or out of title-safe, collides with other text, sits under a band, is too ' +
-        'small, lacks contrast, or sits over footage with no box/outline/shadow — see the `geometry` field. ' +
+        'small, lacks contrast, or sits over footage with no box/outline/shadow — see the `geometry` field — and ' +
+        'flags motion pacing (monotonous eases, front-loaded beats, dead air, flat tempo) and stock motion ' +
+        '(untuned or repeated effects, library sample animations) in `motionWarnings`; ' +
+        'section `assert` entries that fail are errors; `featureWarnings` lists what the local FFmpeg cannot ' +
+        'render (feature_unavailable, see get_capabilities). ' +
         'Pass `render: true` to also render the text-bearing sections and measure contrast from real pixels ' +
         '(seconds; settles text over images, grades and looks).',
       inputSchema,

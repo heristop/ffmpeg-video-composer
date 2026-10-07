@@ -105,6 +105,8 @@
     "unreadableClip": "One of your clips couldn’t be read: it may be damaged, or in a format this browser can’t open.",
     "assemblyFailed": "The scenes couldn’t be put together into one video.",
     "engineUnavailable": "The video engine couldn’t be downloaded. Reconnect, then try again.",
+    "appUpdated": "LeClap was updated since this page opened. Save your work, reload the page, then render again.",
+    "reload": "Reload",
     "stopped": "The render was stopped.",
     "unknown": "The render engine reported an error."
   }

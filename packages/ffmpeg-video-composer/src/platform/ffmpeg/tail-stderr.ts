@@ -10,3 +10,12 @@ const TAIL_LINES = 20;
 export function tailStderr(stderr: string | undefined): string {
   return (stderr ?? '').split('\n').filter(Boolean).slice(-TAIL_LINES).join('\n');
 }
+
+/** Why a command that never started failed: spawn errors such as E2BIG carry no stderr. */
+export function spawnFailure(error: { code?: unknown; message?: string }): string {
+  if (error.code === 'E2BIG') {
+    return 'spawn E2BIG: the command line (usually the filtergraph) exceeds the operating system argument limit';
+  }
+
+  return typeof error.code === 'string' ? (error.message ?? error.code) : '';
+}

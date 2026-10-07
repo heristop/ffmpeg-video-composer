@@ -1,5 +1,6 @@
 import { assertSafeArgToken } from '@/core/arg-guard';
-import { easeRampExpr, type RevealEasing } from '../presets/text';
+import type { RevealEasing } from '../presets/text';
+import { easedRamp, phaseDuration } from '../presets/eased-ramp';
 import type { BackgroundLayer } from '../../schemas/template.schemas';
 import type { GlobalAnimation } from '@/core/types';
 
@@ -266,11 +267,10 @@ export function overlayMotionExpr(motion: OverlayMotionInput | undefined, positi
   }
 
   const delay = intent.delay ?? MOTION_DELAY;
-  const duration = intent.duration ?? MOTION_DURATION;
+  const duration = phaseDuration(intent.duration, intent.easing, MOTION_DURATION);
   const distance = intent.distance ?? MOTION_DISTANCE;
   const [bx = '0', by = '0'] = position.split(':');
-  const linear = `if(lt(t,${trimNum(delay)}),0,if(lt(t,${trimNum(delay + duration)}),(t-${trimNum(delay)})/${trimNum(duration)},1))`;
-  const ramp = easeRampExpr(linear, intent.easing);
+  const ramp = easedRamp(delay, duration, intent.easing);
 
   if (intent.type === 'fade') {
     return { legFilter: `fade=t=in:st=${trimNum(delay)}:d=${trimNum(duration)}:alpha=1` };

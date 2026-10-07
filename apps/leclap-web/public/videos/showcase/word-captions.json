@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "name": "Word captions",
+    "description": "Word-timed captions: speech-to-text word timings grouped into phrases, balanced on two lines, drawn in two caption DNAs with karaoke.",
+    "creativeDirection": "Direction: captions as typography, not an afterthought. Scene one is a calm talking-head voice: clean white Rubik, a soft shadow, and the spoken word lighting up in warm yellow so the eye rides the voice. Scene two is the hype cut: heavy Anton capitals with a thick outline, each word popping in pink as it is said, and the closing exclamation crowned larger as the one payoff line. Asset-free ink backgrounds keep the focus on the type. Review: no phrase exceeds two lines, no line ends on an article or preposition, the highlight never runs ahead of the word timing, and the crown is the only enlarged line."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 5,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "clean-voice",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 4.4
+      },
+      "subtitles": {
+        "style": "clean",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.3,
+            "end": 0.62
+          },
+          {
+            "text": "caption",
+            "start": 0.66,
+            "end": 1.1
+          },
+          {
+            "text": "follows",
+            "start": 1.14,
+            "end": 1.52
+          },
+          {
+            "text": "the",
+            "start": 1.55,
+            "end": 1.66
+          },
+          {
+            "text": "voice,",
+            "start": 1.7,
+            "end": 2.1
+          },
+          {
+            "text": "word",
+            "start": 2.42,
+            "end": 2.7
+          },
+          {
+            "text": "by",
+            "start": 2.74,
+            "end": 2.86
+          },
+          {
+            "text": "word,",
+            "start": 2.9,
+            "end": 3.3
+          },
+          {
+            "text": "on",
+            "start": 3.34,
+            "end": 3.46
+          },
+          {
+            "text": "any",
+            "start": 3.5,
+            "end": 3.7
+          },
+          {
+            "text": "frame.",
+            "start": 3.74,
+            "end": 4.1
+          }
+        ]
+      }
+    },
+    {
+      "name": "loud-payoff",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1E1E24",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "loud",
+        "crown": "auto",
+        "group": {
+          "maxWords": 3
+        },
+        "words": [
+          {
+            "text": "Same",
+            "start": 0.2,
+            "end": 0.48
+          },
+          {
+            "text": "JSON.",
+            "start": 0.52,
+            "end": 0.98
+          },
+          {
+            "text": "Same",
+            "start": 1.1,
+            "end": 1.36
+          },
+          {
+            "text": "frames.",
+            "start": 1.4,
+            "end": 1.86
+          },
+          {
+            "text": "Every",
+            "start": 2,
+            "end": 2.3
+          },
+          {
+            "text": "time!",
+            "start": 2.34,
+            "end": 2.9
+          }
+        ]
+      }
+    }
+  ]
+}

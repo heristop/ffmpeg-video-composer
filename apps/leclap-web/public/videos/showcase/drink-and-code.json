@@ -204,15 +204,7 @@
         "attack": 20,
         "release": 400
       }
-    },
-    "animations": [
-      {
-        "url": "animations/light_leak.apng",
-        "start": 14,
-        "duration": 3,
-        "opacity": 0.35
-      }
-    ]
+    }
   },
   "sections": [
     {
@@ -220,8 +212,9 @@
       "type": "video",
       "look": "teal-orange",
       "transition": {
-        "type": "smoothup",
-        "duration": 0.6
+        "type": "push-up",
+        "duration": 0.6,
+        "ease": "$snappy"
       },
       "options": {
         "useVideoSection": "video_1",
@@ -229,18 +222,6 @@
         "musicVolume": 0.4
       },
       "inputs": [
-        {
-          "name": "intertitles_border",
-          "url": "animations/rounded_border.apng",
-          "type": "animation",
-          "options": {
-            "fps": 25,
-            "position": "0:0",
-            "scale": "1280:720",
-            "persistent": true
-          },
-          "filters": []
-        },
         {
           "name": "watermark",
           "url": "{{ watermark }}"
@@ -254,7 +235,7 @@
               "type": "scale",
               "values": {
                 "h": -1,
-                "w": 100
+                "w": 84
               }
             }
           ],
@@ -268,21 +249,11 @@
           "outputs": ["video"]
         },
         {
-          "inputs": ["@intertitles_border", "scaled_logo"],
+          "inputs": ["video", "scaled_logo"],
           "filters": [
             {
               "type": "overlay",
-              "value": "50:50"
-            }
-          ],
-          "outputs": ["animation_and_logo"]
-        },
-        {
-          "inputs": ["video", "animation_and_logo"],
-          "filters": [
-            {
-              "type": "overlay",
-              "value": "0:0"
+              "value": "80:72"
             }
           ],
           "outputs": ["final"]
@@ -344,6 +315,36 @@
             "color": "{{ color1 }}"
           }
         }
+      ],
+      "graphics": [
+        {
+          "type": "frame",
+          "at": 0.3,
+          "inset": 40,
+          "radius": 28,
+          "trace": "path",
+          "exit": "fade",
+          "color": "{{ color2 }}",
+          "thickness": 6,
+          "above": true
+        },
+        {
+          "type": "fx",
+          "effect": "edge-glow",
+          "at": 1.2,
+          "duration": 4.4,
+          "target": {
+            "x": "iw*0.021",
+            "y": "ih*0.037",
+            "w": "iw*0.958",
+            "h": "ih*0.926",
+            "radius": 19
+          },
+          "glow": "#E0884C",
+          "intensity": 0.7,
+          "line": 0,
+          "above": true
+        }
       ]
     },
     {
@@ -396,8 +397,8 @@
         }
       ],
       "transition": {
-        "type": "smoothleft",
-        "duration": 0.5
+        "type": "whip-left",
+        "duration": 0.4
       },
       "title": {
         "en": "Tell us a little bit about you"
@@ -496,6 +497,15 @@
             "color": "{{ color1 }}"
           }
         }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "leak",
+          "at": 7.8,
+          "duration": 3,
+          "edge": "right"
+        }
       ]
     },
     {
@@ -565,8 +575,9 @@
         }
       ],
       "transition": {
-        "type": "coverleft",
-        "duration": 0.5
+        "type": "swipe-left",
+        "duration": 0.5,
+        "ease": "$snappy"
       },
       "title": {
         "en": "Make your speech"
@@ -730,7 +741,7 @@
       "type": "project_video",
       "look": "teal-orange",
       "transition": {
-        "type": "circleclose",
+        "type": "iris",
         "duration": 0.7
       },
       "title": {
@@ -886,6 +897,32 @@
             "borderw": 2,
             "alpha": "'if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,if(lt(t,5),1,if(lt(t,7),(1-(t-6))/1,0))))'"
           }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "bloom",
+          "at": 0,
+          "duration": 5,
+          "intensity": 1,
+          "above": true
+        },
+        {
+          "type": "fx",
+          "effect": "glint",
+          "at": 1.2,
+          "target": {
+            "x": "iw*0.15",
+            "y": "ih*0.55",
+            "w": "iw*0.7",
+            "h": "ih*0.25"
+          },
+          "path": "scatter",
+          "intensity": 1,
+          "count": 6,
+          "size": 44,
+          "above": true
         }
       ]
     },

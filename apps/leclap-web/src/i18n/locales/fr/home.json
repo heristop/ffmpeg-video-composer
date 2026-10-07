@@ -15,13 +15,14 @@
   },
   "showcase": {
     "eyebrow": "En action",
-    "title": "100 % dans ton navigateur",
-    "subtitle": "Aucun envoi, aucun serveur — ce clip a été composé sur l’appareil à partir d’un modèle, avec transitions, musique, effets, texte et animations, puis rendu par WebAssembly FFmpeg.",
-    "badge": "Rendu d’exemple · dans le navigateur",
-    "videoAria": "Une vidéo d’exemple composée dans LeClap, lue en boucle",
+    "title": "Chaque effet tient dans un modèle",
+    "subtitle": "Reflets, scintillements, cadres, mouvements de caméra et coupes sur le temps : chacun tient en une ligne de modèle, et rend pareil dans ton navigateur, sur ton ordinateur et sur ton téléphone.",
+    "badge": "Démo des effets · faite avec LeClap",
+    "videoAria": "Une démo des effets de mouvement de LeClap, lue en boucle",
     "play": "Lire le rendu",
     "pause": "Mettre le rendu en pause",
     "cta": "Crée la tienne",
+    "viewShowcase": "Voir les inspirations",
     "browseTemplates": "Parcourir les modèles",
     "readDocs": "Lire la doc"
   },
@@ -65,7 +66,16 @@
     },
     "badge": "Sur l’appareil · aucun envoi",
     "phoneAria": "Un téléphone qui fait tourner l’app LeClap",
-    "cta": "Essaie les modèles dans ton navigateur"
+    "cta": "Essaie les modèles dans ton navigateur",
+    "screen": {
+      "title": "Ta vidéo prend vie",
+      "preparing": "Préparation des scènes…",
+      "private": "Le rendu reste sur ton appareil",
+      "cancel": "Annuler le rendu",
+      "readyTitle": "Ta vidéo est prête",
+      "readyBody": "Garde une copie ou partage ton histoire.",
+      "share": "Partager"
+    }
   },
   "agentic": {
     "eyebrow": "Pour le développement agentique",

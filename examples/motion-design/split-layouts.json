@@ -1,0 +1,145 @@
+{
+  "meta": {
+    "name": "Split screens and wipes",
+    "description": "Section layouts: three photographs side by side with gaps and dividers, a stacked two-pane comparison, and a before/after wipe with a divider edge. Bundled photos only.",
+    "creativeDirection": "Audience: travel, real-estate and product editors who compare places or versions. Direction: the triptych arrives as one frame and names its three shores; the stacked pair contrasts two desks with a thin lavender seam; the wipe uncovers the tidy desk over the busy one while BEFORE and AFTER labels sit on their own sides of the edge. Review: panes stay cover-fitted (no stretched photos), dividers are crisp, the wipe eases in and out and finishes before the labels need reading, and type never straddles a pane boundary."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 8,
+    "transition": { "type": "push-left", "duration": 0.5, "ease": "$snappy" }
+  },
+  "sections": [
+    {
+      "name": "triptych",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 3.4 },
+      "layout": {
+        "type": "split",
+        "sources": ["backgrounds/rocky-coast.jpg", "backgrounds/forest-sea.jpg", "backgrounds/green-forest.jpg"],
+        "gap": 12
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0.2,
+          "x": 0,
+          "y": 560,
+          "width": 1280,
+          "height": 160,
+          "color": "#141416@0.72",
+          "from": "bottom"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "title",
+          "text": { "en": "Three shores, one frame" },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 58,
+          "y": 595,
+          "color": "#F5F3F7",
+          "delay": 0.45,
+          "accent": { "words": "last", "color": "#FFF685" }
+        }
+      ]
+    },
+    {
+      "name": "stacked",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 3 },
+      "layout": {
+        "type": "split",
+        "direction": "vertical",
+        "sources": ["backgrounds/laptop-desk.jpg", "backgrounds/desk-flatlay.jpg"],
+        "divider": { "color": "#FFF685", "width": 6 }
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0.15,
+          "x": 900,
+          "y": 40,
+          "width": 320,
+          "height": 88,
+          "color": "#141416@0.82",
+          "from": "right"
+        },
+        {
+          "type": "panel",
+          "at": 0.5,
+          "x": 900,
+          "y": 400,
+          "width": 320,
+          "height": 88,
+          "color": "#141416@0.82",
+          "from": "right"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": { "en": "WIDE" },
+          "preset": "slide",
+          "direction": "left",
+          "ease": "$snappy",
+          "size": 64,
+          "align": "left",
+          "x": 932,
+          "y": 50,
+          "delay": 0.4
+        },
+        {
+          "text": { "en": "OVERHEAD" },
+          "preset": "slide",
+          "direction": "left",
+          "ease": "$snappy",
+          "size": 64,
+          "align": "left",
+          "x": 932,
+          "y": 410,
+          "delay": 0.75,
+          "color": "#FFF685"
+        }
+      ]
+    },
+    {
+      "name": "wipe",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 4 },
+      "layout": {
+        "type": "before-after",
+        "before": "backgrounds/laptop-desk.jpg",
+        "after": "backgrounds/desk-flatlay.jpg",
+        "wipe": { "at": 0.9, "duration": 1.4, "direction": "right", "ease": "ease-in-out-cubic" },
+        "divider": { "color": "#FFFFFF", "width": 5 }
+      },
+      "kinetic": [
+        {
+          "text": { "en": "BEFORE" },
+          "preset": "fade",
+          "size": 72,
+          "align": "right",
+          "x": 1220,
+          "y": 50,
+          "delay": 0.2,
+          "effect": { "shadow": true },
+          "exit": { "preset": "fade", "at": 1.7 }
+        },
+        {
+          "text": { "en": "AFTER" },
+          "preset": "rise",
+          "size": 72,
+          "align": "left",
+          "x": 60,
+          "y": 50,
+          "delay": 1.5,
+          "color": "#FFF685",
+          "effect": { "shadow": true }
+        }
+      ]
+    }
+  ]
+}

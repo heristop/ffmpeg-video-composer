@@ -25,7 +25,7 @@ describe('isolated installed samples entry', () => {
           encoding: 'utf8',
         });
         expect(result.status, result.stderr).toBe(0);
-        expect(JSON.parse(result.stdout)).toEqual([32, 'studio.product-reveal', ['Anton.ttf', 'Oswald.ttf']]);
+        expect(JSON.parse(result.stdout)).toEqual([47, 'studio.product-reveal', ['Anton.ttf', 'Oswald.ttf']]);
       }
     } finally {
       await rm(directory, { recursive: true, force: true });

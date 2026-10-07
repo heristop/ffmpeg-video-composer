@@ -30,6 +30,36 @@ const render = (els: ElementDescriptor[], active: ElementDescriptor['ref'] | nul
   );
 
 describe('ElementList', () => {
+  it('states the kind of an effect row and an animation-file row', () => {
+    const html = render(
+      [
+        {
+          ref: { kind: 'animation', index: 0 },
+          kind: 'animation',
+          labelKey: 'element.animation',
+          family: 'file',
+          previewText: 'confetti.apng',
+        },
+        {
+          ref: { kind: 'effect', index: 0 },
+          kind: 'effect',
+          labelKey: 'element.effect',
+          family: 'effect',
+          previewKey: 'animation.library.sheen',
+        },
+      ],
+      null
+    );
+
+    expect(html).toContain('aria-label="Animation file: confetti.apng"');
+    expect(html).toContain('aria-label="Effect: Sheen"');
+    expect(html).toContain('>Animation file<');
+    expect(html).toContain('>Effect<');
+    // Each family wears its own tone: lavender for effects, rose for files.
+    expect(html).toContain('bg-brand-500/15');
+    expect(html).toContain('bg-secondary-500/15');
+  });
+
   it('renders one row per descriptor with the active row pressed', () => {
     const html = render(elements, { kind: 'text', index: 0 });
 

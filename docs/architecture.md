@@ -270,6 +270,26 @@ Browser storage uses IndexedDB, while FFmpeg reads its own in-memory MEMFS. Inpu
 
 Node/static adapters allow concurrent executions because each command has its own process. WASM and device adapters use shared instances and render segments serially. Progress is delivered through `AbstractFFmpeg.progressListener` to director events; WASM uses elapsed time, while the native adapter can poll an injected progress file. The web app emits `task-cancelled` to stop at director checkpoints, which does not interrupt an active WASM command. Native cancellation uses the module's cooperative `cancel()` hook; see the [native API contracts](./on-device-compilation.md#boundary-contracts-the-schema).
 
+## Web builder: browser agents (WebMCP)
+
+The web app's template builder exposes 23 tools to the browser's own agent through WebMCP. The engine is
+not involved; the tools edit the builder's draft. The code follows the app's layers:
+
+- **`application/usecases/webmcp`** — the tool layer. Each `ToolDefinition` has a kind (read, edit or
+  consequential), a zod input and an optional builder capability. `registry.ts` turns definitions into
+  registrable specs and runs every call through one guard: abort, input size, per-kind rate limit, parse,
+  one mutating call at a time, the confirmation the kind asks for, then an activity report. Tools reach the
+  builder only through the `BuilderPort` interface, so they are tested over a fake port.
+- **`infrastructure/webmcp`** — the adapter to `document.modelContext`, which registers each tool against one
+  abort signal (aborting removes them all), plus the settings store, the dev-only polyfill loader and frame
+  capture.
+- **`presentation/components/admin/agent`** — `useBuilderAgent` implements `BuilderPort` over the editor
+  history, loads the tool layer as a lazy chunk on idle, and owns the confirmation queue (`confirm-queue.ts`:
+  one dialog, declines on dismiss, timeout or abort), the Agent drawer and its activity log.
+
+Tool names live in `tool-names.ts`, and the ones shared with `@leclap/mcp` keep the same meaning and
+revision contract. See [WebMCP](./webmcp.md).
+
 ## Error Handling & Diagnostics
 
 The architecture includes error handling and diagnostics:

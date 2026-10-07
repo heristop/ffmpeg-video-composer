@@ -22,6 +22,10 @@ export const FONTS: FontEntry[] = [
   { id: 'abril-fatface', label: 'Abril Fatface', file: 'AbrilFatface.ttf', cssFamily: 'Abril Fatface' },
   { id: 'righteous', label: 'Righteous', file: 'Righteous.ttf', cssFamily: 'Righteous' },
   { id: 'lobster', label: 'Lobster', file: 'Lobster.ttf', cssFamily: 'Lobster' },
+  // Right-to-left scripts (OFL, library/fonts/NotoSans-OFL.txt). Arabic/Hebrew letters only — pair with
+  // a Latin font for mixed copy. Drawn a line at a time so letters join (core/text-scripts.ts).
+  { id: 'noto-arabic', label: 'Noto Sans Arabic', file: 'NotoSansArabic.ttf', cssFamily: 'Noto Sans Arabic' },
+  { id: 'noto-hebrew', label: 'Noto Sans Hebrew', file: 'NotoSansHebrew.ttf', cssFamily: 'Noto Sans Hebrew' },
 ];
 
 export function findFont(id: string): FontEntry | undefined {

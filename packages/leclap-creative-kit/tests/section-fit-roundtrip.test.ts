@@ -102,3 +102,48 @@ describe('section fit (options.forceAspectRatio / forceOriginalAspectRatio)', ()
     expect(first.fit).toBe('letterbox');
   });
 });
+
+describe('blur fit and footage edits', () => {
+  const footage = {
+    fill: { blur: 30, dim: 0.2 },
+    focus: [
+      { t: 0, x: 0.2, y: 0.5 },
+      { t: 'beat:4', x: 0.8, y: 0.5, ease: 'ease-in-out' },
+    ],
+    clip: { from: 1, to: 4 },
+    speedRamp: 'hero' as const,
+    rampAudio: 'mute' as const,
+    freeze: [{ at: 1.5, hold: 0.5, flash: true }],
+  };
+
+  it('emits fit: "blur" (no legacy flag spells it)', () => {
+    const options = buildDescriptor(stateWith([video('blur')])).sections?.[0]?.options;
+    expect(options?.fit).toBe('blur');
+    expect(options).not.toHaveProperty('forceAspectRatio');
+    expect(options).not.toHaveProperty('forceOriginalAspectRatio');
+  });
+
+  it('carries footage edits through a builder round trip unchanged', () => {
+    const section: EditorSection = { ...video('blur'), footage } as EditorSection;
+    const descriptor = buildDescriptor(stateWith([section]));
+
+    expect(descriptor.sections?.[0]?.options).toMatchObject({ fit: 'blur', ...footage });
+
+    const back = toEditorState(templateFrom(stateWith([section])));
+    const first = back.sections[0] as Extract<EditorSection, { kind: 'video' }>;
+    expect(first.fit).toBe('blur');
+    expect(first.footage).toEqual(footage);
+    expect(buildDescriptor({ ...stateWith(back.sections), id: 'x' }).sections?.[0]?.options).toEqual(
+      descriptor.sections?.[0]?.options
+    );
+  });
+
+  it('reads options.fit over the legacy flags and keeps an untouched section clean', () => {
+    const descriptor = buildDescriptor(stateWith([video()]));
+    descriptor.sections![0]!.options = { ...descriptor.sections![0]!.options, fit: 'off', forceAspectRatio: true };
+
+    const back = toEditorState({ id: 'x', name: 'n', description: '', orientation: 'landscape', descriptor });
+    expect((back.sections[0] as Extract<EditorSection, { kind: 'video' }>).fit).toBe('off');
+    expect(toEditorState(templateFrom(stateWith([video()]))).sections[0]).not.toHaveProperty('footage');
+  });
+});

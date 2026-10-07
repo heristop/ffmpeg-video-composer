@@ -1,0 +1,230 @@
+{
+  "meta": {
+    "name": "Gallery: layouts",
+    "description": "Split screens (horizontal, vertical, ratio, gap, divider, colour pane) and before/after wipes in every direction, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 8,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "two-panes",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "layout": {
+        "type": "split",
+        "sources": ["backgrounds/rocky-coast.jpg", "backgrounds/forest-sea.jpg"]
+      }
+    },
+    {
+      "name": "ratio-0.66",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "layout": {
+        "type": "split",
+        "sources": ["backgrounds/rocky-coast.jpg", "backgrounds/forest-sea.jpg"],
+        "ratio": 0.66,
+        "divider": {
+          "color": "#FFF685",
+          "width": 6
+        }
+      }
+    },
+    {
+      "name": "three-gap",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "layout": {
+        "type": "split",
+        "sources": ["backgrounds/rocky-coast.jpg", "backgrounds/forest-sea.jpg", "backgrounds/green-forest.jpg"],
+        "gap": 16
+      }
+    },
+    {
+      "name": "four-divider",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "layout": {
+        "type": "split",
+        "sources": [
+          "backgrounds/rocky-coast.jpg",
+          "backgrounds/forest-sea.jpg",
+          "backgrounds/green-forest.jpg",
+          "backgrounds/golden-hour.jpg"
+        ],
+        "divider": {
+          "color": "#FFFFFF",
+          "width": 4
+        }
+      }
+    },
+    {
+      "name": "vertical",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "layout": {
+        "type": "split",
+        "sources": ["backgrounds/laptop-desk.jpg", "backgrounds/desk-flatlay.jpg"],
+        "direction": "vertical"
+      }
+    },
+    {
+      "name": "vertical-ratio",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "layout": {
+        "type": "split",
+        "sources": ["backgrounds/laptop-desk.jpg", "backgrounds/desk-flatlay.jpg"],
+        "direction": "vertical",
+        "ratio": 0.33,
+        "divider": {
+          "color": "#FF8AAE",
+          "width": 6
+        }
+      }
+    },
+    {
+      "name": "vertical-three",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "layout": {
+        "type": "split",
+        "sources": ["backgrounds/rocky-coast.jpg", "backgrounds/forest-sea.jpg", "backgrounds/green-forest.jpg"],
+        "direction": "vertical",
+        "gap": 10
+      }
+    },
+    {
+      "name": "colour-pane",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "layout": {
+        "type": "split",
+        "sources": ["backgrounds/golden-hour.jpg", "#7C83FD"],
+        "ratio": 0.6
+      }
+    },
+    {
+      "name": "wipe-right",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "layout": {
+        "type": "before-after",
+        "before": "backgrounds/laptop-desk.jpg",
+        "after": "backgrounds/desk-flatlay.jpg",
+        "wipe": {
+          "at": 0.4,
+          "duration": 1.6,
+          "direction": "right",
+          "ease": "linear"
+        },
+        "divider": {
+          "color": "#FFFFFF",
+          "width": 6
+        }
+      }
+    },
+    {
+      "name": "wipe-left",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "layout": {
+        "type": "before-after",
+        "before": "backgrounds/laptop-desk.jpg",
+        "after": "backgrounds/desk-flatlay.jpg",
+        "wipe": {
+          "at": 0.4,
+          "duration": 1.6,
+          "direction": "left",
+          "ease": "linear"
+        },
+        "divider": {
+          "color": "#FFFFFF",
+          "width": 6
+        }
+      }
+    },
+    {
+      "name": "wipe-down",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "layout": {
+        "type": "before-after",
+        "before": "backgrounds/laptop-desk.jpg",
+        "after": "backgrounds/desk-flatlay.jpg",
+        "wipe": {
+          "at": 0.4,
+          "duration": 1.6,
+          "direction": "down",
+          "ease": "linear"
+        },
+        "divider": {
+          "color": "#FFFFFF",
+          "width": 6
+        }
+      }
+    },
+    {
+      "name": "wipe-up",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "layout": {
+        "type": "before-after",
+        "before": "backgrounds/laptop-desk.jpg",
+        "after": "backgrounds/desk-flatlay.jpg",
+        "wipe": {
+          "at": 0.4,
+          "duration": 1.6,
+          "direction": "up",
+          "ease": "linear"
+        },
+        "divider": {
+          "color": "#FFFFFF",
+          "width": 6
+        }
+      }
+    }
+  ]
+}

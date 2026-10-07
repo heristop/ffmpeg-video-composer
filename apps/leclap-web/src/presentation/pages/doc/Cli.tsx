@@ -49,6 +49,26 @@ const RENDER_FLAGS = [
       </>
     ),
   },
+  {
+    term: '--format <name>',
+    meta: 'landscape | portrait | square',
+    children: (
+      <>
+        Render one composition of a template that declares <Code>formats</Code>: its override and <Code>$format</Code>{' '}
+        values apply.
+      </>
+    ),
+  },
+  {
+    term: '--formats <list>',
+    meta: 'all | landscape,portrait,…',
+    children: (
+      <>
+        Render several formats, each to <Code>&lt;output&gt;-&lt;format&gt;.mp4</Code>; <Code>all</Code> renders every
+        declared one.
+      </>
+    ),
+  },
   { term: '--assets <dir>', meta: 'default: ./assets', children: 'Where the render reads media from.' },
   { term: '--build <dir>', meta: 'default: ./build', children: 'Where the render writes its output.' },
   {
@@ -88,7 +108,7 @@ export const DocCli = () => (
       <CliGetStarted />
     </DocSection>
 
-    <DocSection id="commands" title="Commands" kicker="Five verbs">
+    <DocSection id="commands" title="Commands" kicker="Core verbs">
       <CommandList>
         <CommandPill command="leclap init [name]" label="scaffold a starter project that renders as-is" />
         <CommandPill command="leclap render <template>" label="compile a video from a template JSON" />
@@ -96,7 +116,20 @@ export const DocCli = () => (
           command="leclap validate <template>"
           label="check a template against the schema and its text geometry, without rendering"
         />
-        <CommandPill command="leclap diagnose" label="report which FFmpeg your environment provides" />
+        <CommandPill
+          command="leclap snapshot <template>"
+          label="render still frames and contact sheets of chosen moments, to look at the result"
+        />
+        <CommandPill command="leclap timeline <template>" label="where every section, element, beat and cue sits" />
+        <CommandPill command="leclap style <reference>" label="derive a theme and style guide from an image or clip" />
+        <CommandPill
+          command="leclap beats <audio>"
+          label="measure a track's tempo, beat grid and drop for global.beats"
+        />
+        <CommandPill
+          command="leclap diagnose"
+          label="report which FFmpeg your environment provides and what it can render (--json)"
+        />
         <CommandPill command="leclap samples list" label="discover packaged showcase samples and requirements" />
       </CommandList>
       <Prose>
@@ -129,7 +162,7 @@ export const DocCli = () => (
       </CommandList>
       <Prose>
         <p>
-          The 32 samples are discoverable without FFmpeg or Remotion. Supply or replace their listed media and fonts;
+          The 47 samples are discoverable without FFmpeg or Remotion. Supply or replace their listed media and fonts;
           preview videos are not packaged. Partials are embedded in exports. Use repeatable <Code>--video</Code> and{' '}
           <Code>--field</Code> flags for the sample&apos;s required bindings. Registered-effect samples render through
           the configured <Link to="/doc/mcp">MCP backend</Link>, not directly through <Code>leclap render</Code>.
@@ -154,6 +187,10 @@ export const DocCli = () => (
         <CommandPill
           command="leclap render template.json --orientation portrait -o out/reel.mp4"
           label="re-cut the same template vertically, into a named file"
+        />
+        <CommandPill
+          command="leclap render story.json --formats all -o story.mp4"
+          label="render every declared format of a template, one mp4 each"
         />
         <CommandPill command="leclap render template.json --watch" label="re-render on every edit while you author" />
         <CommandPill command="leclap render template.json --json --quiet" label="one parseable line, for CI" />

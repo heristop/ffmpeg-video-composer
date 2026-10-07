@@ -4,29 +4,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { useReducedMotion } from 'motion/react';
-import { templateService, type Template } from '@/services/templateService';
 import { userTemplateService } from '@/services/userTemplateService';
 import type { StoredTemplate } from '@/stores/userTemplateStore';
-import { buildDescriptor, type EditorState } from '../templateEditorModel';
+import type { EditorState } from '../templateEditorModel';
+import { toUserTemplate } from './user-template';
 import { buildMasterTimeline } from './program-timeline.logic';
 import { useProgramClock } from './use-program-clock';
 import { saveBlocker, saveFeedback, type SaveBlocker } from './save-blocker.logic';
 
-// Editor state -> persisted user Template (same projection as TemplateEditor.toUserTemplate).
-function toUserTemplate(state: EditorState): Template {
-  const descriptor = buildDescriptor(state);
-
-  return {
-    id: state.id,
-    name: state.name.trim(),
-    description: state.description.trim(),
-    orientation: state.orientation,
-    hasForm: templateService.extractFormFields(descriptor).length > 0,
-    complexity: templateService.getTemplateComplexity(descriptor),
-    source: 'user',
-    descriptor,
-  };
-}
+// The browser-agent (WebMCP) port and registration, surfaced here so the shell spends no import on it.
+export { useBuilderAgent } from '../agent/use-builder-agent';
 
 // The live program monitor's state: the visual scenes concatenated into one playable timeline driven
 // by a rAF clock, plus play-mode bookkeeping (starting the clock enters play mode; exit pauses it).

@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "name": "Gallery: footage fit and focus",
+    "description": "A portrait clip under every fit, and a wide clip under every focus anchor, for the docs gallery. The clips are synthetic (make-gallery.sh builds them from bundled photos)."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 23,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "cover",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/portrait.mp4",
+        "duration": 1.5,
+        "fit": "cover"
+      }
+    },
+    {
+      "name": "letterbox",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/portrait.mp4",
+        "duration": 1.5,
+        "fit": "letterbox"
+      }
+    },
+    {
+      "name": "blur",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/portrait.mp4",
+        "duration": 1.5,
+        "fit": "blur",
+        "fill": {
+          "blur": 30,
+          "dim": 0.35,
+          "zoom": 1.1
+        }
+      }
+    },
+    {
+      "name": "focus-left",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/panorama.mp4",
+        "duration": 1.5,
+        "focus": "left"
+      }
+    },
+    {
+      "name": "focus-center",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/panorama.mp4",
+        "duration": 1.5,
+        "focus": "center"
+      }
+    },
+    {
+      "name": "focus-right",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/panorama.mp4",
+        "duration": 1.5,
+        "focus": "right"
+      }
+    }
+  ]
+}

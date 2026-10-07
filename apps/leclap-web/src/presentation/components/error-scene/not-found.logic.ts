@@ -19,6 +19,7 @@ const DOC_PATHS = [
   '/doc/schema',
   '/doc/cli',
   '/doc/mcp',
+  '/doc/webmcp',
   '/doc/effects',
   '/doc/reference',
   '/doc/engine',

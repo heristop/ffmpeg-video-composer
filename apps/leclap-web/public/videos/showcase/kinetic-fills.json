@@ -1,0 +1,147 @@
+{
+  "meta": {
+    "name": "Filled type",
+    "description": "Kinetic fills: a two-colour gradient headline, a photograph seen through the letters and a shimmer band sweeping across a brand word. Bundled fonts and one bundled photo.",
+    "creativeDirection": "Audience: brand and launch editors who want type that carries colour and texture without pre-rendered video. Direction: three beats, one fill each. A pink-to-lavender gradient cascades in; the golden-hour photograph fills a heavy title under a slow push-in; the closing brand word tracks in and catches a single shimmer pass, then a second one before the cut. Review: every fill reads as the letters themselves (no rectangles behind them), the solid fallback colour stays legible, the texture beat is dark enough around the letters for the photo to read, and the shimmer never starts before the word has landed."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 21,
+    "transition": {
+      "type": "push-left",
+      "duration": 0.5,
+      "ease": "$snappy"
+    },
+    "motion": {
+      "energy": 1
+    }
+  },
+  "sections": [
+    {
+      "name": "gradient",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "kinetic": [
+        {
+          "id": "title",
+          "text": {
+            "en": "Colour in motion"
+          },
+          "preset": "cascade",
+          "font": "anton",
+          "size": 150,
+          "y": 240,
+          "color": "#FF8AAE",
+          "fill": {
+            "gradient": {
+              "from": "#FF8AAE",
+              "to": "#7C83FD",
+              "angle": 90
+            }
+          }
+        },
+        {
+          "text": {
+            "en": "kinetic[].fill.gradient"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 30,
+          "y": 430,
+          "color": "#9A98A6",
+          "delay": "title.end + 0.2"
+        }
+      ]
+    },
+    {
+      "name": "texture",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#0B0B0D",
+        "duration": 3.2
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.06
+      },
+      "kinetic": [
+        {
+          "id": "title",
+          "text": {
+            "en": "GOLDEN HOUR"
+          },
+          "preset": "rise",
+          "font": "anton",
+          "size": 230,
+          "y": "center",
+          "color": "#F2B866",
+          "fill": {
+            "texture": "backgrounds/golden-hour.jpg"
+          }
+        },
+        {
+          "text": {
+            "en": "a photograph seen through the letters"
+          },
+          "preset": "fade",
+          "font": "oswald",
+          "size": 36,
+          "y": 560,
+          "color": "#C9C6D2",
+          "delay": "title.end + 0.25"
+        }
+      ]
+    },
+    {
+      "name": "shimmer",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 3.4
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 1.2,
+          "x": 440,
+          "y": 470,
+          "width": 400,
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "brand",
+          "text": {
+            "en": "LECLAP"
+          },
+          "preset": "tracking-in",
+          "size": 210,
+          "y": 220,
+          "color": "#9EA3FF",
+          "fill": {
+            "gradient": {
+              "stops": ["#7C83FD", "#C9CBFF", "#7C83FD"],
+              "angle": 90
+            },
+            "sweep": {
+              "duration": 0.9,
+              "delay": 1.3,
+              "every": 1.5,
+              "color": "#FFFFFF@0.85"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

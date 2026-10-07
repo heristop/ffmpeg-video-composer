@@ -1,0 +1,347 @@
+{
+  "meta": {
+    "name": "Gallery: camera presets",
+    "description": "One section per camera preset (sections[].camera.preset) over the same photograph, plus punch-in hits, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 5,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "push-in",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.3,
+        "ease": "linear"
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 140,
+          "thickness": 10,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "CAMERA"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 170,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "pull-out",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2
+      },
+      "camera": {
+        "preset": "pull-out",
+        "amount": 0.3,
+        "ease": "linear"
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 140,
+          "thickness": 10,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "CAMERA"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 170,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "drift-left",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2
+      },
+      "camera": {
+        "preset": "drift-left",
+        "amount": 0.3,
+        "ease": "linear"
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 140,
+          "thickness": 10,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "CAMERA"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 170,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "drift-right",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2
+      },
+      "camera": {
+        "preset": "drift-right",
+        "amount": 0.3,
+        "ease": "linear"
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 140,
+          "thickness": 10,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "CAMERA"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 170,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "drift-up",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2
+      },
+      "camera": {
+        "preset": "drift-up",
+        "amount": 0.3,
+        "ease": "linear"
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 140,
+          "thickness": 10,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "CAMERA"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 170,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "drift-down",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2
+      },
+      "camera": {
+        "preset": "drift-down",
+        "amount": 0.3,
+        "ease": "linear"
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 140,
+          "thickness": 10,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "CAMERA"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 170,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "orbit",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2
+      },
+      "camera": {
+        "preset": "orbit",
+        "amount": 0.3
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 140,
+          "thickness": 10,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "CAMERA"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 170,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "handheld",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2
+      },
+      "camera": {
+        "preset": "handheld",
+        "shake": {
+          "amplitude": 18,
+          "frequency": 1.2,
+          "rotation": 1.5
+        }
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 140,
+          "thickness": 10,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "CAMERA"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 170,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "hits",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rocky-coast.jpg",
+        "duration": 2
+      },
+      "camera": {
+        "hits": [
+          {
+            "at": 1,
+            "strength": 0.14,
+            "decay": 6
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "duration": 0.01,
+          "inset": 140,
+          "thickness": 10,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "CAMERA"
+          },
+          "preset": "fade",
+          "duration": 0.01,
+          "delay": 0,
+          "size": 170,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ]
+    }
+  ]
+}

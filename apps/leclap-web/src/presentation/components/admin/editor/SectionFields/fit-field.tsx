@@ -1,7 +1,8 @@
-// Three-way source-footage fit control shared by video and image sections: how the clip / picked
+// Four-way source-footage fit control shared by video and image sections: how the clip / picked
 // image maps into the output frame. 'cover' (default) fills and centre-crops, 'letterbox' keeps the
-// whole frame visible with pad bars, 'off' skips the conform scaling entirely. Emitted as the
-// descriptor's forceAspectRatio / forceOriginalAspectRatio flags (see the kit's sectionFitOptions).
+// whole frame visible with pad bars, 'blur' keeps it all visible over a blurred, dimmed copy, 'off'
+// skips the conform scaling entirely. Emitted as the descriptor's forceAspectRatio /
+// forceOriginalAspectRatio flags or `fit: 'blur'` (see the kit's sectionFitOptions).
 import { useTranslation } from 'react-i18next';
 import { SegmentedControl } from '../controls';
 import { SECTION_FIT_MODES, type SectionFit } from '../../templateEditorModel';
@@ -17,6 +18,7 @@ export const FitField = ({ fit, onChange }: FitFieldProps) => {
   const labels: Record<SectionFit, string> = {
     cover: t('fit.cover'),
     letterbox: t('fit.letterbox'),
+    blur: t('fit.blur'),
     off: t('fit.off'),
   };
 

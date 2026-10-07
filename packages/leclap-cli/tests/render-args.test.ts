@@ -95,6 +95,12 @@ describe('buildProjectConfig', () => {
     expect(cfg.userVideoPaths).toBeUndefined();
     expect(cfg.videoConfig).toBeUndefined();
     expect(cfg.currentLocale).toBeUndefined();
+    expect(cfg.deterministic).toBeUndefined();
+  });
+
+  it('forwards --deterministic / --no-deterministic to the engine', () => {
+    expect(buildProjectConfig(cwd, { deterministic: true }).deterministic).toBe(true);
+    expect(buildProjectConfig(cwd, { deterministic: false }).deterministic).toBe(false);
   });
 });
 

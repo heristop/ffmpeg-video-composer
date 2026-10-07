@@ -370,9 +370,9 @@
     "mirror": "Spiegeln",
     "mirrorHorizontal": "Horizontal",
     "mirrorVertical": "Vertikal",
-    "add": "Animation hinzufügen",
-    "layer": "Animation {{number}}",
-    "remove": "Animation entfernen",
+    "add": "Animationsdatei hinzufügen",
+    "layer": "Animationsdatei {{number}}",
+    "remove": "Animationsdatei entfernen",
     "effects": {
       "label": "Effektkombinationen",
       "interface-focus": {
@@ -399,11 +399,59 @@
         "name": "Rahmenenthüllung",
         "description": "Ein feiner Rahmen mit einem einzelnen Lichtstreifen."
       }
-    }
+    },
+    "library": {
+      "sheen": "Glanz",
+      "glint-orbit": "Kreisender Glanzpunkt",
+      "edge-glow": "Kantenglühen",
+      "leak": "Lichteinfall",
+      "bloom": "Überstrahlung",
+      "ripple": "Pulsring",
+      "ripple-tap": "Tippen",
+      "resolve": "Scharfstellen",
+      "glass": "Milchglas",
+      "vignette-breathe": "Atmende Vignette",
+      "confetti": "Konfetti",
+      "glint": "Glanzpunkte",
+      "frame": "Rahmen",
+      "corners": "Eckklammern",
+      "underline": "Unterstrich",
+      "bokeh": "Bokeh",
+      "dust": "Staub",
+      "grain": "Körnung",
+      "shine-sweep": "Glanzwischer",
+      "sparkle": "Funkeln",
+      "corner-brackets": "Eckklammern",
+      "pulse-ring": "Pulsring",
+      "tap-pulse": "Tipp-Impuls",
+      "light-leak": "Lichteinfall",
+      "white-border": "Weißer Rand",
+      "glow-border": "Leuchtrand",
+      "rounded-border": "Abgerundeter Rand",
+      "spec-orbit": "Glanzorbit",
+      "animation-icons": "Animierte Icons"
+    },
+    "groups": {
+      "light": "Licht",
+      "focus": "Fokus",
+      "celebrate": "Feiern",
+      "frames": "Rahmen",
+      "ambient": "Atmosphäre",
+      "samples": "Beispiele",
+      "samplesHint": "Fertige Overlays, die in jeder Vorlage gleich aussehen. Nimm lieber einen Effekt oben: Die Engine zeichnet ihn passend zu dieser Szene."
+    },
+    "engine": {
+      "engineLabel": "Effekte",
+      "engineHelp": "Von LeClap gezeichnet und auf diese Szene abgestimmt. Feinschliff im Web-Editor.",
+      "added": "Effekte in dieser Szene",
+      "removeEffect": "{{label}} entfernen",
+      "addEffect": "{{label}} hinzufügen"
+    },
+    "sampleBadge": "Beispiel"
   },
   "overlays": {
     "kind": "Overlays",
-    "animation": "Animation",
+    "animation": "Animationsdatei",
     "image": "Bild"
   },
   "watermark": {

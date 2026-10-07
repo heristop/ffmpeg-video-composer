@@ -116,7 +116,49 @@ describe('probe_media mapping (mocked ffprobe)', () => {
       audioCodec: 'aac',
       sampleRate: 44100,
       sizeBytes: (await fs.stat(clip)).size,
+      hdr: null,
+      colorPrimaries: null,
+      colorTransfer: null,
+      bitDepth: null,
+      vfr: false,
+      rotation: 0,
     });
+  });
+
+  it('reports HDR, VFR and rotation traits of the video stream', async () => {
+    const clip = path.join(mediaDir, 'hdr.mp4');
+    await fs.writeFile(clip, 'video');
+
+    const runner: ProbeRunner = async () => ({
+      streams: [
+        {
+          codec_type: 'video',
+          codec_name: 'hevc',
+          duration: '4',
+          pix_fmt: 'yuv420p10le',
+          color_primaries: 'bt2020',
+          color_transfer: 'arib-std-b67',
+          r_frame_rate: '30/1',
+          avg_frame_rate: '24/1',
+          side_data_list: [{ side_data_type: 'Display Matrix', rotation: -90 }],
+        },
+      ],
+    });
+
+    const result = (await captureHandler(config, runner)({ path: clip })) as {
+      content: Array<{ text: string }>;
+      structuredContent?: Record<string, unknown>;
+    };
+
+    expect(result.structuredContent).toMatchObject({
+      hdr: 'hlg',
+      colorPrimaries: 'bt2020',
+      colorTransfer: 'arib-std-b67',
+      bitDepth: 10,
+      vfr: true,
+      rotation: 270,
+    });
+    expect(result.content[0].text).toContain('HDR hlg, VFR, rotated 270°');
   });
 
   it('falls back to the audio stream duration when the video stream has none', async () => {

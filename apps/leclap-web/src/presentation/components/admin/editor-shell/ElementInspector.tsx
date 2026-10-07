@@ -1,17 +1,24 @@
 // The left inspector's per-kind dispatcher: given the section + the single shared selection, render the
-// right SETTINGS control for the selected element (text / background layer / image / animation) by
-// reusing the existing extracted controls. Array surgery for layer move/remove reuses sectionElements.
+// right SETTINGS control for the selected element (text / background layer / image / animation / engine
+// effect) by reusing the existing extracted controls. Array surgery for layer move/remove reuses
+// sectionElements. Picking an engine primitive in an animation's library swaps that animation for the
+// primitive (a `graphics[]` entry drafted for this section) and selects it, which opens its parameter panel.
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import type {
-  EditorSection,
-  TextOverlay,
-  BackgroundLayer,
-  ImageOverlay,
-  AnimationOverlay,
-  Orientation,
+import type { Graphic } from 'ffmpeg-video-composer/src/schemas/graphics.schemas.ts';
+import {
+  draftGraphic,
+  type AnimationEffectPreset,
+  type EditorSection,
+  type EngineLibraryEntry,
+  type TextOverlay,
+  type BackgroundLayer,
+  type ImageOverlay,
+  type AnimationOverlay,
+  type Orientation,
 } from '../templateEditorModel';
+import { FxParamPanel } from '../editor/FxParamPanel';
 import { Button } from '@/presentation/components/ui';
 import { SelectedControls } from './overlayControls';
 import { LayerRow } from '../editor/LayerRow';
@@ -21,6 +28,7 @@ import { TitleCardField } from '../editor/SectionFields/TitleCardField';
 import { LowerThirdField } from '../editor/SectionFields/LowerThirdField';
 import { EDITOR_INPUT_CLASS } from '../editor/editorStyles';
 import { removeElement, reorderElement, type SugarKind } from './sectionElements';
+import type { AnimationPickMode } from '../editor/animationSource';
 import { sugarToOverlays } from './sugarToOverlays';
 import type { ElementRef } from './useSectionSelection';
 
@@ -29,8 +37,14 @@ interface ElementInspectorProps {
   activeRef: ElementRef | null;
   variables: string[];
   orientation: Orientation;
+  /** global.theme (the theme colours an effect's colour tokens resolve to). */
+  theme?: unknown;
+  /** Mixed into a fresh effect's seed (the section's index), so placements in different sections differ. */
+  salt?: number;
   onPatchSection: (patch: Partial<EditorSection>) => void;
   onSelectElement: (ref: ElementRef | null) => void;
+  /** The picker side a freshly added animation slot opens on (the add menu's "Effect" vs "Animation file"). */
+  slotMode?: { index: number; mode: AnimationPickMode } | null;
 }
 
 // Immutable single-index patch shared by every array-backed kind.
@@ -59,12 +73,28 @@ export const ElementInspector = ({
   activeRef,
   variables,
   orientation,
+  theme,
+  salt,
   onPatchSection,
   onSelectElement,
+  slotMode,
 }: ElementInspectorProps) => {
   const { t } = useTranslation('admin');
 
   if (!activeRef) return <Hint label={t('element.selectHint')} />;
+
+  if (activeRef.kind === 'effect') {
+    return (
+      <EffectSettings
+        section={section}
+        activeRef={activeRef}
+        theme={theme}
+        t={t}
+        onPatchSection={onPatchSection}
+        onSelectElement={onSelectElement}
+      />
+    );
+  }
 
   if (activeRef.kind === 'text') {
     return (
@@ -119,11 +149,16 @@ export const ElementInspector = ({
 
   return (
     <AnimationSettings
+      // Keyed by index so each animation keeps its own picker state (side, tab) instead of inheriting it.
+      key={activeRef.index}
+      initialMode={slotMode?.index === activeRef.index ? slotMode.mode : undefined}
       section={section}
       activeRef={activeRef}
       orientation={orientation}
+      salt={salt}
       t={t}
       onPatchSection={onPatchSection}
+      onSelectElement={onSelectElement}
     />
   );
 };
@@ -331,11 +366,39 @@ const ImageSettings = ({ section, activeRef, orientation, t, onPatchSection }: P
   );
 };
 
-const AnimationSettings = ({ section, activeRef, orientation, t, onPatchSection }: PlacementSettingsProps) => {
+interface AnimationSettingsProps extends PlacementSettingsProps {
+  salt?: number;
+  initialMode?: AnimationPickMode;
+  onSelectElement: (ref: ElementRef | null) => void;
+}
+
+// The animation element's settings: its library (engine primitives + samples) and, for a sample, its
+// placement and playback. An engine pick replaces this overlay with the drafted graphic(s) and selects the
+// first one, so its parameter panel opens in place.
+const AnimationSettings = ({
+  section,
+  activeRef,
+  orientation,
+  salt,
+  initialMode,
+  t,
+  onPatchSection,
+  onSelectElement,
+}: AnimationSettingsProps) => {
   const animations = readArray<AnimationOverlay>(section, 'animations');
   const animation = elementAt(animations, activeRef.index);
 
   if (!animation) return <Hint label={t('element.selectHint')} />;
+
+  const replaceWith = (build: (context: { section: EditorSection }) => Graphic[]) => {
+    const remaining = animations.filter((_, index) => index !== activeRef.index);
+    const base = { ...section, animations: remaining } as EditorSection;
+    const graphics = readArray<Graphic>(section, 'graphics');
+    const added = build({ section: base });
+
+    onPatchSection({ animations: remaining.length > 0 ? remaining : undefined, graphics: [...graphics, ...added] });
+    onSelectElement({ kind: 'effect', index: graphics.length });
+  };
 
   return (
     <Card>
@@ -343,8 +406,49 @@ const AnimationSettings = ({ section, activeRef, orientation, t, onPatchSection 
         kind="animation"
         orientation={orientation}
         value={animation}
+        initialMode={initialMode}
         onChange={(patch) => {
           onPatchSection({ animations: patchAt(animations, activeRef.index, patch) });
+        }}
+        onPickEngine={(entry: EngineLibraryEntry) => {
+          replaceWith(({ section: base }) => [draftGraphic(entry, { section: base, orientation, salt })]);
+        }}
+        onPickRecipe={(preset: AnimationEffectPreset) => {
+          replaceWith(({ section: base }) => preset.build({ section: base, orientation, salt }));
+        }}
+      />
+    </Card>
+  );
+};
+
+interface EffectSettingsProps {
+  section: EditorSection;
+  activeRef: ElementRef;
+  theme?: unknown;
+  t: TFunction<'admin'>;
+  onPatchSection: (patch: Partial<EditorSection>) => void;
+  onSelectElement: (ref: ElementRef | null) => void;
+}
+
+// An engine effect (section.graphics[i]): its generated parameter panel.
+const EffectSettings = ({ section, activeRef, theme, t, onPatchSection, onSelectElement }: EffectSettingsProps) => {
+  const graphics = readArray<Graphic>(section, 'graphics');
+  const graphic = elementAt(graphics, activeRef.index);
+
+  if (!graphic) return <Hint label={t('element.selectHint')} />;
+
+  return (
+    <Card>
+      <FxParamPanel
+        graphic={graphic}
+        section={section}
+        theme={theme}
+        onChange={(next) => {
+          onPatchSection({ graphics: graphics.map((item, index) => (index === activeRef.index ? next : item)) });
+        }}
+        onRemove={() => {
+          onSelectElement(null);
+          onPatchSection(removeElement(section, activeRef));
         }}
       />
     </Card>

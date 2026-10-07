@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "name": "Spring kinetics",
+    "description": "Motion system study: springs, brand curves, motion tokens, keyframe tracks and the energy dial.",
+    "creativeDirection": "Audience: people who judge motion by feel. Direction: physical, confident, never floaty. The headline lands on a spring and its scale settles a beat later; the support line follows on the brand's juicy curve; the counterpoint slides in on expo and leaves on smooth. Ink canvas, white Bebas Neue, lavender and pink accents. Review: overshoot stays inside the title-safe area, every word is settled for at least half a second before it leaves, and the final hold reads cleanly."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 7,
+    "transition": { "type": "cut" },
+    "motion": {
+      "energy": 1,
+      "springs": { "land": { "stiffness": 260, "damping": 17 } },
+      "curves": { "brand": "cubic-bezier(0.2, 0, 0, 1)" },
+      "durations": { "beat": 0.5 }
+    }
+  },
+  "sections": [
+    {
+      "name": "land",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 3 },
+      "grade": { "grain": 0.25 },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": { "en": "PHYSICS," },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 200,
+            "fontcolor": "#F5F3F7",
+            "x": 80,
+            "y": 150
+          },
+          "animate": {
+            "y": [
+              { "t": 0.1, "v": "+140" },
+              { "v": "+0", "ease": "$land" }
+            ],
+            "opacity": [
+              { "t": 0.1, "v": 0 },
+              { "t": "+$micro", "v": 1 },
+              { "t": 2.5, "v": 1 },
+              { "t": "+0.3", "v": 0, "ease": "$smooth" }
+            ],
+            "scale": [
+              { "t": 0.1, "v": 0.86 },
+              { "t": "+$long", "v": 1, "ease": "$bouncy" }
+            ]
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": { "en": "NOT TIMING." },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 120,
+            "fontcolor": "#B8ADFF",
+            "x": 86,
+            "y": 380
+          },
+          "reveal": { "type": "slide-left", "delay": 0.45, "distance": 90, "easing": "$snappy" },
+          "exit": { "type": "fade", "after": 2.5, "duration": 0.3, "easing": "$smooth" }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": { "en": "MOTION SYSTEM / SPRINGS" },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 30,
+            "fontcolor": "#FF8AAE",
+            "x": 90,
+            "y": 560
+          },
+          "reveal": { "type": "rise", "delay": 0.8, "duration": 0.5, "distance": 24, "easing": "$juicy" },
+          "exit": { "type": "fade", "after": 2.5, "duration": 0.3 }
+        }
+      ]
+    },
+    {
+      "name": "counterpoint",
+      "type": "color_background",
+      "options": { "backgroundColor": "#1B1830", "duration": 2.6 },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": { "en": "ONE CURVE." },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 160,
+            "fontcolor": "#F5F3F7",
+            "x": 80,
+            "y": 200
+          },
+          "animate": {
+            "x": [
+              { "t": 0, "v": "-220" },
+              { "t": "+$beat", "v": "+0", "ease": "$expo" },
+              { "t": 2.1, "v": "+0" },
+              { "t": "+0.4", "v": "+260", "ease": "ease-in-back" }
+            ],
+            "opacity": [
+              { "t": 0, "v": 0 },
+              { "t": "+$short", "v": 1, "ease": "$brand" }
+            ]
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": { "en": "EVERY SCREEN." },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 96,
+            "fontcolor": "#FFF685",
+            "x": 86,
+            "y": 390
+          },
+          "reveal": { "type": "rise", "delay": 0.4, "distance": 60, "easing": "spring(300, 14)" },
+          "exit": { "type": "slide-left", "after": 2.1, "duration": 0.4, "distance": 120, "easing": "ease-in-cubic" }
+        }
+      ]
+    }
+  ]
+}

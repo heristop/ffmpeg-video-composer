@@ -11,18 +11,6 @@ MUSIC (public/musics/)
   License: YouTube Audio Library — free to use, no attribution required.
   Source: https://www.youtube.com/audiolibrary
 
-- Americana — Kevin MacLeod (incompetech.com)
-  License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
-  Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100254
-
-- Arcadia — Kevin MacLeod (incompetech.com)
-  License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
-  Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100291
-
-- Anxiety — Kevin MacLeod (incompetech.com)
-  License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
-  Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100288
-
 - Monkeys Spinning Monkeys — Kevin MacLeod (incompetech.com)
   License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
   Source: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Monkeys%20Spinning%20Monkeys.mp3
@@ -31,33 +19,17 @@ MUSIC (public/musics/)
   License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
   Source: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Fluffing%20a%20Duck.mp3
 
-- Sneaky Snitch — Kevin MacLeod (incompetech.com)
-  License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
-  Source: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Sneaky%20Snitch.mp3
-
 - Carefree — Kevin MacLeod (incompetech.com)
   License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
   Source: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Carefree.mp3
-
-- Pixelland — Kevin MacLeod (incompetech.com)
-  License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
-  Source: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Pixelland.mp3
 
 - The Builder — Kevin MacLeod (incompetech.com)
   License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
   Source: https://incompetech.com/music/royalty-free/mp3-royaltyfree/The%20Builder.mp3
 
-- Brain Dance — Kevin MacLeod (incompetech.com)
-  License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
-  Source: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Brain%20Dance.mp3
-
 - Local Forecast - Elevator — Kevin MacLeod (incompetech.com)
   License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
   Source: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Local%20Forecast%20-%20Elevator.mp3
-
-- Cafe Bossa Nova — rediskasound
-  License: Pixabay License — https://pixabay.com/service/license-summary/
-  Source: https://pixabay.com/music/bossa-nova-cafe-bossa-nova-554525/
 
 - Tropical Cocktail — The_Mountain
   License: Pixabay License — https://pixabay.com/service/license-summary/
@@ -79,14 +51,6 @@ MUSIC (public/musics/)
   License: Pixabay License — https://pixabay.com/service/license-summary/
   Source: https://pixabay.com/music/dance-party-dance-526227/
 
-- Future Bass Energy — BombinSound
-  License: Pixabay License — https://pixabay.com/service/license-summary/
-  Source: https://pixabay.com/music/future-bass-energetic-upbeat-future-bass-version-1-537886/
-
-- Upbeat Electronic — prettyjohn1
-  License: Pixabay License — https://pixabay.com/service/license-summary/
-  Source: https://pixabay.com/music/electro-upbeat-513865/
-
 - Indie Rock Dreamy — alex-morgan
   License: Pixabay License — https://pixabay.com/service/license-summary/
   Source: https://pixabay.com/music/rock-indie-rock-dreamy-537459/
@@ -95,17 +59,89 @@ MUSIC (public/musics/)
   License: Pixabay License — https://pixabay.com/service/license-summary/
   Source: https://pixabay.com/music/beats-peaceful-cafe-jazz-relaxing-coffee-shop-541031/
 
-- Romantic Piano — TolsetMusic
-  License: Pixabay License — https://pixabay.com/service/license-summary/
-  Source: https://pixabay.com/music/beautiful-plays-talking-about-love-romantic-piano-background-music-542958/
+- Autumn Day — Kevin MacLeod (incompetech.com)
+  License: CC BY 3.0 — https://creativecommons.org/licenses/by/3.0/
+  Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100765
 
-Tracks are trimmed to ~75s to keep the bundle small; the composer loops them to
+- Once In Paris — Pumpupthemind
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/beats-once-in-paris-168895/
+
+- Cozy Lofi Beat – Split Memories — IdoBerg
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/beats-cozy-lofi-beat-split-memmories-248205/
+
+- Cozy Lofi Beat – Sunset Stars — IdoBerg
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/beats-cozy-lofi-beat-sunset-stars-253833/
+
+- Frosty Shadow of Winter — ShidenBeatsMusic
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/beats-lo-fi-chill-beat-frosty-shadow-of-winter-136165/
+
+- Lofi Jazz Hip Hop — VibeHorn
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/lofi-lofi-jazz-hip-hop-479218/
+
+- Lofi Jazz Music — lofidreams
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/lofi-lofi-jazz-music-485312/
+
+- Lofi Cafe — lofidreams
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/beats-lofi-cafe-427593/
+
+- WE JAZZ Lofi Soul — jumpingbunny
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/traditional-jazz-we-jazz-lofi-soul-363084/
+
+- Lo-Fi Chill — AudioDollar
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/beats-lo-fi-lo-fi-chill-535316/
+
+- Chillhop — Remain — Ornave
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/beats-chillhop-remain-594997/
+
+- Dreamy Fall People — Diamond_Tunes
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/beats-dreamy-fall-people-lo-fi-chill-vlog-179957/
+
+- Chillhop Jazz Coffee Shop — alex-morgan
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/lofi-chillhop-jazz-coffee-shop-552792/
+
+- Lofi Study — The_Mountain
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/old-school-hip-hop-lofi-study-576576/
+
+- Afterword (Zen Lofi) — Turning_Pages
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/lofi-afterword-zen-lofi-469291/
+
+- Chill Hip Hop Version 2 — BombinSound
+  License: Pixabay License — https://pixabay.com/service/license-summary/
+  Source: https://pixabay.com/music/beats-chill-hip-hop-version-2-544088/
+
+- Lofi Again — omfgdude
+  License: CC0 — https://creativecommons.org/publicdomain/zero/1.0/
+  Source: https://opengameart.org/content/lofi-again
+
+- Lofi Hip Hop Loop — omfgdude
+  License: CC0 — https://creativecommons.org/publicdomain/zero/1.0/
+  Source: https://opengameart.org/content/lofi-hip-hop-loop
+
+- Since 2 A.M. — TAD
+  License: CC0 — https://creativecommons.org/publicdomain/zero/1.0/
+  Source: https://opengameart.org/content/since-2-am
+
+Some tracks are trimmed to ~75s to keep the bundle small; the composer loops them to
 cover the full video length.
 
 BACKGROUNDS (public/backgrounds/)
 ---------------------------------
-Photos from Unsplash (sourced via Lorem Picsum), free to use under the Unsplash
-License — https://unsplash.com/license
+Photos from Unsplash (the first six sourced via Lorem Picsum), free to use under
+the Unsplash License — https://unsplash.com/license
 
 - Forest & Sea — Paul Jarvis — https://unsplash.com/photos/6J--NXulQCs
 - Desk Flatlay — Aleks Dorohovich — https://unsplash.com/photos/nJdwUHmaY8A
@@ -113,6 +149,21 @@ License — https://unsplash.com/license
 - Rocky Coast — Austin Neill — https://unsplash.com/photos/erTjj730fMk
 - Laptop Desk — Luke Chesser — https://unsplash.com/photos/1uxV8fAfhVM
 - Golden Hour — Alexander Shustov — https://unsplash.com/photos/2FrX56QL7P8
+- Neon Alley — masahiro miyagi — https://unsplash.com/photos/mGs7oMPLB-c
+- Warm Bokeh — Md Mahdi — https://unsplash.com/photos/lmlfo8aespo
+- Pastel Gradient — Codioful — https://unsplash.com/photos/LeG68PrXA6Y
+- Sage Wall — David van Dijk — https://unsplash.com/photos/3LTht2nxd34
+- Snowy Peak — Rohit Tandon — https://unsplash.com/photos/9wg5jCEPBsw
+- Desert Dunes — Zetong Li — https://unsplash.com/photos/HEf0fKgJA1Q
+- Turquoise Sea — samsommer — https://unsplash.com/photos/J3ABLQjZQBg
+- Café Table — Kris Atomic — https://unsplash.com/photos/3b2tADGAWnU
+- Concrete Lines — Lukas S — https://unsplash.com/photos/ejGv_enkOBY
+- Milky Way — Dns Dgn — https://unsplash.com/photos/9wH624ALFQA
+- Autumn Leaves — Jeremy Thomas — https://unsplash.com/photos/O6N9RV2rzX8
+- Monstera Leaves — Natalie Kovach — https://unsplash.com/photos/ph7QQq63lCs
+- Rainy Window — C. G. — https://unsplash.com/photos/JgDUVGAXsso
+- Pink Sunset — Diego PH — https://unsplash.com/photos/BCuxVP5WEsU
+- Woodshop — Bailey Alexander — https://unsplash.com/photos/Yl7YJcUn_Oo
 
 Keep this file in sync with apps/leclap-web/src/data/mediaCatalog.ts.
 
@@ -136,3 +187,12 @@ via Google Fonts (github.com/google/fonts).
 - Lobster
 
 Keep this file in sync with packages/creative-kit/src/fonts.ts.
+
+EMOJI (public/assets/emoji/)
+----------------------------
+Colour emoji drawn over video text, rendered to 72x72 PNG from Twemoji
+(https://github.com/jdecked/twemoji), Copyright 2019 Twitter, Inc and other
+contributors, Copyright 2024 jdecked and other contributors.
+Graphics licensed under CC-BY 4.0 — https://creativecommons.org/licenses/by/4.0/
+Source files: packages/leclap-creative-kit/src/library/emoji/ (regenerate with
+`pnpm gen:emoji`).

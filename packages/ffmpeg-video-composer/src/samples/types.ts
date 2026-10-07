@@ -1,7 +1,7 @@
 import type { TemplateDescriptor, Translation, FramingGuide } from '../schemas/template.schemas';
 import type { FontRef } from '../core/fonts';
 
-export const SAMPLE_CATEGORIES = ['templates', 'typography', 'app-demos', 'overlays', 'evidence'] as const;
+export const SAMPLE_CATEGORIES = ['templates', 'typography', 'app-demos', 'overlays', 'evidence', 'effects'] as const;
 export const SAMPLE_BACKENDS = ['native', 'remotion'] as const;
 export type SampleCategory = (typeof SAMPLE_CATEGORIES)[number];
 export type SampleBackend = (typeof SAMPLE_BACKENDS)[number];

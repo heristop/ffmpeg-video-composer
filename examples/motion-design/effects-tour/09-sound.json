@@ -1,0 +1,1467 @@
+{
+  "meta": {
+    "name": "Effects tour: sound",
+    "description": "Chapter 9 of the effects tour: a 120 BPM beat grid with a click track and camera hits on every beat, automatic hits and whooshes, every bundled sound effect placed on its motion event (click, tick, pop, whoosh, swoosh-short, shutter, blip, notification, coin, keystroke, thud, rise-short, zap, glitch, heartbeat, drum-roll, sparkle, riser, boom, hit, ding), a sound board (snap, water-drop, error, success, whistle-up, camera-focus) swelling through a reverse-cymbal into a clap, and the five voice presets on a voice-like recording with a volume fade-up.",
+    "creativeDirection": "Listen with the picture: every sound lands on the frame of its visual event and is named on screen. The beat grid proves sync (each count pops on its click), the riser ends exactly on the drop, the voice beats change only the processing. Review: no sound before its picture, the ding is the only one, and voices stay clear without pumping."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 67,
+    "transition": {
+      "type": "cut"
+    },
+    "motion": {
+      "energy": 1
+    },
+    "overlays": [
+      {
+        "text": {
+          "en": "09  SOUND"
+        },
+        "position": "top-right",
+        "font": "mono",
+        "size": 24,
+        "color": "#C9C6D2",
+        "effect": {
+          "shadow": true
+        }
+      }
+    ],
+    "beats": {
+      "bpm": 120,
+      "offset": 0,
+      "beatsPerBar": 4
+    },
+    "sfx": [
+      {
+        "id": "hit",
+        "at": "beat:1",
+        "volume": 0.55
+      },
+      {
+        "id": "tick",
+        "at": "beat:2"
+      },
+      {
+        "id": "tick",
+        "at": "beat:3"
+      },
+      {
+        "id": "tick",
+        "at": "beat:4"
+      },
+      {
+        "id": "hit",
+        "at": "beat:5",
+        "volume": 0.55
+      },
+      {
+        "id": "tick",
+        "at": "beat:6"
+      },
+      {
+        "id": "tick",
+        "at": "beat:7"
+      },
+      {
+        "id": "tick",
+        "at": "beat:8"
+      }
+    ],
+    "audio": {
+      "sfx": "auto",
+      "sourceVolume": 0.6
+    }
+  },
+  "sections": [
+    {
+      "name": "beat-grid",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": {
+          "bars": 2
+        }
+      },
+      "camera": {
+        "hits": ["beat:5", "beat:6", "beat:7", "beat:8"]
+      },
+      "graphics": [
+        {
+          "type": "flash",
+          "at": "bar:2",
+          "duration": 0.25,
+          "intensity": 0.5
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "global.beats · 120 BPM · sfx on every beat"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "1"
+          },
+          "preset": "drop",
+          "size": 150,
+          "x": 340,
+          "y": 140,
+          "delay": "beat:1 + 0.04",
+          "color": "#FF8AAE",
+          "ease": "$bouncy"
+        },
+        {
+          "text": {
+            "en": "2"
+          },
+          "preset": "rise",
+          "size": 150,
+          "x": 540,
+          "y": 140,
+          "delay": "beat:2 - 0.06",
+          "color": "#F5F3F7",
+          "ease": "$snappy"
+        },
+        {
+          "text": {
+            "en": "3"
+          },
+          "preset": "rise",
+          "size": 150,
+          "x": 740,
+          "y": 140,
+          "delay": "beat:3 - 0.06",
+          "color": "#F5F3F7",
+          "ease": "$expo"
+        },
+        {
+          "text": {
+            "en": "4"
+          },
+          "preset": "rise",
+          "size": 150,
+          "x": 940,
+          "y": 140,
+          "delay": "beat:4 - 0.06",
+          "color": "#F5F3F7",
+          "ease": "$smooth"
+        },
+        {
+          "text": {
+            "en": "ON THE BEAT"
+          },
+          "preset": "impact",
+          "size": 150,
+          "y": 420,
+          "delay": "bar:2 + 0.05",
+          "color": "#FFF685"
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "sfx-auto",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "camera": {
+        "hits": [
+          {
+            "at": "title.end",
+            "strength": 0.3
+          }
+        ]
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "audio.sfx: auto · hit, then whoosh"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "id": "title",
+          "text": {
+            "en": "AUTO HIT"
+          },
+          "preset": "impact",
+          "size": 200,
+          "y": "center",
+          "delay": 0.2,
+          "color": "#FF8AAE"
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "sfx-ui",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.6
+      },
+      "sfx": [
+        {
+          "id": "click",
+          "at": 0.35
+        },
+        {
+          "id": "tick",
+          "at": 0.95
+        },
+        {
+          "id": "pop",
+          "at": 1.55
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · click · tick · pop"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "click"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 90,
+          "x": 320,
+          "y": "center",
+          "delay": 0.35,
+          "ease": "linear"
+        },
+        {
+          "text": {
+            "en": "tick"
+          },
+          "preset": "rise",
+          "font": "mono",
+          "size": 90,
+          "x": 640,
+          "y": "center",
+          "delay": 0.95,
+          "ease": "$snappy",
+          "color": "#FFF685"
+        },
+        {
+          "text": {
+            "en": "pop"
+          },
+          "preset": "pop",
+          "font": "mono",
+          "size": 90,
+          "x": 960,
+          "y": "center",
+          "delay": 1.55,
+          "color": "#FF8AAE"
+        }
+      ]
+    },
+    {
+      "name": "sfx-whoosh",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 2.6
+      },
+      "sfx": [
+        {
+          "id": "whoosh",
+          "at": 0.3
+        },
+        {
+          "id": "swoosh-short",
+          "at": 1.3
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 1.3,
+          "x": 0,
+          "y": 430,
+          "width": 700,
+          "height": 110,
+          "from": "left",
+          "color": "#7C83FD",
+          "ease": "$gentle"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · whoosh · swoosh-short"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "WHOOSH"
+          },
+          "preset": "slide",
+          "direction": "left",
+          "size": 170,
+          "y": 200,
+          "delay": 0.3,
+          "trail": {
+            "echoes": 3,
+            "delta": 0.03
+          }
+        },
+        {
+          "text": {
+            "en": "swoosh-short"
+          },
+          "preset": "slide",
+          "font": "mono",
+          "size": 54,
+          "align": "left",
+          "x": 64,
+          "y": 455,
+          "delay": 1.4,
+          "color": "#141416",
+          "ease": "$expo"
+        }
+      ]
+    },
+    {
+      "name": "sfx-shutter",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.2
+      },
+      "sfx": [
+        {
+          "id": "shutter",
+          "at": 0.6
+        }
+      ],
+      "graphics": [
+        {
+          "type": "flash",
+          "at": 0.6,
+          "duration": 0.3
+        },
+        {
+          "type": "corners",
+          "at": 0.1,
+          "color": "#F5F3F7",
+          "inset": 110
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · shutter"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "SNAP"
+          },
+          "preset": "fade",
+          "size": 180,
+          "y": "center",
+          "delay": 0.6,
+          "ease": "$expo"
+        }
+      ]
+    },
+    {
+      "name": "sfx-ui-chimes",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.8
+      },
+      "sfx": [
+        {
+          "id": "blip",
+          "at": 0.35
+        },
+        {
+          "id": "notification",
+          "at": 1
+        },
+        {
+          "id": "coin",
+          "at": 1.8
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · blip · notification · coin"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "blip"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 72,
+          "x": 230,
+          "y": "center",
+          "delay": 0.35,
+          "ease": "linear"
+        },
+        {
+          "text": {
+            "en": "notification"
+          },
+          "preset": "rise",
+          "font": "mono",
+          "size": 72,
+          "x": 640,
+          "y": "center",
+          "delay": 1,
+          "ease": "$snappy",
+          "color": "#7C83FD"
+        },
+        {
+          "text": {
+            "en": "coin"
+          },
+          "preset": "pop",
+          "font": "mono",
+          "size": 72,
+          "x": 1050,
+          "y": "center",
+          "delay": 1.8,
+          "color": "#FFF685"
+        }
+      ]
+    },
+    {
+      "name": "sfx-keystroke",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.2
+      },
+      "sfx": [
+        {
+          "id": "keystroke",
+          "at": 0.4
+        },
+        {
+          "id": "keystroke",
+          "at": 0.6
+        },
+        {
+          "id": "keystroke",
+          "at": 0.8
+        },
+        {
+          "id": "keystroke",
+          "at": 1
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · keystroke"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "TYPE"
+          },
+          "preset": "typewriter",
+          "font": "mono",
+          "size": 150,
+          "y": "center",
+          "delay": 0.4,
+          "stagger": 0.2
+        }
+      ]
+    },
+    {
+      "name": "sfx-energy",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "sfx": [
+        {
+          "id": "thud",
+          "at": 0.4
+        },
+        {
+          "id": "rise-short",
+          "at": 1.4
+        },
+        {
+          "id": "zap",
+          "at": 1.4
+        },
+        {
+          "id": "glitch",
+          "at": 2.2
+        }
+      ],
+      "graphics": [
+        {
+          "type": "glitch",
+          "at": 2.2,
+          "duration": 0.4,
+          "intensity": 0.8
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · thud · rise-short into a zap · glitch"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "thud"
+          },
+          "preset": "drop",
+          "font": "mono",
+          "size": 90,
+          "x": 250,
+          "y": "center",
+          "delay": 0.4
+        },
+        {
+          "text": {
+            "en": "zap"
+          },
+          "preset": "impact",
+          "font": "mono",
+          "size": 90,
+          "x": 640,
+          "y": "center",
+          "delay": 1.4,
+          "color": "#7C83FD"
+        },
+        {
+          "text": {
+            "en": "glitch"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 90,
+          "x": 1030,
+          "y": "center",
+          "delay": 2.2,
+          "ease": "$expo",
+          "color": "#FF8AAE"
+        }
+      ]
+    },
+    {
+      "name": "sfx-heartbeat",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#200E16",
+        "duration": 2.6
+      },
+      "sfx": [
+        {
+          "id": "heartbeat",
+          "at": 0.3
+        },
+        {
+          "id": "heartbeat",
+          "at": 1.3
+        }
+      ],
+      "camera": {
+        "preset": "none",
+        "hits": [
+          {
+            "at": 0.3,
+            "strength": 0.15
+          },
+          {
+            "at": 1.3,
+            "strength": 0.15
+          }
+        ]
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · heartbeat, once a second"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "hold on"
+          },
+          "preset": "fade",
+          "size": 130,
+          "y": "center",
+          "delay": 0.3,
+          "ease": "$smooth",
+          "color": "#FF8AAE"
+        }
+      ]
+    },
+    {
+      "name": "sfx-reveal",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 3.2
+      },
+      "cues": {
+        "reveal": 1.8
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "glint",
+          "at": "cue:reveal",
+          "duration": 1.2,
+          "path": "scatter",
+          "count": 5
+        }
+      ],
+      "sfx": [
+        {
+          "id": "drum-roll",
+          "at": "cue:reveal"
+        },
+        {
+          "id": "sparkle",
+          "at": "cue:reveal"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · drum-roll into a sparkle on cue:reveal"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "And the winner is"
+          },
+          "preset": "fade",
+          "size": 90,
+          "y": "center",
+          "delay": 0.2,
+          "ease": "$smooth",
+          "color": "#9A98A6",
+          "exit": {
+            "preset": "fade",
+            "at": "cue:reveal - 0.35",
+            "duration": 0.3
+          }
+        },
+        {
+          "text": {
+            "en": "YOU"
+          },
+          "preset": "pop",
+          "size": 220,
+          "y": "center",
+          "delay": "cue:reveal",
+          "color": "#FFF685"
+        }
+      ]
+    },
+    {
+      "name": "sfx-drop",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 3.4
+      },
+      "cues": {
+        "drop": 1.9
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.1,
+        "hits": ["cue:drop"]
+      },
+      "graphics": [
+        {
+          "type": "flash",
+          "at": "cue:drop",
+          "duration": 0.3,
+          "intensity": 0.6
+        }
+      ],
+      "sfx": [
+        {
+          "id": "riser",
+          "at": "cue:drop",
+          "volume": 0.5
+        },
+        {
+          "id": "boom",
+          "at": "cue:drop"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · riser into a boom on cue:drop"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Build up"
+          },
+          "preset": "fade",
+          "size": 110,
+          "y": 250,
+          "delay": 0.2,
+          "ease": "$smooth",
+          "color": "#9A98A6",
+          "exit": {
+            "preset": "fade",
+            "at": "cue:drop - 0.1"
+          }
+        },
+        {
+          "text": {
+            "en": "DROP"
+          },
+          "preset": "impact",
+          "size": 240,
+          "y": "center",
+          "delay": "cue:drop",
+          "color": "#FF8AAE",
+          "trail": {
+            "echoes": 3,
+            "delta": 0.04
+          }
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "voice-clean",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 1.8,
+        "voice": "clean",
+        "audioAutomation": [
+          {
+            "at": 0,
+            "volume": 0.1
+          },
+          {
+            "at": 0.7,
+            "volume": 1,
+            "ease": "ease-in-out"
+          }
+        ]
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.voice: clean · audioAutomation"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "CLEAN"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "voice-broadcast",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 1.8,
+        "voice": "broadcast"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.voice: broadcast"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "BROADCAST"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "voice-warm",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 1.8,
+        "voice": "warm"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.voice: warm"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "WARM"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "voice-rumble-cut",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 1.8,
+        "voice": "rumble-cut"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.voice: rumble-cut"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "RUMBLE-CUT"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "voice-room-gate",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 1.8,
+        "voice": "room-gate"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.voice: room-gate"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "ROOM-GATE"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ],
+      "transition": {
+        "type": "push-left",
+        "duration": 0.45,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "sfx-board",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#16141F",
+        "duration": 5.6
+      },
+      "cues": {
+        "clap": 4.3
+      },
+      "sfx": [
+        {
+          "id": "snap",
+          "at": 0.3
+        },
+        {
+          "id": "water-drop",
+          "at": 0.8
+        },
+        {
+          "id": "error",
+          "at": 1.3
+        },
+        {
+          "id": "success",
+          "at": 1.8
+        },
+        {
+          "id": "whistle-up",
+          "at": 2.4
+        },
+        {
+          "id": "camera-focus",
+          "at": 3.1
+        },
+        {
+          "id": "reverse-cymbal",
+          "at": "cue:clap"
+        },
+        {
+          "id": "clap",
+          "at": "cue:clap",
+          "volume": 0.8
+        },
+        {
+          "id": "clap",
+          "at": "cue:clap + 0.25",
+          "volume": 0.5
+        },
+        {
+          "id": "clap",
+          "at": "cue:clap + 0.5",
+          "volume": 0.65
+        }
+      ],
+      "graphics": [
+        {
+          "type": "flash",
+          "at": "cue:clap",
+          "duration": 0.25,
+          "intensity": 0.5
+        },
+        {
+          "type": "fx",
+          "effect": "confetti",
+          "at": "cue:clap",
+          "origin": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "angle": -90,
+          "spread": 110,
+          "speed": 2.6,
+          "colors": ["#7C83FD", "#FF8AAE", "#FFF685", "#F5F3F7"],
+          "seed": 23
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · the board, then a reverse-cymbal into a clap"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "snap"
+          },
+          "preset": "pop",
+          "font": "mono",
+          "size": 52,
+          "x": 190,
+          "y": 200,
+          "delay": 0.3,
+          "exit": {
+            "preset": "fade",
+            "at": "cue:clap - 0.3",
+            "duration": 0.25
+          }
+        },
+        {
+          "text": {
+            "en": "water-drop"
+          },
+          "preset": "drop",
+          "font": "mono",
+          "size": 52,
+          "x": 480,
+          "y": 200,
+          "delay": 0.8,
+          "exit": {
+            "preset": "fade",
+            "at": "cue:clap - 0.3",
+            "duration": 0.25
+          },
+          "color": "#7C83FD",
+          "ease": "$bouncy"
+        },
+        {
+          "text": {
+            "en": "error"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 52,
+          "x": 790,
+          "y": 200,
+          "delay": 1.3,
+          "exit": {
+            "preset": "fade",
+            "at": "cue:clap - 0.3",
+            "duration": 0.25
+          },
+          "color": "#FF8AAE",
+          "ease": "$expo"
+        },
+        {
+          "text": {
+            "en": "success"
+          },
+          "preset": "rise",
+          "font": "mono",
+          "size": 52,
+          "x": 1090,
+          "y": 200,
+          "delay": 1.8,
+          "exit": {
+            "preset": "fade",
+            "at": "cue:clap - 0.3",
+            "duration": 0.25
+          },
+          "color": "#FFF685",
+          "ease": "$smooth"
+        },
+        {
+          "text": {
+            "en": "whistle-up"
+          },
+          "preset": "rise",
+          "font": "mono",
+          "size": 46,
+          "x": 220,
+          "y": 540,
+          "delay": 2.4,
+          "exit": {
+            "preset": "fade",
+            "at": "cue:clap - 0.3",
+            "duration": 0.25
+          },
+          "ease": "$snappy"
+        },
+        {
+          "text": {
+            "en": "camera-focus"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 46,
+          "x": 590,
+          "y": 540,
+          "delay": 3.1,
+          "exit": {
+            "preset": "fade",
+            "at": "cue:clap - 0.3",
+            "duration": 0.25
+          },
+          "color": "#7C83FD",
+          "ease": "$smooth"
+        },
+        {
+          "text": {
+            "en": "CLAP"
+          },
+          "preset": "pop",
+          "size": 240,
+          "y": "center",
+          "delay": "cue:clap",
+          "color": "#FFF685"
+        }
+      ]
+    },
+    {
+      "name": "close",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.8
+      },
+      "sfx": [
+        {
+          "id": "ding",
+          "at": "title.end",
+          "volume": 0.45
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "sfx · ding"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "id": "title",
+          "text": {
+            "en": "Every cut, scored."
+          },
+          "preset": "cascade",
+          "size": 120,
+          "y": "center",
+          "delay": 0.2,
+          "accent": {
+            "words": "last",
+            "color": "#7C83FD"
+          }
+        }
+      ]
+    }
+  ]
+}

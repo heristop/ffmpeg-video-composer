@@ -1,10 +1,11 @@
 // What a section actually draws on screen, in draw order — obtained by running the renderer's own
-// lowerings (SUGAR_COMPILERS, the global overlay lowering) rather than re-deriving their layout here.
+// lowerings (the overlay SUGAR_COMPILERS, the global overlay lowering) rather than re-deriving their layout here.
 // A hand-kept mirror of each preset drifted every time a preset changed, and never covered the
 // presets nobody mirrored (titleCard, the lowerThird badge, global overlays); reading the emitted
 // drawtext/drawbox filters makes the renderer the single source of where text lands.
 import type { Filter, Section } from '@/core/types';
-import { SUGAR_COMPILERS, type SugarContext } from '../../editor/presets/registry';
+import { OVERLAY_SUGAR_COMPILERS } from '../../editor/presets/overlay-sugars';
+import type { SugarContext } from '../../editor/presets/sugar-context';
 import { globalTextOverlayToFilters } from '../../editor/presets/text-blocks';
 
 export interface DrawLayer {
@@ -25,9 +26,7 @@ const SUGAR_TEXT_FIELDS: Record<string, { label: string; fields: string[] }> = {
   lowerThird: { label: 'lower third', fields: ['title', 'subtitle', 'badge'] },
 };
 
-const OVERLAY_COMPILERS = SUGAR_COMPILERS.filter((compiler) => compiler.layer === 'overlay').sort(
-  (a, b) => a.order - b.order
-);
+const OVERLAY_COMPILERS = [...OVERLAY_SUGAR_COMPILERS].sort((a, b) => a.order - b.order);
 
 function isDrawFilter(filter: Filter | null | undefined): filter is Filter & { values: Record<string, unknown> } {
   return (filter?.type === 'drawtext' || filter?.type === 'drawbox') && filter.values !== undefined;

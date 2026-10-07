@@ -1,0 +1,1055 @@
+{
+  "meta": {
+    "name": "Effects tour: captions",
+    "description": "Chapter 4 of the effects tour: title cards, every lower-third style (band, clean-bar, side-rule, kicker, stack-bars, pill), the caption sugar styles with balanced wrapping, and word-timed subtitles in all six caption DNAs with word / fill / pop karaoke, an SRT cue and a crowned payoff line.",
+    "creativeDirection": "Text that names people, places and voices. Lower thirds and captions sit over bundled photographs so their legibility aids show; each subtitle DNA gets one line of copy that says what it does, timed like speech. Review: no lower third leaves the title-safe area, captions stay on at most two balanced lines, karaoke never runs ahead of its word, and the crown is the only enlarged line."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 43,
+    "transition": {
+      "type": "cut"
+    },
+    "motion": {
+      "energy": 1
+    },
+    "overlays": [
+      {
+        "text": {
+          "en": "04  CAPTIONS"
+        },
+        "position": "top-right",
+        "font": "mono",
+        "size": 24,
+        "color": "#C9C6D2",
+        "effect": {
+          "shadow": true
+        }
+      }
+    ]
+  },
+  "sections": [
+    {
+      "name": "title-card-left",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "titleCard · align left"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "titleCard": {
+        "kicker": {
+          "en": "CHAPTER CARD"
+        },
+        "headline": {
+          "en": "Title cards"
+        },
+        "subtitle": {
+          "en": "Kicker, headline, accent bar, subtitle"
+        },
+        "accent": "#FF8AAE",
+        "stagger": 0.12,
+        "reveal": {
+          "type": "rise",
+          "delay": 0.15,
+          "duration": 0.4,
+          "distance": 30,
+          "easing": "ease-out"
+        },
+        "fade": {
+          "in": false,
+          "out": false
+        }
+      }
+    },
+    {
+      "name": "title-card-center",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "titleCard · align center · stagger"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "titleCard": {
+        "kicker": {
+          "en": "ONE BLOCK OF JSON"
+        },
+        "headline": {
+          "en": "Centred and staggered"
+        },
+        "subtitle": {
+          "en": "Positions derive from the frame"
+        },
+        "accent": "#FFF685",
+        "align": "center",
+        "stagger": 0.2,
+        "reveal": "rise",
+        "fade": {
+          "in": false,
+          "out": false
+        }
+      },
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "lower-third-band",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/turquoise-sea.jpg",
+        "duration": 2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "lowerThird · band"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Ada Lovelace"
+        },
+        "subtitle": {
+          "en": "Analyst, default band"
+        },
+        "accent": "#FF8AAE",
+        "effect": {
+          "shadow": true
+        },
+        "badge": {
+          "en": "LIVE"
+        }
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "lower-third-clean-bar",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/autumn-leaves.jpg",
+        "duration": 2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "lowerThird · clean-bar"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Grace Hopper"
+        },
+        "subtitle": {
+          "en": "Rear admiral"
+        },
+        "accent": "#7C83FD",
+        "effect": {
+          "shadow": true
+        },
+        "style": "clean-bar"
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "lower-third-side-rule",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/golden-hour.jpg",
+        "duration": 2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "lowerThird · side-rule"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Alan Turing"
+        },
+        "subtitle": {
+          "en": "Mathematician"
+        },
+        "accent": "#FFF685",
+        "effect": {
+          "shadow": true
+        },
+        "style": "side-rule"
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "lower-third-kicker",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/desert-dunes.jpg",
+        "duration": 2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "lowerThird · kicker"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Katherine Johnson"
+        },
+        "subtitle": {
+          "en": "NASA"
+        },
+        "accent": "#FF8AAE",
+        "effect": {
+          "shadow": true
+        },
+        "style": "kicker"
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "lower-third-stack-bars",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/milky-way.jpg",
+        "duration": 2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "lowerThird · stack-bars"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Hedy Lamarr"
+        },
+        "subtitle": {
+          "en": "@hedy"
+        },
+        "accent": "#7C83FD",
+        "effect": {
+          "shadow": true
+        },
+        "style": "stack-bars"
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "lower-third-pill",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/green-forest.jpg",
+        "duration": 2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "lowerThird · pill"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "lowerThird": {
+        "title": {
+          "en": "Margaret Hamilton"
+        },
+        "subtitle": {
+          "en": "Apollo software"
+        },
+        "accent": "#FFF685",
+        "effect": {
+          "shadow": true
+        },
+        "style": "pill"
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "caption-bar",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/cafe-table.jpg",
+        "duration": 2.3
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "caption · style: bar"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "caption": {
+        "text": {
+          "en": "Design is how it works"
+        },
+        "style": "bar",
+        "reveal": "rise",
+        "effect": {
+          "shadow": {
+            "color": "#000000@0.75",
+            "dx": 3,
+            "dy": 4
+          },
+          "outline": {
+            "color": "#000000@0.5",
+            "width": 2
+          }
+        }
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "caption-subtle",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/pink-sunset.jpg",
+        "duration": 2.3
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "caption · style: subtle"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "caption": {
+        "text": {
+          "en": "Quiet words for calm footage"
+        },
+        "style": "subtle",
+        "reveal": "rise",
+        "effect": {
+          "shadow": {
+            "color": "#000000@0.75",
+            "dx": 3,
+            "dy": 4
+          },
+          "outline": {
+            "color": "#000000@0.5",
+            "width": 2
+          }
+        }
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "caption-bold",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 2.7
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "caption · style: bold · wrap: balanced"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "caption": {
+        "text": {
+          "en": "Balanced over two even lines, never an orphan"
+        },
+        "style": "bold",
+        "reveal": "rise",
+        "effect": {
+          "shadow": {
+            "color": "#000000@0.75",
+            "dx": 3,
+            "dy": 4
+          },
+          "outline": {
+            "color": "#000000@0.5",
+            "width": 2
+          }
+        },
+        "wrap": "balanced",
+        "fit": {
+          "maxLines": 2
+        }
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "subtitles-clean",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 4.3
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "subtitles · clean · karaoke: word"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "subtitles": {
+        "style": "clean",
+        "karaoke": "word",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.25,
+            "end": 0.67
+          },
+          {
+            "text": "caption",
+            "start": 0.71,
+            "end": 1.2
+          },
+          {
+            "text": "follows",
+            "start": 1.24,
+            "end": 1.74
+          },
+          {
+            "text": "the",
+            "start": 1.78,
+            "end": 2.11
+          },
+          {
+            "text": "voice,",
+            "start": 2.15,
+            "end": 2.61
+          },
+          {
+            "text": "word",
+            "start": 2.95,
+            "end": 3.33
+          },
+          {
+            "text": "by",
+            "start": 3.37,
+            "end": 3.66
+          },
+          {
+            "text": "word.",
+            "start": 3.7,
+            "end": 4.12
+          }
+        ]
+      }
+    },
+    {
+      "name": "subtitles-loud",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/monstera-leaves.jpg",
+        "duration": 3.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "subtitles · loud · karaoke: pop · crown"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "subtitles": {
+        "style": "loud",
+        "karaoke": "pop",
+        "words": [
+          {
+            "text": "Same",
+            "start": 0.25,
+            "end": 0.63
+          },
+          {
+            "text": "JSON.",
+            "start": 0.67,
+            "end": 1.08
+          },
+          {
+            "text": "Same",
+            "start": 1.42,
+            "end": 1.8
+          },
+          {
+            "text": "frames.",
+            "start": 1.84,
+            "end": 2.33
+          },
+          {
+            "text": "Every",
+            "start": 2.67,
+            "end": 3.09
+          },
+          {
+            "text": "time!",
+            "start": 3.13,
+            "end": 3.55
+          }
+        ],
+        "crown": "auto",
+        "group": {
+          "maxWords": 3
+        }
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "subtitles-keynote",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A2238",
+        "duration": 3.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "subtitles · keynote · karaoke: fill"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "subtitles": {
+        "style": "keynote",
+        "karaoke": "fill",
+        "words": [
+          {
+            "text": "Spoken",
+            "start": 0.25,
+            "end": 0.71
+          },
+          {
+            "text": "words",
+            "start": 0.75,
+            "end": 1.16
+          },
+          {
+            "text": "fill",
+            "start": 1.2,
+            "end": 1.58
+          },
+          {
+            "text": "in",
+            "start": 1.62,
+            "end": 1.91
+          },
+          {
+            "text": "and",
+            "start": 1.95,
+            "end": 2.29
+          },
+          {
+            "text": "stay",
+            "start": 2.33,
+            "end": 2.71
+          },
+          {
+            "text": "lit.",
+            "start": 2.75,
+            "end": 3.12
+          }
+        ]
+      }
+    },
+    {
+      "name": "subtitles-documentary",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/snowy-peak.jpg",
+        "duration": 3.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "subtitles · documentary · karaoke: off · srt"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "subtitles": {
+        "style": "documentary",
+        "karaoke": false,
+        "srt": "1\n00:00:00,300 --> 00:00:02,900\nSmall, low and quiet, like broadcast.\n"
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "subtitles-boxed",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "subtitles · boxed · karaoke: word"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "subtitles": {
+        "style": "boxed",
+        "karaoke": "word",
+        "words": [
+          {
+            "text": "A",
+            "start": 0.25,
+            "end": 0.51
+          },
+          {
+            "text": "plate",
+            "start": 0.55,
+            "end": 0.96
+          },
+          {
+            "text": "behind",
+            "start": 1,
+            "end": 1.46
+          },
+          {
+            "text": "every",
+            "start": 1.5,
+            "end": 1.91
+          },
+          {
+            "text": "line",
+            "start": 1.95,
+            "end": 2.33
+          },
+          {
+            "text": "keeps",
+            "start": 2.37,
+            "end": 2.79
+          },
+          {
+            "text": "it",
+            "start": 2.83,
+            "end": 3.12
+          },
+          {
+            "text": "legible.",
+            "start": 3.16,
+            "end": 3.7
+          }
+        ]
+      }
+    },
+    {
+      "name": "subtitles-neon",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/green-forest.jpg",
+        "duration": 3.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "subtitles · neon · karaoke: word"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "subtitles": {
+        "style": "neon",
+        "karaoke": "word",
+        "words": [
+          {
+            "text": "Glow",
+            "start": 0.25,
+            "end": 0.63
+          },
+          {
+            "text": "on,",
+            "start": 0.67,
+            "end": 1
+          },
+          {
+            "text": "lights",
+            "start": 1.34,
+            "end": 1.8
+          },
+          {
+            "text": "down,",
+            "start": 1.84,
+            "end": 2.25
+          },
+          {
+            "text": "words",
+            "start": 2.59,
+            "end": 3.01
+          },
+          {
+            "text": "up.",
+            "start": 3.05,
+            "end": 3.39
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    }
+  ]
+}

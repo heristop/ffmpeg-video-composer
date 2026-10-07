@@ -370,9 +370,9 @@
     "mirror": "Miroir",
     "mirrorHorizontal": "Horizontal",
     "mirrorVertical": "Vertical",
-    "add": "Ajouter une animation",
-    "layer": "Animation {{number}}",
-    "remove": "Retirer l’animation",
+    "add": "Ajouter un fichier d’animation",
+    "layer": "Fichier d’animation {{number}}",
+    "remove": "Retirer le fichier d’animation",
     "effects": {
       "label": "Combinaisons d’effets",
       "interface-focus": {
@@ -399,11 +399,59 @@
         "name": "Révélation du cadre",
         "description": "Un cadre fin et un unique reflet lumineux."
       }
-    }
+    },
+    "library": {
+      "sheen": "Reflet",
+      "glint-orbit": "Éclat en orbite",
+      "edge-glow": "Halo de bord",
+      "leak": "Fuite de lumière",
+      "bloom": "Halo lumineux",
+      "ripple": "Onde",
+      "ripple-tap": "Toucher",
+      "resolve": "Mise au point",
+      "glass": "Verre dépoli",
+      "vignette-breathe": "Vignette vivante",
+      "confetti": "Confettis",
+      "glint": "Scintillements",
+      "frame": "Cadre",
+      "corners": "Coins de visée",
+      "underline": "Soulignement",
+      "bokeh": "Bokeh",
+      "dust": "Poussière",
+      "grain": "Grain",
+      "shine-sweep": "Balayage brillant",
+      "sparkle": "Étincelles",
+      "corner-brackets": "Coins de cadrage",
+      "pulse-ring": "Anneau pulsé",
+      "tap-pulse": "Impulsion de toucher",
+      "light-leak": "Fuite de lumière",
+      "white-border": "Bordure blanche",
+      "glow-border": "Bordure lumineuse",
+      "rounded-border": "Bordure arrondie",
+      "spec-orbit": "Orbite spéculaire",
+      "animation-icons": "Icônes animées"
+    },
+    "groups": {
+      "light": "Lumière",
+      "focus": "Focus",
+      "celebrate": "Célébration",
+      "frames": "Cadres",
+      "ambient": "Ambiance",
+      "samples": "Exemples",
+      "samplesHint": "Calques prêts à l’emploi, identiques dans chaque modèle. Préférez un effet ci-dessus : il est dessiné par le moteur et ajusté à cette scène."
+    },
+    "engine": {
+      "engineLabel": "Effets",
+      "engineHelp": "Dessinés par LeClap et adaptés à cette scène. Réglez-les dans l’éditeur web.",
+      "added": "Effets de cette scène",
+      "removeEffect": "Retirer {{label}}",
+      "addEffect": "Ajouter {{label}}"
+    },
+    "sampleBadge": "Exemple"
   },
   "overlays": {
     "kind": "Surimpressions",
-    "animation": "Animation",
+    "animation": "Fichier d’animation",
     "image": "Image"
   },
   "watermark": {

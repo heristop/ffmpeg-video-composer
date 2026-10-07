@@ -14,6 +14,7 @@ import { loadSelfHostedCore } from '@/infrastructure/ffmpeg-core';
 import { browserMediaService } from '@/services/browserMediaService';
 import { materializeTemplateMedia } from '@/application/usecases/materializeTemplateMedia';
 import { applyMediaChoices, type MediaChoices } from '@/application/usecases/applyMediaChoices';
+import { analyzeMusicInBrowser } from '@/application/usecases/musicBeats';
 import { materializeTemplatePartials } from '@/services/templatePartialService';
 import { renderQuip } from '@leclap/creative-kit/render-quips';
 import { CompileError, classifyCompileFailure } from './compile-failure';
@@ -65,11 +66,31 @@ class CoreCompilationService {
   private readonly renders = createRenderQueue();
 
   // Rejects with a CompileError: its failure says why, in terms the interface can translate.
+  //
+  // `signal` stops this one render (best effort), with the same reach as cancel(): aborted before it
+  // starts (or while it waits behind another render), it rejects with a `stopped` failure without
+  // touching the filesystem; aborted while staging, it gives up at the next step boundary; aborted while
+  // the engine compiles, the director halts at its next segment boundary (a running FFmpeg command
+  // finishes first: the engine owns the shared ffmpeg.wasm worker and exposes no way to terminate it).
+  // Either way the promise rejects with a CompileError of kind `stopped` and no output is kept.
   compileVideo(
     config: CompilationConfig,
-    onProgress: (progress: CompilationProgress) => void
+    onProgress: (progress: CompilationProgress) => void,
+    signal?: AbortSignal
   ): Promise<CompilationResult> {
-    return this.renders.run((isCurrent) => this.render(config, onProgress, isCurrent));
+    return this.renders.run((isCurrent) => {
+      const current = (): boolean => isCurrent() && !signal?.aborted;
+      // Only a render still in flight may tell the engine to stop; once a newer render replaced it, the
+      // engine is that render's, and this one already gives up at its next checkpoint.
+      const onAbort = (): void => {
+        if (isCurrent()) this.signalCancel();
+      };
+      signal?.addEventListener('abort', onAbort, { once: true });
+
+      return this.render(config, onProgress, current).finally(() => {
+        signal?.removeEventListener('abort', onAbort);
+      });
+    });
   }
 
   private async render(
@@ -339,6 +360,8 @@ class CoreCompilationService {
       applyMediaChoices(templateDescriptor, mediaChoices);
     }
 
+    // Uploaded music (or a track the library table lacks) gets its beat grid measured here (musicBeats.ts).
+    await analyzeMusicInBrowser(templateDescriptor, browserMediaService);
     await materializeTemplateMedia(templateDescriptor, browserMediaService, this.filesystemAdapter);
     await this.preloadBundledMusic(templateDescriptor);
   }

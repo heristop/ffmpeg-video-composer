@@ -9,7 +9,7 @@
     "music": {
       "name": "party-dance.mp3"
     },
-    "allowedMusic": ["party-dance", "future-bass-energy", "upbeat-electronic", "indie-rock-dreamy", "cafe-jazz"],
+    "allowedMusic": ["party-dance", "chill-hip-hop", "lofi-study", "indie-rock-dreamy", "cafe-jazz"],
     "allowUploadMusic": true,
     "transition": {
       "type": "fade",
@@ -54,8 +54,9 @@
       "name": "intro",
       "type": "color_background",
       "transition": {
-        "type": "wipeleft",
-        "duration": 0.45
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
       },
       "titleCard": {
         "kicker": {
@@ -75,6 +76,9 @@
         },
         "effect": {
           "shadow": true
+        },
+        "headlineStyle": {
+          "fontsize": 76
         }
       },
       "options": {
@@ -89,26 +93,34 @@
             }
           }
         ]
-      }
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.12
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "bokeh",
+          "target": "frame",
+          "at": 0,
+          "duration": 2.8,
+          "count": 7,
+          "size": 0.13,
+          "softness": 0.4,
+          "drift": -80,
+          "speed": 0.04,
+          "depth": 0.7,
+          "clear": 0.34,
+          "color": "#7C83FD",
+          "intensity": 1
+        }
+      ]
     },
     {
       "name": "video_1",
       "type": "project_video",
       "look": "teal-orange",
-      "inputs": [
-        {
-          "name": "frame_glow",
-          "url": "/assets/animations/glow_border.apng",
-          "type": "animation",
-          "options": {
-            "loop": true,
-            "persistent": true,
-            "position": "0:0",
-            "scale": "720:1280",
-            "opacity": 0.3
-          }
-        }
-      ],
       "title": {
         "en": "Record your clip"
       },
@@ -139,9 +151,40 @@
           "shadow": true
         }
       },
-      "filters": [
+      "graphics": [
         {
-          "type": "vignette"
+          "type": "fx",
+          "effect": "vignette-breathe",
+          "target": "frame",
+          "at": 0,
+          "duration": 6,
+          "angle": 0.62,
+          "swing": 0.03,
+          "period": 6,
+          "focus": {
+            "x": 0.5,
+            "y": 0.4
+          },
+          "intensity": 1
+        },
+        {
+          "type": "fx",
+          "effect": "edge-glow",
+          "target": {
+            "x": 0,
+            "y": 1024,
+            "w": 720,
+            "h": 256
+          },
+          "at": 0.3,
+          "duration": 5.7,
+          "line": 0.45,
+          "spread": 16,
+          "glow": "#7C83FD",
+          "breathe": 0.08,
+          "period": 4.4,
+          "color": "#7C83FD",
+          "intensity": 0.7
         }
       ]
     },

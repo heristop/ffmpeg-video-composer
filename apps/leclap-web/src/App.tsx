@@ -52,6 +52,7 @@ const DocExamples = lazyPage(() => import('@/presentation/pages/doc'), 'DocExamp
 const DocSchema = lazyPage(() => import('@/presentation/pages/doc'), 'DocSchema');
 const DocCli = lazyPage(() => import('@/presentation/pages/doc'), 'DocCli');
 const DocMcp = lazyPage(() => import('@/presentation/pages/doc'), 'DocMcp');
+const DocWebMcp = lazyPage(() => import('@/presentation/pages/doc'), 'DocWebMcp');
 const DocReference = lazyPage(() => import('@/presentation/pages/doc/References'), 'DocReference');
 const DocEffects = lazyPage(() => import('@/presentation/pages/doc/References'), 'DocEffects');
 const DocEngine = lazyPage(() => import('@/presentation/pages/doc/References'), 'DocEngine');
@@ -114,6 +115,7 @@ const router = createBrowserRouter(
         <Route path="schema" element={<DocSchema />} />
         <Route path="cli" element={<DocCli />} />
         <Route path="mcp" element={<DocMcp />} />
+        <Route path="webmcp" element={<DocWebMcp />} />
         <Route path="reference" element={<DocReference />} />
         <Route path="effects" element={<DocEffects />} />
         <Route path="engine" element={<DocEngine />} />

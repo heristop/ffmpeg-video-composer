@@ -3,6 +3,7 @@
 // the engine's reveal.schemas (delay 0.3 / duration 0.6 / distance 60; an exit with no `after` is
 // timed to END exactly at the scene end).
 import type { Reveal, Exit } from '../templateEditorModel';
+import { EasingError, parseEasing, type EasingSpec } from 'ffmpeg-video-composer/src/core/motion/easing.ts';
 
 export type OverlayPhase = 'before' | 'reveal' | 'hold' | 'exit' | 'after';
 
@@ -22,12 +23,12 @@ interface NormalizedReveal {
   delay: number;
   duration: number;
   distance: number;
-  easing?: string;
+  easing?: EasingSpec;
 }
 
 interface NormalizedExit {
   type: string;
-  easing?: string;
+  easing?: EasingSpec;
   after?: number;
   duration: number;
   distance: number;
@@ -44,7 +45,10 @@ function normalizeReveal(reveal: Reveal | undefined): NormalizedReveal | null {
   return {
     type: obj.type,
     delay: typeof reveal === 'string' ? REVEAL_DEFAULTS.delay : (reveal.delay ?? REVEAL_DEFAULTS.delay),
-    duration: typeof reveal === 'string' ? REVEAL_DEFAULTS.duration : (reveal.duration ?? REVEAL_DEFAULTS.duration),
+    duration:
+      typeof reveal === 'string'
+        ? REVEAL_DEFAULTS.duration
+        : phaseDuration(reveal.duration, reveal.easing, REVEAL_DEFAULTS.duration),
     distance: typeof reveal === 'string' ? REVEAL_DEFAULTS.distance : (reveal.distance ?? REVEAL_DEFAULTS.distance),
     ...(typeof reveal === 'object' && reveal.easing !== undefined ? { easing: reveal.easing } : {}),
   };
@@ -60,7 +64,10 @@ function normalizeExit(exit: Exit | undefined): NormalizedExit | null {
   return {
     type: obj.type,
     ...(typeof exit === 'object' && exit.after !== undefined ? { after: exit.after } : {}),
-    duration: typeof exit === 'string' ? EXIT_DEFAULTS.duration : (exit.duration ?? EXIT_DEFAULTS.duration),
+    duration:
+      typeof exit === 'string'
+        ? EXIT_DEFAULTS.duration
+        : phaseDuration(exit.duration, exit.easing, EXIT_DEFAULTS.duration),
     ...(typeof exit === 'object' && exit.easing !== undefined ? { easing: exit.easing } : {}),
     distance: typeof exit === 'string' ? EXIT_DEFAULTS.distance : (exit.distance ?? EXIT_DEFAULTS.distance),
   };
@@ -75,10 +82,37 @@ export function easeOutExpo(p: number): number {
   return 1 - Math.pow(2, -10 * p);
 }
 
+// The engine's own curve for a motion-system easing (springs, beziers, the named set), or null when the
+// spec isn't renderable here: a `$token` needs the template's global.motion, which the monitor doesn't
+// resolve, so it previews with the signature curve instead.
+function engineCurve(easing: EasingSpec): ((p: number) => number) | null {
+  try {
+    return parseEasing(easing).fn;
+  } catch (error) {
+    if (error instanceof EasingError) return null;
+
+    throw error;
+  }
+}
+
+// An unset duration on a spring takes the spring's own settle time, as the engine does.
+function phaseDuration(authored: number | undefined, easing: EasingSpec | undefined, fallback: number): number {
+  if (authored !== undefined || easing === undefined) return authored ?? fallback;
+
+  try {
+    return parseEasing(easing).settle ?? fallback;
+  } catch (error) {
+    if (error instanceof EasingError) return fallback;
+
+    throw error;
+  }
+}
+
 // Samples the AUTHORED easing at a 0..1 progress, mirroring the engine's expression curves
-// (linear ramp / cubic-out 1-(1-p)^3 / smoothstep p*p*(3-2p)). An unset easing keeps the monitor's
-// signature ease-out-expo feel, so pre-easing templates preview exactly as before.
-function easeProgress(progress: number, easing: string | undefined): number {
+// (linear ramp / cubic-out 1-(1-p)^3 / smoothstep p*p*(3-2p), and the motion-system curves through the engine's
+// own functions). An unset easing keeps the monitor's signature ease-out-expo feel, so pre-easing
+// templates preview exactly as before.
+function easeProgress(progress: number, easing: EasingSpec | undefined): number {
   const p = Math.min(1, Math.max(0, progress));
 
   if (easing === 'linear') return p;
@@ -89,7 +123,11 @@ function easeProgress(progress: number, easing: string | undefined): number {
 
   if (easing === 'ease-out-back') return p * (1 + (p - 1) * (2.70158 * (p - 1) - 1));
 
-  return easeOutExpo(p);
+  const curve = easing === undefined ? null : engineCurve(easing);
+
+  if (!curve) return easeOutExpo(p);
+
+  return p >= 1 ? 1 : curve(p);
 }
 
 // Motion can overshoot its resting position; opacity remains bounded to 0..1. `entering` animates toward
@@ -100,7 +138,7 @@ export function revealOffset(
   progress: number,
   distance: number,
   entering: boolean,
-  easing?: string
+  easing?: EasingSpec
 ): { opacity: number; translateX: number; translateY: number } {
   const eased = easeProgress(progress, easing);
   const remaining = entering ? 1 - eased : eased;

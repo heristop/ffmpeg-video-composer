@@ -9,11 +9,11 @@ What if that idea was a template?
 00:00:06.800 --> 00:00:09.544
 LeClap. One template. Every screen.
 
-00:00:10.500 --> 00:00:17.808
-Describe your video once, as a JSON template. LeClap's FFmpeg engine composes it into a finished film.
+00:00:10.500 --> 00:00:14.940
+Describe your video once, as a template. LeClap turns it into a finished film.
 
-00:00:18.300 --> 00:00:22.298
-The same template renders in Node, in your browser, and right on your phone.
+00:00:18.300 --> 00:00:22.484
+The same template works on your computer, in your browser, and right on your phone.
 
 00:00:24.300 --> 00:00:31.635
 On desktop: pick a template. Drop in your footage. Trim the best take. Build your scenes, right in the browser.

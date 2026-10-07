@@ -1,0 +1,28 @@
+{
+  "label": "Edge glow on a rounded video rect (fx)",
+  "kind": "fx",
+  "window": {
+    "at": 0.3,
+    "duration": 4
+  },
+  "subject": {
+    "x": 0.2,
+    "y": 0.24,
+    "w": 0.6,
+    "h": 0.52,
+    "radius": 0.08
+  },
+  "moments": [0.25, 0.45, 1.3, 2.3, 3.3, 4.35],
+  "backgrounds": ["footage"],
+  "section": {
+    "graphics": [
+      {
+        "type": "fx",
+        "effect": "edge-glow",
+        "target": "{{target}}",
+        "at": "{{at}}",
+        "duration": "{{duration}}"
+      }
+    ]
+  }
+}

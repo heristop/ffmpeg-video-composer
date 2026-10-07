@@ -1,0 +1,26 @@
+{
+  "label": "Light leak (legacy APNG)",
+  "kind": "legacy",
+  "window": {
+    "at": 0.3,
+    "duration": 2.6
+  },
+  "section": {
+    "inputs": [
+      {
+        "name": "effect",
+        "type": "animation",
+        "url": "/assets/animations/light_leak.apng",
+        "options": {
+          "position": "0:0",
+          "scale": "{{frameScale}}",
+          "fit": "contain",
+          "persistent": false,
+          "start": "{{at}}",
+          "duration": "{{duration}}",
+          "opacity": 0.5
+        }
+      }
+    ]
+  }
+}

@@ -27,6 +27,17 @@ export function saveBlocker(state: EditorState): SaveBlocker | null {
   return { kind: 'media', index, section: state.sections[index].kind };
 }
 
+// The blocker in plain English for a browser agent (never shown in the UI), or null when saving may go ahead.
+export function saveBlockerText(state: EditorState): string | null {
+  const blocker = saveBlocker(state);
+
+  if (!blocker) return null;
+
+  return blocker.kind === 'media'
+    ? `media: the ${blocker.section} section at position ${String(blocker.index)} offers nothing to pick or upload`
+    : blocker.kind;
+}
+
 // The sentence telling the author what to fix, reusing the editor's validation copy.
 export function saveBlockerMessage(blocker: SaveBlocker, t: TFunction<'admin'>): string {
   if (blocker.kind === 'name') return t('editor.validation.name');

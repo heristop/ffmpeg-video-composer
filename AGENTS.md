@@ -9,9 +9,10 @@ A template-based, cross-platform FFmpeg video composer. A JSON template describe
 - High-level intro: [`README.md`](./README.md)
 - Design system (brand, colors, typography): [`DESIGN.md`](./DESIGN.md)
 - Architecture & design patterns: [`docs/architecture.md`](./docs/architecture.md)
-- Template JSON reference: [`docs/template-configuration.md`](./docs/template-configuration.md)
+- Template JSON reference: [`docs/template-configuration.md`](./docs/template-configuration.md); what each option looks like: [`docs/gallery.md`](./docs/gallery.md) (snapshot sheets, regenerate with `bash docs/gallery/make-gallery.sh`)
 - Registered effect contracts, custom catalogs and authoring workflow: [`docs/effects-configuration.md`](./docs/effects-configuration.md) (regenerate tables with `pnpm docs:effects`).
 - Engine configuration (ProjectConfig, env vars, encoder tiers): [`docs/engine-configuration.md`](./docs/engine-configuration.md)
+- Browser agents in the web builder (WebMCP tools, confirmations, security): [`docs/webmcp.md`](./docs/webmcp.md)
 - MCP runtime (media/output roots, trusted entry/catalog/browser, deadlines and cache): [`packages/leclap-mcp/README.md`](./packages/leclap-mcp/README.md#configuration)
 - FFmpeg detection/fallback: [`docs/architecture.md`](./docs/architecture.md#cross-platform-support)
 
@@ -31,7 +32,7 @@ pnpm workspaces (`apps/*`, `packages/*`, plus `examples/llm-remotion-title`); no
 | `apps/leclap-expo`               | `@leclap/expo`                            | Expo / React Native app — on-device native-engine compiles, Tamagui UI _(reference)_.                                                |
 | `apps/leclap-web`                | `@leclap/web`                             | React 19 + Vite + Tailwind web app — in-browser FFmpeg via WASM _(reference)_.                                                       |
 
-The user-facing CLI is `@leclap/cli` (`leclap render|init|validate|samples|diagnose`). The `compile`/`diagnose` monorepo dev scripts still live in `packages/ffmpeg-video-composer` (root `pnpm compile` / `pnpm diagnose` delegate to them).
+The user-facing CLI is `@leclap/cli` (`leclap render|init|validate|samples|verify|snapshot|compare|timeline|style|beats|studio|diagnose`). The `compile`/`diagnose` monorepo dev scripts still live in `packages/ffmpeg-video-composer` (root `pnpm compile` / `pnpm diagnose` delegate to them).
 
 ## Setup
 
@@ -91,6 +92,18 @@ when only a library build is needed. The dev `compile`/`diagnose` scripts also i
 - **Dependencies:** Radix is added per primitive (`@radix-ui/react-*`) plus `class-variance-authority`; pin versions old enough to satisfy the `minimumReleaseAge` supply-chain policy (`pnpm-workspace.yaml`).
 - **Path alias** in the web app: `@/*` → `apps/leclap-web/src/*` (distinct from core's `@/*`).
 
+### Motion effects (engine `fx` primitives)
+
+- The 13 `graphics[].type: "fx"` primitives are documented in [`docs/template-configuration.md`](./docs/template-configuration.md#light-and-effects-graphicstype-fx). Adding one follows the extension contract at the top of `packages/ffmpeg-video-composer/src/editor/presets/fx.ts`: a row in `FX_PRIMITIVES` (`schemas/fx-primitives.schemas.ts`), its prose in `FX_DOCS` (`schemas/fx-docs.ts`), a lowering module `editor/presets/fx-<name>.ts` (on-device filters only, with a fallback), one line in `fx-registry.ts`, and an entry in `tests/lgpl-filter-audit.test.ts`.
+- Review motion visually, not only through goldens: `pnpm motion:review` renders every effect fixture (`scripts/motion-review/fixtures/`) and bundled template as contact sheets with a before/after `index.html` (see [`scripts/motion-review/README.md`](./scripts/motion-review/README.md)).
+- After changing an effect's defaults or the builder's animation library, regenerate the picker thumbnails with `pnpm gen:animation-thumbs` (plain blobs under `packages/leclap-creative-kit/src/library/animation-thumbs/`).
+
+### Browser-agent tools (web — WebMCP)
+
+- The builder's 23 WebMCP tools live in `apps/leclap-web/src/application/usecases/webmcp/` and reach the builder only through `BuilderPort`; names and kinds are in `tool-names.ts`. Keep the tool layer free of React, AI keys and media storage.
+- Adding, renaming or re-classifying a tool means updating `src/presentation/components/doc/webmcpDocs.ts` (checked by `webmcpDocs.test.ts`), the `agent.json` locales and `docs/webmcp.md`. Names shared with `@leclap/mcp` (`SHARED_WITH_MCP`) must keep the same meaning on both surfaces.
+- Consequential actions always go through the in-page confirmation queue; never add a tool that films, uploads media or downloads exports.
+
 ## Pre-commit
 
 Git hooks run via vite-plus staged checks (`vp fmt` on `*.{ts,tsx,js,cjs,mjs,json,md,yml,yaml}`, `vp lint` on `*.{ts,tsx}`). Keep changes formatted (`pnpm fmt`) and lint-clean before committing.
@@ -99,7 +112,7 @@ Git hooks run via vite-plus staged checks (`vp fmt` on `*.{ts,tsx,js,cjs,mjs,jso
 
 Repo-specific skills live in [`.agents/skills/`](./.agents/skills/). Load the matching one when its trigger applies:
 
-- **authoring-video-templates** — creating/editing template JSON, sections, filters, maps, variables, or fixing validation errors.
+- **authoring-video-templates** — creating/editing template JSON, sections, filters, maps, variables, or fixing validation errors. Compose motion with the motion engine; the library animations are samples, not building blocks.
 - **core-architecture-patterns** — adding a segment type, platform adapter, or core service in `packages/ffmpeg-video-composer`.
 - **monorepo-dev-workflow** — building, testing, linting, formatting, or running any app/package.
 - **cross-platform-ffmpeg** — working across Node/Static/WASM FFmpeg, the PlatformBridge, or browser/RN constraints.

@@ -1,0 +1,687 @@
+{
+  "meta": {
+    "name": "Effects tour · 10 Music",
+    "description": "The music features: a fading bed, per-section volume, a volume swell, ducking under a voice and cuts on the analysed beat.",
+    "creativeDirection": "Listen with the picture: every sound lands on the frame of its visual event and is named on screen. The beat grid proves sync (each count pops on its click), the riser ends exactly on the drop, the voice beats change only the processing. Review: no sound before its picture, the ding is the only one, and voices stay clear without pumping."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": true,
+    "seed": 73,
+    "transition": {
+      "type": "cut"
+    },
+    "motion": {
+      "energy": 1
+    },
+    "overlays": [
+      {
+        "text": {
+          "en": "10  MUSIC"
+        },
+        "position": "top-right",
+        "font": "mono",
+        "size": 24,
+        "color": "#C9C6D2",
+        "effect": {
+          "shadow": true
+        }
+      }
+    ],
+    "beats": {
+      "analyze": "music"
+    },
+    "audio": {
+      "sourceVolume": 1,
+      "musicVolume": 0.8,
+      "ducking": true,
+      "musicFade": 0.4,
+      "automation": [
+        {
+          "at": 0,
+          "volume": 0
+        },
+        {
+          "at": 1.6,
+          "volume": 1,
+          "ease": "ease-in-out"
+        },
+        {
+          "at": "music-swell.start",
+          "volume": 0.25
+        },
+        {
+          "at": "music-swell.end",
+          "volume": 1,
+          "ease": "ease-in-out"
+        }
+      ]
+    },
+    "music": {
+      "name": "cafe-jazz.mp3"
+    }
+  },
+  "sections": [
+    {
+      "name": "music-bed",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.0
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "global.music · audio.automation · fade in"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "MUSIC BED"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "music-quiet",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "musicVolume": 0.25
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.musicVolume: 0.25"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "QUIET"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "music-full",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "musicVolume": 1
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.musicVolume: 1"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "FULL"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "music-swell",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3.0
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "audio.automation · swell into the cut"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "SWELL"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        },
+        {
+          "type": "progress",
+          "at": 0.2,
+          "duration": 2.6,
+          "position": "bottom",
+          "thickness": 10,
+          "color": "#7C83FD"
+        }
+      ]
+    },
+    {
+      "name": "music-duck",
+      "type": "project_video",
+      "options": {
+        "duration": 2.6,
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "voice": "clean"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "audio.ducking · the music dips under the voice"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "DUCK"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "beat-1",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": {
+          "beats": 2
+        }
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "global.beats: { analyze: \"music\" } · cuts on the beat"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "ON"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "beat-2",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1C1A2E",
+        "duration": {
+          "beats": 2
+        }
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "duration: { beats: 2 }"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "THE"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "beat-3",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": {
+          "beats": 2
+        }
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "duration: { beats: 2 }"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "BEAT"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "beat-4",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#2A1F3D",
+        "duration": {
+          "beats": 2
+        }
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "duration: { beats: 2 }"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "!"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "close",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "global.music · one track, ten sections"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Score it in JSON."
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 150,
+          "delay": 0.15,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    }
+  ]
+}

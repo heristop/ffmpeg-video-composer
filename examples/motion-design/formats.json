@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "name": "One story, three formats",
+    "description": "One launch story composed three times: a 16:9 film, a 9:16 vertical cut and a 1:1 feed post, each with its own type scale, holds, camera path and element count.",
+    "creativeDirection": "Audience: people scrolling past a product launch. Direction: one story, separate compositions. Landscape is the full film: a headline with a supporting line, a two-sided proof beat, a stat and a close. Portrait is recomposed for the thumb: larger type, one element per beat, a vertical camera path, no side-by-side layout, platform safe zones respected. Square is the tight feed post: smaller margins, shorter holds, the proof beat dropped. Review: every format tells the same beats in the same order (minus explicit removals), no text under a platform's UI, every beat holds long enough to read."
+  },
+  "global": {
+    "orientation": "landscape",
+    "platform": "youtube",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 7,
+    "transition": { "type": "cut" },
+    "motion": { "energy": 1 }
+  },
+  "sections": [
+    {
+      "name": "hook",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": { "$format": { "landscape": 2.4, "portrait": 2, "square": 2 } }
+      },
+      "camera": { "preset": "push-in", "amount": 0.06, "hits": [0.6] },
+      "graphics": [{ "id": "hit", "type": "flash", "at": 0.6, "duration": 0.25, "intensity": 0.6 }],
+      "kinetic": [
+        {
+          "id": "headline",
+          "text": { "en": "One story." },
+          "preset": "cascade",
+          "size": { "$format": { "landscape": 120, "portrait": 150, "square": 130 } },
+          "y": { "$format": { "default": 220, "portrait": 470, "square": 340 } },
+          "accent": { "words": "last" }
+        },
+        {
+          "id": "support",
+          "text": { "en": "Three compositions, not three crops" },
+          "preset": "fade",
+          "font": "oswald",
+          "size": { "$format": { "landscape": 40, "portrait": 50, "square": 44 } },
+          "y": { "$format": { "landscape": 400, "portrait": 700, "square": 560 } },
+          "delay": "headline.end + 0.15"
+        }
+      ]
+    },
+    {
+      "name": "proof",
+      "type": "color_background",
+      "options": { "backgroundColor": "#0E0E12", "duration": { "$format": { "default": 4, "portrait": 3.4 } } },
+      "camera": { "preset": "drift-left", "amount": 0.05 },
+      "graphics": [{ "id": "rule", "type": "underline", "at": 0.5, "x": 160, "y": 330, "width": 960 }],
+      "kinetic": [
+        {
+          "id": "before",
+          "text": { "en": "Before: crop" },
+          "preset": "rise",
+          "ease": "$snappy",
+          "size": 64,
+          "x": 340,
+          "y": 240
+        },
+        {
+          "id": "after",
+          "text": { "en": "After: compose" },
+          "preset": "rise",
+          "size": 64,
+          "x": 940,
+          "y": 240,
+          "delay": "before.end + 0.1",
+          "accent": { "words": "last" }
+        },
+        {
+          "id": "aside",
+          "text": { "en": "same JSON, per-format patches" },
+          "preset": "fade",
+          "font": "mono",
+          "size": 30,
+          "y": 420,
+          "delay": "after.end + 0.2"
+        }
+      ]
+    },
+    {
+      "name": "stat",
+      "type": "color_background",
+      "options": { "backgroundColor": "#1B1830", "duration": { "$format": { "default": 2.4, "square": 2 } } },
+      "kinetic": [
+        {
+          "id": "number",
+          "text": { "en": "" },
+          "preset": "counter",
+          "counter": { "from": 0, "to": 3, "suffix": " formats" },
+          "duration": 1,
+          "size": { "$format": { "landscape": 150, "portrait": 130, "square": 120 } },
+          "y": "center",
+          "color": "#FFF685"
+        }
+      ]
+    },
+    {
+      "name": "outro",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": { "$format": { "default": 3.6, "square": 3 } } },
+      "camera": { "preset": "push-in", "amount": { "$format": { "default": 0.04, "portrait": 0.06 } } },
+      "kinetic": [
+        { "id": "close", "text": { "en": "Same story. Every screen." }, "preset": "split", "size": 90, "y": "center" }
+      ]
+    }
+  ],
+  "formats": {
+    "portrait": {
+      "global": { "platform": "shorts" },
+      "sections": {
+        "hook": { "camera": { "preset": "drift-up", "amount": 0.06, "hits": null } },
+        "proof": {
+          "camera": { "preset": "drift-down" },
+          "graphics": { "byId": { "rule": { "x": 120, "y": 760, "width": 480 } } },
+          "kinetic": {
+            "byId": {
+              "before": { "size": 76, "x": 360, "y": 470 },
+              "after": { "size": 76, "x": 360, "y": 600 },
+              "aside": { "remove": true }
+            }
+          }
+        },
+        "outro": { "kinetic": { "byId": { "close": { "size": 96, "maxWidth": 560 } } } }
+      }
+    },
+    "square": {
+      "global": { "platform": "square-feed" },
+      "sections": {
+        "proof": { "remove": true },
+        "outro": { "kinetic": { "byId": { "close": { "size": 80 } } } }
+      }
+    }
+  }
+}

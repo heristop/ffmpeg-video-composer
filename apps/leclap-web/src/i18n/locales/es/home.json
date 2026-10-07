@@ -15,13 +15,14 @@
   },
   "showcase": {
     "eyebrow": "Míralo en acción",
-    "title": "Hecho enteramente en tu navegador",
-    "subtitle": "Sin subir nada, sin servidor: este clip se compuso en el dispositivo a partir de una plantilla con transiciones, música, efectos, texto y animaciones, y luego se renderizó con FFmpeg en WebAssembly.",
-    "badge": "Render de ejemplo · en el navegador",
-    "videoAria": "Un vídeo de ejemplo compuesto en LeClap, reproduciéndose en bucle",
+    "title": "Cada efecto cabe en una plantilla",
+    "subtitle": "Destellos de luz, brillos, marcos, movimientos de cámara y cortes al ritmo: cada uno es una línea de plantilla y se ve igual en tu navegador, en tu ordenador y en tu móvil.",
+    "badge": "Reel de efectos · hecho con LeClap",
+    "videoAria": "Un reel de efectos de movimiento de LeClap, reproduciéndose en bucle",
     "play": "Reproducir el render",
     "pause": "Pausar el render",
     "cta": "Crea el tuyo",
+    "viewShowcase": "Ver las muestras",
     "browseTemplates": "Explorar plantillas",
     "readDocs": "Leer la documentación"
   },
@@ -65,7 +66,16 @@
     },
     "badge": "En el dispositivo · sin subidas",
     "phoneAria": "Un móvil con la app de LeClap",
-    "cta": "Prueba las plantillas en tu navegador"
+    "cta": "Prueba las plantillas en tu navegador",
+    "screen": {
+      "title": "Tu vídeo cobra vida",
+      "preparing": "Preparando las escenas…",
+      "private": "El vídeo se crea de forma privada en tu dispositivo",
+      "cancel": "Cancelar creación",
+      "readyTitle": "Tu vídeo está listo",
+      "readyBody": "Guarda una copia o comparte tu historia.",
+      "share": "Compartir"
+    }
   },
   "agentic": {
     "eyebrow": "Para el desarrollo agéntico",

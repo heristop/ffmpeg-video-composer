@@ -84,7 +84,7 @@ export const DOC_ROUTES: readonly DocRoute[] = [
     path: '/doc/animations',
     title: 'Animations & images — template descriptor',
     description:
-      'Animated (APNG / WebM) and still-image overlays composited over a section: formats, position, scale, loop and keep-last-frame.',
+      'Animated (APNG / WebM) and still-image overlays composited over a section, and six effect recipes built from engine primitives.',
     priority: '0.6',
     changefreq: 'monthly',
   },
@@ -125,6 +125,14 @@ export const DOC_ROUTES: readonly DocRoute[] = [
     description:
       'Expose the LeClap engine to an AI agent over MCP: sample discovery, effect contracts, preview and composition tools and their arguments, the authoring loop, every flag and env var, containment rules, and wiring it into Claude Desktop or a project .mcp.json.',
     priority: '0.7',
+    changefreq: 'monthly',
+  },
+  {
+    path: '/doc/webmcp',
+    title: 'Browser agents (WebMCP) — drive the template builder',
+    description:
+      'Let the AI agent built into your browser read, validate and edit a LeClap template in the builder through WebMCP: enabling it, the tools, confirmations, undo and security.',
+    priority: '0.6',
     changefreq: 'monthly',
   },
   {

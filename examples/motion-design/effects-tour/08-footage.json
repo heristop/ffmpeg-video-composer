@@ -1,0 +1,621 @@
+{
+  "meta": {
+    "name": "Effects tour: footage",
+    "description": "Chapter 8 of the effects tour: footage controls on generated clips (bundled photographs set in motion under a running clock). Fit blur, letterbox and cover with a focus anchor, a keyframed focus pan, a clip range, all five speed-ramp presets, a freeze frame with a flash and a B-roll cutaway.",
+    "creativeDirection": "One footage control per beat, named in the corner. The running clock on the clip is the proof: ramps slow it down and speed it up, the clip range starts it at four seconds, the freeze stops it under a white flash. Review: no stretched frames, the pan eases at both ends, the clock reads every speed change and the cutaway returns on time."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 61,
+    "transition": {
+      "type": "cut"
+    },
+    "motion": {
+      "energy": 1
+    },
+    "overlays": [
+      {
+        "text": {
+          "en": "08  FOOTAGE"
+        },
+        "position": "top-right",
+        "font": "mono",
+        "size": 24,
+        "color": "#C9C6D2",
+        "effect": {
+          "shadow": true
+        }
+      }
+    ],
+    "variables": {
+      "broll": "videos/broll.mp4"
+    },
+    "audio": {
+      "sourceVolume": 0.5
+    }
+  },
+  "sections": [
+    {
+      "name": "fit-blur",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 2.6,
+        "fit": "blur",
+        "fill": {
+          "blur": 30,
+          "dim": 0.35,
+          "zoom": 1.1
+        }
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.fit: blur · vertical clip, wide frame"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "fit-letterbox",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 1.9,
+        "fit": "letterbox"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.fit: letterbox"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "fit-cover",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 1.9,
+        "fit": "cover",
+        "focus": "left"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.fit: cover · focus: left"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "focus-pan",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 3.0,
+        "focus": [
+          {
+            "t": 0.2,
+            "x": 0,
+            "y": 0.5
+          },
+          {
+            "t": 2.8,
+            "x": 1,
+            "y": 0.5,
+            "ease": "ease-in-out-sine"
+          }
+        ]
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.focus keys · a pan"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "clip-range",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 2.5,
+        "clip": {
+          "from": 4,
+          "to": 6.5
+        }
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.clip · source seconds 4 to 6.5"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ],
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "ramp-hero",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 2.6,
+        "clip": {
+          "from": 1,
+          "to": 3
+        },
+        "speedRamp": "hero",
+        "rampAudio": "mute"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.speedRamp: hero"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "ramp-montage",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 2.6,
+        "clip": {
+          "from": 0,
+          "to": 7
+        },
+        "speedRamp": "montage",
+        "rampAudio": "mute"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.speedRamp: montage"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "ramp-bullet",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 2.6,
+        "clip": {
+          "from": 1,
+          "to": 4
+        },
+        "speedRamp": "bullet",
+        "rampAudio": "mute"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.speedRamp: bullet"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "ramp-flash-in",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 2.6,
+        "clip": {
+          "from": 0,
+          "to": 4.5
+        },
+        "speedRamp": "flash-in",
+        "rampAudio": "mute"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.speedRamp: flash-in"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "ramp-flash-out",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 2.6,
+        "clip": {
+          "from": 0,
+          "to": 2.6
+        },
+        "speedRamp": "flash-out",
+        "rampAudio": "mute"
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.speedRamp: flash-out"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ],
+      "transition": {
+        "type": "whip-right",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "freeze",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 3.2,
+        "clip": {
+          "from": 2,
+          "to": 4.4
+        },
+        "freeze": [
+          {
+            "at": 1.1,
+            "hold": 0.8,
+            "flash": true
+          }
+        ]
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "options.freeze · flash + shutter"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "shutter",
+          "at": 1.1
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "cutaway",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 3.2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "cutaways · B-roll over the main clip"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        }
+      ],
+      "cutaways": [
+        {
+          "url": "{{ broll }}",
+          "at": 0.9,
+          "duration": 1.4
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    }
+  ]
+}

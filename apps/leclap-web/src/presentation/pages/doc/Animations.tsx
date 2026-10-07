@@ -10,7 +10,7 @@ export const DocAnimations = () => (
   <>
     <Seo
       title="Animations & images — template descriptor"
-      description="Animated (APNG / WebM) and still-image overlays composited over a section: formats, position, scale, loop and keep-last-frame."
+      description="Animated (APNG / WebM) and still-image overlays composited over a section, and six effect recipes built from engine primitives."
       path="/doc/animations"
     />
 
@@ -86,34 +86,40 @@ export const DocAnimations = () => (
       </Prose>
     </DocSection>
 
-    <DocSection id="recipes" title="Six composited effect recipes">
+    <DocSection id="recipes" title="Six effect recipes">
       <Prose>
         <p>
-          These landscape examples use the same six native APNG recipes as the app. Each combines two finite overlays:
-          interface-focus, product-spotlight, celebration-burst, focus-lock, light-pass and frame-reveal. Copy the
-          inputs into your own scene and adjust position, scale, opacity, start and duration around the actual action.
+          The builder's six recipes (interface-focus, product-spotlight, celebration-burst, focus-lock, light-pass and
+          frame-reveal) each layer two engine primitives: <Code>graphics[]</Code> entries such as an <Code>fx</Code>{' '}
+          sheen, glint, ripple, leak or confetti, and <Code>frame</Code> or <Code>corners</Code> strokes. Each part is
+          anchored to the scene's card with a <Code>target</Code> and gets parameters derived from it, so a recipe
+          adapts to landscape, portrait and square. Tune the parameters for your own scene rather than shipping the
+          defaults.
         </p>
         <p>
-          These coordinates target 1280×720. Rebuild placement for portrait/square; start is seconds, duration is
-          playback extent, not speed, and fps does not retime APNG frame delays. Set persistent explicitly; a frozen
-          ring or light sweep can obscure footage. See the{' '}
+          The bundled APNG overlays (shine sweep, sparkle, confetti, light leak and the others) are samples: existing
+          templates keep rendering them, but new motion is composed from the engine. See the{' '}
+          <a href="https://github.com/heristop/leclap/blob/main/docs/template-configuration.md#light-and-effects-graphicstype-fx">
+            light and effects reference
+          </a>
+          , the{' '}
           <a href="https://github.com/heristop/leclap/blob/main/examples/overlay-effects/README.md">recipe guide</a> and
-          <Link to="/doc/reference#complete-field-index"> complete field index</Link> for all overlay controls.
+          the <Link to="/doc/reference#complete-field-index">complete field index</Link>.
         </p>
       </Prose>
       {recipeFixture.sections.map((section) => (
         <details key={section.name} className="rounded-xl border border-divider p-4">
           <summary className="cursor-pointer font-mono text-sm text-foreground">{section.name}</summary>
-          <JsonBlock code={JSON.stringify({ inputs: section.inputs }, null, 2)} />
+          <JsonBlock code={JSON.stringify({ graphics: section.graphics }, null, 2)} />
         </details>
       ))}
     </DocSection>
 
     <Tip className="mt-8">
-      The builder ships a library of ready-made overlays (and accepts your own <Code>.apng</Code> / <Code>.webm</Code>{' '}
-      animation or image uploads). Add as many animations and images as you like to a section, then drag each one to
-      position and resize it right on the preview frame — so most templates never hand-write an <Code>inputs[]</Code>{' '}
-      block.
+      The builder's animation library lists the engine effects first: picking one adds a <Code>graphics[]</Code> entry
+      on the scene's main card and opens its parameters. It also accepts your own <Code>.apng</Code> /{' '}
+      <Code>.webm</Code> animation or image uploads: drag each one to position and resize it right on the preview frame,
+      so most templates never hand-write an <Code>inputs[]</Code> block.
     </Tip>
   </>
 );

@@ -24,7 +24,11 @@ beforeAll(async () => {
 
 const noop = () => {};
 
-const render = (section: EditorSection, activeRef: ElementRef | null) =>
+const render = (
+  section: EditorSection,
+  activeRef: ElementRef | null,
+  slotMode?: { index: number; mode: 'effect' | 'file' }
+) =>
   renderToStaticMarkup(
     <I18nextProvider i18n={i18n}>
       <ElementInspector
@@ -34,6 +38,7 @@ const render = (section: EditorSection, activeRef: ElementRef | null) =>
         orientation="landscape"
         onPatchSection={noop}
         onSelectElement={noop}
+        slotMode={slotMode}
       />
     </I18nextProvider>
   );
@@ -50,8 +55,8 @@ const videoWithImage = (): EditorSection => {
   return { ...(newSection('video') as Extract<EditorSection, { kind: 'video' }>), images: [image] };
 };
 
-const videoWithAnimation = (): EditorSection => {
-  const animation: AnimationOverlay = { id: makeTemplateId(), url: '' };
+const videoWithAnimation = (url = ''): EditorSection => {
+  const animation: AnimationOverlay = { id: makeTemplateId(), url };
 
   return { ...(newSection('video') as Extract<EditorSection, { kind: 'video' }>), animations: [animation] };
 };
@@ -96,9 +101,27 @@ describe('ElementInspector', () => {
     expect(html).toContain('10:20');
   });
 
-  it('dispatches an animation ref to PlacementControls', () => {
+  it('opens an empty animation slot on the effects side of the picker', () => {
     const html = render(videoWithAnimation(), { kind: 'animation', index: 0 });
 
+    expect(html).toContain(`aria-label="${admin.animation.kind.switch}"`);
+    expect(html).toContain(admin.animation.kind.effect.subtitle);
+    expect(html).not.toContain(admin.media.tab.library);
+  });
+
+  it('opens a slot added as an animation file on the files side', () => {
+    const html = render(videoWithAnimation(), { kind: 'animation', index: 0 }, { index: 0, mode: 'file' });
+
+    expect(html).toContain(admin.animation.kind.file.subtitle);
     expect(html).toContain(admin.media.tab.library);
+  });
+
+  it('heads an animation-file element with its name and kind, and offers its engine effect', () => {
+    const html = render(videoWithAnimation('/assets/animations/confetti.apng'), { kind: 'animation', index: 0 });
+
+    expect(html).toContain('confetti.apng');
+    expect(html).toContain(`>${admin.animation.kind.file.name}<`);
+    expect(html).toContain('· APNG');
+    expect(html).toContain(admin.animation.picker.upgrade);
   });
 });

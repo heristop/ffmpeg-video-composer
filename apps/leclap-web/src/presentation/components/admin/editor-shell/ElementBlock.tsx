@@ -1,6 +1,7 @@
 // The unified left-panel element block shared by both panel switches: the "+ Add" menu, the
 // cross-kind element list, and the per-element settings inspector, all driven by the section's shared
 // selection. Section-level fields render above this; this block owns every per-element editor.
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { collectVariables, type EditorSection, type EditorState } from '../templateEditorModel';
 import { AddElementMenu } from './AddElementMenu';
@@ -8,6 +9,7 @@ import { ElementList } from './ElementList';
 import { ElementInspector } from './ElementInspector';
 import { addElement, listSectionElements, removeElement, reorderElement } from './sectionElements';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
+import type { AnimationPickMode } from '../editor/animationSource';
 
 interface ElementBlockProps {
   state: EditorState;
@@ -20,6 +22,9 @@ interface ElementBlockProps {
 export const ElementBlock = ({ state, section, selection, patchSection, onSelectElement }: ElementBlockProps) => {
   const { t } = useTranslation('admin');
   const elements = listSectionElements(section);
+  // The picker side a freshly added animation slot opens on: "Effect" and "Animation file" in the add menu
+  // create the same empty slot, so the choice rides along until something is picked there.
+  const [slotMode, setSlotMode] = useState<{ index: number; mode: AnimationPickMode } | null>(null);
 
   return (
     <div className="mt-4 space-y-3 border-t border-foreground/10 pt-4">
@@ -43,6 +48,10 @@ export const ElementBlock = ({ state, section, selection, patchSection, onSelect
 
             if (!added) return;
 
+            if (added.ref.kind === 'animation') {
+              setSlotMode({ index: added.ref.index, mode: kind === 'effect' ? 'effect' : 'file' });
+            }
+
             patchSection(added.patch);
             onSelectElement(added.ref);
           }}
@@ -65,6 +74,9 @@ export const ElementBlock = ({ state, section, selection, patchSection, onSelect
         activeRef={selection.element}
         variables={collectVariables(state)}
         orientation={state.orientation}
+        theme={state.motion?.theme}
+        salt={state.sections.indexOf(section)}
+        slotMode={slotMode}
         onPatchSection={patchSection}
         onSelectElement={onSelectElement}
       />

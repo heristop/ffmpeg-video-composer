@@ -5,7 +5,13 @@ import type Project from '../../core/models/Project';
 import type { Filter } from '@/core/types';
 import type AbstractLogger from '../../platform/logging/AbstractLogger';
 import { applyFilterCompat, engineCapabilities } from '../utils/filter-compat';
+import { renderFilterGraph } from '../utils/filter-graph';
+import { withTextShaping } from '../utils/text-shaping';
+import { steppedFontSize, type FontSizeTiming } from '../utils/stepped-fontsize';
+import DefaultConfig from '../../core/default.config';
 import { applyAnimation } from '../presets/text';
+import { applyTracks } from '@/core/motion/tracks';
+import { resolvedTimes } from '@/core/timing/seconds';
 import type FormatterManager from './FormatterManager';
 
 // A drawtext base coordinate may be authored as a number or an expression string; anything else
@@ -29,7 +35,15 @@ class FilterManager {
   ) {}
 
   addFilter = (filter: Filter): string => {
-    let resolvedFilter = filter;
+    // An engine sub-graph (masks, split screens): each of its filters goes through this same path.
+    if (filter.graph) {
+      return renderFilterGraph(filter.graph, this.addFilter, (key) => this.segment.extraInputs[key]);
+    }
+
+    const caps = engineCapabilities(this.project.config, this.project.engineFeatures);
+    let resolvedFilter = withTextShaping(filter, caps, (message) => {
+      this.logger.warn(`[${this.segment.currentSection?.name}]${message}`);
+    });
 
     if (resolvedFilter.range) {
       resolvedFilter = this.remapEnableBetweenSuffix(resolvedFilter);
@@ -44,7 +58,7 @@ class FilterManager {
     // Platform filter-compat: rewrite filters the active engine can't run (e.g. the on-device LGPL
     // engine lacks GPL `eq` → lutyuv). A null result means the filter has no equivalent here: degrade
     // to the no-op `null` filter and warn, rather than emitting a filter the engine will die on.
-    const compat = applyFilterCompat(resolvedFilter, engineCapabilities(this.project.config));
+    const compat = applyFilterCompat(resolvedFilter, caps);
 
     if (compat === null) {
       this.logger.warn(`[FilterCompat] dropped unavailable filter "${resolvedFilter.type}"`);
@@ -55,24 +69,44 @@ class FilterManager {
       return 'null';
     }
 
-    resolvedFilter = compat;
+    // An animated drawtext size becomes one constant-size drawtext per run of frames (FFmpeg 8 crashes
+    // on a fontsize that changes between frames; editor/utils/stepped-fontsize.ts).
+    return steppedFontSize(compat, this.fontSizeTiming)
+      .map((step) => this.serialize(step))
+      .join(',');
+  };
 
-    if (resolvedFilter.value) {
-      return this.formattersManager.formatMultipleTypesValue(resolvedFilter);
+  private readonly serialize = (filter: Filter): string => {
+    if (filter.value) {
+      return this.formattersManager.formatMultipleTypesValue(filter);
     }
 
-    if (resolvedFilter.values) {
-      return this.formattersManager.formatMultipleTypesValues(resolvedFilter);
+    if (filter.values) {
+      return this.formattersManager.formatMultipleTypesValues(filter);
     }
 
-    return resolvedFilter.type;
+    return filter.type;
+  };
+
+  // The section's frame rate and length, over which an animated drawtext size is sampled.
+  private readonly fontSizeTiming = (): FontSizeTiming => {
+    const section = this.segment.currentSection;
+    const measured = section ? this.project.buildInfos.durations[section.name] : undefined;
+    const declared = section?.options?.duration;
+
+    return {
+      fps: this.project.config.videoConfig?.fps ?? DefaultConfig.FPS,
+      duration: measured ?? (typeof declared === 'number' ? declared : 0),
+    };
   };
 
   // Animated entrance/exit: a drawtext with a `reveal` and/or `exit` gets alpha + kinetic x/y baked
   // from its base x/y (the same vocabulary as the caption/lowerThird sugar), so positioned text
   // overlays animate in and out. The exit is timed against the section duration.
+  // `animate` keyframe tracks are applied last and override whatever reveal/exit baked
+  // for the same property (core/motion/tracks.ts).
   private readonly bakeTextAnimation = (filter: Filter): Filter => {
-    if (filter.type !== 'drawtext' || (!filter.reveal && !filter.exit) || !filter.values) {
+    if (filter.type !== 'drawtext' || (!filter.reveal && !filter.exit && !filter.animate) || !filter.values) {
       return filter;
     }
 
@@ -81,7 +115,9 @@ class FilterManager {
     // The schema allows numeric x/y as well as expression strings; both are valid base positions.
     // Coercing a number to '0' would anchor the animation to the frame origin.
     const base = { x: baseCoordinate(values.x), y: baseCoordinate(values.y) };
-    applyAnimation(values, filter.reveal, filter.exit, base, duration);
+    applyAnimation(values, resolvedTimes(filter.reveal), resolvedTimes(filter.exit), base, duration);
+
+    if (filter.animate) applyTracks(values, filter.animate, base);
 
     return { ...filter, values };
   };

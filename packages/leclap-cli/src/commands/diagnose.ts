@@ -3,6 +3,7 @@ import pc from 'picocolors';
 import { FFmpegDetector } from 'ffmpeg-video-composer';
 import { fail, hint, step } from '../ui.js';
 import { wordmark, statusRow, ok, dot } from '../theme.js';
+import { capabilityFixes, capabilityReport, capabilityRow } from '../diagnose-capabilities.js';
 
 // `ffprobe` is only reported for static: false when ffmpeg-static has no ffprobe to probe media with.
 type ImplStatus = { available: boolean; version?: string; ffprobe?: boolean };
@@ -34,35 +35,59 @@ function verdict(ff: FFmpegStatus): string {
   return fail('Setup required before you can render.');
 }
 
+// `--json`: the capability report alone, machine-readable — the MCP get_capabilities payload.
+async function runJson(): Promise<void> {
+  process.stdout.write(`${JSON.stringify(await capabilityReport(), null, 2)}\n`);
+}
+
+async function runHuman(): Promise<void> {
+  process.stdout.write(wordmark());
+
+  const report = await FFmpegDetector.runFullDiagnostics(false);
+  const sys = report.systemInfo;
+  const ff = report.ffmpegStatus;
+  const capabilities = await capabilityReport();
+
+  // `systemInfo.os` already carries the arch (e.g. "darwin arm64"), so don't append it again.
+  console.log(statusRow('system', pc.dim(`${sys.os}  ${dot}  node ${sys.nodeVersion}  ${dot}  ${sys.memoryGB}GB`)));
+  console.log(
+    statusRow(
+      'ffmpeg',
+      [impl('system', ff.system), impl('static', ff.static), impl('wasm', ff.wasm)].join(`  ${dot}  `)
+    )
+  );
+  console.log(capabilityRow(capabilities));
+  console.log('');
+
+  // The engine prefixes recommendations with decorative emoji; strip a leading symbol so they sit
+  // cleanly under the `›` marker in the refined layout.
+  const suggestions = [
+    ...report.recommendations.map((rec) => rec.replace(/^[^\p{L}\p{N}]+/u, '')),
+    ...capabilityFixes(capabilities),
+  ];
+
+  if (suggestions.length > 0) {
+    console.log(hint('Suggestions'));
+
+    for (const suggestion of suggestions) console.log(step(suggestion));
+    console.log('');
+  }
+
+  console.log(verdict(ff));
+}
+
 export const diagnose = defineCommand({
-  meta: { name: 'diagnose', description: 'Check your FFmpeg setup' },
-  async run() {
+  meta: { name: 'diagnose', description: 'Check your FFmpeg setup and what it can render' },
+  args: {
+    json: {
+      type: 'boolean',
+      description: 'Print the FFmpeg capability report as JSON (features with fixes, fonts, encoders)',
+      default: false,
+    },
+  },
+  async run({ args }) {
     try {
-      process.stdout.write(wordmark());
-
-      const report = await FFmpegDetector.runFullDiagnostics(false);
-      const sys = report.systemInfo;
-      const ff = report.ffmpegStatus;
-
-      // `systemInfo.os` already carries the arch (e.g. "darwin arm64"), so don't append it again.
-      console.log(statusRow('system', pc.dim(`${sys.os}  ${dot}  node ${sys.nodeVersion}  ${dot}  ${sys.memoryGB}GB`)));
-      console.log(
-        statusRow(
-          'ffmpeg',
-          [impl('system', ff.system), impl('static', ff.static), impl('wasm', ff.wasm)].join(`  ${dot}  `)
-        )
-      );
-      console.log('');
-
-      if (report.recommendations.length > 0) {
-        console.log(hint('Suggestions'));
-        // The engine prefixes recommendations with decorative emoji; strip a leading symbol so they sit
-        // cleanly under the `›` marker in the refined layout.
-        for (const rec of report.recommendations) console.log(step(rec.replace(/^[^\p{L}\p{N}]+/u, '')));
-        console.log('');
-      }
-
-      console.log(verdict(ff));
+      await (args.json ? runJson() : runHuman());
     } catch (error) {
       console.error(fail(`Diagnostics failed: ${error instanceof Error ? error.message : String(error)}`));
       process.exit(1);

@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "name": "Gallery: emoji",
+    "description": "Colour emoji in kinetic type, a title card, a lower third and word captions, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 17,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "kinetic",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "So good 🔥"
+          },
+          "preset": "fade",
+          "font": "anton",
+          "size": 170,
+          "accent": {
+            "words": "last",
+            "color": "#FF8AAE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "sequence",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "☕ 💻 🚀"
+          },
+          "preset": "pop",
+          "size": 170,
+          "y": 200,
+          "stagger": 0.1
+        },
+        {
+          "text": {
+            "en": "👍🏽 🇫🇷 👩‍💻 1️⃣"
+          },
+          "preset": "fade",
+          "size": 110,
+          "y": 440,
+          "delay": 0.3
+        }
+      ]
+    },
+    {
+      "name": "title-card",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "titleCard": {
+        "kicker": {
+          "en": "RELEASE NOTES"
+        },
+        "headline": {
+          "en": "Launch day 🎉"
+        },
+        "subtitle": {
+          "en": "Emoji stay in colour ✅"
+        },
+        "accent": "#FF8AAE",
+        "align": "center",
+        "reveal": {
+          "type": "rise",
+          "delay": 0.1,
+          "duration": 0.4,
+          "distance": 30,
+          "easing": "ease-out"
+        }
+      }
+    },
+    {
+      "name": "lower-third",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/desk-flatlay.jpg",
+        "duration": 2.4
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Coffee break ☕"
+        },
+        "subtitle": {
+          "en": "back in 5 👀"
+        },
+        "style": "pill",
+        "accent": "#FF8AAE",
+        "reveal": {
+          "type": "fade",
+          "delay": 0.1,
+          "duration": 0.2
+        }
+      }
+    }
+  ]
+}

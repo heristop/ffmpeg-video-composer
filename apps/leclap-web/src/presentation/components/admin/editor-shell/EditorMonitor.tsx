@@ -2,6 +2,10 @@ import { useTranslation } from 'react-i18next';
 import { SectionCanvas, type CanvasBackground } from './SectionCanvas';
 import { useClipPreviewUrl } from './use-clip-preview-url';
 import { PartialPreview } from './PartialPreview';
+import { FRAME_STAGE_CLASS } from './frame-fit';
+import { previewEnvOf, sectionGraphics, selectedEffect } from './fx-preview/preview-env';
+import type { FxPreviewLayerProps } from './fx-preview/LazyFxPreview';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { resolveCanvasDrop, type DropPayload, type DropPoint } from './canvasDrop';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
 import { PreviewSurface } from '../editor/PreviewSurface';
@@ -93,6 +97,20 @@ const FallbackPreview = ({ section }: { section: EditorSection }) => {
   );
 };
 
+// The selected effect's live preview props, or undefined when no engine effect is selected.
+const effectPreview = (
+  state: EditorState,
+  section: EditorSection,
+  selection: SectionSelectionState,
+  reduced: boolean
+): FxPreviewLayerProps | undefined => {
+  const only = selectedEffect(section, selection);
+
+  return only === undefined
+    ? undefined
+    : { graphics: sectionGraphics(section), only, env: previewEnvOf(state, section, reduced) };
+};
+
 // The selected section's editable preview, rendered inside ProgramMonitor's children slot. A thin
 // dispatcher: no section → empty state; visual sections → the centered WYSIWYG SectionCanvas (real
 // backdrop + draggable text overlays) wired back through patchSection; other kinds → a labelled frame.
@@ -111,6 +129,7 @@ export const EditorMonitor = ({
   // Asset-backed video sections preview their fixed clip as the canvas backdrop (mirrors the render's
   // base layer); camera sections keep the neutral frame. Resolved before any early return (hooks rule).
   const clipPreviewUrl = useClipPreviewUrl(section?.kind === 'video' ? section.videoUrl : undefined);
+  const reduced = useReducedMotion();
 
   if (!section) return <EmptyState label={t('shell.monitorEmpty')} />;
 
@@ -135,7 +154,7 @@ export const EditorMonitor = ({
   };
 
   return (
-    <div className="grid h-full place-items-center overflow-auto p-4 sm:p-6">
+    <div className={`${FRAME_STAGE_CLASS} overflow-auto`}>
       <SectionCanvas
         overlays={section.overlays}
         orientation={state.orientation}
@@ -193,6 +212,7 @@ export const EditorMonitor = ({
           onPatchSection({ animations });
         }}
         onCanvasDrop={onCanvasDrop}
+        fx={effectPreview(state, section, selection, reduced)}
       />
     </div>
   );

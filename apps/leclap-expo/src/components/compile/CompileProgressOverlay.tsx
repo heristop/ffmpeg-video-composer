@@ -16,7 +16,7 @@ import { colors, spacing, typography, withAlpha } from '@/src/styles/theme';
 import { useMotionPreferences } from '@/src/hooks/use-motion-preferences';
 import { motion } from '@/src/styles/motion';
 
-/** Real engine progress; Clappy holds still while rendering. */
+/** Real engine progress; Clappy runs in place while rendering, cheers at each quarter, and stops when it ends. */
 export function CompileProgressOverlay() {
   const { t } = useTranslation('preview');
   const visible = useCompileProgressStore((s) => s.visible);
@@ -45,7 +45,12 @@ export function CompileProgressOverlay() {
       <SafeAreaProvider>
         <SafeAreaView style={styles.fill}>
           <ScrollView contentContainerStyle={styles.center}>
-            <Clappy size={180} state="working" active={false} />
+            <Clappy
+              size={180}
+              state="working"
+              active={visible && !cancelling}
+              cheer={Math.min(3, Math.floor(ratio * 4))}
+            />
             <Text accessibilityRole="header" style={styles.heading}>
               {t('compile.title')}
             </Text>

@@ -201,16 +201,16 @@ describe('MusicComposer.loadMusic', () => {
   });
 
   it('uses a bundled track by name (no URL, no download) when one ships with the package', async () => {
-    const project = makeProject({ music: { name: 'air-prelude.mp3' } });
+    const project = makeProject({ music: { name: 'lofi-jazz-music.mp3' } });
     const filesystem = makeFilesystem();
     filesystem.stat.mockResolvedValue(false);
-    filesystem.resolveBundledMusic.mockResolvedValue('/pkg/dist/musics/air-prelude.mp3');
+    filesystem.resolveBundledMusic.mockResolvedValue('/pkg/dist/musics/lofi-jazz-music.mp3');
     const { composer } = makeComposer({ project, filesystem });
 
     await composer.loadMusic();
 
-    expect(filesystem.resolveBundledMusic).toHaveBeenCalledWith('air-prelude.mp3');
-    expect(project.buildInfos.musicPath).toBe('/pkg/dist/musics/air-prelude.mp3');
+    expect(filesystem.resolveBundledMusic).toHaveBeenCalledWith('lofi-jazz-music.mp3');
+    expect(project.buildInfos.musicPath).toBe('/pkg/dist/musics/lofi-jazz-music.mp3');
     expect(filesystem.fetch).not.toHaveBeenCalled();
   });
 });
@@ -439,6 +439,19 @@ describe('MusicComposer.normalizeAudio / hasNormalization', () => {
     expect(cmd).toContain('-c:v copy');
     expect(cmd).toContain('+faststart /build/output.mp4');
     expect(filesystem.move).not.toHaveBeenCalled();
+  });
+
+  it('aims loudnorm at the delivery platform loudness when global.platform is set', async () => {
+    const template = makeTemplate({ global: { platform: 'tiktok', audio: { normalize: 'loudnorm' } } });
+    const ffmpeg = {
+      execute: vi.fn<(cmd: string) => Promise<{ rc: number }>>(async () => ({ rc: 0 })),
+      getInfos: vi.fn(async () => ({ duration: 10, videoCodec: 'h264', audioCodec: 'aac', sampleRate: 48000 })),
+    };
+    const { composer } = makeComposer({ template, ffmpeg });
+
+    await composer.normalizeAudio('/build/output.mp4', { kind: 'concat', listPath: '/build/segments.list' });
+
+    expect(ffmpeg.execute.mock.calls[0][0]).toContain('-af "loudnorm=I=-14:TP=-1:LRA=11"');
   });
 
   it('moves and reads a file source by default (unchanged behavior)', async () => {

@@ -46,6 +46,7 @@ export const docNavGroups: readonly DocNavGroup[] = [
       { to: '/doc/engine', label: 'Engine configuration' },
       { to: '/doc/cli', label: 'Command line' },
       { to: '/doc/mcp', label: 'MCP server' },
+      { to: '/doc/webmcp', label: 'Browser agents (WebMCP)' },
     ],
   },
 ];

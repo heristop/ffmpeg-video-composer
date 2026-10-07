@@ -1,0 +1,36 @@
+{
+  "label": "Whip transition (whip-left, 0.4 s)",
+  "kind": "transition",
+  "window": { "at": 1.6, "duration": 0.4 },
+  "moments": [1.62, 1.7, 1.76, 1.8, 1.86, 1.96],
+  "hold": 0,
+  "section": {
+    "transition": { "type": "whip-left", "duration": "{{duration}}" },
+    "kinetic": [
+      {
+        "id": "before",
+        "text": { "en": "BEFORE" },
+        "preset": "fade",
+        "delay": 0,
+        "duration": 0.2,
+        "size": 150,
+        "y": "center",
+        "color": "#E8553A"
+      }
+    ]
+  },
+  "next": {
+    "kinetic": [
+      {
+        "id": "after",
+        "text": { "en": "AFTER" },
+        "preset": "fade",
+        "delay": 0,
+        "duration": 0.01,
+        "size": 150,
+        "y": "center",
+        "color": "#2F6BFF"
+      }
+    ]
+  }
+}

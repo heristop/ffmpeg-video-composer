@@ -15,13 +15,14 @@
   },
   "showcase": {
     "eyebrow": "In Aktion sehen",
-    "title": "Komplett in deinem Browser erstellt",
-    "subtitle": "Kein Upload, kein Server – dieser Clip wurde direkt auf dem Gerät aus einer Vorlage mit Übergängen, Musik, Effekten, Text und Animationen komponiert und dann mit WebAssembly FFmpeg gerendert.",
-    "badge": "Beispiel-Render · im Browser",
-    "videoAria": "Ein Beispielvideo, erstellt in LeClap, läuft in Schleife",
+    "title": "Jeder Effekt steckt in einer Vorlage",
+    "subtitle": "Lichtlecks, Glanzlichter, Rahmen, Kamerafahrten und Schnitte im Takt: Jeder ist eine Zeile in einer Vorlage und sieht im Browser, auf dem Computer und auf dem Handy gleich aus.",
+    "badge": "Effekt-Reel · mit LeClap gemacht",
+    "videoAria": "Ein Reel mit LeClap-Bewegungseffekten, läuft in Schleife",
     "play": "Render abspielen",
     "pause": "Render pausieren",
     "cta": "Mach dein eigenes",
+    "viewShowcase": "Zur Galerie",
     "browseTemplates": "Vorlagen durchstöbern",
     "readDocs": "Docs lesen"
   },
@@ -65,7 +66,16 @@
     },
     "badge": "Auf dem Gerät · kein Upload",
     "phoneAria": "Ein Handy mit der LeClap-App",
-    "cta": "Probier die Vorlagen im Browser aus"
+    "cta": "Probier die Vorlagen im Browser aus",
+    "screen": {
+      "title": "Dein Video entsteht",
+      "preparing": "Szenen werden vorbereitet…",
+      "private": "Das Video wird nur auf deinem Gerät erstellt",
+      "cancel": "Erstellung abbrechen",
+      "readyTitle": "Dein Video ist fertig",
+      "readyBody": "Speichere es oder teile deine Geschichte.",
+      "share": "Teilen"
+    }
   },
   "agentic": {
     "eyebrow": "Für agentische Entwicklung",

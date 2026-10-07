@@ -2,6 +2,7 @@ import AbstractFFmpeg from './AbstractFFmpeg';
 import { parseCommand } from './parse-command';
 import { FFmpegError } from '../../core/errors/FFmpegError';
 import type { FFMpegInfos } from '../../core/types';
+import { reportedTraits } from '../../core/footage/media-traits';
 
 /**
  * The native FFmpeg CLI engine (the `leclap-ffmpeg` Expo module), injected by the React-Native entry
@@ -177,6 +178,7 @@ class FFmpegDeviceAdapter extends AbstractFFmpeg {
       videoCodec: video?.codec_name ?? null,
       audioCodec: audio?.codec_name ?? null,
       sampleRate: audio?.sample_rate ? parseInt(audio.sample_rate, 10) : null,
+      ...reportedTraits(video),
     };
   };
 }

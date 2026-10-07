@@ -8,6 +8,8 @@
   "loading": "Cargando vista previa",
   "videoError": "No se pudo cargar la vista previa. Inténtalo de nuevo.",
   "retry": "Reintentar",
+  "seek": "Avanzar en la vista previa",
+  "position": "{{current}} de {{total}}",
   "native": "JSON nativo",
   "downloadJson": "Descargar JSON",
   "retrySource": "Recargar fuente",
@@ -35,6 +37,7 @@
     "all": "Todas las muestras",
     "templates": "Plantillas",
     "typography": "Tipografía",
+    "effects": "Efectos y edición",
     "overlays": "Superposiciones",
     "app-demos": "Demos de apps",
     "evidence": "Pruebas de revisión"

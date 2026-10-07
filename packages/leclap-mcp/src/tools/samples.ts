@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 import { getSample, listSamples, SAMPLE_BACKENDS, SAMPLE_CATEGORIES } from 'ffmpeg-video-composer/samples';
+import { partialCatalog } from 'ffmpeg-video-composer';
 
 const listInput = z
   .object({
@@ -59,13 +60,16 @@ export function registerSamples(server: McpServer): void {
     {
       title: 'Get Sample',
       description:
-        'Retrieve sample metadata and a self-contained descriptor with referenced partials embedded. Supply your own media and required fields; inspect native/Remotion setup and operator catalog requirements, then validate and compose. No effect execution or bundled preview media.',
+        'Retrieve sample metadata and a self-contained descriptor with referenced partials embedded (summarized in partialCatalog: jobs, useWhen/avoidWhen, envelope, sync points). Supply your own media and required fields; inspect native/Remotion setup and operator catalog requirements, then validate and compose. No effect execution or bundled preview media.',
       inputSchema: getInput,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     },
     (args: z.infer<typeof getInput>) => {
       try {
-        const result = { ...getSample(getInput.parse(args).id) };
+        const sample = getSample(getInput.parse(args).id);
+        const partials = partialCatalog(sample.template.partials ?? []);
+        // What each embedded partial is for (jobs, useWhen/avoidWhen) and how a ref can re-time it.
+        const result = partials.length > 0 ? { ...sample, partialCatalog: partials } : { ...sample };
 
         return {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],

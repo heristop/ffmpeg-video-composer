@@ -8,6 +8,8 @@
 // and writes it to the build FS (uniform on Node, Expo and the browser/WASM virtual FS). A .cube file
 // is plain text, so the transforms below are pure and deterministic — unit-tested to the byte.
 
+import { quantizeStrength } from '@/core/footage/lut-cube';
+
 type RGB = [number, number, number];
 type Transform = (r: number, g: number, b: number) => RGB;
 
@@ -79,26 +81,36 @@ function fmt(x: number): string {
 /**
  * Generates the `.cube` text for a named LUT at the given grid size (default 17³). The grid is walked
  * with red varying fastest (blue outermost), the order the `.cube` spec and `lut3d` expect. Returns
- * null for an unknown name so callers can skip staging gracefully.
+ * null for an unknown name so callers can skip staging gracefully. `strength` (0..1, default 1) blends
+ * each graded point toward the identity grid in JS — a weaker version of the same grade, still ONE lut3d
+ * (no blend filter). Strength 1 takes the historical path untouched, so its bytes never change.
  */
-export function cubeFor(name: string, size: number = DEFAULT_SIZE): string | null {
+export function cubeFor(name: string, size: number = DEFAULT_SIZE, strength = 1): string | null {
   if (!Object.hasOwn(LUT_TRANSFORMS, name)) {
     return null;
   }
 
   const transform = LUT_TRANSFORMS[name];
+  const amount = quantizeStrength(strength);
+  const graded: Transform = amount === 1 ? transform : (r, g, b) => blendPoint([r, g, b], transform(r, g, b), amount);
 
-  const lines = [`# LeClap generated LUT: ${name}`, `LUT_3D_SIZE ${size}`];
+  const header = amount === 1 ? name : `${name} @ ${amount}`;
+  const lines = [`# LeClap generated LUT: ${header}`, `LUT_3D_SIZE ${size}`];
   const last = size - 1;
 
   for (let bi = 0; bi < size; bi++) {
     for (let gi = 0; gi < size; gi++) {
       for (let ri = 0; ri < size; ri++) {
-        const [r, g, b] = transform(ri / last, gi / last, bi / last);
+        const [r, g, b] = graded(ri / last, gi / last, bi / last);
         lines.push(`${fmt(r)} ${fmt(g)} ${fmt(b)}`);
       }
     }
   }
 
   return `${lines.join('\n')}\n`;
+}
+
+// identity + (graded − identity) · amount, per channel.
+function blendPoint(identity: RGB, graded: RGB, amount: number): RGB {
+  return graded.map((value, channel) => identity[channel] + (value - identity[channel]) * amount) as RGB;
 }

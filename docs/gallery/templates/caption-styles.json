@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "name": "Gallery: caption styles",
+    "description": "The same word-timed line in every caption DNA (subtitles.style), for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 5,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "clean",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "clean",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "caption",
+            "start": 0.55,
+            "end": 1.0
+          },
+          {
+            "text": "follows",
+            "start": 1.05,
+            "end": 1.45
+          },
+          {
+            "text": "the",
+            "start": 1.5,
+            "end": 1.6
+          },
+          {
+            "text": "voice.",
+            "start": 1.65,
+            "end": 2.2
+          }
+        ]
+      }
+    },
+    {
+      "name": "loud",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "loud",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "caption",
+            "start": 0.55,
+            "end": 1.0
+          },
+          {
+            "text": "follows",
+            "start": 1.05,
+            "end": 1.45
+          },
+          {
+            "text": "the",
+            "start": 1.5,
+            "end": 1.6
+          },
+          {
+            "text": "voice.",
+            "start": 1.65,
+            "end": 2.2
+          }
+        ]
+      }
+    },
+    {
+      "name": "keynote",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "keynote",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "caption",
+            "start": 0.55,
+            "end": 1.0
+          },
+          {
+            "text": "follows",
+            "start": 1.05,
+            "end": 1.45
+          },
+          {
+            "text": "the",
+            "start": 1.5,
+            "end": 1.6
+          },
+          {
+            "text": "voice.",
+            "start": 1.65,
+            "end": 2.2
+          }
+        ]
+      }
+    },
+    {
+      "name": "documentary",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "documentary",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "caption",
+            "start": 0.55,
+            "end": 1.0
+          },
+          {
+            "text": "follows",
+            "start": 1.05,
+            "end": 1.45
+          },
+          {
+            "text": "the",
+            "start": 1.5,
+            "end": 1.6
+          },
+          {
+            "text": "voice.",
+            "start": 1.65,
+            "end": 2.2
+          }
+        ]
+      }
+    },
+    {
+      "name": "boxed",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "boxed",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "caption",
+            "start": 0.55,
+            "end": 1.0
+          },
+          {
+            "text": "follows",
+            "start": 1.05,
+            "end": 1.45
+          },
+          {
+            "text": "the",
+            "start": 1.5,
+            "end": 1.6
+          },
+          {
+            "text": "voice.",
+            "start": 1.65,
+            "end": 2.2
+          }
+        ]
+      }
+    },
+    {
+      "name": "neon",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "neon",
+        "words": [
+          {
+            "text": "Every",
+            "start": 0.2,
+            "end": 0.5
+          },
+          {
+            "text": "caption",
+            "start": 0.55,
+            "end": 1.0
+          },
+          {
+            "text": "follows",
+            "start": 1.05,
+            "end": 1.45
+          },
+          {
+            "text": "the",
+            "start": 1.5,
+            "end": 1.6
+          },
+          {
+            "text": "voice.",
+            "start": 1.65,
+            "end": 2.2
+          }
+        ]
+      }
+    }
+  ]
+}

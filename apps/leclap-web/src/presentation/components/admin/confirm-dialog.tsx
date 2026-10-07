@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   Button,
   Dialog,
@@ -23,6 +24,10 @@ interface ConfirmDialogProps {
   // Where focus goes when the opener is gone: a confirmed delete removes (or disables) the control
   // that opened the dialog. Otherwise focus returns to that control.
   focusFallback?: () => HTMLElement | null;
+  // Extra content between the question and the buttons (e.g. a "remember this" checkbox).
+  children?: ReactNode;
+  // Shown over an open sheet (the browser agent's drawer), which its scrim then dims too.
+  raised?: boolean;
 }
 
 // A yes/no question before an action that changes the library. Cancel comes first in the DOM, so it
@@ -37,6 +42,8 @@ export const ConfirmDialog = ({
   onCancel,
   tone = 'danger',
   focusFallback,
+  children,
+  raised = false,
 }: ConfirmDialogProps) => {
   const returnFocus = useReturnFocus(focusFallback);
 
@@ -47,11 +54,12 @@ export const ConfirmDialog = ({
         if (!next) onCancel();
       }}
     >
-      <DialogContent className="max-w-md" {...returnFocus}>
+      <DialogContent className="max-w-md" raised={raised} {...returnFocus}>
         <DialogHeader>
           <DialogTitle className="pr-8">{title}</DialogTitle>
           <DialogDescription className="text-pretty">{description}</DialogDescription>
         </DialogHeader>
+        {children}
         <DialogFooter>
           <Button variant="ghost" onClick={onCancel}>
             {cancelLabel}

@@ -12,17 +12,6 @@
 7465d20760e6ef7e4985131ae15ec5c4ba03c7126cc8415f79a165a190aef53d  packages/leclap-creative-kit/src/library/videos/video_2.mp4
 c50d6e6376db69df565c4a3da7c2a94733c0206f1352ab392de139e4192dc920  packages/leclap-creative-kit/src/library/videos/video_portrait.mp4
 
-# Core real-render music
-89e742776f02eba2ceaf7b9d8145cc657f67dc26de2bd7887e64cd4ee96a23cf  packages/leclap-creative-kit/src/library/musics/future-bass-energy.mp3
-ff05341afbfe8b9184c9818239771f20deb0c14046c4c4ae1606ef10f746dfb1  packages/leclap-creative-kit/src/library/musics/indie-rock-dreamy.mp3
-1dcbefd551553386a9e5b08c52af33a556af4b62e92d7849698d2c4fe88ce923  packages/leclap-creative-kit/src/library/musics/lofi-sentimental-jazz.mp3
-c02f8808315b302a52653a79127fc893b39241e1749d83cce564b4aa847c6f61  packages/leclap-creative-kit/src/library/musics/party-dance.mp3
-b81b6effca2f04d7432589140c63b5a6da5f4091d977b15a7e736ca2652de0dc  packages/leclap-creative-kit/src/library/musics/point-being.mp3
-718f6dae61e700056ef4e4ab787c3e8dc1f95646694d74771a48867be4571277  packages/leclap-creative-kit/src/library/musics/pop.mp3
-87a68b3aae0888dbdcd24b317cc2ac9654cffef4c932d9af238ea8ccaaff72a9  packages/leclap-creative-kit/src/library/musics/romantic-piano.mp3
-e77d43a14ddf81c675d7171833ee3196a8bf8f7717039af6d48cc4f849b60577  packages/leclap-creative-kit/src/library/musics/the-builder.mp3
-c82bb5a7970730639e08eb8259dae9aba9eddb19a0cafe07b2de240f031a55a1  packages/leclap-creative-kit/src/library/musics/upbeat-electronic.mp3
-
 # Core real-render overlays and pictures
 c42ff84648e785a0062b322564dd1fd7c22e09b0053bed9e37a36267e6107572  packages/leclap-creative-kit/src/library/animations/animation_icons.apng
 ae1cdb5b3d11bc13c1c9d07f2905f75d2618c8853a1870c24d8676ad5ed32b0a  packages/leclap-creative-kit/src/library/animations/corner_brackets.apng

@@ -1,0 +1,26 @@
+{
+  "label": "Shine sweep (legacy APNG)",
+  "kind": "legacy",
+  "window": {
+    "at": 0.3,
+    "duration": 2.0
+  },
+  "section": {
+    "inputs": [
+      {
+        "name": "effect",
+        "type": "animation",
+        "url": "/assets/animations/shine_sweep.apng",
+        "options": {
+          "position": "{{position}}",
+          "scale": "{{scale}}",
+          "fit": "contain",
+          "persistent": false,
+          "start": "{{at}}",
+          "duration": "{{duration}}",
+          "opacity": 0.5
+        }
+      }
+    ]
+  }
+}

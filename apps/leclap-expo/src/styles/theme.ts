@@ -35,6 +35,7 @@ export const withAlpha = (hex: string, alpha: number): string => {
 export const colors = {
   primary: '#7C83FD', // Lavender — soft and creative
   primaryDark: '#5B61D6', // Deeper lavender for depth / pressed states
+  primaryLight: '#AEB2FB', // The web's brand-300, oklch(0.787 0.104 281.3): Clappy's running dust
   onPrimary: '#FFFFFF',
   monitorBackground: '#17142B',
   monitorText: '#FCFBFF',

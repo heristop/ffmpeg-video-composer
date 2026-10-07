@@ -1,4 +1,10 @@
 {
+  "description": "LeClap logo sting (landscape): the 2.4 s bumper clip framed by brand-coloured rules, faded in and out.",
+  "envelope": { "in": 0.5, "out": 0.5 },
+  "syncPoints": [{ "id": "logo", "offset": 0.5 }],
+  "jobs": ["brand", "close"],
+  "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
+  "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
   "sections": [
     {
       "name": "logo_bumper",

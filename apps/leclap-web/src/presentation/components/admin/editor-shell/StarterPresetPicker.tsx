@@ -2,11 +2,14 @@ import { useTranslation } from 'react-i18next';
 import { STARTER_PRESETS, type StarterPreset } from '../templateEditorModel';
 import { SECTION_ICON } from '@/lib/sectionMeta';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/presentation/components/ui';
+import { Sparkles } from '@/presentation/components/icons';
 
 interface StarterPresetPickerProps {
   open: boolean;
   onPick: (preset: StarterPreset) => void;
   onBlank: () => void;
+  // Offers "describe it and generate with AI" as a third way to start.
+  onGenerate?: () => void;
 }
 
 // The scene-kind glyph strip a preset would create — a tiny structural preview of the template.
@@ -31,8 +34,9 @@ const SceneStrip = ({ preset }: { preset: StarterPreset }) => (
 // Cold-start chooser shown when the builder opens on a blank template: pick a ready-made structure
 // (talking-head, showcase, testimonial…) or start from scratch. Picking resets the editor history to
 // the preset's freshly-built EditorState; "start blank" just dismisses.
-export const StarterPresetPicker = ({ open, onPick, onBlank }: StarterPresetPickerProps) => {
+export const StarterPresetPicker = ({ open, onPick, onBlank, onGenerate }: StarterPresetPickerProps) => {
   const { t } = useTranslation('admin');
+  const { t: tAi } = useTranslation('ai');
 
   return (
     <Dialog
@@ -83,6 +87,16 @@ export const StarterPresetPicker = ({ open, onPick, onBlank }: StarterPresetPick
         >
           {t('presets.startBlank')}
         </button>
+        {onGenerate && (
+          <button
+            type="button"
+            onClick={onGenerate}
+            className="tap inline-flex min-h-11 cursor-pointer items-center gap-1.5 justify-self-start rounded-lg px-1 text-sm font-medium text-brand-300 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
+          >
+            <Sparkles aria-hidden className="size-4" />
+            {tAi('fromPresets')}
+          </button>
+        )}
       </DialogContent>
     </Dialog>
   );

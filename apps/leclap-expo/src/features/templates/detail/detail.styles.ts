@@ -167,6 +167,11 @@ export const styles = StyleSheet.create({
   },
   musicScroll: { padding: spacing.l },
   musicHint: { ...typography.caption, color: colors.textSecondary, marginBottom: spacing.m },
+  musicRowCover: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+  },
   musicRow: {
     flexDirection: 'row',
     alignItems: 'center',

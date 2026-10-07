@@ -59,6 +59,12 @@ the flag, the starter includes direction describing its existing composition. Th
 redesign the starter. Edit its settings, run `leclap validate template.json`, then render and inspect
 the actual entrance, settled frame and ending. Empty or overlong supplied briefs are rejected.
 
+For a full production, `leclap init --studio <dir>` scaffolds a brief, a style guide, a shot list and a
+`template.json` whose sections carry a `purpose` and a `role`, with `meta.brief` set so a section without
+a purpose is flagged. `leclap studio status` and `leclap studio pass <gate>` track the review gates. A
+reference look becomes a theme with `leclap style <image|clip>`; see
+[Match a reference](./template-configuration.md#match-a-reference).
+
 ## MCP
 
 The `compose-video` prompt accepts `goal`, `orientation` and optional `creativeDirection`. Pass the
@@ -83,7 +89,7 @@ Validation checks the descriptor and geometry; it does not grade whether the des
 
 Start with `leclap samples list --category app-demos --backend native`, then
 `leclap samples show web-app-promo`. In MCP, call `list_samples` with those filters and
-`get_sample` with `{ "id": "web-app-promo" }`. Both expose the same 32 showcase entries, their authored
+`get_sample` with `{ "id": "web-app-promo" }`. Both expose the same 47 showcase entries, their authored
 creative direction and actual input requirements. Use `--query` / `query` to search direction as well as
 ID, title and description.
 

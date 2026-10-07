@@ -10,6 +10,7 @@ import type { DefaultTransition, EditorSection, SectionTransition } from '../tem
 import { TransitionPicker } from '../editor/TransitionPicker';
 import { AddSceneMenu } from './AddSceneMenu';
 import { isPristineTimeline } from './timelinePristine';
+import { cn } from '@/lib/utils';
 
 interface EditorSceneTimelineProps {
   sections: EditorSection[];
@@ -29,6 +30,8 @@ interface EditorSceneTimelineProps {
   addKinds?: readonly SectionKind[];
   // When set, an untouched cold-start timeline shows a "browse starter templates" hint that calls this.
   onBrowsePresets?: () => void;
+  // Scenes a browser agent just changed: ringed for a moment (a static ring under reduced motion).
+  highlighted?: ReadonlySet<number>;
 }
 
 const VISUAL_KINDS: ReadonlySet<EditorSection['kind']> = new Set(['video', 'color', 'image']);
@@ -91,6 +94,7 @@ export const EditorSceneTimeline = ({
   sectionKindLabel,
   addKinds,
   onBrowsePresets,
+  highlighted,
 }: EditorSceneTimelineProps) => {
   const { t } = useTranslation('admin');
   const { containerRef, draggingIndex, overIndex, itemPointerDown } = usePointerReorder(onReorder);
@@ -116,6 +120,7 @@ export const EditorSceneTimeline = ({
         // The carried card is lifted out of flow + glued to the pointer by the hook (layout off so framer
         // doesn't fight its fixed position); a skeleton marks where it will drop and the rest spring aside.
         const carried = draggingIndex === i;
+        const ringed = highlighted?.has(i) === true;
 
         return (
           <Fragment key={keyOf(section)}>
@@ -124,8 +129,12 @@ export const EditorSceneTimeline = ({
               layout={!carried}
               transition={REORDER_SPRING}
               data-reorder-index={i}
+              data-agent-highlight={ringed ? '' : undefined}
               onPointerDown={itemPointerDown(i)}
-              className="cursor-grab touch-pan-x active:cursor-grabbing"
+              className={cn(
+                'cursor-grab touch-pan-x rounded-xl active:cursor-grabbing',
+                ringed && 'agent-highlight ring-2 ring-brand-400 ring-offset-2 ring-offset-background'
+              )}
             >
               <SceneCell
                 index={i}

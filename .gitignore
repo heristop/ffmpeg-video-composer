@@ -39,9 +39,12 @@ examples/agentic-pr-video/evidence/
 # The ffmpeg.wasm core, staged from @ffmpeg/core on dev/build by apps/leclap-web/scripts/stage-ffmpeg-core.ts.
 /apps/leclap-web/public/ffmpeg-core/
 /apps/leclap-expo/assets/animations/
+/apps/leclap-expo/assets/animation-thumbs/
 /apps/leclap-expo/assets/musics/
 /apps/leclap-expo/assets/backgrounds/
+/apps/leclap-expo/assets/covers/
 /apps/leclap-expo/assets/fonts/
+/apps/leclap-expo/assets/emoji/
 /apps/leclap-expo/assets/videos/
 # keep the Expo app's own (non-library) font tracked
 !/apps/leclap-expo/assets/fonts/SpaceMono-Regular.ttf

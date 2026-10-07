@@ -1,8 +1,9 @@
 // Filtergraph primitive types — the input / filter / map building blocks plus the editor-only shape
 // recipe — live here to keep `types.d.ts` under the max-lines budget; the public ones are re-exported
 // from `./types` so `@/core/types` stays the single entry point.
-import type { Reveal, Exit } from './descriptor-text';
+import type { Reveal, TimedReveal, TimedExit } from './descriptor-text';
 import type { FontRef } from './fonts';
+import type { Animate, MotionRole } from '../schemas/motion.schemas';
 
 /** How an overlay maps into its "w:h" scale box: free stretch, letterbox inside, or fill + centre-crop. */
 export type OverlayFit = 'stretch' | 'contain' | 'cover';
@@ -82,11 +83,29 @@ export interface Filter {
   value?: string | number;
   values?: FilterValues;
   range?: string;
+  // Id other time fields of the section reference as "<id>.start" / "<id>.end".
+  id?: string;
   // Animated entrance for a `drawtext` filter: the engine bakes it into alpha + kinetic x/y
   // expressions (from the filter's base x/y) at compile, the same reveal vocabulary the text sugar uses.
-  reveal?: Reveal;
+  reveal?: TimedReveal;
   // Animated exit (fade/slide out after a time) baked alongside the entrance onto the same drawtext.
-  exit?: Exit;
+  exit?: TimedExit;
+  // Keyframe tracks, lowered by core/motion/tracks.ts; override reveal/exit per property.
+  animate?: Animate;
+  // Motion role (global.motion.roles): fills reveal/exit easing (and duration) and animate key eases left unset.
+  role?: MotionRole;
+  // ENGINE-INTERNAL (never authored): a sub-graph spliced into the chain in place of one filter, for
+  // lowerings that branch (masks, split screens). See editor/utils/filter-graph.ts.
+  graph?: FilterGraphChain[];
+}
+
+// One chain of a spliced sub-graph. The FIRST chain has no input labels: it continues the stream the
+// fragment is spliced into; the LAST has no output labels: the chain after the fragment continues from
+// it. Labels are `[A-Za-z0-9_]` pad names, or `input:<key>` for an extra `-i` the segment registered.
+export interface FilterGraphChain {
+  inputs?: string[];
+  filters: Filter[];
+  outputs?: string[];
 }
 
 export interface FilterValues {

@@ -10,6 +10,17 @@ export function CompileFailureText({ failure }: { failure: CompileFailure }) {
   return (
     <>
       {t(`compileError.${failure.kind}`)}
+      {failure.kind === 'appUpdated' ? (
+        <button
+          type="button"
+          onClick={() => {
+            window.location.reload();
+          }}
+          className="mt-2 block rounded-md border border-current px-2.5 py-1 text-xs font-semibold"
+        >
+          {t('compileError.reload')}
+        </button>
+      ) : null}
       {failure.detail ? (
         <code className="mt-1.5 block font-mono text-xs font-normal wrap-anywhere">{failure.detail}</code>
       ) : null}

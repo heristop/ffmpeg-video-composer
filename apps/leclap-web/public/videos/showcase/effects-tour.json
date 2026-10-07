@@ -1,0 +1,1246 @@
+{
+  "meta": {
+    "name": "Effects tour",
+    "description": "A guided tour of the LeClap motion vocabulary in ten chapters: kinetic type, camera and graphics, transitions, captions, compositing and light (the fx primitives), themes, looks and grade, footage editing, sound and music. Each chapter is its own template (effects-tour/*.json); this one strings their renders together with chapter cards and designed transitions, over a soft lo-fi bed that steps aside for the sound and music chapters.",
+    "creativeDirection": "Audience: creators and agents deciding what LeClap can do. Direction: a product demo that names every effect while it plays: ink chapter cards with a kicker, a headline and the chapter contents, a designed transition into each chapter and a whip out of it, and a small mono label naming each effect inside the chapters. Review: every card holds long enough to read, chapters run in order, every effect label is legible at 960x540, and the tour ends on a single ding."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": true,
+    "seed": 71,
+    "motion": {
+      "energy": 1
+    },
+    "variables": {
+      "leclap_mark": "pictures/leclap-mark.png",
+      "opening_wall": "videos/effects-tour/opening-wall.mp4",
+      "chapter_01": "videos/effects-tour/01-type.mp4",
+      "chapter_02": "videos/effects-tour/02-camera-graphics.mp4",
+      "chapter_03": "videos/effects-tour/03-transitions.mp4",
+      "chapter_04": "videos/effects-tour/04-captions.mp4",
+      "chapter_05": "videos/effects-tour/05-compositing.mp4",
+      "chapter_06_leclap": "videos/effects-tour/06-theme-a-leclap.mp4",
+      "chapter_06_midnight": "videos/effects-tour/06-theme-b-midnight.mp4",
+      "chapter_06_editorial": "videos/effects-tour/06-theme-c-editorial.mp4",
+      "chapter_06_bold": "videos/effects-tour/06-theme-d-bold.mp4",
+      "chapter_06_neon": "videos/effects-tour/06-theme-e-neon.mp4",
+      "chapter_06_paper": "videos/effects-tour/06-theme-f-paper.mp4",
+      "chapter_06_sunset": "videos/effects-tour/06-theme-g-sunset.mp4",
+      "chapter_06_ocean": "videos/effects-tour/06-theme-h-ocean.mp4",
+      "chapter_06_mono": "videos/effects-tour/06-theme-i-mono.mp4",
+      "chapter_06_candy": "videos/effects-tour/06-theme-j-candy.mp4",
+      "chapter_06_retro": "videos/effects-tour/06-theme-k-retro.mp4",
+      "chapter_06_corporate": "videos/effects-tour/06-theme-l-corporate.mp4",
+      "chapter_07": "videos/effects-tour/07-looks.mp4",
+      "chapter_08": "videos/effects-tour/08-footage.mp4",
+      "chapter_09": "videos/effects-tour/09-sound.mp4",
+      "chapter_10": "videos/effects-tour/10-music.mp4"
+    },
+    "audio": {
+      "sfx": "auto",
+      "sourceVolume": 1,
+      "musicVolume": 0.35,
+      "ducking": true,
+      "musicFade": 0.6
+    },
+    "music": {
+      "name": "lofi-chill.mp3"
+    }
+  },
+  "sections": [
+    {
+      "name": "opening",
+      "type": "video",
+      "options": {
+        "videoUrl": "{{ opening_wall }}",
+        "duration": 3.6,
+        "muteSection": false
+      },
+      "role": "hook",
+      "purpose": "Open the tour with the brand and the promise, over a wall of moments from the chapters.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.05
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "leak",
+          "at": 0,
+          "duration": 3.6,
+          "color": "#7C83FD",
+          "intensity": 0.6
+        },
+        {
+          "type": "underline",
+          "at": 1.4,
+          "x": 440,
+          "y": 440,
+          "width": 400,
+          "origin": "center",
+          "color": "#FF8AAE"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "brand",
+          "text": {
+            "en": "LeClap"
+          },
+          "preset": "tracking-in",
+          "size": 170,
+          "y": 222,
+          "delay": 0.2,
+          "color": "#F5F3F7",
+          "fill": {
+            "gradient": {
+              "stops": ["#7C83FD", "#C9CBFF", "#7C83FD"],
+              "angle": 90
+            },
+            "sweep": {
+              "duration": 0.8,
+              "delay": 1.6,
+              "color": "#FFFFFF@0.85"
+            }
+          },
+          "font": "oswald"
+        },
+        {
+          "text": {
+            "en": "The effects tour"
+          },
+          "preset": "cascade",
+          "font": "oswald",
+          "size": 60,
+          "y": 462,
+          "delay": "brand.end + 0.1",
+          "accent": {
+            "words": "last",
+            "color": "#FFF685"
+          }
+        },
+        {
+          "text": {
+            "en": "every motion effect, from one JSON vocabulary"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 30,
+          "y": 570,
+          "color": "#C9C6D2",
+          "delay": "brand.end + 0.6"
+        }
+      ],
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.6
+      },
+      "inputs": [
+        {
+          "name": "mark",
+          "url": "{{ leclap_mark }}",
+          "type": "image",
+          "options": {
+            "position": "585:52",
+            "scale": "110:-1",
+            "motion": {
+              "type": "rise",
+              "delay": 0.1,
+              "duration": 0.6
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "chapter-01",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "role": "bridge",
+      "purpose": "Announce chapter 01: Type.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.55,
+          "x": 96,
+          "y": 452,
+          "width": 220,
+          "thickness": 8,
+          "color": "#FF8AAE"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "CHAPTER 01"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 34,
+          "align": "left",
+          "x": 96,
+          "y": 200,
+          "color": "#FF8AAE",
+          "delay": 0.1,
+          "ease": "linear"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Type"
+          },
+          "preset": "cascade",
+          "size": 170,
+          "align": "left",
+          "x": 92,
+          "y": 250,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Presets, fills, trails, emoji"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 40,
+          "align": "left",
+          "x": 96,
+          "y": 490,
+          "color": "#C9C6D2",
+          "delay": 0.4,
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "type",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered type chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_01 }}",
+        "duration": 48.05
+      },
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "chapter-02",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "role": "bridge",
+      "purpose": "Announce chapter 02: Camera & graphics.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.55,
+          "x": 96,
+          "y": 452,
+          "width": 220,
+          "thickness": 8,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "CHAPTER 02"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 34,
+          "align": "left",
+          "x": 96,
+          "y": 200,
+          "color": "#FFF685",
+          "delay": 0.1,
+          "ease": "linear"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Camera & graphics"
+          },
+          "preset": "cascade",
+          "size": 170,
+          "align": "left",
+          "x": 92,
+          "y": 250,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Moves, hits, shake, graphics"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 40,
+          "align": "left",
+          "x": 96,
+          "y": 490,
+          "color": "#C9C6D2",
+          "delay": 0.4,
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "iris",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "camera-graphics",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered camera-graphics chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_02 }}",
+        "duration": 52
+      },
+      "transition": {
+        "type": "push-up",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "chapter-03",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "role": "bridge",
+      "purpose": "Announce chapter 03: Transitions.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.55,
+          "x": 96,
+          "y": 452,
+          "width": 220,
+          "thickness": 8,
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "CHAPTER 03"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 34,
+          "align": "left",
+          "x": 96,
+          "y": 200,
+          "color": "#7C83FD",
+          "delay": 0.1,
+          "ease": "linear"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Transitions"
+          },
+          "preset": "cascade",
+          "size": 170,
+          "align": "left",
+          "x": 92,
+          "y": 250,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Basic, designed and xfade"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 40,
+          "align": "left",
+          "x": 96,
+          "y": 490,
+          "color": "#C9C6D2",
+          "delay": 0.4,
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.6,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "transitions",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered transitions chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_03 }}",
+        "duration": 30
+      },
+      "transition": {
+        "type": "whip-down",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "chapter-04",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "role": "bridge",
+      "purpose": "Announce chapter 04: Captions.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.55,
+          "x": 96,
+          "y": 452,
+          "width": 220,
+          "thickness": 8,
+          "color": "#FF8AAE"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "CHAPTER 04"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 34,
+          "align": "left",
+          "x": 96,
+          "y": 200,
+          "color": "#FF8AAE",
+          "delay": 0.1,
+          "ease": "linear"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Captions"
+          },
+          "preset": "cascade",
+          "size": 170,
+          "align": "left",
+          "x": 92,
+          "y": 250,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Cards, lower thirds, subtitles"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 40,
+          "align": "left",
+          "x": 96,
+          "y": 490,
+          "color": "#C9C6D2",
+          "delay": 0.4,
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "captions",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered captions chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_04 }}",
+        "duration": 45.3
+      },
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "chapter-05",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "role": "bridge",
+      "purpose": "Announce chapter 05: Compositing and light.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.55,
+          "x": 96,
+          "y": 452,
+          "width": 220,
+          "thickness": 8,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "CHAPTER 05"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 34,
+          "align": "left",
+          "x": 96,
+          "y": 200,
+          "color": "#FFF685",
+          "delay": 0.1,
+          "ease": "linear"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Compositing"
+          },
+          "preset": "cascade",
+          "size": 170,
+          "align": "left",
+          "x": 92,
+          "y": 250,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Splits, a wipe and every fx primitive"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 40,
+          "align": "left",
+          "x": 96,
+          "y": 490,
+          "color": "#C9C6D2",
+          "delay": 0.4,
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "iris",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "compositing",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered compositing and light chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_05 }}",
+        "duration": 40.1
+      },
+      "transition": {
+        "type": "push-up",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "chapter-06",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "role": "bridge",
+      "purpose": "Announce chapter 06: Themes.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.55,
+          "x": 96,
+          "y": 452,
+          "width": 220,
+          "thickness": 8,
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "CHAPTER 06"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 34,
+          "align": "left",
+          "x": 96,
+          "y": 200,
+          "color": "#7C83FD",
+          "delay": 0.1,
+          "ease": "linear"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Themes"
+          },
+          "preset": "cascade",
+          "size": 170,
+          "align": "left",
+          "x": 92,
+          "y": 250,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Twelve themes, roles, energy"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 40,
+          "align": "left",
+          "x": 96,
+          "y": 490,
+          "color": "#C9C6D2",
+          "delay": 0.4,
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.6,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-leclap",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-leclap chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_leclap }}",
+        "duration": 6.5
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-midnight",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-midnight chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_midnight }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-editorial",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-editorial chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_editorial }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-bold",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-bold chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_bold }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-neon",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-neon chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_neon }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-paper",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-paper chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_paper }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-sunset",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-sunset chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_sunset }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-ocean",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-ocean chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_ocean }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-mono",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-mono chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_mono }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-candy",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-candy chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_candy }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-retro",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-retro chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_retro }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "theme-corporate",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered theme-corporate chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_06_corporate }}",
+        "duration": 3.4
+      },
+      "transition": {
+        "type": "whip-down",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "chapter-07",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "role": "bridge",
+      "purpose": "Announce chapter 07: Looks & grade.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.55,
+          "x": 96,
+          "y": 452,
+          "width": 220,
+          "thickness": 8,
+          "color": "#FF8AAE"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "CHAPTER 07"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 34,
+          "align": "left",
+          "x": 96,
+          "y": 200,
+          "color": "#FF8AAE",
+          "delay": 0.1,
+          "ease": "linear"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Looks & grade"
+          },
+          "preset": "cascade",
+          "size": 170,
+          "align": "left",
+          "x": 92,
+          "y": 250,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Seventeen looks, LUTs, grade"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 40,
+          "align": "left",
+          "x": 96,
+          "y": 490,
+          "color": "#C9C6D2",
+          "delay": 0.4,
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "looks",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered looks chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_07 }}",
+        "duration": 34.9
+      },
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "chapter-08",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "role": "bridge",
+      "purpose": "Announce chapter 08: Footage.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.55,
+          "x": 96,
+          "y": 452,
+          "width": 220,
+          "thickness": 8,
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "CHAPTER 08"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 34,
+          "align": "left",
+          "x": 96,
+          "y": 200,
+          "color": "#FFF685",
+          "delay": 0.1,
+          "ease": "linear"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Footage"
+          },
+          "preset": "cascade",
+          "size": 170,
+          "align": "left",
+          "x": 92,
+          "y": 250,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Fit, focus, ramps, freeze"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 40,
+          "align": "left",
+          "x": 96,
+          "y": 490,
+          "color": "#C9C6D2",
+          "delay": 0.4,
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "iris",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "footage",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered footage chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_08 }}",
+        "duration": 30.11
+      },
+      "transition": {
+        "type": "push-up",
+        "duration": 0.5,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "chapter-09",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "role": "bridge",
+      "purpose": "Announce chapter 09: Sound.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.55,
+          "x": 96,
+          "y": 452,
+          "width": 220,
+          "thickness": 8,
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "CHAPTER 09"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 34,
+          "align": "left",
+          "x": 96,
+          "y": 200,
+          "color": "#7C83FD",
+          "delay": 0.1,
+          "ease": "linear"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Sound"
+          },
+          "preset": "cascade",
+          "size": 170,
+          "align": "left",
+          "x": 92,
+          "y": 250,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Beats, sounds, voices"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 40,
+          "align": "left",
+          "x": 96,
+          "y": 490,
+          "color": "#C9C6D2",
+          "delay": 0.4,
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.6,
+        "ease": "$snappy"
+      }
+    },
+    {
+      "name": "sound",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered sound chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_09 }}",
+        "duration": 46.78,
+        "musicVolume": 0,
+        "muteSection": false
+      },
+      "transition": {
+        "type": "whip-down",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "chapter-10",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "role": "bridge",
+      "purpose": "Announce chapter 09: Sound.",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.55,
+          "x": 96,
+          "y": 452,
+          "width": 220,
+          "thickness": 8,
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "kicker",
+          "text": {
+            "en": "CHAPTER 10"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 34,
+          "align": "left",
+          "x": 96,
+          "y": 200,
+          "color": "#7C83FD",
+          "delay": 0.1,
+          "ease": "linear"
+        },
+        {
+          "id": "headline",
+          "text": {
+            "en": "Music"
+          },
+          "preset": "cascade",
+          "size": 170,
+          "align": "left",
+          "x": 92,
+          "y": 250,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Beds, swells, ducking, beat cuts"
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 40,
+          "align": "left",
+          "x": 96,
+          "y": 490,
+          "color": "#C9C6D2",
+          "delay": 0.4,
+          "ease": "$expo"
+        }
+      ],
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "music",
+      "type": "video",
+      "role": "proof",
+      "purpose": "Play the rendered sound chapter.",
+      "options": {
+        "videoUrl": "{{ chapter_10 }}",
+        "duration": 21.95,
+        "musicVolume": 0,
+        "muteSection": false
+      },
+      "transition": {
+        "type": "whip-left",
+        "duration": 0.4
+      }
+    },
+    {
+      "name": "closing",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 4
+      },
+      "role": "outro",
+      "purpose": "Close on the promise and the call to try it.",
+      "sfx": [
+        {
+          "id": "ding",
+          "at": "title.end",
+          "volume": 0.45
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "title",
+          "text": {
+            "en": "Same JSON. Same frames."
+          },
+          "preset": "split",
+          "size": 110,
+          "y": 220,
+          "delay": 0.2
+        },
+        {
+          "text": {
+            "en": "Every effect, in your hands."
+          },
+          "preset": "rise",
+          "font": "oswald",
+          "size": 54,
+          "y": 400,
+          "delay": "title.end + 0.2",
+          "accent": {
+            "words": "last",
+            "color": "#FF8AAE"
+          }
+        },
+        {
+          "text": {
+            "en": "leclap render effects-tour.json"
+          },
+          "preset": "typewriter",
+          "font": "mono",
+          "size": 30,
+          "y": 520,
+          "color": "#9A98A6",
+          "delay": "title.end + 0.6"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "label": "Frame trace (graphics)",
+  "kind": "graphic",
+  "window": {
+    "at": 0.3,
+    "duration": 0.6
+  },
+  "section": {
+    "graphics": [
+      {
+        "type": "frame",
+        "at": "{{at}}",
+        "duration": "{{duration}}",
+        "color": "#FFFFFF"
+      }
+    ]
+  }
+}

@@ -212,7 +212,7 @@ describe('browser.ts compileBrowser', () => {
     const { compile } = await loadBrowser();
     const { container } = await import('tsyringe');
     // Compiling initializes the platform, which registers the real BrowserLogger
-    // (defined in browser.ts, not mocked) under the 'logger' token.
+    // (defined in browser-compile.ts, not mocked) under the 'logger' token.
     await compile({ buildDir: '/build' }, validDescriptor);
 
     const logger = container.resolve<{

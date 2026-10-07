@@ -1,0 +1,516 @@
+{
+  "meta": {
+    "name": "Gallery: fx primitives",
+    "description": "One section per graphics[] fx primitive (light, marks, ambient, surfaces), for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 11,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "sheen",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "layers": [
+          {
+            "color": "#2A2238",
+            "x": 340,
+            "y": 200,
+            "w": 600,
+            "h": 320
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "sheen",
+          "target": "layer:0",
+          "at": 0.4,
+          "duration": 0.9,
+          "width": 0.14,
+          "tilt": 20,
+          "seed": 3
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Light on glass"
+          },
+          "preset": "fade",
+          "size": 64,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "edge-glow",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "layers": [
+          {
+            "color": "#2A2238",
+            "x": 340,
+            "y": 200,
+            "w": 600,
+            "h": 320
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "edge-glow",
+          "target": "layer:0",
+          "at": 0,
+          "duration": 2.4,
+          "glow": "#7C83FD",
+          "spread": 18,
+          "intensity": 0.9,
+          "seed": 5
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Edge light"
+          },
+          "preset": "fade",
+          "size": 64,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "leak",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/forest.mp4",
+        "duration": 2.4,
+        "fit": "cover"
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "x": 0,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "color": "#000000@0"
+        },
+        {
+          "type": "fx",
+          "effect": "leak",
+          "at": 0,
+          "duration": 2.4,
+          "edge": "left",
+          "size": 0.9,
+          "stretch": 1.4,
+          "shadows": 0.4,
+          "intensity": 1,
+          "seed": 7
+        }
+      ],
+      "kinetic": []
+    },
+    {
+      "name": "bloom",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/sunset.mp4",
+        "duration": 2.4,
+        "fit": "cover"
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "x": 0,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "color": "#000000@0"
+        },
+        {
+          "type": "fx",
+          "effect": "bloom",
+          "at": 0,
+          "duration": 2.4,
+          "threshold": 0.62,
+          "radius": 0.02,
+          "intensity": 1,
+          "seed": 9
+        }
+      ],
+      "kinetic": []
+    },
+    {
+      "name": "ripple",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "layers": [
+          {
+            "color": "#2A2238",
+            "x": 340,
+            "y": 200,
+            "w": 600,
+            "h": 320
+          },
+          {
+            "color": "#7C83FD",
+            "x": 560,
+            "y": 330,
+            "w": 160,
+            "h": 64
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "ripple",
+          "variant": "tap",
+          "target": "layer:1",
+          "at": 0.4,
+          "color": "#FFF685",
+          "seed": 11
+        }
+      ],
+      "kinetic": []
+    },
+    {
+      "name": "glint",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "layers": [
+          {
+            "color": "#2A2238",
+            "x": 340,
+            "y": 200,
+            "w": 600,
+            "h": 320
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "glint",
+          "target": "layer:0",
+          "at": 0.3,
+          "path": "scatter",
+          "count": 4,
+          "size": 56,
+          "seed": 13
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Polished"
+          },
+          "preset": "fade",
+          "size": 64,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "confetti",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4,
+        "layers": [
+          {
+            "color": "#2A2238",
+            "x": 340,
+            "y": 200,
+            "w": 600,
+            "h": 320
+          }
+        ]
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "confetti",
+          "at": 0.2,
+          "origin": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "angle": -90,
+          "spread": 110,
+          "speed": 2.6,
+          "colors": ["#7C83FD", "#FF8AAE", "#FFF685", "#F5F3F7"],
+          "seed": 17
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Launch day"
+          },
+          "preset": "fade",
+          "size": 64,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bokeh",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4,
+        "layers": []
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "bokeh",
+          "at": 0,
+          "duration": 2.4,
+          "count": 9,
+          "color": "#FFF685",
+          "intensity": 1,
+          "seed": 19
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Soft depth"
+          },
+          "preset": "fade",
+          "size": 64,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "dust",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#22303A",
+        "duration": 2.4,
+        "layers": []
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "dust",
+          "at": 0,
+          "duration": 2.4,
+          "count": 36,
+          "size": 3,
+          "intensity": 1,
+          "seed": 23
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Air"
+          },
+          "preset": "fade",
+          "size": 64,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "vignette-breathe",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/main.mp4",
+        "duration": 2.4,
+        "fit": "cover"
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "vignette-breathe",
+          "at": 0,
+          "duration": 2.4,
+          "angle": 0.85,
+          "swing": 0.1,
+          "period": 2.4,
+          "intensity": 1,
+          "seed": 29
+        }
+      ],
+      "kinetic": []
+    },
+    {
+      "name": "grain",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/broll.mp4",
+        "duration": 2.4,
+        "fit": "cover"
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "grain",
+          "at": 0,
+          "duration": 2.4,
+          "size": 2.5,
+          "intensity": 1,
+          "seed": 31
+        }
+      ],
+      "kinetic": []
+    },
+    {
+      "name": "glass",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/main.mp4",
+        "duration": 2.4,
+        "fit": "cover"
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "glass",
+          "target": {
+            "x": 160,
+            "y": 480,
+            "w": 960,
+            "h": 160,
+            "radius": 28
+          },
+          "at": 0,
+          "duration": 2.4,
+          "tone": "dark",
+          "frost": 0.12,
+          "seed": 37
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "A frosted plate"
+          },
+          "preset": "fade",
+          "size": 64,
+          "y": 512,
+          "delay": 0.2,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "resolve",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "resolve",
+          "target": "text:0",
+          "at": 0.4,
+          "duration": 0.9,
+          "blur": 0.06,
+          "scale": 1.05,
+          "seed": 41
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "LECLAP"
+          },
+          "preset": "fade",
+          "size": 170,
+          "y": "center",
+          "delay": 0.05,
+          "duration": 0.15
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { singleton } from 'tsyringe';
 import type { TemplateAssets } from '../types';
 import type { TemplateDescriptor } from '../../schemas/template.schemas';
-import { TemplateValidator, type ValidationResult } from '../../services/TemplateValidator';
+import { BaseTemplateValidator, type ValidationResult } from '../../services/BaseTemplateValidator';
 
 function isTemplateDescriptor(data: unknown): data is TemplateDescriptor {
   return typeof data === 'object' && data !== null && !('name' in data && 'type' in data);
@@ -15,10 +15,11 @@ class Template {
     musics: {},
     inputs: [],
   };
-  private readonly validator: TemplateValidator;
+  private readonly validator: BaseTemplateValidator;
 
   constructor() {
-    this.validator = new TemplateValidator();
+    // Template is the browser / on-device validation path: those engines cannot analyze music.
+    this.validator = new BaseTemplateValidator({ beatsAnalysis: false });
   }
 
   init = (): void => {

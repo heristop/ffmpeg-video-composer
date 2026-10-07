@@ -73,6 +73,8 @@ function makeProject() {
     progress: 0,
     errors: [] as string[],
     finalVideo: '',
+    output: { staging: '', final: '' },
+    qcExpectations: null as unknown,
     applyDefault: vi.fn(),
     buildInfos: {
       totalSegments: 0,
@@ -142,6 +144,7 @@ function makeDeps() {
     appendMusic: vi.fn(async () => undefined),
     normalizeAudio: vi.fn(async () => undefined),
     hasNormalization: vi.fn(() => false),
+    hasStandaloneAudioPass: vi.fn(() => false),
   };
   const ffmpeg = {
     supportsConcurrentExecute: false,
@@ -936,16 +939,30 @@ describe('TemplateDirector.finalizeCompilation path selection', () => {
   });
 
   it('does not call normalizeAudio when music is enabled', async () => {
-    const { director, template, musicComposer } = makeDirector();
+    const { director, template, musicComposer, project } = makeDirector();
     const sections: Section[] = [
       { name: 's1', type: 'video', options: { duration: 4 } },
       { name: 's2', type: 'video', options: { duration: 2 } },
     ];
     template.descriptor = { global: { musicEnabled: true }, sections };
+    project.buildInfos.musicPath = '/music/track.mp3';
 
     await director.compileVideoSegments();
 
     expect(musicComposer.normalizeAudio).not.toHaveBeenCalled();
+  });
+
+  it('still runs the standalone audio pass when music is enabled but no track resolved', async () => {
+    const { director, template, musicComposer } = makeDirector();
+    const sections: Section[] = [
+      { name: 's1', type: 'video', options: { duration: 4 } },
+      { name: 's2', type: 'video', options: { duration: 2 } },
+    ];
+    template.descriptor = { global: { musicEnabled: true, audio: { normalize: 'loudnorm' } }, sections };
+
+    await director.compileVideoSegments();
+
+    expect(musicComposer.normalizeAudio).toHaveBeenCalledWith('/build/output.mp4');
   });
 });
 
@@ -1023,7 +1040,7 @@ describe('TemplateDirector.finalizeCompilation concat fold', () => {
 
   it('folds concat into normalize on the no-music + normalize path', async () => {
     const { director, template, videoEditor, musicComposer, project } = makeDirector();
-    musicComposer.hasNormalization.mockReturnValue(true);
+    musicComposer.hasStandaloneAudioPass.mockReturnValue(true);
     template.descriptor = { global: { audio: { normalize: 'loudnorm' } }, sections: [] } as never;
     project.buildInfos.fileConcatPath = '/build/segments.list';
     project.buildInfos.transitions = cut;

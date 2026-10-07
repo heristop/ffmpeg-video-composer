@@ -1,0 +1,12 @@
+{
+  "label": "Confetti (reduced motion)",
+  "kind": "fx",
+  "window": { "at": 0.3, "duration": 2.2 },
+  "backgrounds": ["dark"],
+  "global": { "motion": { "energy": 0 } },
+  "section": {
+    "graphics": [
+      { "type": "fx", "effect": "confetti", "target": "{{target}}", "at": "{{at}}", "duration": "{{duration}}" }
+    ]
+  }
+}

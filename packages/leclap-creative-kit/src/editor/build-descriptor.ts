@@ -4,6 +4,8 @@ import type { TemplateDescriptor, Section } from 'ffmpeg-video-composer/src/core
 import type { EditorSection, EditorState, FormField, AudioMix, MediaChoice } from './model';
 import { pruneEmpty } from './prune';
 import { metaFrom } from './template-meta';
+import { motionGlobalFrom } from './motion-passthrough';
+import { formatsField } from './formats-passthrough';
 import { overlayFiltersFrom, videoFiltersFrom } from './overlay-filters';
 import {
   DEFAULT_LOCALE,
@@ -260,6 +262,8 @@ function audioGlobal(audio: AudioMix): NonNullable<NonNullable<TemplateDescripto
     musicVolume: audio.musicVolume,
     ...(audio.normalize ? { normalize: audio.normalize } : {}),
     ...duckingField(audio.ducking),
+    ...(audio.automation ? { automation: audio.automation } : {}),
+    ...(audio.sfx ? { sfx: audio.sfx } : {}),
   };
 }
 
@@ -277,9 +281,16 @@ export function buildDescriptor(state: EditorState): TemplateDescriptor {
   const global: NonNullable<TemplateDescriptor['global']> = {
     orientation: state.orientation,
     musicEnabled: false,
-    transition: { type: state.defaultTransition.type, duration: state.defaultTransition.duration },
+    transition: {
+      type: state.defaultTransition.type,
+      duration: state.defaultTransition.duration,
+      ...(state.defaultTransition.ease === undefined ? {} : { ease: state.defaultTransition.ease }),
+    },
+    // Motion template settings, carried through from the loaded descriptor.
+    ...motionGlobalFrom(state.motion),
     // Audio mix: source (recorded clip) volume and background-music volume, each 0..1 (0 = muted).
     audio: audioGlobal(state.audio),
+    ...(state.audio.cues && state.audio.cues.length > 0 ? { sfx: state.audio.cues } : {}),
     ...(state.globalAnimations.length > 0 ? { animations: state.globalAnimations.map(globalAnimationFrom) } : {}),
     // Whole-video text overlays (brand watermark, etc.) authored once and composited onto every section.
     ...globalOverlaysField(state.globalOverlays),
@@ -299,7 +310,9 @@ export function buildDescriptor(state: EditorState): TemplateDescriptor {
     global.variables = { ...global.variables, ...variables };
   }
 
-  return { ...metaFrom(state), global, sections: mapEditorSections(state.sections) };
+  const sections = mapEditorSections(state.sections);
+
+  return { ...metaFrom(state), global, sections, ...formatsField(state.formats, sections) };
 }
 
 // De-duplicated union of every variable name available to the editor: form

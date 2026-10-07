@@ -14,16 +14,21 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "4.0.65",
+    "@ai-sdk/openai": "4.0.78",
+    "@ai-sdk/typesafe-ai": "3.0.8",
     "@codemirror/lang-json": "^6.0.2",
     "@ffmpeg/core": "0.12.10",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@leclap/creative-kit": "workspace:*",
+    "@mcp-b/webmcp-polyfill": "5.1.0",
     "@radix-ui/react-checkbox": "1.3.11",
     "@radix-ui/react-dialog": "1.1.23",
     "@radix-ui/react-select": "2.3.7",
     "@radix-ui/react-slot": "^1.3.3",
     "@uiw/react-codemirror": "^4.25.11",
+    "ai": "7.0.116",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "consola": "^3.4.2",
@@ -44,6 +49,7 @@
     "tailwind-merge": "^3.6.0",
     "tsyringe": "^4.10.0",
     "web-haptics": "^0.0.6",
+    "zod": "^4.4.3",
     "zustand": "^5.0.14"
   },
   "devDependencies": {

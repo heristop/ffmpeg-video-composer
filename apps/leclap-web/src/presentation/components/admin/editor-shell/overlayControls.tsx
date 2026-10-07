@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/presentation/components/ui';
 import type { Exit, Reveal, TextOverlay } from '../templateEditorModel';
+import { editableExit, editableReveal } from './overlay-timing';
 import { EditorSelectContent } from '../editor/editor-select-content';
 
 // newOverlay()'s seed fontsize (creative-kit editor model) — the RangeSlider reset target.
@@ -157,14 +158,14 @@ export const SelectedControls = ({
     <SectionDisclosure label={t('overlay.motionGroup')} summary={motionSummary(t, overlay)}>
       {/* Animated entrance (rise/slide/fade) for the text — same reveal vocabulary as the other layers. */}
       <RevealControl
-        reveal={overlay.reveal}
+        reveal={editableReveal(overlay.reveal)}
         onChange={(reveal) => {
           onPatch({ reveal });
         }}
       />
       {/* Animated exit after a delay, timed against the section duration. */}
       <ExitControl
-        exit={overlay.exit}
+        exit={editableExit(overlay.exit)}
         onChange={(exit) => {
           onPatch({ exit });
         }}

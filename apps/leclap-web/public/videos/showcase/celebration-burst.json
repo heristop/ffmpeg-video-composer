@@ -1,8 +1,8 @@
 {
   "meta": {
     "name": "Overlay effect recipes",
-    "description": "Synthetic review fixture with adaptive shapes and labels for the shared composited effect presets.",
-    "creativeDirection": "Direction: an honest synthetic test fixture for six composited recipes. Frame an interface detail, reveal a product shape, mark a celebration, lock focus, pass a soft light or reveal a fine frame. Keep labels readable and the focal element visible. Use at most two brief layers per scene and a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
+    "description": "Synthetic review fixture for the six builder recipes: each scene layers two engine primitives (graphics[] fx, frame and corners) anchored to the card.",
+    "creativeDirection": "Direction: an honest synthetic test fixture for six two-part recipes built from engine primitives. Frame an interface detail, light a product card, mark a celebration, lock focus, pass a warm light or reveal a fine frame. Every effect is anchored to the card (target layer:0) and tuned on top of the recipe defaults. Keep labels readable and the focal element visible, with a clear hold after each effect. Avoid treating these shapes as a real app demonstration. Review entrance, strongest frame, completion, target visibility and both bright and dark backgrounds."
   },
   "global": {
     "orientation": "landscape",
@@ -63,34 +63,28 @@
           }
         }
       ],
-      "inputs": [
+      "graphics": [
         {
-          "name": "effect_0",
-          "type": "animation",
-          "url": "/assets/animations/confetti.apng",
-          "options": {
-            "position": "96:54",
-            "scale": "1088:612",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.18,
-            "duration": 2.52,
-            "opacity": 0.85
-          }
+          "type": "fx",
+          "effect": "confetti",
+          "target": "layer:0",
+          "seed": 7460,
+          "at": 0.2,
+          "origin": {
+            "x": 0.5,
+            "y": 0.6
+          },
+          "count": 24
         },
         {
-          "name": "effect_1",
-          "type": "animation",
-          "url": "/assets/animations/sparkle.apng",
-          "options": {
-            "position": "256:144",
-            "scale": "768:432",
-            "fit": "contain",
-            "persistent": false,
-            "start": 0.65,
-            "duration": 2,
-            "opacity": 0.7
-          }
+          "type": "fx",
+          "effect": "glint",
+          "target": "layer:0",
+          "seed": 7045,
+          "at": 0.7,
+          "path": "corners",
+          "count": 3,
+          "size": 22
         }
       ]
     }

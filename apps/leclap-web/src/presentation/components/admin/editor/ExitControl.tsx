@@ -5,7 +5,9 @@
 // (seconds from the section start); left unset, the engine times it to end at the section end.
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { REVEAL_TYPES, REVEAL_EASINGS } from 'ffmpeg-video-composer/src/schemas/effects.schemas.ts';
+import { REVEAL_TYPES } from 'ffmpeg-video-composer/src/schemas/effects.schemas.ts';
+import type { EasingSpec } from 'ffmpeg-video-composer/src/core/motion/easing.ts';
+import { CUSTOM_EASING, easingChoice, easingLabel, easingOptions } from './easingOptions';
 import type { Exit } from '../templateEditorModel';
 import { SegmentedControl, RangeSlider, type SegmentOption } from './controls';
 import { SectionDisclosure } from './SectionDisclosure';
@@ -16,15 +18,8 @@ type ExitObject = {
   after?: number;
   duration?: number;
   distance?: number;
-  easing?: (typeof REVEAL_EASINGS)[number];
+  easing?: EasingSpec;
 };
-const EASING_LABEL_KEYS = {
-  linear: 'easingLinear',
-  'ease-out': 'easingEaseOut',
-  'ease-in-out': 'easingEaseInOut',
-  'ease-out-back': 'easingEaseOutBack',
-} as const;
-
 const MOVING: ExitType[] = ['rise', 'slide-left', 'slide-right'];
 const DEFAULT_AFTER = 2.5;
 const DEFAULT_DURATION = 0.6;
@@ -42,7 +37,7 @@ function timingSummary(t: TFunction<'admin'>, current: ExitObject): string {
     current.after === undefined ? null : `${t('exit.after')} ${current.after}s`,
     current.duration === undefined ? null : `${t('reveal.duration')} ${current.duration}s`,
     current.distance === undefined ? null : `${t('reveal.distance')} ${current.distance}px`,
-    current.easing === undefined ? null : t(`reveal.${EASING_LABEL_KEYS[current.easing]}`),
+    current.easing === undefined ? null : easingLabel(t, current.easing),
   ].filter((part): part is string => part !== null);
 
   return parts.length > 0 ? parts.join(' · ') : t('exit.summaryDefault');
@@ -140,9 +135,12 @@ export const ExitControl = ({ exit, onChange }: ExitControlProps) => {
           )}
           <SegmentedControl
             label={t('exit.easing')}
-            value={current.easing ?? 'linear'}
-            options={REVEAL_EASINGS.map((value) => ({ value, label: t(`reveal.${EASING_LABEL_KEYS[value]}`) }))}
+            value={easingChoice(current.easing)}
+            options={easingOptions(t, current.easing)}
             onChange={(easing) => {
+              // The authored curve is already selected; re-picking it changes nothing.
+              if (easing === CUSTOM_EASING) return;
+
               set({ easing });
             }}
           />

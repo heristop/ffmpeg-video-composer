@@ -272,8 +272,14 @@ class MapManager {
    *
    * `videoInputIndex` is the segment's authoritative clip stream (VideoSegment shifts it to 1 when it
    * prepends blank audio) — NOT getVideoInputIncrement, which disagrees for video+videoUrl sections.
+   * `head` (already formatted footage edits: clip range / ramp / freeze) retimes the clip first.
    */
-  addChromakeyComposite = (chromaKey: ChromaKey, videoInputIndex: number, videoScale = ''): void => {
+  addChromakeyComposite = (
+    chromaKey: ChromaKey,
+    videoInputIndex: number,
+    videoScale = '',
+    head: string[] = []
+  ): void => {
     const videoStream = `${videoInputIndex}:v`;
     const color = this.formattersManager.formatColor(chromaKey.color);
     const similarity = chromaKey.similarity ?? 0.3;
@@ -286,8 +292,10 @@ class MapManager {
       ? `scale=${videoScale}:force_original_aspect_ratio=increase,crop=${videoScale},setsar=1,`
       : '';
 
+    const retime = head.map((filter) => `${filter},`).join('');
+
     this.segment.filtersMapList.push(
-      `[${videoStream}]${scaleChain}split[ck_a][ck_b];` +
+      `[${videoStream}]${retime}${scaleChain}split[ck_a][ck_b];` +
         `[ck_a]drawbox=x=0:y=0:w=iw:h=ih:color=${background}@1:t=fill[ck_bg];` +
         `[ck_b]colorkey=${color}:${similarity}:${blend},format=rgba[ck_keyed];` +
         `[ck_bg][ck_keyed]overlay=0:0[ck_out]`

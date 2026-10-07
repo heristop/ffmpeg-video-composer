@@ -1,0 +1,321 @@
+{
+  "meta": {
+    "name": "Gallery: strokes",
+    "description": "The frame, corners and underline graphics with their defaults and their options, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 13,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "frame",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "at": 0.1,
+          "inset": 100,
+          "color": "#7C83FD"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Framed"
+          },
+          "preset": "fade",
+          "size": 110,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "frame-rounded",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "at": 0.1,
+          "inset": 100,
+          "color": "#7C83FD",
+          "radius": 32,
+          "trace": "path",
+          "exit": "fade"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Framed"
+          },
+          "preset": "fade",
+          "size": 110,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "frame-target",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "frame",
+          "at": 0.1,
+          "target": "text:0",
+          "clearance": 28,
+          "radius": 20,
+          "trace": "split",
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "On the title"
+          },
+          "preset": "fade",
+          "size": 110,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "corners",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "corners",
+          "at": 0.2,
+          "inset": 110,
+          "color": "#FF8AAE"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "In focus"
+          },
+          "preset": "fade",
+          "size": 110,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "corners-target",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "corners",
+          "at": 0.2,
+          "target": "text:0",
+          "clearance": 32,
+          "spread": 1.08,
+          "trace": "clockwise",
+          "exit": "expand",
+          "color": "#FF8AAE"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "In focus"
+          },
+          "preset": "fade",
+          "size": 110,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "corners-round",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "corners",
+          "at": 0.2,
+          "target": "text:0",
+          "clearance": 32,
+          "radius": 14,
+          "trace": "together",
+          "color": "#FF8AAE"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "In focus"
+          },
+          "preset": "fade",
+          "size": 110,
+          "y": "center",
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "underline",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.4,
+          "x": 390,
+          "y": 430,
+          "width": 500,
+          "thickness": 8,
+          "origin": "center",
+          "color": "#FFF685"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Underlined"
+          },
+          "preset": "fade",
+          "size": 110,
+          "y": 280,
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "underline-square",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.4,
+          "x": 390,
+          "y": 430,
+          "width": 500,
+          "thickness": 8,
+          "origin": "center",
+          "color": "#FFF685",
+          "caps": "square",
+          "settle": 0,
+          "exit": "retract"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Underlined"
+          },
+          "preset": "fade",
+          "size": 110,
+          "y": 280,
+          "delay": 0.1,
+          "duration": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.7",
+              "dx": 2,
+              "dy": 3
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

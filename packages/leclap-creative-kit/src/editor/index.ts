@@ -19,3 +19,9 @@ export * from './panel-url';
 
 // Curated animation defaults and portable overlay effect recipes shared by both app editors.
 export * from './animation-presets';
+
+// The animation library (engine primitives first, legacy APNG samples last), the placement a pick
+// inserts, and the schema-derived parameter panel of a library graphic.
+export * from './animation-library';
+export * from './fx-draft';
+export * from './fx-params';

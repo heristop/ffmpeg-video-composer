@@ -4,9 +4,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import type { ProjectConfig, RenderedGeometry, TemplateDescriptor } from 'ffmpeg-video-composer';
+import type { ProjectConfig, QcReport, RenderedGeometry, TemplateDescriptor } from 'ffmpeg-video-composer';
 
 import type { GeometryJob } from '../worker/geometry-job.js';
+import type { SnapshotJob, SnapshotOutcome as SnapshotJobOutcome } from '../worker/snapshot-job.js';
 import type { ProgressMessage } from '../worker/progress-reporter.js';
 
 // One render job, shipped to the forked worker over IPC.
@@ -23,17 +24,21 @@ interface WorkerInfos {
   audioCodec: string | null;
 }
 
-interface WorkerMessage {
+export interface WorkerMessage {
   ok: boolean;
   outputPath?: string;
   infos?: WorkerInfos;
   sizeBytes?: number;
+  // The engine's output QC report, when the job's ProjectConfig asked for one.
+  qc?: QcReport;
   // A geometry job's result (worker/geometry-job.ts) in place of the render fields.
   geometry?: RenderedGeometry;
+  // A snapshot job's frames and sheets (worker/snapshot-job.ts).
+  snapshot?: SnapshotJobOutcome;
   error?: string;
 }
 
-type WorkerFailure = { ok: false; error: string; logTail?: string };
+export type WorkerFailure = { ok: false; error: string; logTail?: string };
 
 export type RenderResult =
   | {
@@ -43,6 +48,7 @@ export type RenderResult =
       sizeBytes: number;
       videoCodec: string | null;
       audioCodec: string | null;
+      qc?: QcReport;
     }
   | WorkerFailure;
 
@@ -179,10 +185,11 @@ function successResult(msg: WorkerMessage): RenderResult {
     sizeBytes: msg.sizeBytes ?? 0,
     videoCodec: msg.infos?.videoCodec ?? null,
     audioCodec: msg.infos?.audioCodec ?? null,
+    ...(msg.qc && { qc: msg.qc }),
   };
 }
 
-function failureResult(msg: WorkerMessage, logTail: string): WorkerFailure {
+export function failureResult(msg: WorkerMessage, logTail: string): WorkerFailure {
   const lead = leadLine(logTail);
   const base = msg.error ?? lead ?? 'compilation failed';
 
@@ -274,13 +281,13 @@ function onTimeout<T>(state: RunState<T>, timeoutMs: number): void {
   });
 }
 
-function forkWorker(): ChildProcess {
+export function forkWorker(): ChildProcess {
   return fork(workerPath(), [], { stdio: ['ignore', 'pipe', 'pipe', 'ipc'] });
 }
 
 // Resolves once the worker process is gone: it exited (on its own, or killed on timeout/cancel), or it
 // never spawned at all, in which case 'error' is all it will ever emit.
-function workerGone(child: ChildProcess): Promise<void> {
+export function workerGone(child: ChildProcess): Promise<void> {
   return new Promise<void>((resolve) => {
     child.once('exit', () => {
       resolve();
@@ -293,8 +300,8 @@ function workerGone(child: ChildProcess): Promise<void> {
   });
 }
 
-function executeJob<T>(
-  job: RenderJob | GeometryJob,
+export function executeJob<T>(
+  job: RenderJob | GeometryJob | SnapshotJob,
   opts: RenderOptions,
   interpret: Interpret<T>,
   child: ChildProcess = forkWorker()
@@ -360,7 +367,10 @@ function executeJob<T>(
 
 // Bound how many worker forks run at once; queued calls wait for a free slot before forking. If the
 // call was already cancelled while queued, skip the fork entirely.
-async function inSlot<T>(opts: RenderOptions, run: () => Promise<T | WorkerFailure>): Promise<T | WorkerFailure> {
+export async function inSlot<T>(
+  opts: RenderOptions,
+  run: () => Promise<T | WorkerFailure>
+): Promise<T | WorkerFailure> {
   await renderSemaphore.acquire();
 
   try {

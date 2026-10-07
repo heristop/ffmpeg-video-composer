@@ -44,6 +44,7 @@
     "generate:schema": "tsx scripts/generate-schema-json.ts",
     "generate:capabilities": "tsx scripts/generate-capability-matrix.ts",
     "generate:samples": "tsx scripts/generate-samples.ts",
+    "generate:font-advances": "tsx scripts/generate-font-advances.ts",
     "check:samples": "tsx scripts/generate-samples.ts --check",
     "bench": "tsx scripts/bench.ts",
     "typecheck": "tsc --noEmit",

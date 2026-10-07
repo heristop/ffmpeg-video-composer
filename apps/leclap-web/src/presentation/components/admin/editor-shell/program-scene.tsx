@@ -4,7 +4,8 @@
 // each text overlay wrapped in an animation div the rAF clock mutates directly (reveal/exit,
 // Ken Burns). Still-image / SHAPE overlays render too, each in an animation wrapper the clock
 // samples via imageVisibilityAt (show window + `motion` entrance); background layers get a wrapper
-// sampled via layerVisibilityAt (`reveal`). Animation (video) overlays stay out of playback scope.
+// sampled via layerVisibilityAt (`reveal`). Animation files play as-is in wrappers sampled via
+// animationVisibilityAt (start / duration / motion), and the engine effects draw live on the program clock.
 import { forwardRef, useImperativeHandle, useRef, type CSSProperties, type RefObject } from 'react';
 import { flipCssTransform, type ColorVariableMap } from '@leclap/creative-kit/editor';
 import { displayFromTokens } from '@/lib/variableSyntax';
@@ -26,6 +27,9 @@ import { boxStyle, OverlayAccentBar } from './sectionCanvasBox';
 import { previewScale } from './sugarPreviewGeometry';
 import { SugarPreviewLayer } from './SugarPreviewLayer';
 import { initialSectionSelection } from './useSectionSelection';
+import { LazyFxPreview, type FxPreviewLayerProps } from './fx-preview/LazyFxPreview';
+import { sectionGraphics } from './fx-preview/preview-env';
+import { ProgramAnimations, sceneAnimations } from './program-animations';
 
 export type VisualSection = Extract<EditorSection, { kind: 'video' | 'color' | 'image' }>;
 
@@ -37,6 +41,8 @@ export interface ProgramSceneHandles {
   images: Array<HTMLDivElement | null>;
   // Per-layer animation wrappers (color sections), aligned with sceneLayers(section).
   layers: Array<HTMLDivElement | null>;
+  // Per-file wrappers (animation files), aligned with sceneAnimations(section).
+  animations: Array<HTMLDivElement | null>;
 }
 
 // The still-image / shape overlays a scene composites, in paint order. Shared with the player's
@@ -156,17 +162,21 @@ interface ProgramSceneProps {
   previewH: number;
   // The whole-video look/grade (EditorState.globalLook/globalGrade), chained onto every scene's backdrop.
   globalTreatment: LookGradeTreatment;
+  // The scene's engine effects, drawn live on the program clock (lazy layer); absent = none drawn.
+  fx?: Pick<FxPreviewLayerProps, 'env' | 'subscribe'>;
 }
 
 // Renders one scene; exposes the backdrop + per-overlay wrapper elements for the clock's paint loop.
 export const ProgramScene = forwardRef<ProgramSceneHandles, ProgramSceneProps>(
-  ({ section, orientation, frameRef, previewH, globalTreatment }, ref) => {
+  ({ section, orientation, frameRef, previewH, globalTreatment, fx }, ref) => {
     const backdropRef = useRef<HTMLDivElement>(null);
     const overlayRefs = useRef<Array<HTMLDivElement | null>>([]);
     const imageRefs = useRef<Array<HTMLDivElement | null>>([]);
     const layerRefs = useRef<Array<HTMLDivElement | null>>([]);
+    const animationRefs = useRef<Array<HTMLDivElement | null>>([]);
     const overlays: TextOverlay[] = section.overlays;
     const images = sceneImages(section);
+    const graphics = sectionGraphics(section);
     overlayRefs.current.length = overlays.length;
     imageRefs.current.length = images.length;
     layerRefs.current.length = sceneLayers(section).length;
@@ -186,6 +196,9 @@ export const ProgramScene = forwardRef<ProgramSceneHandles, ProgramSceneProps>(
       get layers() {
         return layerRefs.current;
       },
+      get animations() {
+        return animationRefs.current;
+      },
     }));
 
     return (
@@ -201,6 +214,8 @@ export const ProgramScene = forwardRef<ProgramSceneHandles, ProgramSceneProps>(
             }}
           />
         </div>
+        {/* Engine effects draw over the graded base frame, under the text (their default z-order). */}
+        {fx && graphics.length > 0 ? <LazyFxPreview graphics={graphics} {...fx} /> : null}
         <SugarPreviewLayer
           caption={section.caption}
           titleCard={section.kind === 'color' ? section.titleCard : undefined}
@@ -238,6 +253,13 @@ export const ProgramScene = forwardRef<ProgramSceneHandles, ProgramSceneProps>(
             <ProgramImageBox image={image} orientation={orientation} previewH={previewH} />
           </div>
         ))}
+        {/* Animation files play as-is above the stills, each wrapper sampled via animationVisibilityAt. */}
+        <ProgramAnimations
+          animations={sceneAnimations(section)}
+          orientation={orientation}
+          previewH={previewH}
+          wrappers={animationRefs}
+        />
       </div>
     );
   }

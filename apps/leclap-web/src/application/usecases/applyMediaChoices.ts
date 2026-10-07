@@ -1,6 +1,7 @@
 import type { TemplateDescriptor } from 'ffmpeg-video-composer/src/core/types.d.ts';
 import type { MediaChoice } from '@/presentation/components/admin/templateEditorModel';
 import { findMusic, findBackground } from '@/data/mediaCatalog';
+import { applyLibraryBeats } from './musicBeats';
 
 export interface MediaChoices {
   music?: MediaChoice | null;
@@ -40,6 +41,9 @@ function applyMusicChoice(descriptor: TemplateDescriptor, choice: MediaChoice): 
   descriptor.global ??= {};
   descriptor.global.music = resolveMusic(choice);
   descriptor.global.musicEnabled = true;
+
+  // A library track carries its measured beat grid and drop (uploads are analyzed later, in the browser).
+  if (choice.source === 'library') applyLibraryBeats(descriptor, choice.id);
 }
 
 function applyBackgroundChoice(descriptor: TemplateDescriptor, choice: MediaChoice): void {

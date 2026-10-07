@@ -1,0 +1,172 @@
+{
+  "meta": {
+    "name": "Gallery: lower thirds",
+    "description": "The default band and every lowerThird.style over the same photograph, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 4,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "band",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 2
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Ada Lovelace"
+        },
+        "subtitle": {
+          "en": "First programmer"
+        },
+        "accent": "#FF8AAE",
+        "effect": {
+          "shadow": true
+        },
+        "reveal": {
+          "type": "fade",
+          "delay": 0.1,
+          "duration": 0.2
+        }
+      }
+    },
+    {
+      "name": "clean-bar",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 2
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Ada Lovelace"
+        },
+        "subtitle": {
+          "en": "First programmer"
+        },
+        "accent": "#FF8AAE",
+        "effect": {
+          "shadow": true
+        },
+        "reveal": {
+          "type": "fade",
+          "delay": 0.1,
+          "duration": 0.2
+        },
+        "style": "clean-bar"
+      }
+    },
+    {
+      "name": "side-rule",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 2
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Ada Lovelace"
+        },
+        "subtitle": {
+          "en": "First programmer"
+        },
+        "accent": "#FF8AAE",
+        "effect": {
+          "shadow": true
+        },
+        "reveal": {
+          "type": "fade",
+          "delay": 0.1,
+          "duration": 0.2
+        },
+        "style": "side-rule"
+      }
+    },
+    {
+      "name": "kicker",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 2
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Ada Lovelace"
+        },
+        "subtitle": {
+          "en": "First programmer"
+        },
+        "accent": "#FF8AAE",
+        "effect": {
+          "shadow": true
+        },
+        "reveal": {
+          "type": "fade",
+          "delay": 0.1,
+          "duration": 0.2
+        },
+        "style": "kicker"
+      }
+    },
+    {
+      "name": "stack-bars",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 2
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Ada Lovelace"
+        },
+        "subtitle": {
+          "en": "First programmer"
+        },
+        "accent": "#FF8AAE",
+        "effect": {
+          "shadow": true
+        },
+        "reveal": {
+          "type": "fade",
+          "delay": 0.1,
+          "duration": 0.2
+        },
+        "style": "stack-bars"
+      }
+    },
+    {
+      "name": "pill",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/laptop-desk.jpg",
+        "duration": 2
+      },
+      "lowerThird": {
+        "title": {
+          "en": "Ada Lovelace"
+        },
+        "subtitle": {
+          "en": "First programmer"
+        },
+        "accent": "#FF8AAE",
+        "effect": {
+          "shadow": true
+        },
+        "reveal": {
+          "type": "fade",
+          "delay": 0.1,
+          "duration": 0.2
+        },
+        "style": "pill"
+      }
+    }
+  ]
+}

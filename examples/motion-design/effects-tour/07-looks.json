@@ -1,0 +1,1478 @@
+{
+  "meta": {
+    "name": "Effects tour: looks and grade",
+    "description": "Chapter 7 of the effects tour: all seventeen look presets (filter, LUT and stylized families) on bundled photographs, a LUT look at full and reduced strength on generated footage, a hand-built grade and a user .cube LUT.",
+    "creativeDirection": "A quick colour relay: the same slow push-in under each look so only the grade changes, each named in the corner and bottom-left. Then the take controls on moving footage. Review: every look reads as distinct, the name stays legible on every grade, and the reduced strength sits visibly between the untouched clip and the full grade."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 59,
+    "transition": {
+      "type": "cut"
+    },
+    "motion": {
+      "energy": 1
+    },
+    "overlays": [
+      {
+        "text": {
+          "en": "07  LOOKS & GRADE"
+        },
+        "position": "top-right",
+        "font": "mono",
+        "size": 24,
+        "color": "#C9C6D2",
+        "effect": {
+          "shadow": true
+        }
+      }
+    ],
+    "variables": {
+      "lut": "luts/warm-print.cube"
+    }
+  },
+  "sections": [
+    {
+      "name": "look-cinematic",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/sage-wall.jpg",
+        "duration": 1.5
+      },
+      "look": "cinematic",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · filter look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "cinematic"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-warm",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/pastel-gradient.jpg",
+        "duration": 1.5
+      },
+      "look": "warm",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · filter look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "warm"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-cool",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 1.5
+      },
+      "look": "cool",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · filter look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "cool"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-vintage",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/neon-alley.jpg",
+        "duration": 1.5
+      },
+      "look": "vintage",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · filter look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "vintage"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-noir",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/turquoise-sea.jpg",
+        "duration": 1.5
+      },
+      "look": "noir",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · filter look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "noir"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-vivid",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/desk-flatlay.jpg",
+        "duration": 1.5
+      },
+      "look": "vivid",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · filter look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "vivid"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-dreamy",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/autumn-leaves.jpg",
+        "duration": 1.5
+      },
+      "look": "dreamy",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · filter look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "dreamy"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-teal-orange",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/desert-dunes.jpg",
+        "duration": 1.5
+      },
+      "look": "teal-orange",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · LUT look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "teal-orange"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-warm-film",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 1.5
+      },
+      "look": "warm-film",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · LUT look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "warm-film"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-mono-film",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/milky-way.jpg",
+        "duration": 1.5
+      },
+      "look": "mono-film",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · LUT look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "mono-film"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-noir-film",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/cafe-table.jpg",
+        "duration": 1.5
+      },
+      "look": "noir-film",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · LUT look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "noir-film"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-vivid-pop",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/desk-flatlay.jpg",
+        "duration": 1.5
+      },
+      "look": "vivid-pop",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · LUT look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "vivid-pop"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-duotone",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/pink-sunset.jpg",
+        "duration": 1.5
+      },
+      "look": "duotone",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · stylized look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "duotone"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-posterize",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/monstera-leaves.jpg",
+        "duration": 1.5
+      },
+      "look": "posterize",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · stylized look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "posterize"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-sketch",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 1.5
+      },
+      "look": "sketch",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · stylized look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "sketch"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-glitch",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/snowy-peak.jpg",
+        "duration": 1.5
+      },
+      "look": "glitch",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · stylized look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "glitch"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-soft-vignette",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/rainy-window.jpg",
+        "duration": 1.5
+      },
+      "look": "soft-vignette",
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · stylized look"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "soft-vignette"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ],
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.6
+      }
+    },
+    {
+      "name": "look-strength-full",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · teal-orange · strength 1"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Full grade"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "look": {
+        "preset": "teal-orange",
+        "strength": 1
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "look-strength-soft",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "look · teal-orange · strength 0.35"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Dialled down"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "look": {
+        "preset": "teal-orange",
+        "strength": 0.35
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "grade",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/forest-sea.jpg",
+        "duration": 2.6
+      },
+      "grade": {
+        "contrast": 1.15,
+        "saturation": 1.35,
+        "hue": -14,
+        "gamma": 0.95,
+        "colorBalance": {
+          "shadows": {
+            "b": 0.12
+          },
+          "highlights": {
+            "r": 0.1
+          }
+        },
+        "grain": 0.35
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "grade · contrast, hue, balance, grain"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Hand grade"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "name": "grade-lut",
+      "type": "project_video",
+      "options": {
+        "captureMode": "upload",
+        "allowedCaptureModes": ["upload"],
+        "duration": 2.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "grade.lut · user .cube · strength 0.85"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Your own LUT"
+          },
+          "preset": "rise",
+          "size": 96,
+          "align": "left",
+          "x": 64,
+          "y": 560,
+          "delay": 0.2,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ],
+      "grade": {
+        "lut": {
+          "url": "{{ lut }}",
+          "strength": 0.85
+        }
+      },
+      "graphics": [
+        {
+          "type": "panel",
+          "at": 0,
+          "duration": 0.3,
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 84,
+          "color": "#141416@0.62",
+          "from": "top",
+          "ease": "linear"
+        }
+      ]
+    }
+  ]
+}

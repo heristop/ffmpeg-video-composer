@@ -13,6 +13,7 @@
 import { staggered } from 'ffmpeg-video-composer/src/editor/presets/text.ts';
 import { FONTS, DEFAULT_FONT_ID } from '@leclap/creative-kit/fonts';
 import type { EditorCaption, LowerThird, Orientation, TextOverlay, TitleCard } from '../templateEditorModel';
+import { editableReveal } from './overlay-timing';
 import { refVideoHeight } from '../overlayGeometry';
 import { ENGINE_FRAME, type SugarTextLine } from './sugarPreviewGeometry';
 import { titleCardPreview } from './titleCardPreview';
@@ -98,7 +99,7 @@ export function sugarToOverlays(kind: SugarKind, sugar: AnySugar, orientation: O
   const refH = refVideoHeight(orientation);
   const engine = ENGINE_FRAME[orientation];
   const refW = (refH * engine.w) / engine.h;
-  const reveal = (sugar as { reveal?: TextOverlay['reveal'] }).reveal;
+  const reveal = editableReveal((sugar as { reveal?: TextOverlay['reveal'] }).reveal);
 
   return previewLines(kind, sugar, refH, orientation).map((line, index) => {
     const entrance = kind === 'titleCard' ? staggered(reveal ?? 'rise', index, (sugar as TitleCard).stagger) : reveal;

@@ -12,6 +12,7 @@ import {
   VIDEO_ASSETS,
   ANIMATION_ASSETS,
   BACKGROUND_ASSETS,
+  EMOJI_ASSETS,
   findBackground,
 } from '@/src/data/mediaCatalog';
 import * as Leclap from '@/modules/leclap-ffmpeg';
@@ -69,6 +70,26 @@ async function stageBundledFonts(assetsDir: string): Promise<void> {
   await Promise.all(
     Object.entries(FONT_ASSETS).map(async ([fileName, assetModule]) => {
       const destination = `${fontsDir}/${fileName}`;
+
+      if ((await FileSystem.getInfoAsync(toUri(destination))).exists) return;
+
+      const asset = await Asset.fromModule(assetModule).downloadAsync();
+      await FileSystem.copyAsync({ from: toUri(asset.localUri ?? asset.uri), to: toUri(destination) });
+    })
+  );
+}
+
+// Stage the bundled colour emoji under `assetsDir/emoji`: the engine draws emoji in text as these
+// images, resolving each as `/assets/emoji/<file>` (FilesystemExpoAdapter.resolveLocalAsset). The
+// whole set is staged — emoji can come from form fields and partials, not just the descriptor — and
+// each file is copied once (the existence check makes later compiles cheap). Idempotent.
+async function stageBundledEmoji(assetsDir: string): Promise<void> {
+  const emojiDir = `${assetsDir}/emoji`;
+  await FileSystem.makeDirectoryAsync(toUri(emojiDir), { intermediates: true }).catch(() => {});
+
+  await Promise.all(
+    Object.entries(EMOJI_ASSETS).map(async ([fileName, assetModule]) => {
+      const destination = `${emojiDir}/${fileName}`;
 
       if ((await FileSystem.getInfoAsync(toUri(destination))).exists) return;
 
@@ -265,6 +286,7 @@ async function buildProjectConfig(input: CompileInput) {
 
   await FileSystem.makeDirectoryAsync(toUri(buildDir), { intermediates: true }).catch(() => {});
   await stageBundledFonts(assetsDir);
+  await stageBundledEmoji(assetsDir);
   await stageBundledMusic(descriptor.global?.music?.name, assetsDir);
   await stageBundledVideos(assetsDir);
   await stageBundledAnimations(descriptor, assetsDir);

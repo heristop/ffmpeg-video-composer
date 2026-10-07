@@ -1,0 +1,12 @@
+{
+  "meta": { "name": "cli-deterministic" },
+  "global": { "orientation": "landscape", "musicEnabled": false, "seed": 11 },
+  "sections": [
+    {
+      "name": "card",
+      "type": "color_background",
+      "options": { "backgroundColor": "#1d2140", "duration": 1 },
+      "grade": { "grain": 0.3 }
+    }
+  ]
+}

@@ -7,6 +7,8 @@ import { promisify } from 'node:util';
 import type { McpServer, ServerContext } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
+import { mediaTraits, type MediaTraits, type ProbeVideoStream } from 'ffmpeg-video-composer';
+
 import type { McpConfig } from '../config.js';
 import { assertWithinMediaDir } from '../compose/pathGuard.js';
 
@@ -28,9 +30,15 @@ const outputSchema = z.object({
   audioCodec: z.string().nullable(),
   sampleRate: z.number().nullable(),
   sizeBytes: z.number(),
+  hdr: z.enum(['pq', 'hlg', 'dolby-vision']).nullable(),
+  colorPrimaries: z.string().nullable(),
+  colorTransfer: z.string().nullable(),
+  bitDepth: z.number().nullable(),
+  vfr: z.boolean(),
+  rotation: z.number(),
 });
 
-interface FFProbeStream {
+interface FFProbeStream extends ProbeVideoStream {
   codec_type: string;
   codec_name?: string | null;
   duration?: string;
@@ -51,6 +59,15 @@ export interface ProbeInfos {
   audioCodec: string | null;
   sampleRate: number | null;
   sizeBytes: number;
+  /** HDR transfer of the video stream (PQ, HLG or Dolby Vision), or null for SDR. */
+  hdr: MediaTraits['hdr'];
+  colorPrimaries: string | null;
+  colorTransfer: string | null;
+  bitDepth: number | null;
+  /** r_frame_rate and avg_frame_rate disagree: a variable-frame-rate capture (the engine conforms it). */
+  vfr: boolean;
+  /** Display rotation FFmpeg autorotates by on input, 0/90/180/270. */
+  rotation: number;
   // Index signature so the object satisfies the SDK's structuredContent record type.
   [key: string]: unknown;
 }
@@ -234,7 +251,19 @@ export async function probeMedia(
     audioCodec: audioStream?.codec_name ?? null,
     sampleRate: parseSampleRate(audioStream),
     sizeBytes,
+    ...mediaTraits(videoStream),
   };
+}
+
+// Only the traits that change how a clip should be handled: HDR, VFR and rotation.
+function traitsNote(infos: ProbeInfos): string {
+  const notes = [
+    ...(infos.hdr ? [`HDR ${infos.hdr}`] : []),
+    ...(infos.vfr ? ['VFR'] : []),
+    ...(infos.rotation ? [`rotated ${infos.rotation}°`] : []),
+  ];
+
+  return notes.length > 0 ? `, ${notes.join(', ')}` : '';
 }
 
 async function handleProbe(args: { path: string }, config: McpConfig, runner: ProbeRunner, signal?: AbortSignal) {
@@ -254,7 +283,7 @@ async function handleProbe(args: { path: string }, config: McpConfig, runner: Pr
       content: [
         {
           type: 'text' as const,
-          text: `Probed ${realPath} (${infos.durationSeconds ?? '?'}s, ${infos.videoCodec ?? 'no video'}/${infos.audioCodec ?? 'no audio'}, ${infos.sizeBytes} bytes).`,
+          text: `Probed ${realPath} (${infos.durationSeconds ?? '?'}s, ${infos.videoCodec ?? 'no video'}/${infos.audioCodec ?? 'no audio'}, ${infos.sizeBytes} bytes${traitsNote(infos)}).`,
         },
       ],
       structuredContent: infos,
@@ -271,7 +300,8 @@ export function registerProbe(server: McpServer, config: McpConfig, runner: Prob
       title: 'Probe Media',
       description:
         'Inspect a local media file (absolute path under the configured media dir) and return its ' +
-        'duration, video/audio codecs, audio sample rate, and byte size. Probes via ffprobe directly ' +
+        'duration, video/audio codecs, audio sample rate, byte size and footage traits (hdr: pq/hlg/dolby-vision, ' +
+        'colorPrimaries/colorTransfer, bitDepth, vfr, rotation). Probes via ffprobe directly ' +
         'so it never writes to stdout.',
       inputSchema,
       outputSchema,

@@ -43,7 +43,12 @@ describe('sample discovery on the default MCP server', () => {
     for (const summary of listSamples()) {
       const result = await call('get_sample', { id: summary.id });
       expect(result.isError).toBeUndefined();
-      expect(result.structuredContent).toEqual(getSample(summary.id));
+      const { partialCatalog, ...sample } = result.structuredContent as Record<string, unknown>;
+      const embedded = getSample(summary.id).template.partials ?? [];
+      expect(sample).toEqual(getSample(summary.id));
+      expect((partialCatalog as { id: string }[] | undefined)?.map((p) => p.id)).toEqual(
+        embedded.length > 0 ? embedded.map((p) => p.id) : undefined
+      );
       expect(JSON.parse((result.content[0] as { text: string }).text)).toEqual(result.structuredContent);
     }
     const native = (await call('get_sample', { id: 'web-app-promo' })).structuredContent;

@@ -44,3 +44,38 @@ export const toNum = (value: string): number | undefined => {
 // A single-file animation is either an APNG (renders in <img>) or a WebM/VP9-alpha clip (needs
 // <video>). Library WebM ends in `.webm`; an uploaded one arrives as a `data:video/...` URL.
 export const isAnimationVideo = (url: string): boolean => /\.webm($|\?)/i.test(url) || url.startsWith('data:video');
+
+// The name an animation file goes by in the element list and inspector: the path's basename
+// ("confetti.apng"), or the upload's own filename for a data: URL (whose basename is base64 noise).
+export const animationFileName = (value: { url: string; label?: string }): string | undefined => {
+  if (value.url.startsWith('data:')) return value.label;
+
+  const base = value.url.split(/[?#]/)[0].replace(/\/+$/, '').split('/').pop();
+
+  if (!base) return value.label;
+
+  try {
+    return decodeURIComponent(base);
+  } catch {
+    return base;
+  }
+};
+
+export type AnimationFormat = 'APNG' | 'WebM' | 'GIF' | 'WebP';
+
+const FORMAT_BY_TOKEN: Record<string, AnimationFormat> = {
+  apng: 'APNG',
+  png: 'APNG',
+  webm: 'WebM',
+  gif: 'GIF',
+  webp: 'WebP',
+};
+
+// The container of an animation file, for its "File · APNG" chip: from a data: URL's mime subtype, else from
+// the path's extension. Undefined when neither names a known animation format (an extension-less URL).
+export const animationFormat = (url: string): AnimationFormat | undefined => {
+  const mime = /^data:(?:image|video)\/([a-z0-9]+)/i.exec(url);
+  const token = mime ? mime[1] : /\.([a-z0-9]+)(?:$|[?#])/i.exec(url)?.[1];
+
+  return token ? FORMAT_BY_TOKEN[token.toLowerCase()] : undefined;
+};

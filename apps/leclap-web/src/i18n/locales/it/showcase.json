@@ -8,6 +8,8 @@
   "loading": "Caricamento anteprima",
   "videoError": "Impossibile caricare l’anteprima. Riprova.",
   "retry": "Riprova",
+  "seek": "Spostarsi nell’anteprima",
+  "position": "{{current}} di {{total}}",
   "native": "JSON nativo",
   "downloadJson": "Scarica JSON",
   "retrySource": "Ricarica sorgente",
@@ -35,6 +37,7 @@
     "all": "Tutti gli esempi",
     "templates": "Modelli",
     "typography": "Tipografia",
+    "effects": "Effetti e montaggio",
     "overlays": "Sovrapposizioni",
     "app-demos": "Demo di app",
     "evidence": "Prove di revisione"

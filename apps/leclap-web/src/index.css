@@ -1197,6 +1197,134 @@ body {
   }
 }
 
+/* Indeterminate progress for an AI generation: a short bar gliding across its track while the model
+   works (duration unknown, so no percentage is promised). Reduced motion: a still, half-filled bar. */
+@keyframes ai-progress {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(330%);
+  }
+}
+
+.ai-progress-bar {
+  animation: ai-progress 1.6s var(--ease-smooth) infinite;
+}
+
+/* The Generate-with-AI body: the one scrolling region of the panel. The gutter is reserved so the
+   content doesn't jump sideways when the scrollbar appears, and stays left-aligned with the header and
+   footer; the bar itself is thin and quiet (divider thumb, no track) and brightens on hover. Scroll
+   padding keeps a field that receives focus clear of the panel's top and bottom bars. */
+.ai-scroll-body {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-divider) transparent;
+  scroll-padding-block: 1.25rem;
+}
+
+.ai-scroll-body:hover {
+  scrollbar-color: var(--color-gray-600) transparent;
+}
+
+/* Sheet (ui/sheet.tsx): a panel sliding in from its edge over a light scrim, and back out the same
+   way. Radix keeps the panel mounted until the exit animation ends. The entry keyframes only fill
+   backwards, so once settled the bottom sheet's `transform` is free to follow the drag handle
+   (`--sheet-drag`); the exit starts from wherever the finger let go. Reduced motion: a short fade. */
+@keyframes sheet-in-right {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+@keyframes sheet-out-right {
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+@keyframes sheet-in-bottom {
+  from {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+@keyframes sheet-out-bottom {
+  from {
+    transform: translate3d(0, var(--sheet-drag, 0px), 0);
+  }
+  to {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+@keyframes sheet-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.sheet-overlay[data-state='open'] {
+  animation: sheet-fade-in 0.24s var(--ease-smooth) backwards;
+}
+
+.sheet-overlay[data-state='closed'] {
+  animation: sheet-fade-out 0.2s var(--ease-smooth) forwards;
+}
+
+.sheet-panel[data-side='right'][data-state='open'] {
+  animation: sheet-in-right 0.36s var(--ease-out-expo) backwards;
+}
+
+.sheet-panel[data-side='right'][data-state='closed'] {
+  animation: sheet-out-right 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.sheet-panel[data-side='bottom'] {
+  transform: translate3d(0, var(--sheet-drag, 0px), 0);
+  transition: transform 0.28s var(--ease-out-expo);
+}
+
+.sheet-panel[data-side='bottom'][data-dragging] {
+  transition: none;
+}
+
+.sheet-panel[data-side='bottom'][data-state='open'] {
+  animation: sheet-in-bottom 0.4s var(--ease-out-expo) backwards;
+}
+
+.sheet-panel[data-side='bottom'][data-state='closed'] {
+  animation: sheet-out-bottom 0.24s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-panel[data-state='open'] {
+    animation: sheet-fade-in 0.15s linear backwards !important;
+  }
+
+  .sheet-panel[data-state='closed'] {
+    animation: sheet-fade-out 0.12s linear forwards !important;
+  }
+
+  .sheet-panel[data-side='bottom'] {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-progress-bar {
+    animation: none;
+    width: 50%;
+    opacity: 0.6;
+  }
+}
+
 /* A shell surface arriving from its own side. Translate + opacity only, and short enough that it
    never delays the tap: the tab indicator has already moved, and this just tells you which way. The
    pair restarts every time its element goes from `display:none` to shown — which is exactly how the
@@ -1246,6 +1374,25 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* A scene card a browser agent just changed: its ring (the utilities on the element) breathes a soft
+   brand glow while it shows; under reduced motion the ring stays static. A filter, not box-shadow, so the
+   glow never replaces the ring's own box-shadow. */
+@keyframes agent-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  40% {
+    filter: drop-shadow(0 0 10px color-mix(in oklch, var(--color-brand-400) 70%, transparent));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .agent-highlight {
+    animation: agent-glow 1s ease-in-out 2;
   }
 }
 

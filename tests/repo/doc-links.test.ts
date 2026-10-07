@@ -15,6 +15,7 @@ const DOCS = [
   'docs/engine-configuration.md',
   'docs/template-configuration.md',
   'docs/creative-direction.md',
+  'docs/gallery.md',
 ];
 
 // Markdown inline links. Reference-style links and bare URLs are out of scope — the repo does not

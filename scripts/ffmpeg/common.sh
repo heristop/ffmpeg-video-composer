@@ -32,10 +32,19 @@ DIST_DIR="$REPO_ROOT/scripts/ffmpeg/dist"
 # tests/lgpl-filter-audit.test.ts, which cross-checks every filter the engine can emit against this
 # list (or a FILTER_COMPAT rewrite/drop) — extend both together when a preset or manager starts
 # emitting a new filter.
+# `alphamerge` (LGPL) drives the mask features: gradient/texture-filled kinetic text copies a white-on-
+# black drawtext mask into the fill's alpha. The engine gates it via engineCapabilities (no alphamerge
+# → solid text + a warning), so an engine built before this line keeps rendering.
+# `--enable-libfribidi` (LGPL-2.1, built by build-deps.sh / build-deps-ios.sh) adds the drawtext
+# `text_shaping` option: bidi reordering for Arabic/Hebrew copy on top of HarfBuzz shaping. The engine
+# reads this flag (device-filters.generated.ts DEVICE_LIBRARIES) to advertise textShaping on device.
+# Audio polish: `acompressor`/`agate`/`alimiter`/`equalizer` (voice clean-up presets) and `adelay` (sound-
+# effect placement) are LGPL (no `_deps` in configure; af_sidechaincompress.c, af_agate.c, af_alimiter.c,
+# af_biquads.c, af_adelay.c).
 FF_COMMON="--enable-static --disable-shared --enable-pic --enable-version3 --disable-gpl \
  --disable-ffplay --disable-doc --disable-autodetect \
  --enable-zlib \
- --enable-libfreetype --enable-libharfbuzz --enable-libopenh264 --enable-libvpx \
+ --enable-libfreetype --enable-libharfbuzz --enable-libfribidi --enable-libopenh264 --enable-libvpx \
  --enable-avformat --enable-avcodec --enable-avfilter --enable-swscale --enable-swresample \
  --enable-protocol=file,pipe \
  --enable-demuxer=mov,matroska,m4a,mp3,aac,wav,concat,lavfi,image2,apng,gif \
@@ -44,9 +53,11 @@ FF_COMMON="--enable-static --disable-shared --enable-pic --enable-version3 --dis
  --enable-decoder=h264,hevc,aac,mp3,pcm_s16le,mpeg4,png,mjpeg,apng,gif,webp,vp9,libvpx_vp9 \
  --enable-encoder=aac,mpeg4,libopenh264 \
  --enable-filter=scale,crop,pad,setsar,setdar,format,fps,trim,setpts,settb,fade,drawtext,overlay,concat,xfade,loop,tile,\
+alphamerge,\
 drawbox,gblur,noise,hue,vignette,hflip,vflip,rotate,transpose,negate,colorchannelmixer,colorbalance,curves,zoompan,lutyuv,\
 lut3d,colorkey,split,setparams,null,rgbashift,edgedetect,\
 atrim,asetpts,aresample,aformat,amix,afade,acrossfade,afftdn,sidechaincompress,volume,anull,anullsrc,aevalsrc,color,sine,gradients,\
+acompressor,adelay,agate,alimiter,equalizer,\
 atempo,asplit,loudnorm,dynaudnorm,aecho,highpass,lowpass \
  --enable-bsf=h264_mp4toannexb,hevc_mp4toannexb,aac_adtstoasc"
 

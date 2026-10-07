@@ -105,6 +105,8 @@
     "unreadableClip": "Un de tes clips n’a pas pu être lu : il est peut-être abîmé, ou dans un format que ce navigateur ne sait pas ouvrir.",
     "assemblyFailed": "Les scènes n’ont pas pu être assemblées en une seule vidéo.",
     "engineUnavailable": "Le moteur vidéo n’a pas pu être téléchargé. Reconnecte-toi, puis réessaie.",
+    "appUpdated": "LeClap a été mis à jour depuis l’ouverture de cette page. Enregistre ton travail, recharge la page, puis relance le rendu.",
+    "reload": "Recharger",
     "stopped": "Le rendu a été arrêté.",
     "unknown": "Le moteur de rendu a signalé une erreur."
   }

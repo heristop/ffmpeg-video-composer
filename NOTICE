@@ -10,3 +10,10 @@ with the brand.
 The optional on-device mobile engine statically links an FFmpeg built from
 source under LGPL-3.0-or-later (no --enable-gpl). See
 docs/on-device-compilation.md and packages/ffmpeg-engine/README.md.
+
+Third-party assets:
+- Colour emoji images in packages/leclap-creative-kit/src/library/emoji/ are
+  rendered from Twemoji (https://github.com/jdecked/twemoji), Copyright 2019
+  Twitter, Inc and other contributors, Copyright 2024 jdecked and other
+  contributors, licensed under CC-BY 4.0
+  (https://creativecommons.org/licenses/by/4.0/).

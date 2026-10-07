@@ -30,6 +30,10 @@ export interface TemplatePartialRefSection {
   prefix?: string;
   variables?: Record<string, string>;
   sections?: TemplateSection[];
+  /** Total seconds for this use; only the hold of the partial envelope stretches. */
+  duration?: number;
+  /** Snap a partial sync point onto a beat/cue by resizing the section before the ref. */
+  align?: { sync: string; to: number | string };
   [key: string]: unknown;
 }
 
@@ -57,6 +61,14 @@ export interface TemplatePartial {
    * keeps its built-in look without every template having to restate it.
    */
   variables?: Record<string, string>;
+  /** Fixed intro/outro seconds of the partial motion: only the hold between them stretches on a ref `duration`. */
+  envelope?: { in: number; out: number };
+  /** Named moments (seconds from the partial start, inside the IN envelope), exported as `cue:<id>`. */
+  syncPoints?: Array<{ id: string; offset: number }>;
+  /** Rhetorical jobs the partial does (reveal, emphasize, prove, bridge, orient, ask…). */
+  jobs?: string[];
+  useWhen?: string;
+  avoidWhen?: string;
   /** The real sections this partial expands into. */
   sections: TemplateSection[];
 }

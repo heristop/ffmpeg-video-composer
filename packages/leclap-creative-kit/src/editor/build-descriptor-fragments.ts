@@ -13,9 +13,11 @@ import type {
   ImageOverlay,
   MediaChoice,
   SectionFit,
-  AudioEffect,
+  VisualAudio,
+  FootageEdits,
   WatermarkChoice,
 } from './model';
+import { motionBlocksOf, type MotionBlocks } from './motion-passthrough';
 import { pruneEmpty } from './prune';
 
 // Default authoring locale for Translation fields the editor emits (section descriptions,
@@ -41,6 +43,8 @@ function captionDescriptorFrom(caption: EditorCaption | undefined): Section['cap
     boxOpacity: caption.boxOpacity,
     reveal: caption.reveal,
     effect: caption.effect,
+    wrap: caption.wrap,
+    fit: caption.fit,
   }) as Section['caption'];
 }
 
@@ -177,16 +181,18 @@ export function overlayInputsFrom(section: {
   ];
 }
 
-export function visualExtras(section: {
-  transitionAfter?: SectionTransition;
-  caption?: EditorCaption;
-  look?: string;
-  grade?: Grade;
-  letterbox?: Letterbox;
-  motion?: MotionEffect[];
-  chromaKey?: ChromaKey;
-  animations?: AnimationOverlay[];
-}): Partial<Section> {
+export function visualExtras(
+  section: {
+    transitionAfter?: SectionTransition;
+    caption?: EditorCaption;
+    look?: string;
+    grade?: Grade;
+    letterbox?: Letterbox;
+    motion?: MotionEffect[];
+    chromaKey?: ChromaKey;
+    animations?: AnimationOverlay[];
+  } & MotionBlocks
+): Partial<Section> {
   const caption = captionDescriptorFrom(section.caption);
   const animationInputs = animationInputsFrom(section.animations);
 
@@ -199,30 +205,23 @@ export function visualExtras(section: {
     ...(section.motion && section.motion.length > 0 ? { motion: section.motion } : {}),
     ...(section.chromaKey ? { chromaKey: section.chromaKey } : {}),
     ...(animationInputs.length > 0 ? { inputs: animationInputs } : {}),
+    ...motionBlocksOf(section),
   };
 }
 
 // Per-section audio extras — only emitted when present; undefined values are dropped entirely.
-export function sectionAudioOptions(section: {
-  musicVolume?: number;
-  audioFade?: { in?: { duration: number; curve?: string }; out?: { duration: number; curve?: string } };
-  audioEffect?: AudioEffect;
-}): Partial<{
-  musicVolume: number;
-  audioFade: { in?: { duration: number; curve?: string }; out?: { duration: number; curve?: string } };
-  audioEffect: AudioEffect;
-}> {
-  const out: Partial<{
-    musicVolume: number;
-    audioFade: { in?: { duration: number; curve?: string }; out?: { duration: number; curve?: string } };
-    audioEffect: AudioEffect;
-  }> = {};
+export function sectionAudioOptions(section: VisualAudio): Partial<VisualAudio> {
+  const out: Partial<VisualAudio> = {};
 
   if (section.musicVolume !== undefined) out.musicVolume = section.musicVolume;
 
   if (section.audioFade) out.audioFade = section.audioFade;
 
   if (section.audioEffect) out.audioEffect = section.audioEffect;
+
+  if (section.voice) out.voice = section.voice;
+
+  if (section.audioAutomation) out.audioAutomation = section.audioAutomation;
 
   return out;
 }
@@ -236,13 +235,19 @@ export function sectionPlaybackOptions(section: { speed?: number }): Partial<{ s
 }
 
 // The section's source-footage fit → the descriptor aspect flags SegmentBuilder lowers to
-// scale/crop (cover) or scale/pad (letterbox). The default cover fit emits nothing.
+// scale/crop (cover) or scale/pad (letterbox), or `fit: 'blur'` (no legacy flag spells it). The
+// default cover fit emits nothing; the footage pass-through (fill/focus/clip/ramp/freeze) rides along.
 export function sectionFitOptions(section: {
   fit?: SectionFit;
-}): Partial<{ forceAspectRatio: boolean; forceOriginalAspectRatio: boolean }> {
-  if (section.fit === 'letterbox') return { forceOriginalAspectRatio: true };
+  footage?: FootageEdits;
+}): Partial<{ forceAspectRatio: boolean; forceOriginalAspectRatio: boolean; fit: 'blur' }> & FootageEdits {
+  const footage: FootageEdits = pruneEmpty({ ...section.footage });
 
-  if (section.fit === 'off') return { forceAspectRatio: false };
+  if (section.fit === 'letterbox') return { forceOriginalAspectRatio: true, ...footage };
 
-  return {};
+  if (section.fit === 'off') return { forceAspectRatio: false, ...footage };
+
+  if (section.fit === 'blur') return { fit: 'blur', ...footage };
+
+  return footage;
 }

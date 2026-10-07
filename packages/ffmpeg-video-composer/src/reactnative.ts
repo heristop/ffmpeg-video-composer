@@ -224,12 +224,23 @@ export { default as FFmpegDeviceAdapter, type NativeEngine } from './platform/ff
 export { default as FilesystemExpoAdapter } from './platform/filesystem/FilesystemExpoAdapter';
 export type { ProjectConfig, TemplateDescriptor, Section, Filter } from './core/types';
 export { isFontRef, type FontRef, type FontInput } from './core/fonts';
+export { themeCatalog, resolveTheme, type ThemeCatalog, type ThemeSpec } from './core/theme';
 
 export { EffectReferenceSchema, JsonValueSchema } from './schemas/effect-reference.schema';
 export type { EffectReference, JsonValue } from './schemas/effect-reference.schema';
 export { EffectSectionSchema } from './schemas/section.schemas';
 export type { EffectSection } from './schemas/section.schemas';
 export { resolveTemplateEffects } from './core/resolve-template-effects';
+export {
+  platformCatalog,
+  resolvePlatform,
+  type DeliveryPlatform,
+  type PlatformCatalogEntry,
+  type PlatformId,
+  type PlatformName,
+  type ResolvedPlatform,
+  type SafeZone,
+} from './core/platforms';
 export type {
   EffectRenderResult,
   EffectRenderer,

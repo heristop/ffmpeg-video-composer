@@ -13,6 +13,9 @@ import { resolveMusicFade } from './utils/music-fade';
 import { finalizeLeg, type PendingLeg } from './utils/music-leg';
 import { formatMusicName, removeExtension } from './utils/music-name';
 import { musicAssetUrl } from '@/core/asset-source';
+import { loudnessTarget, musicMixGraph, normalizeSuffix, sfxOnlyGraph } from './utils/music-mix';
+import { normalizeWithTruePeakGuard } from './utils/true-peak-guard';
+import { descriptorHasSfx, prepareSfxStage, type SfxStage } from './utils/sfx-stage';
 
 type AppendMusicOptions = {
   videoInputArgs: string;
@@ -22,7 +25,10 @@ type AppendMusicOptions = {
   reduceNoiseConfig: string;
   sampleRate: number | undefined;
   hasSegmentAudio: boolean;
+  sfx: SfxStage | null;
 };
+
+type SfxBed = { hasSegmentAudio: boolean; ceiling?: number };
 
 @injectable()
 class MusicComposer {
@@ -279,92 +285,66 @@ class MusicComposer {
     this.project.buildInfos.currentLength = resolved.nextCurrentLength;
   }
 
-  // Comma-prefixed normalize filter string inserted at the end of the chain that produces
-  // [final] (a labeled output ends an ffmpeg chain, so the filter must come BEFORE the label).
-  private buildNormalizeSuffix(): string {
-    const filters: Record<string, string> = {
-      loudnorm: ',loudnorm=I=-16:TP=-1.5:LRA=11',
-      dynaudnorm: ',dynaudnorm=f=150:g=15',
-    };
-    const n = this.template.descriptor.global?.audio?.normalize ?? '';
+  // The loudnorm guard's true-peak probe of the encoded output, where the adapter can measure (Node).
+  private truePeakProbe(file: string): (() => Promise<number | null>) | undefined {
+    const adapter = this.ffmpegAdapter;
+    const measure = adapter.measureTruePeak?.bind(adapter);
 
-    return filters[n] ?? '';
+    return measure ? () => measure(file) : undefined;
   }
 
-  // Ducking mix: sidechain-compresses music under voice when ducking is enabled, then amix.
-  private buildDuckingMix(musicLabel: string, voiceLabel: string, normalizeSuffix: string): string {
-    const duckingConfig = this.template.descriptor.global?.audio?.ducking;
-    const isDucking = duckingConfig === true || typeof duckingConfig === 'object';
+  // Runs one audio pass; with loudnorm, through the true-peak guard (utils/true-peak-guard.ts), whose
+  // report is kept for the render manifest and the output QC.
+  private async runNormalizedPass(finalVideo: string, run: (ceiling?: number) => Promise<void>): Promise<void> {
+    if (this.template.descriptor.global?.audio?.normalize !== 'loudnorm') {
+      await run();
 
-    if (!isDucking) {
-      return `[${voiceLabel}][${musicLabel}]amix=inputs=2:duration=first${normalizeSuffix}[final]`;
+      return;
     }
 
-    const cfg = typeof duckingConfig === 'object' ? duckingConfig : {};
-    const sc = `sidechaincompress=threshold=${cfg.threshold ?? 0.05}:ratio=${cfg.ratio ?? 8}:attack=${cfg.attack ?? 20}:release=${cfg.release ?? 400}`;
+    const target = loudnessTarget(this.template.descriptor.global).truePeak;
 
-    return (
-      `[${voiceLabel}]asplit=2[vout][vkey]; ` +
-      `[${musicLabel}][vkey]${sc}[ducked]; ` +
-      `[vout][ducked]amix=inputs=2:duration=first:normalize=0${normalizeSuffix}[final]`
+    this.project.loudness = await normalizeWithTruePeakGuard({ run, measure: this.truePeakProbe(finalVideo), target });
+    const { ceiling, measured, retries } = this.project.loudness;
+    this.logger.info(
+      `[Music][Normalize] loudnorm TP=${ceiling} (measured ${measured ?? '?'} dBTP, ${retries} retries)`
     );
   }
 
-  private buildFilterComplex(
-    segments: Section[],
-    audioVolumeLevel: number,
-    reduceNoiseConfig: string,
-    channelConfig: string,
-    hasSegmentAudio: boolean
-  ): string {
-    const hasMultipleSegments = segments.length > 1;
-    const normalizeSuffix = this.buildNormalizeSuffix();
-
-    // Video-only upload: the concat output has no audio stream, so referencing
-    // `[0:a]` would abort ("Stream specifier matches no streams"). Route the
-    // music straight to [final] instead of amix-ing it with absent segment audio.
-    if (!hasSegmentAudio) {
-      if (hasMultipleSegments) {
-        return `${this.project.buildInfos.musicFilters.join(' ')} [lastcrossed]${channelConfig}${normalizeSuffix}[final]`;
-      }
-
-      return `[1:a]${channelConfig}${normalizeSuffix}[final]`;
-    }
-
-    let filterComplex = `[0:a]${channelConfig},volume=${audioVolumeLevel},${reduceNoiseConfig}[audio_formatted]; `;
-
-    if (hasMultipleSegments) {
-      filterComplex += `${this.project.buildInfos.musicFilters.join(' ')} `;
-      filterComplex += `[lastcrossed]${channelConfig}[music_formatted]; `;
-
-      return `${filterComplex}${this.buildDuckingMix('music_formatted', 'audio_formatted', normalizeSuffix)}`;
-    }
-
-    filterComplex += `[1:a]${channelConfig}[music_formatted]; `;
-
-    return `${filterComplex}${this.buildDuckingMix('music_formatted', 'audio_formatted', normalizeSuffix)}`;
-  }
-
-  private buildAppendMusicCommand(opts: AppendMusicOptions): string {
-    const { segments, finalVideo, audioVolumeLevel, reduceNoiseConfig, sampleRate, hasSegmentAudio } = opts;
-    const channelConfig = `aformat=sample_fmts=fltp:sample_rates=${sampleRate}:channel_layouts=stereo`;
-    const filterComplex = this.buildFilterComplex(
-      segments,
-      audioVolumeLevel,
-      reduceNoiseConfig,
+  private buildAppendMusicCommand(opts: AppendMusicOptions, ceiling?: number): string {
+    const channelConfig = `aformat=sample_fmts=fltp:sample_rates=${opts.sampleRate}:channel_layouts=stereo`;
+    const filterComplex = musicMixGraph({
+      global: this.template.descriptor.global,
+      musicFilters: this.project.buildInfos.musicFilters,
+      multipleSegments: opts.segments.length > 1,
+      audioVolumeLevel: opts.audioVolumeLevel,
+      reduceNoiseConfig: opts.reduceNoiseConfig,
       channelConfig,
-      hasSegmentAudio
-    );
+      hasSegmentAudio: opts.hasSegmentAudio,
+      ceiling,
+      // Inputs: 0 the video, 1 the music, then one per distinct sound effect.
+      sfx: opts.sfx?.graph(2, channelConfig),
+    });
 
-    let command = ` -y ${opts.videoInputArgs} -i ${this.project.buildInfos.musicPath} `;
+    let command = ` -y ${opts.videoInputArgs} -i ${this.project.buildInfos.musicPath}${opts.sfx?.inputArgs ?? ''} `;
     command += ` -filter_complex "${filterComplex}" `;
     // +faststart so the music-mixed final output previews in a browser <video> (moov to the front),
     // matching the concat/single-file paths. -shortest bounds the muxed output to the (finite, stream-
     // copied) video stream — without it a longer music tail (e.g. after loopMusic overshoots, or a
     // music-only graph with no video-derived audio length) would extend the output past the video.
-    command += ` -map 0:v -map "[final]" -c:v copy -c:a aac -ac 2 -movflags +faststart -shortest ${finalVideo} `;
+    command += ` -map 0:v -map "[final]" -c:v copy -c:a aac -ac 2 -movflags +faststart -shortest ${opts.finalVideo} `;
 
     return command;
+  }
+
+  private async executeAudioPass(command: string, label: string, failure: string): Promise<void> {
+    this.logger.debug(`[${label}][Command] ffmpeg ${command}`);
+    const result = await this.ffmpegAdapter.execute(command);
+    this.logger.info(`[${label}] ffmpeg process exited with rc ${result.rc}`);
+
+    if (result.rc === 1) {
+      throw new Error(failure);
+    }
   }
 
   /**
@@ -375,10 +355,6 @@ class MusicComposer {
     // space-split by parseCommand, so a path with raw whitespace would silently mis-tokenize.
     assertSafeArgToken(this.project.buildInfos.musicPath, 'music path');
     const source: VideoSource = videoSource ?? { kind: 'file', path: finalVideo };
-    const reduceNoiseConfig = 'afftdn=nr=20:nf=-20';
-
-    const audioVolumeLevel = this.template.descriptor.global?.audio?.sourceVolume ?? 1;
-    const sampleRate = this.project.config.audioConfig?.sampleRate;
 
     const resolved = await resolveVideoInput(source, this.filesystemAdapter, 'tmp_video');
     const { videoInputArgs, probeTarget, tempToClean } = resolved;
@@ -387,23 +363,20 @@ class MusicComposer {
     // missing `[0:a]`. For concat, probeTarget is the first segment — uniform streams match the whole.
     const hasSegmentAudio = (await this.ffmpegAdapter.getInfos(probeTarget)).audioCodec !== null;
 
-    const command = this.buildAppendMusicCommand({
+    const options: AppendMusicOptions = {
       videoInputArgs,
       segments,
       finalVideo,
-      audioVolumeLevel,
-      reduceNoiseConfig,
-      sampleRate,
+      audioVolumeLevel: this.template.descriptor.global?.audio?.sourceVolume ?? 1,
+      reduceNoiseConfig: 'afftdn=nr=20:nf=-20',
+      sampleRate: this.project.config.audioConfig?.sampleRate,
       hasSegmentAudio,
-    });
+      sfx: await this.prepareSfx(),
+    };
 
-    this.logger.debug(`[Music][Command] ffmpeg ${command}`);
-    const result = await this.ffmpegAdapter.execute(command);
-    this.logger.info(`[Music] ffmpeg process exited with rc ${result.rc}`);
-
-    if (result.rc === 1) {
-      throw new Error('Error on music add');
-    }
+    await this.runNormalizedPass(finalVideo, (ceiling) =>
+      this.executeAudioPass(this.buildAppendMusicCommand(options, ceiling), 'Music', 'Error on music add')
+    );
 
     if (tempToClean) {
       await this.filesystemAdapter.unlink(tempToClean);
@@ -413,7 +386,38 @@ class MusicComposer {
   // True when the template requests loudnorm/dynaudnorm — lets the director decide whether a
   // normalize pass will run (and thus whether the concat can fold into it) without duplicating the
   // descriptor logic.
-  hasNormalization = (): boolean => this.buildNormalizeSuffix() !== '';
+  hasNormalization = (): boolean => normalizeSuffix(this.template.descriptor.global) !== '';
+
+  // True when a render without music still needs its own audio pass: normalisation or sound effects.
+  hasStandaloneAudioPass = (): boolean => this.hasNormalization() || descriptorHasSfx(this.template.descriptor);
+
+  // The planned sound effects with their files resolved (utils/sfx-stage.ts), null when there are none.
+  private prepareSfx(): Promise<SfxStage | null> {
+    return prepareSfxStage({
+      descriptor: this.template.descriptor,
+      buildInfos: this.project.buildInfos,
+      config: this.project.config,
+      filesystem: this.filesystemAdapter,
+      logger: this.logger,
+    });
+  }
+
+  // The no-music pass with sound effects: the clip sound as the bed, the effects over it, then the
+  // normalize filter (when requested), as one -filter_complex.
+  private sfxOnlyCommand(videoInputArgs: string, finalVideo: string, sfx: SfxStage, bed: SfxBed): string {
+    const channelConfig = `aformat=sample_fmts=fltp:sample_rates=${sfx.sampleRate}:channel_layouts=stereo`;
+    const graph = sfxOnlyGraph(this.template.descriptor.global, sfx.graph(1, channelConfig), {
+      channelConfig,
+      hasSegmentAudio: bed.hasSegmentAudio,
+      total: sfx.total,
+      sampleRate: sfx.sampleRate,
+      ceiling: bed.ceiling,
+    });
+
+    const output = ` -map 0:v -map "[final]" -c:v copy -c:a aac -ac 2 -movflags +faststart ${finalVideo} `;
+
+    return ` -y ${videoInputArgs}${sfx.inputArgs} -filter_complex "${graph}" ${output}`;
+  }
 
   /**
    * Apply audio normalization to a final video when music is disabled. Called after assembly when
@@ -422,28 +426,33 @@ class MusicComposer {
    * Runs a single-pass normalize filter (loudnorm or dynaudnorm) via `-af`, copies the video stream,
    * and writes finalVideo. A concat `videoSource` lets it consume the segment list directly (folding
    * the standalone concat into this pass); the default file source preserves the move-in-place flow.
+   * loudnorm runs through the true-peak guard, which may repeat the pass with a lower ceiling.
    */
   normalizeAudio = async (finalVideo: string, videoSource?: VideoSource): Promise<void> => {
-    const normalizeSuffix = this.buildNormalizeSuffix();
-
-    if (!normalizeSuffix) {
+    if (!this.hasStandaloneAudioPass()) {
       return;
     }
 
-    // Strip the leading comma so it can be used as a standalone -af value.
-    const afFilter = normalizeSuffix.slice(1);
     const source = videoSource ?? { kind: 'file' as const, path: finalVideo };
-    const { videoInputArgs, tempToClean } = await resolveVideoInput(source, this.filesystemAdapter, 'tmp_normalize');
+    const input = await resolveVideoInput(source, this.filesystemAdapter, 'tmp_normalize');
+    const { videoInputArgs, tempToClean } = input;
+    const sfx = await this.prepareSfx();
+    // Only the sound-effect mix needs to know whether the joined video carries audio (else a silent bed).
+    const hasSegmentAudio = !sfx || (await this.ffmpegAdapter.getInfos(input.probeTarget)).audioCodec !== null;
 
-    const command = ` -y ${videoInputArgs} -af "${afFilter}" -c:v copy -movflags +faststart ${finalVideo} `;
+    await this.runNormalizedPass(finalVideo, (ceiling) => {
+      if (sfx) {
+        const command = this.sfxOnlyCommand(videoInputArgs, finalVideo, sfx, { hasSegmentAudio, ceiling });
 
-    this.logger.debug(`[Music][Normalize] ffmpeg ${command}`);
-    const result = await this.ffmpegAdapter.execute(command);
-    this.logger.info(`[Music][Normalize] ffmpeg process exited with rc ${result.rc}`);
+        return this.executeAudioPass(command, 'Music][Sfx', 'Error on sound effects mix');
+      }
 
-    if (result.rc === 1) {
-      throw new Error('Error on audio normalization');
-    }
+      // Strip the leading comma so it can be used as a standalone -af value.
+      const afFilter = normalizeSuffix(this.template.descriptor.global, ceiling).slice(1);
+      const command = ` -y ${videoInputArgs} -af "${afFilter}" -c:v copy -movflags +faststart ${finalVideo} `;
+
+      return this.executeAudioPass(command, 'Music][Normalize', 'Error on audio normalization');
+    });
 
     if (tempToClean) {
       await this.filesystemAdapter.unlink(tempToClean);

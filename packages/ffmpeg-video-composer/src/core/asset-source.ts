@@ -23,6 +23,10 @@ export function musicAssetUrl(file: string, env?: Record<string, string | undefi
   return `${assetBaseUrl(env)}/musics/${file}`;
 }
 
+export function sfxAssetUrl(file: string, env?: Record<string, string | undefined>): string {
+  return `${assetBaseUrl(env)}/sfx/${file}`;
+}
+
 // Resolve a catalog-relative reference (e.g. `videos/outro.mp4`, `pictures/logo.png`,
 // `animations/light_leak.apng`) to a remote URL under the public library. Descriptors carry the
 // subdir in the path already, so we just prefix the base (and trim any leading slash so it doesn't

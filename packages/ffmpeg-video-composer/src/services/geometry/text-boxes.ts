@@ -51,7 +51,18 @@ export interface LoweredSection {
   layers: DrawLayer[];
 }
 
-type TemplateGlobal = AppearanceGlobal & { variables?: TextVariables; overlays?: unknown };
+type TemplateGlobal = AppearanceGlobal & { variables?: TextVariables; overlays?: unknown; platform?: string };
+
+// The context SegmentBuilder hands the sugar compilers, as far as a static model knows it.
+function sugarContextFor(section: LooseSection, duration: number, canvas: Canvas, global: TemplateGlobal | undefined) {
+  return {
+    duration,
+    scale: `${canvas.width}:${canvas.height}`,
+    fps: DefaultConfig.FPS,
+    isVideo: section.type === 'project_video' || section.type === 'video' || section.type === 'effect',
+    platform: global?.platform,
+  };
+}
 
 // `origins[i]` is where the author edits expanded section `i` (see authoredPaths in ./index.ts).
 export function lowerTemplate(template: TemplateDescriptor, canvas: Canvas, origins?: string[]): LoweredSection[] {
@@ -73,12 +84,7 @@ export function lowerTemplate(template: TemplateDescriptor, canvas: Canvas, orig
     const duration = Math.max(declared ?? ASSUMED_DURATION_SEC, 0);
     // Sticky: once one window is a guess, every later start time is built on it.
     timingAssumed ||= declared === null;
-    const ctx = {
-      duration,
-      scale: `${canvas.width}:${canvas.height}`,
-      fps: DefaultConfig.FPS,
-      isVideo: section.type === 'project_video' || section.type === 'video' || section.type === 'effect',
-    };
+    const ctx = sugarContextFor(section, duration, canvas, global);
     // Typed as required, but an unvalidated descriptor may omit it.
     const name: unknown = section.name;
     const label = `Section "${typeof name === 'string' ? name : `sections[${index}]`}"`;

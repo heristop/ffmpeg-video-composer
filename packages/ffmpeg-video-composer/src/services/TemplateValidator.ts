@@ -1,84 +1,46 @@
-import type { z } from 'zod';
-import {
-  TemplateDescriptorSchema,
-  SectionSchema,
-  type TemplateDescriptor,
-  type Section,
-} from '../schemas/template.schemas';
-import {
-  validateTransitions,
-  validateMotion,
-  validateGlobalAnimations,
-  validateGlobalWatermark,
-  validateFonts,
-  type ValidationError,
-} from './template-validation-rules';
-import { expandPartialsSafe } from '@/core/partials';
+import type { TemplateDescriptor } from '../schemas/template.schemas';
+import { referenceFinding } from './validation/reference-finding';
+import { BaseTemplateValidator, type ValidationError } from './BaseTemplateValidator';
+import { accentAdvisories, findAccentOveruse } from '@/core/theme/accent';
+import { findPaletteDrift, paletteAdvisories } from '@/core/theme/palette';
 import type { GeometryWarning, FontLoader } from './geometry';
+import { collectMotionWarnings, type MotionWarning } from './motion-lint';
+import { capabilityFindings } from './capability-validation';
+import type { CapabilityReport } from '@/core/capabilities';
+import { collectScriptWarnings, type ScriptLintCapabilities } from './script-lint';
+import { emojiAdvisories } from './emoji-advisories';
+import { subtitleAdvisories } from './subtitles-advisories';
+import { footageAdvisories } from './footage-advisories';
+import { beatGridAdvisories } from './beats-advisory';
+import { nondeterminismAdvisories } from './determinism-advisories';
+import { adviseEachFormat, adviseEachFormatSync, expandedForFormats } from './validation/format-validation';
+import { formatAdvisories } from '@/core/formats/advisories';
+import { takeAdvisories } from './take-validation';
+import { expandPartialsSafe } from '@/core/partials';
 
-export type { ValidationError } from './template-validation-rules';
+export type { ValidationError, ValidationResult } from './BaseTemplateValidator';
+export type { MotionWarning } from './motion-lint';
+export type { ScriptLintCapabilities } from './script-lint';
 export type { GeometryWarning, FontLoader } from './geometry';
 
-export interface ValidationResult {
-  success: boolean;
-  data?: TemplateDescriptor | Section;
-  errors?: ValidationError[];
+// Footage advisories read the expanded sections, like the pacing lint, so paths index them.
+function takeWarnings(template: unknown): MotionWarning[] {
+  const expanded = expandPartialsSafe(template);
+
+  return expanded.ok && expanded.data ? takeAdvisories(expanded.data) : [];
 }
 
-export class TemplateValidator {
-  private formatZodError(error: z.ZodError): ValidationError[] {
-    try {
-      // Handle different ZodError structures
-      let errorArray: Array<{ path?: unknown; message?: unknown; code?: unknown }> = [];
+// Expansion advisories (partial_compressed: a ref squeezed under its partial's fixed intro/outro). Partials
+// expand before formats resolve, so these are the same for every format: reported once, at authored paths.
+function partialWarnings(template: unknown): MotionWarning[] {
+  const expanded = expandPartialsSafe(template);
 
-      const hasIssues = Array.isArray(error.issues);
+  return expanded.ok ? (expanded.warnings ?? []).map((w) => ({ ...w, severity: 'warn' as const })) : [];
+}
 
-      if (!hasIssues && !error.message) {
-        return [
-          {
-            path: 'zod_error_structure',
-            message: 'Invalid ZodError structure',
-            code: 'invalid_zod_error',
-          },
-        ];
-      }
-
-      if (hasIssues) {
-        errorArray = error.issues;
-      }
-
-      if (!hasIssues && error.message) {
-        // Try to parse the message as JSON (some versions of Zod store errors this way)
-        try {
-          errorArray = JSON.parse(error.message);
-        } catch {
-          // If parsing fails, create a single error from the message
-          errorArray = [
-            {
-              path: [],
-              message: error.message,
-              code: 'zod_error',
-            },
-          ];
-        }
-      }
-
-      return errorArray.map((err) => ({
-        path: Array.isArray(err.path) ? err.path.join('.') : 'unknown',
-        message: typeof err.message === 'string' ? err.message : 'Unknown validation error',
-        code: typeof err.code === 'string' ? err.code : 'unknown',
-      }));
-    } catch (mapError) {
-      return [
-        {
-          path: 'format_error',
-          message: mapError instanceof Error ? mapError.message : 'Error formatting Zod errors',
-          code: 'format_error',
-        },
-      ];
-    }
-  }
-
+// The full validator: everything BaseTemplateValidator checks, plus the advisory passes. Advisories
+// never enter `errors` nor flip `success` — a template that renders badly still renders.
+export class TemplateValidator extends BaseTemplateValidator {
   private validateVariableReferences(template: TemplateDescriptor): ValidationError[] {
     const errors: ValidationError[] = [];
 
@@ -98,11 +60,13 @@ export class TemplateValidator {
           const variable = match[1];
 
           if (!definedVariables.has(variable)) {
-            errors.push({
-              path,
-              message: `Undefined variable reference: ${variable}`,
-              code: 'undefined_variable',
-            });
+            errors.push(
+              referenceFinding(path, `Undefined variable reference: ${variable}`, 'undefined_variable', {
+                name: variable,
+                known: [...definedVariables],
+                fix: `define "${variable}" in global.variables`,
+              })
+            );
           }
         }
 
@@ -130,214 +94,14 @@ export class TemplateValidator {
     return errors;
   }
 
-  private validateSectionReferences(template: TemplateDescriptor): ValidationError[] {
-    const errors: ValidationError[] = [];
-
-    if (!template.sections || !Array.isArray(template.sections)) {
-      return errors;
-    }
-
-    const sectionNames = new Set(template.sections.map((section) => section.name));
-
-    for (let index = 0; index < template.sections.length; index++) {
-      const section = template.sections[index];
-
-      if (section.type !== 'effect' && section.options?.useVideoSection) {
-        const referencedSection = section.options.useVideoSection;
-
-        if (!sectionNames.has(referencedSection)) {
-          errors.push({
-            path: `sections[${index}].options.useVideoSection`,
-            message: `Referenced section "${referencedSection}" does not exist`,
-            code: 'undefined_section_reference',
-          });
-        }
-      }
-    }
-
-    return errors;
-  }
-
-  validateTemplate(templateData: unknown): ValidationResult {
-    // Expand `{ type: "partial", ref }` sections to real sections first, so the schema + reference
-    // checks (and the engine downstream) only ever see real sections.
-    const expansion = expandPartialsSafe(templateData);
-
-    if (!expansion.ok) {
-      return { success: false, errors: [expansion.error] };
-    }
-
-    return this.validateParsed(expansion.data);
-  }
-
-  private validateParsed(templateData: unknown): ValidationResult {
-    try {
-      let result;
-
-      try {
-        result = TemplateDescriptorSchema.safeParse(templateData);
-      } catch (zodError) {
-        return {
-          success: false,
-          errors: [
-            {
-              path: 'zod_parse',
-              message: zodError instanceof Error ? zodError.message : 'Zod parsing error',
-              code: 'zod_error',
-            },
-          ],
-        };
-      }
-
-      if (!result.success) {
-        return {
-          success: false,
-          errors: this.formatZodError(result.error),
-        };
-      }
-
-      const template = result.data;
-
-      try {
-        // Only validate section references as hard errors
-        // Variable references are warnings since templates often use runtime variables
-        const allErrors = this.collectDescriptorErrors(template);
-
-        if (allErrors.length > 0) {
-          return {
-            success: false,
-            data: template,
-            errors: allErrors,
-          };
-        }
-
-        return {
-          success: true,
-          data: template,
-        };
-      } catch (error) {
-        return {
-          success: false,
-          errors: [
-            {
-              path: 'custom_validation',
-              message: error instanceof Error ? error.message : 'Error in custom validation',
-              code: 'custom_validation_error',
-            },
-          ],
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        errors: [
-          {
-            path: 'root',
-            message: error instanceof Error ? error.message : 'Unknown validation error',
-            code: 'validation_error',
-          },
-        ],
-      };
-    }
-  }
-
-  // Runs every descriptor-level rule (beyond the zod schema itself) and merges their errors. Extracted
-  // out of validateParsed to keep that function under the statement-count lint budget.
-  private collectDescriptorErrors(template: TemplateDescriptor): ValidationError[] {
-    return [
-      ...this.validateSectionReferences(template),
-      ...validateTransitions(template),
-      ...validateMotion(template),
-      ...validateGlobalAnimations(template),
-      ...validateGlobalWatermark(template),
-      ...validateFonts(template),
-    ];
-  }
-
-  validateSection(sectionData: unknown): ValidationResult {
-    try {
-      const result = SectionSchema.safeParse(sectionData);
-
-      if (!result.success) {
-        return {
-          success: false,
-          errors: this.formatZodError(result.error),
-        };
-      }
-
-      return {
-        success: true,
-        data: result.data,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        errors: [
-          {
-            path: 'root',
-            message: error instanceof Error ? error.message : 'Unknown validation error',
-            code: 'validation_error',
-          },
-        ],
-      };
-    }
-  }
-
-  async validateTemplateFromFile(filePath: string): Promise<ValidationResult> {
-    if (process.env.PLATFORM === 'browser') {
-      return {
-        success: false,
-        errors: [
-          {
-            path: 'file',
-            message: 'File system operations are only supported in Node.js environment',
-            code: 'unsupported_environment',
-          },
-        ],
-      };
-    }
-
-    try {
-      const fs = await import('node:fs');
-      const templateContent = fs.readFileSync(filePath, 'utf-8');
-      const templateData = JSON.parse(templateContent);
-
-      return this.validateTemplate(templateData);
-    } catch (error) {
-      return {
-        success: false,
-        errors: [
-          {
-            path: 'file',
-            message: error instanceof Error ? error.message : 'Failed to read or parse template file',
-            code: 'file_error',
-          },
-        ],
-      };
-    }
-  }
-
-  validateTemplateFromJSON(jsonString: string): ValidationResult {
-    try {
-      const templateData = JSON.parse(jsonString);
-
-      return this.validateTemplate(templateData);
-    } catch {
-      return {
-        success: false,
-        errors: [
-          {
-            path: 'json',
-            message: 'Invalid JSON format',
-            code: 'json_parse_error',
-          },
-        ],
-      };
-    }
-  }
-
   getVariableWarnings(template: TemplateDescriptor): ValidationError[] {
     return this.validateVariableReferences(template);
+  }
+
+  // Advisory: sections that spread the theme accent over too many elements (core/theme/accent.ts),
+  // and colours/fonts that drift off the theme (core/theme/palette.ts).
+  getThemeWarnings(template: TemplateDescriptor): ValidationError[] {
+    return [...findAccentOveruse(template), ...findPaletteDrift(template)];
   }
 
   // Advisory, exactly like getVariableWarnings: geometry findings never enter `errors` and never
@@ -349,20 +113,42 @@ export class TemplateValidator {
   async getGeometryWarnings(template: TemplateDescriptor, loadFont?: FontLoader): Promise<GeometryWarning[]> {
     const { collectGeometryWarnings } = await import('./geometry');
 
-    return collectGeometryWarnings(template, loadFont);
+    // Per format when the template declares several (each its own frame, platform and safe zones).
+    return adviseEachFormat(template, (resolved) => collectGeometryWarnings(resolved as TemplateDescriptor, loadFont));
   }
 
-  getValidationSummary(result: ValidationResult): string {
-    if (result.success) {
-      return 'Template validation passed';
-    }
+  // Advisory, like getGeometryWarnings: pacing findings read off the motion timeline (ease monotony,
+  // front-loaded sections, dead air, flat tempo…) plus assertions that can't be measured render-free.
+  // Synchronous and render-free; partials are expanded first, so paths index the expanded sections.
+  // The theme advisories (one accent per idea, palette drift), the emoji advisories (missing bundled image,
+  // per-section cap, strip mode), the subtitle advisories (split, shrunk, past the end), the footage
+  // advisories (extreme ramp speeds, ignored focus, blur fit under overlays, a clip range shorter than the
+  // section), the low-confidence beat grid advisory and the take advisories (take-validation.ts) ride along, so every surface
+  // that shows pacing feedback shows them. Per format when the template declares several, plus the
+  // whole-template format advisories (format_crop_only, format_story_diverges: core/formats/advisories.ts).
+  // Script/mask advisories ride along too (services/script-lint.ts); pass the target build's
+  // capabilities to also hear what it can't draw (rtl_unshaped, mask_unavailable).
+  getMotionWarnings(template: unknown, capabilities?: ScriptLintCapabilities): MotionWarning[] {
+    const perFormat = adviseEachFormatSync(template, (resolved) => [
+      ...collectMotionWarnings(resolved),
+      ...accentAdvisories(resolved),
+      ...paletteAdvisories(resolved),
+      ...emojiAdvisories(resolved),
+      ...subtitleAdvisories(resolved),
+      ...footageAdvisories(resolved),
+      ...beatGridAdvisories(resolved),
+      ...nondeterminismAdvisories(resolved),
+      ...takeWarnings(resolved),
+      ...collectScriptWarnings(resolved, capabilities),
+    ]);
 
-    const errorCount = result.errors?.length ?? 0;
-    const errorSummary = result.errors
-      ?.slice(0, 3)
-      .map((err) => `${err.path}: ${err.message}`)
-      .join('; ');
+    return [...partialWarnings(template), ...perFormat, ...formatAdvisories(expandedForFormats(template))];
+  }
 
-    return `Template validation failed with ${errorCount} error(s): ${errorSummary}${errorCount > 3 ? '...' : ''}`;
+  // Advisory: `feature_unavailable` for every feature the template uses that the probed FFmpeg cannot
+  // render (drawtext, xfade, lut3d, loudnorm…). Pure; without a capability report there is nothing to
+  // compare against, so it returns nothing. Node hosts pass `probeCapabilities()`.
+  getCapabilityWarnings(template: unknown, capabilities?: CapabilityReport | null): ValidationError[] {
+    return capabilities ? capabilityFindings(template, capabilities) : [];
   }
 }

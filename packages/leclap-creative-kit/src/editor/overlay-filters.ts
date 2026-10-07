@@ -114,7 +114,9 @@ function accentEnable(reveal: TextOverlay['reveal']): string | undefined {
 
   const delay = 'delay' in obj && obj.delay !== undefined ? obj.delay : REVEAL_DEFAULT_DELAY;
 
-  if (delay <= 0) return undefined;
+  // A time reference ("title.end + 0.2") only resolves inside the engine; the bar then shows from the
+  // section start rather than guessing its number here.
+  if (typeof delay === 'string' || delay <= 0) return undefined;
 
   return `'gte(t,${Number(delay.toFixed(4))})'`;
 }

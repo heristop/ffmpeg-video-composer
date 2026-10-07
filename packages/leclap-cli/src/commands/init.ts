@@ -7,6 +7,7 @@ import { starterMeta } from '../starter-direction.js';
 import { success, fail, step, hint } from '../ui.js';
 import { wordmark } from '../theme.js';
 import { confirm } from '../prompt.js';
+import { runStudioInit } from './studio-init.js';
 
 export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun';
 
@@ -355,8 +356,11 @@ export const init = defineCommand({
       description: 'Authoring brief stored in template metadata (1..4000 characters; does not change render settings)',
     },
     yes: { type: 'boolean', alias: 'y', description: 'Accept all defaults (no prompts)' },
+    studio: { type: 'string', description: 'Scaffold a production folder (brief, shot list, gates) instead' },
   },
   async run({ args }) {
+    if (args.studio) return runStudioInit(args.studio);
+
     const name = args.name || 'my-leclap-video';
     const dir = path.resolve(process.cwd(), name);
 

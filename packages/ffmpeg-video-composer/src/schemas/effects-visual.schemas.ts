@@ -27,7 +27,43 @@ export const LOOK_PRESETS = [
   'soft-vignette',
 ] as const;
 
+/** The look presets backed by a generated `.cube` (lut3d): the only ones `strength` can blend. */
+export const LUT_LOOK_PRESETS = ['teal-orange', 'warm-film', 'mono-film', 'noir-film', 'vivid-pop'] as const;
+
 // ── grade / look ───────────────────────────────────────────────────────────────
+
+const LutStrengthSchema = z
+  .number()
+  .min(0)
+  .max(1)
+  .describe('How much of the LUT to apply, 0..1 (default 1): 0 = untouched footage, 1 = the full grade.');
+
+export const LookSchema = z
+  .union([
+    z.enum(LOOK_PRESETS),
+    z
+      .object({
+        preset: z.enum(LOOK_PRESETS).describe('Look preset name (same values as the string form).'),
+        strength: LutStrengthSchema.optional().describe(
+          `Grade strength 0..1 (default 1), blended into the generated LUT; only for the LUT looks (${LUT_LOOK_PRESETS.join(', ')}).`
+        ),
+      })
+      .strict(),
+  ])
+  .describe(
+    'Named colour-grade preset: a preset string, or { preset, strength } to dial a LUT look down (e.g. { "preset": "teal-orange", "strength": 0.6 }).'
+  );
+
+export const GradeLutSchema = z
+  .object({
+    url: z
+      .string()
+      .min(1)
+      .describe('URL or assets-relative path of a 3D .cube LUT (e.g. a camera Log-to-Rec.709 conversion).'),
+    strength: LutStrengthSchema.optional(),
+  })
+  .strict()
+  .describe('A user-supplied 3D .cube LUT applied first in the grade (before eq/colour balance/curves).');
 
 const ChannelAdjustSchema = z
   .object({
@@ -60,6 +96,9 @@ export const GradeSchema = z
       .optional()
       .describe('Film-grain strength, 0..1 (default 0; lowered to the FFmpeg noise filter).'),
     curvesPreset: z.string().optional().describe('Named curves preset key applied on top of other grade settings.'),
+    lut: GradeLutSchema.optional().describe(
+      'User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).'
+    ),
   })
   .describe('Colour-grade settings applied to the section video via FFmpeg eq/curves filters.');
 

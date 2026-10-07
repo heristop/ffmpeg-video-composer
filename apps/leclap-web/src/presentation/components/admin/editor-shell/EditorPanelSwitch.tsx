@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { SectionFields } from '../editor/SectionFields';
 import { AudioPanel } from '../editor/AudioPanel';
 import { GlobalVariablesEditor } from '../editor/GlobalVariablesEditor';
-import { ColorsListEditor } from '../editor/colors-list-editor';
+import { PaletteAndTheme } from '../editor/palette-and-theme';
 import { WholeVideoAnimations } from '../editor/WholeVideoAnimations';
 import { WholeVideoLookGrade } from '../editor/whole-video-look-grade';
 import { GlobalOverlaysField } from '../editor/GlobalOverlaysField';
@@ -137,7 +137,7 @@ export const EditorPanelSwitch = ({
   return (
     <PanelFrame eyebrow={t('shell.tools')} title={t('shell.advanced')}>
       <div className="space-y-4">
-        <ColorsListEditor state={state} patch={patch} />
+        <PaletteAndTheme state={state} patch={patch} />
         <WholeVideoLookGrade state={state} patch={patch} />
         <WholeVideoAnimations state={state} patch={patch} />
         <GlobalWatermarkField watermark={state.watermark} patch={patch} />

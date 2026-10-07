@@ -1,0 +1,272 @@
+{
+  "meta": {
+    "name": "Gallery: kinetic presets",
+    "description": "One section per kinetic preset (kinetic[].preset), each with the same kind of copy, for the docs gallery."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 11,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "cascade",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "size": 140,
+          "text": {
+            "en": "Make every word land"
+          },
+          "preset": "cascade",
+          "accent": {
+            "words": "last"
+          }
+        }
+      ]
+    },
+    {
+      "name": "rise",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "size": 140,
+          "text": {
+            "en": "Make every word land"
+          },
+          "preset": "rise"
+        }
+      ]
+    },
+    {
+      "name": "drop",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "size": 140,
+          "text": {
+            "en": "Make every word land"
+          },
+          "preset": "drop"
+        }
+      ]
+    },
+    {
+      "name": "slide",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "size": 140,
+          "text": {
+            "en": "Make every word land"
+          },
+          "preset": "slide",
+          "direction": "left"
+        }
+      ]
+    },
+    {
+      "name": "pop",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "Springy pop"
+          },
+          "preset": "pop",
+          "size": 130
+        }
+      ]
+    },
+    {
+      "name": "impact",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "BIG. LOUD."
+          },
+          "preset": "impact",
+          "size": 200,
+          "color": "#FF8AAE"
+        }
+      ]
+    },
+    {
+      "name": "tracking-in",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "LECLAP"
+          },
+          "preset": "tracking-in",
+          "size": 200
+        }
+      ]
+    },
+    {
+      "name": "typewriter",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "Deterministic video"
+          },
+          "preset": "typewriter",
+          "font": "mono",
+          "size": 72
+        }
+      ]
+    },
+    {
+      "name": "scramble",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "DECODED"
+          },
+          "preset": "scramble",
+          "font": "mono",
+          "size": 120
+        }
+      ]
+    },
+    {
+      "name": "wave",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "and alive"
+          },
+          "preset": "wave",
+          "size": 170
+        }
+      ]
+    },
+    {
+      "name": "highlight",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "size": 140,
+          "text": {
+            "en": "Point at one word"
+          },
+          "preset": "highlight",
+          "accent": {
+            "words": "last"
+          }
+        }
+      ]
+    },
+    {
+      "name": "counter",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": ""
+          },
+          "preset": "counter",
+          "counter": {
+            "from": 0,
+            "to": 98.6,
+            "decimals": 1,
+            "suffix": "%"
+          },
+          "size": 200,
+          "color": "#FFF685"
+        }
+      ]
+    },
+    {
+      "name": "split",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "size": 140,
+          "text": {
+            "en": "Two halves meet"
+          },
+          "preset": "split"
+        }
+      ]
+    },
+    {
+      "name": "fade",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "size": 140,
+          "text": {
+            "en": "Calm and steady"
+          },
+          "preset": "fade"
+        }
+      ]
+    }
+  ]
+}

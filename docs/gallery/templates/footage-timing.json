@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "name": "Gallery: footage retiming",
+    "description": "A clip with a running clock under every speedRamp preset, a freeze frame with a flash, and a cutaway, for the docs gallery. The clips are synthetic (make-gallery.sh builds them from bundled photos)."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 23,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "no-ramp",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/timer.mp4",
+        "duration": 4,
+        "clip": {
+          "from": 0,
+          "to": 4
+        }
+      }
+    },
+    {
+      "name": "hero",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/timer.mp4",
+        "duration": 6,
+        "clip": {
+          "from": 0,
+          "to": 4
+        },
+        "speedRamp": "hero",
+        "rampAudio": "mute"
+      }
+    },
+    {
+      "name": "montage",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/timer.mp4",
+        "duration": 6,
+        "clip": {
+          "from": 0,
+          "to": 4
+        },
+        "speedRamp": "montage",
+        "rampAudio": "mute"
+      }
+    },
+    {
+      "name": "bullet",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/timer.mp4",
+        "duration": 6,
+        "clip": {
+          "from": 0,
+          "to": 4
+        },
+        "speedRamp": "bullet",
+        "rampAudio": "mute"
+      }
+    },
+    {
+      "name": "flash-in",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/timer.mp4",
+        "duration": 6,
+        "clip": {
+          "from": 0,
+          "to": 4
+        },
+        "speedRamp": "flash-in",
+        "rampAudio": "mute"
+      }
+    },
+    {
+      "name": "flash-out",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/timer.mp4",
+        "duration": 6,
+        "clip": {
+          "from": 0,
+          "to": 4
+        },
+        "speedRamp": "flash-out",
+        "rampAudio": "mute"
+      }
+    },
+    {
+      "name": "freeze",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/zoom.mp4",
+        "duration": 3,
+        "clip": {
+          "from": 1,
+          "to": 3
+        },
+        "freeze": [
+          {
+            "at": 1,
+            "hold": 1,
+            "flash": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "cutaway",
+      "type": "video",
+      "options": {
+        "videoUrl": "videos/gallery/main.mp4",
+        "duration": 3
+      },
+      "cutaways": [
+        {
+          "url": "videos/gallery/broll.mp4",
+          "at": 0.8,
+          "duration": 1.4
+        }
+      ]
+    }
+  ]
+}

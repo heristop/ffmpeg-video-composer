@@ -5,23 +5,27 @@
 // same kind→icon mapping as AddElementMenu so the list and the add menu stay in agreement.
 import { useState, type ComponentType, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useIconHover } from '@/presentation/components/icons/useIconHover';
-import { Image, Square, Trash2, Type } from '@/presentation/components/icons';
+import { Image, Plus, Square, Trash2, Type } from '@/presentation/components/icons';
 import { ChevronDownIcon } from '@/presentation/components/icons/chevron-down';
 import { ChevronUpIcon } from '@/presentation/components/icons/chevron-up';
-import { SparklesIcon } from '@/presentation/components/icons/sparkles';
 import { cn } from '@/lib/utils';
+import { FamilyTile, familyNameKey } from '../editor/animationKinds';
 import type { ElementRef } from './useSectionSelection';
 import type { ElementDescriptor } from './sectionElements';
 import { CANVAS_DND_MIME } from './canvasDrop';
 
 // Shared with AddElementMenu's KIND_ICON so list rows and add-menu items use the same glyph per kind.
 // The text-sugar singletons reuse the text glyph — they are styled text blocks, differentiated by label.
+// Effects and animation files carry their family tile instead (FamilyTile: lavender sparkles vs rose
+// film); an animation slot with nothing picked yet reads as a plain "+".
 const KIND_ICON: Record<ElementRef['kind'], ComponentType<{ className?: string }>> = {
   layer: Square,
   text: Type,
   image: Image,
-  animation: SparklesIcon,
+  animation: Plus,
+  effect: Plus,
   caption: Type,
   titleCard: Type,
   lowerThird: Type,
@@ -141,8 +145,7 @@ const Row = ({
   onMove,
 }: RowProps) => {
   const { t } = useTranslation('admin');
-  const Icon = KIND_ICON[descriptor.kind];
-  const { ref } = descriptor;
+  const { ref, family } = descriptor;
   const { ref: chevronUpRef, hoverProps: chevronUpHoverProps } = useIconHover();
   const { ref: chevronDownRef, hoverProps: chevronDownHoverProps } = useIconHover();
   const [dropTarget, setDropTarget] = useState(false);
@@ -209,6 +212,8 @@ const Row = ({
         aria-pressed={active}
         // The preview text truncates in the narrow panel; the title surfaces the full text on hover.
         title={descriptor.previewText}
+        // An effect or a file states its kind first ("Effect: Sheen", "Animation file: confetti.apng").
+        aria-label={family ? rowAriaLabel(t, descriptor) : undefined}
         onClick={() => {
           onSelect(ref);
         }}
@@ -217,8 +222,11 @@ const Row = ({
           active ? 'bg-brand-500/15 text-foreground' : 'text-gray-600 hover:bg-foreground/5 dark:text-gray-300'
         )}
       >
-        <Icon className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
+        <RowIcon descriptor={descriptor} />
         <span className="shrink-0">{t(descriptor.labelKey, descriptor.labelParams)}</span>
+        {descriptor.previewKey ? (
+          <span className="truncate text-gray-400 dark:text-gray-500">{t(descriptor.previewKey)}</span>
+        ) : null}
         {descriptor.previewText && (
           <span className="truncate text-gray-400 dark:text-gray-500">{descriptor.previewText}</span>
         )}
@@ -259,6 +267,22 @@ const Row = ({
     </li>
   );
 };
+
+// The family tile of an effect / animation file row (a touch smaller than the picker's), else the kind glyph.
+const RowIcon = ({ descriptor }: { descriptor: ElementDescriptor }) => {
+  if (descriptor.family) return <FamilyTile family={descriptor.family} className="h-5 w-5 rounded-[0.3rem]" />;
+
+  const Icon = KIND_ICON[descriptor.kind];
+
+  return <Icon className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />;
+};
+
+function rowAriaLabel(t: TFunction<'admin'>, descriptor: ElementDescriptor): string {
+  const kind = t(familyNameKey(descriptor.family ?? 'file'));
+  const name = descriptor.previewKey ? t(descriptor.previewKey) : descriptor.previewText;
+
+  return name ? t('element.kindLabel', { kind, name }) : kind;
+}
 
 interface IconButtonProps {
   label: string;
