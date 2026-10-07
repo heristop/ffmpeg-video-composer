@@ -21,7 +21,7 @@ STILLS = [
     ('03-activity-undo', 31.0),
     ('04-confirm-declined', 37.6),
     ('05-off-switch', 58.6),
-    ('06-tools', 69.6),
+    ('06-tools', 68.0),
 ]
 
 for name, at in STILLS:
