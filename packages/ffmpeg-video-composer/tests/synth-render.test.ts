@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_SOUND_LENGTH, PEAK_DBFS, SYNTH_RATE } from '@/core/audio/synth/bounds';
+import { MAX_NOTE_SECONDS, MAX_SOUND_LENGTH, PEAK_DBFS, SYNTH_RATE } from '@/core/audio/synth/bounds';
 import { renderSound, renderSoundWav, soundLength, soundUsesSeed } from '@/core/audio/synth/render';
+import { noteSeconds } from '@/core/audio/synth/timing';
 import type { ComposedSound } from '@/core/audio/synth/types';
 import { sha256Hex } from '@/core/determinism/sha256';
 
@@ -145,5 +146,53 @@ describe('renderSound', () => {
     expect(performance.now() - started).toBeLessThan(2000);
     expect(sound.left.every(Number.isFinite)).toBe(true);
     expect(peak([sound.left, sound.right])).toBeCloseTo(peakTarget, 9);
+  });
+
+  it('keeps notes shorter than the default release audible', () => {
+    const short: ComposedSound[] = [
+      { layers: [{ source: 'tone', pitch: 800, length: 0.015 }] },
+      { layers: [{ source: 'tone', pitch: 800, length: 0.015, repeat: 8, every: 0.03 }] },
+      { layers: [{ source: 'noise', repeat: 16, every: 0.01 }] },
+      {
+        layers: [{ source: 'tone', pitch: 800, length: 0.05, envelope: { attack: 0.001, decay: 0.04, release: 0.1 } }],
+      },
+    ];
+
+    for (const sound of short) expect(renderSound(sound, 1).peak, JSON.stringify(sound)).toBeGreaterThan(0.5);
+  });
+
+  it('counts the note-seconds a sound renders, each note cut at the end of the sound', () => {
+    expect(noteSeconds({ length: 1, layers: [{ source: 'tone', pitch: 440, length: 0.2, repeat: 3 }] })).toBeCloseTo(
+      0.6,
+      9
+    );
+    expect(noteSeconds({ layers: [{ source: 'strike', pitch: 440, ring: 4, length: 4, repeat: 32 }] })).toBeCloseTo(
+      32 * 4 - 0.1 * ((31 * 32) / 2),
+      6
+    );
+    expect(noteSeconds({ layers: [{ source: 'silence', length: 4 }] })).toBe(0);
+  });
+
+  it('renders the most expensive sound within the note budget quickly', () => {
+    const partials = Array.from({ length: 8 }, (_, k) => ({ ratio: k + 1, gain: 1 / (k + 1) }));
+    const heaviest: ComposedSound = {
+      length: MAX_SOUND_LENGTH,
+      layers: Array.from({ length: 8 }, (_, i) => ({
+        source: 'strike' as const,
+        pitch: { from: 2000, to: 60 },
+        partials,
+        ring: 4,
+        length: 4,
+        click: 1,
+        filter: [{ type: 'bandpass' as const, from: 12000, to: 40, resonance: 12 }],
+        delay: i * 0.001,
+      })),
+      fx: { room: 1, echo: { mix: 1, time: 1, feedback: 0.8 } },
+    };
+    const started = performance.now();
+
+    expect(noteSeconds(heaviest)).toBeLessThanOrEqual(MAX_NOTE_SECONDS);
+    renderSound(heaviest, 3);
+    expect(performance.now() - started).toBeLessThan(3000);
   });
 });

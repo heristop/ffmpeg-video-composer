@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   MAX_CUTOFF,
   MAX_LAYERS,
+  MAX_NOTE_SECONDS,
   MAX_PARTIALS,
   MAX_PITCH,
   MAX_REPEAT,
@@ -13,6 +14,8 @@ import {
   MIN_SOUND_LENGTH,
 } from '../core/audio/synth/bounds';
 import { SFX_IDS } from '../core/audio/sfx-library';
+import { noteSeconds } from '../core/audio/synth/timing';
+import type { Layer, SoundFx } from '../core/audio/synth/types';
 
 // ── composed sounds: the vocabulary of `sfx[].sound` ──────────────────────────────────────────────────
 //
@@ -155,6 +158,19 @@ const SoundFxSchema = z
 
 const PRESET_ONLY = ['pitch', 'brightness', 'room'] as const;
 
+// Render cost grows with the note-seconds. Presets stay within the budget at any variation (checked
+// by tests/sound-presets.test.ts), so only composed layers are measured.
+function costIssue(sound: { layers: unknown[]; length?: number; fx?: SoundFx }): string | null {
+  const seconds = noteSeconds({ layers: sound.layers as Layer[], length: sound.length, fx: sound.fx });
+
+  if (seconds <= MAX_NOTE_SECONDS) return null;
+
+  return (
+    `the notes add up to ${Math.round(seconds)} s of audio to render (every hit's note, cut at the end of the ` +
+    `sound); the limit is ${MAX_NOTE_SECONDS} s: use shorter notes or fewer repeats`
+  );
+}
+
 export const SoundSchema = z
   .object({
     preset: z
@@ -185,10 +201,15 @@ export const SoundSchema = z
     const stray = preset ? [] : PRESET_ONLY.filter((key) => sound[key] !== undefined);
 
     for (const key of stray) ctx.addIssue({ code: 'custom', message: `${key} needs a preset`, path: [key] });
+
+    const cost = sound.layers && !preset ? costIssue({ ...sound, layers: sound.layers }) : null;
+
+    if (cost) ctx.addIssue({ code: 'custom', message: cost, path: ['layers'] });
   })
   .describe(
     'A synthesized sound: layers of tone/noise/strike/silence, each shaped (envelope, filter, gain, pan, ' +
-      'delay, repeat), mixed, fx applied, peak-normalised to -3 dBFS. Or a preset varied. Max 4 s, 8 layers.'
+      'delay, repeat), mixed, fx applied, peak-normalised to -3 dBFS. Or a preset varied. Max 4 s, 8 layers, ' +
+      '32 s of notes in all.'
   )
   .meta({ id: 'Sound' });
 

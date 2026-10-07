@@ -1,5 +1,6 @@
 // The gain envelope of one note: an attack to 1, a hold, a decay to `sustain`, the sustain held until the
-// note's end minus `release`, then the release to 0. Every stage is exponential by default (a curve
+// note's end minus `release`, then the release to 0 from the level the body reached. A note too short for
+// its attack and release gets both shortened in proportion. Every stage is exponential by default (a curve
 // normalised to reach its target exactly: the attack swells, the decay and release fall fast then
 // linger), linear on request. A decay left out fills the note.
 // Pure.
@@ -33,10 +34,23 @@ interface Stages {
   curve: Curve;
 }
 
+// A note shorter than its attack plus its release shrinks both in proportion, so it still rises and falls
+// instead of starting its release before its first sample (silent).
+function fitted(samples: number, attack: number, release: number): { attack: number; release: number } {
+  if (attack + release <= samples) return { attack, release };
+
+  const scale = samples / (attack + release);
+
+  return { attack: Math.floor(attack * scale), release: Math.floor(release * scale) };
+}
+
 function stages(samples: number, spec: Envelope): Stages {
-  const attack = Math.round((spec.attack ?? DEFAULT_ATTACK) * SYNTH_RATE);
+  const { attack, release } = fitted(
+    samples,
+    Math.round((spec.attack ?? DEFAULT_ATTACK) * SYNTH_RATE),
+    Math.round((spec.release ?? 0) * SYNTH_RATE)
+  );
   const hold = Math.round((spec.hold ?? 0) * SYNTH_RATE);
-  const release = Math.round((spec.release ?? 0) * SYNTH_RATE);
   const rest = Math.max(0, samples - attack - hold - release);
   const decay = spec.decay === undefined ? rest : Math.round(spec.decay * SYNTH_RATE);
 
@@ -61,7 +75,7 @@ export function envelope(samples: number, spec: Envelope): Float64Array {
   const s = stages(samples, spec);
   const out = new Float64Array(samples);
   const releaseAt = samples - s.release;
-  const releaseFrom = s.release > 0 ? bodyAt(Math.max(0, releaseAt), s) : 0;
+  const releaseFrom = s.release > 0 ? bodyAt(releaseAt, s) : 0;
 
   for (let i = 0; i < samples; i++) {
     out[i] = i < releaseAt ? bodyAt(i, s) : releaseFrom * fall((i - releaseAt) / s.release, s.curve);

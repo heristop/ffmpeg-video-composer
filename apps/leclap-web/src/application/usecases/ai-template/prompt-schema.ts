@@ -1,8 +1,8 @@
 // The template schema as the generation prompt sees it. Composed sounds (`sfx[].sound`: layers, envelopes,
 // filters) are authored by MCP agents that can measure them (analyze_sound); a one-shot generation can't
 // listen, and their vocabulary would cost the prompt's tight size budget. So the prompt keeps library sound
-// ids and drops the `Sound*` definitions and every property pointing at them. The engine schema and MCP
-// get_template_schema keep the full vocabulary.
+// ids and drops the `Sound*` definitions and every property pointing at them, so a cue's "id or sound"
+// becomes "id required". The engine schema and MCP get_template_schema keep the full vocabulary.
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 
@@ -19,12 +19,42 @@ function pointsAtSound(node: Json): boolean {
   );
 }
 
+type JsonObject = { [key: string]: Json };
+
+function isObject(node: Json | undefined): node is JsonObject {
+  return node !== null && node !== undefined && typeof node === 'object' && !Array.isArray(node);
+}
+
+function requiredOf(node: Json): string[] {
+  return isObject(node) && Array.isArray(node.required) ? node.required.filter((key) => typeof key === 'string') : [];
+}
+
+function isKeyChoice(branch: Json): boolean {
+  return isObject(branch) && Object.keys(branch).length === 1 && Array.isArray(branch.required);
+}
+
+// A "one of these keys" rule (`oneOf: [{ required: [a] }, { required: [b] }]`, the sfx cue's id / sound)
+// loses the branches whose key was stripped; the single branch left becomes a plain `required`.
+function settleChoice(node: JsonObject): JsonObject {
+  const { oneOf, properties } = node;
+
+  if (!Array.isArray(oneOf) || !isObject(properties) || !oneOf.every(isKeyChoice)) return node;
+
+  const kept = oneOf.filter((branch) => requiredOf(branch).every((key) => key in properties));
+
+  if (kept.length !== 1) return { ...node, oneOf: kept };
+
+  const { oneOf: _choice, ...rest } = node;
+
+  return { ...rest, required: [...new Set([...requiredOf(node), ...requiredOf(kept[0])])] };
+}
+
 function strip(node: Json): Json {
   if (Array.isArray(node)) return node.map(strip);
 
-  if (node === null || typeof node !== 'object') return node;
+  if (!isObject(node)) return node;
 
-  const out: { [key: string]: Json } = {};
+  const out: JsonObject = {};
 
   for (const [key, value] of Object.entries(node)) {
     if (pointsAtSound(value)) continue;
@@ -32,7 +62,7 @@ function strip(node: Json): Json {
     out[key] = strip(value);
   }
 
-  return out;
+  return settleChoice(out);
 }
 
 export function promptSchema(schema: unknown): unknown {

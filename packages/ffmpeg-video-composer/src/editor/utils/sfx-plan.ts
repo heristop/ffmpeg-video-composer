@@ -7,9 +7,8 @@
 // so the stage can render it to the file named here. Pure.
 
 import type { ProjectBuildInfos, Section, SfxCue, TemplateDescriptorGlobal } from '@/core/types';
-import { resolveCue, type ComposedPlacement } from '@/core/audio/sfx-cue';
+import { cueSeed, resolveCue, type ComposedPlacement } from '@/core/audio/sfx-cue';
 import { resolveSeed } from '@/core/determinism/contract';
-import { deriveSeed } from '@/core/determinism/hash';
 import { seconds } from '@/core/timing/seconds';
 import { effectiveDurations } from './transition-graph';
 
@@ -91,10 +90,10 @@ export function planSfx(
   const placed = [
     ...segments.flatMap((section, index) =>
       (section.sfx ?? []).map((cue, k) =>
-        place(cue, starts[index], deriveSeed(root, `sections.${section.name}.sfx[${k}]`))
+        place(cue, starts[index], cueSeed(root, `sections.${section.name}.sfx[${k}]`))
       )
     ),
-    ...(global?.sfx ?? []).map((cue, k) => place(cue, 0, deriveSeed(root, `global.sfx[${k}]`))),
+    ...(global?.sfx ?? []).map((cue, k) => place(cue, 0, cueSeed(root, `global.sfx[${k}]`))),
   ];
 
   return placed

@@ -1,6 +1,6 @@
 // Measurements of a rendered sound, so an author who can't hear checks it by numbers (MCP analyze_sound,
 // the sound advisories, the preset parity test):
-//   peakDb      sample peak, dBFS;
+//   peakDb      sample peak, dBFS (floored at -120, so silence reads -120);
 //   rmsDb       RMS level over the whole sound and every channel, dBFS (a plain RMS, not LUFS: no K-weighting
 //               and no gating, which for sub-4 s effects mostly differs on the low end);
 //   centroidHz  spectral centroid — the power-weighted mean frequency of 2048-point Hann frames, frames
@@ -28,9 +28,12 @@ const HIGH_HZ = 8000;
 const LOW_HZ = 250;
 const ENVELOPE_SECONDS = 0.005;
 const ATTACK_DB = 1;
+/** The floor of every level: a silent sound measures this, not -Infinity. */
+export const SILENCE_DB = -120;
 
+/** dBFS, floored at SILENCE_DB so silence stays a finite number. */
 function db(value: number): number {
-  return value > 0 ? 20 * Math.log10(value) : Number.NEGATIVE_INFINITY;
+  return value > 0 ? Math.max(SILENCE_DB, 20 * Math.log10(value)) : SILENCE_DB;
 }
 
 function round(value: number, digits: number): number {

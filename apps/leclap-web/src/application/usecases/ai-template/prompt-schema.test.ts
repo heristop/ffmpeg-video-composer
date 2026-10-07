@@ -14,6 +14,17 @@ describe('promptSchema', () => {
     expect(trimmed.length).toBeLessThan(full.length);
   });
 
+  it('requires a library id on every sound effect once the composed sound is gone', () => {
+    const schema = promptSchema(templateDescriptorJsonSchema) as {
+      properties: { global: { properties: { sfx: { items: Record<string, unknown> } } } };
+    };
+    const cue = schema.properties.global.properties.sfx.items;
+
+    expect(cue.required).toEqual(['at', 'id']);
+    expect(cue.oneOf).toBeUndefined();
+    expect(Object.keys(cue.properties as object)).not.toContain('sound');
+  });
+
   it('leaves the engine schema itself untouched', () => {
     expect(JSON.stringify(templateDescriptorJsonSchema)).toBe(full);
   });

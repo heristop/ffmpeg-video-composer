@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { SfxCueSchema } from '@/schemas/audio.schemas';
 import { SoundSchema } from '@/schemas/sound.schemas';
+import { templateDescriptorJsonSchema } from '@/schemas/template.schemas';
 import { TemplateValidator } from '@/services/TemplateValidator';
 
 // A sound-effect cue names a bundled preset (`id`) or carries a composed `sound`, never both; the sound's
@@ -35,6 +36,14 @@ describe('SfxCueSchema', () => {
     expect(SfxCueSchema.safeParse({ sound: composed, at: 'beat:4', volume: 0.5 }).success).toBe(true);
     expect(SfxCueSchema.safeParse({ at: 1 }).success).toBe(false);
     expect(SfxCueSchema.safeParse({ id: 'hit', sound: composed, at: 1 }).success).toBe(false);
+  });
+
+  it('says "exactly one of id or sound" in the JSON schema too', () => {
+    const global = templateDescriptorJsonSchema.properties?.global as { properties: Record<string, unknown> };
+    const cue = (global.properties.sfx as { items: Record<string, unknown> }).items;
+
+    expect(cue.required).toEqual(['at']);
+    expect(cue.oneOf).toEqual([{ required: ['id'] }, { required: ['sound'] }]);
   });
 
   it('validates inside a template, sections and global', () => {
@@ -126,5 +135,15 @@ describe('SoundSchema bounds', () => {
     expect(issues({ preset: 'whoosh', pitch: 8 })).not.toEqual([]);
     expect(issues({ layers: composed.layers, brightness: 0.5 })).not.toEqual([]);
     expect(issues({})).not.toEqual([]);
+  });
+
+  it('bounds the note-seconds a sound renders, with a message saying what to cut', () => {
+    const roll = { source: 'strike', pitch: 220, ring: 4, length: 4, repeat: 32 };
+
+    expect(issues({ layers: Array.from({ length: 8 }, () => roll) })).toEqual([
+      expect.stringMatching(/^layers: the notes add up to \d+ s .*32 s.*shorter notes or fewer repeats/),
+    ]);
+    expect(issues({ layers: Array.from({ length: 8 }, () => ({ ...roll, repeat: 1 })) })).toEqual([]);
+    expect(issues({ preset: 'whoosh', length: 4 })).toEqual([]);
   });
 });

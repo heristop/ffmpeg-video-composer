@@ -41,10 +41,11 @@ describe('analyzeChannels', () => {
     expect(Math.abs(analyzeChannels([swell]).attackMs - 178)).toBeLessThan(15);
   });
 
-  it('reports silence as -Infinity dB with a zero centroid', () => {
+  it('reports silence at the -120 dB floor with a zero centroid', () => {
     const metrics = analyzeChannels([new Float64Array(4800)]);
 
-    expect(metrics.peakDb).toBe(Number.NEGATIVE_INFINITY);
+    expect(metrics.peakDb).toBe(-120);
+    expect(metrics.rmsDb).toBe(-120);
     expect(metrics.centroidHz).toBe(0);
     expect(metrics.attackMs).toBe(0);
   });

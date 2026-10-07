@@ -59,6 +59,26 @@ describe('sound advisories', () => {
     expect(codes({ global: { musicEnabled: false }, sections: [card('a', [{ at: 1, sound: rumble }])] })).toEqual([]);
   });
 
+  it('sound_silent: a sound that renders nothing', () => {
+    const silent = { layers: [{ source: 'silence', length: 1 }] };
+    const muted = { layers: [{ ...tone(440), gain: 0 }] };
+
+    expect(codes({ sections: [card('a', [{ at: 1, sound: silent }])] })).toEqual([
+      { code: 'sound_silent', path: 'sections[0].sfx[0].sound' },
+    ]);
+    expect(codes({ sections: [card('a', [{ at: 1, sound: muted }])] }).map((w) => w.code)).toEqual(['sound_silent']);
+  });
+
+  it('skips measuring a sound past the render budget (the schema rejects it)', () => {
+    const roll = { source: 'strike', pitch: 220, ring: 4, length: 4, repeat: 32 };
+    const started = performance.now();
+
+    expect(
+      codes({ sections: [card('a', [{ at: 0, sound: { layers: Array.from({ length: 8 }, () => roll) } }])] })
+    ).toEqual([]);
+    expect(performance.now() - started).toBeLessThan(1000);
+  });
+
   it('sound_long: a sound running well past the end of its section', () => {
     expect(codes({ sections: [card('a', [{ id: 'boom', at: 2.5 }], 3)] })).toEqual([
       { code: 'sound_long', path: 'sections[0].sfx[0]' },

@@ -18,6 +18,11 @@ export const MIN_RESONANCE = 0.5;
 export const MAX_RESONANCE = 12;
 export const MAX_REPEAT = 32;
 export const MAX_PARTIALS = 8;
+/**
+ * Seconds of notes a sound may render, summed over its layers and hits (each cut at the end of the sound):
+ * eight layers filling a 4 s sound. Render cost grows with it, so a long roll of long notes is refused.
+ */
+export const MAX_NOTE_SECONDS = 32;
 
 /** The library sounds are peak-normalised to this level; synthesized ones too. */
 export const PEAK_DBFS = -3;
@@ -33,4 +38,4 @@ export const DEFAULT_RESONANCE = Math.SQRT1_2;
 export const DEFAULT_SOUND_VOLUME = 0.6;
 
 /** Bumped when a change to the synth changes rendered bytes, so cached files are not reused. */
-export const SYNTH_VERSION = 2;
+export const SYNTH_VERSION = 3;

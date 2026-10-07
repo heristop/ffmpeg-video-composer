@@ -4,8 +4,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import { cueSeed, renderSoundWav, soundSpec, SoundSchema } from 'ffmpeg-video-composer';
+
 import type { McpConfig } from '../src/config.js';
-import { registerAnalyzeSound } from '../src/tools/analyzeSound.js';
+import { analyzeSoundOutputSchema, registerAnalyzeSound } from '../src/tools/analyzeSound.js';
 
 type Handler = (args: Record<string, unknown>) => Promise<{
   isError?: boolean;
@@ -88,5 +90,30 @@ describe('analyze_sound', () => {
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toMatch(/layers\.0\.pitch/);
+  });
+
+  it('reports a silent sound with finite numbers and a sound_silent warning', async () => {
+    const { handler } = captureHandler(config);
+    const result = await handler({ sound: { layers: [{ source: 'silence', length: 1 }] } });
+    const data = analyzeSoundOutputSchema.parse(result.structuredContent);
+
+    expect(result.isError).toBeUndefined();
+    expect(data).toMatchObject({ peakDb: -120, rmsDb: -120, rawPeakDb: -120 });
+    expect(data.warnings.map((w) => w.code)).toEqual(['sound_silent']);
+  });
+
+  it('seeds a sound like the mix does for the cue it names', async () => {
+    const { handler } = captureHandler(config);
+    const hiss = { length: 0.3, layers: [{ source: 'noise', envelope: { decay: 0.2 } }] };
+    const atCue = await handler({ sound: hiss, seed: 5, cue: 'sections.intro.sfx[0]' });
+    const plain = await handler({ sound: hiss, seed: 5 });
+    const data = analyzeSoundOutputSchema.parse(atCue.structuredContent);
+    const expected = cueSeed(5, 'sections.intro.sfx[0]');
+
+    expect(data.seed).toBe(expected);
+    expect(analyzeSoundOutputSchema.parse(plain.structuredContent).seed).not.toBe(expected);
+    expect(await fs.readFile(data.wav)).toEqual(
+      Buffer.from(renderSoundWav(soundSpec(SoundSchema.parse(hiss)), expected))
+    );
   });
 });

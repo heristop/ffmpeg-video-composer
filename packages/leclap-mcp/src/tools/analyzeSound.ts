@@ -8,9 +8,10 @@ import type { McpServer, ServerContext } from '@modelcontextprotocol/server';
 import {
   analyzeChannels,
   canonicalJson,
+  cueSeed,
   deriveSeed,
+  encodeWav,
   renderSound,
-  renderSoundWav,
   sha256Hex,
   soundFindings,
   soundSpec,
@@ -25,23 +26,42 @@ import type { McpConfig } from '../config.js';
 // library preset with its variations) through the same synth the mix uses, writes the WAV under the output
 // dir, measures it and draws a spectrogram and a waveform with FFmpeg (system binary first, then
 // ffmpeg-static). Numbers: length, sample peak and RMS level in dBFS (plain RMS over the whole sound, not
-// LUFS), the raw layer-sum peak before normalisation, spectral centroid, the share of energy above 8 kHz
-// and under 250 Hz, and the attack time; plus the sound advisories it would raise in a template.
+// LUFS, floored at -120 so silence stays a number), the raw layer-sum peak before normalisation, spectral
+// centroid, the share of energy above 8 kHz and under 250 Hz, and the attack time; plus the sound
+// advisories it would raise in a template. Given the `cue` path, it seeds the sound exactly as the mix
+// seeds that cue, so a noisy or jittered sound renders the bytes the video will play.
 
 const execFileAsync = promisify(execFile);
+const CUE_PATH = /^(?:sections\..+|global)\.sfx\[\d+\]$/;
+/** Floor of a level in dBFS, as the engine's analysis floors it: silence reads -120, not -Infinity. */
+const SILENCE_DB = -120;
 const requireModule = createRequire(import.meta.url);
 
 const inputSchema = z.object({
   sound: z
     .record(z.string(), z.unknown())
     .describe('A `sfx[].sound`: { layers, length?, fx? } or { preset, pitch?, length?, brightness?, room? }.'),
-  seed: z.number().int().min(0).max(0xffffffff).optional().describe('Seed of its noise and jitter (default 0).'),
+  seed: z
+    .number()
+    .int()
+    .min(0)
+    .max(0xffffffff)
+    .optional()
+    .describe('Seed of its noise and jitter (default 0); with `cue`, the template global.seed.'),
+  cue: z
+    .string()
+    .regex(CUE_PATH)
+    .optional()
+    .describe(
+      'Where the sound sits in the template, e.g. "sections.intro.sfx[0]" or "global.sfx[2]": seeds it as the ' +
+        'mix seeds that cue, so the analysis hears what the render plays.'
+    ),
   music: z.boolean().optional().describe('Whether music plays under it (enables the sound_muddy check).'),
 });
 
 const warningSchema = z.object({ code: z.string(), message: z.string(), hint: z.string().optional() });
 
-const outputSchema = z.object({
+export const analyzeSoundOutputSchema = z.object({
   length: z.number(),
   peakDb: z.number(),
   rmsDb: z.number(),
@@ -50,6 +70,7 @@ const outputSchema = z.object({
   highShare: z.number(),
   lowShare: z.number(),
   attackMs: z.number(),
+  seed: z.number(),
   warnings: z.array(warningSchema),
   wav: z.string(),
   spectrogram: z.string().optional(),
@@ -128,7 +149,9 @@ async function imageBlocks(files: Array<string | undefined>) {
 
 function measure(args: Args, sound: ReturnType<typeof SoundSchema.parse>) {
   const spec = soundSpec(sound);
-  const seed = soundUsesSeed(spec) ? deriveSeed(args.seed ?? 0, 'analyze_sound') : 0;
+  const root = args.seed ?? 0;
+  const derived = args.cue ? cueSeed(root, args.cue) : deriveSeed(root, 'analyze_sound');
+  const seed = soundUsesSeed(spec) ? derived >>> 0 : 0;
   const rendered = renderSound(spec, seed);
   const metrics = analyzeChannels([rendered.left, rendered.right]);
   const warnings = soundFindings('sound', { ...metrics, peak: rendered.peak }, args.music ?? false).map(
@@ -150,11 +173,11 @@ async function handleAnalyze(args: Args, config: McpConfig, signal?: AbortSignal
   const wav = path.join(dir, 'sound.wav');
 
   await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(wav, renderSoundWav(spec, seed));
+  await fs.writeFile(wav, encodeWav(rendered.left, rendered.right));
 
   const drawn = await pictures(dir, wav, signal);
-  const rawPeakDb = Number((20 * Math.log10(Math.max(rendered.peak, 1e-9))).toFixed(2));
-  const result = { length: metrics.duration, ...metrics, rawPeakDb, warnings, wav, ...drawn, note: NOTE };
+  const rawPeakDb = Number(Math.max(SILENCE_DB, 20 * Math.log10(rendered.peak)).toFixed(2));
+  const result = { length: metrics.duration, ...metrics, rawPeakDb, seed, warnings, wav, ...drawn, note: NOTE };
   const summary =
     `${metrics.duration} s, peak ${metrics.peakDb} dBFS, RMS ${metrics.rmsDb} dBFS, centroid ${metrics.centroidHz} Hz, ` +
     `attack ${metrics.attackMs} ms${warnings.length > 0 ? `; ${warnings.map((w) => w.code).join(', ')}` : ''}. Files in ${dir}.`;
@@ -175,9 +198,10 @@ export function registerAnalyzeSound(server: McpServer, config: McpConfig) {
         'Render a sfx `sound` (composed layers, or { preset, pitch, length, brightness, room }) with the engine ' +
         'synth and measure it: length, peak and RMS dBFS, raw pre-normalisation peak, spectral centroid ' +
         '(brightness), energy share above 8 kHz / under 250 Hz, attack ms, the sound advisories it raises, ' +
-        'and a spectrogram + waveform PNG. Iterate until the numbers match the intent.',
+        'and a spectrogram + waveform PNG. Pass `cue` (e.g. "sections.intro.sfx[0]") and the template ' +
+        'global.seed as `seed` to hear the exact render of that cue. Iterate until the numbers match the intent.',
       inputSchema,
-      outputSchema,
+      outputSchema: analyzeSoundOutputSchema,
     },
     (args: Args, ctx?: ServerContext) => handleAnalyze(args, config, ctx?.mcpReq.signal)
   );

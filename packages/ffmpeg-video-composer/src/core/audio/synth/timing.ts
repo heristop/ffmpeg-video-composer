@@ -1,7 +1,9 @@
 // How long notes and sounds last before anything is rendered: the mix needs a sound's length to anchor a
 // riser by its end, and the length decides the buffer. A note lasts its layer's `length`, else a strike's
 // `ring`, else its envelope (attack + hold + decay + release), else it fills the sound. A sound lasts its
-// `length`, else its longest layer plus the fx tail, within [MIN_SOUND_LENGTH, MAX_SOUND_LENGTH]. Pure.
+// `length`, else its longest layer plus the fx tail, within [MIN_SOUND_LENGTH, MAX_SOUND_LENGTH]. The
+// note-seconds (every hit's note, cut at the end of the sound, as layer.ts renders it) measure the render
+// cost the schema bounds. Pure.
 
 import { DEFAULT_NOTE, DEFAULT_RING, MAX_SOUND_LENGTH, MIN_SOUND_LENGTH } from './bounds';
 import { envelopeLength } from './envelope';
@@ -49,4 +51,29 @@ export function soundLength(sound: ComposedSound): number {
   const dry = Math.max(0, ...sound.layers.map(layerEnd));
 
   return round6(clamp(dry + fxTail(sound.fx), MIN_SOUND_LENGTH, MAX_SOUND_LENGTH));
+}
+
+function layerNoteSeconds(layer: Layer, end: number): number {
+  if (layer.source === 'silence') return 0;
+
+  const note = noteLength(layer);
+  const gaps = intervals(layer);
+  let start = layer.delay ?? 0;
+  let sum = 0;
+
+  for (let k = 0; k <= gaps.length && start < end; k++) {
+    const gap = gaps.at(k) ?? Number.POSITIVE_INFINITY;
+
+    sum += Math.min(note ?? gap, end - start);
+    start += gap;
+  }
+
+  return sum;
+}
+
+/** Seconds of notes `sound` renders, every hit of every layer, each cut at the end of the sound. */
+export function noteSeconds(sound: ComposedSound): number {
+  const end = soundLength(sound);
+
+  return sound.layers.reduce((sum, layer) => sum + layerNoteSeconds(layer, end), 0);
 }

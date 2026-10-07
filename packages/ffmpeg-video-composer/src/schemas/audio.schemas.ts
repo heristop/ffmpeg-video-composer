@@ -64,7 +64,11 @@ export const SfxCueSchema = z
       ctx.addIssue({ code: 'custom', message: 'a sound effect needs exactly one of id (library) or sound (composed)' });
     }
   })
-  .describe('One sound effect: a library `id`, or a composed `sound`.');
+  // The refinement doesn't reach JSON Schema: say "exactly one of id or sound" there too.
+  .meta({
+    description: 'One sound effect: a library `id`, or a composed `sound`.',
+    oneOf: [{ required: ['id'] }, { required: ['sound'] }],
+  });
 
 export const SectionSfxSchema = z
   .array(SfxCueSchema)

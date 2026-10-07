@@ -1,9 +1,13 @@
 // The sound advisories that need the sound itself: every rendered cue (a composed sound or a varied preset)
 // is synthesized once — the same render the mix makes, milliseconds each — and measured
-// (core/audio/synth/analysis.ts). Library files and unvaried presets are curated and skipped.
+// (core/audio/synth/analysis.ts). Library files and unvaried presets are curated and skipped, and so is a
+// sound over the render budget (MAX_NOTE_SECONDS): the schema already rejects it, and measuring it would
+// cost seconds.
 
 import { analyzeChannels } from '@/core/audio/synth/analysis';
+import { MAX_NOTE_SECONDS } from '@/core/audio/synth/bounds';
 import { renderSound } from '@/core/audio/synth/render';
+import { noteSeconds } from '@/core/audio/synth/timing';
 import type { MotionWarning } from './motion-lint';
 import type { CueSound } from './sound-cues';
 
@@ -33,7 +37,7 @@ export interface Measured {
 function measure(cue: CueSound, cache: Map<string, Measured>): Measured | null {
   const placement = cue.resolved.sound;
 
-  if (!placement) return null;
+  if (!placement || noteSeconds(placement.spec) > MAX_NOTE_SECONDS) return null;
 
   const cached = cache.get(cue.resolved.file);
 
@@ -56,6 +60,17 @@ function warn(path: string, code: string, message: string, hint: string): Motion
 export function measuredFindings(path: string, m: Measured, music: boolean): MotionWarning[] {
   const t = SPECTRAL_THRESHOLDS;
   const out: MotionWarning[] = [];
+
+  if (m.peak === 0) {
+    return [
+      warn(
+        path,
+        'sound_silent',
+        'the sound renders silent',
+        'Give a layer an audible source and a gain above 0, and start its notes inside the sound length.'
+      ),
+    ];
+  }
 
   if (m.peak > t.clippedPeak) {
     const db = (20 * Math.log10(m.peak)).toFixed(1);
@@ -95,7 +110,7 @@ export function measuredFindings(path: string, m: Measured, music: boolean): Mot
   return out;
 }
 
-/** sound_clipped, sound_harsh and sound_muddy for every rendered cue. */
+/** sound_silent, sound_clipped, sound_harsh and sound_muddy for every rendered cue. */
 export function spectralAdvisories(cues: readonly CueSound[], music: boolean): MotionWarning[] {
   const cache = new Map<string, Measured>();
 

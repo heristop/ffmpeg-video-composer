@@ -803,7 +803,15 @@
             },
             "required": ["at"],
             "additionalProperties": false,
-            "description": "One sound effect: a library `id`, or a composed `sound`."
+            "description": "One sound effect: a library `id`, or a composed `sound`.",
+            "oneOf": [
+              {
+                "required": ["id"]
+              },
+              {
+                "required": ["sound"]
+              }
+            ]
           },
           "description": "Sound effects on the whole-video timeline. `at`: video seconds, \"beat:n\" / \"bar:n\", \"<section>.start\" / \"<section>.end\" (a section name), \"cue:<name>\" (the first section with that cue), \"50%\" or \"end\" of the video, each with an optional offset."
         },
@@ -3171,7 +3179,15 @@
                   },
                   "required": ["at"],
                   "additionalProperties": false,
-                  "description": "One sound effect: a library `id`, or a composed `sound`."
+                  "description": "One sound effect: a library `id`, or a composed `sound`.",
+                  "oneOf": [
+                    {
+                      "required": ["id"]
+                    },
+                    {
+                      "required": ["sound"]
+                    }
+                  ]
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -5963,7 +5979,15 @@
                   },
                   "required": ["at"],
                   "additionalProperties": false,
-                  "description": "One sound effect: a library `id`, or a composed `sound`."
+                  "description": "One sound effect: a library `id`, or a composed `sound`.",
+                  "oneOf": [
+                    {
+                      "required": ["id"]
+                    },
+                    {
+                      "required": ["sound"]
+                    }
+                  ]
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -8798,7 +8822,15 @@
                   },
                   "required": ["at"],
                   "additionalProperties": false,
-                  "description": "One sound effect: a library `id`, or a composed `sound`."
+                  "description": "One sound effect: a library `id`, or a composed `sound`.",
+                  "oneOf": [
+                    {
+                      "required": ["id"]
+                    },
+                    {
+                      "required": ["sound"]
+                    }
+                  ]
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -11357,7 +11389,15 @@
                   },
                   "required": ["at"],
                   "additionalProperties": false,
-                  "description": "One sound effect: a library `id`, or a composed `sound`."
+                  "description": "One sound effect: a library `id`, or a composed `sound`.",
+                  "oneOf": [
+                    {
+                      "required": ["id"]
+                    },
+                    {
+                      "required": ["sound"]
+                    }
+                  ]
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -13896,7 +13936,15 @@
                   },
                   "required": ["at"],
                   "additionalProperties": false,
-                  "description": "One sound effect: a library `id`, or a composed `sound`."
+                  "description": "One sound effect: a library `id`, or a composed `sound`.",
+                  "oneOf": [
+                    {
+                      "required": ["id"]
+                    },
+                    {
+                      "required": ["sound"]
+                    }
+                  ]
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -16906,7 +16954,15 @@
                   },
                   "required": ["at"],
                   "additionalProperties": false,
-                  "description": "One sound effect: a library `id`, or a composed `sound`."
+                  "description": "One sound effect: a library `id`, or a composed `sound`.",
+                  "oneOf": [
+                    {
+                      "required": ["id"]
+                    },
+                    {
+                      "required": ["sound"]
+                    }
+                  ]
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -19445,7 +19501,15 @@
                   },
                   "required": ["at"],
                   "additionalProperties": false,
-                  "description": "One sound effect: a library `id`, or a composed `sound`."
+                  "description": "One sound effect: a library `id`, or a composed `sound`.",
+                  "oneOf": [
+                    {
+                      "required": ["id"]
+                    },
+                    {
+                      "required": ["sound"]
+                    }
+                  ]
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -21984,7 +22048,15 @@
                   },
                   "required": ["at"],
                   "additionalProperties": false,
-                  "description": "One sound effect: a library `id`, or a composed `sound`."
+                  "description": "One sound effect: a library `id`, or a composed `sound`.",
+                  "oneOf": [
+                    {
+                      "required": ["id"]
+                    },
+                    {
+                      "required": ["sound"]
+                    }
+                  ]
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -23499,7 +23571,7 @@
         }
       },
       "additionalProperties": false,
-      "description": "A synthesized sound: layers of tone/noise/strike/silence, each shaped (envelope, filter, gain, pan, delay, repeat), mixed, fx applied, peak-normalised to -3 dBFS. Or a preset varied. Max 4 s, 8 layers."
+      "description": "A synthesized sound: layers of tone/noise/strike/silence, each shaped (envelope, filter, gain, pan, delay, repeat), mixed, fx applied, peak-normalised to -3 dBFS. Or a preset varied. Max 4 s, 8 layers, 32 s of notes in all."
     },
     "SoundPitch": {
       "anyOf": [

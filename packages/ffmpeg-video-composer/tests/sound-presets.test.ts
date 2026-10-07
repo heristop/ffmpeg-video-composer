@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { SFX_IDS, SFX_LIBRARY } from '@/core/audio/sfx-library';
 import { SOUND_PRESETS, isVaried, varyPreset } from '@/core/audio/sound-presets';
-import { soundLength } from '@/core/audio/synth/timing';
+import { MAX_NOTE_SECONDS, MAX_SOUND_LENGTH } from '@/core/audio/synth/bounds';
+import { noteSeconds, soundLength } from '@/core/audio/synth/timing';
 import { renderSound } from '@/core/audio/synth/render';
 import { analyzeChannels } from '@/core/audio/synth/analysis';
 import type { ToneLayer, StrikeLayer } from '@/core/audio/synth/types';
@@ -23,6 +24,16 @@ describe('SOUND_PRESETS', () => {
     for (const id of SFX_IDS) {
       expect(soundLength(SOUND_PRESETS[id]), id).toBe(SFX_LIBRARY[id].duration);
       expect(SoundSchema.safeParse(SOUND_PRESETS[id]).error?.issues ?? [], id).toEqual([]);
+    }
+  });
+});
+
+describe('preset render cost', () => {
+  it('stays within the note budget at any variation, so the schema need not measure presets', () => {
+    for (const id of SFX_IDS) {
+      const longest = varyPreset(id, { length: MAX_SOUND_LENGTH, room: 1, pitch: 0.25 });
+
+      expect(noteSeconds(longest), id).toBeLessThanOrEqual(MAX_NOTE_SECONDS);
     }
   });
 });

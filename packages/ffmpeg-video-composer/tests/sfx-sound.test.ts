@@ -8,7 +8,7 @@ import type {
 } from '@/core/types';
 import { planSfx } from '@/editor/utils/sfx-plan';
 import { prepareSfxStage } from '@/editor/utils/sfx-stage';
-import { resolveCue, soundFileName } from '@/core/audio/sfx-cue';
+import { cueSeed, resolveCue, soundFileName } from '@/core/audio/sfx-cue';
 import { varyPreset } from '@/core/audio/sound-presets';
 import { deriveSeed } from '@/core/determinism/hash';
 import { renderSoundWav, soundLength } from '@/core/audio/synth/render';
@@ -169,5 +169,18 @@ describe('prepareSfxStage with composed sounds', () => {
     });
 
     expect(files.get(wav)).toBe(stale);
+  });
+});
+
+describe('cueSeed', () => {
+  it('is the seed the mix renders a cue with: global.seed hashed with the cue path', () => {
+    const plan = planSfx([section('a', [{ at: 0, sound: swell }]), section('b', [{ at: 0, sound: blip }])], timing, {
+      seed: 5,
+      sfx: [{ at: 1, sound: swell }],
+    } as TemplateDescriptorGlobal);
+    const seeds = plan.map((placement) => placement.sound?.seed);
+
+    expect(seeds).toEqual([cueSeed(5, 'sections.a.sfx[0]'), cueSeed(5, 'global.sfx[0]'), 0]);
+    expect(cueSeed(5, 'sections.a.sfx[0]')).toBe(deriveSeed(5, 'sections.a.sfx[0]') >>> 0);
   });
 });

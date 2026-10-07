@@ -1,7 +1,8 @@
 // Sound advisories: the guardrails for an author who can't hear, read render-free like the pacing lint
 // (they never enter `errors`), each with a fix hint. Surfaced by getMotionWarnings (CLI `validate`, MCP
 // validate_template).
-//   sound_clipped   the layers of a rendered sound sum far over full scale (sound-advisories-spectral.ts);
+//   sound_silent    a rendered sound with nothing audible in it (sound-advisories-spectral.ts);
+//   sound_clipped   the layers of a rendered sound sum far over full scale (idem);
 //   sound_harsh     a sustained sound with most of its energy above 8 kHz (idem);
 //   sound_muddy     a long, low-heavy sound under music (idem);
 //   sound_long      a section's sound running well past the section's end;

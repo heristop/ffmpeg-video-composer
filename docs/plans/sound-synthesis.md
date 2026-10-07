@@ -21,8 +21,10 @@ sound a moment needs, and keeps the 33 sounds as named presets anyone can still 
    the new vocabulary and published as a worked example, so "pick" and "compose" are the same thing at two depths.
 3. **Synthesized in TypeScript, mixed by FFmpeg.** A pure, dependency-free synth module renders each sound to PCM
    and writes a WAV; the existing sfx mix places it like a bundled file. Rationale:
-   - **Identical everywhere.** JS float math is IEEE-754 on Node, browsers and Hermes, so a sound renders the same on
-     every platform. Building sounds out of FFmpeg filters would not: the phone build lacks `anoisesrc`, `bandpass`,
+   - **The same everywhere, up to the last bit.** A sound and a seed always render the same file on a given platform.
+     Across Node, browsers and Hermes the output matches up to the last bit: arithmetic is IEEE-754 everywhere, but
+     each engine computes `Math.sin` and `Math.exp` its own way. Building sounds out of FFmpeg filters would differ
+     far more: the phone build lacks `anoisesrc`, `bandpass`,
      `flanger`, `chorus` and the bit-crusher, and filter internals differ between FFmpeg versions.
    - **Deterministic.** Seeded noise (from `global.seed` and the cue's path, like fx), no wall-clock.
    - **Cheap.** A 1 s mono 48 kHz sound is 48 k samples; rendering is milliseconds. Results are cached by content

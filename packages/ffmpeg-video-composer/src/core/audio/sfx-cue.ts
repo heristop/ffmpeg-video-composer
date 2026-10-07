@@ -5,7 +5,7 @@
 
 import type { SfxCue } from '../../schemas/audio.schemas';
 import type { SoundInput } from '../../schemas/sound.schemas';
-import { canonicalJson } from '../determinism/hash';
+import { canonicalJson, deriveSeed } from '../determinism/hash';
 import { sha256Hex } from '../determinism/sha256';
 import { sfxEntry, type SfxEntry, type SfxId } from './sfx-library';
 import { isVaried, varyPreset } from './sound-presets';
@@ -35,6 +35,14 @@ export function composedSpec(sound: SoundInput): ComposedSound {
   const layers = (sound.layers ?? []) as Layer[];
 
   return { layers, ...(length === undefined ? {} : { length }), ...(fx ? { fx } : {}) };
+}
+
+/**
+ * The seed of the cue at `path` ("sections.<name>.sfx[k]" or "global.sfx[k]") under `globalSeed`
+ * (global.seed): what the mix renders it with when the sound draws random numbers.
+ */
+export function cueSeed(globalSeed: number, path: string): number {
+  return deriveSeed(globalSeed, path) >>> 0;
 }
 
 /** The build file of a composed sound rendered with `seed`. */

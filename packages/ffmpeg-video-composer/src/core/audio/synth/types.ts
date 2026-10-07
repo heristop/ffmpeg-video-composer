@@ -35,7 +35,7 @@ export interface Envelope {
   /** 0..1, default 0 (a percussive note). */
   sustain?: number;
   release?: number;
-  /** Shape of the decay and the release (the attack is linear). Default exp. */
+  /** Shape of the attack (a swell), the decay and the release. Default exp. */
   curve?: Curve;
 }
 

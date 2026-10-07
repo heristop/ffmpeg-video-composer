@@ -54,6 +54,23 @@ describe('synth envelope', () => {
     expect(exp[SYNTH_RATE / 4]).toBeLessThan(linear[SYNTH_RATE / 4] / 2);
   });
 
+  it('fits the attack and release into a note shorter than both, releasing from the level reached', () => {
+    const steady = envelope(Math.round(0.015 * SYNTH_RATE), { sustain: 1, release: 0.02 });
+    const struck = envelope(Math.round(0.05 * SYNTH_RATE), { attack: 0.001, decay: 0.04, release: 0.1 });
+
+    expect(Math.max(...steady)).toBeGreaterThan(0.9);
+    expect(steady.at(-1)).toBeLessThan(0.05);
+    expect(Math.max(...struck)).toBeGreaterThan(0.9);
+    expect(struck.at(-1)).toBeLessThan(0.05);
+  });
+
+  it('keeps a release that fits the note as it was', () => {
+    const fits = envelope(SYNTH_RATE / 2, { attack: 0.1, sustain: 0.5, release: 0.4, curve: 'linear' });
+
+    expect(fits[Math.round(100 * ms)]).toBeCloseTo(0.5, 6);
+    expect(fits[Math.round(300 * ms)]).toBeCloseTo(0.25, 2);
+  });
+
   it('decays across the whole note when no decay is given', () => {
     const gains = envelope(SYNTH_RATE, { attack: 0.01, curve: 'linear' });
 
@@ -129,6 +146,25 @@ describe('synth sequence', () => {
     expect(a).toEqual(b);
     expect(a.some((hit, i) => Math.abs(hit.time - i * 0.1) > 1e-6)).toBe(true);
     expect(a.every((hit) => hit.time >= 0 && hit.gain <= 1 && hit.gain >= 0.7)).toBe(true);
+  });
+
+  it('keeps jittered hits in order, even on an accelerating or slowing roll', () => {
+    for (const spec of [
+      { repeat: 16, every: 0.1, accelerate: 0.3, jitter: 1 },
+      { repeat: 32, every: 0.05, accelerate: 0.3, jitter: 1 },
+      { repeat: 16, every: 0.01, accelerate: -1, jitter: 1 },
+      { repeat: 32, every: 0.1, jitter: 1 },
+    ]) {
+      for (let seed = 0; seed < 500; seed++) {
+        const times = onsets(spec, seededRandom(seed)).map((hit) => hit.time);
+
+        expect(times.length).toBe(spec.repeat);
+        expect(
+          times.every((time, i) => i === 0 || time > times[i - 1]),
+          `${JSON.stringify(spec)} seed ${seed}`
+        ).toBe(true);
+      }
+    }
   });
 
   it('is a single hit at 0 without repeat', () => {

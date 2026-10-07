@@ -3,9 +3,8 @@
 // sound, its length and anchor), when it starts and ends in the list's own time (null when its `at` is a
 // time reference the template can't resolve render-free), and a key naming the sound so repeats are found.
 
-import { resolveCue, type ResolvedCue } from '@/core/audio/sfx-cue';
+import { cueSeed, resolveCue, type ResolvedCue } from '@/core/audio/sfx-cue';
 import { resolveSeed } from '@/core/determinism/contract';
-import { deriveSeed } from '@/core/determinism/hash';
 import { resolveTimeRefs } from '@/core/timing/resolve';
 import type { SfxCue } from '../schemas/audio.schemas';
 
@@ -38,7 +37,7 @@ function cueSounds(list: unknown, path: string, seedPath: string, root: number):
   if (!Array.isArray(list)) return [];
 
   return (list as SfxCue[]).flatMap((cue, k) => {
-    const resolved = resolveCue(cue, deriveSeed(root, `${seedPath}[${k}]`));
+    const resolved = resolveCue(cue, cueSeed(root, `${seedPath}[${k}]`));
 
     return resolved ? [{ path: `${path}[${k}]`, resolved, ...placed(cue, resolved) }] : [];
   });

@@ -33,6 +33,12 @@ video models, which sample rather than render.
 | `render_remotion_clip`  | _(bonus, opt-in)_ Render a composition from **your own** Remotion project → an mp4 clip for a `project_video` section                                                                         |
 | `ping`                  | Liveness check                                                                                                                                                                                |
 
+`analyze_sound` seeds a sound's noise and jitter with `seed` (default 0). To hear the exact render a template
+will play, pass the template's `global.seed` as `seed` and the cue's path as `cue`: `"sections.intro.sfx[0]"`
+for the first cue of the section named `intro`, `"global.sfx[2]"` for the third global cue. The tool then seeds
+the sound as the mix seeds that cue and returns the `seed` it used. Levels are floored at -120 dBFS, so a silent
+sound reads -120 and raises `sound_silent`.
+
 Typical agent flow: `list_samples` → `get_sample` → inspect requirements and customize media/copy →
 `get_template_schema` → `validate_template` (iterate until valid) → `render_frames` (look at the result;
 check safe zones with `safe`) → `compose_video` → read the returned `outputPath`. Author a fresh descriptor
