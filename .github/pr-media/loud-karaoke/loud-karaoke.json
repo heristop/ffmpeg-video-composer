@@ -1,0 +1,102 @@
+{
+  "meta": {
+    "name": "loud word karaoke portrait",
+    "description": "loud + word karaoke at 720x1280"
+  },
+  "global": {
+    "orientation": "portrait",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 5,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "say",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "loud",
+        "karaoke": "word",
+        "position": "center",
+        "words": [
+          {
+            "text": "What",
+            "start": 0.2,
+            "end": 0.6
+          },
+          {
+            "text": "you",
+            "start": 0.65,
+            "end": 1.05
+          },
+          {
+            "text": "say",
+            "start": 1.1,
+            "end": 1.5
+          },
+          {
+            "text": "becomes",
+            "start": 1.55,
+            "end": 1.95
+          },
+          {
+            "text": "what",
+            "start": 2.0,
+            "end": 2.4
+          },
+          {
+            "text": "you",
+            "start": 2.45,
+            "end": 2.85
+          },
+          {
+            "text": "do",
+            "start": 2.9,
+            "end": 3.3
+          }
+        ]
+      }
+    },
+    {
+      "name": "long",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 3.6
+      },
+      "subtitles": {
+        "style": "loud",
+        "karaoke": "word",
+        "position": "center",
+        "words": [
+          {
+            "text": "Unbelievable",
+            "start": 0.2,
+            "end": 0.6
+          },
+          {
+            "text": "extraordinary",
+            "start": 0.65,
+            "end": 1.05
+          },
+          {
+            "text": "accomplishments",
+            "start": 1.1,
+            "end": 1.5
+          },
+          {
+            "text": "happen",
+            "start": 1.55,
+            "end": 1.95
+          }
+        ]
+      }
+    }
+  ]
+}

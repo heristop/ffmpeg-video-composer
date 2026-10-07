@@ -6,8 +6,13 @@
 //   readability penalty (a line ending on an article or preposition, a one-word orphan line), the
 //   widest line, and the width difference between the widest and narrowest line.
 //
-// fitCaption shrinks the font until the copy fits `maxLines` lines (fit-size-then-wrap), down to a
-// floor; what still overflows is the caller's to split into consecutive cues.
+// fitCaption shrinks the font until the copy fits `maxLines` lines no wider than `maxWidth`
+// (fit-size-then-wrap), down to a floor; what still overflows is the caller's to split into consecutive cues.
+//
+// With an active scale above 1 (karaoke that draws the spoken word larger, centred on itself), a line is
+// measured with the room that word needs: half its growth on each outer edge and, between two words, the
+// larger of their half-growths on top of the space. A line laid out that way never lets the enlarged word
+// touch its neighbours or the safe width, and doesn't move as the highlight travels.
 
 import { measureBundled } from '../kinetic/layout';
 import { isFunctionWord } from './function-words';
@@ -40,10 +45,31 @@ export function measureText(font: string, text: string, size: number): number | 
   return width;
 }
 
-type Measure = (text: string) => number;
+/**
+ * The extra room each word of a line needs on top of plain text so its `activeScale` version, centred
+ * on the word, clears its neighbours: `edges[i]` before word i (after the previous one, or the line
+ * start), and `edges[words.length]` after the last word. All zero at scale 1.
+ */
+export function activeReserve(font: string, words: readonly string[], size: number, activeScale: number): number[] {
+  // Measured at the whole pixel size above the scaled one: word karaoke rounds it, pop peaks just under.
+  const grown = Math.ceil(size * activeScale);
+  const overhangs = words.map((word) =>
+    activeScale > 1 ? ((measureText(font, word, grown) ?? 0) - (measureText(font, word, size) ?? 0)) / 2 : 0
+  );
 
-function measurer(font: string, size: number): Measure | null {
-  return measureText(font, 'n', size) === null ? null : (text) => measureText(font, text, size) ?? 0;
+  return [...overhangs, 0].map((overhang, index) => Math.max(overhang, overhangs[index - 1] ?? 0));
+}
+
+type Measure = (words: readonly string[]) => number;
+
+function measurer(font: string, size: number, activeScale: number): Measure | null {
+  if (measureText(font, 'n', size) === null) return null;
+
+  return (words) => {
+    const text = measureText(font, words.join(' '), size) ?? 0;
+
+    return activeScale > 1 ? text + activeReserve(font, words, size, activeScale).reduce((a, b) => a + b, 0) : text;
+  };
 }
 
 function greedy(words: readonly string[], measure: Measure, maxWidth: number): string[][] {
@@ -51,7 +77,7 @@ function greedy(words: readonly string[], measure: Measure, maxWidth: number): s
   let current: string[] = [];
 
   for (const word of words) {
-    if (current.length > 0 && measure([...current, word].join(' ')) > maxWidth) {
+    if (current.length > 0 && measure([...current, word]) > maxWidth) {
       lines.push(current);
       current = [];
     }
@@ -71,7 +97,7 @@ interface Cost {
 }
 
 function linesCost(lines: readonly string[][], measure: Measure, total: number): Cost {
-  const widths = lines.map((line) => measure(line.join(' ')));
+  const widths = lines.map((line) => measure(line));
   let penalty = 0;
 
   for (const [index, line] of lines.entries()) {
@@ -110,7 +136,7 @@ function explore(search: Search, from: number, lines: string[][]): void {
   if (remaining === 1) {
     const last = words.slice(from);
 
-    if (last.length > 1 && search.measure(last.join(' ')) > search.maxWidth) return;
+    if (last.length > 1 && search.measure(last) > search.maxWidth) return;
 
     const candidate = [...lines, last];
     const cost = linesCost(candidate, search.measure, words.length);
@@ -123,7 +149,7 @@ function explore(search: Search, from: number, lines: string[][]): void {
   for (let end = from + 1; end <= words.length - remaining + 1; end++) {
     const line = words.slice(from, end);
 
-    if (line.length > 1 && search.measure(line.join(' ')) > search.maxWidth) return;
+    if (line.length > 1 && search.measure(line) > search.maxWidth) return;
 
     explore(search, end, [...lines, line]);
   }
@@ -148,10 +174,12 @@ export function wrapWords(
   maxWidth: number,
   mode: WrapMode = 'greedy'
 ): string[][] | null {
-  const measure = measurer(font, size);
+  const measure = measurer(font, size, 1);
 
-  if (!measure) return null;
+  return measure && wrapMeasured(words, measure, maxWidth, mode);
+}
 
+function wrapMeasured(words: readonly string[], measure: Measure, maxWidth: number, mode: WrapMode): string[][] {
   return mode === 'balanced' ? balanced(words, measure, maxWidth) : greedy(words, measure, maxWidth);
 }
 
@@ -179,6 +207,8 @@ export interface FitInput {
   maxWidth: number;
   maxLines: number;
   mode: WrapMode;
+  /** Size multiplier of the spoken word (karaoke), reserved around every word. Default 1. */
+  activeScale?: number;
 }
 
 export interface Fit {
@@ -203,19 +233,25 @@ export function shrinkSizes(size: number, minSize: number): number[] {
   return sizes;
 }
 
-/** Shrink-then-wrap: the largest size whose wrap fits maxLines, or null when the font isn't bundled. */
+/**
+ * Shrink-then-wrap: the largest size whose wrap fits maxLines without a line (a lone long word, say)
+ * wider than maxWidth, or null when the font isn't bundled. At the floor, the floor's wrap as is.
+ */
 export function fitCaption(input: FitInput): Fit | null {
   const sizes = shrinkSizes(input.size, Math.min(input.minSize, input.size));
+  const activeScale = input.activeScale ?? 1;
   let last: Fit | null = null;
 
   for (const size of sizes) {
-    const lines = wrapWords(input.words, input.font, size, input.maxWidth, input.mode);
+    const measure = measurer(input.font, size, activeScale);
 
-    if (!lines) return null;
+    if (!measure) return null;
+
+    const lines = wrapMeasured(input.words, measure, input.maxWidth, input.mode);
 
     last = { size, lines, overflow: lines.length > input.maxLines };
 
-    if (!last.overflow) return last;
+    if (!last.overflow && lines.every((line) => measure(line) <= input.maxWidth)) return last;
   }
 
   return last;

@@ -30,7 +30,6 @@ import type { SugarContext } from './sugar-context';
 /** A silence shorter than this keeps the previous word active, so the highlight doesn't flicker. */
 const ACTIVE_BRIDGE = 0.25;
 const POP_SECONDS = 0.24;
-const POP_PEAK = 1.2;
 const POP_EASE = parseEasing('ease-out-cubic');
 
 interface Palette {
@@ -84,9 +83,8 @@ function wordText(draw: CueDraw, word: PlacedWord, line: PlacedLine, color: stri
 function activeText(draw: CueDraw, word: PlacedWord, line: PlacedLine, window: ActiveSpan): Filter {
   const { size } = draw.cue;
   const mode = draw.style.karaoke;
-  // pop always bumps: a DNA whose active word keeps its size pops to POP_PEAK.
-  const scale = draw.style.dna.activeScale;
-  const peak = mode === 'pop' && scale === 1 ? POP_PEAK : scale;
+  // The line was laid out with room for this scale (core/captions/place.ts), so the word clears its neighbours.
+  const peak = draw.style.activeScale;
   const enable = windowExpr(window.from, window.to);
 
   if (peak === 1) return wordText(draw, word, line, draw.palette.active, enable);

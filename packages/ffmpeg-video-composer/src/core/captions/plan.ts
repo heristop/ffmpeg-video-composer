@@ -64,7 +64,7 @@ function regroup(words: readonly WordTiming[], lines: readonly string[][]): Word
   });
 }
 
-function fitWords(fitter: Fitter, words: readonly WordTiming[], size: number, minSize: number) {
+function fitWords(fitter: Fitter, words: readonly WordTiming[], size: number, minSize: number, activeScale: number) {
   const fit = fitCaption({
     words: words.map((word) => word.text),
     font: fitter.style.font,
@@ -73,6 +73,7 @@ function fitWords(fitter: Fitter, words: readonly WordTiming[], size: number, mi
     maxWidth: fitter.maxWidth,
     maxLines: fitter.style.maxLines,
     mode: 'balanced',
+    activeScale,
   });
 
   return fit && { ...fit, lines: regroup(words, fit.lines) };
@@ -81,7 +82,7 @@ function fitWords(fitter: Fitter, words: readonly WordTiming[], size: number, mi
 // One timed cue → one chunk, or several when it overflows maxLines at minSize.
 function chunksOf(fitter: Fitter, cue: { start: number; end: number; words: WordTiming[] }, source: number) {
   const { size, minSize, maxLines } = fitter.style;
-  const fit = fitWords(fitter, cue.words, size, minSize);
+  const fit = fitWords(fitter, cue.words, size, minSize, fitter.style.activeScale);
 
   if (!fit) return null;
 
@@ -93,7 +94,7 @@ function chunksOf(fitter: Fitter, cue: { start: number; end: number; words: Word
 
   return groups.map((words, i) => {
     // Every part of a split cue keeps the floor size, so consecutive parts read as one caption.
-    const refit = fitWords(fitter, words, fit.size, minSize) ?? fit;
+    const refit = fitWords(fitter, words, fit.size, minSize, fitter.style.activeScale) ?? fit;
     const next = groups.at(i + 1);
 
     return {
@@ -128,7 +129,8 @@ function crownIndex(chunks: readonly Chunk[], crown: string | undefined): number
 function crowned(fitter: Fitter, chunk: Chunk): Chunk {
   const { crown } = fitter.style.dna;
   const words = chunk.lines.flat().map((word) => ({ ...word, text: cased(word.text, crown.case) }));
-  const fit = fitWords(fitter, words, Math.round(chunk.size * crown.scale), chunk.size);
+  // The crown is drawn without karaoke: no word grows, so none needs room.
+  const fit = fitWords(fitter, words, Math.round(chunk.size * crown.scale), chunk.size, 1);
 
   return fit ? { ...chunk, size: fit.size, lines: fit.lines, crowned: true } : { ...chunk, crowned: true };
 }

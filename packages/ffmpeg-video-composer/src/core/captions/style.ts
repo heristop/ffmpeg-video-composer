@@ -22,6 +22,8 @@ export interface SubtitleStyle {
   /** Line spacing as a multiple of the size. */
   lineHeight: number;
   karaoke: CaptionKaraoke;
+  /** Size multiplier of the spoken word as drawn (the peak of a pop); 1 when no word grows. */
+  activeScale: number;
   position: CaptionPosition;
   case: CaptionCase;
   minDuration: number;
@@ -30,6 +32,15 @@ export interface SubtitleStyle {
 const DEFAULT_MAX_LINES = 2;
 const DEFAULT_MIN_DURATION = 1;
 const MIN_SIZE_RATIO = 0.75;
+/** The peak of a pop for a DNA whose active word keeps its size: pop always bumps. */
+const POP_PEAK = 1.2;
+
+// Only word and pop karaoke draw the spoken word on its own, larger.
+function activeScale(dna: CaptionDna, karaoke: CaptionKaraoke): number {
+  if (karaoke === 'pop') return dna.activeScale === 1 ? POP_PEAK : dna.activeScale;
+
+  return karaoke === 'word' ? dna.activeScale : 1;
+}
 
 /** The font file a subtitle track draws with: a bundled id, else the value as given. */
 export function subtitleFontFile(font: string): string {
@@ -39,6 +50,7 @@ export function subtitleFontFile(font: string): string {
 export function subtitleStyle(subtitles: Subtitles, frame: CaptionFrame): SubtitleStyle {
   const dna = captionDna(subtitles.style);
   const size = subtitles.size ?? Math.round(Math.min(frame.width, frame.height) * dna.size);
+  const karaoke = subtitles.karaoke ?? dna.karaoke;
 
   return {
     dna,
@@ -47,7 +59,8 @@ export function subtitleStyle(subtitles: Subtitles, frame: CaptionFrame): Subtit
     minSize: Math.min(size, subtitles.minSize ?? Math.round(size * MIN_SIZE_RATIO)),
     maxLines: subtitles.maxLines ?? DEFAULT_MAX_LINES,
     lineHeight: dna.lineHeight,
-    karaoke: subtitles.karaoke ?? dna.karaoke,
+    karaoke,
+    activeScale: activeScale(dna, karaoke),
     position: subtitles.position ?? dna.position,
     case: dna.case,
     minDuration: subtitles.minDuration ?? DEFAULT_MIN_DURATION,
