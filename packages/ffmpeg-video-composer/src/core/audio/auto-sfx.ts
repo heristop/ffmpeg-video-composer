@@ -86,14 +86,20 @@ interface Landing {
   anchor: 'start' | 'end';
 }
 
-function landing(cue: { id: unknown; at: number }): Landing {
-  return { at: cue.at, anchor: sfxEntry(String(cue.id))?.anchor ?? 'start' };
+function landing(cue: { id?: unknown; sound?: unknown; at: number }): Landing {
+  const sound = cue.sound as { anchor?: 'start' | 'end'; preset?: string } | undefined;
+  const id = typeof cue.id === 'string' ? cue.id : sound?.preset;
+  const library = id === undefined ? undefined : sfxEntry(id)?.anchor;
+
+  return { at: cue.at, anchor: sound?.anchor ?? library ?? 'start' };
 }
 
 function authoredLandings(section: Bag): Landing[] {
   const sfx = Array.isArray(section.sfx) ? (section.sfx as Bag[]) : [];
 
-  return sfx.flatMap((cue) => (typeof cue.at === 'number' ? [landing({ id: cue.id, at: cue.at })] : []));
+  return sfx.flatMap((cue) =>
+    typeof cue.at === 'number' ? [landing({ id: cue.id, sound: cue.sound, at: cue.at })] : []
+  );
 }
 
 function spaced(cues: readonly AutoCue[], taken: Landing[]): AutoCue[] {

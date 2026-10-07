@@ -2,21 +2,29 @@
 // shift by the section's start in the joined video — the sum of the earlier rendered lengths minus each
 // boundary's xfade overlap, the same arithmetic as the assembly (transition-graph.ts) and the QC. Global
 // sfx are already video time. A riser (anchor "end") starts its own length earlier; a head that would
-// fall before 0 is trimmed. Sorted and capped, so the mix graph is deterministic. Pure.
+// fall before 0 is trimmed. Sorted and capped, so the mix graph is deterministic. A composed `sound`
+// (core/audio/sfx-cue.ts) carries its spec and seed — global.seed hashed with the cue's path, like fx —
+// so the stage can render it to the file named here. Pure.
 
 import type { ProjectBuildInfos, Section, SfxCue, TemplateDescriptorGlobal } from '@/core/types';
-import { sfxEntry, type SfxId } from '@/core/audio/sfx-library';
+import { resolveCue, type ComposedPlacement } from '@/core/audio/sfx-cue';
+import { resolveSeed } from '@/core/determinism/contract';
+import { deriveSeed } from '@/core/determinism/hash';
 import { seconds } from '@/core/timing/seconds';
 import { effectiveDurations } from './transition-graph';
 
 export interface SfxPlacement {
-  id: SfxId;
+  /** The library id, or `sound-<hash>` for a composed sound. */
+  id: string;
+  /** A library file name, or `<hash>.wav` rendered into the build for a composed sound. */
   file: string;
   /** Video time the sound starts playing, seconds. */
   start: number;
   /** Seconds cut from the head of the file (a riser anchored before the video starts). */
   trim: number;
   volume: number;
+  /** Set for a composed sound: what to render into `file`. */
+  sound?: ComposedPlacement;
 }
 
 /** At most this many sounds are mixed (the schema bounds each list; this bounds their sum). */
@@ -58,15 +66,18 @@ export function videoTimeline(
   return { starts, total: round(cursor) };
 }
 
-function place(cue: SfxCue, offset: number): Omit<SfxPlacement, 'trim'> & { at: number } {
-  const entry = sfxEntry(cue.id);
+type Placed = Omit<SfxPlacement, 'trim'> & { at: number };
 
-  if (!entry) throw new Error(`unknown sound effect "${cue.id}"`);
+function place(cue: SfxCue, offset: number, seed: number): Placed {
+  const entry = resolveCue(cue, seed);
+
+  if (!entry) throw new Error(`unknown sound effect "${cue.id ?? cue.sound?.preset}"`);
 
   const at = offset + (seconds(cue.at) ?? 0);
   const start = entry.anchor === 'end' ? at - entry.duration : at;
+  const placed: Placed = { id: entry.id, file: entry.file, at, start, volume: cue.volume ?? entry.defaultVolume };
 
-  return { id: entry.id, file: entry.file, at, start, volume: cue.volume ?? entry.defaultVolume };
+  return entry.sound ? { ...placed, sound: entry.sound } : placed;
 }
 
 /** Every sound effect of the render, in mix order. */
@@ -76,19 +87,25 @@ export function planSfx(
   global: TemplateDescriptorGlobal | undefined
 ): SfxPlacement[] {
   const { starts, total } = videoTimeline(segments, buildInfos);
+  const root = resolveSeed({ global });
   const placed = [
-    ...segments.flatMap((section, index) => (section.sfx ?? []).map((cue) => place(cue, starts[index]))),
-    ...(global?.sfx ?? []).map((cue) => place(cue, 0)),
+    ...segments.flatMap((section, index) =>
+      (section.sfx ?? []).map((cue, k) =>
+        place(cue, starts[index], deriveSeed(root, `sections.${section.name}.sfx[${k}]`))
+      )
+    ),
+    ...(global?.sfx ?? []).map((cue, k) => place(cue, 0, deriveSeed(root, `global.sfx[${k}]`))),
   ];
 
   return placed
     .filter((sound) => sound.at >= 0 && sound.start < total)
-    .map(({ id, file, start, volume }) => ({
+    .map(({ id, file, start, volume, sound }) => ({
       id,
       file,
       start: round(Math.max(0, start)),
       trim: round(Math.max(0, -start)),
       volume,
+      ...(sound ? { sound } : {}),
     }))
     .sort((a, b) => a.start - b.start || a.id.localeCompare(b.id))
     .slice(0, MAX_SFX);

@@ -27,6 +27,7 @@ video models, which sample rather than render.
 | `probe_media`          | Inspect a local media file → codecs, duration, sample rate, size, and HDR / colour / bit depth / VFR / rotation traits                                                                        |
 | `extract_style`        | Reference image/clip under the media dir → `{ theme, styleGuide, confidence }`: palette roles + WCAG contrast, grain, pacing (palette and pacing only)                                        |
 | `analyze_music`        | Measure a local music file → `{ bpm, offset, beatsPerBar, confidence, usable, cues, globalBeats }` for `global.beats` and `cue:drop`                                                          |
+| `analyze_sound`        | Render an `sfx[].sound` (composed, or a preset with variations) → length, peak/RMS dBFS, centroid, high/low energy shares, attack, advisories + spectrogram and waveform PNGs                 |
 | `get_capabilities`     | Local FFmpeg capability report (listings + one-frame probes) → each feature yes/no/unknown with a fix                                                                                         |
 | `render_remotion_clip` | _(bonus, opt-in)_ Render a composition from **your own** Remotion project → an mp4 clip for a `project_video` section                                                                         |
 | `ping`                 | Liveness check                                                                                                                                                                                |
@@ -185,9 +186,9 @@ Its `fields`, `userVideoPaths` and `locale` arguments bind media/copy, and `form
 orientation and fps. Codec, quality-tier and FFmpeg segment-concurrency fields are library host
 settings, not arbitrary MCP tool arguments.
 
-Sixteen tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`,
+Seventeen tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`,
 `get_motion_catalog`, `report_catalog_gap`, `get_timeline`, `validate_template`, `compose_video`,
-`render_frames`, `patch_template`, `edit_template`, `probe_media`, `extract_style`, `analyze_music` and `get_capabilities`. Opt-in adds
+`render_frames`, `patch_template`, `edit_template`, `probe_media`, `extract_style`, `analyze_music`, `analyze_sound` and `get_capabilities`. Opt-in adds
 `get_effect_schema`, `render_preview` and `render_remotion_clip`. Patch availability does not bypass
 effect-backend validation.
 

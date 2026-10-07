@@ -25,3 +25,5 @@ export {
   type JsonPatchOperation,
 } from './core/json-patch';
 export { findingLine, invalidTemplateText, summarizeErrors } from './services/validation-format';
+// Sound synthesis (pure): render and measure a composed `sound` or a varied library preset (MCP analyze_sound).
+export * from './core/audio/sound-api';

@@ -3,6 +3,7 @@ import { EasingSpecSchema } from './motion.schemas';
 import { timeValue } from './time.schemas';
 import { SFX_IDS } from '../core/audio/sfx-library';
 import { VOICE_PRESETS } from '../core/audio/voice-presets';
+import { SoundSchema } from './sound.schemas';
 
 // ── audio polish: voice presets, volume automation and sound effects ─────────────
 //
@@ -44,7 +45,8 @@ export const SfxIdSchema = z
 
 export const SfxCueSchema = z
   .object({
-    id: SfxIdSchema,
+    id: SfxIdSchema.optional(),
+    sound: SoundSchema.optional(),
     at: timeValue(z.number().min(0)).describe(
       'When the sound lands: seconds or a time reference ("cue:drop", "title.end", "beat:8"). A riser ends ' +
         'at this moment; every other sound starts at it.'
@@ -54,9 +56,15 @@ export const SfxCueSchema = z
       .min(0)
       .max(2)
       .optional()
-      .describe('Gain of this sound in the mix (default: the library default for the id).'),
+      .describe('Gain of this sound in the mix (default: the library default for the id or preset, else 0.6).'),
   })
-  .strict();
+  .strict()
+  .superRefine((cue, ctx) => {
+    if ((cue.id === undefined) === (cue.sound === undefined)) {
+      ctx.addIssue({ code: 'custom', message: 'a sound effect needs exactly one of id (library) or sound (composed)' });
+    }
+  })
+  .describe('One sound effect: a library `id`, or a composed `sound`.');
 
 export const SectionSfxSchema = z
   .array(SfxCueSchema)

@@ -5,12 +5,14 @@
 import { SFX_IDS, SFX_LIBRARY, type SfxEntry } from './sfx-library';
 import { VOICE_PRESETS, VOICE_PRESET_STAGES, type VoicePreset } from './voice-presets';
 import { AUTO_SFX_CAP } from './auto-sfx';
+import { composeCatalog, type ComposeCatalog } from './compose-catalog';
 
 export interface AudioCatalog {
   sfx: Array<Omit<SfxEntry, 'file'>>;
   voice: Record<VoicePreset, string>;
   automation: { fields: string[]; example: unknown; ducking: string };
   rules: string[];
+  compose: ComposeCatalog;
 }
 
 const VOICE_USE: Record<VoicePreset, string> = {
@@ -60,5 +62,6 @@ export function audioCatalog(): AudioCatalog {
       'voice on a recorded section (video / project_video) cleans speech; combine with audioEffect only for ' +
         'a creative colour (telephone, echo).',
     ],
+    compose: composeCatalog(),
   };
 }

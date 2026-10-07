@@ -16,6 +16,7 @@ import { nondeterminismAdvisories } from './determinism-advisories';
 import { adviseEachFormat, adviseEachFormatSync, expandedForFormats } from './validation/format-validation';
 import { formatAdvisories } from '@/core/formats/advisories';
 import { takeAdvisories } from './take-validation';
+import { soundAdvisories } from './sound-advisories';
 import { expandPartialsSafe } from '@/core/partials';
 
 export type { ValidationError, ValidationResult } from './BaseTemplateValidator';
@@ -139,6 +140,7 @@ export class TemplateValidator extends BaseTemplateValidator {
       ...beatGridAdvisories(resolved),
       ...nondeterminismAdvisories(resolved),
       ...takeWarnings(resolved),
+      ...soundAdvisories(resolved),
       ...collectScriptWarnings(resolved, capabilities),
     ]);
 

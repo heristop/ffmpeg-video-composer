@@ -68,7 +68,7 @@ export const DocMcp = () => (
     <DocSection id="tools" title="Tools" kicker={`${mcpDoc.tools.length} tools`}>
       <Prose>
         <p>
-          Sixteen tools are always registered. Remotion opt-in adds <Code>get_effect_schema</Code>,{' '}
+          Seventeen tools are always registered. Remotion opt-in adds <Code>get_effect_schema</Code>,{' '}
           <Code>render_preview</Code> and <Code>render_remotion_clip</Code>. Every argument below is the literal key the
           agent passes. Patch availability does not bypass effect-backend validation.
         </p>

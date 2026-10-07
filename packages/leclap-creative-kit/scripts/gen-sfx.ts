@@ -6,6 +6,8 @@
 // Run with `pnpm --dir packages/leclap-creative-kit gen:sfx [id ...]` (needs ffmpeg on PATH; ids limit the run,
 // since another FFmpeg build may not reproduce the other files byte for byte). The manifest the
 // engine reads (ids, durations, anchors, guidance) lives in ffmpeg-video-composer core/audio/sfx-library.ts.
+// Each recipe is also re-expressed in the engine's sound vocabulary (core/audio/sound-presets, what
+// `sound.preset` varies); tests/sound-presets-parity.test.ts keeps the two close, so change them together.
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync } from 'node:fs';
 import path from 'node:path';

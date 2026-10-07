@@ -11,6 +11,14 @@ Upgrading from v2? See the [migration guide](MIGRATION.md#upgrading-from-v2-to-v
 
 ### Added
 
+- Composed sound effects. An `sfx` cue takes a `sound` instead of an `id`: layers of `tone`, `noise`,
+  `strike` and `silence` shaped by envelopes, filter chains, glides, drive, pan and sequences, with
+  whole-sound saturate/crush/room/echo, bounded to 4 s and 8 layers. A pure TypeScript synth renders it
+  (identical on Node, browsers and Hermes, seeded by `global.seed` and the cue path) to `build/sfx/<hash>.wav`,
+  mixed like a library file. Every library sound is also a recipe (`SOUND_PRESETS`); `sound.preset` varies one
+  by `pitch`, `length`, `brightness` and `room`, while `id` cues keep playing the shipped files. Advisories
+  `sound_clipped`, `sound_harsh`, `sound_muddy`, `sound_long`, `sound_repeated` and `sound_overlap`;
+  `motionCatalog().audio.compose`; `renderSound`, `analyzeChannels`, `soundSpec` and `SoundSchema` exports.
 - `applyJsonPatch(doc, operations, { maxOps })` and `parsePointer(pointer)` (Node entry): RFC 6902 JSON
   Patch (`add`, `remove`, `replace`, `move`, `copy`, `test`) over RFC 6901 pointers (`-` append, `~0`/`~1`
   escapes). Atomic (runs on a copy, the input is never mutated); rejects `__proto__`/`prototype`/`constructor`

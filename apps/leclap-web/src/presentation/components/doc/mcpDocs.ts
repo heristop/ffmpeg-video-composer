@@ -172,6 +172,13 @@ export const mcpDoc: McpDoc = {
       when: 'Use before timing cuts and hits to the music ("beat:n", "bar:n", "cue:drop"). When usable is false (calm or ambient music), pace by phrases instead.',
     },
     {
+      name: 'analyze_sound',
+      args: 'sound, seed?, music?',
+      purpose:
+        'Renders a sound effect with the engine synth (composed layers, or a library preset with pitch/length/brightness/room) and measures it: length, peak and RMS dBFS, raw pre-normalisation peak, spectral centroid, energy above 8 kHz and under 250 Hz, attack time, the sound advisories it raises, plus a spectrogram and a waveform PNG.',
+      when: 'Use while composing an sfx sound: iterate until the numbers match the intent (a warm pop: centroid under 2 kHz, attack under 10 ms), then place it in the template.',
+    },
+    {
       name: 'get_capabilities',
       args: 'no arguments',
       purpose:

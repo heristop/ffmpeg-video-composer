@@ -1,0 +1,160 @@
+{
+  "meta": {
+    "name": "Composed sounds",
+    "description": "Every sound in this edit is composed in the template, not picked from the library: a varied preset, a glide-and-noise impact, a riser built from a swept tone and air that ends on the drop, and two bell blips a fifth apart for the close.",
+    "creativeDirection": "Audience: agents and editors who want a signature sound rather than the stock whoosh. Direction: one sound per visual event, each named on screen; vary pitch rather than repeat. Review with analyze_sound: the impact's centroid stays under 1 kHz, the bell blips sit above 1 kHz with a sub-10 ms attack, the riser ends exactly on the drop, and validate reports no sound advisory."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 41,
+    "transition": { "type": "push-left", "duration": 0.45, "ease": "$snappy" }
+  },
+  "sections": [
+    {
+      "name": "hook",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 2.6 },
+      "camera": { "hits": [{ "at": 0.6, "strength": 0.35 }] },
+      "sfx": [
+        {
+          "at": 0.6,
+          "sound": {
+            "length": 0.6,
+            "layers": [
+              {
+                "source": "tone",
+                "pitch": { "from": 190, "to": 48, "time": 0.08 },
+                "drive": 0.25,
+                "envelope": { "attack": 0.002, "decay": 0.55 }
+              },
+              {
+                "source": "noise",
+                "color": "pink",
+                "gain": 0.6,
+                "filter": { "type": "lowpass", "from": 7000, "to": 500 },
+                "envelope": { "attack": 0.002, "decay": 0.25 }
+              }
+            ],
+            "fx": { "saturate": 0.2, "room": 0.15 }
+          }
+        },
+        { "at": 1.6, "sound": { "preset": "whoosh", "pitch": 1.25, "length": 0.45, "brightness": 0.3 } }
+      ],
+      "kinetic": [
+        {
+          "text": { "en": "MADE, NOT PICKED." },
+          "preset": "impact",
+          "size": 150,
+          "y": "center",
+          "delay": 0.6,
+          "color": "#F5F3F7"
+        },
+        {
+          "text": { "en": "impact: glide + noise · whoosh, varied" },
+          "preset": "fade",
+          "font": "mono",
+          "size": 30,
+          "y": 560,
+          "color": "#9A98A6",
+          "delay": 1.0
+        }
+      ]
+    },
+    {
+      "name": "build",
+      "type": "color_background",
+      "options": { "backgroundColor": "#1B1830", "duration": 3.4 },
+      "cues": { "drop": 2.2 },
+      "camera": { "preset": "push-in", "amount": 0.1, "hits": ["cue:drop"] },
+      "graphics": [{ "type": "flash", "at": "cue:drop", "duration": 0.3, "intensity": 0.6 }],
+      "sfx": [
+        {
+          "at": "cue:drop",
+          "sound": {
+            "length": 1.6,
+            "anchor": "end",
+            "layers": [
+              {
+                "source": "tone",
+                "wave": "triangle",
+                "gain": 0.6,
+                "pitch": { "from": 220, "to": 2200 },
+                "envelope": { "attack": 1.55, "sustain": 1, "release": 0.05 }
+              },
+              {
+                "source": "noise",
+                "gain": 0.2,
+                "filter": { "type": "highpass", "from": 1500, "to": 6000 },
+                "envelope": { "attack": 1.55, "sustain": 1, "release": 0.05 }
+              }
+            ]
+          }
+        },
+        { "at": "cue:drop", "sound": { "preset": "boom", "pitch": 0.85, "length": 1 } }
+      ],
+      "kinetic": [
+        { "text": { "en": "Build up" }, "preset": "fade", "size": 110, "y": 250, "delay": 0.4, "color": "#9A98A6" },
+        {
+          "text": { "en": "DROP" },
+          "preset": "pop",
+          "size": 220,
+          "y": "center",
+          "delay": "cue:drop",
+          "color": "#FFF685"
+        }
+      ]
+    },
+    {
+      "name": "close",
+      "type": "color_background",
+      "options": { "backgroundColor": "#141416", "duration": 2.6 },
+      "sfx": [
+        {
+          "at": 0.5,
+          "sound": {
+            "layers": [
+              {
+                "source": "strike",
+                "pitch": 1320,
+                "ring": 0.45,
+                "partials": [
+                  { "ratio": 1, "gain": 1 },
+                  { "ratio": 2.76, "gain": 0.3 }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "at": 0.75,
+          "sound": {
+            "layers": [
+              {
+                "source": "strike",
+                "pitch": 1980,
+                "ring": 0.7,
+                "partials": [
+                  { "ratio": 1, "gain": 1 },
+                  { "ratio": 2.76, "gain": 0.3 }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "kinetic": [
+        {
+          "text": { "en": "Your sound." },
+          "preset": "rise",
+          "size": 120,
+          "y": "center",
+          "delay": 0.5,
+          "color": "#F5F3F7",
+          "ease": "$smooth"
+        }
+      ]
+    }
+  ]
+}

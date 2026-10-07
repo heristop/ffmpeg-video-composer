@@ -21,4 +21,9 @@ describe('motionForPrompt', () => {
 
     expect(riser?.anchor).toBe('end');
   });
+
+  it('leaves composed sounds to MCP agents: no compose section in the prompt', () => {
+    expect(motion.audio).toHaveProperty('compose');
+    expect(trimmed.audio).not.toHaveProperty('compose');
+  });
 });

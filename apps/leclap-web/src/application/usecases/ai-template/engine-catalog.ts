@@ -93,12 +93,15 @@ function fxForPrompt(fx: MotionCatalog['fx']): MotionCatalog['fx'] {
 }
 
 // Each sound with what it is for and, for a build, that it ends on its cue: the mix decides length and level.
+// The `compose` guide is for MCP agents that measure what they compose (prompt-schema.ts drops the
+// vocabulary too).
 function audioForPrompt(audio: MotionCatalog['audio']): MotionCatalog['audio'] {
   const sfx = audio.sfx.map(({ id, anchor, useWhen }) =>
     anchor === 'end' ? { id, anchor, useWhen } : { id, useWhen }
   );
+  const { compose: _compose, ...rest } = audio;
 
-  return { ...audio, sfx } as unknown as MotionCatalog['audio'];
+  return { ...rest, sfx } as unknown as MotionCatalog['audio'];
 }
 
 export function motionForPrompt(motion: MotionCatalog, genre?: string): Omit<MotionCatalog, 'partials'> {

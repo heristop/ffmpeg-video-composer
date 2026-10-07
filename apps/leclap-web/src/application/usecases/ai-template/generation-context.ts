@@ -6,6 +6,7 @@ import { getSample, listSamples } from 'ffmpeg-video-composer/src/samples.ts';
 import type { SampleDetail } from 'ffmpeg-video-composer/src/samples/types.ts';
 import { ANIMATION_LIBRARY, MUSIC_LIBRARY } from '@/data/mediaCatalog';
 import { buildEngineCatalog, type EngineCatalog } from './engine-catalog';
+import { promptSchema } from './prompt-schema';
 import { isSeedCandidate, pickSamples } from './sample-picker';
 import { buildSystemPrompt, type BuiltPrompt, type GenerationHints } from './system-prompt';
 
@@ -19,7 +20,7 @@ let cached: GenerationContext | null = null;
 
 export function generationContext(): GenerationContext {
   cached ??= {
-    schema: templateDescriptorJsonSchema,
+    schema: promptSchema(templateDescriptorJsonSchema),
     samples: listSamples()
       .map((summary) => getSample(summary.id))
       .filter(isSeedCandidate),

@@ -1091,7 +1091,7 @@
       "purpose": "Play the rendered sound chapter.",
       "options": {
         "videoUrl": "{{ chapter_09 }}",
-        "duration": 46.78,
+        "duration": 51.58,
         "musicVolume": 0,
         "muteSection": false
       },

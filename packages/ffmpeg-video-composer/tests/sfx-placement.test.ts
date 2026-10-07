@@ -65,6 +65,17 @@ describe('auto sound effects', () => {
 
     expect(auto([authored])).toEqual([[{ id: 'boom', at: 2.05 }]]);
 
+    // A composed sound counts too, by its own anchor: a composed riser ending at 2 leaves the hit alone.
+    const sound = { layers: [{ source: 'noise' }], length: 1 };
+    const composed = card('a', { sfx: [{ sound, at: 2.05 }], camera: { preset: 'push-in', hits: [2] } });
+    const riser = card('a', {
+      sfx: [{ sound: { ...sound, anchor: 'end' }, at: 2.05 }],
+      camera: { preset: 'push-in', hits: [2] },
+    });
+
+    expect(auto([composed])).toEqual([[{ sound, at: 2.05 }]]);
+    expect(auto([riser])[0]).toHaveLength(2);
+
     const off = { global: {}, sections: [card('a', { camera: { preset: 'push-in', hits: [2] } })] };
 
     expect(expandAutoSfx(off)).toBe(off);

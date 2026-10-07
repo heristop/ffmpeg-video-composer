@@ -650,6 +650,9 @@
                 ],
                 "description": "A sound from the bundled library (motionCatalog().audio.sfx lists when to use each one)."
               },
+              "sound": {
+                "$ref": "#/$defs/Sound"
+              },
               "at": {
                 "anyOf": [
                   {
@@ -663,14 +666,15 @@
                 "description": "When the sound lands: seconds or a time reference (\"cue:drop\", \"title.end\", \"beat:8\"). A riser ends at this moment; every other sound starts at it."
               },
               "volume": {
-                "description": "Gain of this sound in the mix (default: the library default for the id).",
+                "description": "Gain of this sound in the mix (default: the library default for the id or preset, else 0.6).",
                 "type": "number",
                 "minimum": 0,
                 "maximum": 2
               }
             },
-            "required": ["id", "at"],
-            "additionalProperties": false
+            "required": ["at"],
+            "additionalProperties": false,
+            "description": "One sound effect: a library `id`, or a composed `sound`."
           },
           "description": "Sound effects on the whole-video timeline. `at`: video seconds, \"beat:n\" / \"bar:n\", \"<section>.start\" / \"<section>.end\" (a section name), \"cue:<name>\" (the first section with that cue), \"50%\" or \"end\" of the video, each with an optional offset."
         },
@@ -3014,6 +3018,9 @@
                       ],
                       "description": "A sound from the bundled library (motionCatalog().audio.sfx lists when to use each one)."
                     },
+                    "sound": {
+                      "$ref": "#/$defs/Sound"
+                    },
                     "at": {
                       "anyOf": [
                         {
@@ -3027,14 +3034,15 @@
                       "description": "When the sound lands: seconds or a time reference (\"cue:drop\", \"title.end\", \"beat:8\"). A riser ends at this moment; every other sound starts at it."
                     },
                     "volume": {
-                      "description": "Gain of this sound in the mix (default: the library default for the id).",
+                      "description": "Gain of this sound in the mix (default: the library default for the id or preset, else 0.6).",
                       "type": "number",
                       "minimum": 0,
                       "maximum": 2
                     }
                   },
-                  "required": ["id", "at"],
-                  "additionalProperties": false
+                  "required": ["at"],
+                  "additionalProperties": false,
+                  "description": "One sound effect: a library `id`, or a composed `sound`."
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -5802,6 +5810,9 @@
                       ],
                       "description": "A sound from the bundled library (motionCatalog().audio.sfx lists when to use each one)."
                     },
+                    "sound": {
+                      "$ref": "#/$defs/Sound"
+                    },
                     "at": {
                       "anyOf": [
                         {
@@ -5815,14 +5826,15 @@
                       "description": "When the sound lands: seconds or a time reference (\"cue:drop\", \"title.end\", \"beat:8\"). A riser ends at this moment; every other sound starts at it."
                     },
                     "volume": {
-                      "description": "Gain of this sound in the mix (default: the library default for the id).",
+                      "description": "Gain of this sound in the mix (default: the library default for the id or preset, else 0.6).",
                       "type": "number",
                       "minimum": 0,
                       "maximum": 2
                     }
                   },
-                  "required": ["id", "at"],
-                  "additionalProperties": false
+                  "required": ["at"],
+                  "additionalProperties": false,
+                  "description": "One sound effect: a library `id`, or a composed `sound`."
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -8633,6 +8645,9 @@
                       ],
                       "description": "A sound from the bundled library (motionCatalog().audio.sfx lists when to use each one)."
                     },
+                    "sound": {
+                      "$ref": "#/$defs/Sound"
+                    },
                     "at": {
                       "anyOf": [
                         {
@@ -8646,14 +8661,15 @@
                       "description": "When the sound lands: seconds or a time reference (\"cue:drop\", \"title.end\", \"beat:8\"). A riser ends at this moment; every other sound starts at it."
                     },
                     "volume": {
-                      "description": "Gain of this sound in the mix (default: the library default for the id).",
+                      "description": "Gain of this sound in the mix (default: the library default for the id or preset, else 0.6).",
                       "type": "number",
                       "minimum": 0,
                       "maximum": 2
                     }
                   },
-                  "required": ["id", "at"],
-                  "additionalProperties": false
+                  "required": ["at"],
+                  "additionalProperties": false,
+                  "description": "One sound effect: a library `id`, or a composed `sound`."
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -11188,6 +11204,9 @@
                       ],
                       "description": "A sound from the bundled library (motionCatalog().audio.sfx lists when to use each one)."
                     },
+                    "sound": {
+                      "$ref": "#/$defs/Sound"
+                    },
                     "at": {
                       "anyOf": [
                         {
@@ -11201,14 +11220,15 @@
                       "description": "When the sound lands: seconds or a time reference (\"cue:drop\", \"title.end\", \"beat:8\"). A riser ends at this moment; every other sound starts at it."
                     },
                     "volume": {
-                      "description": "Gain of this sound in the mix (default: the library default for the id).",
+                      "description": "Gain of this sound in the mix (default: the library default for the id or preset, else 0.6).",
                       "type": "number",
                       "minimum": 0,
                       "maximum": 2
                     }
                   },
-                  "required": ["id", "at"],
-                  "additionalProperties": false
+                  "required": ["at"],
+                  "additionalProperties": false,
+                  "description": "One sound effect: a library `id`, or a composed `sound`."
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -13723,6 +13743,9 @@
                       ],
                       "description": "A sound from the bundled library (motionCatalog().audio.sfx lists when to use each one)."
                     },
+                    "sound": {
+                      "$ref": "#/$defs/Sound"
+                    },
                     "at": {
                       "anyOf": [
                         {
@@ -13736,14 +13759,15 @@
                       "description": "When the sound lands: seconds or a time reference (\"cue:drop\", \"title.end\", \"beat:8\"). A riser ends at this moment; every other sound starts at it."
                     },
                     "volume": {
-                      "description": "Gain of this sound in the mix (default: the library default for the id).",
+                      "description": "Gain of this sound in the mix (default: the library default for the id or preset, else 0.6).",
                       "type": "number",
                       "minimum": 0,
                       "maximum": 2
                     }
                   },
-                  "required": ["id", "at"],
-                  "additionalProperties": false
+                  "required": ["at"],
+                  "additionalProperties": false,
+                  "description": "One sound effect: a library `id`, or a composed `sound`."
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -16729,6 +16753,9 @@
                       ],
                       "description": "A sound from the bundled library (motionCatalog().audio.sfx lists when to use each one)."
                     },
+                    "sound": {
+                      "$ref": "#/$defs/Sound"
+                    },
                     "at": {
                       "anyOf": [
                         {
@@ -16742,14 +16769,15 @@
                       "description": "When the sound lands: seconds or a time reference (\"cue:drop\", \"title.end\", \"beat:8\"). A riser ends at this moment; every other sound starts at it."
                     },
                     "volume": {
-                      "description": "Gain of this sound in the mix (default: the library default for the id).",
+                      "description": "Gain of this sound in the mix (default: the library default for the id or preset, else 0.6).",
                       "type": "number",
                       "minimum": 0,
                       "maximum": 2
                     }
                   },
-                  "required": ["id", "at"],
-                  "additionalProperties": false
+                  "required": ["at"],
+                  "additionalProperties": false,
+                  "description": "One sound effect: a library `id`, or a composed `sound`."
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -19264,6 +19292,9 @@
                       ],
                       "description": "A sound from the bundled library (motionCatalog().audio.sfx lists when to use each one)."
                     },
+                    "sound": {
+                      "$ref": "#/$defs/Sound"
+                    },
                     "at": {
                       "anyOf": [
                         {
@@ -19277,14 +19308,15 @@
                       "description": "When the sound lands: seconds or a time reference (\"cue:drop\", \"title.end\", \"beat:8\"). A riser ends at this moment; every other sound starts at it."
                     },
                     "volume": {
-                      "description": "Gain of this sound in the mix (default: the library default for the id).",
+                      "description": "Gain of this sound in the mix (default: the library default for the id or preset, else 0.6).",
                       "type": "number",
                       "minimum": 0,
                       "maximum": 2
                     }
                   },
-                  "required": ["id", "at"],
-                  "additionalProperties": false
+                  "required": ["at"],
+                  "additionalProperties": false,
+                  "description": "One sound effect: a library `id`, or a composed `sound`."
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -21799,6 +21831,9 @@
                       ],
                       "description": "A sound from the bundled library (motionCatalog().audio.sfx lists when to use each one)."
                     },
+                    "sound": {
+                      "$ref": "#/$defs/Sound"
+                    },
                     "at": {
                       "anyOf": [
                         {
@@ -21812,14 +21847,15 @@
                       "description": "When the sound lands: seconds or a time reference (\"cue:drop\", \"title.end\", \"beat:8\"). A riser ends at this moment; every other sound starts at it."
                     },
                     "volume": {
-                      "description": "Gain of this sound in the mix (default: the library default for the id).",
+                      "description": "Gain of this sound in the mix (default: the library default for the id or preset, else 0.6).",
                       "type": "number",
                       "minimum": 0,
                       "maximum": 2
                     }
                   },
-                  "required": ["id", "at"],
-                  "additionalProperties": false
+                  "required": ["at"],
+                  "additionalProperties": false,
+                  "description": "One sound effect: a library `id`, or a composed `sound`."
                 },
                 "description": "Sound effects placed in this section; `at` is section time. Mixed over music and clip sound."
               },
@@ -23078,6 +23114,376 @@
       "minLength": 1,
       "maxLength": 80,
       "description": "A moment in this section, resolved to seconds at compile time. \"<id>.start\" / \"<id>.end\": an element with that id in the same section (kinetic block, graphic or drawtext filter); end = when its entrance has landed. \"50%\": a fraction of the section duration. \"end\": the section end. \"beat:12\" / \"bar:3\": the 12th beat / downbeat of bar 3 of global.beats (1-based, counted on the whole video). \"cue:drop\": a named point in sections[].cues. Every form takes an offset in seconds: \"title.end + 0.2\", \"end - 0.5\", \"beat:8 - 0.1\". Hits and flashes land exactly on a beat; lead entrances by 0.04–0.19 s (\"beat:8 - 0.1\") so they read as on the beat."
+    },
+    "Sound": {
+      "type": "object",
+      "properties": {
+        "preset": {
+          "description": "Start from a library sound; vary it with pitch/length/brightness/room.",
+          "type": "string",
+          "enum": [
+            "whoosh",
+            "swoosh-short",
+            "hit",
+            "boom",
+            "riser",
+            "click",
+            "tick",
+            "pop",
+            "shutter",
+            "ding",
+            "glitch",
+            "sparkle",
+            "thud",
+            "zap",
+            "notification",
+            "keystroke",
+            "blip",
+            "rise-short",
+            "coin",
+            "drum-roll",
+            "heartbeat",
+            "clap",
+            "snap",
+            "success",
+            "error",
+            "swoosh-long",
+            "sub-drop",
+            "reverse-cymbal",
+            "water-drop",
+            "whistle-up",
+            "camera-focus",
+            "paper",
+            "tada"
+          ]
+        },
+        "pitch": {
+          "description": "Preset only: pitch ratio.",
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 4
+        },
+        "brightness": {
+          "description": "Preset only: filter tilt.",
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "room": {
+          "description": "Preset only: added reverb.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "layers": {
+          "minItems": 1,
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string",
+                "enum": ["tone", "noise", "strike", "silence"]
+              },
+              "pitch": {
+                "$ref": "#/$defs/SoundPitch"
+              },
+              "wave": {
+                "description": "tone",
+                "type": "string",
+                "enum": ["sine", "triangle", "square", "saw"]
+              },
+              "vibrato": {
+                "description": "tone",
+                "type": "object",
+                "properties": {
+                  "rate": {
+                    "type": "number",
+                    "minimum": 0.1,
+                    "maximum": 20
+                  },
+                  "depth": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2,
+                    "description": "Semitones."
+                  }
+                },
+                "required": ["rate", "depth"],
+                "additionalProperties": false
+              },
+              "color": {
+                "description": "noise",
+                "type": "string",
+                "enum": ["white", "pink", "brown"]
+              },
+              "ring": {
+                "description": "strike: seconds to fall 60 dB (0.6).",
+                "type": "number",
+                "minimum": 0.01,
+                "maximum": 4
+              },
+              "partials": {
+                "description": "strike overtones, ratio × pitch (default 1, 2, 3).",
+                "minItems": 1,
+                "maxItems": 8,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ratio": {
+                      "type": "number",
+                      "minimum": 0.25,
+                      "maximum": 16
+                    },
+                    "gain": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": ["ratio", "gain"],
+                  "additionalProperties": false
+                }
+              },
+              "click": {
+                "description": "strike: noise transient.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "gain": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "delay": {
+                "description": "Seconds before the layer.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 4
+              },
+              "pan": {
+                "type": "number",
+                "minimum": -1,
+                "maximum": 1
+              },
+              "envelope": {
+                "$ref": "#/$defs/SoundEnvelope"
+              },
+              "filter": {
+                "description": "One filter or a chain (e.g. highpass then lowpass).",
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/SoundFilter"
+                  },
+                  {
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/SoundFilter"
+                    }
+                  }
+                ]
+              },
+              "drive": {
+                "description": "Per-layer soft clip (square-ish, 808).",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "length": {
+                "description": "Seconds per note.",
+                "type": "number",
+                "minimum": 0.005,
+                "maximum": 4
+              },
+              "repeat": {
+                "description": "Hits (rolls, ticks).",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 32
+              },
+              "every": {
+                "description": "Seconds between hits (0.1).",
+                "type": "number",
+                "minimum": 0.01,
+                "maximum": 2
+              },
+              "accelerate": {
+                "description": "Each gap ×(1-accelerate).",
+                "type": "number",
+                "minimum": -1,
+                "maximum": 0.9
+              },
+              "jitter": {
+                "description": "Seeded hit timing/level variation.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": ["source"],
+            "additionalProperties": false,
+            "description": "tone and strike need pitch; silence takes only length and delay."
+          }
+        },
+        "length": {
+          "description": "Seconds (default: the layers plus the fx tail).",
+          "type": "number",
+          "minimum": 0.02,
+          "maximum": 4
+        },
+        "anchor": {
+          "description": "Edge that lands on `at` (end = a riser). Default start.",
+          "type": "string",
+          "enum": ["start", "end"]
+        },
+        "fx": {
+          "type": "object",
+          "properties": {
+            "saturate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "crush": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "room": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "echo": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "additionalProperties": false,
+          "description": "Whole-sound fx, 0..1: soft clip, bit crush, small reverb, echo (mix; 0.18 s, feedback 0.35)."
+        }
+      },
+      "additionalProperties": false,
+      "description": "A synthesized sound: layers of tone/noise/strike/silence, each shaped (envelope, filter, gain, pan, delay, repeat), mixed, fx applied, peak-normalised to -3 dBFS. Or a preset varied. Max 4 s, 8 layers."
+    },
+    "SoundPitch": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 12000
+        },
+        {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "number",
+              "minimum": 20,
+              "maximum": 12000
+            },
+            "to": {
+              "type": "number",
+              "minimum": 20,
+              "maximum": 12000
+            },
+            "curve": {
+              "type": "string",
+              "enum": ["linear", "exp"]
+            },
+            "time": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 4
+            }
+          },
+          "required": ["from", "to"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "Hz, or a sweep {from,to} over each note (exp by default), or over `time` s then held."
+    },
+    "SoundEnvelope": {
+      "type": "object",
+      "properties": {
+        "attack": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "hold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "decay": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "sustain": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "release": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "curve": {
+          "type": "string",
+          "enum": ["linear", "exp"]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Seconds; attack (default 0.005) to 1, hold, decay to sustain (default 0; no decay = the whole note), release at the note end. curve: exp (default; the attack swells, decays fall fast) or linear."
+    },
+    "SoundFilter": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["lowpass", "highpass", "bandpass"]
+        },
+        "cutoff": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 20000
+        },
+        "from": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 20000
+        },
+        "to": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 20000
+        },
+        "curve": {
+          "type": "string",
+          "enum": ["linear", "exp"]
+        },
+        "time": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "resonance": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 12
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false,
+      "description": "Hz: cutoff, or from→to over each note. resonance = Q (default 0.707)."
     },
     "Animate": {
       "type": "object",

@@ -371,12 +371,50 @@ The bar height is `(ih - iw/aspect) / 2`, computed from the compiled output fram
 
 **Clip automation** — `options.audioAutomation: [{ at, volume, ease? }]` on `video` / `project_video`, in section time, after voice and effect and before `audioFade`.
 
-**Sound effects** — section `sfx` (up to 32, section time) and `global.sfx` (up to 64, whole-video time) take `[{ id, at, volume? }]`. Ids: `whoosh`, `swoosh-short`, `hit`, `boom`, `riser`, `click`, `tick`, `pop`, `shutter`, `ding`, `glitch`, `sparkle`, `thud`, `zap`, `notification`, `keystroke`, `blip`, `rise-short`, `coin`, `drum-roll`, `heartbeat`, `clap`, `snap`, `success`, `error`, `swoosh-long`, `sub-drop`, `reverse-cymbal`, `water-drop`, `whistle-up`, `camera-focus`, `paper`, `tada`; `motionCatalog().audio.sfx` says when to use each. `riser`, `rise-short`, `drum-roll` and `reverse-cymbal` end at `at`; every other sound starts there. Sounds are placed on the joined timeline (transition overlaps included) and mixed over music and clip sound (`amix normalize=0`) before normalisation, so `loudnorm` measures the finished mix. A global `at` takes seconds, `"beat:n"` / `"bar:n"`, `"<section>.start"` / `"<section>.end"`, `"cue:<name>"` (the first section declaring it), `"50%"` or `"end"`, and needs every earlier section to declare `options.duration`. The sounds are synthesized originals bundled with the creative kit (`@leclap/creative-kit/sfx`).
+**Sound effects** — section `sfx` (up to 32, section time) and `global.sfx` (up to 64, whole-video time) take `[{ id, at, volume? }]` or `[{ sound, at, volume? }]` (see [Composed sounds](#composed-sounds)). Ids: `whoosh`, `swoosh-short`, `hit`, `boom`, `riser`, `click`, `tick`, `pop`, `shutter`, `ding`, `glitch`, `sparkle`, `thud`, `zap`, `notification`, `keystroke`, `blip`, `rise-short`, `coin`, `drum-roll`, `heartbeat`, `clap`, `snap`, `success`, `error`, `swoosh-long`, `sub-drop`, `reverse-cymbal`, `water-drop`, `whistle-up`, `camera-focus`, `paper`, `tada`; `motionCatalog().audio.sfx` says when to use each. `riser`, `rise-short`, `drum-roll` and `reverse-cymbal` end at `at`; every other sound starts there. Sounds are placed on the joined timeline (transition overlaps included) and mixed over music and clip sound (`amix normalize=0`) before normalisation, so `loudnorm` measures the finished mix. A global `at` takes seconds, `"beat:n"` / `"bar:n"`, `"<section>.start"` / `"<section>.end"`, `"cue:<name>"` (the first section declaring it), `"50%"` or `"end"`, and needs every earlier section to declare `options.duration`. The sounds are synthesized originals bundled with the creative kit (`@leclap/creative-kit/sfx`).
 
 ```jsonc
 "global": { "audio": { "sfx": "auto", "automation": [{ "at": 0, "volume": 1 }, { "at": "cue:drop", "volume": 0.4, "ease": "ease-out" }] } },
 "sections": [{ "name": "hook", "type": "video", "options": { "videoUrl": "videos/talk.mp4", "voice": "clean" }, "sfx": [{ "id": "hit", "at": 1.2 }] }]
 ```
+
+### Composed sounds
+
+A cue takes exactly one of `id` (a library file, unchanged) or `sound`. A `sound` is synthesized in TypeScript (identical on Node, in the browser and on device), written to `build/sfx/<hash>.wav` and mixed like a library file; identical sounds render once.
+
+- **Preset, varied** — `{ "preset": "<id>", "pitch"?: 0.25–4 (ratio), "length"?: s, "brightness"?: −1–1, "room"?: 0–1 }` renders the library sound's recipe with the variation applied: every pitch and cutoff scaled, every time stretched to `length`, cutoffs moved up to two octaves plus a tilt filter, a small room. A preset with no variation plays the shipped file byte for byte. It keeps the library's anchor and default level.
+- **Composed** — `{ "layers": [...], "length"?: ≤ 4 s, "anchor"?: "start" | "end", "fx"?: {...} }`, up to 8 layers. A layer's `source` is `tone` (`wave` sine/triangle/square/saw, `pitch`, `vibrato { rate, depth }`), `noise` (`color` white/pink/brown, seeded), `strike` (a struck note: `pitch`, `ring` seconds to −60 dB, `partials [{ ratio, gain }]`, `click` transient) or `silence` (`length`, `delay`). `pitch` is Hz (20–12 000) or a sweep `{ from, to, curve?: exp|linear, time? }` (over `time` seconds then held, else over the note). Every audible layer takes `envelope { attack, hold, decay, sustain, release, curve }`, `filter` (one or a chain of up to 3: `{ type: lowpass|highpass|bandpass, cutoff | from+to, resonance 0.5–12, time? }`), `drive` (soft clip), `gain` 0–1, `pan` −1–1, `delay`, `length` per note, and `repeat` / `every` / `accelerate` / `jitter` for rolls and ticks. Whole-sound `fx`: `saturate`, `crush`, `room`, `echo` (0–1 each).
+- **Level and seed** — the render is peak-normalised to −3 dBFS like the library, then `volume` applies (default 0.6 for a composed sound). Layer gains set the balance, not the level. Noise and jitter are seeded by `global.seed` and the cue's path (`sections.<name>.sfx[k]`, `global.sfx[k]`), so a render is reproducible.
+- **Recipes** — every library sound is a recipe in the same vocabulary (`SOUND_PRESETS`); `motionCatalog().audio.compose` explains impacts, risers, blips and textures with worked examples, and its rule: one signature sound per beat, vary pitch rather than repeat.
+
+```jsonc
+"sfx": [
+  { "id": "whoosh", "at": "title.start" },
+  { "at": "cue:reveal", "sound": { "preset": "sparkle", "pitch": 1.2, "length": 0.8 } },
+  { "at": "beat:4", "sound": {
+      "length": 0.45,
+      "layers": [
+        { "source": "noise", "color": "pink", "filter": { "type": "lowpass", "from": 9000, "to": 600 },
+          "envelope": { "attack": 0.01, "decay": 0.35 }, "gain": 0.8 },
+        { "source": "tone", "pitch": { "from": 180, "to": 55, "time": 0.08 }, "drive": 0.2,
+          "envelope": { "attack": 0.002, "decay": 0.3 }, "gain": 0.6 }
+      ],
+      "fx": { "saturate": 0.2, "room": 0.15 } } }
+]
+```
+
+**Sound advisories** (advisory, like the motion lint; `leclap validate` and the MCP `validate_template` report them with a hint):
+
+| Code             | When                                                                                                                  |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `sound_clipped`  | A rendered sound's layers sum past +9 dBFS before normalisation: the written gains no longer describe the balance.    |
+| `sound_harsh`    | A rendered sound longer than 0.25 s has over half its energy above 8 kHz (white noise measures 0.67, pink 0.14).      |
+| `sound_muddy`    | Under music, a rendered sound longer than 0.8 s has over 90 % of its energy under 250 Hz: it blurs the kick and bass. |
+| `sound_long`     | A section's sound runs more than 0.5 s past the section's end.                                                        |
+| `sound_repeated` | Three or more cues of a list all play the same sound: vary `pitch` on a preset instead.                               |
+| `sound_overlap`  | A fourth sound starts while three still play.                                                                         |
+
+**Measure before placing** — the MCP `analyze_sound` tool renders a `sound` and returns its length, peak and RMS level (dBFS; a plain RMS, not LUFS), raw pre-normalisation peak, spectral centroid, energy share above 8 kHz and under 250 Hz, attack time and the advisories it raises, plus a spectrogram and a waveform PNG. Iterate until the numbers match the intent (a warm pop: centroid under 2 kHz, attack under 10 ms).
 
 > `speed` ≠ 1 retimes audio via `atempo`, which is **clamped to `[0.5, 2]`**. Outside that range, video and audio can desync — split into multiple `atempo` stages or avoid extreme speeds.
 

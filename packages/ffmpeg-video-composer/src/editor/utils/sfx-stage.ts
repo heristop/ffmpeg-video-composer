@@ -1,6 +1,7 @@
 // Prepares the sound effects for the final audio pass (MusicComposer): plans where each lands
-// (sfx-plan.ts), resolves each distinct file — the copy shipped with the creative kit on Node, else a
-// download from the asset source into the build assets — and hands back the `-i` arguments plus a
+// (sfx-plan.ts), resolves each distinct file — a composed sound rendered into the build (sfx-sound.ts),
+// else the copy shipped with the creative kit on Node, else a download from the asset source into the
+// build assets — and hands back the `-i` arguments plus a
 // builder for the mix chains once the caller knows which input index they start at.
 
 import type { ProjectBuildInfos, ProjectConfig, Section, TemplateDescriptor } from '@/core/types';
@@ -13,6 +14,7 @@ import { engineCapabilities } from './filter-compat';
 import { VIDEO_SEGMENT_TYPES } from './section-types';
 import { hasSfx, planSfx, videoTimeline, type SfxPlacement } from './sfx-plan';
 import { sfxFiles, sfxGraph, type SfxGraph } from './sfx-mix';
+import { stageSound } from './sfx-sound';
 
 export interface SfxStage {
   placements: SfxPlacement[];
@@ -44,7 +46,15 @@ export function descriptorHasSfx(descriptor: TemplateDescriptor): boolean {
   return hasSfx(renderingSections(descriptor), descriptor.global);
 }
 
-async function resolveSfxFile(file: string, ctx: SfxStageContext): Promise<string> {
+async function resolveSfxFile(
+  file: string,
+  placements: readonly SfxPlacement[],
+  ctx: SfxStageContext
+): Promise<string> {
+  const sound = placements.find((placement) => placement.file === file)?.sound;
+
+  if (sound) return stageSound(file, sound, ctx);
+
   const bundled = await ctx.filesystem.resolveBundledSfx(file);
 
   if (bundled) return bundled;
@@ -65,7 +75,7 @@ export async function prepareSfxStage(ctx: SfxStageContext): Promise<SfxStage | 
 
   if (placements.length === 0) return null;
 
-  const resolved = await Promise.all(sfxFiles(placements).map((file) => resolveSfxFile(file, ctx)));
+  const resolved = await Promise.all(sfxFiles(placements).map((file) => resolveSfxFile(file, placements, ctx)));
   const paths = resolved.map((path) => assertSafeArgToken(path, 'sound effect path'));
 
   const sampleRate = ctx.config.audioConfig?.sampleRate ?? DefaultConfig.SAMPLE_RATE;

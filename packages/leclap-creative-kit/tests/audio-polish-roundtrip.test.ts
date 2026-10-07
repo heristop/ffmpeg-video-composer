@@ -65,5 +65,7 @@ describe('sound-effect library listing', () => {
   it('lists every bundled sound with its kit path and license', () => {
     expect(SFX_ITEMS.map((item) => item.path)).toContain('sfx/riser.m4a');
     expect(SFX_ITEMS.every((item) => item.useWhen.length > 0 && item.license.startsWith('CC0'))).toBe(true);
+    // Each file's recipe in the sound vocabulary: what a `sound: { preset }` cue varies.
+    expect(SFX_ITEMS.every((item) => item.recipe.layers.length > 0)).toBe(true);
   });
 });
