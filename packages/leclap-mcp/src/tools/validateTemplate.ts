@@ -22,6 +22,7 @@ import { validateTemplate } from '../compose/validation.js';
 import { motionNote, motionWarnings, motionWarningsSchema } from './motionWarnings.js';
 import { capabilityWarnings } from '../compose/capabilities.js';
 import { featureNote, featureWarningsSchema } from './featureWarnings.js';
+import { fieldContract, fieldContractSchema } from '../compose/field-values.js';
 
 const inputSchema = z.object({
   template: z.record(z.string(), z.unknown()),
@@ -43,6 +44,7 @@ const outputSchema = z.object({
   orientation: z.string().nullable(),
   requiredClips: z.array(z.string()),
   formFields: z.array(z.string()),
+  fields: fieldContractSchema,
   // Present only when there is something to say. A clean template omits the field rather than
   // sending an empty array — the agent pays for every key it reads.
   geometry: z
@@ -301,6 +303,7 @@ async function summary(
   const orientation = effectiveOrientation(descriptor.global) ?? null;
   const clips = requiredClips(descriptor);
   const fields = formFields(descriptor);
+  const contract = fieldContract(descriptor);
   const hasEffects = (descriptor.sections ?? []).some((section) => section.type === 'effect');
   const { geometry, render } = hasEffects
     ? await effectFindings(descriptor, authored, request)
@@ -310,6 +313,7 @@ async function summary(
   const needs = [
     clips.length > 0 ? `clips: ${clips.join(', ')}` : 'no clips',
     fields.length > 0 ? `fields: ${fields.join(', ')}` : 'no fields',
+    ...(contract ? [`declared fields: ${contract.map((field) => `${field.name} (${field.type})`).join(', ')}`] : []),
   ].join('; ');
 
   return {
@@ -327,6 +331,7 @@ async function summary(
       orientation,
       requiredClips: clips,
       formFields: fields,
+      ...(contract ? { fields: contract } : {}),
       geometry,
       motionWarnings: motion,
       featureWarnings: features,
@@ -335,7 +340,7 @@ async function summary(
   };
 }
 
-async function handleValidate(args: ValidateArgs, config: RenderConfig, ctx?: ServerContext) {
+export async function handleValidate(args: ValidateArgs, config: RenderConfig, ctx?: ServerContext) {
   const resolved = resolveDescriptor(args);
 
   if ('isError' in resolved) {
@@ -360,7 +365,8 @@ export function registerValidateTemplate(server: McpServer, config: RenderConfig
       description:
         'Dry-run an inline `template` descriptor against the core schema WITHOUT rendering — returns ' +
         'instantly unless `render: true`. Get back whether it is valid plus what compose_video will require: the ' +
-        'project_video clip sections and the form fields. Use this to iterate on a descriptor in ' +
+        'project_video clip sections, the form fields and the declared global.fields (`fields`: name, type, ' +
+        'required, default). Use this to iterate on a descriptor in ' +
         'milliseconds before the slower compose_video render. Also catches, render-free, text that ' +
         'runs off the frame or out of title-safe, collides with other text, sits under a band, is too ' +
         'small, lacks contrast, or sits over footage with no box/outline/shadow — see the `geometry` field — and ' +

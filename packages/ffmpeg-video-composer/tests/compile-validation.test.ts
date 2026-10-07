@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { compile } from '@/index';
 import type { ProjectConfig, TemplateDescriptor } from '@/core/types';
 import { testBuildDir } from './fixtures/build-dir';
@@ -36,6 +36,27 @@ describe('compile() validation gate', () => {
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toContain('Template validation failed');
     expect(errors[0].message).toContain('definitelyNotAField');
+  });
+
+  it('leaves the console to a caller that takes onError (no stack trace for a refused field)', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const errors: Error[] = [];
+    const fielded = {
+      global: { fields: { HOLD: { type: 'number', default: 3 } } },
+      sections: [
+        { type: 'color_background', name: 'card', options: { duration: '{{ HOLD }}', backgroundColor: '#204060' } },
+      ],
+    } as unknown as TemplateDescriptor;
+
+    try {
+      const config = { ...baseConfig(), fields: { HOLD: 'slow' } } as ProjectConfig;
+
+      expect(await compile(config, fielded, { onError: (error) => errors.push(error) })).toBeNull();
+      expect(errors[0].message).toContain('HOLD');
+      expect(consoleError).not.toHaveBeenCalled();
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 
   it('compiles the same descriptor when skipValidation is set', async () => {

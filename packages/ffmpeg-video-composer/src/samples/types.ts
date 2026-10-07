@@ -31,7 +31,7 @@ export interface SampleFormField {
   section: string;
   name: string;
   label: Translation;
-  maxLength: number;
+  maxLength?: number;
   default?: string | string[];
 }
 

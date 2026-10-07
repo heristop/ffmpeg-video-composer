@@ -103,6 +103,13 @@ export const mcpDoc: McpDoc = {
       when: 'Use to pick render_frames moments and to align hits with beats.',
     },
     {
+      name: 'get_resolved_template',
+      args: 'template, fields?, format?',
+      purpose:
+        'Returns the descriptor compose_video starts its build from for these fields, render-free: partials expanded, the declared global.fields filled with their typed values, then the format resolved; variables and form values stay as placeholders. values holds each typed value.',
+      when: 'Use to check where a field lands before rendering. A missing required value, or one that fails its type or slot, is an error naming the field.',
+    },
+    {
       name: 'validate_template',
       args: 'template, render?',
       purpose:

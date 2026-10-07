@@ -65,6 +65,7 @@ Project-wide defaults and the options a builder/editor exposes to end users. `gl
 | Field                   | Type                                    | Description                                                                                                                                    |
 | ----------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `variables`             | `Record<string, string \| string[]>`    | Named values referenced anywhere via `{{ varName }}`.                                                                                          |
+| `fields`                | map or list of typed fields             | The template's declared inputs, filled into `{{ name }}` with typed values. See [Typed fields](#typed-fields-globalfields).                    |
 | `orientation`           | `'landscape' \| 'portrait' \| 'square'` | Output orientation → resolution preset: landscape `1280x720`, portrait `720x1280`, square `1080x1080` (default `landscape`).                   |
 | `fps`                   | `number`                                | Output frame rate for the rendered video — integer `1..120` (default `30`). Applies to every re-encode pass (segments and the final assembly). |
 | `colorsList`            | `string[]`                              | Palette offered to the user; reference as `{{ color1 }}`, `{{ color2 }}`.                                                                      |
@@ -196,7 +197,7 @@ Common options (`BaseSectionOptionsSchema`, `strict`) shared by native sections,
 | `captureMode`                              | `'front' \| 'back' \| 'screen' \| 'upload'` | **`project_video` only** — default capture mode when the recorder opens (default `'front'`). `screen` = display capture (web only); `upload` = file picker instead of camera. |
 | `allowedCaptureModes`                      | `CaptureMode[]`                             | **`project_video` only** — modes the user may switch between. Omit to allow all; single-element array locks to one mode. `screen` is silently ignored on native/Expo.         |
 
-`form` sections use `options.fields`: `{ name, maxLength, label: Translation }[]`. Each field's `name` becomes a `{{ name }}` variable usable in any filter.
+`form` sections use `options.fields`: `{ name, maxLength, label: Translation }[]`. Each field's `name` becomes a `{{ name }}` variable usable in any filter. `maxLength` is required unless the field binds a non-text `global.fields` entry.
 
 ### Footage editing
 
@@ -969,6 +970,96 @@ For a hand-framed scene, a final `{ "type": "scale", "value": "output" }` is a L
 - **`{{ colorN }}`** — 1-indexed into `global.colorsList`.
 - **`{{ form_field }}`** — a `form` section's field `name`, filled at compose time.
 
+### Typed fields (`global.fields`)
+
+`global.variables` is free text. `global.fields` declares the template's **inputs** instead: what a host must
+(or may) fill in, with a type the engine checks. Declare them as a map (name → spec) or as a list of
+`{ name, … }`; names are word characters (`[A-Za-z0-9_]`).
+
+| Key           | Type               | Description                                             |
+| ------------- | ------------------ | ------------------------------------------------------- |
+| `type`        | see below          | Required.                                               |
+| `default`     | `string \| number` | Used when no value is provided. Must fit the type.      |
+| `required`    | `boolean`          | A render without a value (and without a default) fails. |
+| `maxLength`   | `number`           | `text` only: longest accepted value.                    |
+| `min` / `max` | `number`           | `number` and `time`: accepted range.                    |
+| `options`     | `string[]`         | `enum` only (required there): the accepted values.      |
+| `label`       | `Translation`      | What a builder shows next to the input.                 |
+| `description` | `string`           | Help text for authors and agents.                       |
+
+| Type     | Accepts                                                                                                                                                                                      | Substituted as                                             |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `text`   | any text (≤ `maxLength`); an optional text field without value is `""` (blank counts as no value)                                                                                            | string                                                     |
+| `color`  | `#rrggbb(aa)`, `0xrrggbb`, an FFmpeg colour name (`white`, `lightgrey`), `#rgb(a)` and `rgb()`/`rgba()` (rewritten to `#rrggbb(aa)`), each with an optional `@alpha` from 0 to 1 (`red@0.5`) | string                                                     |
+| `url`    | an `http(s)://`, `data:` or `media://` URL, or a relative path; other schemes are refused                                                                                                    | string                                                     |
+| `media`  | a file path or URL                                                                                                                                                                           | string                                                     |
+| `number` | a decimal number, or a decimal string (`"2.5"`, not `"0x10"`), within `min`/`max`                                                                                                            | number                                                     |
+| `enum`   | one of `options`                                                                                                                                                                             | string (a numeric option fills a numeric slot as a number) |
+| `time`   | seconds (`4.5`) or a clock (`"1:02.5"`, `"0:01:02"`; seconds and minutes below 60)                                                                                                           | number (s)                                                 |
+
+```json
+{
+  "global": {
+    "fields": {
+      "TITLE": { "type": "text", "required": true, "maxLength": 32, "label": { "en": "Title" } },
+      "ACCENT": { "type": "color", "default": "#ff5a36" },
+      "HOLD": { "type": "number", "default": 3, "min": 1, "max": 8 }
+    }
+  },
+  "sections": [
+    {
+      "name": "title",
+      "type": "color_background",
+      "options": { "backgroundColor": "{{ ACCENT }}", "duration": "{{ HOLD }}" },
+      "titleCard": { "headline": { "en": "{{ TITLE }}" } }
+    }
+  ]
+}
+```
+
+**Resolution.** A value comes from the render's inputs (`ProjectConfig.fields`, `leclap render --set NAME=value`,
+the MCP `fields` argument), else from `default`. It is coerced by its type, then every `{{ NAME }}` of a declared
+field is filled across the descriptor, after partials expand and before formats resolve. A placeholder that is
+the **whole** string takes the typed value, so `"duration": "{{ HOLD }}"` becomes the number `3`; one inside a
+longer string is written as text (`"{{ TITLE }} — live"`). The slot has the last word: a number alone in a
+text slot (`"text": { "en": "{{ PRICE }}" }`) goes in as its text, and a numeric enum option alone in a numeric
+slot goes in as a number. Substituted text is never scanned again, and the filled descriptor no longer carries
+`global.fields`, so filling it twice changes nothing. The filled descriptor then goes through the normal
+schema, so a value its slot rejects fails **at that slot** (`field_type_mismatch` at `sections.0.options.duration`).
+A render refuses a missing required value or one that fails its type before encoding anything.
+`leclap resolve template.json --set TITLE=Hi` and the MCP `get_resolved_template` tool print the descriptor the
+build starts from: partials expanded, the fields filled, the format resolved. `global.variables` and form values
+stay as placeholders there; the engine fills them as it draws.
+
+**Text belongs in text slots.** A raw filter value (`filters[].values.fontsize`, `values.enable`, any key but
+`text`) goes to FFmpeg as written, so a field value carrying a filtergraph separator (`, ; : ' [ ] = \`) is
+refused there (`field_type_mismatch`): `"fontsize": "{{ SIZE }}"` with `10,movie=/etc/passwd` never reaches
+FFmpeg. Put text fields in `values.text` or the text sugar (`titleCard`, `reveal`, `lowerThird`), which escape it.
+
+Placeholders of names that are not declared fields (`global.variables`, form fields, partial variables) are
+left to the later passes. Templates without `global.fields` are unaffected.
+
+**Forms.** A form field named like a declared field is bound to it: the declaration owns the type, default,
+range and options; the form field keeps its `label` and `maxLength`. A form field bound to a non-text declared
+field may leave `maxLength` out (its typed control checks the value instead). The web builder then shows a
+matching control (colour picker, number input, select, URL input), and gathers the declared fields no form asks
+for into a "Template inputs" step, counted in its progress.
+
+**Advisories** (only for templates that declare `global.fields`; returned by `getFieldWarnings`, and with the
+motion feedback of `leclap validate` and `validate_template`):
+
+| Code                     | When                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `field_undefined`        | `{{ x }}` names no declared field, variable, form field nor partial variable (nearest name suggested). |
+| `field_unused`           | A declared field is never referenced (a form field of that name counts as a use).                      |
+| `field_type_mismatch`    | A default or provided value does not fit its type, or a filled slot rejects it.                        |
+| `field_missing_required` | A required field, or a non-text one, has neither a value nor a default.                                |
+
+Validating without values (`leclap validate`) fills a missing field with a stand-in of its type so the rest of
+the template is still checked, and hands back the descriptor as authored (placeholders kept) for the render to
+fill; validating with values (`validateTemplate(t, { fields })`, a render) is strict and hands back the filled
+descriptor.
+
 ---
 
 ## Example: simple (cuts, music)
@@ -1121,7 +1212,7 @@ Notable codes:
 
 - `unknown_key`: a key the schema does not declare, including on objects that would otherwise drop it silently. The suggestion is the closest allowed key at that path (typos, `font-size` → `fontsize`, and common synonyms such as `colour` → `color`, `ease` → `easing`, `start` → `delay`/`at`, `zoom` → `intensity`, only when the target exists there). Keys starting with `$` or `_` are treated as comments and ignored; free-form maps (translations, `global.variables`, effect `props`/`assets`, motion tokens, raw filter `values`) are never checked. At the descriptor's top level, host-specific fields are tolerated unless they look like a typo of a real key (`section` → `sections`).
 - `invalid_value`: a value outside an enum (including an unknown section or graphic `type`); the hint lists the allowed values and the suggestion is the nearest one.
-- Rule findings such as `transition_too_long` (suggests a transition with a fitting `duration`), `dangling_transition` (suggests `{ "type": "cut" }`), `unknown_font`, `undefined_section_reference`, `undefined_variable`, `unknown_motion_token` and `invalid_easing` (nearest name) carry hints too.
+- Rule findings such as `transition_too_long` (suggests a transition with a fitting `duration`), `dangling_transition` (suggests `{ "type": "cut" }`), `unknown_font`, `undefined_section_reference`, `undefined_variable`, `field_type_mismatch`, `field_missing_required`, `unknown_motion_token` and `invalid_easing` (nearest name) carry hints too.
 
 `leclap validate` prints each hint as a `→` line under its error, and `--json` includes the fields unchanged. `validate_template` lists every finding with its hint in the text result and returns them as `structuredContent.errors` (with `valid: false`).
 

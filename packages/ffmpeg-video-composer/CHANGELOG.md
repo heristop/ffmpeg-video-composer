@@ -19,6 +19,21 @@ Upgrading from v2? See the [migration guide](MIGRATION.md#upgrading-from-v2-to-v
   by `pitch`, `length`, `brightness` and `room`, while `id` cues keep playing the shipped files. Advisories
   `sound_clipped`, `sound_harsh`, `sound_muddy`, `sound_long`, `sound_repeated` and `sound_overlap`;
   `motionCatalog().audio.compose`; `renderSound`, `analyzeChannels`, `soundSpec` and `SoundSchema` exports.
+- Typed template fields: `global.fields` declares a template's inputs (map or list of `{ name, type, default?,
+required?, maxLength?, min?, max?, options?, label?, description? }`, types text, color, url, media, number,
+  enum and time). Values come from `ProjectConfig.fields`, then `default`; each is coerced by its type and
+  filled into `{{ name }}` after partial expansion — a whole-string placeholder takes the typed value, so
+  `"duration": "{{ HOLD }}"` lands as a number — then the slot's own schema judges it. A render fails before
+  encoding on a missing required or ill-typed value; `validateTemplate(t, { fields })` checks strictly,
+  without `fields` it probes. New advisories (`getFieldWarnings`, also in `getMotionWarnings`):
+  `field_undefined`, `field_unused`, `field_type_mismatch`, `field_missing_required`. Node entry exports
+  `resolveFields`, `assertFieldsResolved`, `coerceFieldValue` (pluggable coercers and `encode`),
+  `declaredFields`, `fieldAdvisories` and `resolveTemplate`. Templates without `global.fields` are unchanged.
+  Colours follow FFmpeg's grammar (`#rgb(a)` and `rgb()`/`rgba()` normalised to `#rrggbb(aa)`, names from
+  FFmpeg's list, `@alpha` in 0–1); urls take http(s), data, `media://` or relative paths; a field value with
+  filtergraph separators is refused in a raw filter value. Validation without values returns the authored
+  descriptor; the resolved descriptor drops `global.fields`, so resolution is idempotent. A form field bound
+  to a non-text declared field may omit `maxLength`.
 - `applyJsonPatch(doc, operations, { maxOps })` and `parsePointer(pointer)` (Node entry): RFC 6902 JSON
   Patch (`add`, `remove`, `replace`, `move`, `copy`, `test`) over RFC 6901 pointers (`-` append, `~0`/`~1`
   escapes). Atomic (runs on a copy, the input is never mutated); rejects `__proto__`/`prototype`/`constructor`
@@ -187,6 +202,7 @@ Upgrading from v2? See the [migration guide](MIGRATION.md#upgrading-from-v2-to-v
 
 ### Changed
 
+- `compile()` leaves error reporting to a reporter that takes `onError` (no console message or stack trace).
 - **Breaking:** validation is stricter, so some templates that passed in 2.5.0 now fail:
   - keys that strip objects used to drop silently (section options, transitions, discriminated unions) are
     reported as `unknown_key` errors; remove or rename them (the finding suggests the nearest key);

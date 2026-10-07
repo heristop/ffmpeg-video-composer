@@ -1,0 +1,29 @@
+$ leclap validate promo.json
+✓ Template is valid — 1 warning
+  › ~ Field "TITLE" is required and no value was given global.fields.TITLE field_missing_required
+      Give "TITLE" a default, or pass a value (leclap render --set TITLE=…, MCP fields).
+
+$ leclap render promo.json --set "TITLE=Night Market" --set HOLD=abc
+Rendering promo.json…
+✗ Template validation failed with 1 error(s): global.fields.HOLD: Field "HOLD" (number): the value does not fit — expected a number, got "abc"
+(exit 1; no section was encoded)
+
+$ leclap render promo.json --set "TITLE=Night Market" --set ACCENT=#ff6f6
+Rendering promo.json…
+✗ Template validation failed with 1 error(s): global.fields.ACCENT: Field "ACCENT" (color): the value does not fit — expected a colour (#rrggbb[aa], #rgb, rgb(), 0xrrggbb or an FFmpeg colour name, then @alpha), got "#ff6f6"
+(exit 1; no section was encoded)
+
+$ leclap render promo.json --set "TITLE=Night Market" --set ACCENT=notacolor
+Rendering promo.json…
+✗ Template validation failed with 1 error(s): global.fields.ACCENT: Field "ACCENT" (color): the value does not fit — expected a colour (#rrggbb[aa], #rgb, rgb(), 0xrrggbb or an FFmpeg colour name, then @alpha), got "notacolor"
+(exit 1; no section was encoded)
+
+$ leclap render promo.json --set "TITLE=Night Market" --set STYLE=bounce
+Rendering promo.json…
+✗ Template validation failed with 1 error(s): global.fields.STYLE: Field "STYLE" (enum): the value does not fit — expected one of rise, slide-left, fade, got "bounce"
+(exit 1; no section was encoded)
+
+$ leclap render promo.json --set HOLD=9
+Rendering promo.json…
+✗ Template validation failed with 2 error(s): global.fields.TITLE: Field "TITLE" is required and no value was given; global.fields.HOLD: Field "HOLD" (number): the value does not fit — 9 is above the maximum 6
+(exit 1; no section was encoded)

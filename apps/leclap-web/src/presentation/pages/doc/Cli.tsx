@@ -31,6 +31,16 @@ const RENDER_FLAGS = [
     ),
   },
   {
+    term: '--set name=value',
+    meta: 'repeatable',
+    children: (
+      <>
+        Fill a typed input the template declares in <Code>global.fields</Code>, checked against its type before the
+        render starts.
+      </>
+    ),
+  },
+  {
     term: '--video section=path',
     meta: 'repeatable',
     children: (
@@ -121,6 +131,10 @@ export const DocCli = () => (
           label="render still frames and contact sheets of chosen moments, to look at the result"
         />
         <CommandPill command="leclap timeline <template>" label="where every section, element, beat and cue sits" />
+        <CommandPill
+          command="leclap resolve <template>"
+          label="the descriptor a render would see, with its fields filled"
+        />
         <CommandPill command="leclap style <reference>" label="derive a theme and style guide from an image or clip" />
         <CommandPill
           command="leclap beats <audio>"

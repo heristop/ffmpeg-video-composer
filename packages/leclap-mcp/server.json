@@ -120,6 +120,10 @@
             "description": "Return the template timeline on video seconds: sections, motion events, beats and cues, without rendering."
           },
           {
+            "name": "get_resolved_template",
+            "description": "Return the descriptor compose_video starts its build from for the given fields: declared global.fields filled with typed values and the format resolved, without rendering."
+          },
+          {
             "name": "validate_template",
             "description": "Validate a template without rendering and report the clips and fields compose_video will require."
           },
@@ -173,7 +177,7 @@
           }
         ],
         "prompts": ["compose-video"],
-        "notes": "Seventeen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, patching and rendering; callers cannot select executable source through effect JSON. patch_template remains registered when Remotion is disabled."
+        "notes": "Eighteen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, patching and rendering; callers cannot select executable source through effect JSON. patch_template remains registered when Remotion is disabled."
       }
     }
   }

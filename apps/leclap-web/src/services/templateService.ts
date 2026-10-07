@@ -7,6 +7,7 @@ import type { TemplateDescriptor } from 'ffmpeg-video-composer/src/core/types.d.
 import { userTemplateService } from '@/services/userTemplateService';
 import { materializeTemplatePartials } from '@/services/templatePartialService';
 import { templateLogger } from '@/lib/logger';
+import { TEMPLATE_INPUTS_SECTION, TEMPLATE_INPUTS_TITLE, templateInputFields } from '@/services/template-inputs';
 
 export interface Template {
   id: string;
@@ -152,6 +153,8 @@ class TemplateService {
 
   // Fields of ONE form section (by section name) — for the per-section form step in the wizard.
   extractFormFieldsForSection(template: TemplateDescriptor, sectionName: string): FormFieldShape[] {
+    if (sectionName === TEMPLATE_INPUTS_SECTION) return templateInputFields(this.materializeForRead(template));
+
     const section = (this.materializeForRead(template).sections ?? []).find((s) => s.name === sectionName);
 
     if (section?.type !== 'form' || !section.options?.fields) {
@@ -163,12 +166,17 @@ class TemplateService {
 
   // The template's INPUT sections (form + project_video) in template order — drives the
   // section-by-section wizard (both linear and hub). Each clip carries `clipIndex`, its 0-based
-  // position among project_video sections (forms get -1).
+  // position among project_video sections (forms get -1). Declared global.fields no form asks for come
+  // first, as the synthetic "Template inputs" form (services/template-inputs.ts).
   orderedInputSections(template: TemplateDescriptor): InputSection[] {
-    const out: InputSection[] = [];
+    const materialized = this.materializeForRead(template);
+    const out: InputSection[] =
+      templateInputFields(materialized).length > 0
+        ? [{ name: TEMPLATE_INPUTS_SECTION, kind: 'form', clipIndex: -1, title: TEMPLATE_INPUTS_TITLE }]
+        : [];
     let clipIndex = 0;
 
-    for (const section of (this.materializeForRead(template).sections ?? []) as Array<{
+    for (const section of (materialized.sections ?? []) as Array<{
       name: string;
       type: string;
       title?: Translation;

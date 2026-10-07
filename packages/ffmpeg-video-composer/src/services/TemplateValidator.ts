@@ -18,6 +18,7 @@ import { formatAdvisories } from '@/core/formats/advisories';
 import { takeAdvisories } from './take-validation';
 import { soundAdvisories } from './sound-advisories';
 import { expandPartialsSafe } from '@/core/partials';
+import { declaresFields, fieldAdvisories, withFieldDefaults } from './field-advisories';
 
 export type { ValidationError, ValidationResult } from './BaseTemplateValidator';
 export type { MotionWarning } from './motion-lint';
@@ -37,6 +38,11 @@ function partialWarnings(template: unknown): MotionWarning[] {
   const expanded = expandPartialsSafe(template);
 
   return expanded.ok ? (expanded.warnings ?? []).map((w) => ({ ...w, severity: 'warn' as const })) : [];
+}
+
+// The field contract's advisories, once on the authored template (they name authored paths).
+function fieldWarnings(template: unknown): MotionWarning[] {
+  return fieldAdvisories(template).map((w) => ({ ...w, severity: 'warn' as const }));
 }
 
 // The full validator: everything BaseTemplateValidator checks, plus the advisory passes. Advisories
@@ -95,8 +101,16 @@ export class TemplateValidator extends BaseTemplateValidator {
     return errors;
   }
 
+  // A template that declares `global.fields` gets field_undefined (getFieldWarnings) instead, which also
+  // knows the fields, form fields and partial variables.
   getVariableWarnings(template: TemplateDescriptor): ValidationError[] {
-    return this.validateVariableReferences(template);
+    return declaresFields(template) ? [] : this.validateVariableReferences(template);
+  }
+
+  // Advisory: the typed field contract (services/field-advisories.ts) — field_undefined, field_unused,
+  // field_type_mismatch, field_missing_required. `values` are the inputs a render would pass.
+  getFieldWarnings(template: TemplateDescriptor, values?: Readonly<Record<string, unknown>>): ValidationError[] {
+    return fieldAdvisories(template, values);
   }
 
   // Advisory: sections that spread the theme accent over too many elements (core/theme/accent.ts),
@@ -115,7 +129,9 @@ export class TemplateValidator extends BaseTemplateValidator {
     const { collectGeometryWarnings } = await import('./geometry');
 
     // Per format when the template declares several (each its own frame, platform and safe zones).
-    return adviseEachFormat(template, (resolved) => collectGeometryWarnings(resolved as TemplateDescriptor, loadFont));
+    return adviseEachFormat(withFieldDefaults(template), (resolved) =>
+      collectGeometryWarnings(resolved as TemplateDescriptor, loadFont)
+    );
   }
 
   // Advisory, like getGeometryWarnings: pacing findings read off the motion timeline (ease monotony,
@@ -129,7 +145,8 @@ export class TemplateValidator extends BaseTemplateValidator {
   // whole-template format advisories (format_crop_only, format_story_diverges: core/formats/advisories.ts).
   // Script/mask advisories ride along too (services/script-lint.ts); pass the target build's
   // capabilities to also hear what it can't draw (rtl_unshaped, mask_unavailable).
-  getMotionWarnings(template: unknown, capabilities?: ScriptLintCapabilities): MotionWarning[] {
+  getMotionWarnings(authored: unknown, capabilities?: ScriptLintCapabilities): MotionWarning[] {
+    const template = withFieldDefaults(authored);
     const perFormat = adviseEachFormatSync(template, (resolved) => [
       ...collectMotionWarnings(resolved),
       ...accentAdvisories(resolved),
@@ -144,7 +161,12 @@ export class TemplateValidator extends BaseTemplateValidator {
       ...collectScriptWarnings(resolved, capabilities),
     ]);
 
-    return [...partialWarnings(template), ...perFormat, ...formatAdvisories(expandedForFormats(template))];
+    return [
+      ...fieldWarnings(authored),
+      ...partialWarnings(template),
+      ...perFormat,
+      ...formatAdvisories(expandedForFormats(template)),
+    ];
   }
 
   // Advisory: `feature_unavailable` for every feature the template uses that the probed FFmpeg cannot

@@ -22,6 +22,7 @@ import type {
 export * from './effects.schemas';
 export * from './effect-reference.schema';
 export * from './global.schemas';
+export * from './fields.schemas';
 export * from './filter.schemas';
 export * from './section.schemas';
 export * from './partial.schemas';

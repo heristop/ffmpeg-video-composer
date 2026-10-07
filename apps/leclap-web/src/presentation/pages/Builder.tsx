@@ -8,6 +8,7 @@ import { renderPhase, type RenderPhase } from '@/presentation/components/builder
 import { orientationOf } from '@/presentation/components/builder/editorPanels';
 import { useVideoProcessing, type ProcessedVideo, type MediaChoices } from '@/hooks/useVideoProcessing';
 import { templateService, type Template, type InputSection, type QualityTier } from '@/services/templateService';
+import { bindFieldContracts, fieldSatisfied } from '@/presentation/components/template-form-fields.logic';
 import { findMusicByUrl } from '@/data/mediaCatalog';
 import { type VideoEdit } from '@/domain/valueObjects/videoEdits';
 import type { MediaChoice } from '@/presentation/components/admin/templateEditorModel';
@@ -96,11 +97,13 @@ interface BuilderState {
 // Whether a single step's required input is satisfied.
 const isStepComplete = (step: WizardStep, s: BuilderState): boolean => {
   if (step.kind === 'form') {
-    const fields = s.selectedTemplate
-      ? templateService.extractFormFieldsForSection(s.selectedTemplate.descriptor, step.sectionName)
+    const descriptor = s.selectedTemplate?.descriptor;
+    const fields = descriptor
+      ? bindFieldContracts(templateService.extractFormFieldsForSection(descriptor, step.sectionName), descriptor)
       : [];
 
-    return fields.every((f) => (s.formData[f.name] ?? '').trim() !== '');
+    // A field bound to a declared global.fields entry with a default (or an optional text) may stay empty.
+    return fields.every((f) => fieldSatisfied(f, s.formData[f.name] ?? ''));
   }
 
   if (step.kind === 'clip') {

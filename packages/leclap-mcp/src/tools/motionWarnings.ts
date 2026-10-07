@@ -21,7 +21,8 @@ export const motionWarningsSchema = z
       'starts_at_zero, transition_monotony, exit_before_transition, dead_air, tempo_flat), the theme accent ' +
       'advisory (accent_overuse), the sameness lint (fx_untuned, effect_repeated, library_animation_sample, ' +
       'effect_off_theme, decor_overload: stock motion to recompose with the engine), a partial ref squeezed under ' +
-      'its fixed intro/outro (partial_compressed) and assertions that ' +
+      'its fixed intro/outro (partial_compressed), the typed field contract (field_undefined, field_unused, ' +
+      'field_type_mismatch, field_missing_required) and assertions that ' +
       'could not be checked render-free (assertion_skipped), each with a hint — present only when there is ' +
       'something to say.'
   );

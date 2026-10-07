@@ -1,3 +1,4 @@
+import type { CompileReporter } from '../core/types';
 import type { IEventEmitter } from './AbstractEventManager';
 
 export interface CompilationListeners {
@@ -36,4 +37,20 @@ export function attachCompilationListeners(
       emitter.off?.('compilation-progress', onProgressEvent);
     },
   };
+}
+
+// Why compile() failed: a caller that takes onError owns the failure (the CLI prints the message alone, even
+// with -q); without one, the message and stack go to stderr.
+export function reportCompileFailure(error: unknown, reporter: CompileReporter | undefined): void {
+  const failure = error instanceof Error ? error : new Error(`Unknown compilation error: ${JSON.stringify(error)}`);
+
+  if (reporter?.onError) {
+    reporter.onError(failure);
+
+    return;
+  }
+
+  console.error(error instanceof Error ? `Compilation error: ${failure.message}` : 'Unknown compilation error');
+
+  if (error instanceof Error && error.stack) console.error('Stack:', error.stack);
 }

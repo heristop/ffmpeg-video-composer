@@ -52,7 +52,8 @@
       "maxChars": "Maximal {{count}} Zeichen erlaubt",
       "counter": "{{count}}/{{max}}",
       "requiredMark": "erforderlich",
-      "fieldRequired": "Dieses Feld ist erforderlich"
+      "fieldRequired": "Dieses Feld ist erforderlich",
+      "invalidValue": "Passt nicht: {{reason}}"
     },
     "placeholder": {
       "firstName": "Gib deinen Vornamen ein",

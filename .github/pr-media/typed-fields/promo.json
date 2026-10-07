@@ -1,0 +1,237 @@
+{
+  "meta": {
+    "name": "Typed fields promo",
+    "description": "A two-card promo whose title, accent colour, hold time, entrance and link are typed inputs."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "transition": {
+      "type": "fade",
+      "duration": 0.4
+    },
+    "fields": {
+      "TITLE": {
+        "type": "text",
+        "required": true,
+        "maxLength": 24,
+        "label": {
+          "en": "Title"
+        },
+        "description": "The product or event name."
+      },
+      "ACCENT": {
+        "type": "color",
+        "default": "#b8adff",
+        "label": {
+          "en": "Accent colour"
+        }
+      },
+      "HOLD": {
+        "type": "number",
+        "default": 3,
+        "min": 2,
+        "max": 6,
+        "label": {
+          "en": "Title hold (s)"
+        }
+      },
+      "STYLE": {
+        "type": "enum",
+        "options": ["rise", "slide-left", "fade"],
+        "default": "rise",
+        "label": {
+          "en": "Entrance"
+        }
+      },
+      "LINK": {
+        "type": "url",
+        "default": "https://leclap.dev",
+        "label": {
+          "en": "Link"
+        }
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "details",
+      "type": "form",
+      "title": {
+        "en": "Your promo"
+      },
+      "options": {
+        "fields": [
+          {
+            "name": "TITLE",
+            "maxLength": 24,
+            "label": {
+              "en": "Title"
+            }
+          },
+          {
+            "name": "ACCENT",
+            "label": {
+              "en": "Accent colour"
+            }
+          },
+          {
+            "name": "HOLD",
+            "label": {
+              "en": "Title hold (s)"
+            }
+          },
+          {
+            "name": "STYLE",
+            "label": {
+              "en": "Entrance"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "title",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": "{{ HOLD }}"
+      },
+      "filters": [
+        {
+          "type": "drawbox",
+          "values": {
+            "x": 82,
+            "y": 560,
+            "w": 160,
+            "h": 10,
+            "color": "{{ ACCENT }}",
+            "t": "fill"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "TYPED FIELDS"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 40,
+            "fontcolor": "#f5f3f7",
+            "x": 82,
+            "y": 230
+          },
+          "reveal": {
+            "type": "fade",
+            "delay": 0.05,
+            "duration": 0.4
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ TITLE }}"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 220,
+            "fontcolor": "{{ ACCENT }}",
+            "x": 76,
+            "y": 280
+          },
+          "reveal": {
+            "type": "{{ STYLE }}",
+            "delay": 0.15,
+            "duration": 0.5,
+            "distance": 80,
+            "easing": "ease-out"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Held {{ HOLD }} s  /  entrance: {{ STYLE }}"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 44,
+            "fontcolor": "#c9c6d0",
+            "x": 82,
+            "y": 600
+          },
+          "reveal": {
+            "type": "fade",
+            "delay": 0.45,
+            "duration": 0.4
+          }
+        }
+      ]
+    },
+    {
+      "name": "outro",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "{{ ACCENT }}",
+        "duration": 2.5
+      },
+      "filters": [
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ TITLE }}"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 150,
+            "fontcolor": "#141416",
+            "x": "(w-text_w)/2",
+            "y": 190
+          },
+          "reveal": {
+            "type": "rise",
+            "delay": 0.1,
+            "duration": 0.45,
+            "easing": "ease-out"
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "Out now"
+            },
+            "fontfile": "BebasNeue.ttf",
+            "fontsize": 64,
+            "fontcolor": "#141416",
+            "x": "(w-text_w)/2",
+            "y": 370
+          },
+          "reveal": {
+            "type": "fade",
+            "delay": 0.4,
+            "duration": 0.4
+          }
+        },
+        {
+          "type": "drawtext",
+          "values": {
+            "text": {
+              "en": "{{ LINK }}"
+            },
+            "fontfile": "RobotoMono.ttf",
+            "fontsize": 30,
+            "fontcolor": "#141416",
+            "x": "(w-text_w)/2",
+            "y": 470
+          },
+          "reveal": {
+            "type": "fade",
+            "delay": 0.6,
+            "duration": 0.4
+          }
+        }
+      ]
+    }
+  ]
+}

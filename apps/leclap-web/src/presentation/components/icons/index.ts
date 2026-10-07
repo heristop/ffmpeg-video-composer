@@ -12,6 +12,7 @@ export { Captions, CaptionsOff, CheckCircle2, Clapperboard, Code2, Crop } from '
 export { File, FileCode } from 'lucide-react';
 export { FileVideo, Film, Globe, HardDrive, Hash, Image } from 'lucide-react';
 export { Info, Lightbulb, Loader2, Minimize2, Monitor, MonitorSmartphone } from 'lucide-react';
+export { Link, List, Palette } from 'lucide-react';
 export { Move, Music, Pencil, Proportions, Redo2, Save } from 'lucide-react';
 export { Scissors, SearchX, Settings2, Share2, Shield, Shuffle, Square } from 'lucide-react';
 export { TimerReset, Trash2, Type, Undo2, Video, Volume2 } from 'lucide-react';

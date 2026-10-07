@@ -46,6 +46,8 @@ describe('compose-video prompt', () => {
     expect(text).toContain('check safe zones');
     expect(text).toContain('get_timeline');
     expect(text).toContain('report_catalog_gap');
+    expect(text).toContain('global.fields');
+    expect(text).toContain('get_resolved_template');
   });
 
   it('points to render_remotion_clip for an animated intro fed via userVideoPaths', () => {

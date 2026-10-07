@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   pre-normalisation peak, spectral centroid, energy above 8 kHz / under 250 Hz, attack time and the sound
   advisories it raises, plus a spectrogram and a waveform PNG. Seventeen tools are now always registered.
 
+- Typed template fields: `get_resolved_template` returns the descriptor `compose_video` would render for
+  the given `fields` (declared `global.fields` filled with typed values) or every value it would refuse;
+  `compose_video` and `render_frames` take `fields` as strings, numbers or booleans and refuse a missing
+  required or ill-typed value before rendering; `validate_template` lists the declared contract as `fields`
+  and reports `field_undefined`, `field_unused`, `field_type_mismatch` and `field_missing_required`.
 - `edit_template`: an RFC 6902 JSON Patch over inline template JSON under `expectedRevision` (stale →
   `revision_conflict`), all-or-nothing and validated after applying; returns the template, its new
   `revision` and `changedPaths`. The web builder's WebMCP tools share the name, operations and revision,

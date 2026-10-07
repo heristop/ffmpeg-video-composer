@@ -52,7 +52,8 @@
       "maxChars": "Se permiten como máximo {{count}} caracteres",
       "counter": "{{count}}/{{max}}",
       "requiredMark": "obligatorio",
-      "fieldRequired": "Este campo es obligatorio"
+      "fieldRequired": "Este campo es obligatorio",
+      "invalidValue": "No encaja: {{reason}}"
     },
     "placeholder": {
       "firstName": "Escribe tu nombre",

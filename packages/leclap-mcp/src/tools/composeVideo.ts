@@ -18,6 +18,7 @@ import { templateRevision } from '../effects/template-revision.js';
 import type { McpConfig } from '../config.js';
 import { assertWithinMediaDir } from '../compose/pathGuard.js';
 import { assertDescriptorSafe } from '../compose/descriptorGuard.js';
+import { fieldsArg, fieldValues, type FieldArgs } from '../compose/field-values.js';
 import { validateTemplate } from '../compose/validation.js';
 import { runRender, type RenderResult } from '../compose/renderRunner.js';
 import { applyOutputName, pruneRenderDir, removeDir } from '../compose/renderDir.js';
@@ -28,7 +29,7 @@ import { formatArg, prepareComposeTemplate } from '../compose/format.js';
 const inputSchema = z.object({
   template: z.record(z.string(), z.unknown()),
   expectedRevision: z.string().optional(),
-  fields: z.record(z.string(), z.string()).optional(),
+  fields: fieldsArg,
   userVideoPaths: z.record(z.string(), z.string()).optional(),
   locale: z.string().optional(),
   format: formatArg,
@@ -70,7 +71,7 @@ const outputSchema = z.object({
 export type ComposeArgs = {
   template: Record<string, unknown>;
   expectedRevision?: string;
-  fields?: Record<string, string>;
+  fields?: FieldArgs;
   userVideoPaths?: Record<string, string>;
   locale?: string;
   format?: 'landscape' | 'portrait' | 'square';
@@ -86,7 +87,8 @@ export function errorResult(text: string): ToolError {
 
 // Validate the inline descriptor against the core schema before rendering.
 function resolveDescriptor(args: ComposeArgs): DescriptorResult {
-  const result = validateTemplate(args.template);
+  // Strict on declared fields: the render's own values must fill them (a refusal names every field).
+  const result = validateTemplate(args.template, fieldValues(args.fields) ?? {});
 
   if (!result.ok) {
     return errorResult(result.message);
@@ -186,7 +188,7 @@ async function buildProjectConfig(
     // and the fontfile guard both explicitly allow.
     assetsDir: config.mediaDir,
     userVideoPaths,
-    fields: args.fields,
+    fields: fieldValues(args.fields),
     currentLocale: args.locale,
     // Agent renders are evidence: the same descriptor must yield the same bytes (bit-exact muxing,
     // pinned encoder threads; see the engine's core/determinism/command-tap.ts).
@@ -300,7 +302,11 @@ export async function prepareCompose(
 
   if (descriptor.descriptor.sections?.some((section) => section.type === 'effect')) {
     try {
-      return await resolveComposeEffects(args.template, config, resolved.paths, signal);
+      // The validated descriptor, its declared fields already filled with this render's values: the effects
+      // render from it and the build receives it as is.
+      const filled = descriptor.descriptor as Record<string, unknown>;
+
+      return await resolveComposeEffects(filled, config, resolved.paths, signal);
     } catch (error) {
       return errorResult(`Effect preparation failed: ${error instanceof Error ? error.message : String(error)}`);
     }

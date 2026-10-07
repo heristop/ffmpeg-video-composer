@@ -4,6 +4,7 @@
 import { templateService, type Template, type InputSection } from '@/services/templateService';
 import type { VideoEdit } from '@/domain/valueObjects/videoEdits';
 import type { MediaChoice } from '@/presentation/components/admin/templateEditorModel';
+import { bindFieldContracts, fieldSatisfied } from '@/presentation/components/template-form-fields.logic';
 
 export interface SceneModel {
   clipsBySection: Record<string, File>;
@@ -14,13 +15,17 @@ export interface SceneModel {
   backgroundChoice: MediaChoice | null;
 }
 
-// A clip scene is done once a clip exists; a form scene once every one of its fields has a value.
+// A clip scene is done once a clip exists; a form scene once every one of its fields has a value that fits
+// (a field bound to a declared `global.fields` entry with a default may stay empty).
 export const sectionComplete = (template: Template, section: InputSection, model: SceneModel): boolean => {
   if (section.kind === 'clip') return Boolean(model.clipsBySection[section.name]);
 
-  const fields = templateService.extractFormFieldsForSection(template.descriptor, section.name);
+  const fields = bindFieldContracts(
+    templateService.extractFormFieldsForSection(template.descriptor, section.name),
+    template.descriptor
+  );
 
-  return fields.every((f) => (model.formData[f.name] ?? '').trim() !== '');
+  return fields.every((f) => fieldSatisfied(f, model.formData[f.name] ?? ''));
 };
 
 // Media (music/background) counts as done once either a track or a background is chosen.

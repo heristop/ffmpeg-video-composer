@@ -13,6 +13,7 @@ export const KNOWN_COMMANDS = [
   'snapshot',
   'compare',
   'timeline',
+  'resolve',
 ] as const;
 
 // Pure preprocess applied to process.argv before handing off to the command router. Bare paths /

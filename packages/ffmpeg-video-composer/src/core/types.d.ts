@@ -93,6 +93,7 @@ export type ProjectConfig = {
   buildDir?: string;
   assetsDir?: string;
   music?: MusicConfig;
+  /** Values for form fields and declared `global.fields` (coerced to each field's type). */
   fields?: Record<string, string>;
   currentLocale?: string;
   codecConfig?: CodecConfig;
@@ -175,6 +176,11 @@ interface TemplateMeta {
 
 export interface TemplateDescriptorGlobal {
   variables?: Variables;
+  /**
+   * The typed input contract filled into `{{ name }}` placeholders (core/fields). Spelled structurally here
+   * (the file's dependency budget); schemas/fields.schemas.ts holds the exact shape.
+   */
+  fields?: Record<string, TypedFieldSpec> | Array<TypedFieldSpec & { name: string }>;
   orientation?: string;
   /** Delivery platform id or alias (core/platforms.ts): orientation default, safe zones, loudness. */
   platform?: PlatformName;
@@ -234,6 +240,18 @@ interface GlobalAudio {
   automation?: AutomationKeyInput[];
   /** 'auto' places sound effects from the motion (core/audio/auto-sfx.ts). */
   sfx?: 'auto';
+}
+
+interface TypedFieldSpec {
+  type: 'text' | 'color' | 'url' | 'media' | 'number' | 'enum' | 'time';
+  default?: string | number;
+  required?: boolean;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+  options?: string[];
+  label?: Record<string, string>;
+  description?: string;
 }
 
 export interface Variables {
@@ -361,7 +379,8 @@ export interface FramingGuideConfig {
 
 interface Field {
   name: string;
-  maxLength: number;
+  /** Required unless the field binds a non-text `global.fields` entry (the validator checks it). */
+  maxLength?: number;
   label: Translation;
 }
 

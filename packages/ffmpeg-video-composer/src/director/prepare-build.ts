@@ -15,6 +15,7 @@ import { assertEffectsResolved, expandPartialsSafe } from '@/core/partials';
 import type AbstractLogger from '../platform/logging/AbstractLogger';
 import { analyzeTemplateMusic } from './beats-analysis';
 import { resolveBuildFormat } from '@/core/formats/resolve';
+import { assertFieldsResolved } from '@/core/fields';
 
 export { discardOutput, publishOutput, resolveOutputPaths } from './output-staging';
 export { qcExpectations } from './qc-expectations';
@@ -65,7 +66,8 @@ export function recordBuildCommands(adapter: AbstractFFmpeg, project: Project): 
 export function expandForBuild(
   descriptor: TemplateDescriptor,
   logger: AbstractLogger,
-  format?: string
+  format?: string,
+  fields?: ProjectConfig['fields']
 ): ReturnType<typeof assertEffectsResolved> {
   const cloned = structuredClone(descriptor);
   const expansion = expandPartialsSafe(cloned);
@@ -79,7 +81,11 @@ export function expandForBuild(
     logger.warn(`[Director] ${warning.path}: ${warning.message}`);
   }
 
-  return assertEffectsResolved(resolveBuildFormat(expansion.ok ? expansion.data : cloned, format));
+  // Declared fields (core/fields) take this build's values, strictly: a missing or ill-typed value fails the
+  // build here, before any section is encoded. A no-op without `global.fields`.
+  const filled = assertFieldsResolved(expansion.ok ? expansion.data : cloned, fields);
+
+  return assertEffectsResolved(resolveBuildFormat(filled, format));
 }
 
 /** What the time-reference pass needs from the build: output frame, fps, locale and form fields. */

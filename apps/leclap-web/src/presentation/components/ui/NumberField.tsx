@@ -9,9 +9,15 @@ import { useHoldRepeat } from '@/lib/useHoldRepeat';
 
 const UNBOUNDED = Number.MAX_SAFE_INTEGER;
 
+/** Pass as `min` for a field with no lower bound (the default lower bound is 0). */
+export const NO_MIN = -UNBOUNDED;
+
 interface NumberFieldProps {
-  value: number;
+  /** null shows an empty input (no value yet); steppers and scrub then start from 0. */
+  value: number | null;
   onChange: (v: number) => void;
+  /** Called when the viewer clears the input; without it a cleared input commits 0. */
+  onEmpty?: () => void;
   label?: string;
   min?: number;
   max?: number;
@@ -22,6 +28,9 @@ interface NumberFieldProps {
   className?: string;
   inputCls?: string;
   compact?: boolean;
+  'aria-invalid'?: boolean;
+  'aria-describedby'?: string;
+  'aria-required'?: boolean;
 }
 
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
@@ -41,7 +50,7 @@ const resolveKeyMove = ({ key, value, step, min, max }: MoveArgs): number | null
   const moves: Record<string, number | undefined> = {
     PageUp: clamp(value + big, min, max),
     PageDown: clamp(value - big, min, max),
-    Home: min,
+    Home: min === NO_MIN ? value : min,
     End: max === UNBOUNDED ? value : max,
   };
 
@@ -154,8 +163,9 @@ const CounterAffordances = ({ unit, aria, step, onStep }: AffordanceProps) => (
 );
 
 export const NumberField = ({
-  value,
+  value: shown,
   onChange,
+  onEmpty,
   label,
   min = 0,
   max = UNBOUNDED,
@@ -166,7 +176,11 @@ export const NumberField = ({
   inputCls,
   compact = false,
   'aria-label': ariaLabel,
+  'aria-invalid': ariaInvalid,
+  'aria-describedby': ariaDescribedBy,
+  'aria-required': ariaRequired,
 }: NumberFieldProps) => {
+  const value = shown ?? 0;
   const autoId = useId();
   const fieldId = id ?? autoId;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -189,6 +203,7 @@ export const NumberField = ({
 
   const resolvedAria = ariaFor(ariaLabel, label, unit);
   const maxAttr = max === UNBOUNDED ? undefined : max;
+  const minAttr = min === NO_MIN ? undefined : min;
 
   return (
     <div className={className}>
@@ -203,13 +218,22 @@ export const NumberField = ({
           id={fieldId}
           type="number"
           inputMode="numeric"
-          min={min}
+          min={minAttr}
           max={maxAttr}
           step={step}
-          value={value}
+          value={shown ?? ''}
           aria-label={resolvedAria}
+          aria-invalid={ariaInvalid}
+          aria-describedby={ariaDescribedBy}
+          aria-required={ariaRequired}
           onKeyDown={handleKeyDown}
           onChange={(e) => {
+            if (e.target.value === '' && onEmpty) {
+              onEmpty();
+
+              return;
+            }
+
             commit(Number(e.target.value));
           }}
           className={cn(

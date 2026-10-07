@@ -84,6 +84,15 @@ describe('buildProjectConfig', () => {
     expect(cfg.videoConfig).toBeUndefined();
   });
 
+  it('merges --set values over --field values', () => {
+    const cfg = buildProjectConfig(cwd, { field: ['title=Hi', 'hold=2'], set: ['hold=5', 'accent=#ff5a36'] });
+    expect(cfg.fields).toEqual({ title: 'Hi', hold: '5', accent: '#ff5a36' });
+  });
+
+  it('rejects a --set without a key', () => {
+    expect(() => buildProjectConfig(cwd, { set: ['=x'] })).toThrow(/--set expects key=value/);
+  });
+
   it('honors --assets and --build overrides (resolved vs cwd)', () => {
     const cfg = buildProjectConfig(cwd, { assets: 'media', build: '/tmp/out' });
     expect(cfg.assetsDir).toBe(path.resolve(cwd, 'media'));

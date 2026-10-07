@@ -27,3 +27,15 @@ export {
 export { findingLine, invalidTemplateText, summarizeErrors } from './services/validation-format';
 // Sound synthesis (pure): render and measure a composed `sound` or a varied library preset (MCP analyze_sound).
 export * from './core/audio/sound-api';
+// Typed template fields (`global.fields`): coercion, resolution, advisories and the resolved descriptor.
+export * from './core/fields';
+export { fieldAdvisories } from './services/field-advisories';
+export { resolveTemplate, type ResolvedTemplate } from './services/resolve-template';
+export {
+  FIELD_TYPES,
+  FieldsSchema,
+  type FieldType,
+  type FieldSpec,
+  type TemplateField,
+  type FieldsDeclaration,
+} from './schemas/fields.schemas';

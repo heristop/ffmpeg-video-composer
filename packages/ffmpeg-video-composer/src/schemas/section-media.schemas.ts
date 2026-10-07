@@ -91,7 +91,11 @@ export const InputSchema = z
 export const FieldSchema = z
   .object({
     name: z.string().describe('Unique identifier for this form field, used as a variable name in filter templates.'),
-    maxLength: z.number().positive().describe('Maximum number of characters allowed in this field.'),
+    maxLength: z
+      .number()
+      .positive()
+      .optional()
+      .describe('Maximum number of characters; required unless the field binds a non-text global.fields entry.'),
     label: TranslationSchema.describe('Localised display label shown to the user for this field.'),
   })
   .describe('A single user-editable text field rendered in a form section.');

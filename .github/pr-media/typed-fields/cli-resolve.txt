@@ -1,0 +1,79 @@
+$ leclap resolve promo.json --set "TITLE=Night Market" --set ACCENT=#ff6f61 --set HOLD=5 --set STYLE=slide-left
+# excerpt: the resolved "global" (no "fields" left) and sections[1] ("title"): options and first three filters
+{
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "transition": {
+      "type": "fade",
+      "duration": 0.4
+    }
+  },
+  "sections[1]": {
+    "name": "title",
+    "options": {
+      "backgroundColor": "#141416",
+      "duration": 5
+    },
+    "filters": [
+      {
+        "type": "drawbox",
+        "values": {
+          "x": 82,
+          "y": 560,
+          "w": 160,
+          "h": 10,
+          "color": "#ff6f61",
+          "t": "fill"
+        }
+      },
+      {
+        "type": "drawtext",
+        "values": {
+          "text": {
+            "en": "TYPED FIELDS"
+          },
+          "fontfile": "BebasNeue.ttf",
+          "fontsize": 40,
+          "fontcolor": "#f5f3f7",
+          "x": 82,
+          "y": 230
+        },
+        "reveal": {
+          "type": "fade",
+          "delay": 0.05,
+          "duration": 0.4
+        }
+      },
+      {
+        "type": "drawtext",
+        "values": {
+          "text": {
+            "en": "Night Market"
+          },
+          "fontfile": "BebasNeue.ttf",
+          "fontsize": 220,
+          "fontcolor": "#ff6f61",
+          "x": 76,
+          "y": 280
+        },
+        "reveal": {
+          "type": "slide-left",
+          "delay": 0.15,
+          "duration": 0.5,
+          "distance": 80,
+          "easing": "ease-out"
+        }
+      }
+    ]
+  }
+}
+
+# the same slots in promo.json:
+{
+  "options.duration": "{{ HOLD }}",
+  "filters[0].values.color": "{{ ACCENT }}",
+  "filters[2].values.fontcolor": "{{ ACCENT }}",
+  "filters[2].reveal.type": "{{ STYLE }}"
+}

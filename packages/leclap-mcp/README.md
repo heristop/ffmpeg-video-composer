@@ -13,24 +13,25 @@ video models, which sample rather than render.
 
 ## Tools
 
-| Tool                   | Description                                                                                                                                                                                   |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `list_samples`         | Discover sample metadata and required inputs, filtered by category/backend/query → `{ samples }`                                                                                              |
-| `get_sample`           | Get a sample by stable ID → metadata, requirements and self-contained `template` JSON                                                                                                         |
-| `get_template_schema`  | The JSON Schema for a template descriptor + a short authoring guide                                                                                                                           |
-| `get_motion_catalog`   | Motion presets, camera, graphics, transitions, easing/time grammar, themes, platforms, genre doctrine and scene blueprints; `{ query, kind? }` → ranked matches                               |
-| `report_catalog_gap`   | `{ query, wanted }` → append a need the catalog could not answer to a JSONL log under the output dir                                                                                          |
-| `get_timeline`         | Render-free timeline on video seconds → sections with absolute start/end, motion events, beats and cues                                                                                       |
-| `validate_template`    | Dry-run an inline descriptor (no render) → `{ valid, sectionCount, orientation, requiredClips, formFields, geometry?, featureWarnings? }`                                                     |
-| `compose_video`        | Validate an inline descriptor and render (one `format` of it, optionally) → `{ outputPath, durationSeconds, sizeBytes, videoCodec, audioCodec, renderId }`, plus a `resource_link` to the mp4 |
-| `render_frames`        | Render a native template and return still frames as PNG images + paths: `at`, `atTransitions`, `perSection`, `sheet`, `safe`, `zoom`, `variants`, `looks`                                     |
-| `probe_media`          | Inspect a local media file → codecs, duration, sample rate, size, and HDR / colour / bit depth / VFR / rotation traits                                                                        |
-| `extract_style`        | Reference image/clip under the media dir → `{ theme, styleGuide, confidence }`: palette roles + WCAG contrast, grain, pacing (palette and pacing only)                                        |
-| `analyze_music`        | Measure a local music file → `{ bpm, offset, beatsPerBar, confidence, usable, cues, globalBeats }` for `global.beats` and `cue:drop`                                                          |
-| `analyze_sound`        | Render an `sfx[].sound` (composed, or a preset with variations) → length, peak/RMS dBFS, centroid, high/low energy shares, attack, advisories + spectrogram and waveform PNGs                 |
-| `get_capabilities`     | Local FFmpeg capability report (listings + one-frame probes) → each feature yes/no/unknown with a fix                                                                                         |
-| `render_remotion_clip` | _(bonus, opt-in)_ Render a composition from **your own** Remotion project → an mp4 clip for a `project_video` section                                                                         |
-| `ping`                 | Liveness check                                                                                                                                                                                |
+| Tool                    | Description                                                                                                                                                                                   |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `list_samples`          | Discover sample metadata and required inputs, filtered by category/backend/query → `{ samples }`                                                                                              |
+| `get_sample`            | Get a sample by stable ID → metadata, requirements and self-contained `template` JSON                                                                                                         |
+| `get_template_schema`   | The JSON Schema for a template descriptor + a short authoring guide                                                                                                                           |
+| `get_motion_catalog`    | Motion presets, camera, graphics, transitions, easing/time grammar, themes, platforms, genre doctrine and scene blueprints; `{ query, kind? }` → ranked matches                               |
+| `report_catalog_gap`    | `{ query, wanted }` → append a need the catalog could not answer to a JSONL log under the output dir                                                                                          |
+| `get_timeline`          | Render-free timeline on video seconds → sections with absolute start/end, motion events, beats and cues                                                                                       |
+| `get_resolved_template` | The descriptor `compose_video` starts its build from for `fields` → `{ descriptor, values }`: declared `global.fields` filled, format resolved; a refused value is an error                   |
+| `validate_template`     | Dry-run an inline descriptor (no render) → `{ valid, sectionCount, orientation, requiredClips, formFields, fields?, geometry?, featureWarnings? }`                                            |
+| `compose_video`         | Validate an inline descriptor and render (one `format` of it, optionally) → `{ outputPath, durationSeconds, sizeBytes, videoCodec, audioCodec, renderId }`, plus a `resource_link` to the mp4 |
+| `render_frames`         | Render a native template and return still frames as PNG images + paths: `at`, `atTransitions`, `perSection`, `sheet`, `safe`, `zoom`, `variants`, `looks`                                     |
+| `probe_media`           | Inspect a local media file → codecs, duration, sample rate, size, and HDR / colour / bit depth / VFR / rotation traits                                                                        |
+| `extract_style`         | Reference image/clip under the media dir → `{ theme, styleGuide, confidence }`: palette roles + WCAG contrast, grain, pacing (palette and pacing only)                                        |
+| `analyze_music`         | Measure a local music file → `{ bpm, offset, beatsPerBar, confidence, usable, cues, globalBeats }` for `global.beats` and `cue:drop`                                                          |
+| `analyze_sound`         | Render an `sfx[].sound` (composed, or a preset with variations) → length, peak/RMS dBFS, centroid, high/low energy shares, attack, advisories + spectrogram and waveform PNGs                 |
+| `get_capabilities`      | Local FFmpeg capability report (listings + one-frame probes) → each feature yes/no/unknown with a fix                                                                                         |
+| `render_remotion_clip`  | _(bonus, opt-in)_ Render a composition from **your own** Remotion project → an mp4 clip for a `project_video` section                                                                         |
+| `ping`                  | Liveness check                                                                                                                                                                                |
 
 Typical agent flow: `list_samples` → `get_sample` → inspect requirements and customize media/copy →
 `get_template_schema` → `validate_template` (iterate until valid) → `render_frames` (look at the result;
@@ -182,12 +183,19 @@ require restart. See the complete [engine configuration reference](../../docs/en
 for host configuration, output precedence, stage deadlines and cache behavior.
 
 `compose_video` uses `mediaDir` as the engine's `assetsDir` and creates one `buildDir` per render.
-Its `fields`, `userVideoPaths` and `locale` arguments bind media/copy, and `format` picks one composition of a template with `formats`; its `template.global` controls
+Its `fields` (strings, numbers or booleans: form values and the declared `global.fields`, each coerced to its type), `userVideoPaths` and `locale` arguments bind media/copy, and `format` picks one composition of a template with `formats`; its `template.global` controls
 orientation and fps. Codec, quality-tier and FFmpeg segment-concurrency fields are library host
 settings, not arbitrary MCP tool arguments.
 
-Seventeen tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`,
-`get_motion_catalog`, `report_catalog_gap`, `get_timeline`, `validate_template`, `compose_video`,
+A template can declare its inputs in `global.fields` (typed: text, color, url, media, number, enum,
+time; see the [template reference](../../docs/template-configuration.md#typed-fields-globalfields)).
+`validate_template` lists them as `fields` and reports `field_undefined`, `field_unused`,
+`field_type_mismatch` and `field_missing_required` among its advisories; `compose_video` and
+`render_frames` refuse a missing required value or one that fails its type before rendering; and
+`get_resolved_template` shows the descriptor those `fields` produce.
+
+Eighteen tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`,
+`get_motion_catalog`, `report_catalog_gap`, `get_timeline`, `get_resolved_template`, `validate_template`, `compose_video`,
 `render_frames`, `patch_template`, `edit_template`, `probe_media`, `extract_style`, `analyze_music`, `analyze_sound` and `get_capabilities`. Opt-in adds
 `get_effect_schema`, `render_preview` and `render_remotion_clip`. Patch availability does not bypass
 effect-backend validation.

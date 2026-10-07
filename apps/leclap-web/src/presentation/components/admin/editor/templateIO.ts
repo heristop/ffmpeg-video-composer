@@ -1,9 +1,10 @@
 // Pure JSON import/export for the builder. Export serialises the built descriptor; import parses
-// arbitrary JSON, validates it against the core schema, and (on success) re-hydrates an EditorState
+// arbitrary JSON, validates it with the core validator (field-aware: a `{{ HOLD }}` placeholder in a numeric
+// slot is checked as the typed value it renders as), and (on success) re-hydrates an EditorState
 // — round-tripping cleanly because buildDescriptor / toEditorState are inverse. No DOM dependency
 // (the actual file download/upload wiring lives in the component); unit-testable in node.
 import { OrientationSchema } from 'ffmpeg-video-composer/src/schemas/global.schemas.ts';
-import { TemplateDescriptorSchema } from 'ffmpeg-video-composer/src/schemas/template.schemas.ts';
+import { BaseTemplateValidator } from 'ffmpeg-video-composer/src/services/BaseTemplateValidator.ts';
 import {
   buildDescriptor,
   toEditorState,
@@ -41,13 +42,9 @@ export function exportFilename(state: EditorState): string {
   return `${base === '' ? 'template' : base}.json`;
 }
 
-// Flatten a zod error into readable "path: message" lines for the import-failure dialog.
-function readableZodErrors(error: { issues: Array<{ path: PropertyKey[]; message: string }> }): string[] {
-  return error.issues.map((issue) => {
-    const path = issue.path.length > 0 ? issue.path.join('.') : 'root';
-
-    return `${path}: ${issue.message}`;
-  });
+// Validator findings as readable "path: message" lines for the import-failure dialog.
+function readableErrors(errors: Array<{ path: string; message: string }>): string[] {
+  return errors.map((error) => `${error.path === '' ? 'root' : error.path}: ${error.message}`);
 }
 
 // Every OrientationSchema value (landscape/portrait/square) maps through; only an absent or
@@ -65,7 +62,8 @@ function importedOrientation(value: string | undefined, current: Orientation): O
 // lands as an undoable edit of the same template (not a brand-new one), but the imported
 // descriptor's own identity wins: toEditorState prefers descriptor.meta name/description over the
 // wrapper values passed here (which remain the per-field fallback for meta-less legacy JSON).
-// On any failure the zod issues are surfaced verbatim.
+// On any failure the validator's findings are surfaced verbatim. The descriptor kept is the JSON as written
+// (placeholders, partial refs and `global.fields` included), never the probe-filled copy the check read.
 export function importDescriptorJson(text: string, current: EditorState): ImportResult {
   let parsed: unknown;
 
@@ -75,13 +73,13 @@ export function importDescriptorJson(text: string, current: EditorState): Import
     return { ok: false, errors: [`Invalid JSON: ${error instanceof Error ? error.message : 'parse error'}`] };
   }
 
-  const result = TemplateDescriptorSchema.safeParse(parsed);
+  const result = new BaseTemplateValidator().validateTemplate(parsed);
 
   if (!result.success) {
-    return { ok: false, errors: readableZodErrors(result.error) };
+    return { ok: false, errors: readableErrors(result.errors ?? []) };
   }
 
-  const descriptor = result.data as TemplateDescriptor;
+  const descriptor = parsed as TemplateDescriptor;
 
   // Effect sections have no builder representation yet. Importing them would silently turn the effect
   // into a camera or upload slot with no effect id, props or assets, so refuse and point at the JSON.

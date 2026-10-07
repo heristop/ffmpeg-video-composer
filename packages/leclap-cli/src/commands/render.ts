@@ -95,6 +95,7 @@ export const render = defineCommand({
     template: { type: 'positional', description: 'Path to a template JSON file', required: true },
     output: { type: 'string', alias: 'o', description: 'Copy the rendered video to this path' },
     field: { type: 'string', description: 'Set a template variable: --field key=value (repeatable)' },
+    set: { type: 'string', description: 'Set a declared field (global.fields): --set name=value (repeatable)' },
     video: { type: 'string', description: 'Map a project_video section to a file: --video section=path (repeatable)' },
     locale: { type: 'string', description: 'Locale for translated text (e.g. en, fr)' },
     orientation: { type: 'string', description: 'Override orientation: landscape | portrait | square' },
@@ -132,6 +133,7 @@ export const render = defineCommand({
 
     const flags: RenderFlags = {
       field: repeatedFlag(rawArgs, args.field, 'field'),
+      set: repeatedFlag(rawArgs, args.set, 'set'),
       video: repeatedFlag(rawArgs, args.video, 'video'),
       locale: args.locale,
       orientation: args.orientation,

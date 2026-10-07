@@ -8,6 +8,8 @@ import { parseFormatFlag } from './render-formats.js';
 export interface RenderFlags {
   /** Repeatable `--field key=value`, merged into `fields` (template variables / form values). */
   field?: string[];
+  /** Repeatable `--set name=value`: a value for a declared `global.fields` entry (wins over `--field`). */
+  set?: string[];
   /** Repeatable `--video section=path`, merged into `userVideoPaths` (paths resolved vs cwd). */
   video?: string[];
   /** `--locale` → `currentLocale`. */
@@ -83,7 +85,7 @@ export function buildProjectConfig(cwd: string, flags: RenderFlags): ProjectConf
   const config: ProjectConfig & { buildDir: string } = {
     buildDir,
     assetsDir,
-    fields: parseKeyValues(flags.field, 'field'),
+    fields: { ...parseKeyValues(flags.field, 'field'), ...parseKeyValues(flags.set, 'set') },
   };
 
   const videos = parseKeyValues(flags.video, 'video');

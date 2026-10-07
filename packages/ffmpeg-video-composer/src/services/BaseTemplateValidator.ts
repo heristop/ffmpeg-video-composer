@@ -21,12 +21,19 @@ import { resolveSectionDurations } from '@/core/timing/durations';
 import { validateBeatsAnalysis } from './time-ref-validation';
 import { usesFormats } from '@/core/formats/resolve';
 import { validateEachFormat } from './validation/format-validation';
+import { validateWithFields } from './validation/field-validation';
+import { formFieldBudgetErrors } from './validation/form-field-budget';
 
 export type { ValidationError } from './template-validation-rules';
 
-/** `format`: validate the descriptor as it renders in that one format (default: every declared format). */
+/**
+ * `format`: validate the descriptor as it renders in that one format (default: every declared format).
+ * `fields`: the values a render will fill `global.fields` with; given, a missing or ill-typed value is an
+ * error (strict). Omitted, missing values are probed and left to the field advisories (core/fields).
+ */
 export interface ValidateOptions {
   format?: string;
+  fields?: Readonly<Record<string, unknown>>;
 }
 
 export interface ValidationResult {
@@ -127,11 +134,26 @@ export class BaseTemplateValidator {
       return { success: false, errors: [expansion.error] };
     }
 
-    if (usesFormats(expansion.data) || options.format !== undefined) {
-      return this.validateFormats(expansion.data, options.format);
-    }
+    // Declared fields are filled in after the partials expand (a ref's own variables win) and before the
+    // formats resolve; `data` is then the descriptor as it renders (services/validation/field-validation.ts).
+    const result = validateWithFields(expansion.data, options.fields, (resolved) =>
+      usesFormats(resolved) || options.format !== undefined
+        ? this.validateFormats(resolved, options.format)
+        : this.validateParsed(resolved)
+    );
+    // Read on the expanded descriptor, where the field contract still says which form fields are typed.
+    const budget = formFieldBudgetErrors(expansion.data);
 
-    return this.validateParsed(expansion.data);
+    return budget.length > 0 ? { ...result, success: false, errors: [...(result.errors ?? []), ...budget] } : result;
+  }
+
+  // The validation a render runs: its format, and strict on declared fields — the render's own values (or
+  // none) must fill every required one, each fitting its type (core/fields).
+  validateForRender(
+    templateData: unknown,
+    config: { format?: string; fields?: Record<string, string> }
+  ): ValidationResult {
+    return this.validateTemplate(templateData, { format: config.format, fields: config.fields ?? {} });
   }
 
   // One story, several formats: each format is validated as the descriptor it renders

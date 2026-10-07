@@ -88,11 +88,13 @@ export function effectKeyError(raw: unknown): string | undefined {
 
   return unsafeEffectValue(values);
 }
-export function validateTemplate(raw: unknown): ValidationResult {
+// `fields`: a render's own values. Given (even empty), declared global.fields are checked strictly — a
+// missing required value or one that fails its type is an error — and the descriptor comes back filled in.
+export function validateTemplate(raw: unknown, fields?: Record<string, string>): ValidationResult {
   const keyError = effectKeyError(raw);
 
   if (keyError) return { ok: false, message: keyError };
-  const validation = new TemplateValidator().validateTemplate(raw);
+  const validation = new TemplateValidator().validateTemplate(raw, fields === undefined ? {} : { fields });
 
   if (!validation.success || !validation.data) {
     const errors = validation.errors ?? [];

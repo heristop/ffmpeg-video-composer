@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Typed template fields: `leclap render --set name=value` (repeatable) fills a declared `global.fields`
+  entry, coerced to its type (`--field` still works; `--set` wins); `leclap resolve <template> [--set …]`
+  prints the descriptor a render would see and exits 1 listing every value it would refuse.
 - `leclap samples list --category effects`; the catalog now has 46 samples.
 - `leclap render --qc` prints output QC findings and exits non-zero on a failing check (`--json`
   includes the report); `--cache <dir>` reuses unchanged sections across renders. `--output` is written

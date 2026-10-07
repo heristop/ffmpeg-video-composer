@@ -31,6 +31,7 @@ leclap beats <audio>      # tempo, beat grid, confidence and drop/build cues for
 leclap snapshot <template> # render and save still frames (PNG) of chosen moments, contact sheets
 leclap compare <a> <b>    # the same moment of several templates in one labelled grid
 leclap timeline <template> # sections, motion events, beats and cues on video seconds (--json)
+leclap resolve <template>  # the descriptor a render would see, global.fields filled (--set name=value)
 leclap diagnose           # check your FFmpeg setup and what it can render (--json for the report)
 leclap --help             # usage (per-command help with `leclap <command> --help`)
 leclap --version
@@ -49,6 +50,11 @@ leclap render template.json \
   --field form_1_title="Your next release" \
   --locale en --orientation landscape --output ./exports/promo.mp4
 ```
+
+A template that declares typed inputs in `global.fields` takes them with `--set NAME=value` (repeatable;
+wins over `--field`). Each value is coerced to its declared type before anything renders, and a missing
+required or ill-typed value fails the render up front. `leclap resolve template.json --set HOLD=4` prints
+the descriptor those values produce and exits 1 listing what a render would refuse.
 
 Use the descriptor's effective section and field names. Repeat `--video` and `--field` to bind
 multiple inputs; later values win for the same key. All relative file/directory paths resolve from

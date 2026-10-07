@@ -5,6 +5,7 @@ import { MotionTokensSchema } from './motion.schemas';
 import { ThemeSchema } from './theme.schemas';
 import { BeatsSchema } from './time.schemas';
 import { GlobalSfxSchema } from './audio.schemas';
+import { FieldsSchema } from './fields.schemas';
 import {
   TransitionSchema,
   GlobalAudioSchema,
@@ -203,6 +204,7 @@ export const GlobalConfigSchema = z
     variables: VariablesSchema.optional().describe(
       'Template-wide variable definitions referenced via {{ varName }} syntax.'
     ),
+    fields: FieldsSchema.optional(),
     orientation: OrientationSchema.optional(),
     platform: PlatformSchema.optional(),
     emoji: z

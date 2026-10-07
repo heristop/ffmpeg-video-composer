@@ -11,6 +11,7 @@ import { runSnapshot } from '../compose/snapshotRunner.js';
 import { pruneRenderDir, removeDir } from '../compose/renderDir.js';
 import type { SnapshotJob, SnapshotOutcome } from '../worker/snapshot-job.js';
 import { formatArg } from '../compose/format.js';
+import { fieldsArg, fieldValues } from '../compose/field-values.js';
 import { errorResult, prepareCompose, type ComposeArgs, type ToolError } from './composeVideo.js';
 
 // render_frames: the agent's eyes. Renders a native template (through the per-section cache under the
@@ -59,7 +60,7 @@ export const renderFramesInput = z.object({
     .boolean()
     .optional()
     .describe('Tile the section at the first `at` moment once per LOOK preset (the section alone; slow).'),
-  fields: z.record(z.string(), z.string()).optional(),
+  fields: fieldsArg,
   userVideoPaths: z.record(z.string(), z.string()).optional(),
   locale: z.string().optional(),
   format: formatArg,
@@ -142,7 +143,7 @@ function snapshotOptions(args: FramesArgs, config: McpConfig, outDir: string, pa
     assetsDir: config.mediaDir,
     cacheDir: path.join(config.outputDir, '.section-cache'),
     workDir: config.outputDir,
-    fields: args.fields,
+    fields: fieldValues(args.fields),
     currentLocale: args.locale,
     userVideoPaths: paths,
     at: args.at,

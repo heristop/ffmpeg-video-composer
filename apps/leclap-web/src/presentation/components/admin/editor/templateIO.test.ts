@@ -155,3 +155,53 @@ describe('importDescriptorJson effect sections', () => {
     expect(!result.ok && result.errors.join(' ')).toMatch(/effect/i);
   });
 });
+
+describe('importDescriptorJson with typed fields', () => {
+  const typed = {
+    global: {
+      orientation: 'landscape',
+      fields: {
+        TITLE: { type: 'text', required: true, maxLength: 24 },
+        HOLD: { type: 'number', default: 3, min: 2, max: 6 },
+        STYLE: { type: 'enum', options: ['rise', 'fade'], default: 'rise' },
+      },
+    },
+    sections: [
+      {
+        name: 'details',
+        type: 'form',
+        options: { fields: [{ name: 'TITLE', maxLength: 24, label: { en: 'Title' } }] },
+      },
+      {
+        name: 'title',
+        type: 'color_background',
+        options: { backgroundColor: '#141416', duration: '{{ HOLD }}' },
+        filters: [{ type: 'drawtext', values: { text: { en: '{{ TITLE }}' } }, reveal: { type: '{{ STYLE }}' } }],
+      },
+    ],
+  };
+
+  it('accepts placeholders in typed slots and keeps the field contract when saved', () => {
+    const result = importDescriptorJson(JSON.stringify(typed), state());
+
+    expect(result.ok).toBe(true);
+
+    if (!result.ok) return;
+
+    const saved = buildDescriptor(result.state);
+
+    expect(saved.global?.fields).toEqual(typed.global.fields);
+    expect(JSON.stringify(saved.sections)).toContain('{{ HOLD }}');
+  });
+
+  it('still refuses a value its slot rejects', () => {
+    const broken = {
+      ...typed,
+      global: { ...typed.global, fields: { ...typed.global.fields, HOLD: { type: 'text', default: 'slow' } } },
+    };
+    const result = importDescriptorJson(JSON.stringify(broken), state());
+
+    expect(result.ok).toBe(false);
+    expect(!result.ok && result.errors.join(' ')).toContain('HOLD');
+  });
+});
