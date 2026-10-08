@@ -8,7 +8,6 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { runRender } from '../src/compose/renderRunner.js';
 import { createServer } from '../src/server.js';
-import { resolvedTemplateResult } from '../src/tools/getResolvedTemplate.js';
 import { fieldValues } from '../src/compose/field-values.js';
 import { handleValidate } from '../src/tools/validateTemplate.js';
 import { prepareCompose } from '../src/tools/composeVideo.js';
@@ -49,18 +48,24 @@ describe('fieldValues', () => {
   });
 });
 
-describe('get_resolved_template', () => {
-  it('returns the descriptor a render would see, with the typed values', () => {
-    const result = resolvedTemplateResult({ template, fields: { TITLE: 'Hi', HOLD: 5 } });
-    const content = result.structuredContent as Resolved;
+describe('validate_template include: ["resolved"]', () => {
+  it('returns the descriptor a render would see, with the typed values', async () => {
+    const result = (await handleValidate(
+      { template, include: ['resolved'], fields: { TITLE: 'Hi', HOLD: 5 } },
+      {} as never
+    )) as unknown as { isError?: boolean; structuredContent: { valid: boolean; resolved: Resolved } };
 
     expect(result.isError).toBeUndefined();
-    expect(content.descriptor.sections[0].options.duration).toBe(5);
-    expect(content.values).toEqual({ HOLD: 5, TITLE: 'Hi' });
+    expect(result.structuredContent.valid).toBe(true);
+    expect(result.structuredContent.resolved.descriptor.sections[0].options.duration).toBe(5);
+    expect(result.structuredContent.resolved.values).toEqual({ HOLD: 5, TITLE: 'Hi' });
   });
 
-  it('lists what a render would refuse', () => {
-    const result = resolvedTemplateResult({ template, fields: { HOLD: 'slow' } });
+  it('lists what a render would refuse', async () => {
+    const result = (await handleValidate(
+      { template, include: ['resolved'], fields: { HOLD: 'slow' } },
+      {} as never
+    )) as unknown as { isError?: boolean; content: unknown };
 
     expect(result.isError).toBe(true);
     expect(JSON.stringify(result.content)).toContain('field_type_mismatch');
@@ -98,11 +103,12 @@ describe('the MCP server', () => {
     await Promise.all([client.close(), server.close()]);
   });
 
-  it('registers get_resolved_template and takes typed fields on compose_video and render_frames', async () => {
+  it('takes typed fields on validate_template, compose_video and render_frames', async () => {
     const { tools } = await client.listTools();
     const fieldsOf = (name: string) => tools.find((tool) => tool.name === name)?.inputSchema.properties?.fields;
 
-    expect(tools.map((tool) => tool.name)).toContain('get_resolved_template');
+    expect(tools.map((tool) => tool.name)).not.toContain('get_resolved_template');
+    expect(JSON.stringify(fieldsOf('validate_template'))).toContain('number');
     expect(JSON.stringify(fieldsOf('compose_video'))).toContain('number');
     expect(JSON.stringify(fieldsOf('render_frames'))).toContain('number');
   });

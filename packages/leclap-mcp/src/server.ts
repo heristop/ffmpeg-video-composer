@@ -11,7 +11,6 @@ import { registerValidateTemplate } from './tools/validateTemplate.js';
 import { registerRenderRemotionClip } from './tools/renderRemotionClip.js';
 import { registerGetEffectSchema } from './tools/getEffectSchema.js';
 import { registerRenderPreview } from './tools/renderPreview.js';
-import { registerPatchTemplate } from './tools/patchTemplate.js';
 import { registerEditTemplate } from './tools/editTemplate.js';
 import { validateEffects } from './effects/title-registry.js';
 import { registerSamples } from './tools/samples.js';
@@ -20,20 +19,9 @@ import { registerInspectTools } from './tools/inspectTools.js';
 import { registerOpenInBuilder } from './tools/open-in-builder.js';
 
 // Each tool group is registered by a small `registerXxx(server, config)` function, called from
-// `createServer`. The surface is authoring-only: schema, validate, compose, probe, the Remotion
-// authoring helpers, and a health-check ping.
-function registerPing(server: McpServer, _config: McpConfig): void {
-  server.registerTool(
-    'ping',
-    {
-      title: 'Ping',
-      description: 'Health check — returns a fixed readiness string.',
-    },
-    () => ({
-      content: [{ type: 'text', text: 'leclap mcp ok' }],
-    })
-  );
-}
+// `createServer`. The surface is authoring-only: samples, schema, validate, edit, compose, inspect and
+// probe, plus the Remotion authoring helpers behind their opt-in. Every tool's name and description is
+// paid for on every agent turn, so a tool earns its place only when no other one can answer it.
 
 // The tool/prompt surface is fixed for the process lifetime (only `allowRemotion`, a start-up
 // config, changes it), so the 2026-07-28 `CacheableResult` fields can advertise a real freshness
@@ -59,15 +47,12 @@ export function snapshotEffectConfig(input: McpConfig): Readonly<McpConfig> {
       : {}),
   });
 }
-// Revision-guarded template edits: patch_template (registered effect props) and edit_template (JSON Patch).
-// Both stay registered without Remotion; effect sections they produce still pass effect-backend validation.
+// Revision-guarded template edits: edit_template (JSON Patch, plus registered effect props by section name).
+// Registered without Remotion too; effect sections it produces still pass effect-backend validation.
 function registerTemplateEdits(server: McpServer, config: McpConfig): void {
-  async function effects(template: Record<string, unknown>, signal?: AbortSignal): Promise<void> {
+  registerEditTemplate(server, async (template, signal) => {
     await validateEffects(template, config, signal);
-  }
-
-  registerPatchTemplate(server, effects);
-  registerEditTemplate(server, effects);
+  });
 }
 
 // Config-free tools: the local FFmpeg capability report and the builder hand-off link.
@@ -90,7 +75,6 @@ export function createServer(input: McpConfig): McpServer {
     }
   );
 
-  registerPing(server, config);
   registerSamples(server);
   registerGetTemplateSchema(server);
   registerValidateTemplate(server, config);

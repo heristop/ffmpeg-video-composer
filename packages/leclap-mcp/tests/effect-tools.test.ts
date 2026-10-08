@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { parseCustomEffectCatalog } from '../src/effects/custom-effect-catalog.js';
-import { registerPatchTemplate } from '../src/tools/patchTemplate.js';
+import { registerEditTemplate } from '../src/tools/editTemplate.js';
 import { validateEffects } from '../src/effects/title-registry.js';
 import { registerCompose } from '../src/tools/composeVideo.js';
 import { registerRenderPreview } from '../src/tools/renderPreview.js';
@@ -47,11 +47,11 @@ function capture(register: any) {
   return handler;
 }
 
-function registerPatchForEffects(
-  server: Parameters<typeof registerPatchTemplate>[0],
+function registerEditForEffects(
+  server: Parameters<typeof registerEditTemplate>[0],
   config: Parameters<typeof registerCompose>[1]
 ) {
-  registerPatchTemplate(server, async (patched, signal) => {
+  registerEditTemplate(server, async (patched, signal) => {
     await validateEffects(patched, config, signal);
   });
 }
@@ -116,7 +116,7 @@ describe('MCP registered effects', () => {
     ['compose_video', registerCompose],
     ['render_preview', registerRenderPreview],
     ['validate_template', registerValidateTemplate],
-    ['patch_template', registerPatchForEffects],
+    ['edit_template', registerEditForEffects],
   ] as const)('%s cancels an active effect preflight before rendering', async (name, register) => {
     const controller = new AbortController();
     let started = false;
@@ -132,11 +132,11 @@ describe('MCP registered effects', () => {
       );
     });
     const args =
-      name === 'patch_template'
+      name === 'edit_template'
         ? {
             template,
             expectedRevision: templateRevision(template),
-            edits: [{ section: 'title', props: { headline: 'Updated' } }],
+            effectProps: [{ section: 'title', props: { headline: 'Updated' } }],
           }
         : { template, section: 'title', frames: [0] };
     const pending = capture(register)(args, { mcpReq: { signal: controller.signal } });
@@ -423,7 +423,7 @@ it('rejects custom invalid props before rendering', async () => {
 it('patches custom props through the configured snapshot', async () => {
   useCustom();
   let handler: any;
-  registerPatchTemplate(
+  registerEditTemplate(
     {
       registerTool: (_name: any, _meta: any, cb: any) => {
         handler = cb;
@@ -436,7 +436,7 @@ it('patches custom props through the configured snapshot', async () => {
   const result = await handler({
     template,
     expectedRevision: templateRevision(template),
-    edits: [{ section: 'title', props: { headline: 'Updated' } }],
+    effectProps: [{ section: 'title', props: { headline: 'Updated' } }],
   });
   expect(result.isError, JSON.stringify(result.content)).toBeUndefined();
   expect(result.structuredContent.template.sections[0].effect.props.headline).toBe('Updated');

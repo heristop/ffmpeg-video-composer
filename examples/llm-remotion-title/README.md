@@ -50,7 +50,7 @@ For storyboard planning, template variety and frame review, follow the [agent au
 1. Read `get_template_schema` and `get_effect_schema` for the registered `leclap.title-reveal@1.0.0` effect.
 2. Submit `template.json` (its relative assets resolve under the configured media directory) to `validate_template`; keep the returned revision.
 3. Use `render_preview` with `section: "intro"` and either `frames: [0, 15, 30, 150, 299]` or `frameRange: { "from": 0, "to": 89 }` (inclusive). Pass the expected revision to reject stale requests.
-4. Call `patch_template` with the JSON, expected revision and a batch of semantic prop edits.
+4. Call `edit_template` with the JSON, expected revision and a batch of semantic prop edits in `effectProps`.
 5. Inspect the new preview, then pass the revised JSON to `compose_video`. Use `get_effect_schema` without arguments for the title catalog, or pass its exact `id` and `version`.
 
 For effects inside partials, preview and patch by the expanded section name, including its prefix.
@@ -174,7 +174,7 @@ Alternatively set `LECLAP_MCP_EFFECT_CATALOG` alongside the earlier environment 
 1. Call `get_effect_schema` with `{ "list": true }`, then `{ "id": "studio.product-reveal", "version": "1.0.0" }`. Inspect defaults, bounds, output and `definitionHash`. The zero-argument call still describes the builtin title; do not combine `list: true` with `id` or `version`.
 2. Read the actual `custom-template.json` object and submit it to `validate_template`. Retain the revision.
 3. Call `render_preview` with that object, `section: "product"`, `frames: [0, 12, 36, 150, 299]` and the revision. Inspect the exported PNGs for readable copy and complete framing. An inclusive range `{ "from": 0, "to": 59 }` shows the entrance motion.
-4. Call `patch_template` with the same object, revision and `edits: [{ "section": "product", "props": { "headline": "Your next idea, in motion", "accent": "mint" } }]`. Save the returned template and revision, then preview again.
+4. Call `edit_template` with the same object, revision and `effectProps: [{ "section": "product", "props": { "headline": "Your next idea, in motion", "accent": "mint" } }]`. Save the returned template and revision, then preview again.
 5. Submit the revised object to `compose_video`. The effect alone produces an opaque H.264 video at 1280×720, 30 fps, 300 frames / ten seconds. Repeat unchanged previews/compositions to inspect cache hits; prop, composition mapping or contract changes invalidate reuse.
 
 This example needs compatible local Chrome or Remotion browser setup and the existing optional Remotion peers. Catalog registration uses the supported strict JSON Schema subset and resource bounds documented in the [MCP guide](../../packages/leclap-mcp/README.md#operator-custom-effect-catalogs); arbitrary schemas, inline source and custom output formats are rejected. Visual text fit remains a preview inspection step.

@@ -4,7 +4,7 @@ import { resolveFormat } from '@/core/formats/resolve';
 import { BaseTemplateValidator } from './BaseTemplateValidator';
 import type { ValidationError } from './validation/types';
 
-// The descriptor a render starts from for the given values (`leclap resolve`, MCP get_resolved_template),
+// The descriptor a render starts from for the given values (`leclap resolve`, MCP validate_template include resolved),
 // built as the build builds it (director/prepare-build.ts): partials expanded, declared fields filled with
 // their typed values (core/fields), then the requested format resolved. global.variables and plain form
 // values stay as placeholders: the engine fills them as it draws (text; variables also colours and URLs).

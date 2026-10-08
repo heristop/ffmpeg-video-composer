@@ -1078,7 +1078,7 @@ slot goes in as a number. Substituted text is never scanned again, and the fille
 `global.fields`, so filling it twice changes nothing. The filled descriptor then goes through the normal
 schema, so a value its slot rejects fails **at that slot** (`field_type_mismatch` at `sections.0.options.duration`).
 A render refuses a missing required value or one that fails its type before encoding anything.
-`leclap resolve template.json --set TITLE=Hi` and the MCP `get_resolved_template` tool print the descriptor the
+`leclap resolve template.json --set TITLE=Hi` and MCP `validate_template` with `include: ["resolved"]` print the descriptor the
 build starts from: partials expanded, the fields filled, the format resolved. `global.variables` and form values
 stay as placeholders there; the engine fills them as it draws.
 
@@ -2075,7 +2075,7 @@ Calling the core compile API with an unresolved effect reports `effect_backend_u
 Configure the MCP entry, browser, catalog, media root, timeout and cache through its startup flags,
 not effect props or `ProjectConfig`. See [registered-effect configuration](./engine-configuration.md#registered-effects-and-mcp-runtime).
 Use expanded effect section names, including partial prefixes, for preview and patch requests.
-`patch_template` preserves inline partial authoring and materializes only a selected registry instance;
+MCP `edit_template` `effectProps` preserve inline partial authoring and materializes only a selected registry instance;
 other references and the shared definition remain unchanged. JSON revisions guard edits, while
 render provenance records observed inputs; neither guarantees identical bytes across hosts.
 

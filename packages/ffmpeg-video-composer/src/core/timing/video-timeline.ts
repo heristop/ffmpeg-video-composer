@@ -1,6 +1,6 @@
 // The whole-video timeline: every rendering section placed at its absolute start, every motion event of
 // the motion timeline moved onto video seconds, the beat grid and the named cues. Pure and render-free,
-// so an agent can ask "what is on screen at 4.2 s" (`leclap timeline --json`, MCP `get_timeline`) and the
+// so an agent can ask "what is on screen at 4.2 s" (`leclap timeline --json`, MCP `validate_template` include timeline) and the
 // snapshot planner can turn "intro.end" or "beat:8" into a time to grab a frame at.
 
 import { motionTimeline, type MotionEvent, type SectionTimeline } from '../motion/timeline';

@@ -1,7 +1,7 @@
 // Checking without changing anything: #7 validate_template (the current draft, or a candidate the agent
 // is about to apply) in the same shape and wording as @leclap/mcp's validate_template, plus a builder
 // advisory listing the fields the builder would drop; #8 get_timeline, the render-free whole-video
-// timeline. Neither renders: geometry advisories (text overflow, collisions, safe zones, contrast) are
+// timeline (browser-only: @leclap/mcp returns it from validate_template with include: ["timeline"]). Neither renders: geometry advisories (text overflow, collisions, safe zones, contrast) are
 // measured render-free with the bundled fonts the page serves; a pixel check is render_preview.
 import { z } from 'zod';
 import { invalidTemplateText } from 'ffmpeg-video-composer/src/services/validation-format.ts';

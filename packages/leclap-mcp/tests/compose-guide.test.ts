@@ -44,10 +44,15 @@ describe('compose-video prompt', () => {
     expect(text).toContain('compose_video');
     expect(text).toContain('render_frames after validate to look at the result');
     expect(text).toContain('check safe zones');
-    expect(text).toContain('get_timeline');
-    expect(text).toContain('report_catalog_gap');
+    expect(text).toContain('include: ["timeline"]');
     expect(text).toContain('global.fields');
-    expect(text).toContain('get_resolved_template');
+    expect(text).toContain('include: ["resolved"]');
+    for (const removed of ['get_timeline', 'report_catalog_gap', 'get_resolved_template', 'patch_template']) {
+      expect(text).not.toContain(removed);
+    }
+    for (const removed of ['list_samples', 'get_sample ', 'get_sample,']) {
+      expect(text).not.toContain(removed);
+    }
   });
 
   it('points to render_remotion_clip for an animated intro fed via userVideoPaths', () => {

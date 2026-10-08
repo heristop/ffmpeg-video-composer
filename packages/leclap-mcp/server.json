@@ -3,7 +3,7 @@
   "name": "dev.leclap/video",
   "title": "LeClap",
   "description": "Compose and render video from one JSON template. Deterministic, runs locally, no generative model.",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "websiteUrl": "https://leclap.dev",
   "repository": {
     "url": "https://github.com/heristop/leclap",
@@ -15,7 +15,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@leclap/mcp",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
@@ -79,7 +79,7 @@
         },
         {
           "name": "LECLAP_MCP_CATALOG_GAP_LOG",
-          "description": "JSONL log report_catalog_gap appends to, relative to and always under the output dir. Defaults to catalog-gaps.jsonl.",
+          "description": "JSONL log of get_motion_catalog queries that matched nothing, relative to and always under the output dir. Defaults to catalog-gaps.jsonl.",
           "format": "filepath",
           "isRequired": false,
           "isSecret": false
@@ -92,16 +92,8 @@
       "dev.leclap.video": {
         "tools": [
           {
-            "name": "ping",
-            "description": "Health check that returns a fixed readiness string."
-          },
-          {
-            "name": "list_samples",
-            "description": "Discover packaged showcase samples, creative direction, required inputs and native or Remotion setup."
-          },
-          {
-            "name": "get_sample",
-            "description": "Retrieve a sample descriptor with embedded partials and its input requirements, without downloading media or rendering."
+            "name": "get_samples",
+            "description": "List packaged showcase samples with creative direction, required inputs and native or Remotion setup, or retrieve one with its template and embedded partials, without downloading media or rendering."
           },
           {
             "name": "get_template_schema",
@@ -112,20 +104,8 @@
             "description": "Return the motion catalog: kinetic presets, camera moves, graphics, designed transitions, easing grammar, motion tokens, themes, delivery platforms and art-direction rules, or ranked matches for a query."
           },
           {
-            "name": "report_catalog_gap",
-            "description": "Record a motion need the catalog could not answer to a JSONL log under the output dir."
-          },
-          {
-            "name": "get_timeline",
-            "description": "Return the template timeline on video seconds: sections, motion events, beats and cues, without rendering."
-          },
-          {
-            "name": "get_resolved_template",
-            "description": "Return the descriptor compose_video starts its build from for the given fields: declared global.fields filled with typed values and the format resolved, without rendering."
-          },
-          {
             "name": "validate_template",
-            "description": "Validate a template without rendering and report the clips and fields compose_video will require."
+            "description": "Validate a template without rendering and report the clips and fields compose_video will require; optionally return the resolved descriptor for given fields and the timeline (sections, motion events, beats, cues)."
           },
           {
             "name": "compose_video",
@@ -176,16 +156,12 @@
             "description": "Preview frames or a short frame range of a registered JSON effect using trusted local Remotion source."
           },
           {
-            "name": "patch_template",
-            "description": "Apply effect-prop edits to inline template JSON atomically using an expected revision, returning the updated template."
-          },
-          {
             "name": "edit_template",
-            "description": "Apply a JSON Patch (RFC 6902) to inline template JSON atomically using an expected revision; the result must validate."
+            "description": "Apply a JSON Patch (RFC 6902) and registered effect-prop edits to inline template JSON atomically using an expected revision; the result must validate."
           }
         ],
         "prompts": ["compose-video"],
-        "notes": "Twenty tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, patching and rendering; callers cannot select executable source through effect JSON. patch_template remains registered when Remotion is disabled."
+        "notes": "Fourteen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, editing and rendering; callers cannot select executable source through effect JSON. edit_template, including its effect-prop edits, remains registered when Remotion is disabled."
       }
     }
   }

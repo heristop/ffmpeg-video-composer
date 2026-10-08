@@ -13,27 +13,23 @@ video models, which sample rather than render.
 
 ## Tools
 
-| Tool                    | Description                                                                                                                                                                                   |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `list_samples`          | Discover sample metadata and required inputs, filtered by category/backend/query → `{ samples }`                                                                                              |
-| `get_sample`            | Get a sample by stable ID → metadata, requirements and self-contained `template` JSON                                                                                                         |
-| `get_template_schema`   | The JSON Schema for a template descriptor + a short authoring guide                                                                                                                           |
-| `get_motion_catalog`    | Motion presets, camera, graphics, transitions, easing/time grammar, themes, platforms, genre doctrine and scene blueprints; `{ query, kind? }` → ranked matches                               |
-| `report_catalog_gap`    | `{ query, wanted }` → append a need the catalog could not answer to a JSONL log under the output dir                                                                                          |
-| `get_timeline`          | Render-free timeline on video seconds → sections with absolute start/end, motion events, beats and cues                                                                                       |
-| `get_resolved_template` | The descriptor `compose_video` starts its build from for `fields` → `{ descriptor, values }`: declared `global.fields` filled, format resolved; a refused value is an error                   |
-| `validate_template`     | Dry-run an inline descriptor (no render) → `{ valid, sectionCount, orientation, requiredClips, formFields, fields?, geometry?, featureWarnings? }`                                            |
-| `compose_video`         | Validate an inline descriptor and render (one `format` of it, optionally) → `{ outputPath, durationSeconds, sizeBytes, videoCodec, audioCodec, renderId }`, plus a `resource_link` to the mp4 |
-| `render_frames`         | Render a native template and return still frames as PNG images + paths: `at`, `atTransitions`, `perSection`, `sheet`, `safe`, `zoom`, `variants`, `looks`                                     |
-| `probe_media`           | Inspect a local media file → codecs, duration, sample rate, size, and HDR / colour / bit depth / VFR / rotation traits                                                                        |
-| `extract_style`         | Reference image/clip under the media dir → `{ theme, styleGuide, confidence }`: palette roles + WCAG contrast, grain, pacing (palette and pacing only)                                        |
-| `analyze_music`         | Measure a local music file → `{ bpm, offset, beatsPerBar, confidence, usable, cues, globalBeats }` for `global.beats` and `cue:drop`                                                          |
-| `analyze_sound`         | Render an `sfx[].sound` (composed, or a preset with variations) → length, peak/RMS dBFS, centroid, high/low energy shares, attack, advisories + spectrogram and waveform PNGs                 |
-| `transcribe_media`      | Transcribe a local audio/video file's speech with whisper.cpp, locally → `{ words, srt, language, confidence, advice }` to pin into `subtitles.words`                                         |
-| `get_capabilities`      | Local FFmpeg capability report (listings + one-frame probes) → each feature yes/no/unknown with a fix                                                                                         |
-| `open_in_builder`       | Template → a `leclap.dev/studio/builder#t=…` link for a person to edit it; the template rides in the URL fragment (never sent to a server) → `{ url, length, mediaToRebind, warnings }`       |
-| `render_remotion_clip`  | _(bonus, opt-in)_ Render a composition from **your own** Remotion project → an mp4 clip for a `project_video` section                                                                         |
-| `ping`                  | Liveness check                                                                                                                                                                                |
+| Tool                   | Description                                                                                                                                                                                                                                                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `get_samples`          | Without `id`: sample metadata and required inputs, filtered by category/backend/query → `{ samples }`; with `id`: that sample with its self-contained `template` JSON                                                                                                                                              |
+| `get_template_schema`  | The JSON Schema for a template descriptor + a short authoring guide                                                                                                                                                                                                                                                |
+| `get_motion_catalog`   | Motion presets, camera, graphics, transitions, easing/time grammar, themes, platforms, genre doctrine and scene blueprints; `{ query, kind? }` → ranked matches (a query matching nothing is logged to the catalog gap log)                                                                                        |
+| `validate_template`    | Dry-run an inline descriptor (no render) → `{ valid, sectionCount, orientation, requiredClips, formFields, fields?, geometry?, featureWarnings? }`; `include: ["resolved"]` adds `resolved` (the descriptor for `fields`/`format`), `include: ["timeline"]` adds `timeline` (sections, motion events, beats, cues) |
+| `compose_video`        | Validate an inline descriptor and render (one `format` of it, optionally) → `{ outputPath, durationSeconds, sizeBytes, videoCodec, audioCodec, renderId }`, plus a `resource_link` to the mp4                                                                                                                      |
+| `render_frames`        | Render a native template and return still frames as PNG images + paths: `at`, `atTransitions`, `perSection`, `sheet`, `safe`, `zoom`, `variants`, `looks`                                                                                                                                                          |
+| `edit_template`        | JSON Patch `operations` and/or registered `effectProps` by section name over inline JSON, under `expectedRevision`, all-or-nothing → `{ template, revision, changedPaths, changedSections? }`                                                                                                                      |
+| `probe_media`          | Inspect a local media file → codecs, duration, sample rate, size, and HDR / colour / bit depth / VFR / rotation traits                                                                                                                                                                                             |
+| `extract_style`        | Reference image/clip under the media dir → `{ theme, styleGuide, confidence }`: palette roles + WCAG contrast, grain, pacing (palette and pacing only)                                                                                                                                                             |
+| `analyze_music`        | Measure a local music file → `{ bpm, offset, beatsPerBar, confidence, usable, cues, globalBeats }` for `global.beats` and `cue:drop`                                                                                                                                                                               |
+| `analyze_sound`        | Render an `sfx[].sound` (composed, or a preset with variations) → length, peak/RMS dBFS, centroid, high/low energy shares, attack, advisories + spectrogram and waveform PNGs                                                                                                                                      |
+| `transcribe_media`     | Transcribe a local audio/video file's speech with whisper.cpp, locally → `{ words, srt, language, confidence, advice }` to pin into `subtitles.words`                                                                                                                                                              |
+| `get_capabilities`     | Local FFmpeg capability report (listings + one-frame probes) → each feature yes/no/unknown with a fix                                                                                                                                                                                                              |
+| `open_in_builder`      | Template → a `leclap.dev/studio/builder#t=…` link for a person to edit it; the template rides in the URL fragment (never sent to a server) → `{ url, length, mediaToRebind, warnings }`                                                                                                                            |
+| `render_remotion_clip` | _(bonus, opt-in)_ Render a composition from **your own** Remotion project → an mp4 clip for a `project_video` section                                                                                                                                                                                              |
 
 `analyze_sound` seeds a sound's noise and jitter with `seed` (default 0). To hear the exact render a template
 will play, pass the template's `global.seed` as `seed` and the cue's path as `cue`: `"sections.intro.sfx[0]"`
@@ -41,7 +37,7 @@ for the first cue of the section named `intro`, `"global.sfx[2]"` for the third 
 the sound as the mix seeds that cue and returns the `seed` it used. Levels are floored at -120 dBFS, so a silent
 sound reads -120 and raises `sound_silent`.
 
-Typical agent flow: `list_samples` → `get_sample` → inspect requirements and customize media/copy →
+Typical agent flow: `get_samples` → `get_samples { id }` → inspect requirements and customize media/copy →
 `get_template_schema` → `validate_template` (iterate until valid) → `render_frames` (look at the result;
 check safe zones with `safe`) → `compose_video` → read the returned `outputPath`. Author a fresh descriptor
 from the schema when no sample fits.
@@ -51,7 +47,7 @@ after a small edit re-encodes only the sections that changed. It runs in the ren
 media-dir checks, slot cap, timeout and cancellation as `compose_video`, writes PNGs to
 `<output-dir>/frames-<id>/`, and inlines at most eight images (the sheets when `sheet` is set). Moments are
 seconds or time references on the whole video: `"intro.end"` (a section or an element id), `"50%"`,
-`"beat:8"`, `"cue:drop + 0.1"`. `get_timeline` lists the moments worth picking.
+`"beat:8"`, `"cue:drop + 0.1"`. `validate_template` with `include: ["timeline"]` lists the moments worth picking.
 
 `validate_template` also reports, render-free, text that would run off the frame or out of title-safe,
 collide with other text, sit under a band, be too small, lack contrast, or sit over footage with no box,
@@ -72,20 +68,20 @@ the render-free findings come back either way.
 
 ### Discover samples before authoring
 
-Both discovery tools are always available, even with Remotion disabled. They read packaged data only:
-no media downloads, effect execution or repository access. `list_samples` accepts optional `category`
+`get_samples` is always available, even with Remotion disabled. It reads packaged data only: no media
+downloads, effect execution or repository access. Without `id` it lists, filtered by optional `category`
 (`templates`, `typography`, `effects`, `app-demos`, `overlays`, `evidence`), `backend` (`native`, `remotion`) and
-case-insensitive `query` (up to 4000 characters). `get_sample` takes `id` (1–200 characters).
+case-insensitive `query` (up to 4000 characters). With `id` (1–200 characters) it returns that sample.
 
 ```json
-{ "name": "list_samples", "arguments": { "category": "app-demos", "backend": "native" } }
+{ "name": "get_samples", "arguments": { "category": "app-demos", "backend": "native" } }
 ```
 
 ```json
-{ "name": "get_sample", "arguments": { "id": "web-app-promo" } }
+{ "name": "get_samples", "arguments": { "id": "web-app-promo" } }
 ```
 
-Results include identical JSON in text and `structuredContent`; `get_sample` puts the descriptor at
+Results include identical JSON in text and `structuredContent`; with `id`, the descriptor sits at
 `template` alongside its metadata. Unknown IDs return `isError` with a discovery hint. Required inputs
 include named clips and durations/capture hints, form fields and limits, variables/defaults/placeholders,
 assets, effective preset font files (`source: "preset"`) and versioned effects. Replace the sample copy,
@@ -200,13 +196,16 @@ time; see the [template reference](../../docs/template-configuration.md#typed-fi
 `validate_template` lists them as `fields` and reports `field_undefined`, `field_unused`,
 `field_type_mismatch` and `field_missing_required` among its advisories; `compose_video` and
 `render_frames` refuse a missing required value or one that fails its type before rendering; and
-`get_resolved_template` shows the descriptor those `fields` produce.
+`validate_template` with `include: ["resolved"]` shows the descriptor those `fields` produce.
 
-Twenty tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`,
-`get_motion_catalog`, `report_catalog_gap`, `get_timeline`, `get_resolved_template`, `validate_template`, `compose_video`,
-`render_frames`, `patch_template`, `edit_template`, `probe_media`, `extract_style`, `analyze_music`, `analyze_sound`, `transcribe_media`, `get_capabilities` and `open_in_builder`. Opt-in adds
-`get_effect_schema`, `render_preview` and `render_remotion_clip`. Patch availability does not bypass
-effect-backend validation.
+Fourteen tools are always registered: `get_samples`, `get_template_schema`, `get_motion_catalog`,
+`validate_template`, `edit_template`, `compose_video`, `render_frames`, `probe_media`, `extract_style`,
+`analyze_music`, `analyze_sound`, `transcribe_media`, `get_capabilities` and `open_in_builder`. Opt-in adds
+`get_effect_schema`, `render_preview` and `render_remotion_clip`. Effect-prop edits do not bypass
+effect-backend validation. Every tool's name and description is sent to the agent on each turn, so the
+surface stays small: 0.5.0 folded `get_resolved_template` and `get_timeline` into `validate_template`,
+`patch_template` into `edit_template`, `list_samples` and `get_sample` into `get_samples`, and dropped
+`ping` (MCP has a protocol ping) and `report_catalog_gap` (see the [CHANGELOG](./CHANGELOG.md) migration table).
 
 `open_in_builder` hands a template to a person: it returns
 `https://leclap.dev/studio/builder#t=v1.…` (`baseUrl` for a locale prefix such as `/fr` or a local dev server),
@@ -219,10 +218,11 @@ is listed with reason `unsupported_scheme` and dropped the same way. A `baseUrl`
 template in the fragment, so the agent should say where the link points before sharing it.
 
 `edit_template` applies a JSON Patch (RFC 6902) to inline template JSON under `expectedRevision`: the
-batch is all-or-nothing and the result must validate. The web template builder exposes the same
-vocabulary to in-browser agents through [WebMCP](../../docs/webmcp.md): `get_template_schema`,
-`get_motion_catalog`, `list_samples`, `get_sample`, `validate_template`, `get_timeline`, `edit_template`
-and `render_frames` mean the same there, and both surfaces compute the same `revision` for the same JSON.
+batch is all-or-nothing and the result must validate. `effectProps` (`[{ section, props }]`) also merges
+registered effect props by expanded section name, after the operations, in the same batch. The web template
+builder exposes the same vocabulary to in-browser agents through [WebMCP](../../docs/webmcp.md):
+`get_template_schema`, `get_motion_catalog`, `validate_template`, `edit_template` (JSON Patch) and
+`render_frames` mean the same there, and both surfaces compute the same `revision` for the same JSON.
 
 **Captions from speech: pin, then review.** `transcribe_media` runs whisper.cpp on the host (the audio
 never leaves it) and returns `{ words, srt, language, confidence, advice }`, word times in seconds into
@@ -318,7 +318,7 @@ The opt-in desktop graphics backend can resolve `type: "effect"` sections direct
 - `get_effect_schema({ list: true })` lists builtin and operator-registered identities, descriptions, output and contract digests. Pass `id` and `version` to inspect strict props/assets; no arguments still returns the builtin title contract. `list: true` cannot be combined with identity fields.
 - `validate_template` checks references/props/assets and returns a content-based JSON revision.
 - `render_preview` renders selected frames or an inclusive frame range from the effect scene; frame images are readable MCP image content.
-- `patch_template` atomically applies selected effect props to inline JSON using an expected revision. Use the expanded section name (including any partial prefix). Effects inside inline partials are editable; editing a registry partial materializes only that reference as an inline partial, preserving its variables and prefix. Other references and the shared definition remain unchanged.
+- `edit_template` with `effectProps` atomically applies selected effect props to inline JSON using an expected revision. Use the expanded section name (including any partial prefix). Effects inside inline partials are editable; editing a registry partial materializes only that reference as an inline partial, preserving its variables and prefix. Other references and the shared definition remain unchanged.
 - `compose_video` resolves effect clips and sends the normalized template to the existing engine.
 
 Remotion remains optional and requires the existing trusted-local opt-in. Set `LECLAP_MCP_REMOTION_BROWSER` / `--remotion-browser` to a compatible installed Chrome executable if you want to avoid browser setup downloads. Direct core compilation rejects unresolved effects before platform initialization. Library callers can use the exported `resolveTemplateEffects` callback API with their own trusted renderer.

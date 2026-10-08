@@ -7,8 +7,7 @@ describe('mcpDoc', () => {
     expect(mcpDoc.id).toBe('mcp');
     expect(mcpDoc.title).toContain('MCP');
     expect(mcpDoc.flow).toEqual([
-      'list_samples',
-      'get_sample',
+      'get_samples',
       'get_template_schema',
       'get_motion_catalog',
       'validate_template',
@@ -45,6 +44,29 @@ describe('mcpDoc', () => {
     expect(toolNames).not.toContain('list_templates');
     expect(toolNames).not.toContain('get_remotion_authoring_guide');
     expect(toolNames).not.toContain('draft_template_from_remotion_storyboard');
+  });
+
+  it('no longer documents the tools merged into others or dropped', () => {
+    const removed = [
+      'ping',
+      'report_catalog_gap',
+      'get_resolved_template',
+      'get_timeline',
+      'patch_template',
+      'list_samples',
+      'get_sample',
+    ];
+    const text = JSON.stringify(mcpDoc);
+
+    for (const name of removed) expect(text).not.toMatch(new RegExp(`\\b${name}\\b`));
+  });
+
+  it('documents the merged options on validate_template and edit_template', () => {
+    const validate = mcpDoc.tools.find((tool) => tool.name === 'validate_template');
+    const edit = mcpDoc.tools.find((tool) => tool.name === 'edit_template');
+
+    expect(validate?.args).toContain('include?');
+    expect(edit?.args).toContain('effectProps?');
   });
 
   it('marks the three Remotion tools as opt-in', () => {

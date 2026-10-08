@@ -143,7 +143,7 @@ export const DocWebMcp = () => (
             <Code>@leclap/mcp</Code>
           </Link>{' '}
           runs locally for desktop agents and renders final videos. Names they share (<Code>validate_template</Code>,{' '}
-          <Code>edit_template</Code>, <Code>get_timeline</Code>…) mean the same and agree on the template revision.
+          <Code>edit_template</Code>, <Code>render_frames</Code>…) mean the same and agree on the template revision.
         </p>
       </Prose>
     </DocSection>

@@ -53,14 +53,12 @@ export const webMcpTools: readonly WebMcpToolDoc[] = [
     ...READ,
     args: 'category?, backend?, query?',
     purpose: 'Packaged samples, each flagged openable when the builder can hold it.',
-    sharedWithMcp: true,
   },
   {
     name: 'get_sample',
     ...READ,
     args: 'id',
     purpose: 'One sample with its self-contained descriptor.',
-    sharedWithMcp: true,
   },
   {
     name: 'validate_template',
@@ -74,7 +72,6 @@ export const webMcpTools: readonly WebMcpToolDoc[] = [
     ...READ,
     args: 'template?, format?',
     purpose: 'Whole-video timeline: sections, motion events, beats and cues.',
-    sharedWithMcp: true,
   },
   {
     name: 'select_section',

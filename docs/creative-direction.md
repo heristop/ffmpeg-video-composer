@@ -88,8 +88,8 @@ Validation checks the descriptor and geometry; it does not grade whether the des
 ## Discover an installed sample
 
 Start with `leclap samples list --category app-demos --backend native`, then
-`leclap samples show web-app-promo`. In MCP, call `list_samples` with those filters and
-`get_sample` with `{ "id": "web-app-promo" }`. Both expose the same 47 showcase entries, their authored
+`leclap samples show web-app-promo`. In MCP, call `get_samples` with those filters and
+then with `{ "id": "web-app-promo" }`. Both expose the same 47 showcase entries, their authored
 creative direction and actual input requirements. Use `--query` / `query` to search direction as well as
 ID, title and description.
 

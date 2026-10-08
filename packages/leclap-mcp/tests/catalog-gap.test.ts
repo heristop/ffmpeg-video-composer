@@ -5,9 +5,9 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { loadConfig, type McpConfig } from '../src/config.js';
-import { catalogResponse } from '../src/tools/getMotionCatalog.js';
-import { timelineResult } from '../src/tools/getTimeline.js';
-import { gapLogPath, reportGap, safeGapLog } from '../src/tools/reportCatalogGap.js';
+import { gapLogPath, safeGapLog } from '../src/compose/catalog-gap-log.js';
+import { catalogResponse, catalogResult } from '../src/tools/getMotionCatalog.js';
+import { handleValidate } from '../src/tools/validateTemplate.js';
 
 let outputDir: string;
 let config: McpConfig;
@@ -20,6 +20,15 @@ beforeEach(async () => {
 afterEach(async () => {
   await fs.rm(outputDir, { recursive: true, force: true });
 });
+
+async function logLines(file = path.join(outputDir, 'catalog-gaps.jsonl')): Promise<Record<string, unknown>[]> {
+  const text = await fs.readFile(file, 'utf8');
+
+  return text
+    .trim()
+    .split('\n')
+    .map((line) => JSON.parse(line) as Record<string, unknown>);
+}
 
 describe('get_motion_catalog search', () => {
   it('returns the whole catalog without a query', () => {
@@ -35,65 +44,28 @@ describe('get_motion_catalog search', () => {
     expect(result.matches.every((match) => match.kind === 'kinetic')).toBe(true);
   });
 
-  it('points an empty result at report_catalog_gap', () => {
-    expect(catalogResponse({ query: 'xyzzy hologram' })).toEqual({
-      query: 'xyzzy hologram',
-      matches: [],
-      gap: { query: 'xyzzy hologram', hint: 'call report_catalog_gap' },
-    });
+  it('marks an empty result as a gap without pointing at another tool', () => {
+    const result = catalogResponse({ query: 'xyzzy hologram' }) as { matches: unknown[]; gap: { query: string } };
+
+    expect(result.matches).toEqual([]);
+    expect(result.gap.query).toBe('xyzzy hologram');
+    expect(JSON.stringify(result)).not.toContain('report_catalog_gap');
   });
 });
 
-describe('get_timeline', () => {
-  it('returns sections on absolute seconds, events, beats and cues', () => {
-    const result = timelineResult({
-      global: { beats: { bpm: 60 }, transition: { type: 'cut' } },
-      sections: [
-        { name: 'a', type: 'color_background', options: { duration: 2 }, cues: { hit: 1 } },
-        { name: 'b', type: 'color_background', options: { duration: 1 } },
-      ],
-    }) as { structuredContent: Record<string, unknown> };
+describe('catalog gap log', () => {
+  it('appends one JSON line per query that matched nothing, under the output dir', async () => {
+    await catalogResult({ query: 'liquid morph' }, config);
+    await catalogResult({ query: 'one punch word on the beat' }, config);
+    await catalogResult({ query: 'neon xyzzy', kind: 'kinetic' }, config);
 
-    expect(result.structuredContent).toMatchObject({
-      duration: 3,
-      approx: false,
-      sections: [
-        { name: 'a', start: 0, end: 2 },
-        { name: 'b', start: 2, end: 3 },
-      ],
-      cues: [{ section: 'a', name: 'hit', time: 1 }],
-      beats: [{ beat: 1, time: 0 }, { beat: 2 }, { beat: 3 }, { beat: 4, time: 3 }],
-    });
-    expect(Array.isArray(result.structuredContent.events)).toBe(true);
+    expect(await logLines()).toMatchObject([{ query: 'liquid morph' }, { query: 'neon xyzzy', kind: 'kinetic' }]);
   });
 
-  it('times the requested format', () => {
-    const template = {
-      global: { orientation: 'landscape' },
-      sections: [{ name: 'a', type: 'color_background', options: { duration: 2 } }],
-    };
-    const result = timelineResult(template, 'portrait') as unknown as {
-      structuredContent: { width: number; height: number };
-    };
+  it('does not log the whole-catalog call', async () => {
+    await catalogResult({}, config);
 
-    expect(result.structuredContent).toMatchObject({ width: 720, height: 1280 });
-  });
-
-  it('reports an invalid template as a tool error', () => {
-    expect(timelineResult({ sections: [{ type: 'nope' }] })).toMatchObject({ isError: true });
-  });
-});
-
-describe('report_catalog_gap', () => {
-  it('appends one JSON line per report under the output dir', async () => {
-    await reportGap({ query: 'liquid morph', wanted: 'a blob transition' }, config);
-    await reportGap({ query: 'neon', wanted: 'a glow title' }, config);
-    const lines = (await fs.readFile(path.join(outputDir, 'catalog-gaps.jsonl'), 'utf8')).trim().split('\n');
-
-    expect(lines.map((line) => JSON.parse(line) as { query: string })).toMatchObject([
-      { query: 'liquid morph', wanted: 'a blob transition' },
-      { query: 'neon', wanted: 'a glow title' },
-    ]);
+    await expect(fs.access(path.join(outputDir, 'catalog-gaps.jsonl'))).rejects.toThrow();
   });
 
   it('accepts a configured log inside the output dir and refuses one outside it', async () => {
@@ -105,14 +77,14 @@ describe('report_catalog_gap', () => {
     expect(gapLogPath({ outputDir })).toBe(path.join(outputDir, 'catalog-gaps.jsonl'));
   });
 
-  it('refuses a symlinked folder that leads outside the output dir', async () => {
+  it('still answers the search when the log cannot be written (symlinked folder leading outside)', async () => {
     const outside = await fs.mkdtemp(path.join(os.tmpdir(), 'leclap-gap-outside-'));
 
     try {
       await fs.symlink(outside, path.join(outputDir, 'link'));
-      const result = await reportGap({ query: 'q', wanted: 'w' }, { ...config, catalogGapLog: 'link/gaps.jsonl' });
+      const result = await catalogResult({ query: 'xyzzy' }, { ...config, catalogGapLog: 'link/gaps.jsonl' });
 
-      expect(result).toMatchObject({ isError: true });
+      expect(result).toMatchObject({ matches: [], gap: { query: 'xyzzy' } });
       await expect(fs.readdir(outside)).resolves.toEqual([]);
     } finally {
       await fs.rm(outside, { recursive: true, force: true });
@@ -123,5 +95,65 @@ describe('report_catalog_gap', () => {
     expect(loadConfig(['node', 'x', '--output-dir', outputDir, '--catalog-gap-log', 'g.jsonl']).catalogGapLog).toBe(
       'g.jsonl'
     );
+  });
+});
+
+type Validated = { isError?: boolean; structuredContent?: Record<string, unknown> };
+
+describe('validate_template include: ["timeline"]', () => {
+  it('returns sections on absolute seconds, events, beats and cues', async () => {
+    const result = (await handleValidate(
+      {
+        template: {
+          global: { beats: { bpm: 60 }, transition: { type: 'cut' } },
+          sections: [
+            { name: 'a', type: 'color_background', options: { duration: 2 }, cues: { hit: 1 } },
+            { name: 'b', type: 'color_background', options: { duration: 1 } },
+          ],
+        },
+        include: ['timeline'],
+      },
+      config
+    )) as Validated;
+
+    expect(result.structuredContent?.valid).toBe(true);
+    expect(result.structuredContent?.timeline).toMatchObject({
+      duration: 3,
+      approx: false,
+      sections: [
+        { name: 'a', start: 0, end: 2 },
+        { name: 'b', start: 2, end: 3 },
+      ],
+      cues: [{ section: 'a', name: 'hit', time: 1 }],
+      beats: [{ beat: 1, time: 0 }, { beat: 2 }, { beat: 3 }, { beat: 4, time: 3 }],
+    });
+    expect(Array.isArray((result.structuredContent?.timeline as { events?: unknown } | undefined)?.events)).toBe(true);
+  });
+
+  it('times the requested format', async () => {
+    const template = {
+      global: { orientation: 'landscape' },
+      sections: [{ name: 'a', type: 'color_background', options: { duration: 2 } }],
+    };
+    const result = (await handleValidate({ template, include: ['timeline'], format: 'portrait' }, config)) as Validated;
+
+    expect(result.structuredContent?.timeline).toMatchObject({ width: 720, height: 1280 });
+  });
+
+  it('omits the timeline unless asked', async () => {
+    const template = { sections: [{ name: 'a', type: 'color_background', options: { duration: 2 } }] };
+    const result = (await handleValidate({ template }, config)) as Validated;
+
+    expect(result.structuredContent).not.toHaveProperty('timeline');
+    expect(result.structuredContent).not.toHaveProperty('resolved');
+  });
+
+  it('reports an invalid template as a tool error', async () => {
+    const result = (await handleValidate(
+      { template: { sections: [{ type: 'nope' }] }, include: ['timeline'] },
+      config
+    )) as Validated;
+
+    expect(result.isError).toBe(true);
   });
 });

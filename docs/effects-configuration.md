@@ -86,16 +86,16 @@ node packages/leclap-mcp/dist/index.js \
 
 The example workspace supplies the optional Remotion peers. A standalone MCP install needs compatible v4 `@remotion/bundler` and `@remotion/renderer` plus the trusted project's dependencies. Chromium can be managed by Remotion or explicitly configured with `--remotion-browser`. The entry must register every selected composition. A catalog supplies contracts, not executable components, media or a browser. See [the runnable example](../examples/llm-remotion-title/README.md) for asset generation and complete setup.
 
-`get_effect_schema`, `render_preview` and `render_remotion_clip` are opt-in. `list_samples`, `get_sample` and `patch_template` remain available with execution disabled. Direct CLI sample discovery does not add registered-effect rendering.
+`get_effect_schema`, `render_preview` and `render_remotion_clip` are opt-in. `get_samples` and `edit_template` (including `effectProps`) remain available with execution disabled. Direct CLI sample discovery does not add registered-effect rendering.
 
 ## Discover, validate, preview, edit, compose
 
-1. Discover templates with `list_samples`; read a full descriptor and its requirements with `get_sample`.
+1. Discover templates with `get_samples`; read a full descriptor and its requirements with `get_samples` and an `id`.
 2. Call `get_effect_schema` with `{ "list": true }`, then `{ "id": "studio.editorial-type", "version": "1.0.0" }`. Inspect the running operator's contract, defaults, asset slots, output and digest.
 3. Author concrete props and asset paths. Preserve the sample's [creative direction](./creative-direction.md) while implementing it explicitly.
 4. Call `validate_template`. Validation checks descriptor structure and reports advisory native text geometry; actual registered props/assets/backend preflight also runs before preview/composition. `render: true` is native text-contrast inspection, not an effect preview.
 5. Call `render_preview` for a named effect section, using either `frames` (1..10 distinct indices in 0..299) or an inclusive `frameRange` (1..90 frames). Do not send both. Inspect entrance, overshoot, settled text and ending.
-6. If needed, use `patch_template` with the returned current revision and named edits, then validate and preview again.
+6. If needed, use `edit_template` with the returned current revision and named `effectProps` edits, then validate and preview again.
 7. Call `compose_video` with the current `expectedRevision` and any required native clip/field bindings. Inspect the resulting video and its provenance.
 
 ```json
@@ -109,7 +109,7 @@ The example workspace supplies the optional Remotion peers. A standalone MCP ins
 
 The strings above are explanatory placeholders; send an actual object for `template`. For a short moving preview use `"frameRange": { "from": 0, "to": 59 }` instead of `frames`.
 
-`patch_template` takes `edits` with `{ "section": "product", "props": { "accent": "coral" } }`. It atomically updates named effect props and reports the new revision and changed sections. Use expanded names for partial instances. It preserves inline authoring and materializes only the edited registry instance. A stale `expectedRevision` rejects the request instead of silently overwriting newer JSON.
+`edit_template` takes `effectProps` with `{ "section": "product", "props": { "accent": "coral" } }` (alongside or instead of JSON Patch `operations`). It atomically updates named effect props and reports the new revision and changed sections. Use expanded names for partial instances. It preserves inline authoring and materializes only the edited registry instance. A stale `expectedRevision` rejects the request instead of silently overwriting newer JSON.
 
 ## Register another effect
 

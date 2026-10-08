@@ -1,6 +1,6 @@
 // The partial vocabulary of the motion catalog: how an agent picks a partial for its rhetorical job and
 // re-times it (envelope, duration, sync points, align), plus a summary of any partial registry — the
-// partials a sample embeds (get_sample) or a catalog ships — without their section bodies.
+// partials a sample embeds (MCP get_samples) or a catalog ships — without their section bodies.
 
 import { PARTIAL_JOB_DESCRIPTIONS } from '../../schemas/partial.schemas';
 

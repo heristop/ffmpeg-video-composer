@@ -39,15 +39,13 @@ export type BuilderToolName = (typeof BUILDER_TOOL_NAMES)[number];
 
 /**
  * Names the builder shares with @leclap/mcp: same meaning and arguments where they overlap, same revision
- * contract (render_preview is deliberately absent: on MCP it previews a registered effect).
+ * contract. Deliberately absent: render_preview (on MCP it previews a registered effect), and list_samples,
+ * get_sample and get_timeline, which MCP folded into get_samples and validate_template `include`.
  */
 export const SHARED_WITH_MCP = [
   'get_template_schema',
   'get_motion_catalog',
-  'list_samples',
-  'get_sample',
   'validate_template',
-  'get_timeline',
   'edit_template',
   'render_frames',
 ] as const;

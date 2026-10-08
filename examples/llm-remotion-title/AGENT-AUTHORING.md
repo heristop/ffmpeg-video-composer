@@ -31,7 +31,7 @@ This is an example storyboard, not a mandatory three-card layout. A tutorial may
 1. Validate the template and retain its revision. Check the longest supported form copy with the real fonts.
 2. For registered effects, request selected frames with `render_preview`, including entrance, overshoot/settling, readable hold and ending. Preview a short `frameRange` around a motion beat before requesting the full clip. Ordinary JSON scenes currently need an engine render followed by frame extraction; do not assume the registered-effect preview tool supports them.
 3. Inspect assets, copy, crop, contrast and text bounds. Check that typography does not obscure the product interaction. Inspect the motion range for collisions and verify the final frame remains readable.
-4. Apply semantic changes through `patch_template` for registered effect props, with `expectedRevision`. Save the returned template and revision and inspect the changed beat again.
+4. Apply semantic changes through `edit_template` `effectProps` for registered effect props, with `expectedRevision`. Save the returned template and revision and inspect the changed beat again.
 5. Compose approved scenes. Review joins and measure audio peaks/duration; listen to the mix where playback is available. Verify video duration separately from audio/container padding.
 6. Repeat unchanged registered-effect requests to reuse the existing cache. Change only the scene that needs revision. Scene-level effect reuse is implemented; whole-project incremental FFmpeg compilation is not.
 

@@ -9,11 +9,6 @@ Feature: Agent drives the leclap MCP server over stdio
   Background:
     Given a running leclap MCP server
 
-  Scenario: Health check
-    When the agent pings the server
-    Then the server reports ready
-    And the "ping" call ran in under 1500 ms
-
   Scenario: Discover the authoring schema
     When the agent requests the template schema
     Then the schema includes sections

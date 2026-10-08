@@ -2,10 +2,14 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import { CATALOG_KINDS, motionCatalog, searchMotionCatalog } from 'ffmpeg-video-composer';
 import { z } from 'zod';
 
+import { logCatalogGap } from '../compose/catalog-gap-log.js';
+import type { McpConfig } from '../config.js';
+
 // The motion catalog (kinetic typography presets, exits, orders, easing grammar, built-in tokens,
 // built-in themes, art-direction rules, genre doctrine, scene blueprints and a complete starter beat)
 // straight from the engine, so an agent can design "wow" motion without reading source, and every
-// name it picks is one the renderer accepts. With a `query`, only the ranked matches come back.
+// name it picks is one the renderer accepts. With a `query`, only the ranked matches come back; a query
+// that matches nothing is appended to the catalog gap log under the output dir for maintainers.
 
 const inputSchema = z.object({
   query: z
@@ -31,10 +35,24 @@ export function catalogResponse(args: CatalogArgs): unknown {
 
   if (search.matches.length > 0) return search;
 
-  return { ...search, gap: { query: args.query, hint: 'call report_catalog_gap' } };
+  return {
+    ...search,
+    gap: { query: args.query, hint: 'Nothing matches: compose the need from the closest primitives.' },
+  };
 }
 
-export function registerGetMotionCatalog(server: McpServer): void {
+/** catalogResponse, logging a query that matched nothing (best effort, never failing the search). */
+export async function catalogResult(args: CatalogArgs, config: Pick<McpConfig, 'outputDir' | 'catalogGapLog'>) {
+  const response = catalogResponse(args);
+
+  if (args.query !== undefined && (response as { gap?: unknown }).gap) {
+    await logCatalogGap(config, { query: args.query, kind: args.kind });
+  }
+
+  return response;
+}
+
+export function registerGetMotionCatalog(server: McpServer, config: McpConfig): void {
   server.registerTool(
     'get_motion_catalog',
     {
@@ -50,13 +68,13 @@ export function registerGetMotionCatalog(server: McpServer): void {
         'parameters, and a complete starter template. The creative-kit library animations are listed only under ' +
         '`samples`: stock demo overlays, each mapped to the engine primitives that replace it (a last resort). ' +
         'Pass `query` (and optionally `kind`) for ranked matches instead of the whole catalog (engine primitives ' +
-        'always rank above samples); an empty result carries a `gap` — then call report_catalog_gap. Call it ' +
+        'always rank above samples); an empty result carries a `gap` (logged for maintainers). Call it ' +
         'before authoring animated copy, camera moves, graphics or designed transitions, and compose the motion ' +
         'from these primitives tuned to the brief instead of picking stock looks.',
       inputSchema,
     },
-    (args: CatalogArgs) => ({
-      content: [{ type: 'text', text: JSON.stringify(catalogResponse(args), null, 2) }],
+    async (args: CatalogArgs) => ({
+      content: [{ type: 'text' as const, text: JSON.stringify(await catalogResult(args, config), null, 2) }],
     })
   );
 }

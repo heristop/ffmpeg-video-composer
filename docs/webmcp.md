@@ -63,7 +63,9 @@ Some consequential tools need a builder capability and are not registered withou
 `always`.
 
 **MCP** marks a name that `@leclap/mcp` also registers with the same meaning. Both surfaces compute the
-same `revision` for the same JSON.
+same `revision` for the same JSON. `list_samples`, `get_sample` and `get_timeline` are browser-only: on
+`@leclap/mcp` the samples come from `get_samples` and the timeline from `validate_template` with
+`include: ["timeline"]`.
 
 | Tool                  | Kind          | Confirm  | Input                                                                                               | MCP | What it does                                                                                                                  |
 | --------------------- | ------------- | -------- | --------------------------------------------------------------------------------------------------- | --- | ----------------------------------------------------------------------------------------------------------------------------- |
@@ -71,10 +73,10 @@ same `revision` for the same JSON.
 | `list_sections`       | read          | never    |                                                                                                     |     | Lists scenes in order: `position`, `pointer`, timing, transition, on-screen `texts` with pointers, and error count.           |
 | `get_template_schema` | read          | never    | `pointer?`                                                                                          | yes | Returns the builder guide and the descriptor JSON Schema, sliced by pointer.                                                  |
 | `get_motion_catalog`  | read          | never    | `query?`, `kind?`                                                                                   | yes | Returns the motion catalog, or ranked matches for a query.                                                                    |
-| `list_samples`        | read          | never    | `category?`, `backend?`, `query?`                                                                   | yes | Lists the packaged samples. Each has an `openable` flag.                                                                      |
-| `get_sample`          | read          | never    | `id`                                                                                                | yes | Returns one sample with its descriptor.                                                                                       |
+| `list_samples`        | read          | never    | `category?`, `backend?`, `query?`                                                                   |     | Lists the packaged samples. Each has an `openable` flag.                                                                      |
+| `get_sample`          | read          | never    | `id`                                                                                                |     | Returns one sample with its descriptor.                                                                                       |
 | `validate_template`   | read          | never    | `template?`                                                                                         | yes | Validates without rendering, in the MCP shape. Adds motion advisories and `geometry` (measured with the bundled fonts).       |
-| `get_timeline`        | read          | never    | `template?`, `format?`                                                                              | yes | Returns the timeline on whole-video seconds.                                                                                  |
+| `get_timeline`        | read          | never    | `template?`, `format?`                                                                              |     | Returns the timeline on whole-video seconds.                                                                                  |
 | `select_section`      | read          | never    | `name?` or `position?`                                                                              |     | Selects a scene in the UI.                                                                                                    |
 | `edit_template`       | edit          | optional | `expectedRevision`, `operations`, `note?`                                                           | yes | Applies an RFC 6902 JSON Patch to the descriptor.                                                                             |
 | `add_section`         | edit          | optional | `expectedRevision`, `type`, `position?`, `section?`, `note?`                                        |     | Inserts a scene with the builder defaults, optionally merged with a fragment.                                                 |

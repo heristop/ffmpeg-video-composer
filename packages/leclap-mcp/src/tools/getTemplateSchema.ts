@@ -126,7 +126,7 @@ const GUIDE = [
     'colorsList), and `{{ form_field }}` placeholders, all resolved at compose time.',
   'project_video sections need user-supplied clips passed at compose time; the JSON Schema below is ' +
     'the authoritative shape.',
-  'Registered effect sections use {name,type:"effect",options:{duration:10},effect:{id:"leclap.title-reveal",version:"1.0.0",props:{},assets:{background,logo,font}}}. Get get_effect_schema for strict defaults/bounds. Configure the trusted Remotion backend, validate_template, patch_template with its revision, inspect render_preview, then compose_video resolves effects automatically. FFmpeg geometry does not measure Remotion text fit or contrast.',
+  'Registered effect sections use {name,type:"effect",options:{duration:10},effect:{id:"leclap.title-reveal",version:"1.0.0",props:{},assets:{background,logo,font}}}. Get get_effect_schema for strict defaults/bounds. Configure the trusted Remotion backend, validate_template, edit_template effectProps with its revision, inspect render_preview, then compose_video resolves effects automatically. FFmpeg geometry does not measure Remotion text fit or contrast.',
   'Author the descriptor from this schema — keep it premium and use only on-device-safe filters. ' +
     'For an animated intro that FFmpeg filters cannot produce, call render_remotion_clip with your own ' +
     'Remotion project (entry + compositionId) and add the returned clip as a leading project_video ' +

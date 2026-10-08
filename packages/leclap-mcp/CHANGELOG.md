@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Breaking: seven tools are gone, merged into others or dropped, because every tool's name and
+  description is sent to the agent on every turn and overlapping tools dilute its choice. No aliases;
+  call the replacement:
+
+  | Removed                     | Call instead                                                            |
+  | --------------------------- | ----------------------------------------------------------------------- |
+  | `ping`                      | the MCP protocol `ping` request                                         |
+  | `report_catalog_gap`        | nothing: `get_motion_catalog { query }` logs a query that matches none  |
+  | `get_resolved_template`     | `validate_template { template, include: ["resolved"], fields, format }` |
+  | `get_timeline`              | `validate_template { template, include: ["timeline"], format }`         |
+  | `patch_template { edits }`  | `edit_template { template, expectedRevision, effectProps: edits }`      |
+  | `list_samples { …filters }` | `get_samples { …filters }`                                              |
+  | `get_sample { id }`         | `get_samples { id }`                                                    |
+
+  Fourteen tools are now always registered (seventeen with the Remotion opt-in).
+
+### Changed
+
+- `validate_template` takes `include: ["resolved" | "timeline"]`, plus `fields` and `format` for them:
+  `resolved` is `{ descriptor, values }` as `get_resolved_template` returned it (a refused field value is
+  still an error), `timeline` is what `get_timeline` returned. Without `include`, validation is unchanged.
+- `edit_template` takes `effectProps` (`[{ section, props }]`, the former `patch_template` edits), applied
+  after the JSON Patch `operations` in the same revision-guarded, all-or-nothing batch and checked by the
+  effect backend; it returns `changedSections`. `operations` is optional when `effectProps` is given.
+- `get_samples` replaces `list_samples` and `get_sample`: without `id` it lists, with `id` it returns the
+  sample and its template.
+- `get_motion_catalog` appends a query that matches nothing to the catalog gap log
+  (`--catalog-gap-log` / `LECLAP_MCP_CATALOG_GAP_LOG`, still confined to the output dir); its `gap` no
+  longer points at another tool.
+
 ### Added
 
 - `analyze_sound`: renders an `sfx[].sound` (composed layers, or a library preset varied by pitch, length,

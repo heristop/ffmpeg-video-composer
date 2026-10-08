@@ -1,12 +1,14 @@
-import type { McpServer, ServerContext } from '@modelcontextprotocol/server';
 import { expandPartialsSafe } from 'ffmpeg-video-composer';
 import { z } from 'zod';
-import { validateTemplate, effectKeyError, unsafeEffectValue } from '../compose/validation.js';
-import { templateRevision } from '../effects/template-revision.js';
+import { unsafeEffectValue } from '../compose/validation.js';
+
+// edit_template `effectProps`: replace registered effect props by section name. Names are the expanded
+// ones (partial prefixes and variables applied), so an effect inside a partial is addressable where a
+// JSON Pointer is not; editing a registry partial materializes only that instance.
 
 // The SDK parses this schema before invoking the handler. Run the bounded raw-key
 // gate before JSON records can remove __proto__, retaining object discovery metadata.
-function guardedJsonObject(check: (raw: unknown) => string | undefined) {
+export function guardedJsonObject(check: (raw: unknown) => string | undefined) {
   return z
     .unknown()
     .superRefine((raw, context) => {
@@ -24,17 +26,14 @@ const editSchema = z
     props: guardedJsonObject((raw) => unsafeEffectValue([raw])),
   })
   .strict();
-const inputSchema = z
-  .object({
-    template: guardedJsonObject(effectKeyError),
-    expectedRevision: z.string(),
-    edits: z.array(editSchema).min(1),
-  })
-  .strict();
-type PatchArgs = z.infer<typeof inputSchema>;
 
-type EffectValidator = (template: Record<string, unknown>, signal?: AbortSignal) => void | Promise<void>;
-
+export const effectPropsArg = z
+  .array(editSchema)
+  .min(1)
+  .max(100)
+  .optional()
+  .describe('Effect props merged by expanded section name (partial prefix included), after `operations`.');
+export type EffectPropsEdit = z.infer<typeof editSchema>;
 type JsonObject = Record<string, z.infer<ReturnType<typeof z.json>>>;
 
 function isObject(value: unknown): value is JsonObject {
@@ -128,59 +127,20 @@ function applyEdit(
   effect.props = { ...(isObject(effect.props) ? effect.props : {}), ...edit.props };
 }
 
-/** Apply a complete edit batch to a copy. A conflict or invalid edit never changes caller state. */
-export function patchTemplate(input: unknown) {
-  const args = inputSchema.parse(input);
-
-  if (templateRevision(args.template) !== args.expectedRevision) {
-    throw new Error('revision_conflict: template changed; use the revision returned by validate_template.');
-  }
-  const template = structuredClone(args.template);
+/**
+ * Apply the effect prop edits to `template` in place (the caller passes a copy) and return the edited
+ * section names. Throws on an unknown, ambiguous or duplicate edit.
+ */
+export function applyEffectProps(template: Record<string, unknown>, edits: readonly EffectPropsEdit[]): string[] {
   const sections = template.sections;
 
-  if (!Array.isArray(sections)) {
-    throw new Error('Template sections must be an array.');
-  }
+  if (!Array.isArray(sections)) throw new Error('Template sections must be an array.');
+
   const seen = new Set<string>();
 
-  for (const edit of args.edits) {
-    applyEdit(sections, template.partials, edit, seen);
-  }
-  const validated = validateTemplate(template);
-
-  if (!validated.ok) {
-    throw new Error(validated.message);
+  for (const edit of edits) {
+    applyEdit(sections, template.partials as JsonObject[string], edit, seen);
   }
 
-  return {
-    template,
-    revision: templateRevision(template),
-    changedSections: [...new Set(args.edits.map((edit) => edit.section))],
-  };
-}
-
-export function registerPatchTemplate(server: McpServer, validateEffects?: EffectValidator): void {
-  server.registerTool(
-    'patch_template',
-    {
-      title: 'Patch Template',
-      description:
-        'Atomically replace selected effect props in inline JSON. Use expanded section names including partial prefixes; editing a registry partial materializes only that instance. Pass the expected revision from validate_template. Returns updated JSON and revision; never rewrites effect source.',
-      inputSchema,
-    },
-    async (args: PatchArgs, ctx?: ServerContext) => {
-      try {
-        ctx?.mcpReq.signal?.throwIfAborted();
-        const result = patchTemplate(args);
-        await validateEffects?.(result.template, ctx?.mcpReq.signal);
-
-        return { content: [{ type: 'text' as const, text: JSON.stringify(result) }], structuredContent: result };
-      } catch (error) {
-        return {
-          isError: true,
-          content: [{ type: 'text' as const, text: error instanceof Error ? error.message : String(error) }],
-        };
-      }
-    }
-  );
+  return [...new Set(edits.map((edit) => edit.section))];
 }

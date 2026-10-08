@@ -26,7 +26,7 @@ export interface McpConfig {
   /** Optional host Chromium/Chrome executable for registered effect rendering. */
   browserExecutable?: string;
   /**
-   * JSONL log report_catalog_gap appends to, relative to (and always under) outputDir. Defaults to
+   * JSONL log get_motion_catalog appends unmatched queries to, relative to (and always under) outputDir. Defaults to
    * `catalog-gaps.jsonl`.
    */
   catalogGapLog?: string;

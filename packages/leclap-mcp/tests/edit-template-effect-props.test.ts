@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { templateRevision } from '../src/effects/template-revision.js';
 import { Client } from '@modelcontextprotocol/client';
 import { McpServer, InMemoryTransport } from '@modelcontextprotocol/server';
-import { patchTemplate, registerPatchTemplate } from '../src/tools/patchTemplate.js';
+import { editTemplate, registerEditTemplate } from '../src/tools/editTemplate.js';
 import { validateTemplate } from '../src/compose/validation.js';
 
 const template = {
@@ -29,10 +29,10 @@ describe('JSON effect revisions', () => {
   });
   it('patches only named effect props without mutating the caller document', () => {
     const before = structuredClone(template);
-    const result = patchTemplate({
+    const result = editTemplate({
       template,
       expectedRevision: templateRevision(template),
-      edits: [{ section: 'intro', props: { headlineY: 260 } }],
+      effectProps: [{ section: 'intro', props: { headlineY: 260 } }],
     });
     expect((result.template.sections as unknown[])[0]).toMatchObject({
       effect: { props: { headline: 'LECLAP', headlineY: 260 } },
@@ -43,16 +43,20 @@ describe('JSON effect revisions', () => {
   });
   it('rejects stale revisions before applying changes', () => {
     expect(() =>
-      patchTemplate({ template, expectedRevision: 'stale', edits: [{ section: 'intro', props: { headlineY: 260 } }] })
+      editTemplate({
+        template,
+        expectedRevision: 'stale',
+        effectProps: [{ section: 'intro', props: { headlineY: 260 } }],
+      })
     ).toThrow('revision_conflict');
   });
   it('rejects a mixed valid/invalid batch without changing the original', () => {
     const before = structuredClone(template);
     expect(() =>
-      patchTemplate({
+      editTemplate({
         template,
         expectedRevision: templateRevision(template),
-        edits: [
+        effectProps: [
           { section: 'intro', props: { headlineY: 260 } },
           { section: 'missing', props: { headline: 'x' } },
         ],
@@ -63,17 +67,17 @@ describe('JSON effect revisions', () => {
   it('rejects ambiguous duplicate names and duplicate edits', () => {
     const duplicate = { ...template, sections: [template.sections[0], template.sections[0]] };
     expect(() =>
-      patchTemplate({
+      editTemplate({
         template: duplicate,
         expectedRevision: templateRevision(duplicate),
-        edits: [{ section: 'intro', props: { headline: 'x' } }],
+        effectProps: [{ section: 'intro', props: { headline: 'x' } }],
       })
     ).toThrow('Ambiguous');
     expect(() =>
-      patchTemplate({
+      editTemplate({
         template,
         expectedRevision: templateRevision(template),
-        edits: [
+        effectProps: [
           { section: 'intro', props: { headline: 'x' } },
           { section: 'intro', props: { headline: 'y' } },
         ],
@@ -107,10 +111,10 @@ describe('patching effects in partials', () => {
       ],
     };
     const before = structuredClone(authored);
-    const result = patchTemplate({
+    const result = editTemplate({
       template: authored,
       expectedRevision: templateRevision(authored),
-      edits: [{ section: 'first-intro', props: { headlineY: 260 } }],
+      effectProps: [{ section: 'first-intro', props: { headlineY: 260 } }],
     });
     expect(result.template).toEqual({
       sections: [
@@ -140,10 +144,10 @@ describe('patching effects in partials', () => {
     const second = { ...instance, prefix: 'second-', variables: { headline: 'Second' } };
     const authored = { partials: [registered], sections: [instance, second, template.sections[0]] };
     const before = structuredClone(authored);
-    const result = patchTemplate({
+    const result = editTemplate({
       template: authored,
       expectedRevision: templateRevision(authored),
-      edits: [
+      effectProps: [
         { section: 'first-intro', props: { headlineY: 260 } },
         { section: 'first-intro', props: { headline: 'Edited' } },
       ],
@@ -183,10 +187,10 @@ describe('patching effects in partials', () => {
   it('rejects a name shared by a partial and a top-level section', () => {
     const authored = { partials: [registered], sections: [{ ...instance, prefix: '' }, template.sections[0]] };
     expect(() =>
-      patchTemplate({
+      editTemplate({
         template: authored,
         expectedRevision: templateRevision(authored),
-        edits: [{ section: 'intro', props: { headlineY: 260 } }],
+        effectProps: [{ section: 'intro', props: { headlineY: 260 } }],
       })
     ).toThrow('Ambiguous section name: intro');
   });
@@ -195,10 +199,10 @@ describe('patching effects in partials', () => {
     const authored = { partials: [registered], sections: [instance] };
     const before = structuredClone(authored);
     expect(() =>
-      patchTemplate({
+      editTemplate({
         template: authored,
         expectedRevision: templateRevision(authored),
-        edits: [
+        effectProps: [
           { section: 'first-intro', props: { headlineY: 260 } },
           { section: 'missing-intro', props: { headline: 'Wrong instance' } },
         ],
@@ -208,16 +212,16 @@ describe('patching effects in partials', () => {
   });
 });
 
-describe('patch_template tool validation', () => {
+describe('edit_template effectProps validation', () => {
   it('returns an error for a rejected effect batch and retains the source JSON', async () => {
-    const { registerPatchTemplate } = await import('../src/tools/patchTemplate.js');
+    const { registerEditTemplate } = await import('../src/tools/editTemplate.js');
     let handler: ((args: unknown) => Promise<{ isError?: boolean; content: { text: string }[] }>) | undefined;
     const server = {
       registerTool: (_name: string, _meta: unknown, callback: typeof handler) => {
         handler = callback;
       },
     };
-    registerPatchTemplate(server as never, (candidate) => {
+    registerEditTemplate(server as never, (candidate) => {
       const section = (candidate.sections as { effect: { props: Record<string, unknown> } }[])[0];
       if ((section.effect.props.headlineY as number) > 720) throw new Error('headlineY must fit the frame');
     });
@@ -225,7 +229,7 @@ describe('patch_template tool validation', () => {
     const result = await handler!({
       template,
       expectedRevision: templateRevision(template),
-      edits: [{ section: 'intro', props: { headlineY: 900 } }],
+      effectProps: [{ section: 'intro', props: { headlineY: 900 } }],
     });
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('headlineY');
@@ -234,7 +238,7 @@ describe('patch_template tool validation', () => {
 });
 
 it('rejects unknown registered title props before returning a patched document', async () => {
-  const { registerPatchTemplate } = await import('../src/tools/patchTemplate.js');
+  const { registerEditTemplate } = await import('../src/tools/editTemplate.js');
   const { titlePropsSchema } = await import('../src/effects/title-registry.js');
   let handler: ((args: unknown) => Promise<{ isError?: boolean }>) | undefined;
   const server = {
@@ -242,7 +246,7 @@ it('rejects unknown registered title props before returning a patched document',
       handler = callback;
     },
   };
-  registerPatchTemplate(server as never, (candidate) => {
+  registerEditTemplate(server as never, (candidate) => {
     const sections = candidate.sections as typeof template.sections;
     titlePropsSchema.parse(sections[0].effect!.props);
   });
@@ -250,7 +254,7 @@ it('rejects unknown registered title props before returning a patched document',
   const result = await handler!({
     template,
     expectedRevision: templateRevision(template),
-    edits: [{ section: 'intro', props: { unknownParameter: 42 } }],
+    effectProps: [{ section: 'intro', props: { unknownParameter: 42 } }],
   });
   expect(result.isError).toBe(true);
   expect(template).toEqual(before);
@@ -275,43 +279,47 @@ function unsafePatch(location: string) {
     authored.sections[0].effect.props = JSON.parse('{"__proto__":{},"headline":"Product"}');
   }
   if (location === 'template assets') authored.sections[0].effect.assets = JSON.parse('{"__proto__":{}}');
-  return { template: authored, expectedRevision: templateRevision(authored), edits: [{ section: 'product', props }] };
+  return {
+    template: authored,
+    expectedRevision: templateRevision(authored),
+    effectProps: [{ section: 'product', props }],
+  };
 }
 it.each(['edit', 'nested edit', 'template props', 'template assets'])(
   'rejects reserved raw keys in pure patch %s',
   (location) => {
     const input = unsafePatch(location);
     const before = JSON.stringify(input);
-    expect(() => patchTemplate(input)).toThrow(/effect_key_unsafe/);
+    expect(() => editTemplate(input)).toThrow(/effect_key_unsafe/);
     expect(JSON.stringify(input)).toBe(before);
   }
 );
 it('rejects raw reserved keys through actual SDK input validation while preserving object discovery and valid JSON patches', async () => {
-  const server = new McpServer({ name: 'patch-test', version: '1.0.0' });
-  registerPatchTemplate(server);
+  const server = new McpServer({ name: 'edit-props-test', version: '1.0.0' });
+  registerEditTemplate(server);
   const client = new Client({ name: 'patch-test-client', version: '1.0.0' });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   await Promise.all([client.connect(clientTransport), server.connect(serverTransport)]);
   try {
     const listed = await client.listTools();
-    const schema = listed.tools.find((tool) => tool.name === 'patch_template')?.inputSchema;
+    const schema = listed.tools.find((tool) => tool.name === 'edit_template')?.inputSchema;
     expect(schema?.properties?.template).toMatchObject({ type: 'object' });
-    expect(schema?.properties?.edits).toMatchObject({
+    expect(schema?.properties?.effectProps).toMatchObject({
       type: 'array',
       items: { properties: { props: { type: 'object' } } },
     });
     for (const location of ['edit', 'nested edit', 'template props', 'template assets']) {
-      const result = await client.callTool({ name: 'patch_template', arguments: unsafePatch(location) });
+      const result = await client.callTool({ name: 'edit_template', arguments: unsafePatch(location) });
       expect(result.isError).toBe(true);
       expect(JSON.stringify(result.content)).toContain('effect_key_unsafe');
     }
     const authored = { ...customTemplate, metadata: { arbitrary: { constructor: 'preserve ordinary metadata' } } };
     const result = await client.callTool({
-      name: 'patch_template',
+      name: 'edit_template',
       arguments: {
         template: authored,
         expectedRevision: templateRevision(authored),
-        edits: [{ section: 'product', props: { headline: 'Updated' } }],
+        effectProps: [{ section: 'product', props: { headline: 'Updated' } }],
       },
     });
     expect(result.isError).toBeUndefined();

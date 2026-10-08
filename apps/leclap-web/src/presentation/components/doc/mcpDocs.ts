@@ -42,14 +42,7 @@ export const mcpDoc: McpDoc = {
   title: 'MCP for agents',
   intro:
     'The LeClap MCP server exposes this same descriptor engine to local AI agents. The agent authors a JSON descriptor from the schema, the server validates it, and compose_video renders a deterministic MP4 through the FFmpeg pipeline. The packaged catalog includes 47 samples with creative direction and input requirements. Registered JSON effects use a configured trusted Node/Remotion backend; render_remotion_clip also accepts your own Remotion composition.',
-  flow: [
-    'list_samples',
-    'get_sample',
-    'get_template_schema',
-    'get_motion_catalog',
-    'validate_template',
-    'compose_video',
-  ],
+  flow: ['get_samples', 'get_template_schema', 'get_motion_catalog', 'validate_template', 'compose_video'],
   agenticReview: {
     intro:
       'For a pull or merge request, the development agent can turn a real walkthrough into a short evidence video before handing the change to a reviewer.',
@@ -65,16 +58,11 @@ export const mcpDoc: McpDoc = {
   },
   tools: [
     {
-      name: 'list_samples',
-      args: 'category?, backend?, query?',
-      purpose: 'Discovers packaged sample metadata, creative direction, required inputs and backend setup.',
-      when: 'Available without FFmpeg or Remotion; media and preview videos are not downloaded.',
-    },
-    {
-      name: 'get_sample',
-      args: 'id',
-      purpose: 'Returns a sample descriptor with embedded partials and its input requirements.',
-      when: 'Customize copy, supply required clips/assets and inspect setup before validating.',
+      name: 'get_samples',
+      args: 'id?, category?, backend?, query?',
+      purpose:
+        'Without id, lists packaged samples with creative direction, required inputs and backend setup (filtered by category, backend or query). With id, returns that sample with its descriptor, embedded partials and input requirements.',
+      when: 'Available without FFmpeg or Remotion; media and preview videos are not downloaded. Customize copy, supply required clips/assets and inspect setup before validating.',
     },
     {
       name: 'get_template_schema',
@@ -87,34 +75,14 @@ export const mcpDoc: McpDoc = {
       args: 'query?, kind?',
       purpose:
         'Returns the motion catalog: kinetic presets, camera moves, graphics, designed transitions, the easing and time-reference grammar, motion tokens, themes, delivery platforms, genre doctrine and validated scene blueprints. With a query, returns ranked matches instead (optionally one kind).',
-      when: 'Use before authoring animated copy, camera moves, graphics or designed transitions. An empty search carries a gap: report it with report_catalog_gap.',
-    },
-    {
-      name: 'report_catalog_gap',
-      args: 'query, wanted',
-      purpose: 'Appends what the catalog could not answer to a JSONL log under the output dir.',
-      when: 'Use when get_motion_catalog returns a gap for a need.',
-    },
-    {
-      name: 'get_timeline',
-      args: 'template, format?',
-      purpose:
-        'Returns the timeline on whole-video seconds, render-free: sections with absolute start/end, every motion event, the beat grid and cues.',
-      when: 'Use to pick render_frames moments and to align hits with beats.',
-    },
-    {
-      name: 'get_resolved_template',
-      args: 'template, fields?, format?',
-      purpose:
-        'Returns the descriptor compose_video starts its build from for these fields, render-free: partials expanded, the declared global.fields filled with their typed values, then the format resolved; variables and form values stay as placeholders. values holds each typed value.',
-      when: 'Use to check where a field lands before rendering. A missing required value, or one that fails its type or slot, is an error naming the field.',
+      when: 'Use before authoring animated copy, camera moves, graphics or designed transitions. An empty search carries a gap, logged under the output dir for maintainers: compose the need from the closest primitives.',
     },
     {
       name: 'validate_template',
-      args: 'template, render?',
+      args: 'template, render?, include?, fields?, format?',
       purpose:
-        'Dry-runs validation of an inline descriptor — no render unless render: true, which renders the text-bearing sections and measures contrast from real pixels (seconds). Returns valid, revision, capabilities, sectionCount, orientation, requiredClips and formFields, plus an optional geometry array listing text that would run off the frame or out of title-safe, collide with other text, sit under a band, be too small, lack contrast, or sit over footage with no box, outline or shadow.',
-      when: 'Use repeatedly to iterate on the descriptor before a slower render. The geometry findings are advisory — valid stays true — and the field is absent when there is nothing to fix.',
+        'Dry-runs validation of an inline descriptor — no render unless render: true, which renders the text-bearing sections and measures contrast from real pixels (seconds). Returns valid, revision, capabilities, sectionCount, orientation, requiredClips and formFields, plus an optional geometry array listing text that would run off the frame or out of title-safe, collide with other text, sit under a band, be too small, lack contrast, or sit over footage with no box, outline or shadow. include: ["resolved"] adds the descriptor compose_video starts from for these fields and format (partials expanded, global.fields typed); include: ["timeline"] adds sections on whole-video seconds, every motion event, the beat grid and cues.',
+      when: 'Use repeatedly to iterate on the descriptor before a slower render. The geometry findings are advisory — valid stays true — and the field is absent when there is nothing to fix. Ask for the timeline to pick render_frames moments and align hits with beats; ask for resolved to check where a field lands (a refused value is an error naming the field).',
     },
     {
       name: 'get_effect_schema',
@@ -132,17 +100,11 @@ export const mcpDoc: McpDoc = {
       optIn: true,
     },
     {
-      name: 'patch_template',
-      args: 'template, expectedRevision, edits',
-      purpose: 'Atomically applies named effect-prop edits and returns updated JSON, revision and changedSections.',
-      when: 'Use expanded section names. Registry partial edits materialize only the selected instance; rendering/backend validation still requires opt-in.',
-    },
-    {
       name: 'edit_template',
-      args: 'template, expectedRevision, operations',
+      args: 'template, expectedRevision, operations?, effectProps?',
       purpose:
-        'Applies a JSON Patch (RFC 6902) atomically; the result must validate. Returns updated JSON, revision and changedPaths.',
-      when: "Use for any descriptor change with the revision validate_template returned. The builder's browser tools (WebMCP) expose the same name and contract.",
+        'Applies a JSON Patch (RFC 6902) and registered effect-prop edits by expanded section name atomically; the result must validate. Returns updated JSON, revision, changedPaths and, for effect props, changedSections.',
+      when: "Use for any descriptor change with the revision validate_template returned. effectProps reach effects inside partials; a registry partial edit materializes only that instance. The builder's browser tools (WebMCP) expose the same name and JSON Patch contract.",
     },
     {
       name: 'compose_video',
@@ -214,12 +176,6 @@ export const mcpDoc: McpDoc = {
       when: 'For an animated intro: render the clip, then feed it to compose_video as a project_video via userVideoPaths.',
       optIn: true,
     },
-    {
-      name: 'ping',
-      args: 'no arguments',
-      purpose: 'Liveness check — returns a fixed readiness string.',
-      when: 'Use to confirm the server is up before a longer session.',
-    },
   ],
   config: [
     {
@@ -290,7 +246,7 @@ export const mcpDoc: McpDoc = {
       env: 'LECLAP_MCP_CATALOG_GAP_LOG',
       fallback: 'catalog-gaps.jsonl',
       detail:
-        'JSONL file report_catalog_gap appends to, relative to the output dir. Paths that resolve outside the output dir are refused.',
+        'JSONL file get_motion_catalog appends unmatched queries to, relative to the output dir. Paths that resolve outside the output dir are refused.',
     },
   ],
   // Mirrors the one-click editor deep-links in docMarkdown.ts, which install via npx. Env values are

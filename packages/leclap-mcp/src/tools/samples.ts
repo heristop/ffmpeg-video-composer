@@ -3,8 +3,14 @@ import { z } from 'zod';
 import { getSample, listSamples, SAMPLE_BACKENDS, SAMPLE_CATEGORIES } from 'ffmpeg-video-composer/samples';
 import { partialCatalog } from 'ffmpeg-video-composer';
 
-const listInput = z
+const inputSchema = z
   .object({
+    id: z
+      .string()
+      .min(1)
+      .max(200)
+      .optional()
+      .describe('A sample ID from the list: returns that sample with its self-contained template.'),
     category: z.enum(SAMPLE_CATEGORIES).optional(),
     backend: z.enum(SAMPLE_BACKENDS).optional(),
     query: z
@@ -14,7 +20,7 @@ const listInput = z
       .describe('Case-insensitive search over ID, title, description and creative direction.'),
   })
   .strict();
-const getInput = z.object({ id: z.string().min(1).max(200).describe('Stable sample ID from list_samples.') }).strict();
+type SamplesArgs = z.infer<typeof inputSchema>;
 
 function failure(error: unknown) {
   return {
@@ -25,51 +31,48 @@ function failure(error: unknown) {
         text: JSON.stringify({
           code: 'sample_discovery_error',
           message: error instanceof Error ? error.message : String(error),
-          hint: 'Use list_samples to discover IDs and get_sample to inspect requirements before rendering.',
+          hint: 'Call get_samples without `id` to discover IDs, then with `id` to inspect requirements before rendering.',
         }),
       },
     ],
   };
 }
 
+// One sample with its descriptor, plus what each embedded partial is for (jobs, useWhen/avoidWhen)
+// and how a ref can re-time it.
+function sampleResult(id: string) {
+  const sample = getSample(id);
+  const partials = partialCatalog(sample.template.partials ?? []);
+
+  return partials.length > 0 ? { ...sample, partialCatalog: partials } : { ...sample };
+}
+
+function samplesResult(args: SamplesArgs) {
+  const { id, ...filters } = inputSchema.parse(args);
+
+  if (id !== undefined) return sampleResult(id);
+
+  return { samples: listSamples(filters) };
+}
+
 export function registerSamples(server: McpServer): void {
   server.registerTool(
-    'list_samples',
+    'get_samples',
     {
-      title: 'List Samples',
+      title: 'Get Samples',
       description:
-        'Discover packaged showcase samples, creative direction and required inputs. Always available, including Remotion samples when execution is disabled. No media is downloaded or rendered.',
-      inputSchema: listInput,
+        'Packaged showcase samples. Without `id`: list them with creative direction and required inputs, ' +
+        "filtered by `category`, `backend` or `query`. With `id`: that sample's metadata and a self-contained " +
+        'descriptor with referenced partials embedded (summarized in partialCatalog: jobs, useWhen/avoidWhen, ' +
+        'envelope, sync points); supply your own media and required fields, inspect native/Remotion setup and ' +
+        'operator catalog requirements, then validate and compose. Always available, including Remotion samples ' +
+        'when execution is disabled. No media is downloaded or rendered.',
+      inputSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     },
-    (args: z.infer<typeof listInput>) => {
+    (args: SamplesArgs) => {
       try {
-        const result = { samples: listSamples(listInput.parse(args)) };
-
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
-          structuredContent: result,
-        };
-      } catch (error) {
-        return failure(error);
-      }
-    }
-  );
-  server.registerTool(
-    'get_sample',
-    {
-      title: 'Get Sample',
-      description:
-        'Retrieve sample metadata and a self-contained descriptor with referenced partials embedded (summarized in partialCatalog: jobs, useWhen/avoidWhen, envelope, sync points). Supply your own media and required fields; inspect native/Remotion setup and operator catalog requirements, then validate and compose. No effect execution or bundled preview media.',
-      inputSchema: getInput,
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
-    },
-    (args: z.infer<typeof getInput>) => {
-      try {
-        const sample = getSample(getInput.parse(args).id);
-        const partials = partialCatalog(sample.template.partials ?? []);
-        // What each embedded partial is for (jobs, useWhen/avoidWhen) and how a ref can re-time it.
-        const result = partials.length > 0 ? { ...sample, partialCatalog: partials } : { ...sample };
+        const result = samplesResult(args);
 
         return {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],

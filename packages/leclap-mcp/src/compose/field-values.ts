@@ -44,3 +44,11 @@ export function fieldContract(descriptor: TemplateDescriptor): FieldContract {
     ...(field.default === undefined ? {} : { default: field.default }),
   }));
 }
+
+// The form field names the template collects — what compose_video expects in `fields`.
+export function formFields(descriptor: TemplateDescriptor): string[] {
+  return (descriptor.sections ?? [])
+    .filter((section) => section.type === 'form')
+    .flatMap((section) => section.options?.fields ?? [])
+    .map((field) => field.name);
+}

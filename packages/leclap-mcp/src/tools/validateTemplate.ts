@@ -22,7 +22,8 @@ import { validateTemplate } from '../compose/validation.js';
 import { motionNote, motionWarnings, motionWarningsSchema } from './motionWarnings.js';
 import { capabilityWarnings } from '../compose/capabilities.js';
 import { featureNote, featureWarningsSchema } from './featureWarnings.js';
-import { fieldContract, fieldContractSchema } from '../compose/field-values.js';
+import { fieldContract, fieldContractSchema, formFields } from '../compose/field-values.js';
+import { extrasInput, extrasOutput, validateExtras, withExtras, type ExtrasArgs } from './validate-extras.js';
 
 const inputSchema = z.object({
   template: z.record(z.string(), z.unknown()),
@@ -34,6 +35,7 @@ const inputSchema = z.object({
         'pixels — settles text over images, grades and looks that the render-free check can only call ' +
         'unknown. Costs seconds, not milliseconds; default false.'
     ),
+  ...extrasInput,
 });
 
 const outputSchema = z.object({
@@ -79,9 +81,11 @@ const outputSchema = z.object({
     .object({ measured: z.number(), seconds: z.number(), unavailable: z.string().optional() })
     .optional()
     .describe('What the rendered check measured from pixels, or why it could not render.'),
+  // Present only when asked for through `include`.
+  ...extrasOutput,
 });
 
-type ValidateArgs = { template: Record<string, unknown>; render?: boolean };
+type ValidateArgs = ExtrasArgs & { render?: boolean };
 type RenderSummary = { measured: number; seconds: number; unavailable?: string };
 type RenderConfig = Pick<McpConfig, 'mediaDir' | 'outputDir' | 'renderTimeoutMs'> & EffectConfig;
 type ToolError = {
@@ -115,14 +119,6 @@ function requiredClips(descriptor: TemplateDescriptor): string[] {
   return (descriptor.sections ?? [])
     .filter((section) => section.type === 'project_video' && typeof section.name === 'string')
     .map((section) => section.name as string);
-}
-
-// The form field names the template collects — what compose_video expects in `fields`.
-function formFields(descriptor: TemplateDescriptor): string[] {
-  return (descriptor.sections ?? [])
-    .filter((section) => section.type === 'form')
-    .flatMap((section) => section.options?.fields ?? [])
-    .map((field) => field.name);
 }
 
 // `descriptor` reaches this function via `compose/validation.ts`'s `validateTemplate()`, which parses
@@ -352,9 +348,12 @@ export async function handleValidate(args: ValidateArgs, config: RenderConfig, c
   } catch (error) {
     return errorResult(`Effect validation failed: ${error instanceof Error ? error.message : String(error)}`);
   }
-  const request = args.render === true ? { config, signal: ctx?.mcpReq.signal } : null;
+  const extras = validateExtras(args);
 
-  return summary(resolved.descriptor, args.template, request, config);
+  if ('isError' in extras) return extras;
+
+  const request = args.render === true ? { config, signal: ctx?.mcpReq.signal } : null;
+  return withExtras(await summary(resolved.descriptor, args.template, request, config), extras);
 }
 
 export function registerValidateTemplate(server: McpServer, config: RenderConfig): void {
@@ -375,7 +374,8 @@ export function registerValidateTemplate(server: McpServer, config: RenderConfig
         'section `assert` entries that fail are errors; `featureWarnings` lists what the local FFmpeg cannot ' +
         'render (feature_unavailable, see get_capabilities). ' +
         'Pass `render: true` to also render the text-bearing sections and measure contrast from real pixels ' +
-        '(seconds; settles text over images, grades and looks).',
+        '(seconds; settles text over images, grades and looks). `include` adds the descriptor a render starts ' +
+        'from for `fields` (a refused value is an error) and the whole-video timeline, to pick render_frames moments.',
       inputSchema,
       outputSchema,
     },

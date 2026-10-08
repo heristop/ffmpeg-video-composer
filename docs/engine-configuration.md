@@ -154,7 +154,7 @@ Both analyzers are deterministic and platform-neutral; the Node entry adds file 
 
 ## Snapshots, timeline and catalog search
 
-The Node entry also exports the inspection tools behind `leclap snapshot` / `compare` / `timeline` and MCP `render_frames` / `get_timeline` / `get_motion_catalog { query }`:
+The Node entry also exports the inspection tools behind `leclap snapshot` / `compare` / `timeline` and MCP `render_frames` / `validate_template { include: ["timeline"] }` / `get_motion_catalog { query }`:
 
 - `renderSnapshots(descriptor, { outDir, at?, atTransitions?, perSection?, sheet?, safe?, zoom?, cacheDir?, assetsDir?, workDir? })` renders the template (through the per-section cache) and saves PNG frames: explicit moments, each boundary 0.1 s before and 0.2 s after, or each section once its entrances have landed (the default). `sheet` builds labelled contact sheets, `safe` shades a platform's UI zones and `zoom` crops a region. `compareSnapshots(variants, { at, … })` puts the same moment of several templates in one grid; `lookSnapshots(descriptor, { at, … })` renders the section on screen at that moment once per look preset.
 - `videoTimeline(descriptor)` is render-free: sections with absolute start and end, every motion event on video seconds, the `global.beats` grid and cues, and an `approx` flag when a clip length is assumed.
@@ -186,7 +186,7 @@ Precedence is flag → environment → default. Paths resolve from the server's 
 
 `render_frames` renders through the same worker, slot cap and deadline as `compose_video`, writes PNGs to `<output-dir>/frames-<id>/` and reuses a section cache at `<output-dir>/.section-cache`. `report_catalog_gap` appends one JSON line per call to the catalog gap log.
 
-Sample discovery (`list_samples`, `get_sample`) and JSON patching remain available with Remotion disabled. `get_effect_schema`, `render_preview` and `render_remotion_clip` are registered only with opt-in. Validating, patching or composing an effect template still requires the configured backend and valid local assets.
+Sample discovery (`get_samples`) and template editing (`edit_template`, including `effectProps`) remain available with Remotion disabled. `get_effect_schema`, `render_preview` and `render_remotion_clip` are registered only with opt-in. Validating, patching or composing an effect template still requires the configured backend and valid local assets.
 
 ### Deadlines, cancellation and cache
 

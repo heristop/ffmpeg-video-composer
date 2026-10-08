@@ -43,17 +43,6 @@ Given('a running leclap MCP server', function (this: AgentWorld) {
   this.requireClient();
 });
 
-// --- ping ---------------------------------------------------------------------------------------
-When('the agent pings the server', async function (this: AgentWorld) {
-  this.lastResult = await this.timed('ping', (client) => client.callTool({ name: 'ping', arguments: {} }));
-});
-
-Then('the server reports ready', function (this: AgentWorld) {
-  const result = this.lastResult as ToolResult;
-  const text = result.content?.map((part) => part.text ?? '').join('\n') ?? '';
-  assert.ok(text.toLowerCase().includes('ok'), 'ping should report readiness');
-});
-
 // --- get_template_schema ------------------------------------------------------------------------
 When('the agent requests the template schema', async function (this: AgentWorld) {
   this.lastResult = await this.timed('get_template_schema', (client) =>

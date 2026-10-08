@@ -1,7 +1,8 @@
 // Reference material, each loaded on its first call (none of it ships with the builder): the template
 // JSON Schema with a builder guide (#3 get_template_schema), the motion catalog with ranked search
-// (#4 get_motion_catalog), and the packaged samples (#5 list_samples, #6 get_sample). Inputs and output
-// shapes match @leclap/mcp so an agent can move between the two surfaces.
+// (#4 get_motion_catalog), and the packaged samples (#5 list_samples, #6 get_sample). The schema and
+// catalog match @leclap/mcp so an agent can move between the two surfaces; the sample pair is browser-only
+// (@leclap/mcp has one get_samples).
 import { z } from 'zod';
 import { SAMPLE_BACKENDS, SAMPLE_CATEGORIES } from 'ffmpeg-video-composer/src/samples/types.ts';
 import { parsePointer } from 'ffmpeg-video-composer/src/core/json-patch.ts';

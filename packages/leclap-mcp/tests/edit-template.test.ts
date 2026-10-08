@@ -51,6 +51,39 @@ describe('edit_template', () => {
     expect(() => edit([{ op: 'add', path: '/__proto__/x', value: 1 }])).toThrow('unsafe_pointer');
   });
 
+  it('needs operations or effectProps', () => {
+    expect(() => editTemplate({ template, expectedRevision: templateRevision(template) })).toThrow(
+      /operations or effectProps/
+    );
+  });
+
+  it('applies operations, then effectProps by section name, in one revision-guarded batch', () => {
+    const withEffect = {
+      sections: [
+        ...template.sections,
+        {
+          name: 'title',
+          type: 'effect',
+          options: { duration: 10 },
+          effect: { id: 'leclap.title-reveal', version: '1.0.0', props: { headline: 'A' }, assets: {} },
+        },
+      ],
+    };
+    const result = editTemplate({
+      template: withEffect,
+      expectedRevision: templateRevision(withEffect),
+      operations: [{ op: 'remove', path: '/sections/1' }],
+      effectProps: [{ section: 'title', props: { headline: 'B' } }],
+    });
+
+    const sections = result.template.sections as unknown[];
+
+    expect(sections).toHaveLength(2);
+    expect(sections[1]).toMatchObject({ effect: { props: { headline: 'B' } } });
+    expect(result.changedPaths).toEqual(['/sections/1']);
+    expect(result.changedSections).toEqual(['title']);
+  });
+
   it('is listed with an object template schema and answers errors as isError', async () => {
     const server = new McpServer({ name: 'edit-test', version: '1.0.0' });
     registerEditTemplate(server);
