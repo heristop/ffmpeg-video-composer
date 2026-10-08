@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AssetManager from '@/editor/managers/AssetManager';
 import type { Media, Section } from '@/core/types';
 import type { FontRequest } from '@/core/models/Segment';
+import { isBackgroundInput } from '@/editor/utils/background-input';
 
 // ---------------------------------------------------------------------------
 // AssetManager performs network/fs work through the injected filesystem adapter
@@ -140,6 +141,19 @@ describe('AssetManager.prepareAssets', () => {
     const inputs = section.inputs as unknown as Array<{ name: string; url: string }>;
     expect(inputs[0].url).toBe('pictures/bg.png');
     expect(inputs.map((i) => i.name)).toEqual(['hero', 'shine', 'border']);
+  });
+
+  it('marks the injected background so an input named after the section is not mistaken for it', () => {
+    const section = {
+      name: 'badge',
+      type: 'image_background',
+      options: { pictureUrl: 'pictures/bg.png', duration: 2 },
+      inputs: [{ name: 'badge', url: 'pictures/logo.png', type: 'image' }],
+    } as unknown as Section;
+    const { manager } = build({ section });
+    manager.prepareAssets();
+    const inputs = section.inputs ?? [];
+    expect(inputs.map((input) => isBackgroundInput(input))).toEqual([true, false]);
   });
 });
 
@@ -456,8 +470,18 @@ describe('AssetManager.fetchMedia', () => {
     const cache: Record<string, string | string[]> = {};
     const { manager } = build({ section: { name: 's', type: 'video' }, inputsCache: cache, fs });
     await manager.fetchMedia({ name: 'clip', url: 'http://a/clip.mp4' } as Media);
-    expect(fs.move).toHaveBeenCalledWith('/tmp/video', '/assets/clip.mp4');
-    expect(cache['http://a/clip.mp4']).toBe('/assets/clip.mp4');
+    expect(fs.move).toHaveBeenCalledWith('/tmp/video', expect.stringMatching(/^\/assets\/clip-\w+\.mp4$/));
+    expect(cache['http://a/clip.mp4']).toMatch(/^\/assets\/clip-\w+\.mp4$/);
+  });
+
+  it('stages two same-named media from different urls to different files', async () => {
+    // A section background is staged under the section's name, so an input named after the section
+    // used to be downloaded onto the very same file and overwrite it.
+    const cache: Record<string, string | string[]> = {};
+    const { manager } = build({ section: { name: 'badge', type: 'image_background' }, inputsCache: cache });
+    await manager.fetchMedia({ name: 'badge', url: 'http://a/bg.png' } as Media);
+    await manager.fetchMedia({ name: 'badge', url: 'http://a/logo.png' } as Media);
+    expect(cache['http://a/bg.png']).not.toBe(cache['http://a/logo.png']);
   });
 
   it('uses a staged local asset and skips the download', async () => {

@@ -1,0 +1,9 @@
+Section "badge" (image_background, pictureUrl pictures/empty-1280.png) with an image input also named "badge":
+
+FFmpeg command failed
+--- FFmpeg stderr ---
+[fc#0 @ 0x14a80a400] Invalid file index 2 in filtergraph description [1:v]scale=640:360:force_original_aspect_ratio=increase,crop=640:360,setsar=1[badge_norm];[badge_norm]fps=30[badge_bg];[badge_bg][2:v]overlay=20:20:eof_action=pass[badge];[badge]setparams=range=tv:colorspace=bt709:color_primaries=bt709:color_trc=bt709[ctag].
+Error binding filtergraph inputs/outputs: Invalid argument
+
+The same input on a color_background section named "badge" rendered without error, but the overlay
+read stream 1 (the color source) instead of the logo: the badge was silently missing from the video.

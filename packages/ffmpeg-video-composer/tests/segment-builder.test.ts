@@ -3,6 +3,7 @@ import { vi, beforeEach, describe, it, expect } from 'vitest';
 import SegmentBuilder from '@/editor/SegmentBuilder';
 import { SectionError } from '@/core/errors/section-error';
 import type { ProjectConfig, Section, TemplateDescriptor } from '@/core/types';
+import { isBackgroundInput, markBackgroundInput } from '@/editor/utils/background-input';
 
 function makeLogger() {
   return { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
@@ -29,6 +30,7 @@ function makeManagers(logger = makeLogger(), filesystem = makeFilesystem()) {
       fetchFonts: vi.fn(async () => undefined),
       fetchLuts: vi.fn(async () => undefined),
       fetchCachedMedia: vi.fn((media: { name: string }, frame = 0) => `/cache/${media.name}_${frame}.png`),
+      isBackgroundInput,
     },
     variableManager: {},
     mapManager: {
@@ -262,7 +264,7 @@ describe('SegmentBuilder.buildMaps', () => {
       name: 'hero',
       type: 'image_background',
       inputs: [
-        { name: 'hero', url: 'pictures/bg.png' },
+        markBackgroundInput({ name: 'hero', url: 'pictures/bg.png' }),
         { name: 'shine', url: 'shine.apng', type: 'animation', options: {} },
       ],
     } as never;
@@ -273,6 +275,51 @@ describe('SegmentBuilder.buildMaps', () => {
     expect(managers.mapManager.addAnimationOverlay).toHaveBeenCalledTimes(1);
     expect(managers.mapManager.addAnimationOverlay).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'shine' }),
+      2,
+      '1280:720'
+    );
+  });
+
+  it('numbers an input named after a color section past the color source', async () => {
+    // Only the injected background occupies the base slot. An authored input that merely shares the
+    // section's name is an overlay: numbering it as the base made it overlay the color onto itself.
+    const segment = makeSegment();
+    const { builder, managers } = makeBuilder({ segment });
+    builder.hydrate({ name: 'badge', type: 'color_background' });
+    (builder as unknown as { section: Section }).section = {
+      name: 'badge',
+      type: 'color_background',
+      options: { backgroundColor: '#000', duration: 1 },
+      inputs: [{ name: 'badge', url: 'pictures/logo.png', type: 'image', options: {} }],
+    } as never;
+
+    await builder.buildMaps();
+
+    expect(managers.mapManager.addAnimationOverlay).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'badge' }),
+      2,
+      '1280:720'
+    );
+  });
+
+  it('keeps both the background and an input named after the section as inputs', async () => {
+    const segment = makeSegment();
+    const { builder, managers } = makeBuilder({ segment });
+    builder.hydrate({ name: 'badge', type: 'image_background' });
+    (builder as unknown as { section: Section }).section = {
+      name: 'badge',
+      type: 'image_background',
+      inputs: [
+        markBackgroundInput({ name: 'badge', url: 'pictures/bg.png' }),
+        { name: 'badge', url: 'pictures/logo.png', type: 'image', options: {} },
+      ],
+    } as never;
+
+    await builder.buildMaps();
+
+    expect(Object.keys(segment.inputsAsset as unknown as Record<string, string>)).toHaveLength(2);
+    expect(managers.mapManager.addAnimationOverlay).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'badge', type: 'image' }),
       2,
       '1280:720'
     );

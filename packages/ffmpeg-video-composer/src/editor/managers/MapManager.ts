@@ -11,6 +11,7 @@ import {
 import type FormattersManager from './FormatterManager';
 import type FilterManager from './FilterManager';
 import { escapeRegExp } from './VariableManager';
+import { isBackgroundInput } from '../utils/background-input';
 
 // Section.inputs is typed as Input[] for schema purposes, but at runtime it holds
 // MapAnimationInput objects indexed by string keys (used as a keyed record).
@@ -329,8 +330,9 @@ class MapManager {
    * Resolves `@name` input references in a map's `inputs` to concrete stream labels.
    *
    * Each section input is now exactly one `-i` source (no per-frame explosion), so the
-   * stream index of the input at position `i` is `getVideoInputIncrement() + 1 + i`: the
-   * main video sits at `getVideoInputIncrement()`, and asset inputs follow it in section order.
+   * stream index of the authored input at position `i` is `getVideoInputIncrement() + 1 + i`: the
+   * main video (or the injected section background) sits at `getVideoInputIncrement()`, and asset
+   * inputs follow it in section order.
    *
    * Animation inputs are composited by `addAnimationOverlay` into an overlay pad named after
    * the input, so `@<animName>` resolves to that pad label rather than a raw `:v` stream.
@@ -349,9 +351,13 @@ class MapManager {
       // The input name is author-chosen free text, so it is escaped (metacharacters like `(` would
       // otherwise build an invalid or wrong RegExp), matched longest-first (so `logo` can never
       // rewrite the front of `@logo2`), and end-anchored against a following name character. The
-      // stream index still comes from each input's ORIGINAL section position.
+      // stream index still comes from each input's ORIGINAL authored position.
+      // The injected section background is the `@video` leg, not a `@name` input: it is skipped, so an
+      // input named after the section resolves to itself, numbered from the stream after the background.
       const entries = Object.keys(inputs)
-        .map((key, position) => ({ input: inputs[key], position }))
+        .map((key) => inputs[key])
+        .filter((input) => !isBackgroundInput(input))
+        .map((input, position) => ({ input, position }))
         .sort((a, b) => b.input.name.length - a.input.name.length);
 
       for (const { input, position } of entries) {

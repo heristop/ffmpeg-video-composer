@@ -1,0 +1,11 @@
+{
+  "global": { "orientation": "landscape", "musicEnabled": false },
+  "sections": [
+    {
+      "name": "badge",
+      "type": "image_background",
+      "options": { "pictureUrl": "pictures/empty-1280.png", "duration": 1 },
+      "inputs": [{ "name": "badge", "type": "image", "url": "pictures/logo.png", "options": { "position": "20:20" } }]
+    }
+  ]
+}

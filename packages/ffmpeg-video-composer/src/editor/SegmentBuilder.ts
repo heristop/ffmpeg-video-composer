@@ -331,35 +331,20 @@ class SegmentBuilder {
 
     // Stream index of each input in section order. The main video sits at `getVideoInputIncrement()`;
     // asset inputs follow it. When the section's base media is itself the leading input — image_background's
-    // pictureUrl (and video's videoUrl) are injected by AssetManager.prepareAssets as the first input named
-    // after the section — that input occupies the base slot, so overlays after it are numbered from there.
-    // Otherwise the base is a separate source (color lavfi / useVideoSection) and assets start one slot later.
-    const baseIsFirstInput = inputs[0]?.name === this.section.name && inputs[0]?.type !== 'animation';
-    let inputIndex = this.mapManager.getVideoInputIncrement() + (baseIsFirstInput ? 0 : 1);
+    // pictureUrl (and video's videoUrl) are injected by AssetManager.prepareAssets as the first input — that
+    // input occupies the base slot, so overlays after it are numbered from there. Otherwise the base is a
+    // separate source (color lavfi / useVideoSection) and assets start one slot later. The injected input is
+    // recognized by its mark, not its name: an authored input may be named after the section too.
+    const baseIsFirstInput = this.assetManager.isBackgroundInput(inputs[0]);
+    const firstIndex = this.mapManager.getVideoInputIncrement() + (baseIsFirstInput ? 0 : 1);
     const videoScale = this.project.config.videoConfig?.scale ?? DefaultConfig.SCALE;
-    const pendingAnimations: Array<{ input: MapAnimationInput; index: number }> = [];
 
     // Extra inputs come after every other one; numbered now, because the first overlay map below
     // already renders the section chain that reads them.
     this.extras.number(this.extraInputsStart(), this.segment.extraInputs);
 
-    // Stage every input as one `-i` in section order (stable stream indices), deferring the animation
-    // overlay maps so gradient layers can composite UNDER them.
-    for (const input of inputs) {
-      const source = this.resolveAnimationSource(input);
-
-      if (source !== undefined) {
-        inputsAsset[`asset_${input.name}`] = source;
-        pendingAnimations.push({ input: input as MapAnimationInput, index: inputIndex });
-      }
-
-      if (source === undefined) {
-        // Plain staged media (e.g. an image_background picture or a watermark).
-        inputsAsset[`asset_${input.name}`] = this.assetManager.fetchCachedMedia(input);
-      }
-
-      inputIndex++;
-    }
+    const pendingAnimations = this.stageInputs(inputs, firstIndex, inputsAsset);
+    const inputIndex = firstIndex + inputs.length;
 
     // Gradient layers are the BACKGROUND: composite them first (the first overlay bakes the section
     // filters), then the animation overlays on top — so the final mapped pad is an animation overlay,
@@ -372,6 +357,34 @@ class SegmentBuilder {
     }
 
     this.extras.append(inputsAsset);
+  };
+
+  // Stage every input as one `-i` in section order (stable stream indices), returning the animation
+  // overlays to map later so gradient layers can composite UNDER them.
+  private readonly stageInputs = (
+    inputs: NonNullable<Section['inputs']>,
+    firstIndex: number,
+    inputsAsset: InputsAssetMap
+  ): Array<{ input: MapAnimationInput; index: number }> => {
+    const pendingAnimations: Array<{ input: MapAnimationInput; index: number }> = [];
+
+    for (const [position, input] of inputs.entries()) {
+      const source = this.resolveAnimationSource(input);
+      // Keyed apart from the inputs: one named after the section would otherwise overwrite its `-i`.
+      const key = this.assetManager.isBackgroundInput(input) ? 'background' : `asset_${input.name}`;
+
+      if (source !== undefined) {
+        inputsAsset[key] = source;
+        pendingAnimations.push({ input: input as MapAnimationInput, index: firstIndex + position });
+      }
+
+      if (source === undefined) {
+        // Plain staged media (e.g. an image_background picture or a watermark).
+        inputsAsset[key] = this.assetManager.fetchCachedMedia(input);
+      }
+    }
+
+    return pendingAnimations;
   };
 
   /**

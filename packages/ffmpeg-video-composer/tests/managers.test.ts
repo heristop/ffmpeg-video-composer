@@ -7,6 +7,7 @@ import VariableManager from '@/editor/managers/VariableManager';
 import * as filterCompat from '@/editor/utils/filter-compat';
 import type { Filter, Map as FilterMap, MapAnimationInput, Section } from '@/core/types';
 import type { FontRequest } from '@/core/models/Segment';
+import { markBackgroundInput } from '@/editor/utils/background-input';
 
 // ---------------------------------------------------------------------------
 // Lightweight stubs for the DI-injected collaborators. Managers are plain
@@ -1016,6 +1017,31 @@ describe('MapManager', () => {
       expect(manager.mapInputsVariables('@logo')).toBe('2:v');
       expect(manager.mapInputsVariables('@logo2')).toBe('3:v');
       expect(manager.mapInputsVariables('[@logo][@logo2]overlay')).toBe('[2:v][3:v]overlay');
+    });
+
+    it('resolves an input named after its section to the input, not the section background', () => {
+      // The background picture is injected as the first input under the section's own name; an
+      // authored input with that same name must still resolve to its own stream.
+      const section = {
+        name: 'badge',
+        type: 'image_background', // increment = 1: the picture is stream 1
+        inputs: [
+          markBackgroundInput({ name: 'badge', url: 'pictures/bg.png' }),
+          { name: 'badge', type: 'image', options: {} },
+        ],
+      } as unknown as Section;
+      const { manager } = build({ section });
+      expect(manager.mapInputsVariables('@badge')).toBe('2:v');
+    });
+
+    it('numbers inputs after an injected background from the stream that follows it', () => {
+      const section = {
+        name: 'hero',
+        type: 'image_background', // increment = 1: the picture is stream 1, the logo stream 2
+        inputs: [markBackgroundInput({ name: 'hero', url: 'pictures/bg.png' }), { name: 'logo', options: {} }],
+      } as unknown as Section;
+      const { manager } = build({ section });
+      expect(manager.mapInputsVariables('@logo')).toBe('2:v');
     });
 
     it('treats regex metacharacters in an input name as literal text', () => {
