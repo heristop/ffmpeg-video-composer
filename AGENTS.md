@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for AI agents working in the **leclap** monorepo. This is the canonical, tool-agnostic agent guide. Read it first.
+Guidance for AI agents working in the **leclap** monorepo. This is the canonical, tool-agnostic agent guide (`CLAUDE.md` imports it). Read it first.
 
 ## Project overview
 
