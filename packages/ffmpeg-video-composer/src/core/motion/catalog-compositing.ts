@@ -32,3 +32,6 @@ export interface CompositingCatalog {
 }
 
 export const COMPOSITING: CompositingCatalog = { kineticFill: KINETIC_FILL, layouts: LAYOUTS };
+
+// HTML layers composite over the frame like images; their catalog entry lives with the layout code.
+export { htmlCatalog, type HtmlCatalog } from '../html/html-catalog';

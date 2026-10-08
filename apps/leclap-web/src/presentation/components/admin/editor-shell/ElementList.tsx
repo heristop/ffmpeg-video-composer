@@ -7,7 +7,7 @@ import { useState, type ComponentType, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useIconHover } from '@/presentation/components/icons/useIconHover';
-import { Image, Plus, Square, Trash2, Type } from '@/presentation/components/icons';
+import { Code2, Image, Plus, Square, Trash2, Type } from '@/presentation/components/icons';
 import { ChevronDownIcon } from '@/presentation/components/icons/chevron-down';
 import { ChevronUpIcon } from '@/presentation/components/icons/chevron-up';
 import { cn } from '@/lib/utils';
@@ -25,6 +25,7 @@ const KIND_ICON: Record<ElementRef['kind'], ComponentType<{ className?: string }
   text: Type,
   image: Image,
   animation: Plus,
+  html: Code2,
   effect: Plus,
   caption: Type,
   titleCard: Type,

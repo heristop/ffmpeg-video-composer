@@ -53,10 +53,13 @@
     "test:integration": "pnpm build && NODE_OPTIONS=\"--import tsx/esm\" cucumber-js"
   },
   "dependencies": {
+    "@resvg/resvg-wasm": "2.6.2",
     "axios": "^1.19.0",
+    "harfbuzzjs": "0.10.0",
     "picocolors": "^1.1.1",
     "pino": "^10.3.1",
     "reflect-metadata": "^0.2.2",
+    "satori": "0.33.5",
     "tslib": "^2.8.1",
     "tsyringe": "^4.10.0",
     "zod": "^4.4.3"

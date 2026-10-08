@@ -303,6 +303,25 @@ describe('AssetManager.fetchFonts', () => {
     expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('bundled'));
   });
 
+  // Two HTML layers of one section are staged in parallel and both ask for Rubik: the second must wait
+  // for the first copy, not see the half-written file through stat and read it.
+  it('stages a font once when two requests for it overlap', async () => {
+    const fs = createFilesystem();
+    let copied = false;
+    fs.stat.mockImplementation(async () => copied);
+    fs.resolveBundledFont.mockResolvedValue('/pkg/dist/fonts/Rubik.ttf');
+    fs.copy.mockImplementation(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      copied = true;
+    });
+    const { manager } = build({ section: { name: 's', type: 'video' }, fs });
+    manager.segment.tempFonts = [{ file: 'Rubik.ttf' }, { file: 'Rubik.ttf' }];
+
+    await manager.fetchFonts();
+
+    expect(fs.copy).toHaveBeenCalledTimes(1);
+  });
+
   it('downloads a font referenced in the Google Fonts CSS', async () => {
     const fs = createFilesystem();
     fs.fetchAndRead.mockResolvedValue('src: url(https://fonts.gstatic.com/s/roboto/v1/font.ttf) format("truetype");');

@@ -836,7 +836,9 @@
     "effectAddHint": "Disegnato dal motore · regolabile",
     "animationAddHint": "APNG o WebM · riprodotto così com’è",
     "animationPending": "Effetto o file",
-    "kindLabel": "{{kind}}: {{name}}"
+    "kindLabel": "{{kind}}: {{name}}",
+    "html": "Livello HTML",
+    "addHtml": "Livello HTML"
   },
   "shape": {
     "kind": "Forma",
@@ -1307,5 +1309,36 @@
     "summary": "{{count}} parole fissate · {{unsure}} da controllare",
     "hint": "Parole trascritte dal clip (sul telefono o con leclap transcribe). Correggi sul posto una parola fraintesa; le parole in ambra sono quelle su cui il riconoscimento era incerto. I tempi restano quelli trascritti.",
     "word": "Parola a {{start}} s"
+  },
+  "htmlLayer": {
+    "name": "Nome del livello",
+    "nameHint": "Le map indicano il livello come @nome. Solo lettere, cifre e _.",
+    "html": "HTML",
+    "css": "CSS",
+    "fields": "Inserisci un campo",
+    "fieldsEmpty": "Ancora nessun campo: aggiungi variabili o una scena modulo per riempire il livello.",
+    "insert": "Inserisci {{name}}",
+    "source": {
+      "field": "Campo del modello",
+      "variable": "Variabile",
+      "form": "Campo del modulo"
+    },
+    "box": "Riquadro",
+    "width": "Larghezza",
+    "height": "Altezza",
+    "preview": "Anteprima",
+    "previewAlt": "Il livello HTML come lo disegna il render",
+    "drawing": "Disegno in corso…",
+    "failed": "Impossibile disegnare l’anteprima: {{error}}",
+    "clean": "Tutto in questo livello viene renderizzato.",
+    "advisories": "Ciò che il render scarta o taglia",
+    "advisory": {
+      "html_unsupported_css": "CSS ignorato",
+      "html_unsupported_markup": "Markup rimosso",
+      "html_overflow": "Contenuto tagliato",
+      "html_font_unknown": "Font sconosciuto",
+      "html_missing_field": "Campo senza valore"
+    },
+    "remove": "Rimuovi il livello"
   }
 }

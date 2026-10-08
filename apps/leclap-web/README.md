@@ -8,7 +8,8 @@ The browser host binds media/form values and supplies optional video, encoder-pr
 overrides through `ProjectConfig`. Descriptor `global.orientation` resolves output dimensions and
 `global.fps` wins over host fps. WASM segments render serially and always validate descriptors.
 `BrowserCompileOptions.loadFFmpegCore` configures the initial WASM load; this app serves its pinned
-core locally. Registered React effects use a separately configured Node/Remotion backend; the
+core locally, and the HTML layer rasteriser's WebAssembly too (`loadHtmlWasm`, staged under
+`/html-engine/<version>/` by `scripts/stage-html-engine.ts`; it also draws the builder's live preview). Registered React effects use a separately configured Node/Remotion backend; the
 browser can compose its output clips. The showcase plays pre-rendered samples and does not enable
 that backend. See [engine configuration](../../docs/engine-configuration.md) for all defaults and limits.
 

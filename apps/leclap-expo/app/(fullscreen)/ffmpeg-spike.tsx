@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useEffectEvent, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system/legacy';
 import { useVideoPlayer, VideoView } from 'expo-video';
@@ -9,8 +9,12 @@ import { colors, spacing, typography } from '@/src/styles/theme';
 import * as Leclap from '@/modules/leclap-ffmpeg';
 
 import { runNativeSmoke } from '@/src/services/compile/native-smoke';
+import { runHtmlLayerCheck } from '@/src/services/compile/html-layer-check';
 
-/** Auto-runs the production JSON pipeline via deep link leclap://ffmpeg-spike. */
+/**
+ * Auto-runs the production JSON pipeline via deep link leclap://ffmpeg-spike, or the HTML layer check
+ * (two layers drawn in the hidden WebView, compared with Node's bytes) via leclap://ffmpeg-spike?check=html.
+ */
 async function resolveSampleClip(): Promise<string> {
   const asset = Asset.fromModule(require('../../assets/sample.mp4'));
   await asset.downloadAsync();
@@ -20,6 +24,7 @@ async function resolveSampleClip(): Promise<string> {
 
 export default function FFmpegSpikeScreen() {
   const router = useRouter();
+  const { check } = useLocalSearchParams<{ check?: string }>();
   const [log, setLog] = useState('Tap “Check version” to begin.');
   const [busy, setBusy] = useState(false);
   const [outputUri, setOutputUri] = useState<string | null>(null);
@@ -74,17 +79,42 @@ export default function FFmpegSpikeScreen() {
     }
   }, [append]);
 
+  async function renderHtmlLayers(): Promise<void> {
+    setBusy(true);
+    setOutputUri(null);
+    setLog('HTML layers on-device');
+
+    try {
+      const result = await runHtmlLayerCheck(append);
+      const verdict = result.layers.every((layer) => layer.golden) ? 'all layers match Node' : 'a layer differs';
+
+      append(`✅ Rendered (${verdict}) — playing below.`);
+      setOutputUri(result.outputUri);
+    } catch (error) {
+      console.error('[html-layer-check]', String(error));
+      append(`❌ ${String(error)}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const autoRun = useEffectEvent(() => {
+    const run = check === 'html' ? renderHtmlLayers : render;
+
+    run().catch(() => null);
+  });
+
   // Auto-run on mount so the on-device smoke test is deterministic.
   useEffect(() => {
     checkVersion();
     const timer = setTimeout(() => {
-      render().catch(() => null);
+      autoRun();
     }, 600);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [checkVersion, render]);
+  }, [checkVersion]);
 
   return (
     <View style={styles.container}>
@@ -114,6 +144,17 @@ export default function FFmpegSpikeScreen() {
             <Text style={[styles.btnText, styles.btnTextPrimary]}>Compile clip</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          testID="spike-html"
+          onPress={() => {
+            renderHtmlLayers().catch(() => null);
+          }}
+          style={[styles.btn, styles.btnWide]}
+          disabled={busy}
+        >
+          <Ionicons name="code-slash" size={18} color={colors.primary} />
+          <Text style={styles.btnText}>HTML layers</Text>
+        </TouchableOpacity>
 
         {outputUri && (
           <VideoView testID="spike-video" player={player} style={styles.video} contentFit="contain" nativeControls />
@@ -156,6 +197,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
     backgroundColor: 'rgba(124,131,253,0.08)',
   },
+  btnWide: { flex: 0, marginTop: spacing.s },
   btnPrimary: { backgroundColor: colors.primary, borderColor: colors.primary },
   btnText: { ...typography.button, color: colors.primary },
   btnTextPrimary: { color: '#fff' },

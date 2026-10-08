@@ -52,7 +52,7 @@ export const DocMcp = () => (
     <DocSection id="what" title="What it is" kicker="Authoring, not generating">
       <Prose>
         <p>
-          The server includes <strong>47 packaged showcase samples</strong> with creative direction and input
+          The server includes <strong>48 packaged showcase samples</strong> with creative direction and input
           requirements. Discovery reads data only; rendering uses your media and the configured backend. Keep the
           descriptor, assets, fonts, configuration and runtime versions together for reproducibility. Different encoders
           and platforms can produce different bytes.

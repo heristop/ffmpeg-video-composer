@@ -16,6 +16,7 @@ import {
   type BackgroundLayer,
   type ImageOverlay,
   type AnimationOverlay,
+  type HtmlLayer,
   type Orientation,
 } from '../templateEditorModel';
 import { FxParamPanel } from '../editor/FxParamPanel';
@@ -27,10 +28,12 @@ import { CaptionField } from '../editor/SectionFields/CaptionField';
 import { TitleCardField } from '../editor/SectionFields/TitleCardField';
 import { LowerThirdField } from '../editor/SectionFields/LowerThirdField';
 import { EDITOR_INPUT_CLASS } from '../editor/editorStyles';
-import { removeElement, reorderElement, type SugarKind } from './sectionElements';
+import { isSugarKind, removeElement, reorderElement, type SugarKind } from './sectionElements';
 import type { AnimationPickMode } from '../editor/animationSource';
 import { sugarToOverlays } from './sugarToOverlays';
 import type { ElementRef } from './useSectionSelection';
+import { HtmlLayerInspector } from './html-layer/html-layer-inspector';
+import type { HtmlPreviewEnv } from './html-layer/html-layer-env';
 
 interface ElementInspectorProps {
   section: EditorSection;
@@ -39,6 +42,8 @@ interface ElementInspectorProps {
   orientation: Orientation;
   /** global.theme (the theme colours an effect's colour tokens resolve to). */
   theme?: unknown;
+  /** What an HTML layer's preview fills in: the theme, placeholder values and insertable field names. */
+  htmlEnv?: HtmlPreviewEnv;
   /** Mixed into a fresh effect's seed (the section's index), so placements in different sections differ. */
   salt?: number;
   onPatchSection: (patch: Partial<EditorSection>) => void;
@@ -74,6 +79,7 @@ export const ElementInspector = ({
   variables,
   orientation,
   theme,
+  htmlEnv,
   salt,
   onPatchSection,
   onSelectElement,
@@ -82,6 +88,19 @@ export const ElementInspector = ({
   const { t } = useTranslation('admin');
 
   if (!activeRef) return <Hint label={t('element.selectHint')} />;
+
+  if (activeRef.kind === 'html') {
+    return (
+      <HtmlSettings
+        section={section}
+        activeRef={activeRef}
+        env={htmlEnv ?? EMPTY_HTML_ENV}
+        t={t}
+        onPatchSection={onPatchSection}
+        onSelectElement={onSelectElement}
+      />
+    );
+  }
 
   if (activeRef.kind === 'effect') {
     return (
@@ -133,7 +152,7 @@ export const ElementInspector = ({
     );
   }
 
-  if (activeRef.kind === 'caption' || activeRef.kind === 'titleCard' || activeRef.kind === 'lowerThird') {
+  if (isSugarKind(activeRef.kind)) {
     return (
       <SugarSettings
         kind={activeRef.kind}
@@ -415,6 +434,41 @@ const AnimationSettings = ({
         }}
         onPickRecipe={(preset: AnimationEffectPreset) => {
           replaceWith(({ section: base }) => preset.build({ section: base, orientation, salt }));
+        }}
+      />
+    </Card>
+  );
+};
+
+const EMPTY_HTML_ENV: HtmlPreviewEnv = { global: {}, values: {}, fields: [] };
+
+interface HtmlSettingsProps {
+  section: EditorSection;
+  activeRef: ElementRef;
+  env: HtmlPreviewEnv;
+  t: TFunction<'admin'>;
+  onPatchSection: (patch: Partial<EditorSection>) => void;
+  onSelectElement: (ref: ElementRef | null) => void;
+}
+
+// An HTML layer (section.htmlLayers[i]): its code, fields, box and live preview.
+const HtmlSettings = ({ section, activeRef, env, t, onPatchSection, onSelectElement }: HtmlSettingsProps) => {
+  const layers = readArray<HtmlLayer>(section, 'htmlLayers');
+  const layer = elementAt(layers, activeRef.index);
+
+  if (!layer) return <Hint label={t('element.selectHint')} />;
+
+  return (
+    <Card>
+      <HtmlLayerInspector
+        layer={layer}
+        env={env}
+        onChange={(patch) => {
+          onPatchSection({ htmlLayers: patchAt(layers, activeRef.index, patch) });
+        }}
+        onRemove={() => {
+          onSelectElement(null);
+          onPatchSection(removeElement(section, activeRef));
         }}
       />
     </Card>

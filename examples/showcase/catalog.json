@@ -335,6 +335,34 @@
       "description": "Sound effects placed on motion events, automatic whooshes and hits, a riser into the drop, a voice preset and volume automation on a recorded line.",
       "category": "effects",
       "source": "examples/motion-design/sound-design.json"
+    },
+    {
+      "id": "html-card",
+      "title": "HTML layers: listing reel",
+      "description": "A three-scene property reel laid out in HTML and CSS: an address card and price tag, a stat row with feature chips, then the agent's card under an open-visit badge, every fact filled from typed fields.",
+      "category": "effects",
+      "source": "examples/motion-design/html-card.json"
+    },
+    {
+      "id": "html-testimonial",
+      "title": "HTML layers: testimonial",
+      "description": "A vertical Reels testimonial: a serif quote with bold accent words inside one sentence, a round customer portrait, star rating chips cut with clip-path, then a shop card.",
+      "category": "effects",
+      "source": "examples/motion-design/html-testimonial.json"
+    },
+    {
+      "id": "html-speaker",
+      "title": "HTML layers: speaker card",
+      "description": "A conference opener and lower third: a wordmark set from text, date and venue badges, the speaker on an accent rule, a talk title that wraps in its box, and time, room and track badges.",
+      "category": "effects",
+      "source": "examples/motion-design/html-speaker.json"
+    },
+    {
+      "id": "html-stats",
+      "title": "HTML layers: stats dashboard",
+      "description": "A square stat board and spec sheet: a header on an accent bar, four stat tiles landing in reading order, and a two-column spec list with values aligned right. A landscape cut is composed with $format.",
+      "category": "effects",
+      "source": "examples/motion-design/html-stats.json"
     }
   ]
 }

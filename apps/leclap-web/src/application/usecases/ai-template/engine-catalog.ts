@@ -104,13 +104,26 @@ function audioForPrompt(audio: MotionCatalog['audio']): MotionCatalog['audio'] {
   return { ...rest, sfx } as unknown as MotionCatalog['audio'];
 }
 
+// HTML layers in a few lines: the shape and the rules of the subset. The full tag and property lists, the
+// recipes and the platform note are for MCP agents (the schema digest already describes the input), and the
+// prompt's size budget has no room for them.
+function htmlForPrompt(html: MotionCatalog['html']): MotionCatalog['html'] {
+  const { description: _d, tags: _t, attributes: _a, css: _c, platforms: _p, recipes: _r, ...rules } = html;
+
+  return {
+    ...rules,
+    css: 'flexbox, box model, borders and radius, colour, font, text, backgrounds and gradients, box-shadow, opacity, transform',
+  } as unknown as MotionCatalog['html'];
+}
+
 export function motionForPrompt(motion: MotionCatalog, genre?: string): Omit<MotionCatalog, 'partials'> {
-  const { partials: _partials, footage, fx, audio, ...rest } = motion;
+  const { partials: _partials, footage, fx, audio, html, ...rest } = motion;
   const { take: _take, ...builderFootage } = footage;
   const trimmed = {
     ...rest,
     fx: fxForPrompt(fx),
     audio: audioForPrompt(audio),
+    html: htmlForPrompt(html),
     footage: builderFootage as MotionCatalog['footage'],
   };
 

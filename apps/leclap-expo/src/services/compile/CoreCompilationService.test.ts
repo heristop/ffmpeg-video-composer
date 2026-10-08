@@ -1,7 +1,8 @@
 import { CoreCompilationService } from './CoreCompilationService';
 import * as Leclap from '@/modules/leclap-ffmpeg';
 import * as FileSystem from 'expo-file-system/legacy';
-import { compileReactNative } from 'ffmpeg-video-composer/reactnative';
+import { compileReactNative, registerHtmlRasteriser } from 'ffmpeg-video-composer/reactnative';
+import { htmlRasterHost } from './html-raster/html-raster-host';
 import type { CompileInput } from './CompileService';
 
 // The app's type program uses vitest globals (declarations.d.ts), but this colocated test
@@ -60,6 +61,11 @@ jest.mock('@/src/data/mediaCatalog', () => ({
 
 jest.mock('ffmpeg-video-composer/reactnative', () => ({
   compileReactNative: jest.fn(),
+  registerHtmlRasteriser: jest.fn(),
+}));
+
+jest.mock('./html-raster/html-raster-host', () => ({
+  htmlRasterHost: { rasteriser: { version: 'test' }, release: jest.fn(), prepare: jest.fn() },
 }));
 
 const input = { descriptor: { sections: [] }, clips: {} } as unknown as CompileInput;
@@ -89,6 +95,43 @@ describe('CoreCompilationService abort wiring', () => {
     controller.abort();
 
     expect(Leclap.cancel).not.toHaveBeenCalled();
+  });
+});
+
+describe('CoreCompilationService HTML layers', () => {
+  it('draws them with the WebView host and tears its page down after the compile', async () => {
+    (compileReactNative as unknown as MockFn).mockResolvedValue('/cache/out.mp4');
+
+    await new CoreCompilationService().compile(input);
+
+    expect(registerHtmlRasteriser).toHaveBeenCalledWith(htmlRasterHost.rasteriser);
+    expect(htmlRasterHost.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads the page while the assets stage when the template has an HTML layer', async () => {
+    (compileReactNative as unknown as MockFn).mockResolvedValue('/cache/out.mp4');
+    const withHtml = {
+      descriptor: { sections: [{ name: 's', inputs: [{ name: 'card', type: 'html' }] }] },
+      clips: {},
+    } as unknown as CompileInput;
+
+    await new CoreCompilationService().compile(input);
+
+    expect(htmlRasterHost.prepare).not.toHaveBeenCalled();
+
+    await new CoreCompilationService().compile(withHtml);
+
+    expect(htmlRasterHost.prepare).toHaveBeenCalledTimes(1);
+  });
+
+  it('tears the page down when the compile fails too', async () => {
+    (compileReactNative as unknown as MockFn).mockImplementation(async () => {
+      throw new Error('boom');
+    });
+
+    await new CoreCompilationService().compile(input);
+
+    expect(htmlRasterHost.release).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -226,6 +269,39 @@ describe('CoreCompilationService image_background staging', () => {
 
     const copiedTo = (FileSystem.copyAsync as unknown as MockFn).mock.calls.map((c) => (c[0] as { to: string }).to);
     // Without this staging the background image never lands on device and the render fails ffprobe.
+    expect(copiedTo).toContain('file:///cache/leclap-assets/backgrounds/desk-flatlay.jpg');
+  });
+
+  it('stages a bundled background an HTML layer draws as an image', async () => {
+    (FileSystem.getInfoAsync as unknown as MockFn).mockResolvedValue({ exists: false });
+    (compileReactNative as unknown as MockFn).mockResolvedValue('/cache/out.mp4');
+
+    const withHtmlImage = {
+      descriptor: {
+        sections: [
+          {
+            type: 'color_background',
+            name: 'card',
+            options: { duration: 4 },
+            inputs: [
+              {
+                name: 'portrait',
+                type: 'html',
+                html: '<img class="face" src="/assets/backgrounds/desk-flatlay.jpg" />',
+                css: '.face { width: 80px; height: 80px }',
+                width: 100,
+                height: 100,
+              },
+            ],
+          },
+        ],
+      },
+      clips: {},
+    } as unknown as CompileInput;
+
+    await new CoreCompilationService().compile(withHtmlImage);
+
+    const copiedTo = (FileSystem.copyAsync as unknown as MockFn).mock.calls.map((c) => (c[0] as { to: string }).to);
     expect(copiedTo).toContain('file:///cache/leclap-assets/backgrounds/desk-flatlay.jpg');
   });
 });

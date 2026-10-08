@@ -1478,9 +1478,9 @@
                       "type": "string"
                     },
                     "type": {
-                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration.",
+                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration; \"html\" = HTML/CSS layout rendered to a still (html, css, width, height).",
                       "type": "string",
-                      "enum": ["animation", "image"]
+                      "enum": ["animation", "image", "html"]
                     },
                     "shape": {
                       "description": "Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine.",
@@ -1512,6 +1512,28 @@
                       },
                       "required": ["kind", "color"],
                       "additionalProperties": false
+                    },
+                    "html": {
+                      "description": "html layer: markup (div, span, p, h1-h6, strong, em, img…); {{ var }} values are HTML-escaped.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "css": {
+                      "description": "html layer: stylesheet (tag, .class, descendant selectors; flexbox subset); $color.*/$font.* tokens.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "width": {
+                      "description": "html layer: box width in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "height": {
+                      "description": "html layer: box height in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -1942,7 +1964,7 @@
                   },
                   "required": ["name"],
                   "additionalProperties": false,
-                  "description": "An external asset (animation or still image) composited into the section video."
+                  "description": "An external asset (animation, still image or HTML layer) composited into the section video."
                 }
               },
               "maps": {
@@ -4278,9 +4300,9 @@
                       "type": "string"
                     },
                     "type": {
-                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration.",
+                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration; \"html\" = HTML/CSS layout rendered to a still (html, css, width, height).",
                       "type": "string",
-                      "enum": ["animation", "image"]
+                      "enum": ["animation", "image", "html"]
                     },
                     "shape": {
                       "description": "Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine.",
@@ -4312,6 +4334,28 @@
                       },
                       "required": ["kind", "color"],
                       "additionalProperties": false
+                    },
+                    "html": {
+                      "description": "html layer: markup (div, span, p, h1-h6, strong, em, img…); {{ var }} values are HTML-escaped.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "css": {
+                      "description": "html layer: stylesheet (tag, .class, descendant selectors; flexbox subset); $color.*/$font.* tokens.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "width": {
+                      "description": "html layer: box width in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "height": {
+                      "description": "html layer: box height in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -4742,7 +4786,7 @@
                   },
                   "required": ["name"],
                   "additionalProperties": false,
-                  "description": "An external asset (animation or still image) composited into the section video."
+                  "description": "An external asset (animation, still image or HTML layer) composited into the section video."
                 }
               },
               "maps": {
@@ -7121,9 +7165,9 @@
                       "type": "string"
                     },
                     "type": {
-                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration.",
+                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration; \"html\" = HTML/CSS layout rendered to a still (html, css, width, height).",
                       "type": "string",
-                      "enum": ["animation", "image"]
+                      "enum": ["animation", "image", "html"]
                     },
                     "shape": {
                       "description": "Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine.",
@@ -7155,6 +7199,28 @@
                       },
                       "required": ["kind", "color"],
                       "additionalProperties": false
+                    },
+                    "html": {
+                      "description": "html layer: markup (div, span, p, h1-h6, strong, em, img…); {{ var }} values are HTML-escaped.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "css": {
+                      "description": "html layer: stylesheet (tag, .class, descendant selectors; flexbox subset); $color.*/$font.* tokens.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "width": {
+                      "description": "html layer: box width in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "height": {
+                      "description": "html layer: box height in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -7585,7 +7651,7 @@
                   },
                   "required": ["name"],
                   "additionalProperties": false,
-                  "description": "An external asset (animation or still image) composited into the section video."
+                  "description": "An external asset (animation, still image or HTML layer) composited into the section video."
                 }
               },
               "maps": {
@@ -9688,9 +9754,9 @@
                       "type": "string"
                     },
                     "type": {
-                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration.",
+                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration; \"html\" = HTML/CSS layout rendered to a still (html, css, width, height).",
                       "type": "string",
-                      "enum": ["animation", "image"]
+                      "enum": ["animation", "image", "html"]
                     },
                     "shape": {
                       "description": "Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine.",
@@ -9722,6 +9788,28 @@
                       },
                       "required": ["kind", "color"],
                       "additionalProperties": false
+                    },
+                    "html": {
+                      "description": "html layer: markup (div, span, p, h1-h6, strong, em, img…); {{ var }} values are HTML-escaped.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "css": {
+                      "description": "html layer: stylesheet (tag, .class, descendant selectors; flexbox subset); $color.*/$font.* tokens.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "width": {
+                      "description": "html layer: box width in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "height": {
+                      "description": "html layer: box height in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -10152,7 +10240,7 @@
                   },
                   "required": ["name"],
                   "additionalProperties": false,
-                  "description": "An external asset (animation or still image) composited into the section video."
+                  "description": "An external asset (animation, still image or HTML layer) composited into the section video."
                 }
               },
               "maps": {
@@ -12235,9 +12323,9 @@
                       "type": "string"
                     },
                     "type": {
-                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration.",
+                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration; \"html\" = HTML/CSS layout rendered to a still (html, css, width, height).",
                       "type": "string",
-                      "enum": ["animation", "image"]
+                      "enum": ["animation", "image", "html"]
                     },
                     "shape": {
                       "description": "Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine.",
@@ -12269,6 +12357,28 @@
                       },
                       "required": ["kind", "color"],
                       "additionalProperties": false
+                    },
+                    "html": {
+                      "description": "html layer: markup (div, span, p, h1-h6, strong, em, img…); {{ var }} values are HTML-escaped.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "css": {
+                      "description": "html layer: stylesheet (tag, .class, descendant selectors; flexbox subset); $color.*/$font.* tokens.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "width": {
+                      "description": "html layer: box width in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "height": {
+                      "description": "html layer: box height in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -12699,7 +12809,7 @@
                   },
                   "required": ["name"],
                   "additionalProperties": false,
-                  "description": "An external asset (animation or still image) composited into the section video."
+                  "description": "An external asset (animation, still image or HTML layer) composited into the section video."
                 }
               },
               "maps": {
@@ -15253,9 +15363,9 @@
                       "type": "string"
                     },
                     "type": {
-                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration.",
+                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration; \"html\" = HTML/CSS layout rendered to a still (html, css, width, height).",
                       "type": "string",
-                      "enum": ["animation", "image"]
+                      "enum": ["animation", "image", "html"]
                     },
                     "shape": {
                       "description": "Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine.",
@@ -15287,6 +15397,28 @@
                       },
                       "required": ["kind", "color"],
                       "additionalProperties": false
+                    },
+                    "html": {
+                      "description": "html layer: markup (div, span, p, h1-h6, strong, em, img…); {{ var }} values are HTML-escaped.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "css": {
+                      "description": "html layer: stylesheet (tag, .class, descendant selectors; flexbox subset); $color.*/$font.* tokens.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "width": {
+                      "description": "html layer: box width in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "height": {
+                      "description": "html layer: box height in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -15717,7 +15849,7 @@
                   },
                   "required": ["name"],
                   "additionalProperties": false,
-                  "description": "An external asset (animation or still image) composited into the section video."
+                  "description": "An external asset (animation, still image or HTML layer) composited into the section video."
                 }
               },
               "maps": {
@@ -17800,9 +17932,9 @@
                       "type": "string"
                     },
                     "type": {
-                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration.",
+                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration; \"html\" = HTML/CSS layout rendered to a still (html, css, width, height).",
                       "type": "string",
-                      "enum": ["animation", "image"]
+                      "enum": ["animation", "image", "html"]
                     },
                     "shape": {
                       "description": "Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine.",
@@ -17834,6 +17966,28 @@
                       },
                       "required": ["kind", "color"],
                       "additionalProperties": false
+                    },
+                    "html": {
+                      "description": "html layer: markup (div, span, p, h1-h6, strong, em, img…); {{ var }} values are HTML-escaped.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "css": {
+                      "description": "html layer: stylesheet (tag, .class, descendant selectors; flexbox subset); $color.*/$font.* tokens.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "width": {
+                      "description": "html layer: box width in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "height": {
+                      "description": "html layer: box height in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -18264,7 +18418,7 @@
                   },
                   "required": ["name"],
                   "additionalProperties": false,
-                  "description": "An external asset (animation or still image) composited into the section video."
+                  "description": "An external asset (animation, still image or HTML layer) composited into the section video."
                 }
               },
               "maps": {
@@ -20347,9 +20501,9 @@
                       "type": "string"
                     },
                     "type": {
-                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration.",
+                      "description": "\"animation\" = animated overlay (.apng/.webp/.gif/.webm); \"image\" = still held for section duration; \"html\" = HTML/CSS layout rendered to a still (html, css, width, height).",
                       "type": "string",
-                      "enum": ["animation", "image"]
+                      "enum": ["animation", "image", "html"]
                     },
                     "shape": {
                       "description": "Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine.",
@@ -20381,6 +20535,28 @@
                       },
                       "required": ["kind", "color"],
                       "additionalProperties": false
+                    },
+                    "html": {
+                      "description": "html layer: markup (div, span, p, h1-h6, strong, em, img…); {{ var }} values are HTML-escaped.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "css": {
+                      "description": "html layer: stylesheet (tag, .class, descendant selectors; flexbox subset); $color.*/$font.* tokens.",
+                      "type": "string",
+                      "maxLength": 20000
+                    },
+                    "width": {
+                      "description": "html layer: box width in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "height": {
+                      "description": "html layer: box height in output pixels (max 1920).",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -20811,7 +20987,7 @@
                   },
                   "required": ["name"],
                   "additionalProperties": false,
-                  "description": "An external asset (animation or still image) composited into the section video."
+                  "description": "An external asset (animation, still image or HTML layer) composited into the section video."
                 }
               },
               "maps": {

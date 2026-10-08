@@ -5,6 +5,7 @@
 // font files, so a themed template renders exactly like its literal twin.
 
 import { findFont } from '../fonts';
+import { EMBEDDED_TOKEN_KEYS, resolveEmbeddedTokens } from './embedded';
 import { easingError, type EasingSpec } from '../motion/easing';
 import { resolveEasingRef, resolveTokens, type MotionTokenSet } from '../motion/tokens';
 import {
@@ -119,7 +120,9 @@ function resolveString(value: string, theme: ResolvedTheme, key: string): string
 }
 
 function resolveNode(value: unknown, theme: ResolvedTheme, key: string): unknown {
-  if (typeof value === 'string') return resolveString(value, theme, key);
+  if (typeof value === 'string') {
+    return EMBEDDED_TOKEN_KEYS.has(key) ? resolveEmbeddedTokens(value, theme) : resolveString(value, theme, key);
+  }
 
   if (Array.isArray(value)) return value.map((item) => resolveNode(item, theme, key));
 

@@ -22,6 +22,7 @@ import MusicComposer from './editor/MusicComposer';
 import AnimationComposer from './editor/AnimationComposer';
 import Project from './core/models/Project';
 import Template, { assertEffectsResolved } from './core/models/Template';
+import { HTML_RASTERISER, type HtmlRasteriser } from './core/html/html-rasteriser';
 import type { ProjectConfig, TemplateDescriptor } from './core/types';
 
 class ReactNativeLogger extends AbstractLogger {
@@ -175,6 +176,16 @@ function wireCompilationEvents(
 }
 
 /**
+ * Registers what draws HTML layers (`inputs[].type: "html"`): Hermes has no WebAssembly, so the app hands
+ * in a rasteriser that posts each layer to a hidden WebView running dist/html-rasteriser.html
+ * (createRasterSession / readRasterReply speak its messages). Without one, such templates fail validation
+ * with html_unavailable.
+ */
+export function registerHtmlRasteriser(rasteriser: HtmlRasteriser): void {
+  container.registerInstance<HtmlRasteriser>(HTML_RASTERISER, rasteriser);
+}
+
+/**
  * Compile a template entirely on-device. `engine` is the native `leclap-ffmpeg` module (run/probe).
  * Returns the output file path, or null on failure.
  */
@@ -223,6 +234,15 @@ export async function compileReactNative(
 export { default as FFmpegDeviceAdapter, type NativeEngine } from './platform/ffmpeg/FFmpegDeviceAdapter';
 export { default as FilesystemExpoAdapter } from './platform/filesystem/FilesystemExpoAdapter';
 export type { ProjectConfig, TemplateDescriptor, Section, Filter } from './core/types';
+export type { HtmlRaster, HtmlRasteriser, HtmlRasterRequest } from './core/html/html-rasteriser';
+export {
+  createRasterSession,
+  readRasterReply,
+  type RasterPageReply,
+  type RasterRenderMessage,
+  type RasterSession,
+} from './core/html/raster-messages';
+export { HTML_RENDERER_VERSION } from './core/html/html-engine';
 export { isFontRef, type FontRef, type FontInput } from './core/fonts';
 export { themeCatalog, resolveTheme, type ThemeCatalog, type ThemeSpec } from './core/theme';
 

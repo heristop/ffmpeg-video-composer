@@ -5,7 +5,7 @@ An [MCP](https://modelcontextprotocol.io) server that exposes the
 
 An AI agent (Claude Desktop, Cursor, …) is the LLM; this server helps it **author a customized
 template with nice effects** from the schema, then validates and renders it **deterministically** to
-an mp4. The server includes the 47 showcase samples through the shared packaged catalog, with
+an mp4. The server includes the 51 showcase samples through the shared packaged catalog, with
 creative direction, descriptors and required inputs. It works without the app or private creative-kit
 at runtime. Remotion-assisted authoring is an optional path.
 The result is _agent-composable, deterministic, reproducible_ video — the opposite of generative
@@ -197,6 +197,15 @@ time; see the [template reference](../../docs/template-configuration.md#typed-fi
 `field_type_mismatch` and `field_missing_required` among its advisories; `compose_video` and
 `render_frames` refuse a missing required value or one that fails its type before rendering; and
 `validate_template` with `include: ["resolved"]` shows the descriptor those `fields` produce.
+
+An `inputs[]` entry of `type: "html"` lays out a card, badge or price tag in HTML and CSS (a flexbox
+subset; see [HTML layers](../../docs/template-configuration.md#html-layers)). `compose_video` and
+`render_frames` draw it into a transparent PNG and composite it like an image. Its images must be
+template assets under the media dir (or PNG/JPEG data URIs); remote URLs and absolute paths are refused.
+`validate_template` reports `html_unsupported_css`, `html_unsupported_markup`, `html_font_unknown`,
+`html_missing_field` and `html_overflow` (the layer laid out against its box), and fails on
+`html_too_large`. `get_template_schema` explains the input, and `get_motion_catalog` lists the CSS subset
+and four layout recipes under `html`.
 
 Fourteen tools are always registered: `get_samples`, `get_template_schema`, `get_motion_catalog`,
 `validate_template`, `edit_template`, `compose_video`, `render_frames`, `probe_media`, `extract_style`,

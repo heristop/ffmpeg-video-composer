@@ -10,6 +10,7 @@ import type {
   AnimationOverlay,
   EditorCaption,
   Grade,
+  HtmlLayer,
   ImageOverlay,
   LowerThird,
   TextOverlay,
@@ -29,6 +30,8 @@ import { SugarPreviewLayer } from './SugarPreviewLayer';
 import type { DropPayload, DropPoint } from './canvasDrop';
 import { useCanvasDropTarget } from './useCanvasDropTarget';
 import { LazyFxPreview, type FxPreviewLayerProps } from './fx-preview/LazyFxPreview';
+import { HtmlLayerItems } from './html-layer/html-layer-items';
+import type { HtmlPreviewEnv } from './html-layer/html-layer-env';
 
 const clamp01 = (value: number): number => Math.min(1, Math.max(0, value));
 
@@ -123,6 +126,9 @@ interface SectionCanvasProps {
   layers?: CanvasLayers;
   images?: ImageOverlay[];
   animations?: AnimationOverlay[];
+  // HTML layers, drawn by the engine's rasteriser (live preview) with the template's theme and values.
+  htmlLayers?: HtmlLayer[];
+  htmlEnv?: HtmlPreviewEnv;
   // The section's colour treatment, previewed as a CSS filter on the backdrop group only — the
   // engine bakes look/grade into the linear chain BEFORE the text sugar and the authored drawtext
   // overlays (SegmentBuilder.injectSugarFilters), so text must stay ungraded here too.
@@ -149,6 +155,7 @@ interface SectionCanvasProps {
   onChange: (overlays: TextOverlay[]) => void;
   onChangeImages?: (images: ImageOverlay[]) => void;
   onChangeAnimations?: (animations: AnimationOverlay[]) => void;
+  onChangeHtmlLayers?: (htmlLayers: HtmlLayer[]) => void;
   onCanvasDrop?: (payload: DropPayload, point: DropPoint) => void;
   // The selected engine effect, drawn live by the browser (lazy layer): an approximation of the render.
   fx?: FxPreviewLayerProps;
@@ -201,6 +208,8 @@ export const SectionCanvas = ({
   layers,
   images,
   animations,
+  htmlLayers,
+  htmlEnv,
   look,
   grade,
   globalLook,
@@ -219,6 +228,7 @@ export const SectionCanvas = ({
   onChange,
   onChangeImages,
   onChangeAnimations,
+  onChangeHtmlLayers,
   onCanvasDrop,
   fx,
 }: SectionCanvasProps) => {
@@ -348,6 +358,15 @@ export const SectionCanvas = ({
           onDelete={removeAnimation}
         />
       ))}
+      <HtmlLayerItems
+        layers={htmlLayers}
+        env={htmlEnv}
+        orientation={orientation}
+        selection={selection}
+        frameRect={frameRect}
+        onSelectElement={onSelectElement}
+        onChange={onChangeHtmlLayers}
+      />
       {/* The selected engine effect, live: drawn over the composited media, below the editable text. */}
       {fx ? <LazyFxPreview {...fx} annotate /> : null}
       {/* Text sugar draws above the composited media, below the draggable overlays — the engine's

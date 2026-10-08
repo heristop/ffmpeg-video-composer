@@ -10,6 +10,7 @@ import { ElementInspector } from './ElementInspector';
 import { addElement, listSectionElements, removeElement, reorderElement } from './sectionElements';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
 import type { AnimationPickMode } from '../editor/animationSource';
+import { htmlPreviewEnv } from './html-layer/html-layer-env';
 
 interface ElementBlockProps {
   state: EditorState;
@@ -75,6 +76,7 @@ export const ElementBlock = ({ state, section, selection, patchSection, onSelect
         variables={collectVariables(state)}
         orientation={state.orientation}
         theme={state.motion?.theme}
+        htmlEnv={htmlPreviewEnv(state)}
         salt={state.sections.indexOf(section)}
         slotMode={slotMode}
         onPatchSection={patchSection}

@@ -21,6 +21,7 @@ bash docs/gallery/make-gallery.sh camera     # one sheet group (see SHEETS in do
 - [Strokes](#strokes)
 - [Transitions](#transitions)
 - [Lower thirds and title cards](#lower-thirds-and-title-cards)
+- [HTML layers](#html-layers)
 - [Captions](#captions)
 - [Layouts](#layouts)
 - [Themes](#themes)
@@ -80,6 +81,12 @@ The default band and every `lowerThird.style`: `clean-bar`, `side-rule`, `kicker
 ![Title card variants](./media/gallery/title-cards.webp)
 
 `titleCard` with `align: left` and an accent, `align: center` and an accent, and a headline with a subtitle only. Template: [`title-cards.json`](./gallery/templates/title-cards.json). Sheet: `bash docs/gallery/make-gallery.sh title-cards`.
+
+## HTML layers
+
+![The four HTML layout recipes](./media/gallery/html-layers.webp)
+
+The four layout recipes of `motionCatalog().html` as `inputs[].type: "html"` layers on the `leclap` theme: `card`, `badge`, `priceTag` and `twoColumnStat`, each filled from typed fields and styled with `$color.*` / `$font.*` tokens. Template: [`html-layers.json`](./gallery/templates/html-layers.json). Sheet: `bash docs/gallery/make-gallery.sh html-layers`.
 
 ## Captions
 

@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -13,6 +13,7 @@ const paint = (code: number, text: string): string => (color ? `[${code}m${text
 const bold = (text: string): string => paint(1, text);
 const dim = (text: string): string => paint(2, text);
 const green = (text: string): string => paint(32, text);
+const yellow = (text: string): string => paint(33, text);
 
 type CopyDest = { src: string; dest: string; include?: string[] };
 
@@ -141,6 +142,23 @@ for (const { src, dest, include } of destinations) {
 }
 
 console.log(`\n${green('✓')} ${bold(`${total} files`)} staged across ${destinations.length} targets\n`);
+
+// The engine's HTML layer page, which the phone's hidden WebView draws HTML layers with. It is built with the
+// engine (tsdown), so a checkout that hasn't built it yet gets a warning rather than a failure here.
+const rasterPage = resolve(root, 'packages/ffmpeg-video-composer/dist/html-rasteriser.html');
+const rasterPageDir = resolve(root, 'apps/leclap-expo/assets/html-rasteriser');
+
+if (existsSync(rasterPage)) {
+  mkdirSync(rasterPageDir, { recursive: true });
+  cpSync(rasterPage, resolve(rasterPageDir, 'html-rasteriser.html'));
+  console.log(`${green('✓')} ${dim(`html layer page → ${relative(root, rasterPageDir)}`)}\n`);
+}
+
+if (!existsSync(rasterPage)) {
+  console.log(
+    `${yellow('!')} ${dim('html layer page not built: run pnpm --filter ffmpeg-video-composer build before bundling the app')}\n`
+  );
+}
 
 // Emit the animation manifest the web reads (a static, HMR-friendly list — more reliable than a
 // cross-package import.meta.glob, which the dev server doesn't re-scan when files land in the library).

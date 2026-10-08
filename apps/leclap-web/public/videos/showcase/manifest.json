@@ -576,6 +576,54 @@
       "templateSha256": "7be4a31ef95d50906315ff19e697f4612ea08c9c6d3f1b50c8d311a36c843811",
       "media": "Synthetic clips from bundled photos (FFmpeg) and lavfi audio",
       "bytes": 361664
+    },
+    {
+      "id": "html-card",
+      "source": "examples/motion-design/html-card.json",
+      "duration": 10.449002,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "93a549b90ec8af4cd28ae78890059394b062d7bf25370f01a3dda4a1888ed5c6",
+      "templateSha256": "6045a6d37d2e216c58a96008e482240c89729735bc82d02c33e6834ede58e53e",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 494344
+    },
+    {
+      "id": "html-testimonial",
+      "source": "examples/motion-design/html-testimonial.json",
+      "duration": 7.522993,
+      "hasAudio": true,
+      "orientation": "portrait",
+      "backend": "native",
+      "sha256": "5cf01f5e4e6ed041ad87fddcc31744c71d328905d3954dc204dacedb4524fd3b",
+      "templateSha256": "24be629bb7c715c7765b551a738ce2c3a48192d5a6ab29a5263af0efd1a67a3e",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 242759
+    },
+    {
+      "id": "html-speaker",
+      "source": "examples/motion-design/html-speaker.json",
+      "duration": 7.522993,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "358a404ad84b3bed904c4d38d1b112a58252f57b92640a64da158fe85da1414b",
+      "templateSha256": "3c986fe01e9e79c1f4f897977a957733ac6be36da9033dbd26ea8f191a1ffe3f",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 474224
+    },
+    {
+      "id": "html-stats",
+      "source": "examples/motion-design/html-stats.json",
+      "duration": 8.127007,
+      "hasAudio": true,
+      "orientation": "square",
+      "backend": "native",
+      "sha256": "348e772623975e3ed81f246670fc045d88d66086c12a64f112c4832fcd1009a8",
+      "templateSha256": "00f4b566ed60d57ab7cfa63909d0e2f009528dc89dd3bed593cdf397722e47a1",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 61960
     }
   ]
 }

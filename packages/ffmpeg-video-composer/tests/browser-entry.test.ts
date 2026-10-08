@@ -291,6 +291,60 @@ describe('browser.ts compileBrowser', () => {
     expect(adapterArgs[0][1]).toBe(loadFFmpegCore);
   });
 
+  it('compiles a template with an HTML layer, drawn by the rasteriser it registers with the host loader', async () => {
+    vi.resetModules();
+    const loadHtmlWasm = vi.fn();
+    const descriptor = {
+      global: { orientation: 'landscape' as const },
+      sections: [
+        {
+          name: 'card',
+          type: 'color_background' as const,
+          options: { duration: 2, backgroundColor: '#000000' },
+          inputs: [{ name: 'tag', type: 'html' as const, html: '<p>Hi</p>', width: 200, height: 80 }],
+        },
+      ],
+    };
+
+    const { compile } = await loadBrowser();
+    const { container } = await import('tsyringe');
+    await expect(compile({ buildDir: '/build' }, descriptor as never, undefined, { loadHtmlWasm })).resolves.toBe(
+      '/browser/out.mp4'
+    );
+
+    expect(container.isRegistered('htmlRasteriser')).toBe(true);
+    // The WASM loads on the first layer drawn, never at init.
+    expect(loadHtmlWasm).not.toHaveBeenCalled();
+  });
+
+  it('refuses a template with an HTML layer when the host brings no loadHtmlWasm, and registers no rasteriser', async () => {
+    vi.resetModules();
+    const { container } = await import('tsyringe');
+    container.reset();
+    const descriptor = {
+      global: { orientation: 'landscape' as const },
+      sections: [
+        {
+          name: 'card',
+          type: 'color_background' as const,
+          options: { duration: 2, backgroundColor: '#000000' },
+          inputs: [{ name: 'tag', type: 'html' as const, html: '<p>Hi</p>', width: 200, height: 80 }],
+        },
+      ],
+    };
+
+    const { compile } = await loadBrowser();
+
+    await expect(compile({ buildDir: '/build' }, descriptor as never)).rejects.toThrow(/loadHtmlWasm/);
+    expect(container.isRegistered('htmlRasteriser')).toBe(false);
+  });
+
+  it('previews an HTML layer through a lazily loaded rasteriser', async () => {
+    const mod = await loadBrowser();
+
+    expect(typeof mod.renderHtmlLayerPreview).toBe('function');
+  });
+
   it('exposes the browser export surface', async () => {
     const mod = await loadBrowser();
     expect(mod.FFmpegWasmAdapter).toBeDefined();

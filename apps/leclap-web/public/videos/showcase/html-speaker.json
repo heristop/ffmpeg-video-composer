@@ -1,0 +1,252 @@
+{
+  "meta": {
+    "name": "Conference speaker card",
+    "description": "An event opener and a speaker lower third laid out in HTML and CSS: a wordmark set from text, date and venue badges, the speaker’s name on an accent rule, the talk title wrapped in its own box, and time, room and track badges.",
+    "creativeDirection": "Audience: event teams who cut a short clip for every talk. Direction: a conference look that holds up on a stage screen and on a phone. The opener is the event: the wordmark rises over the night sky, then the date and venue badges settle under it. A swipe hands over to the speaker beat, where the lower third builds in three steps: the name on its accent rule, the talk title in a box that wraps a long title over two lines, then the time, room and track badges. A small wordmark bug keeps the event on screen. Review: the long talk title wraps without cutting a word, the badges line up with the title box, nothing sits on the right-hand edge, and no layer shows before its entrance."
+  },
+  "global": {
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "theme": {
+      "extends": "midnight",
+      "fonts": {
+        "body": "rubik"
+      }
+    },
+    "transition": {
+      "type": "cut"
+    },
+    "fields": {
+      "event_first": {
+        "type": "text",
+        "default": "Motion",
+        "maxLength": 14,
+        "label": {
+          "en": "Event name, first word"
+        }
+      },
+      "event_second": {
+        "type": "text",
+        "default": "Days",
+        "maxLength": 10,
+        "label": {
+          "en": "Event name, highlighted word"
+        }
+      },
+      "event_date": {
+        "type": "text",
+        "default": "14–15 Nov 2026",
+        "maxLength": 24,
+        "label": {
+          "en": "Dates"
+        }
+      },
+      "event_venue": {
+        "type": "text",
+        "default": "Lyon · La Sucrière",
+        "maxLength": 32,
+        "label": {
+          "en": "Venue"
+        }
+      },
+      "speaker": {
+        "type": "text",
+        "default": "Samir Haddad",
+        "maxLength": 28,
+        "label": {
+          "en": "Speaker"
+        }
+      },
+      "speaker_role": {
+        "type": "text",
+        "default": "Motion lead, Studio Kite",
+        "maxLength": 40,
+        "label": {
+          "en": "Speaker role"
+        }
+      },
+      "talk_title": {
+        "type": "text",
+        "default": "HTML cards in a video engine: layouts that fill themselves in",
+        "maxLength": 90,
+        "label": {
+          "en": "Talk title"
+        }
+      },
+      "talk_time": {
+        "type": "text",
+        "default": "14:30",
+        "maxLength": 8,
+        "label": {
+          "en": "Time"
+        }
+      },
+      "talk_room": {
+        "type": "text",
+        "default": "Room B · Hall 2",
+        "maxLength": 24,
+        "label": {
+          "en": "Room"
+        }
+      },
+      "talk_track": {
+        "type": "text",
+        "default": "Motion track",
+        "maxLength": 20,
+        "label": {
+          "en": "Track"
+        }
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "opener",
+      "type": "image_background",
+      "purpose": "Say which event this is, when and where.",
+      "options": {
+        "pictureUrl": "/assets/backgrounds/milky-way.jpg",
+        "duration": 3.2
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.06,
+        "includeText": false
+      },
+      "transition": {
+        "type": "swipe-left",
+        "duration": 0.5
+      },
+      "inputs": [
+        {
+          "name": "event_wordmark",
+          "type": "html",
+          "html": "<div class=\"mark\"><span class=\"one\">{{ event_first }}</span><span class=\"two\">{{ event_second }}</span></div>",
+          "css": ".mark { display: flex; align-items: center; gap: 16px } .one { color: $color.fg; font: 130px $font.display; letter-spacing: 5px } .two { padding: 0 18px; border-radius: 16px; background: $color.accent; color: $color.bg; font: 130px $font.display; letter-spacing: 5px } .mark { justify-content: center }",
+          "width": 900,
+          "height": 190,
+          "options": {
+            "position": "190:220",
+            "start": 0.3,
+            "motion": {
+              "type": "rise",
+              "delay": 0.3,
+              "duration": 0.8,
+              "distance": 50,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "event_badges",
+          "type": "html",
+          "html": "<div class=\"row\"><span class=\"badge\">{{ event_date }}</span><span class=\"badge alt\">{{ event_venue }}</span></div>",
+          "css": ".row { display: flex; justify-content: center; gap: 14px } .badge { padding: 12px 24px; border-radius: 999px; border: 2px solid $color.accent; color: $color.fg; font: 500 28px $font.body } .badge.alt { border-color: $color.muted@0.6; background: $color.surface@0.7 }",
+          "width": 900,
+          "height": 70,
+          "options": {
+            "position": "190:420",
+            "start": 1,
+            "motion": {
+              "type": "rise",
+              "delay": 1,
+              "duration": 0.6,
+              "distance": 30,
+              "easing": "ease-out"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "speaker",
+      "type": "image_background",
+      "purpose": "Who is speaking, about what, and where to find the talk.",
+      "options": {
+        "pictureUrl": "/assets/backgrounds/concrete-lines.jpg",
+        "duration": 4.8
+      },
+      "camera": {
+        "preset": "drift-right",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "inputs": [
+        {
+          "name": "event_bug",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"bug\"><div class=\"mark\"><span class=\"one\">{{ event_first }}</span><span class=\"two\">{{ event_second }}</span></div></div></div>",
+          "css": ".mark { display: flex; align-items: center; gap: 4px } .one { color: $color.fg; font: 34px $font.display; letter-spacing: 1px } .two { padding: 0 5px; border-radius: 4px; background: $color.accent; color: $color.bg; font: 34px $font.display; letter-spacing: 1px } .wrap { display: flex; align-items: flex-start } .bug { display: flex; padding: 10px 16px; border-radius: 12px; background: $color.bg@0.85 }",
+          "width": 260,
+          "height": 64,
+          "options": {
+            "position": "56:48",
+            "start": 0.4,
+            "motion": {
+              "type": "fade",
+              "delay": 0.4,
+              "duration": 0.4
+            }
+          }
+        },
+        {
+          "name": "speaker_name",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"name\"><h2>{{ speaker }}</h2><p>{{ speaker_role }}</p></div></div>",
+          "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 30px } .name { display: flex; flex-direction: column; flex-grow: 1; padding: 20px 28px 22px; border-left: 10px solid $color.accent; border-radius: 6px 18px 18px 6px; background: $color.bg@0.92; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) } h2 { margin: 0; color: $color.fg; font: 76px $font.display; line-height: 1; letter-spacing: 1px } p { margin: 4px 0 0; color: $color.muted; font: 400 26px $font.body }",
+          "width": 588,
+          "height": 184,
+          "options": {
+            "position": "32:448",
+            "start": 0.5,
+            "motion": {
+              "type": "slide-right",
+              "delay": 0.5,
+              "duration": 0.6,
+              "distance": 60,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "talk_box",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"talk\"><span class=\"kicker\">Now on stage</span><p>{{ talk_title }}</p></div></div>",
+          "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 30px } .talk { display: flex; flex-direction: column; flex-grow: 1; gap: 8px; padding: 20px 26px 24px; border-radius: 18px; background: $color.surface@0.94; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) } .kicker { color: $color.accent; font: 600 18px $font.body; text-transform: uppercase; letter-spacing: 3px } p { margin: 0; color: $color.fg; font: 600 32px $font.body; line-height: 1.2 }",
+          "width": 600,
+          "height": 184,
+          "options": {
+            "position": "640:392",
+            "start": 1,
+            "motion": {
+              "type": "rise",
+              "delay": 1,
+              "duration": 0.6,
+              "distance": 40,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "talk_badges",
+          "type": "html",
+          "html": "<div class=\"row\"><span class=\"badge time\">{{ talk_time }}</span><span class=\"badge\">{{ talk_room }}</span><span class=\"badge\">{{ talk_track }}</span></div>",
+          "css": ".row { display: flex; gap: 10px } .badge { padding: 10px 18px; border-radius: 12px; background: $color.bg@0.92; color: $color.fg; font: 500 24px $font.body } .badge.time { background: $color.accent; color: $color.bg; font: 700 24px $font.mono }",
+          "width": 552,
+          "height": 60,
+          "options": {
+            "position": "664:556",
+            "start": 1.5,
+            "motion": {
+              "type": "rise",
+              "delay": 1.5,
+              "duration": 0.5,
+              "distance": 24,
+              "easing": "ease-out"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

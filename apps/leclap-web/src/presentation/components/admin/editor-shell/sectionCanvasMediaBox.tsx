@@ -1,4 +1,4 @@
-// A draggable/resizable/rotatable IMAGE or ANIMATION overlay box on the center SectionCanvas. It is
+// A draggable/resizable/rotatable IMAGE, ANIMATION or HTML layer box on the center SectionCanvas. It is
 // presentational: position/scale/opacity/rotation come from the overlay `value`, the media URL is
 // pre-resolved by the parent, and every geometry decision is delegated to imageAnimationDrag.ts (the
 // same math the legacy AnimationFrameCanvas uses). Pointer-drag on the body moves it; when active a
@@ -16,12 +16,13 @@ import { moveOverlay, nudgeOverlay, resizeOverlay, resolveOverlayRect, rotateOve
 const STEP = 8;
 const STEP_FAST = 40;
 
-type MediaOverlay = ImageOverlay | AnimationOverlay;
+// The geometry a box reads: an image, an animation, or an HTML layer's drawn still.
+type MediaOverlay = Pick<ImageOverlay | AnimationOverlay, 'position' | 'scale' | 'rotation' | 'flip' | 'opacity'>;
 
 interface MediaBoxProps {
   value: MediaOverlay;
   url: string;
-  kind: 'image' | 'animation';
+  kind: 'image' | 'animation' | 'html';
   orientation: Orientation;
   active: boolean;
   frameRect: () => DOMRect | undefined;

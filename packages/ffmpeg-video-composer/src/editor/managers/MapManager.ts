@@ -168,7 +168,7 @@ class MapManager {
     // Still images ignore the -itsoffset/-t source flags animations get (their source is a bare
     // `-loop 1`), so a timed image lowers its start/duration to the overlay's timeline `enable`
     // instead; animations keep the source-flag path (gating them here would double-apply the delay).
-    const timeline = input.type === 'image' ? imageOverlayEnable(input.options) : '';
+    const timeline = input.type === 'image' || input.type === 'html' ? imageOverlayEnable(input.options) : '';
 
     // Moving entrances use the named, single-quoted overlay form so the comma-bearing time expressions
     // are not mis-parsed as extra filter options; otherwise the static positional "x:y" form.

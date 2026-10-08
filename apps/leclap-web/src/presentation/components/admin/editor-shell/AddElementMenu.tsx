@@ -5,7 +5,7 @@
 // overlayControls' VariableMenu (outside-click + Escape).
 import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Circle, Image, Square, Type } from '@/presentation/components/icons';
+import { Circle, Code2, Image, Square, Type } from '@/presentation/components/icons';
 import { PlusIcon } from '@/presentation/components/icons/plus';
 import { Button } from '@/presentation/components/ui';
 import { useIconHover } from '@/presentation/components/icons/useIconHover';
@@ -14,7 +14,7 @@ import type { EditorSection } from '../templateEditorModel';
 import { canAddElement, type AddableKind } from './sectionElements';
 import { FAMILY_ICON, FAMILY_TONE, type AnimationFamily } from '../editor/animationKinds';
 
-// Canonical add order: background layer → text → image overlay → shapes → effect → animation file →
+// Canonical add order: background layer → text → image overlay → shapes → HTML layer → effect → animation file →
 // structured text sugar. The shape entries (rectangle/circle) lower to image overlays carrying a shape
 // recipe. "Effect" and "Animation file" are two distinct entries: both open the picker, on its own side.
 const ADD_ORDER: ReadonlyArray<AddableKind> = [
@@ -23,6 +23,7 @@ const ADD_ORDER: ReadonlyArray<AddableKind> = [
   'image',
   'shapeRect',
   'shapeEllipse',
+  'html',
   'effect',
   'animation',
   'caption',
@@ -42,6 +43,7 @@ const KIND_ICON: Record<AddableKind, ComponentType<{ className?: string }>> = {
   image: Image,
   shapeRect: Square,
   shapeEllipse: Circle,
+  html: Code2,
   effect: FAMILY_ICON.effect,
   animation: FAMILY_ICON.file,
   caption: Type,
@@ -55,6 +57,7 @@ const KIND_LABEL: Record<AddableKind, string> = {
   image: 'element.addImageOverlay',
   shapeRect: 'element.addShapeRect',
   shapeEllipse: 'element.addShapeEllipse',
+  html: 'element.addHtml',
   effect: 'element.addEffect',
   animation: 'element.addAnimation',
   caption: 'element.addCaption',

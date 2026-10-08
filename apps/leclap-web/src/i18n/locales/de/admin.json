@@ -836,7 +836,9 @@
     "effectAddHint": "Von der Engine gezeichnet · anpassbar",
     "animationAddHint": "APNG oder WebM · unverändert abgespielt",
     "animationPending": "Effekt oder Datei",
-    "kindLabel": "{{kind}}: {{name}}"
+    "kindLabel": "{{kind}}: {{name}}",
+    "html": "HTML-Ebene",
+    "addHtml": "HTML-Ebene"
   },
   "shape": {
     "kind": "Form",
@@ -1306,5 +1308,36 @@
     "summary": "{{count}} festgelegte Wörter · {{unsure}} zu prüfen",
     "hint": "Aus dem Clip transkribierte Wörter (auf dem Handy oder mit leclap transcribe). Korrigiere ein falsch verstandenes Wort direkt; bernsteinfarbene Wörter waren für die Erkennung unsicher. Die Zeiten bleiben wie transkribiert.",
     "word": "Wort bei {{start}} s"
+  },
+  "htmlLayer": {
+    "name": "Name der Ebene",
+    "nameHint": "Maps verweisen mit @name auf die Ebene. Nur Buchstaben, Ziffern und _.",
+    "html": "HTML",
+    "css": "CSS",
+    "fields": "Feld einfügen",
+    "fieldsEmpty": "Noch keine Felder: Füge Variablen oder eine Formularszene hinzu, um die Ebene zu füllen.",
+    "insert": "{{name}} einfügen",
+    "source": {
+      "field": "Vorlagenfeld",
+      "variable": "Variable",
+      "form": "Formularfeld"
+    },
+    "box": "Rahmen",
+    "width": "Breite",
+    "height": "Höhe",
+    "preview": "Vorschau",
+    "previewAlt": "Die HTML-Ebene, wie das Rendering sie zeichnet",
+    "drawing": "Wird gezeichnet…",
+    "failed": "Die Vorschau konnte nicht gezeichnet werden: {{error}}",
+    "clean": "Alles in dieser Ebene wird gerendert.",
+    "advisories": "Was das Rendering weglässt oder abschneidet",
+    "advisory": {
+      "html_unsupported_css": "CSS ignoriert",
+      "html_unsupported_markup": "Markup entfernt",
+      "html_overflow": "Inhalt abgeschnitten",
+      "html_font_unknown": "Unbekannte Schrift",
+      "html_missing_field": "Feld ohne Wert"
+    },
+    "remove": "Ebene entfernen"
   }
 }

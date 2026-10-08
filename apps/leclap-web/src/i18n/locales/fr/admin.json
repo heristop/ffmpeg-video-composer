@@ -836,7 +836,9 @@
     "effectAddHint": "Dessiné par le moteur · réglable",
     "animationAddHint": "APNG ou WebM · joué tel quel",
     "animationPending": "Effet ou fichier",
-    "kindLabel": "{{kind}} : {{name}}"
+    "kindLabel": "{{kind}} : {{name}}",
+    "html": "Calque HTML",
+    "addHtml": "Calque HTML"
   },
   "shape": {
     "kind": "Forme",
@@ -1307,5 +1309,36 @@
     "summary": "{{count}} mots figés · {{unsure}} à vérifier",
     "hint": "Mots transcrits depuis le clip (sur le téléphone ou avec leclap transcribe). Corrigez un mot mal entendu sur place ; les mots en ambre sont ceux dont la reconnaissance doutait. Les horaires restent ceux de la transcription.",
     "word": "Mot à {{start}} s"
+  },
+  "htmlLayer": {
+    "name": "Nom du calque",
+    "nameHint": "Les maps désignent le calque par @nom. Lettres, chiffres et _ uniquement.",
+    "html": "HTML",
+    "css": "CSS",
+    "fields": "Insérer un champ",
+    "fieldsEmpty": "Aucun champ pour l’instant : ajoutez des variables ou une scène formulaire pour remplir le calque.",
+    "insert": "Insérer {{name}}",
+    "source": {
+      "field": "Champ du modèle",
+      "variable": "Variable",
+      "form": "Champ de formulaire"
+    },
+    "box": "Cadre",
+    "width": "Largeur",
+    "height": "Hauteur",
+    "preview": "Aperçu",
+    "previewAlt": "Le calque HTML tel que le rendu le dessine",
+    "drawing": "Dessin…",
+    "failed": "Impossible de dessiner l’aperçu : {{error}}",
+    "clean": "Tout ce calque sera rendu.",
+    "advisories": "Ce que le rendu ignore ou coupe",
+    "advisory": {
+      "html_unsupported_css": "CSS ignoré",
+      "html_unsupported_markup": "Balisage retiré",
+      "html_overflow": "Contenu coupé",
+      "html_font_unknown": "Police inconnue",
+      "html_missing_field": "Champ sans valeur"
+    },
+    "remove": "Supprimer le calque"
   }
 }

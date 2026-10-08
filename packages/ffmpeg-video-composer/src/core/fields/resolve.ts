@@ -2,6 +2,7 @@ import type { TemplateField } from '../../schemas/fields.schemas';
 import { coerceFieldValue, probeValue, type FieldCoercers, type FieldValue } from './coerce';
 import { declaredFields, declaresFields, hasEmptyValue } from './declared';
 import { settleSlotTypes, type SlotCandidate } from './slot-types';
+import { escapeHtml } from '../html/html-entities';
 
 // Typed field resolution: each declared field's value (provided, else its default) is coerced by its type,
 // then every `{{ name }}` of a declared field is filled across the descriptor. A placeholder that is the
@@ -193,10 +194,17 @@ function fillWhole(text: string, name: string, path: Path, walk: Walk): unknown 
   return value;
 }
 
+// An HTML layer's markup (`inputs[n].html`): a value is text inside HTML, so it is always escaped, never
+// placed whole, whatever the field's type.
+function isHtmlSlot(path: Path): boolean {
+  return path.at(-1) === 'html' && path.at(-3) === 'inputs';
+}
+
 function fillString(text: string, path: Path, walk: Walk): unknown {
   const whole = WHOLE_PLACEHOLDER.exec(text);
+  const html = isHtmlSlot(path);
 
-  if (whole && walk.declared.has(whole[1])) return fillWhole(text, whole[1], path, walk);
+  if (whole && !html && walk.declared.has(whole[1])) return fillWhole(text, whole[1], path, walk);
 
   return text.replace(PLACEHOLDER, (match, name: string) => {
     const field = walk.declared.get(name);
@@ -207,7 +215,9 @@ function fillString(text: string, path: Path, walk: Walk): unknown {
 
     const value = slotValue(name, path, walk);
 
-    return value === null ? match : walk.encode(value, field);
+    if (value === null) return match;
+
+    return html ? escapeHtml(String(value)) : walk.encode(value, field);
   });
 }
 

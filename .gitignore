@@ -38,6 +38,7 @@ examples/agentic-pr-video/evidence/
 /apps/leclap-web/public/assets/
 # The ffmpeg.wasm core, staged from @ffmpeg/core on dev/build by apps/leclap-web/scripts/stage-ffmpeg-core.ts.
 /apps/leclap-web/public/ffmpeg-core/
+/apps/leclap-web/public/html-engine/
 /apps/leclap-expo/assets/animations/
 /apps/leclap-expo/assets/animation-thumbs/
 /apps/leclap-expo/assets/musics/
@@ -46,6 +47,8 @@ examples/agentic-pr-video/evidence/
 /apps/leclap-expo/assets/fonts/
 /apps/leclap-expo/assets/emoji/
 /apps/leclap-expo/assets/videos/
+# the engine's HTML layer page (packages/ffmpeg-video-composer/dist/html-rasteriser.html)
+/apps/leclap-expo/assets/html-rasteriser/
 # keep the Expo app's own (non-library) font tracked
 !/apps/leclap-expo/assets/fonts/SpaceMono-Regular.ttf
 # server template JSONs copied from packages/server-app/templates by the same script

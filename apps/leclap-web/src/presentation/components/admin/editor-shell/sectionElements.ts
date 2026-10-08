@@ -8,6 +8,7 @@
 //   - background layers (`layers`):  color only
 //   - image overlays (`images`):     video, color, image
 //   - animation overlays (`animations`): video, color, image
+//   - HTML layers (`htmlLayers`):     video, color, image
 //   - engine effects (`graphics`: fx lights and stroke graphics): video, color, image — always inserted from
 //     the picker's Effects side (a library entry). The "+ Add" menu's "Effect" opens an empty slot on that
 //     side; its "Animation file" opens the same kind of slot on the files side.
@@ -18,7 +19,9 @@
 import {
   makeTemplateId,
   newOverlay,
+  newHtmlLayer,
   type EditorSection,
+  type HtmlLayer,
   type EditorCaption,
   type Orientation,
   type TextOverlay,
@@ -51,12 +54,12 @@ export interface ElementDescriptor {
   family?: 'effect' | 'file';
 }
 
-type ArrayField = 'layers' | 'overlays' | 'images' | 'animations' | 'graphics';
+type ArrayField = 'layers' | 'overlays' | 'images' | 'animations' | 'htmlLayers' | 'graphics';
 
 // The kinds backed by an ordered per-section array, vs the SINGLETON text-sugar kinds
 // (caption/titleCard/lowerThird — at most one per section, always ElementRef index 0). Sugar is
 // authored via the scene fields / its inspector, never added or reordered like array elements.
-type ArrayKind = 'layer' | 'text' | 'image' | 'animation' | 'effect';
+type ArrayKind = 'layer' | 'text' | 'image' | 'animation' | 'html' | 'effect';
 export type SugarKind = 'caption' | 'titleCard' | 'lowerThird';
 
 // Everything the "+ Add" menu can offer: the selectable element kinds plus the two shape entries.
@@ -82,15 +85,16 @@ const FIELD_FOR_KIND: Record<ArrayKind, ArrayField> = {
   text: 'overlays',
   image: 'images',
   animation: 'animations',
+  html: 'htmlLayers',
   effect: 'graphics',
 };
 
 // Which element kinds each section kind owns. The arrays are optional on the model (absent when
 // empty), so ownership is keyed by section kind here rather than inferred from a present field.
 const OWNED_KINDS: Record<EditorSection['kind'], ReadonlyArray<ElementRef['kind']>> = {
-  video: ['text', 'image', 'animation', 'effect'],
-  color: ['layer', 'text', 'image', 'animation', 'effect'],
-  image: ['text', 'image', 'animation', 'effect'],
+  video: ['text', 'image', 'animation', 'html', 'effect'],
+  color: ['layer', 'text', 'image', 'animation', 'html', 'effect'],
+  image: ['text', 'image', 'animation', 'html', 'effect'],
   music: [],
   form: [],
   partial: [],
@@ -105,8 +109,8 @@ const SUGAR_OWNERS: Record<SugarKind, ReadonlyArray<EditorSection['kind']>> = {
 };
 
 // Stable flatten order: background layers, then text overlays, then image overlays, then animations,
-// then engine effects.
-const KIND_ORDER: ReadonlyArray<ArrayKind> = ['layer', 'text', 'image', 'animation', 'effect'];
+// then HTML layers, then engine effects.
+const KIND_ORDER: ReadonlyArray<ArrayKind> = ['layer', 'text', 'image', 'animation', 'html', 'effect'];
 
 // Sugar rows follow the array elements, in the engine's overlay draw order (registry 50/55/58).
 const SUGAR_ORDER: ReadonlyArray<SugarKind> = ['caption', 'titleCard', 'lowerThird'];
@@ -179,6 +183,8 @@ function elementPreview(element: unknown, kind: ArrayKind): string | undefined {
 
     if (kind === 'animation') return animationFileName(element as AnimationOverlay);
 
+    if (kind === 'html') return htmlLayerPreview(element as HtmlLayer);
+
     // A graphic the library does not offer (flash, bars…) reads as its type.
     if (kind === 'effect') return (element as Graphic).type;
 
@@ -196,6 +202,20 @@ function elementLabelKey(element: unknown, kind: ArrayKind): string {
   if (kind === 'animation' && !(element as AnimationOverlay).url) return 'element.animationPending';
 
   return `element.${kind}`;
+}
+
+// An HTML layer reads as its name, else as the text its markup shows.
+function htmlLayerPreview(layer: HtmlLayer): string | undefined {
+  const name = layer.name?.trim();
+
+  if (name) return name;
+
+  const text = layer.html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return displayVariables(text) || undefined;
 }
 
 // Display `{{ variable }}` placeholders as a compact `#variable` chip. Applied only to authored TEXT
@@ -288,8 +308,10 @@ export function listSectionElements(section: EditorSection): ElementDescriptor[]
 // A fresh default element for `kind`, reusing the model's real factories.
 function newElement(
   kind: Exclude<ArrayKind, 'effect'>
-): TextOverlay | BackgroundLayer | ImageOverlay | AnimationOverlay {
+): TextOverlay | BackgroundLayer | ImageOverlay | AnimationOverlay | HtmlLayer {
   if (kind === 'text') return newOverlay();
+
+  if (kind === 'html') return newHtmlLayer();
 
   if (kind === 'layer') return newExtraLayer();
 

@@ -134,6 +134,19 @@ leclap render examples/motion-design/formats.json --formats all \
 
 [`composed-sounds.json`](./composed-sounds.json) composes every sound in the template instead (`sfx[].sound`): a glide-and-noise impact, a varied `whoosh` preset, a riser built from a swept tone and air that ends on the drop with a varied `boom`, and two bell strikes a fifth apart. Check each with the MCP `analyze_sound` tool before placing it; see [Composed sounds](../../docs/template-configuration.md#composed-sounds).
 
+## HTML layers
+
+HTML and CSS (`inputs[].type: "html"`) lay out what positioned `drawtext` can't: cards, badges, chips, tables and text with mixed weights. Each layer is drawn once into a transparent PNG, then moves like any image overlay (`rise`, `slide-*`, `fade`, under a camera move). The copy comes from typed `global.fields`, the colours and faces from `$color.*` / `$font.*` tokens. HTML layers render on Node, in the browser and in the LeClap app, byte for byte alike; see [HTML layers](../../docs/template-configuration.md#html-layers).
+
+| Sample                                             | Format    | What it shows                                                                                                        |
+| -------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------- |
+| [`html-card.json`](./html-card.json)               | landscape | A three-scene listing reel: address card and price tag, a stat row with feature chips, an agent card with a portrait |
+| [`html-testimonial.json`](./html-testimonial.json) | portrait  | A Reels quote with bold accent words inside one sentence, a round portrait, star chips cut with `clip-path`          |
+| [`html-speaker.json`](./html-speaker.json)         | landscape | A conference opener and lower third: a text wordmark, a talk title that wraps in its box, time and room badges       |
+| [`html-stats.json`](./html-stats.json)             | square    | Stat tiles that land in reading order and a spec list with values aligned right; a landscape cut via `$format`       |
+
+Images inside a layer (`<img src>`, CSS `url()`) name bundled backgrounds by their `/assets/backgrounds/…` path, like the sections' `pictureUrl`, so the CLI, the web app and the phone all stage them.
+
 ## Native controls
 
 [`native-timing.json`](./native-timing.json) is a landscape, asset-free demonstration with bundled fonts. It includes a broadcast-inspired frame, a title card with configurable line stagger, and coordinated exits on positioned text.

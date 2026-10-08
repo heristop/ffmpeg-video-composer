@@ -836,7 +836,9 @@
     "effectAddHint": "Drawn by the engine · adjustable",
     "animationAddHint": "APNG or WebM · played as-is",
     "animationPending": "Effect or file",
-    "kindLabel": "{{kind}}: {{name}}"
+    "kindLabel": "{{kind}}: {{name}}",
+    "html": "HTML layer",
+    "addHtml": "HTML layer"
   },
   "shape": {
     "kind": "Shape",
@@ -1306,5 +1308,36 @@
     "summary": "{{count}} pinned words · {{unsure}} to check",
     "hint": "Words transcribed from the clip (on the phone or with leclap transcribe). Fix a misheard word in place; amber words are the ones the recogniser was unsure of. Timings stay as transcribed.",
     "word": "Word at {{start}} s"
+  },
+  "htmlLayer": {
+    "name": "Layer name",
+    "nameHint": "Maps refer to the layer as @name. Letters, digits and _ only.",
+    "html": "HTML",
+    "css": "CSS",
+    "fields": "Insert a field",
+    "fieldsEmpty": "No fields yet: add variables or a form scene to fill the layer.",
+    "insert": "Insert {{name}}",
+    "source": {
+      "field": "Template field",
+      "variable": "Variable",
+      "form": "Form field"
+    },
+    "box": "Box",
+    "width": "Width",
+    "height": "Height",
+    "preview": "Preview",
+    "previewAlt": "The HTML layer as the render draws it",
+    "drawing": "Drawing…",
+    "failed": "The preview could not be drawn: {{error}}",
+    "clean": "Everything in this layer renders.",
+    "advisories": "What the render drops or cuts",
+    "advisory": {
+      "html_unsupported_css": "CSS dropped",
+      "html_unsupported_markup": "Markup removed",
+      "html_overflow": "Content cut off",
+      "html_font_unknown": "Unknown font",
+      "html_missing_field": "Field without a value"
+    },
+    "remove": "Remove layer"
   }
 }

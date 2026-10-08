@@ -14,3 +14,4 @@ export * from './overlay-parsing';
 export * from './overlay-filters';
 export * from './starter-presets';
 export * from './color-token';
+export * from './html-layer';

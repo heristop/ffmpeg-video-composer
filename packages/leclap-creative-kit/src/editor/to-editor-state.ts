@@ -22,7 +22,6 @@ import {
   type ChromaKey,
   type CaptureMode,
   type SectionFit,
-  type VisualAudio,
   type FootageEdits,
 } from './model';
 import { audioFrom, colorsListFrom, defaultTransitionFrom, globalVariablesFrom } from './to-editor-global';
@@ -33,6 +32,8 @@ import { pruneEmpty } from './prune';
 import { editorIdentityFrom, renameTranscripts } from './template-meta';
 import { emittedSectionNames } from './build-descriptor';
 import { animationsFrom, choiceFromMarker, imagesFrom, overlayOptionsFrom, watermarkFrom } from './to-editor-overlay';
+import { htmlLayersFrom, type HtmlLayer } from './html-layer';
+import { sectionAudioExtrasFrom } from './visual-audio';
 
 function formSectionFrom(s: Section): EditorSection {
   const fields = (s.options?.fields ?? []) as Array<{
@@ -96,11 +97,13 @@ type VisualExtras = MotionBlocks & {
   letterbox?: Letterbox;
   motion?: MotionEffect[];
   animations?: AnimationOverlay[];
+  htmlLayers?: HtmlLayer[];
 };
 
 function visualExtrasFrom(s: Section): VisualExtras {
   const caption = captionFrom(s);
   const animations = animationsFrom(s);
+  const htmlLayers = htmlLayersFrom(s);
 
   return {
     ...(s.transition ? { transitionAfter: s.transition } : {}),
@@ -111,23 +114,8 @@ function visualExtrasFrom(s: Section): VisualExtras {
     ...(s.letterbox ? { letterbox: s.letterbox } : {}),
     ...(s.motion && s.motion.length > 0 ? { motion: s.motion } : {}),
     ...(animations.length > 0 ? { animations } : {}),
+    ...(htmlLayers.length > 0 ? { htmlLayers } : {}),
     ...motionBlocksOf(s),
-  };
-}
-
-// Recover per-section audio extras (musicVolume / audioFade / audioEffect / voice / audioAutomation).
-function sectionAudioExtrasFrom(s: Section): VisualAudio {
-  const mv = s.options?.musicVolume;
-  const af = s.options?.audioFade;
-  const ae = s.options?.audioEffect;
-  const { voice, audioAutomation } = s.options ?? {};
-
-  return {
-    ...(mv === undefined ? {} : { musicVolume: mv }),
-    ...(af ? { audioFade: af } : {}),
-    ...(ae ? { audioEffect: ae } : {}),
-    ...(voice ? { voice } : {}),
-    ...(audioAutomation ? { audioAutomation } : {}),
   };
 }
 

@@ -1,0 +1,358 @@
+{
+  "meta": {
+    "name": "Product spec dashboard",
+    "description": "A square stat dashboard and spec sheet laid out in HTML and CSS: a header on an accent bar, four stat tiles that land one after another, then a table-like spec list with labels and values aligned in two columns. A landscape cut is composed with $format.",
+    "creativeDirection": "Audience: product and developer-relations teams posting release numbers to a feed. Direction: a quiet, typographic data board on the mono theme: white canvas, black ink, one electric-blue tile. The header rises first, then the four stat tiles land one after another left to right and top to bottom, so the eye reads them in order; the camera pushes in slightly under them. A push-up hands over to the spec sheet: labels left, values right in the monospace face, hairline rules between rows, and a badge that states the one claim worth remembering. The landscape cut lays the tiles in a single row and keeps the same order. Review: numbers are crisp and never wrap, each value lines up on the right edge, rules do not touch the text, no tile shows before its entrance, and nothing is cut at a box edge."
+  },
+  "global": {
+    "orientation": "square",
+    "platform": "square-feed",
+    "musicEnabled": false,
+    "theme": {
+      "extends": "mono",
+      "fonts": {
+        "body": "rubik"
+      }
+    },
+    "transition": {
+      "type": "cut"
+    },
+    "fields": {
+      "product": {
+        "type": "text",
+        "default": "LeClap",
+        "maxLength": 20,
+        "label": {
+          "en": "Product"
+        }
+      },
+      "release": {
+        "type": "text",
+        "default": "Autumn release",
+        "maxLength": 28,
+        "label": {
+          "en": "Release"
+        }
+      },
+      "samples": {
+        "type": "text",
+        "default": "51",
+        "maxLength": 4,
+        "label": {
+          "en": "Samples"
+        }
+      },
+      "tools": {
+        "type": "text",
+        "default": "14",
+        "maxLength": 4,
+        "label": {
+          "en": "Tools"
+        }
+      },
+      "platforms": {
+        "type": "text",
+        "default": "3",
+        "maxLength": 4,
+        "label": {
+          "en": "Platforms"
+        }
+      },
+      "fonts": {
+        "type": "text",
+        "default": "14",
+        "maxLength": 4,
+        "label": {
+          "en": "Fonts"
+        }
+      },
+      "claim": {
+        "type": "text",
+        "default": "Same layer, same bytes on every platform",
+        "maxLength": 48,
+        "label": {
+          "en": "Claim"
+        }
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "numbers",
+      "type": "color_background",
+      "purpose": "Four numbers that size the product, read in order.",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 4.4
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.03,
+        "delay": 0.4,
+        "includeText": false
+      },
+      "transition": {
+        "type": "push-up",
+        "duration": 0.5
+      },
+      "inputs": [
+        {
+          "name": "board_header",
+          "type": "html",
+          "html": "<div class=\"head\"><span class=\"bar\"></span><div class=\"titles\"><span class=\"kicker\">{{ product }} · {{ release }}</span><h1>In numbers</h1></div></div>",
+          "css": ".head { display: flex; align-items: stretch; gap: 26px } .bar { width: 14px; background: $color.accent } .titles { display: flex; flex-direction: column } .kicker { color: $color.muted; font: 500 30px $font.mono; text-transform: uppercase; letter-spacing: 2px } h1 { margin: 6px 0 0; color: $color.fg; font: 110px $font.display; line-height: 1; letter-spacing: -3px }",
+          "width": {
+            "$format": {
+              "square": 920,
+              "landscape": 1152
+            }
+          },
+          "height": 170,
+          "options": {
+            "position": {
+              "$format": {
+                "square": "80:90",
+                "landscape": "64:48"
+              }
+            },
+            "start": 0.2,
+            "motion": {
+              "type": "rise",
+              "delay": 0.2,
+              "duration": 0.6,
+              "distance": 30,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "stat_samples",
+          "type": "html",
+          "html": "<div class=\"tile accent\"><strong>{{ samples }}</strong><span>samples</span><small>in the showcase</small></div>",
+          "css": ".tile { display: flex; flex-direction: column; justify-content: flex-end; flex-grow: 1; padding: 26px 30px 28px; background: $color.surface; border-top: 10px solid $color.fg } .tile.accent { background: $color.accent; border-top-color: $color.accent } strong { color: $color.fg; font: 136px $font.display; line-height: 0.9; letter-spacing: -4px } .tile.accent strong { color: $color.bg } .tile.accent span, .tile.accent small { color: $color.bg } span { margin-top: 12px; color: $color.fg; font: 600 30px $font.body } small { margin-top: 2px; color: $color.muted; font: 400 22px $font.mono }",
+          "width": {
+            "$format": {
+              "square": 450,
+              "landscape": 272
+            }
+          },
+          "height": {
+            "$format": {
+              "square": 330,
+              "landscape": 330
+            }
+          },
+          "options": {
+            "position": {
+              "$format": {
+                "square": "80:310",
+                "landscape": "64:250"
+              }
+            },
+            "start": 0.5,
+            "motion": {
+              "type": "rise",
+              "delay": 0.5,
+              "duration": 0.5,
+              "distance": 36,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "stat_tools",
+          "type": "html",
+          "html": "<div class=\"tile\"><strong>{{ tools }}</strong><span>MCP tools</span><small>agent-callable</small></div>",
+          "css": ".tile { display: flex; flex-direction: column; justify-content: flex-end; flex-grow: 1; padding: 26px 30px 28px; background: $color.surface; border-top: 10px solid $color.fg } .tile.accent { background: $color.accent; border-top-color: $color.accent } strong { color: $color.fg; font: 136px $font.display; line-height: 0.9; letter-spacing: -4px } .tile.accent strong { color: $color.bg } .tile.accent span, .tile.accent small { color: $color.bg } span { margin-top: 12px; color: $color.fg; font: 600 30px $font.body } small { margin-top: 2px; color: $color.muted; font: 400 22px $font.mono }",
+          "width": {
+            "$format": {
+              "square": 450,
+              "landscape": 272
+            }
+          },
+          "height": {
+            "$format": {
+              "square": 330,
+              "landscape": 330
+            }
+          },
+          "options": {
+            "position": {
+              "$format": {
+                "square": "550:310",
+                "landscape": "352:250"
+              }
+            },
+            "start": 0.65,
+            "motion": {
+              "type": "rise",
+              "delay": 0.65,
+              "duration": 0.5,
+              "distance": 36,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "stat_platforms",
+          "type": "html",
+          "html": "<div class=\"tile\"><strong>{{ platforms }}</strong><span>platforms</span><small>node, web, phone</small></div>",
+          "css": ".tile { display: flex; flex-direction: column; justify-content: flex-end; flex-grow: 1; padding: 26px 30px 28px; background: $color.surface; border-top: 10px solid $color.fg } .tile.accent { background: $color.accent; border-top-color: $color.accent } strong { color: $color.fg; font: 136px $font.display; line-height: 0.9; letter-spacing: -4px } .tile.accent strong { color: $color.bg } .tile.accent span, .tile.accent small { color: $color.bg } span { margin-top: 12px; color: $color.fg; font: 600 30px $font.body } small { margin-top: 2px; color: $color.muted; font: 400 22px $font.mono }",
+          "width": {
+            "$format": {
+              "square": 450,
+              "landscape": 272
+            }
+          },
+          "height": {
+            "$format": {
+              "square": 330,
+              "landscape": 330
+            }
+          },
+          "options": {
+            "position": {
+              "$format": {
+                "square": "80:660",
+                "landscape": "640:250"
+              }
+            },
+            "start": 0.8,
+            "motion": {
+              "type": "rise",
+              "delay": 0.8,
+              "duration": 0.5,
+              "distance": 36,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "stat_fonts",
+          "type": "html",
+          "html": "<div class=\"tile\"><strong>{{ fonts }}</strong><span>bundled fonts</span><small>offline, no CDN</small></div>",
+          "css": ".tile { display: flex; flex-direction: column; justify-content: flex-end; flex-grow: 1; padding: 26px 30px 28px; background: $color.surface; border-top: 10px solid $color.fg } .tile.accent { background: $color.accent; border-top-color: $color.accent } strong { color: $color.fg; font: 136px $font.display; line-height: 0.9; letter-spacing: -4px } .tile.accent strong { color: $color.bg } .tile.accent span, .tile.accent small { color: $color.bg } span { margin-top: 12px; color: $color.fg; font: 600 30px $font.body } small { margin-top: 2px; color: $color.muted; font: 400 22px $font.mono }",
+          "width": {
+            "$format": {
+              "square": 450,
+              "landscape": 272
+            }
+          },
+          "height": {
+            "$format": {
+              "square": 330,
+              "landscape": 330
+            }
+          },
+          "options": {
+            "position": {
+              "$format": {
+                "square": "550:660",
+                "landscape": "928:250"
+              }
+            },
+            "start": 0.95,
+            "motion": {
+              "type": "rise",
+              "delay": 0.95,
+              "duration": 0.5,
+              "distance": 36,
+              "easing": "ease-out"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "spec",
+      "type": "color_background",
+      "purpose": "The facts behind the numbers, as a spec sheet.",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 4.2
+      },
+      "camera": {
+        "preset": "drift-up",
+        "amount": 0.03,
+        "includeText": false
+      },
+      "inputs": [
+        {
+          "name": "spec_sheet",
+          "type": "html",
+          "html": "<div class=\"sheet\"><div class=\"top\"><span class=\"bar\"></span><h2>Spec sheet</h2></div><div class=\"row\"><span class=\"key\">Renders on</span><span class=\"value\">Node · browser · phone</span></div><div class=\"row\"><span class=\"key\">Composed by</span><span class=\"value\">FFmpeg filter graphs</span></div><div class=\"row\"><span class=\"key\">HTML layers</span><span class=\"value\">Satori + resvg, flexbox</span></div><div class=\"row\"><span class=\"key\">Output</span><span class=\"value\">MP4 · H.264 · AAC</span></div><div class=\"row\"><span class=\"key\">Uploads</span><span class=\"value\">none, fully local</span></div><div class=\"row\"><span class=\"key\">Licence</span><span class=\"value\">MIT</span></div></div>",
+          "css": {
+            "$format": {
+              "square": ".sheet { display: flex; flex-direction: column } .top { display: flex; align-items: center; gap: 22px; margin-bottom: 26px } .bar { width: 64px; height: 14px; background: $color.accent } h2 { margin: 0; color: $color.fg; font: 72px $font.display; letter-spacing: -2px } .row { display: flex; justify-content: space-between; align-items: baseline; padding: 28px 0; border-bottom: 2px solid $color.surface } .key { color: $color.muted; font: 500 32px $font.body } .value { color: $color.fg; font: 500 32px $font.mono }",
+              "landscape": ".sheet { display: flex; flex-direction: column } .top { display: flex; align-items: center; gap: 22px; margin-bottom: 26px } .bar { width: 64px; height: 14px; background: $color.accent } h2 { margin: 0; color: $color.fg; font: 72px $font.display; letter-spacing: -2px } .row { display: flex; justify-content: space-between; align-items: baseline; padding: 13px 0; border-bottom: 2px solid $color.surface } .key { color: $color.muted; font: 500 28px $font.body } .value { color: $color.fg; font: 500 28px $font.mono }"
+            }
+          },
+          "width": {
+            "$format": {
+              "square": 920,
+              "landscape": 900
+            }
+          },
+          "height": {
+            "$format": {
+              "square": 760,
+              "landscape": 600
+            }
+          },
+          "options": {
+            "position": {
+              "$format": {
+                "square": "80:90",
+                "landscape": "190:40"
+              }
+            },
+            "start": 0.4,
+            "motion": {
+              "type": "rise",
+              "delay": 0.4,
+              "duration": 0.7,
+              "distance": 40,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "spec_claim",
+          "type": "html",
+          "html": "<div class=\"claim\"><span class=\"dot\"></span>{{ claim }}</div>",
+          "css": ".claim { display: flex; align-items: center; align-self: flex-start; gap: 16px; padding: 18px 28px; background: $color.accent; color: $color.bg; font: 600 32px $font.body } .dot { width: 14px; height: 14px; background: $color.bg }",
+          "width": {
+            "$format": {
+              "square": 920,
+              "landscape": 900
+            }
+          },
+          "height": 80,
+          "options": {
+            "position": {
+              "$format": {
+                "square": "80:880",
+                "landscape": "190:590"
+              }
+            },
+            "start": 1.3,
+            "motion": {
+              "type": "slide-right",
+              "delay": 1.3,
+              "duration": 0.5,
+              "distance": 50,
+              "easing": "ease-out"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "formats": {
+    "landscape": {
+      "global": {
+        "platform": "youtube"
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
-// Section audio types for the builder model (re-exported from model.ts).
+// Section audio types for the builder model (re-exported from model.ts), and their recovery from a stored section.
+import type { Section } from 'ffmpeg-video-composer/src/core/types.d.ts';
 import type { ClipAudioPassthrough } from './motion-passthrough';
 
 // Voice effect applied to the section's own audio (descriptor options.audioEffect): echo (aecho),
@@ -24,4 +25,20 @@ export interface VisualAudio extends ClipAudioPassthrough {
   musicVolume?: number;
   audioFade?: SectionAudioFade;
   audioEffect?: AudioEffect;
+}
+
+// Recover per-section audio extras (musicVolume / audioFade / audioEffect / voice / audioAutomation).
+export function sectionAudioExtrasFrom(s: Section): VisualAudio {
+  const mv = s.options?.musicVolume;
+  const af = s.options?.audioFade;
+  const ae = s.options?.audioEffect;
+  const { voice, audioAutomation } = s.options ?? {};
+
+  return {
+    ...(mv === undefined ? {} : { musicVolume: mv }),
+    ...(af ? { audioFade: af } : {}),
+    ...(ae ? { audioEffect: ae } : {}),
+    ...(voice ? { voice } : {}),
+    ...(audioAutomation ? { audioAutomation } : {}),
+  };
 }

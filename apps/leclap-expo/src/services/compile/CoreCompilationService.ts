@@ -4,7 +4,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { Asset } from 'expo-asset';
 // Import the PRE-BUILT output (decorators compiled) — not the raw src — so Metro/Hermes never sees
 // the core's tsyringe decorators. reflect-metadata is loaded once at the app entry (app/_layout.tsx).
-import { compileReactNative, type NativeEngine } from 'ffmpeg-video-composer/reactnative';
+import { compileReactNative, registerHtmlRasteriser, type NativeEngine } from 'ffmpeg-video-composer/reactnative';
 import { renderQuip } from '@leclap/creative-kit/render-quips';
 import {
   MUSIC_ASSETS,
@@ -17,6 +17,7 @@ import {
 } from '@/src/data/mediaCatalog';
 import * as Leclap from '@/modules/leclap-ffmpeg';
 import type { CompileInput, CompileOptions, CompileResult, CompileService } from './CompileService';
+import { htmlRasterHost } from './html-raster/html-raster-host';
 
 const toPath = (uri: string): string => uri.replace(/^file:\/\//, '');
 const toUri = (p: string): string => (p.startsWith('file://') ? p : `file://${p}`);
@@ -205,8 +206,20 @@ function libraryInputFile(input: { type?: string; url?: string }): string | unde
   return file;
 }
 
-// Every bundled background file the descriptor references (image_background pictureUrls + library://
-// image inputs). Mutates library:// input urls to their canonical staged path.
+const HTML_BACKGROUND_REF = /\/assets\/backgrounds\/([\w.-]+)/g;
+
+// The bundled backgrounds an HTML layer draws (`<img src>` or CSS `url()` on `/assets/backgrounds/<file>`):
+// the engine reads them through resolveLocalAsset, so they must be staged like a pictureUrl.
+function htmlInputFiles(input: { type?: string; html?: string; css?: string }): string[] {
+  if (input.type !== 'html') return [];
+
+  const source = `${input.html ?? ''} ${input.css ?? ''}`;
+
+  return [...source.matchAll(HTML_BACKGROUND_REF)].map((match) => match[1]).filter((file) => file in BACKGROUND_ASSETS);
+}
+
+// Every bundled background file the descriptor references (image_background pictureUrls, library://
+// image inputs and HTML layer images). Mutates library:// input urls to their canonical staged path.
 function collectBundledImageFiles(descriptor: CompileInput['descriptor']): Set<string> {
   const files = new Set<string>();
 
@@ -215,12 +228,15 @@ function collectBundledImageFiles(descriptor: CompileInput['descriptor']): Set<s
 
     if (pictureFile) files.add(pictureFile);
 
-    const inputs = (section as { inputs?: Array<{ type?: string; url?: string }> }).inputs ?? [];
+    const inputs =
+      (section as { inputs?: Array<{ type?: string; url?: string; html?: string; css?: string }> }).inputs ?? [];
 
     for (const input of inputs) {
       const file = libraryInputFile(input);
 
       if (file) files.add(file);
+
+      for (const htmlFile of htmlInputFiles(input)) files.add(htmlFile);
     }
   }
 
@@ -333,12 +349,32 @@ async function publishOutput(outputPath: string): Promise<string> {
   return target;
 }
 
+function hasHtmlLayers(descriptor: CompileInput['descriptor']): boolean {
+  const sections = (descriptor as { sections?: { inputs?: { type?: string }[] }[] }).sections ?? [];
+
+  return sections.some((section) => section.inputs?.some((item) => item.type === 'html'));
+}
+
 export class CoreCompilationService implements CompileService {
   async compile(input: CompileInput, options: CompileOptions = {}): Promise<CompileResult> {
     if (options.signal?.aborted) {
       return { success: false, error: 'Compilation cancelled.' };
     }
 
+    // HTML layers are drawn in a hidden WebView (Hermes has no WebAssembly): its page loads while the
+    // assets stage, and is torn down when the compile ends.
+    registerHtmlRasteriser(htmlRasterHost.rasteriser);
+
+    if (hasHtmlLayers(input.descriptor)) htmlRasterHost.prepare();
+
+    try {
+      return await this.compileWithPage(input, options);
+    } finally {
+      htmlRasterHost.release();
+    }
+  }
+
+  private async compileWithPage(input: CompileInput, options: CompileOptions): Promise<CompileResult> {
     const projectConfig = await buildProjectConfig(input);
 
     // Cooperative cancellation: ffmpeg exits as on SIGTERM, the failed run rejects inside

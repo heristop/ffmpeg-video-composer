@@ -41,7 +41,7 @@ export const mcpDoc: McpDoc = {
   id: 'mcp',
   title: 'MCP for agents',
   intro:
-    'The LeClap MCP server exposes this same descriptor engine to local AI agents. The agent authors a JSON descriptor from the schema, the server validates it, and compose_video renders a deterministic MP4 through the FFmpeg pipeline. The packaged catalog includes 47 samples with creative direction and input requirements. Registered JSON effects use a configured trusted Node/Remotion backend; render_remotion_clip also accepts your own Remotion composition.',
+    'The LeClap MCP server exposes this same descriptor engine to local AI agents. The agent authors a JSON descriptor from the schema, the server validates it, and compose_video renders a deterministic MP4 through the FFmpeg pipeline. The packaged catalog includes 51 samples with creative direction and input requirements. Registered JSON effects use a configured trusted Node/Remotion backend; render_remotion_clip also accepts your own Remotion composition.',
   flow: ['get_samples', 'get_template_schema', 'get_motion_catalog', 'validate_template', 'compose_video'],
   agenticReview: {
     intro:

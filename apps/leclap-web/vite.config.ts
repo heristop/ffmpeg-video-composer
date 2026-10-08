@@ -61,24 +61,34 @@ export default defineConfig({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV ?? 'development'),
   },
   resolve: {
-    alias: {
+    alias: [
       // Mirror tsconfig's `@/core/*` → core-src mapping (must precede the general `@`): the core
       // package uses `@/core/...` internally, so a runtime import like `@/core/argGuard` pulled into
       // this build must resolve to the core src, not this app's src. (Type-only `@/core/types` was
       // erased and never needed this; value imports do.)
-      '@/core': path.resolve(projectDir, '../../packages/ffmpeg-video-composer/src/core'),
-      '@': path.resolve(projectDir, 'src'),
+      { find: '@/core', replacement: path.resolve(projectDir, '../../packages/ffmpeg-video-composer/src/core') },
+      { find: '@', replacement: path.resolve(projectDir, 'src') },
+      // Satori's `import … from "harfbuzzjs"` (exactly that, not its files): the package's entry fetches
+      // hb.wasm next to the page as soon as it loads; the engine's shim waits for the bytes the HTML layer
+      // rasteriser's loader fetched from /html-engine/ instead.
+      {
+        find: /^harfbuzzjs$/,
+        replacement: path.resolve(
+          projectDir,
+          '../../packages/ffmpeg-video-composer/src/platform/html/harfbuzz-shaper.ts'
+        ),
+      },
       // Provide browser-compatible alternatives for Node.js modules
-      path: 'path-browserify',
-      os: 'os-browserify',
-      events: 'events',
-      util: 'util',
-      stream: 'stream-browserify',
-      crypto: 'crypto-browserify',
-      buffer: 'buffer',
-      fs: 'memfs',
-      'fs/promises': 'memfs',
-    },
+      { find: 'path', replacement: 'path-browserify' },
+      { find: 'os', replacement: 'os-browserify' },
+      { find: 'events', replacement: 'events' },
+      { find: 'util', replacement: 'util' },
+      { find: 'stream', replacement: 'stream-browserify' },
+      { find: 'crypto', replacement: 'crypto-browserify' },
+      { find: 'buffer', replacement: 'buffer' },
+      { find: 'fs', replacement: 'memfs' },
+      { find: 'fs/promises', replacement: 'memfs' },
+    ],
   },
   build: {
     // scripts/seo-prerender.ts needs to name each locale's lazy chunk in the prerendered <head>, and

@@ -10,6 +10,7 @@ import { findFont } from '../fonts';
 import { easingError } from '../motion/easing';
 import { resolveEasingRef, resolveTokens, type MotionTokenSet } from '../motion/tokens';
 import { mentionsThemeToken, parseThemeRef, resolveTheme, resolveThemeRef } from './resolve';
+import { EMBEDDED_TOKEN_KEYS, embeddedThemeTokens } from './embedded';
 import { BUILTIN_THEMES, THEME_COLOR_NAMES, THEME_FONT_NAMES, type ResolvedTheme, type ThemeSpec } from './themes';
 
 // Structurally the validator's ValidationError (declared here so this module stays free of services).
@@ -115,11 +116,24 @@ function tokenProblem(value: string, theme: ResolvedTheme): string | null {
   return `unknown theme ${ref.namespace} "${ref.name}"${didYouMean(ref.name, names)}`;
 }
 
+// CSS text (an HTML layer's css and html) mentions tokens mid-value; any other string is one whole token.
+function stringProblems(value: string, path: string, theme: ResolvedTheme): string[] {
+  const key = path.slice(path.lastIndexOf('.') + 1);
+
+  if (EMBEDDED_TOKEN_KEYS.has(key)) {
+    return embeddedThemeTokens(value).flatMap((token) => tokenProblem(token, theme) ?? []);
+  }
+
+  const problem = mentionsThemeToken(value) ? tokenProblem(value, theme) : null;
+
+  return problem ? [problem] : [];
+}
+
 function collectTokenIssues(value: unknown, path: string, theme: ResolvedTheme, out: ThemeIssue[]): void {
   if (typeof value === 'string') {
-    const problem = mentionsThemeToken(value) ? tokenProblem(value, theme) : null;
-
-    if (problem) out.push({ path, message: problem, code: 'unknown_theme_token' });
+    for (const problem of stringProblems(value, path, theme)) {
+      out.push({ path, message: problem, code: 'unknown_theme_token' });
+    }
 
     return;
   }

@@ -28,7 +28,7 @@ async function run(args: string[]) {
   }
 }
 describe('packaged samples command outside the repository', () => {
-  it('lists all 47 samples as clean JSON and applies category/backend/query filters', async () => {
+  it('lists all 51 samples as clean JSON and applies category/backend/query filters', async () => {
     const result = await run(['list', '--json']);
     expect(result.code, result.stderr).toBe(0);
     expect(JSON.parse(result.stdout)).toEqual(listSamples());

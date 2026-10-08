@@ -89,7 +89,7 @@ Validation checks the descriptor and geometry; it does not grade whether the des
 
 Start with `leclap samples list --category app-demos --backend native`, then
 `leclap samples show web-app-promo`. In MCP, call `get_samples` with those filters and
-then with `{ "id": "web-app-promo" }`. Both expose the same 47 showcase entries, their authored
+then with `{ "id": "web-app-promo" }`. Both expose the same 51 showcase entries, their authored
 creative direction and actual input requirements. Use `--query` / `query` to search direction as well as
 ID, title and description.
 

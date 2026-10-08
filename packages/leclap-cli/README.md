@@ -107,8 +107,8 @@ platform constraints and environment-variable scope.
 
 ## `samples` — discover and adapt a showcase
 
-The installed CLI includes the same 47 samples as the [web showcase](https://leclap.dev/showcase/):
-37 native and 10 registered Remotion examples. Discovery and export work without a repository checkout,
+The installed CLI includes the same 51 samples as the [web showcase](https://leclap.dev/showcase/):
+41 native and 10 registered Remotion examples. Discovery and export work without a repository checkout,
 FFmpeg or Remotion, and do not download media or render effects.
 
 ```bash

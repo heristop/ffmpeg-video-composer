@@ -288,6 +288,14 @@ def title_cards():
             grid(tiles, 3, 768 / 302))
 
 
+
+def html_layers():
+    section_sheet('html-layers', 'html-layers.json', 2, [
+        ('recipe-card.start+1.5', 'recipe: card'), ('recipe-badge.start+1.5', 'recipe: badge'),
+        ('recipe-price-tag.start+1.5', 'recipe: priceTag'), ('recipe-two-column-stat.start+1.5', 'recipe: twoColumnStat'),
+    ], 'HTML layers: the four layout recipes of the motion catalog')
+
+
 def captions():
     styles = ['clean', 'loud', 'keynote', 'documentary', 'boxed', 'neon']
     section_sheet('caption-styles', 'caption-styles.json', 3, [(f'{s}.start+1.3', f'style: {s}') for s in styles],
@@ -402,7 +410,8 @@ def tooling():
 SHEETS = {
     'kinetic': kinetic, 'kinetic-extras': kinetic_extras, 'camera': camera, 'graphics': graphics,
     'fx': fx_primitives, 'strokes': strokes,
-    'transitions': transitions, 'lower-thirds': lower_thirds, 'title-cards': title_cards, 'captions': captions,
+    'transitions': transitions, 'lower-thirds': lower_thirds, 'title-cards': title_cards, 'html-layers': html_layers,
+    'captions': captions,
     'layouts': layouts, 'themes': themes, 'platforms': platforms, 'formats': formats, 'looks': looks,
     'emoji-rtl': emoji_rtl, 'footage': footage, 'tooling': tooling,
 }

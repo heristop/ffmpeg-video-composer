@@ -14592,5 +14592,1448 @@
         }
       ]
     }
+  },
+  {
+    "id": "html-card",
+    "title": "HTML layers: listing reel",
+    "description": "A three-scene property reel laid out in HTML and CSS: an address card and price tag, a stat row with feature chips, then the agent's card under an open-visit badge, every fact filled from typed fields.",
+    "category": "effects",
+    "source": "examples/motion-design/html-card.json",
+    "orientation": "landscape",
+    "backend": "native",
+    "creativeDirection": "Audience: estate agents who post listings as short videos. Direction: the photos carry the mood, the cards carry the facts, one idea per scene. Scene one says where and how much: the address card rises bottom left once the push-in has started, the price tag slides in from the right half a second later. Scene two says what you get: a stat row (rooms, area, floor) and feature chips settle on the right while the camera drifts. Scene three says what to do: the open-visit badge drops in, then the agent's card with a round portrait. Push and zoom-through transitions keep the reel moving; nothing waits more than a beat. Copy comes from the fields, so the same template lists any property. Review: text crisp at 720p, round corners, nothing cut at a card's edge, the price never covers the lamp, and every layer is hidden until its entrance.",
+    "showcasePath": "/showcase?sample=html-card",
+    "preview": {
+      "video": "/videos/showcase/html-card.mp4",
+      "poster": "/videos/showcase/html-card.webp",
+      "template": "/videos/showcase/html-card.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [
+        {
+          "name": "address",
+          "placeholders": ["{{ address }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "city",
+          "placeholders": ["{{ city }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "price",
+          "placeholders": ["{{ price }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "rooms",
+          "placeholders": ["{{ rooms }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "area",
+          "placeholders": ["{{ area }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "floor",
+          "placeholders": ["{{ floor }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "visit",
+          "placeholders": ["{{ visit }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "agent",
+          "placeholders": ["{{ agent }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "agency",
+          "placeholders": ["{{ agency }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "phone",
+          "placeholders": ["{{ phone }}"],
+          "source": "placeholder"
+        }
+      ],
+      "assets": [
+        {
+          "kind": "image",
+          "reference": "/assets/backgrounds/sage-wall.jpg",
+          "path": "sections[0].options.pictureUrl"
+        },
+        {
+          "kind": "image",
+          "reference": "/assets/backgrounds/cafe-table.jpg",
+          "path": "sections[1].options.pictureUrl"
+        },
+        {
+          "kind": "image",
+          "reference": "/assets/backgrounds/warm-bokeh.jpg",
+          "path": "sections[2].options.pictureUrl"
+        }
+      ],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Preview media is not included. Supply or replace the listed authored asset references; relative references remain unchanged and must resolve in your configured assets/media directory.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Real-estate listing",
+        "description": "A three-scene listing reel laid out in HTML and CSS over interior photos: an address card and price tag, a spec panel with a stat row and feature chips, then the agent's contact card under an open-visit badge. Every fact comes from a typed field.",
+        "creativeDirection": "Audience: estate agents who post listings as short videos. Direction: the photos carry the mood, the cards carry the facts, one idea per scene. Scene one says where and how much: the address card rises bottom left once the push-in has started, the price tag slides in from the right half a second later. Scene two says what you get: a stat row (rooms, area, floor) and feature chips settle on the right while the camera drifts. Scene three says what to do: the open-visit badge drops in, then the agent's card with a round portrait. Push and zoom-through transitions keep the reel moving; nothing waits more than a beat. Copy comes from the fields, so the same template lists any property. Review: text crisp at 720p, round corners, nothing cut at a card's edge, the price never covers the lamp, and every layer is hidden until its entrance."
+      },
+      "global": {
+        "orientation": "landscape",
+        "musicEnabled": false,
+        "theme": {
+          "extends": "leclap",
+          "fonts": {
+            "body": "rubik"
+          }
+        },
+        "transition": {
+          "type": "cut"
+        },
+        "fields": {
+          "address": {
+            "type": "text",
+            "default": "12 rue des Lilas",
+            "maxLength": 40,
+            "label": {
+              "en": "Address"
+            }
+          },
+          "city": {
+            "type": "text",
+            "default": "Lyon 3e · 69003",
+            "maxLength": 40,
+            "label": {
+              "en": "City"
+            }
+          },
+          "price": {
+            "type": "text",
+            "default": "420 000 €",
+            "maxLength": 20,
+            "label": {
+              "en": "Price"
+            }
+          },
+          "rooms": {
+            "type": "text",
+            "default": "4",
+            "maxLength": 6,
+            "label": {
+              "en": "Rooms"
+            }
+          },
+          "area": {
+            "type": "text",
+            "default": "92 m²",
+            "maxLength": 12,
+            "label": {
+              "en": "Living area"
+            }
+          },
+          "floor": {
+            "type": "text",
+            "default": "3rd",
+            "maxLength": 8,
+            "label": {
+              "en": "Floor"
+            }
+          },
+          "visit": {
+            "type": "text",
+            "default": "Saturday 10–12",
+            "maxLength": 24,
+            "label": {
+              "en": "Open visit"
+            }
+          },
+          "agent": {
+            "type": "text",
+            "default": "Claire Dumas",
+            "maxLength": 28,
+            "label": {
+              "en": "Agent"
+            }
+          },
+          "agency": {
+            "type": "text",
+            "default": "Maison Lumière",
+            "maxLength": 32,
+            "label": {
+              "en": "Agency"
+            }
+          },
+          "phone": {
+            "type": "text",
+            "default": "04 72 00 12 34",
+            "maxLength": 20,
+            "label": {
+              "en": "Phone"
+            }
+          }
+        }
+      },
+      "sections": [
+        {
+          "name": "address",
+          "type": "image_background",
+          "purpose": "Where the property is and what it costs.",
+          "options": {
+            "pictureUrl": "/assets/backgrounds/sage-wall.jpg",
+            "duration": 4
+          },
+          "camera": {
+            "preset": "push-in",
+            "amount": 0.04,
+            "includeText": false
+          },
+          "transition": {
+            "type": "push-left",
+            "duration": 0.5
+          },
+          "inputs": [
+            {
+              "name": "address_card",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"card\"><span class=\"tag\">For sale</span><h2>{{ address }}</h2><p>{{ city }}</p></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 34px } .card { flex-grow: 1; display: flex; flex-direction: column; gap: 6px; padding: 26px 32px 30px; border-radius: 28px; background: $color.surface@0.94; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35)} .tag { color: $color.accent; font: 600 20px $font.body; text-transform: uppercase; letter-spacing: 3px } h2 { margin: 4px 0 0; color: $color.fg; font: 64px $font.display; line-height: 1 } p { margin: 0; color: $color.muted; font: 400 24px $font.body }",
+              "width": 608,
+              "height": 264,
+              "options": {
+                "position": "32:420",
+                "start": 0.3,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.3,
+                  "duration": 0.7,
+                  "distance": 48,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "price_tag",
+              "type": "html",
+              "html": "<div class=\"price\"><small>Asking price</small><strong>{{ price }}</strong></div>",
+              "css": ".price { display: flex; flex-direction: column; align-items: flex-end; padding: 16px 24px; border-radius: 20px; background: $color.accent } small { color: $color.bg; font: 600 16px $font.body; text-transform: uppercase; letter-spacing: 2px } strong { color: $color.bg; font: 52px $font.display; line-height: 1.1 }",
+              "width": 300,
+              "height": 120,
+              "options": {
+                "position": "56:56",
+                "start": 0.9,
+                "motion": {
+                  "type": "slide-left",
+                  "delay": 0.9,
+                  "duration": 0.6,
+                  "distance": 80,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "details",
+          "type": "image_background",
+          "purpose": "What the property offers, in figures and features.",
+          "options": {
+            "pictureUrl": "/assets/backgrounds/cafe-table.jpg",
+            "duration": 3.8
+          },
+          "camera": {
+            "preset": "drift-left",
+            "amount": 0.04,
+            "includeText": false
+          },
+          "transition": {
+            "type": "zoom-through",
+            "duration": 0.5
+          },
+          "inputs": [
+            {
+              "name": "spec_stats",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"row\"><div class=\"stat\"><strong>{{ rooms }}</strong><span>rooms</span></div><div class=\"stat\"><strong>{{ area }}</strong><span>living area</span></div><div class=\"stat\"><strong>{{ floor }}</strong><span>floor, lift</span></div></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 34px } .row { flex-grow: 1; display: flex; gap: 12px } .stat { display: flex; flex-direction: column; flex-grow: 1; padding: 18px 22px 20px; border-radius: 20px; background: $color.surface@0.94; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35)} strong { color: $color.fg; font: 56px $font.display; line-height: 1; white-space: nowrap } span { margin-top: 4px; color: $color.muted; font: 400 20px $font.body }",
+              "width": 588,
+              "height": 184,
+              "options": {
+                "position": "660:120",
+                "start": 0.5,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.5,
+                  "duration": 0.6,
+                  "distance": 40,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "spec_chips",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"panel\"><span class=\"label\">Highlights</span><div class=\"chips\"><span class=\"chip\">Balcony</span><span class=\"chip\">Parquet floors</span><span class=\"chip\">South facing</span><span class=\"chip\">Cellar</span><span class=\"chip\">Fibre</span></div></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 34px } .panel { flex-grow: 1; display: flex; flex-direction: column; gap: 14px; padding: 22px 24px 24px; border-radius: 20px; background: $color.surface@0.94; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35)} .label { color: $color.accent; font: 600 18px $font.body; text-transform: uppercase; letter-spacing: 3px } .chips { display: flex; flex-wrap: wrap; gap: 10px } .chip { padding: 8px 16px; border-radius: 999px; border: 2px solid $color.brand@0.6; color: $color.fg; font: 500 22px $font.body }",
+              "width": 588,
+              "height": 224,
+              "options": {
+                "position": "660:290",
+                "start": 0.9,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.9,
+                  "duration": 0.6,
+                  "distance": 40,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "visit",
+          "type": "image_background",
+          "purpose": "Who to call and when to come.",
+          "options": {
+            "pictureUrl": "/assets/backgrounds/warm-bokeh.jpg",
+            "duration": 3.6
+          },
+          "camera": {
+            "preset": "push-in",
+            "amount": 0.05,
+            "includeText": false
+          },
+          "inputs": [
+            {
+              "name": "visit_badge",
+              "type": "html",
+              "html": "<div class=\"badge\"><span class=\"dot\"></span><span class=\"label\">Open visit</span><strong>{{ visit }}</strong></div>",
+              "css": ".badge { display: flex; align-items: center; align-self: center; gap: 12px; padding: 14px 26px; border-radius: 999px; background: $color.accent } .dot { width: 14px; height: 14px; border-radius: 7px; background: $color.bg } .label { color: $color.bg; font: 600 20px $font.body; text-transform: uppercase; letter-spacing: 2px } strong { color: $color.bg; font: 40px $font.display; line-height: 1 }",
+              "width": 480,
+              "height": 72,
+              "options": {
+                "position": "400:180",
+                "start": 0.5,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.5,
+                  "duration": 0.5,
+                  "distance": 32,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "agent_card",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"card\"><img class=\"portrait\" src=\"/assets/backgrounds/golden-hour.jpg\" /><div class=\"who\"><span class=\"role\">Your agent</span><h3>{{ agent }}</h3><p>{{ agency }}</p><span class=\"phone\">{{ phone }}</span></div></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 34px } .card { flex-grow: 1; display: flex; align-items: center; gap: 28px; padding: 26px 34px 26px 26px; border-radius: 28px; background: $color.surface@0.95; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35)} .portrait { width: 132px; height: 132px; border-radius: 66px; object-fit: cover; object-position: 40% 30%; border: 4px solid $color.accent } .who { display: flex; flex-direction: column } .role { color: $color.accent; font: 600 16px $font.body; text-transform: uppercase; letter-spacing: 3px } h3 { margin: 4px 0 0; color: $color.fg; font: 52px $font.display; line-height: 1 } p { margin: 2px 0 0; color: $color.muted; font: 400 22px $font.body } .phone { margin-top: 10px; color: $color.fg; font: 500 26px $font.mono; letter-spacing: 1px }",
+              "width": 648,
+              "height": 234,
+              "options": {
+                "position": "316:280",
+                "start": 0.9,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.9,
+                  "duration": 0.6,
+                  "distance": 40,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "html-testimonial",
+    "title": "HTML layers: testimonial",
+    "description": "A vertical Reels testimonial: a serif quote with bold accent words inside one sentence, a round customer portrait, star rating chips cut with clip-path, then a shop card.",
+    "category": "effects",
+    "source": "examples/motion-design/html-testimonial.json",
+    "orientation": "portrait",
+    "backend": "native",
+    "creativeDirection": "Audience: small shops that turn a customer review into a Reel. Direction: the words are the hero. A large serif quote fills the upper half, with the two words that sell set bold in the accent colour inside the sentence; the opening quote mark fades in first, the quote rises, then the customer slides in with a round portrait and the rating lands last as five star chips. A push-up transition hands over to a calm shop card. Everything stays inside the Reels safe zone, clear of the header, the caption row and the action buttons. Review: the quote reads in one pass, line breaks never strand a single word, stars are crisp, the portrait is round with no square corner, and each layer waits for its entrance.",
+    "showcasePath": "/showcase?sample=html-testimonial",
+    "preview": {
+      "video": "/videos/showcase/html-testimonial.mp4",
+      "poster": "/videos/showcase/html-testimonial.webp",
+      "template": "/videos/showcase/html-testimonial.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [
+        {
+          "name": "quote_lead",
+          "placeholders": ["{{ quote_lead }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "quote_highlight",
+          "placeholders": ["{{ quote_highlight }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "quote_tail",
+          "placeholders": ["{{ quote_tail }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "customer",
+          "placeholders": ["{{ customer }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "customer_role",
+          "placeholders": ["{{ customer_role }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "rating",
+          "placeholders": ["{{ rating }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "shop",
+          "placeholders": ["{{ shop }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "offer",
+          "placeholders": ["{{ offer }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "cta",
+          "placeholders": ["{{ cta }}"],
+          "source": "placeholder"
+        }
+      ],
+      "assets": [
+        {
+          "kind": "image",
+          "reference": "/assets/backgrounds/pink-sunset.jpg",
+          "path": "sections[0].options.pictureUrl"
+        },
+        {
+          "kind": "image",
+          "reference": "/assets/backgrounds/monstera-leaves.jpg",
+          "path": "sections[1].options.pictureUrl"
+        }
+      ],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Preview media is not included. Supply or replace the listed authored asset references; relative references remain unchanged and must resolve in your configured assets/media directory.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Customer testimonial",
+        "description": "A vertical testimonial for Reels laid out in HTML and CSS: a serif quote with bold and accent words inside one sentence, a round customer portrait with name and role, star rating chips drawn with clip-path, then a shop card.",
+        "creativeDirection": "Audience: small shops that turn a customer review into a Reel. Direction: the words are the hero. A large serif quote fills the upper half, with the two words that sell set bold in the accent colour inside the sentence; the opening quote mark fades in first, the quote rises, then the customer slides in with a round portrait and the rating lands last as five star chips. A push-up transition hands over to a calm shop card. Everything stays inside the Reels safe zone, clear of the header, the caption row and the action buttons. Review: the quote reads in one pass, line breaks never strand a single word, stars are crisp, the portrait is round with no square corner, and each layer waits for its entrance."
+      },
+      "global": {
+        "orientation": "portrait",
+        "platform": "reels",
+        "musicEnabled": false,
+        "theme": {
+          "extends": "editorial",
+          "fonts": {
+            "body": "rubik"
+          }
+        },
+        "transition": {
+          "type": "cut"
+        },
+        "fields": {
+          "quote_lead": {
+            "type": "text",
+            "default": "The cups arrived in",
+            "maxLength": 40,
+            "label": {
+              "en": "Quote, before the highlight"
+            }
+          },
+          "quote_highlight": {
+            "type": "text",
+            "default": "two days",
+            "maxLength": 24,
+            "label": {
+              "en": "Quote, highlighted words"
+            }
+          },
+          "quote_tail": {
+            "type": "text",
+            "default": "and look even better on our shelves.",
+            "maxLength": 60,
+            "label": {
+              "en": "Quote, after the highlight"
+            }
+          },
+          "customer": {
+            "type": "text",
+            "default": "Inès Moreau",
+            "maxLength": 28,
+            "label": {
+              "en": "Customer name"
+            }
+          },
+          "customer_role": {
+            "type": "text",
+            "default": "Owner, Café Lumen",
+            "maxLength": 32,
+            "label": {
+              "en": "Customer role"
+            }
+          },
+          "rating": {
+            "type": "text",
+            "default": "4.9 / 5",
+            "maxLength": 10,
+            "label": {
+              "en": "Rating"
+            }
+          },
+          "shop": {
+            "type": "text",
+            "default": "Atelier Nord",
+            "maxLength": 24,
+            "label": {
+              "en": "Shop"
+            }
+          },
+          "offer": {
+            "type": "text",
+            "default": "Stoneware, made in small batches",
+            "maxLength": 40,
+            "label": {
+              "en": "Shop line"
+            }
+          },
+          "cta": {
+            "type": "text",
+            "default": "Shop the collection",
+            "maxLength": 28,
+            "label": {
+              "en": "Call to action"
+            }
+          }
+        }
+      },
+      "sections": [
+        {
+          "name": "review",
+          "type": "image_background",
+          "purpose": "Let a customer say it, with the proof underneath.",
+          "options": {
+            "pictureUrl": "/assets/backgrounds/pink-sunset.jpg",
+            "duration": 5.2
+          },
+          "camera": {
+            "preset": "push-in",
+            "amount": 0.05,
+            "includeText": false
+          },
+          "transition": {
+            "type": "push-up",
+            "duration": 0.5
+          },
+          "inputs": [
+            {
+              "name": "quote_mark",
+              "type": "html",
+              "html": "<div class=\"mark\">“</div>",
+              "css": ".mark { display: flex; color: $color.accent; font: 700 220px $font.display; line-height: 0.9 }",
+              "width": 160,
+              "height": 200,
+              "options": {
+                "position": "44:160",
+                "start": 0.2,
+                "motion": {
+                  "type": "fade",
+                  "delay": 0.2,
+                  "duration": 0.5
+                }
+              }
+            },
+            {
+              "name": "quote_text",
+              "type": "html",
+              "html": "<p class=\"quote\">{{ quote_lead }} <strong>{{ quote_highlight }}</strong> {{ quote_tail }}</p>",
+              "css": ".quote { margin: 0; color: $color.fg; font: 400 64px $font.display; line-height: 1.1; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45) } strong { color: $color.accent; font-weight: 800 }",
+              "width": 584,
+              "height": 380,
+              "options": {
+                "position": "44:310",
+                "start": 0.5,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.5,
+                  "duration": 0.7,
+                  "distance": 40,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "customer_row",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"row\"><img class=\"portrait\" src=\"/assets/backgrounds/golden-hour.jpg\" /><div class=\"who\"><strong>{{ customer }}</strong><span>{{ customer_role }}</span></div></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 30px } .row { display: flex; align-items: center; gap: 22px; padding: 16px 30px 16px 16px; border-radius: 999px; background: $color.surface@0.9; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) } .portrait { width: 96px; height: 96px; border-radius: 48px; object-fit: cover; object-position: 40% 30%; border: 3px solid $color.accent } .who { display: flex; flex-direction: column } strong { color: $color.fg; font: 600 34px $font.body } span { color: $color.muted; font: 400 24px $font.body }",
+              "width": 584,
+              "height": 162,
+              "options": {
+                "position": "20:700",
+                "start": 1.3,
+                "motion": {
+                  "type": "slide-right",
+                  "delay": 1.3,
+                  "duration": 0.6,
+                  "distance": 60,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "rating_chips",
+              "type": "html",
+              "html": "<div class=\"row\"><div class=\"chip\"><span class=\"star\"></span></div><div class=\"chip\"><span class=\"star\"></span></div><div class=\"chip\"><span class=\"star\"></span></div><div class=\"chip\"><span class=\"star\"></span></div><div class=\"chip\"><span class=\"star\"></span></div><div class=\"score\">{{ rating }}</div></div>",
+              "css": ".row { display: flex; align-items: center; gap: 10px } .chip { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 18px; background: $color.accent } .star { width: 38px; height: 38px; background: $color.bg; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%) } .score { display: flex; margin-left: 10px; padding: 12px 22px; border-radius: 999px; background: $color.surface@0.9; color: $color.fg; font: 600 30px $font.body }",
+              "width": 584,
+              "height": 72,
+              "options": {
+                "position": "44:880",
+                "start": 1.9,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1.9,
+                  "duration": 0.5,
+                  "distance": 30,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "shop",
+          "type": "image_background",
+          "purpose": "Name the shop and send the viewer to it.",
+          "options": {
+            "pictureUrl": "/assets/backgrounds/monstera-leaves.jpg",
+            "duration": 2.8
+          },
+          "camera": {
+            "preset": "drift-up",
+            "amount": 0.04,
+            "includeText": false
+          },
+          "inputs": [
+            {
+              "name": "shop_card",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"card\"><span class=\"kicker\">Thank you for the review</span><h2>{{ shop }}</h2><p>{{ offer }}</p><div class=\"cta\">{{ cta }}</div></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 34px } .card { display: flex; flex-direction: column; align-items: center; flex-grow: 1; gap: 8px; padding: 40px 36px 36px; border-radius: 32px; background: $color.surface@0.94; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) } .kicker { color: $color.accent; font: 600 20px $font.body; text-transform: uppercase; letter-spacing: 3px } h2 { margin: 6px 0 0; color: $color.fg; font: 700 76px $font.display; line-height: 1 } p { margin: 0; color: $color.muted; font: 400 26px $font.body; text-align: center } .cta { display: flex; margin-top: 22px; padding: 16px 34px; border-radius: 999px; background: $color.accent; color: $color.bg; font: 600 28px $font.body }",
+              "width": 584,
+              "height": 380,
+              "options": {
+                "position": "44:380",
+                "start": 0.5,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.5,
+                  "duration": 0.7,
+                  "distance": 40,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "html-speaker",
+    "title": "HTML layers: speaker card",
+    "description": "A conference opener and lower third: a wordmark set from text, date and venue badges, the speaker on an accent rule, a talk title that wraps in its box, and time, room and track badges.",
+    "category": "effects",
+    "source": "examples/motion-design/html-speaker.json",
+    "orientation": "landscape",
+    "backend": "native",
+    "creativeDirection": "Audience: event teams who cut a short clip for every talk. Direction: a conference look that holds up on a stage screen and on a phone. The opener is the event: the wordmark rises over the night sky, then the date and venue badges settle under it. A swipe hands over to the speaker beat, where the lower third builds in three steps: the name on its accent rule, the talk title in a box that wraps a long title over two lines, then the time, room and track badges. A small wordmark bug keeps the event on screen. Review: the long talk title wraps without cutting a word, the badges line up with the title box, nothing sits on the right-hand edge, and no layer shows before its entrance.",
+    "showcasePath": "/showcase?sample=html-speaker",
+    "preview": {
+      "video": "/videos/showcase/html-speaker.mp4",
+      "poster": "/videos/showcase/html-speaker.webp",
+      "template": "/videos/showcase/html-speaker.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [
+        {
+          "name": "event_first",
+          "placeholders": ["{{ event_first }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "event_second",
+          "placeholders": ["{{ event_second }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "event_date",
+          "placeholders": ["{{ event_date }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "event_venue",
+          "placeholders": ["{{ event_venue }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "speaker",
+          "placeholders": ["{{ speaker }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "speaker_role",
+          "placeholders": ["{{ speaker_role }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "talk_title",
+          "placeholders": ["{{ talk_title }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "talk_time",
+          "placeholders": ["{{ talk_time }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "talk_room",
+          "placeholders": ["{{ talk_room }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "talk_track",
+          "placeholders": ["{{ talk_track }}"],
+          "source": "placeholder"
+        }
+      ],
+      "assets": [
+        {
+          "kind": "image",
+          "reference": "/assets/backgrounds/milky-way.jpg",
+          "path": "sections[0].options.pictureUrl"
+        },
+        {
+          "kind": "image",
+          "reference": "/assets/backgrounds/concrete-lines.jpg",
+          "path": "sections[1].options.pictureUrl"
+        }
+      ],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Preview media is not included. Supply or replace the listed authored asset references; relative references remain unchanged and must resolve in your configured assets/media directory.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Conference speaker card",
+        "description": "An event opener and a speaker lower third laid out in HTML and CSS: a wordmark set from text, date and venue badges, the speaker’s name on an accent rule, the talk title wrapped in its own box, and time, room and track badges.",
+        "creativeDirection": "Audience: event teams who cut a short clip for every talk. Direction: a conference look that holds up on a stage screen and on a phone. The opener is the event: the wordmark rises over the night sky, then the date and venue badges settle under it. A swipe hands over to the speaker beat, where the lower third builds in three steps: the name on its accent rule, the talk title in a box that wraps a long title over two lines, then the time, room and track badges. A small wordmark bug keeps the event on screen. Review: the long talk title wraps without cutting a word, the badges line up with the title box, nothing sits on the right-hand edge, and no layer shows before its entrance."
+      },
+      "global": {
+        "orientation": "landscape",
+        "musicEnabled": false,
+        "theme": {
+          "extends": "midnight",
+          "fonts": {
+            "body": "rubik"
+          }
+        },
+        "transition": {
+          "type": "cut"
+        },
+        "fields": {
+          "event_first": {
+            "type": "text",
+            "default": "Motion",
+            "maxLength": 14,
+            "label": {
+              "en": "Event name, first word"
+            }
+          },
+          "event_second": {
+            "type": "text",
+            "default": "Days",
+            "maxLength": 10,
+            "label": {
+              "en": "Event name, highlighted word"
+            }
+          },
+          "event_date": {
+            "type": "text",
+            "default": "14–15 Nov 2026",
+            "maxLength": 24,
+            "label": {
+              "en": "Dates"
+            }
+          },
+          "event_venue": {
+            "type": "text",
+            "default": "Lyon · La Sucrière",
+            "maxLength": 32,
+            "label": {
+              "en": "Venue"
+            }
+          },
+          "speaker": {
+            "type": "text",
+            "default": "Samir Haddad",
+            "maxLength": 28,
+            "label": {
+              "en": "Speaker"
+            }
+          },
+          "speaker_role": {
+            "type": "text",
+            "default": "Motion lead, Studio Kite",
+            "maxLength": 40,
+            "label": {
+              "en": "Speaker role"
+            }
+          },
+          "talk_title": {
+            "type": "text",
+            "default": "HTML cards in a video engine: layouts that fill themselves in",
+            "maxLength": 90,
+            "label": {
+              "en": "Talk title"
+            }
+          },
+          "talk_time": {
+            "type": "text",
+            "default": "14:30",
+            "maxLength": 8,
+            "label": {
+              "en": "Time"
+            }
+          },
+          "talk_room": {
+            "type": "text",
+            "default": "Room B · Hall 2",
+            "maxLength": 24,
+            "label": {
+              "en": "Room"
+            }
+          },
+          "talk_track": {
+            "type": "text",
+            "default": "Motion track",
+            "maxLength": 20,
+            "label": {
+              "en": "Track"
+            }
+          }
+        }
+      },
+      "sections": [
+        {
+          "name": "opener",
+          "type": "image_background",
+          "purpose": "Say which event this is, when and where.",
+          "options": {
+            "pictureUrl": "/assets/backgrounds/milky-way.jpg",
+            "duration": 3.2
+          },
+          "camera": {
+            "preset": "push-in",
+            "amount": 0.06,
+            "includeText": false
+          },
+          "transition": {
+            "type": "swipe-left",
+            "duration": 0.5
+          },
+          "inputs": [
+            {
+              "name": "event_wordmark",
+              "type": "html",
+              "html": "<div class=\"mark\"><span class=\"one\">{{ event_first }}</span><span class=\"two\">{{ event_second }}</span></div>",
+              "css": ".mark { display: flex; align-items: center; gap: 16px } .one { color: $color.fg; font: 130px $font.display; letter-spacing: 5px } .two { padding: 0 18px; border-radius: 16px; background: $color.accent; color: $color.bg; font: 130px $font.display; letter-spacing: 5px } .mark { justify-content: center }",
+              "width": 900,
+              "height": 190,
+              "options": {
+                "position": "190:220",
+                "start": 0.3,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.3,
+                  "duration": 0.8,
+                  "distance": 50,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "event_badges",
+              "type": "html",
+              "html": "<div class=\"row\"><span class=\"badge\">{{ event_date }}</span><span class=\"badge alt\">{{ event_venue }}</span></div>",
+              "css": ".row { display: flex; justify-content: center; gap: 14px } .badge { padding: 12px 24px; border-radius: 999px; border: 2px solid $color.accent; color: $color.fg; font: 500 28px $font.body } .badge.alt { border-color: $color.muted@0.6; background: $color.surface@0.7 }",
+              "width": 900,
+              "height": 70,
+              "options": {
+                "position": "190:420",
+                "start": 1,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1,
+                  "duration": 0.6,
+                  "distance": 30,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "speaker",
+          "type": "image_background",
+          "purpose": "Who is speaking, about what, and where to find the talk.",
+          "options": {
+            "pictureUrl": "/assets/backgrounds/concrete-lines.jpg",
+            "duration": 4.8
+          },
+          "camera": {
+            "preset": "drift-right",
+            "amount": 0.04,
+            "includeText": false
+          },
+          "inputs": [
+            {
+              "name": "event_bug",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"bug\"><div class=\"mark\"><span class=\"one\">{{ event_first }}</span><span class=\"two\">{{ event_second }}</span></div></div></div>",
+              "css": ".mark { display: flex; align-items: center; gap: 4px } .one { color: $color.fg; font: 34px $font.display; letter-spacing: 1px } .two { padding: 0 5px; border-radius: 4px; background: $color.accent; color: $color.bg; font: 34px $font.display; letter-spacing: 1px } .wrap { display: flex; align-items: flex-start } .bug { display: flex; padding: 10px 16px; border-radius: 12px; background: $color.bg@0.85 }",
+              "width": 260,
+              "height": 64,
+              "options": {
+                "position": "56:48",
+                "start": 0.4,
+                "motion": {
+                  "type": "fade",
+                  "delay": 0.4,
+                  "duration": 0.4
+                }
+              }
+            },
+            {
+              "name": "speaker_name",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"name\"><h2>{{ speaker }}</h2><p>{{ speaker_role }}</p></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 30px } .name { display: flex; flex-direction: column; flex-grow: 1; padding: 20px 28px 22px; border-left: 10px solid $color.accent; border-radius: 6px 18px 18px 6px; background: $color.bg@0.92; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) } h2 { margin: 0; color: $color.fg; font: 76px $font.display; line-height: 1; letter-spacing: 1px } p { margin: 4px 0 0; color: $color.muted; font: 400 26px $font.body }",
+              "width": 588,
+              "height": 184,
+              "options": {
+                "position": "32:448",
+                "start": 0.5,
+                "motion": {
+                  "type": "slide-right",
+                  "delay": 0.5,
+                  "duration": 0.6,
+                  "distance": 60,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "talk_box",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"talk\"><span class=\"kicker\">Now on stage</span><p>{{ talk_title }}</p></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 30px } .talk { display: flex; flex-direction: column; flex-grow: 1; gap: 8px; padding: 20px 26px 24px; border-radius: 18px; background: $color.surface@0.94; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) } .kicker { color: $color.accent; font: 600 18px $font.body; text-transform: uppercase; letter-spacing: 3px } p { margin: 0; color: $color.fg; font: 600 32px $font.body; line-height: 1.2 }",
+              "width": 600,
+              "height": 184,
+              "options": {
+                "position": "640:392",
+                "start": 1,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1,
+                  "duration": 0.6,
+                  "distance": 40,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "talk_badges",
+              "type": "html",
+              "html": "<div class=\"row\"><span class=\"badge time\">{{ talk_time }}</span><span class=\"badge\">{{ talk_room }}</span><span class=\"badge\">{{ talk_track }}</span></div>",
+              "css": ".row { display: flex; gap: 10px } .badge { padding: 10px 18px; border-radius: 12px; background: $color.bg@0.92; color: $color.fg; font: 500 24px $font.body } .badge.time { background: $color.accent; color: $color.bg; font: 700 24px $font.mono }",
+              "width": 552,
+              "height": 60,
+              "options": {
+                "position": "664:556",
+                "start": 1.5,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1.5,
+                  "duration": 0.5,
+                  "distance": 24,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "html-stats",
+    "title": "HTML layers: stats dashboard",
+    "description": "A square stat board and spec sheet: a header on an accent bar, four stat tiles landing in reading order, and a two-column spec list with values aligned right. A landscape cut is composed with $format.",
+    "category": "effects",
+    "source": "examples/motion-design/html-stats.json",
+    "orientation": "square",
+    "backend": "native",
+    "creativeDirection": "Audience: product and developer-relations teams posting release numbers to a feed. Direction: a quiet, typographic data board on the mono theme: white canvas, black ink, one electric-blue tile. The header rises first, then the four stat tiles land one after another left to right and top to bottom, so the eye reads them in order; the camera pushes in slightly under them. A push-up hands over to the spec sheet: labels left, values right in the monospace face, hairline rules between rows, and a badge that states the one claim worth remembering. The landscape cut lays the tiles in a single row and keeps the same order. Review: numbers are crisp and never wrap, each value lines up on the right edge, rules do not touch the text, no tile shows before its entrance, and nothing is cut at a box edge.",
+    "showcasePath": "/showcase?sample=html-stats",
+    "preview": {
+      "video": "/videos/showcase/html-stats.mp4",
+      "poster": "/videos/showcase/html-stats.webp",
+      "template": "/videos/showcase/html-stats.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [
+        {
+          "name": "product",
+          "placeholders": ["{{ product }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "release",
+          "placeholders": ["{{ release }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "samples",
+          "placeholders": ["{{ samples }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "tools",
+          "placeholders": ["{{ tools }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "platforms",
+          "placeholders": ["{{ platforms }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "fonts",
+          "placeholders": ["{{ fonts }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "claim",
+          "placeholders": ["{{ claim }}"],
+          "source": "placeholder"
+        }
+      ],
+      "assets": [],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Product spec dashboard",
+        "description": "A square stat dashboard and spec sheet laid out in HTML and CSS: a header on an accent bar, four stat tiles that land one after another, then a table-like spec list with labels and values aligned in two columns. A landscape cut is composed with $format.",
+        "creativeDirection": "Audience: product and developer-relations teams posting release numbers to a feed. Direction: a quiet, typographic data board on the mono theme: white canvas, black ink, one electric-blue tile. The header rises first, then the four stat tiles land one after another left to right and top to bottom, so the eye reads them in order; the camera pushes in slightly under them. A push-up hands over to the spec sheet: labels left, values right in the monospace face, hairline rules between rows, and a badge that states the one claim worth remembering. The landscape cut lays the tiles in a single row and keeps the same order. Review: numbers are crisp and never wrap, each value lines up on the right edge, rules do not touch the text, no tile shows before its entrance, and nothing is cut at a box edge."
+      },
+      "global": {
+        "orientation": "square",
+        "platform": "square-feed",
+        "musicEnabled": false,
+        "theme": {
+          "extends": "mono",
+          "fonts": {
+            "body": "rubik"
+          }
+        },
+        "transition": {
+          "type": "cut"
+        },
+        "fields": {
+          "product": {
+            "type": "text",
+            "default": "LeClap",
+            "maxLength": 20,
+            "label": {
+              "en": "Product"
+            }
+          },
+          "release": {
+            "type": "text",
+            "default": "Autumn release",
+            "maxLength": 28,
+            "label": {
+              "en": "Release"
+            }
+          },
+          "samples": {
+            "type": "text",
+            "default": "51",
+            "maxLength": 4,
+            "label": {
+              "en": "Samples"
+            }
+          },
+          "tools": {
+            "type": "text",
+            "default": "14",
+            "maxLength": 4,
+            "label": {
+              "en": "Tools"
+            }
+          },
+          "platforms": {
+            "type": "text",
+            "default": "3",
+            "maxLength": 4,
+            "label": {
+              "en": "Platforms"
+            }
+          },
+          "fonts": {
+            "type": "text",
+            "default": "14",
+            "maxLength": 4,
+            "label": {
+              "en": "Fonts"
+            }
+          },
+          "claim": {
+            "type": "text",
+            "default": "Same layer, same bytes on every platform",
+            "maxLength": 48,
+            "label": {
+              "en": "Claim"
+            }
+          }
+        }
+      },
+      "sections": [
+        {
+          "name": "numbers",
+          "type": "color_background",
+          "purpose": "Four numbers that size the product, read in order.",
+          "options": {
+            "backgroundColor": "$color.bg",
+            "duration": 4.4
+          },
+          "camera": {
+            "preset": "push-in",
+            "amount": 0.03,
+            "delay": 0.4,
+            "includeText": false
+          },
+          "transition": {
+            "type": "push-up",
+            "duration": 0.5
+          },
+          "inputs": [
+            {
+              "name": "board_header",
+              "type": "html",
+              "html": "<div class=\"head\"><span class=\"bar\"></span><div class=\"titles\"><span class=\"kicker\">{{ product }} · {{ release }}</span><h1>In numbers</h1></div></div>",
+              "css": ".head { display: flex; align-items: stretch; gap: 26px } .bar { width: 14px; background: $color.accent } .titles { display: flex; flex-direction: column } .kicker { color: $color.muted; font: 500 30px $font.mono; text-transform: uppercase; letter-spacing: 2px } h1 { margin: 6px 0 0; color: $color.fg; font: 110px $font.display; line-height: 1; letter-spacing: -3px }",
+              "width": {
+                "$format": {
+                  "square": 920,
+                  "landscape": 1152
+                }
+              },
+              "height": 170,
+              "options": {
+                "position": {
+                  "$format": {
+                    "square": "80:90",
+                    "landscape": "64:48"
+                  }
+                },
+                "start": 0.2,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.2,
+                  "duration": 0.6,
+                  "distance": 30,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "stat_samples",
+              "type": "html",
+              "html": "<div class=\"tile accent\"><strong>{{ samples }}</strong><span>samples</span><small>in the showcase</small></div>",
+              "css": ".tile { display: flex; flex-direction: column; justify-content: flex-end; flex-grow: 1; padding: 26px 30px 28px; background: $color.surface; border-top: 10px solid $color.fg } .tile.accent { background: $color.accent; border-top-color: $color.accent } strong { color: $color.fg; font: 136px $font.display; line-height: 0.9; letter-spacing: -4px } .tile.accent strong { color: $color.bg } .tile.accent span, .tile.accent small { color: $color.bg } span { margin-top: 12px; color: $color.fg; font: 600 30px $font.body } small { margin-top: 2px; color: $color.muted; font: 400 22px $font.mono }",
+              "width": {
+                "$format": {
+                  "square": 450,
+                  "landscape": 272
+                }
+              },
+              "height": {
+                "$format": {
+                  "square": 330,
+                  "landscape": 330
+                }
+              },
+              "options": {
+                "position": {
+                  "$format": {
+                    "square": "80:310",
+                    "landscape": "64:250"
+                  }
+                },
+                "start": 0.5,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.5,
+                  "duration": 0.5,
+                  "distance": 36,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "stat_tools",
+              "type": "html",
+              "html": "<div class=\"tile\"><strong>{{ tools }}</strong><span>MCP tools</span><small>agent-callable</small></div>",
+              "css": ".tile { display: flex; flex-direction: column; justify-content: flex-end; flex-grow: 1; padding: 26px 30px 28px; background: $color.surface; border-top: 10px solid $color.fg } .tile.accent { background: $color.accent; border-top-color: $color.accent } strong { color: $color.fg; font: 136px $font.display; line-height: 0.9; letter-spacing: -4px } .tile.accent strong { color: $color.bg } .tile.accent span, .tile.accent small { color: $color.bg } span { margin-top: 12px; color: $color.fg; font: 600 30px $font.body } small { margin-top: 2px; color: $color.muted; font: 400 22px $font.mono }",
+              "width": {
+                "$format": {
+                  "square": 450,
+                  "landscape": 272
+                }
+              },
+              "height": {
+                "$format": {
+                  "square": 330,
+                  "landscape": 330
+                }
+              },
+              "options": {
+                "position": {
+                  "$format": {
+                    "square": "550:310",
+                    "landscape": "352:250"
+                  }
+                },
+                "start": 0.65,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.65,
+                  "duration": 0.5,
+                  "distance": 36,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "stat_platforms",
+              "type": "html",
+              "html": "<div class=\"tile\"><strong>{{ platforms }}</strong><span>platforms</span><small>node, web, phone</small></div>",
+              "css": ".tile { display: flex; flex-direction: column; justify-content: flex-end; flex-grow: 1; padding: 26px 30px 28px; background: $color.surface; border-top: 10px solid $color.fg } .tile.accent { background: $color.accent; border-top-color: $color.accent } strong { color: $color.fg; font: 136px $font.display; line-height: 0.9; letter-spacing: -4px } .tile.accent strong { color: $color.bg } .tile.accent span, .tile.accent small { color: $color.bg } span { margin-top: 12px; color: $color.fg; font: 600 30px $font.body } small { margin-top: 2px; color: $color.muted; font: 400 22px $font.mono }",
+              "width": {
+                "$format": {
+                  "square": 450,
+                  "landscape": 272
+                }
+              },
+              "height": {
+                "$format": {
+                  "square": 330,
+                  "landscape": 330
+                }
+              },
+              "options": {
+                "position": {
+                  "$format": {
+                    "square": "80:660",
+                    "landscape": "640:250"
+                  }
+                },
+                "start": 0.8,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.8,
+                  "duration": 0.5,
+                  "distance": 36,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "stat_fonts",
+              "type": "html",
+              "html": "<div class=\"tile\"><strong>{{ fonts }}</strong><span>bundled fonts</span><small>offline, no CDN</small></div>",
+              "css": ".tile { display: flex; flex-direction: column; justify-content: flex-end; flex-grow: 1; padding: 26px 30px 28px; background: $color.surface; border-top: 10px solid $color.fg } .tile.accent { background: $color.accent; border-top-color: $color.accent } strong { color: $color.fg; font: 136px $font.display; line-height: 0.9; letter-spacing: -4px } .tile.accent strong { color: $color.bg } .tile.accent span, .tile.accent small { color: $color.bg } span { margin-top: 12px; color: $color.fg; font: 600 30px $font.body } small { margin-top: 2px; color: $color.muted; font: 400 22px $font.mono }",
+              "width": {
+                "$format": {
+                  "square": 450,
+                  "landscape": 272
+                }
+              },
+              "height": {
+                "$format": {
+                  "square": 330,
+                  "landscape": 330
+                }
+              },
+              "options": {
+                "position": {
+                  "$format": {
+                    "square": "550:660",
+                    "landscape": "928:250"
+                  }
+                },
+                "start": 0.95,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.95,
+                  "duration": 0.5,
+                  "distance": 36,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "spec",
+          "type": "color_background",
+          "purpose": "The facts behind the numbers, as a spec sheet.",
+          "options": {
+            "backgroundColor": "$color.bg",
+            "duration": 4.2
+          },
+          "camera": {
+            "preset": "drift-up",
+            "amount": 0.03,
+            "includeText": false
+          },
+          "inputs": [
+            {
+              "name": "spec_sheet",
+              "type": "html",
+              "html": "<div class=\"sheet\"><div class=\"top\"><span class=\"bar\"></span><h2>Spec sheet</h2></div><div class=\"row\"><span class=\"key\">Renders on</span><span class=\"value\">Node · browser · phone</span></div><div class=\"row\"><span class=\"key\">Composed by</span><span class=\"value\">FFmpeg filter graphs</span></div><div class=\"row\"><span class=\"key\">HTML layers</span><span class=\"value\">Satori + resvg, flexbox</span></div><div class=\"row\"><span class=\"key\">Output</span><span class=\"value\">MP4 · H.264 · AAC</span></div><div class=\"row\"><span class=\"key\">Uploads</span><span class=\"value\">none, fully local</span></div><div class=\"row\"><span class=\"key\">Licence</span><span class=\"value\">MIT</span></div></div>",
+              "css": {
+                "$format": {
+                  "square": ".sheet { display: flex; flex-direction: column } .top { display: flex; align-items: center; gap: 22px; margin-bottom: 26px } .bar { width: 64px; height: 14px; background: $color.accent } h2 { margin: 0; color: $color.fg; font: 72px $font.display; letter-spacing: -2px } .row { display: flex; justify-content: space-between; align-items: baseline; padding: 28px 0; border-bottom: 2px solid $color.surface } .key { color: $color.muted; font: 500 32px $font.body } .value { color: $color.fg; font: 500 32px $font.mono }",
+                  "landscape": ".sheet { display: flex; flex-direction: column } .top { display: flex; align-items: center; gap: 22px; margin-bottom: 26px } .bar { width: 64px; height: 14px; background: $color.accent } h2 { margin: 0; color: $color.fg; font: 72px $font.display; letter-spacing: -2px } .row { display: flex; justify-content: space-between; align-items: baseline; padding: 13px 0; border-bottom: 2px solid $color.surface } .key { color: $color.muted; font: 500 28px $font.body } .value { color: $color.fg; font: 500 28px $font.mono }"
+                }
+              },
+              "width": {
+                "$format": {
+                  "square": 920,
+                  "landscape": 900
+                }
+              },
+              "height": {
+                "$format": {
+                  "square": 760,
+                  "landscape": 600
+                }
+              },
+              "options": {
+                "position": {
+                  "$format": {
+                    "square": "80:90",
+                    "landscape": "190:40"
+                  }
+                },
+                "start": 0.4,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.4,
+                  "duration": 0.7,
+                  "distance": 40,
+                  "easing": "ease-out"
+                }
+              }
+            },
+            {
+              "name": "spec_claim",
+              "type": "html",
+              "html": "<div class=\"claim\"><span class=\"dot\"></span>{{ claim }}</div>",
+              "css": ".claim { display: flex; align-items: center; align-self: flex-start; gap: 16px; padding: 18px 28px; background: $color.accent; color: $color.bg; font: 600 32px $font.body } .dot { width: 14px; height: 14px; background: $color.bg }",
+              "width": {
+                "$format": {
+                  "square": 920,
+                  "landscape": 900
+                }
+              },
+              "height": 80,
+              "options": {
+                "position": {
+                  "$format": {
+                    "square": "80:880",
+                    "landscape": "190:590"
+                  }
+                },
+                "start": 1.3,
+                "motion": {
+                  "type": "slide-right",
+                  "delay": 1.3,
+                  "duration": 0.5,
+                  "distance": 50,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "formats": {
+        "landscape": {
+          "global": {
+            "platform": "youtube"
+          }
+        }
+      }
+    }
   }
 ]

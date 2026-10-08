@@ -44,6 +44,15 @@ class VariableManager {
     });
   };
 
+  /** The render-time value of a placeholder name: a global variable, else a form field (lists joined). */
+  valueOf = (name: string): string | undefined => {
+    const sources = [this.template.descriptor.global?.variables, this.project.config.fields];
+    const source = sources.find((record) => record !== undefined && Object.hasOwn(record, name));
+    const value = source?.[name];
+
+    return Array.isArray(value) ? value.join(', ') : value;
+  };
+
   /**
    * Replace fields
    */

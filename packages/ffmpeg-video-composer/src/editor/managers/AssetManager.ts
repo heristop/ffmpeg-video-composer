@@ -11,6 +11,8 @@ import { cutawayMedia } from '../footage/cutaway-media';
 import { isBackgroundInput, markBackgroundInput } from '../utils/background-input';
 import { fnv1a32 } from '@/core/determinism/hash';
 import { generatedImage } from '../presets/generated-images';
+import { stageHtmlInput, type HtmlAssetDeps } from '../html/html-input-stage';
+import { extensionFromUrl, frameInName, frameInUrl, mediaName } from '../utils/media-naming';
 import { findFontByFile, DEFAULT_FONT_WEIGHT, type FontRef } from '@/core/fonts';
 import { googleCssUrl, extractTtfUrl, GOOGLE_FONTS_USER_AGENT } from '@/core/google-fonts';
 import { fontAssetUrl } from '@/core/asset-source';
@@ -43,6 +45,8 @@ type ResolvedMedia = {
 
 @injectable()
 class AssetManager {
+  private readonly fontsInFlight = new Map<string, Promise<void>>();
+
   constructor(
     @inject('template') private readonly template: Template,
     @inject('VariableManager') private readonly variableManager: VariableManager,
@@ -131,6 +135,13 @@ class AssetManager {
       return;
     }
 
+    // An HTML layer is drawn, not fetched (editor/html): staged under an `html:<hash>` url.
+    if (item.type === 'html') {
+      await stageHtmlInput(item, this.htmlDeps());
+
+      return;
+    }
+
     this.resolveItemUrl(item);
 
     // A ref is an http(s) URL, an absolute staged path, or a path relative to assetsDir — all valid.
@@ -143,16 +154,37 @@ class AssetManager {
     await this.fetchMedia(item);
   };
 
+  private readonly htmlDeps = (): HtmlAssetDeps => ({
+    filesystem: this.filesystemAdapter,
+    logger: this.logger,
+    segment: this.segment,
+    global: this.template.descriptor.global,
+    valueOf: this.variableManager.valueOf,
+    stageFont: (request) => this.stageFont(request),
+    cache: this.inputsCache,
+  });
+
   fetchFonts = async (): Promise<void> => {
     await Promise.all(this.segment.tempFonts.map((request) => this.stageFont(request)));
   };
 
+  // Requests for the same font that overlap (two HTML layers of a section are staged in parallel) share
+  // one staging: a second copy would see the first one half-written through stat and read it as is.
+  private stageFont(request: FontRequest): Promise<void> {
+    const targetPath = `${this.segment.fontsDir}/${request.file}`;
+    const staging =
+      this.fontsInFlight.get(targetPath) ??
+      this.stageFontOnce(request, targetPath).finally(() => this.fontsInFlight.delete(targetPath));
+
+    this.fontsInFlight.set(targetPath, staging);
+
+    return staging;
+  }
+
   // Stages one font, trying the cheapest source first. Every rung is a real fallback except the last:
   // a font that cannot be staged throws, because a missing font does not stop the render — drawtext
   // simply draws with the wrong face, and the failure only shows up as a visibly wrong video.
-  private async stageFont({ file, ref }: FontRequest): Promise<void> {
-    const targetPath = `${this.segment.fontsDir}/${file}`;
-
+  private async stageFontOnce({ file, ref }: FontRequest, targetPath: string): Promise<void> {
     if (await this.stageFontLocally(file, targetPath)) {
       return;
     }
@@ -407,45 +439,13 @@ class AssetManager {
 
   extractFromMedia = (media: Media, frame = 0): ResolvedMedia => {
     const mediaUrl = media.url ?? '';
-    const extension = this.getExtensionFromUrl(mediaUrl);
-    let url = this.variableManager.mapVariables(mediaUrl);
-    let name = this.generateName(media, url, frame);
+    const url = this.variableManager.mapVariables(mediaUrl);
 
-    url = this.replaceFrameInUrl(url, frame);
-    name = this.replaceFrameInName(name, frame);
-
-    return { name, url, extension };
-  };
-
-  private readonly getExtensionFromUrl = (url: string): string => {
-    return url.split('.').pop() ?? '';
-  };
-
-  private readonly generateName = (media: Media, url: string, frame: number): string => {
-    if (frame || !media.name) {
-      return url
-        .substring(url.lastIndexOf('/') + 1)
-        .split('.')
-        .slice(0, -1)
-        .join('.');
-    }
-
-    return media.name;
-  };
-
-  private readonly replaceFrameInUrl = (url: string, frame: number): string => {
-    if (frame && url.includes('%d')) {
-      const framePattern = /-([0-9]{3}).([a-z]{3})$/;
-      const frameString = `00${frame}`.slice(-3);
-
-      return framePattern.test(url) ? url.replace('%d', frameString) : url.replace('%d', `${frame}`);
-    }
-
-    return url;
-  };
-
-  private readonly replaceFrameInName = (name: string, frame: number): string => {
-    return frame ? name.replace('%d', `00${frame}`.slice(-3)) : name;
+    return {
+      name: frameInName(mediaName(media, url, frame), frame),
+      url: frameInUrl(url, frame),
+      extension: extensionFromUrl(mediaUrl),
+    };
   };
 }
 

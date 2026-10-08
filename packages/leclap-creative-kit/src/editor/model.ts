@@ -41,6 +41,7 @@ import type { DefaultTransition, SectionTransition } from './transition-types';
 export { DEFAULT_TRANSITION, type DefaultTransition, type SectionTransition } from './transition-types';
 export type { EditorMotion, FootageEdits, MotionBlocks } from './motion-passthrough';
 import type { VisualAudio } from './visual-audio';
+import type { HtmlLayer } from './html-layer';
 export type { AudioEffect, AudioFadeSide, SectionAudioFade, VisualAudio } from './visual-audio';
 import type {
   Orientation,
@@ -267,6 +268,8 @@ export interface VisualAnimation extends MotionBlocks {
   // Animated overlays composited over the section, in array order (later entries paint on top).
   // Author-set; empty/absent means none.
   animations?: AnimationOverlay[];
+  // HTML layers, painted over the animations and still images, in array order.
+  htmlLayers?: HtmlLayer[];
   // kinetic / camera / graphics come from MotionBlocks (motion-passthrough.ts).
 }
 

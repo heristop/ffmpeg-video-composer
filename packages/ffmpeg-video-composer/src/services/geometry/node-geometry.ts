@@ -8,6 +8,7 @@ import type { TemplateDescriptor } from '../../schemas/template.schemas';
 import { TemplateValidator } from '../TemplateValidator';
 import { createBundledFontLoader, type FontLoader } from './bundled-font-loader';
 import type { GeometryWarning } from './rules';
+import { htmlOverflowWarnings } from '../html-node/html-overflow-node';
 
 // Node-only: the one place the geometry check is allowed to reach disk and network. Exported from
 // the Node entry alone, so the geometry module itself stays reachable from the browser and
@@ -143,8 +144,11 @@ export async function nodeGeometryWarnings(
 ): Promise<GeometryWarning[]> {
   try {
     const validator = options.validator ?? new TemplateValidator();
+    const loadFont = options.loadFont ?? nodeFontLoader();
+    const measured = await validator.getGeometryWarnings(descriptor, loadFont);
 
-    return await validator.getGeometryWarnings(descriptor, options.loadFont ?? nodeFontLoader());
+    // HTML layers are laid out by Satori here (Node only), loaded only when the template has one.
+    return [...measured, ...(await htmlOverflowWarnings(descriptor, loadFont))];
   } catch (error) {
     process.stderr.write(`geometry checks skipped: ${error instanceof Error ? error.message : String(error)}\n`);
 

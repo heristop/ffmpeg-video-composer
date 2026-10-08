@@ -180,7 +180,7 @@ export const DocCli = () => (
       </CommandList>
       <Prose>
         <p>
-          The 47 samples are discoverable without FFmpeg or Remotion. Supply or replace their listed media and fonts;
+          The 51 samples are discoverable without FFmpeg or Remotion. Supply or replace their listed media and fonts;
           preview videos are not packaged. Partials are embedded in exports. Use repeatable <Code>--video</Code> and{' '}
           <Code>--field</Code> flags for the sample&apos;s required bindings. Registered-effect samples render through
           the configured <Link to="/doc/mcp">MCP backend</Link>, not directly through <Code>leclap render</Code>.

@@ -41,6 +41,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- HTML layers (`inputs[].type: "html"`): `compose_video` and `render_frames` draw a card, badge or price
+  tag laid out in HTML and CSS and composite it like an image; its images must be template assets under the
+  media dir. `validate_template` reports `html_unsupported_css`, `html_unsupported_markup`,
+  `html_font_unknown`, `html_missing_field` and a measured `html_overflow`, and fails on `html_too_large`.
+  `get_template_schema` documents the input and `get_motion_catalog` lists the CSS subset and four layout
+  recipes under `html`.
+
 - `analyze_sound`: renders an `sfx[].sound` (composed layers, or a library preset varied by pitch, length,
   brightness and room) with the engine synth and returns its length, peak and RMS dBFS, raw
   pre-normalisation peak, spectral centroid, energy above 8 kHz / under 250 Hz, attack time and the sound

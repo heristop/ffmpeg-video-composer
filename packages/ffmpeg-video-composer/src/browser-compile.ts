@@ -8,11 +8,8 @@ import TemplateConcreteBuilder from './director/TemplateConcreteBuilder';
 import BrowserFilesystemAdapter from './platform/filesystem/BrowserFilesystemAdapter';
 import FFmpegWasmAdapter, { type FFmpegCoreLoader } from './platform/ffmpeg/FFmpegWasmAdapter';
 import MusicWasmAdapter from './platform/ffmpeg/MusicWasmAdapter';
-import AssetManager from './editor/managers/AssetManager';
 import VariableManager from './editor/managers/VariableManager';
-import MapManager from './editor/managers/MapManager';
-import FilterManager from './editor/managers/FilterManager';
-import FormattersManager from './editor/managers/FormatterManager';
+import { registerEditorManagers } from './editor/managers/register-managers';
 import Segment from './core/models/Segment';
 import AbstractLogger from './platform/logging/AbstractLogger';
 import BrowserEventManager from './platform/BrowserEventManager';
@@ -22,6 +19,8 @@ import AnimationComposer from './editor/AnimationComposer';
 import Project from './core/models/Project';
 import Template, { assertEffectsResolved } from './core/models/Template';
 import { attachCompilationListeners } from './platform/compilation-listeners';
+import { registerBrowserHtmlRasteriser } from './platform/html/html-rasteriser-browser';
+import type { HtmlWasmLoader } from './core/html/html-engine';
 import type { ProjectConfig, TemplateDescriptor } from './core/types';
 
 class BrowserLogger extends AbstractLogger {
@@ -64,11 +63,7 @@ async function registerAdapters(logger: AbstractLogger, loadFFmpegCore?: FFmpegC
 }
 
 function registerServices(): void {
-  container.register('AssetManager', { useClass: AssetManager });
-  container.register('VariableManager', { useClass: VariableManager });
-  container.register('MapManager', { useClass: MapManager });
-  container.register('FilterManager', { useClass: FilterManager });
-  container.register('FormattersManager', { useClass: FormattersManager });
+  registerEditorManagers();
 
   const eventManager = new BrowserEventManager();
   container.registerInstance('eventManager', eventManager);
@@ -80,7 +75,21 @@ function registerServices(): void {
   container.register('TemplateDirector', { useClass: TemplateDirector });
 }
 
-async function initializeBrowserPlatform(loadFFmpegCore?: FFmpegCoreLoader): Promise<void> {
+// HTML layers render once the host hands over the rasteriser's WebAssembly (loaded on the first layer only);
+// without it nothing is registered and validation refuses them (html_unavailable): the engine fetches no
+// WebAssembly from a third party.
+function registerHtmlLayers(loadHtmlWasm: HtmlWasmLoader | undefined): void {
+  if (!loadHtmlWasm) return;
+
+  registerBrowserHtmlRasteriser(loadHtmlWasm);
+}
+
+export interface BrowserLoaders {
+  loadFFmpegCore?: FFmpegCoreLoader;
+  loadHtmlWasm?: HtmlWasmLoader;
+}
+
+async function initializeBrowserPlatform({ loadFFmpegCore }: BrowserLoaders): Promise<void> {
   if (isInitialized) return;
 
   if (initializationPromise) return initializationPromise;
@@ -254,10 +263,11 @@ export async function runBrowserCompilation(
   projectConfig: ProjectConfig,
   templateDescriptor: TemplateDescriptor,
   onProgress?: (progress: number) => void,
-  loadFFmpegCore?: FFmpegCoreLoader
+  loaders: BrowserLoaders = {}
 ): Promise<string> {
   assertEffectsResolved(templateDescriptor);
-  await initializeBrowserPlatform(loadFFmpegCore);
+  await initializeBrowserPlatform(loaders);
+  registerHtmlLayers(loaders.loadHtmlWasm);
 
   const ctx: CompilationContext = {
     eventManager: container.resolve<BrowserEventManager>('eventManager'),

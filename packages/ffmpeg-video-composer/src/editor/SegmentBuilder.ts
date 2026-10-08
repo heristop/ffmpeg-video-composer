@@ -454,7 +454,8 @@ class SegmentBuilder {
   }): string | undefined => {
     // A still-image overlay takes the same overlay path as an animation (positioned/scaled via
     // addAnimationOverlay), differing only in its `-i` source (held with `-loop 1`, not stream-looped).
-    if (input.type === 'image') {
+    // An HTML layer is a still image once the asset stage has drawn it (editor/html).
+    if (input.type === 'image' || input.type === 'html') {
       return buildSingleFileImageSource(this.assetManager.fetchCachedMedia(input));
     }
 

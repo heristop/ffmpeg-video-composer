@@ -7,6 +7,7 @@ import { previewEnvOf, sectionGraphics, selectedEffect } from './fx-preview/prev
 import type { FxPreviewLayerProps } from './fx-preview/LazyFxPreview';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { resolveCanvasDrop, type DropPayload, type DropPoint } from './canvasDrop';
+import { htmlPreviewEnv } from './html-layer/html-layer-env';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
 import { PreviewSurface } from '../editor/PreviewSurface';
 import { newBaseLayer } from '../editor/layerGeometry';
@@ -173,6 +174,8 @@ export const EditorMonitor = ({
         }
         images={section.images}
         animations={section.animations}
+        htmlLayers={section.htmlLayers}
+        htmlEnv={htmlPreviewEnv(state)}
         look={section.look}
         grade={section.grade}
         globalLook={state.globalLook}
@@ -210,6 +213,9 @@ export const EditorMonitor = ({
         }}
         onChangeAnimations={(animations) => {
           onPatchSection({ animations });
+        }}
+        onChangeHtmlLayers={(htmlLayers) => {
+          onPatchSection({ htmlLayers });
         }}
         onCanvasDrop={onCanvasDrop}
         fx={effectPreview(state, section, selection, reduced)}

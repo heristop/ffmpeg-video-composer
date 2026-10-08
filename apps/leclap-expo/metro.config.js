@@ -14,9 +14,12 @@ const blockList = Array.isArray(existing) ? existing : [];
 config.resolver.blockList = [...blockList, /.*\.(test|spec)\.[jt]sx?$/];
 
 // Animated PNG overlays (.apng) aren't a default Metro asset extension, so require() them as assets
-// (bundled for staging on-device + used as picker thumbnails).
-if (!config.resolver.assetExts.includes('apng')) {
-  config.resolver.assetExts = [...config.resolver.assetExts, 'apng'];
+// (bundled for staging on-device + used as picker thumbnails). The engine's HTML layer page (.html) is an
+// asset too: the hidden WebView loads it (src/services/compile/html-raster).
+for (const extension of ['apng', 'html']) {
+  if (!config.resolver.assetExts.includes(extension)) {
+    config.resolver.assetExts = [...config.resolver.assetExts, extension];
+  }
 }
 
 // The internal @leclap/* packages publish only an `exports` map and no `main` (e.g.

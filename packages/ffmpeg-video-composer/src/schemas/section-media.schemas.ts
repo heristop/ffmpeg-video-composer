@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { OverlayFitSchema, OverlayFlipSchema, RevealSchema } from './effects.schemas';
 import { FilterSchema } from './filter.schemas';
 import { TranslationSchema } from './global.schemas';
+import { HtmlInputShape, htmlInputIssues } from './html-input.schemas';
 
 // Input/shape/field media primitives — the animation input options, the editor-only shape recipe, the
 // input schema and the form-field schema — live here to keep `section.schemas` under the max-lines
@@ -75,16 +76,21 @@ export const InputSchema = z
       .optional()
       .describe('URL or file path of the input asset; may use {{ varName }} template variables.'),
     type: z
-      .enum(['animation', 'image'])
+      .enum(['animation', 'image', 'html'])
       .optional()
-      .describe('"animation" = animated overlay (.apng/.webp/.gif/.webm); "image" = still held for section duration.'),
+      .describe(
+        '"animation" = animated overlay (.apng/.webp/.gif/.webm); "image" = still held for section duration; ' +
+          '"html" = HTML/CSS layout rendered to a still (html, css, width, height).'
+      ),
     shape: ShapeSpecSchema.optional().describe(
       'Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine.'
     ),
+    ...HtmlInputShape,
     options: InputOptionsSchema.optional().describe('Playback and compositing options for this input.'),
     filters: z.array(FilterSchema).optional().describe('Filter chain applied to this input stream before compositing.'),
   })
-  .describe('An external asset (animation or still image) composited into the section video.');
+  .superRefine(htmlInputIssues)
+  .describe('An external asset (animation, still image or HTML layer) composited into the section video.');
 
 // ── section options ────────────────────────────────────────────────────────────
 

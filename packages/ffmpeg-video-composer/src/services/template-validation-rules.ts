@@ -13,6 +13,7 @@ import { validateSubtitles } from './subtitles-validation';
 import { validateTranscribeSources } from './transcribe-validation';
 import { validateTakeEdits } from './take-validation';
 import { validateFootage } from './footage-validation';
+import { validateHtmlBoxes } from './html-validation';
 
 export type { ValidationError, ValidationFindingKind } from './validation/types';
 
@@ -277,5 +278,6 @@ export function validateDescriptorRules(template: TemplateDescriptor): Validatio
     ...validateTranscribeSources(template),
     ...validateTakeEdits(template),
     ...validateFootage(template),
+    ...validateHtmlBoxes(template),
   ];
 }

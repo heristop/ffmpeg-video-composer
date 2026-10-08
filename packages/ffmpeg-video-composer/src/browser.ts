@@ -2,6 +2,8 @@
 import 'reflect-metadata';
 import type { FFmpegCoreLoader } from './platform/ffmpeg/FFmpegWasmAdapter';
 import type { ProjectConfig, TemplateDescriptor } from './core/types';
+import type { HtmlWasmLoader } from './core/html/html-engine';
+import type { HtmlLayerPreview, HtmlLayerPreviewRequest } from './services/html-raster/html-layer-preview';
 
 export interface BrowserCompileOptions {
   /**
@@ -9,6 +11,12 @@ export interface BrowserCompileOptions {
    * omitted. Read once, on the compile that initializes the platform.
    */
   loadFFmpegCore?: FFmpegCoreLoader;
+  /**
+   * Loads the HTML layer rasteriser's WebAssembly (resvg.wasm, hb-subset.wasm, hb.wasm), which the host serves
+   * itself; the engine fetches none from a third party. Without it, a template with an HTML layer fails
+   * validation with html_unavailable.
+   */
+  loadHtmlWasm?: HtmlWasmLoader;
 }
 
 // The render graph (director, editor, managers) lives in its own lazily loaded chunk: importing the
@@ -22,11 +30,27 @@ export async function compileBrowser(
   try {
     const { runBrowserCompilation } = await import('./browser-compile');
 
-    return await runBrowserCompilation(projectConfig, templateDescriptor, onProgress, options.loadFFmpegCore);
+    return await runBrowserCompilation(projectConfig, templateDescriptor, onProgress, options);
   } catch (error) {
     throw new Error(`Browser video compilation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
+/**
+ * Draws one HTML layer as a render would (the builder's live preview); the rasteriser loads on first use, from
+ * `options.loadHtmlWasm` (required: without it the preview rejects).
+ */
+export async function renderHtmlLayerPreview(
+  request: HtmlLayerPreviewRequest,
+  options: Pick<BrowserCompileOptions, 'loadHtmlWasm'> = {}
+): Promise<HtmlLayerPreview> {
+  const { previewHtmlLayerInBrowser } = await import('./platform/html/html-rasteriser-browser');
+
+  return previewHtmlLayerInBrowser(request, options.loadHtmlWasm);
+}
+
+export type { HtmlLayerPreview, HtmlLayerPreviewRequest, HtmlWasmLoader };
+export type { HtmlLayerFinding } from './services/html-raster/html-layer-findings';
 
 export {
   default as FFmpegWasmAdapter,

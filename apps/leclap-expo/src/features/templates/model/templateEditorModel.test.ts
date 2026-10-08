@@ -7,6 +7,7 @@ import {
   type EditableTemplate,
 } from './templateEditorModel';
 import { TemplateDescriptorSchema } from 'ffmpeg-video-composer/src/schemas/template.schemas.ts';
+import htmlCard from '../../../../../../examples/motion-design/html-card.json';
 
 // The editor model itself is exhaustively tested in the core package
 // (packages/.../tests/template-editor-model.test.ts). This file only guards the expo re-export
@@ -54,5 +55,24 @@ describe('expo templateEditorModel re-export', () => {
 
     expect(state.audio).toEqual(DEFAULT_AUDIO_MIX);
     expect(state.sections).toEqual([newSection('video')]);
+  });
+
+  it('keeps the HTML layers of an imported template, as the JSON import does (schema, then toEditorState)', () => {
+    const parsed = TemplateDescriptorSchema.safeParse(htmlCard);
+
+    expect(parsed.success).toBe(true);
+
+    const descriptor = parsed.data as unknown as EditableTemplate['descriptor'];
+    const state = toEditorState({
+      id: 'user-html',
+      name: 'html',
+      description: '',
+      orientation: 'landscape',
+      descriptor,
+    });
+    const htmlInputs = (desc: unknown) => JSON.stringify(desc).match(/"type":"html"/g)?.length ?? 0;
+
+    expect(htmlInputs(htmlCard)).toBeGreaterThan(0);
+    expect(htmlInputs(buildDescriptor(state))).toBe(htmlInputs(htmlCard));
   });
 });

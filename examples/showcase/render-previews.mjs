@@ -57,6 +57,10 @@ const POSTER_AT = {
   'theme-roles': 2,
   'footage-edit': 1,
   'sound-design': 3.3,
+  'html-card': 2.4,
+  'html-testimonial': 2.5,
+  'html-speaker': 2.4,
+  'html-stats': 2.4,
   'effects-tour': 2.2,
 };
 const fields = {

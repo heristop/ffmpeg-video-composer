@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node ../../scripts/copy-core-assets.ts && node scripts/stage-ffmpeg-core.ts && vite",
-    "build": "bash ../../scripts/ci/fetch-web-media.sh && node ../../scripts/copy-core-assets.ts && node scripts/stage-ffmpeg-core.ts && vite build && node scripts/seo-prerender.ts",
+    "dev": "node ../../scripts/copy-core-assets.ts && node scripts/stage-ffmpeg-core.ts && node scripts/stage-html-engine.ts && vite",
+    "build": "bash ../../scripts/ci/fetch-web-media.sh && node ../../scripts/copy-core-assets.ts && node scripts/stage-ffmpeg-core.ts && node scripts/stage-html-engine.ts && vite build && node scripts/seo-prerender.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vp test run",

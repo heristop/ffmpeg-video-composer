@@ -889,7 +889,7 @@ Whole-video text/colour, the sibling of `global.animations`: authored once in `g
 
 ## Overlay inputs (animations & images)
 
-`inputs[]` composites overlays on top of a section. Each input is one of two `type`s — `animation` (a single-file animated input) or `image` (a single still picture). Both share the same `position`/`scale` placement convention and composite in array order (later entries paint on top), so a section can carry any number of them — e.g. a branded backdrop, a logo, and a confetti animation at once.
+`inputs[]` composites overlays on top of a section. Each input is one of three `type`s — `animation` (a single-file animated input), `image` (a single still picture) or `html` (a card laid out in HTML and CSS, see [HTML layers](#html-layers)). They share the same `position`/`scale` placement convention and composite in array order (later entries paint on top), so a section can carry any number of them — e.g. a branded backdrop, a logo, and a confetti animation at once.
 
 ### `type: "animation"`
 
@@ -943,6 +943,53 @@ A still picture (PNG/JPG/WebP) composited over the section — a backdrop, water
 ```
 
 In the template builder, each image is picked from the bundled library or uploaded, then **dragged to position and resized** on the preview frame — exactly like an animation overlay. It takes the same `opacity`/`rotation`/`motion` options too.
+
+### HTML layers
+
+An `inputs[]` entry of `type: "html"` lays out a card, a badge, a price tag or a stat row in HTML and CSS instead of positioned `drawtext` and `drawbox` filters. The engine draws it once into a transparent PNG (with [Satori](https://github.com/vercel/satori) and resvg), then composites it like an `image` input, so `position`, `scale`, `start`, `opacity`, `rotation` and `motion` work as above:
+
+```jsonc
+{
+  "name": "address_card",
+  "type": "html",
+  "html": "<div class=\"card\"><span class=\"tag\">For sale</span><h2>{{ address }}</h2></div>",
+  "css": ".card { display: flex; flex-direction: column; padding: 26px 32px; border-radius: 28px; background: $color.surface@0.92 } .tag { color: $color.accent; font: 600 20px Rubik } h2 { margin: 0; color: $color.fg; font: 64px $font.display }",
+  "width": 560, // the box, in output pixels (at most 1920 per side)
+  "height": 300,
+  "options": {
+    "position": "56:370",
+    "start": 0.4, // hidden until 0.4 s
+    "motion": { "type": "rise", "delay": 0.4, "duration": 0.7 },
+  },
+}
+```
+
+- **Box** — `width` and `height` are required and set the layer's box; the PNG is drawn at 2× and scaled back into the box unless you set `options.scale`. A side over 1920 fails validation with `html_too_large`. An html input takes no `url`.
+- **Copy** — `{{ name }}` placeholders take typed [`global.fields`](#typed-fields-globalfields), variables and form values. Every value is HTML-escaped, so copy can never add markup. A placeholder with no value stays as written and is reported as `html_missing_field`.
+- **Theme** — `$color.*` (with `@alpha`, as `rgba()`) and `$font.*` tokens work in `css` and `html`, and the [theme](#themes) checks them like any other token.
+- **Fonts** — `font-family` takes the [registry](#fonts) families and the generic families (`sans-serif` and `system-ui` use the theme body font, `serif` Playfair Display, `monospace` Roboto Mono, `cursive` Pacifico). Any other family falls back to the theme's body font and is reported as `html_font_unknown`. Variable fonts (Rubik, Oswald, Playfair, Roboto Mono) are pinned to the static weights the layer uses.
+- **Images** — `<img src>` and CSS `url()` take a template asset (a relative path or `/assets/…`) or a PNG/JPEG data URI. Remote URLs and absolute paths are refused.
+- **Markup** — the allowed tags keep `class` and `style` (`<img>` also keeps `src`, `alt`, `width` and `height`). `<script>`, `<iframe>`, `<form>`, `<svg>` and similar are dropped with their content, other unknown tags are unwrapped and keep their text, and event handlers and `href` are removed. Each removal is reported as `html_unsupported_markup`.
+- **CSS** — a flexbox subset. Selectors are tag, `.class`, `tag.class` and descendants, applied by specificity; `#id`, pseudo-classes, `>` `+` `~` and `@` rules are not supported. Properties cover flex layout, `position: relative | absolute`, box sizes, margins, padding and gaps, borders and radii, text (font, `text-align`, `text-transform`, `letter-spacing`, `line-height`, `text-shadow`, `line-clamp`, `white-space`…), backgrounds and gradients, `box-shadow`, `opacity`, `transform`, `filter`, `clip-path`, masks and custom properties. Grid, floats, `z-index`, animations, transitions and `calc()` are not. Each dropped declaration is reported as `html_unsupported_css`. `get_motion_catalog` (MCP) lists the full subset under `html`, with four layout recipes.
+- **Overflow** — validation lays the layer out and reports `html_overflow` when the content is larger than the box.
+
+A layer is a still: animate it with `options.motion`. `rise` and `slide-*` only move the layer, so set `start` to the same time as the motion `delay` when the layer should not be visible before it moves in. Inline text and inline elements in one paragraph are laid out word by word on flexbox, so the browser's exact line breaks are not guaranteed.
+
+The PNG is named by a hash of everything that changes the drawing (resolved HTML and CSS, images, fonts, box, density and renderer versions), so an unchanged layer is rendered once per process. See [`html-card.json`](../examples/motion-design/html-card.json) (cards, a stat row, chips), [`html-testimonial.json`](../examples/motion-design/html-testimonial.json) (mixed weights in a sentence, a round portrait, `clip-path` stars), [`html-speaker.json`](../examples/motion-design/html-speaker.json) (a lower third with wrapped title and badges) and [`html-stats.json`](../examples/motion-design/html-stats.json) (stat tiles and an aligned spec list).
+
+Where HTML layers render (everywhere, byte for byte alike):
+
+| Engine                              | Status                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node (CLI, MCP, programmatic API)   | Renders. Satori, resvg and HarfBuzz run in process; their WebAssembly is read from `node_modules`.                                                                                                                                                                                                                                                                                                                                                                                 |
+| Browser (`compileBrowser`, web app) | Renders: the same WebAssembly builds load on the first HTML layer. The host serves `resvg.wasm`, `hb-subset.wasm` and HarfBuzz's `hb.wasm` itself and hands them over through `BrowserCompileOptions.loadHtmlWasm` (the web app stages them under `/html-engine/<version>/`); the engine fetches none from a third party, and without the loader validation reports `html_unavailable`. `renderHtmlLayerPreview` draws one layer with its advisories (the builder's live preview). |
+| Phone (LeClap app, React Native)    | Renders in a hidden WebView running the same WebAssembly (`dist/html-rasteriser.html`), registered with `registerHtmlRasteriser`.                                                                                                                                                                                                                                                                                                                                                  |
+
+A host with no rasteriser registered refuses the template with `html_unavailable`.
+
+![The four HTML layout recipes](./media/gallery/html-layers.webp)
+
+More in the [gallery](./gallery.md#html-layers).
 
 ## Whole-video animations
 

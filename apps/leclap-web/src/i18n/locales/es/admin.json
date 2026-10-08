@@ -836,7 +836,9 @@
     "effectAddHint": "Dibujado por el motor · ajustable",
     "animationAddHint": "APNG o WebM · se reproduce tal cual",
     "animationPending": "Efecto o archivo",
-    "kindLabel": "{{kind}}: {{name}}"
+    "kindLabel": "{{kind}}: {{name}}",
+    "html": "Capa HTML",
+    "addHtml": "Capa HTML"
   },
   "shape": {
     "kind": "Forma",
@@ -1307,5 +1309,36 @@
     "summary": "{{count}} palabras fijadas · {{unsure}} por revisar",
     "hint": "Palabras transcritas del clip (en el teléfono o con leclap transcribe). Corrige una palabra mal oída en su sitio; las palabras en ámbar son las que el reconocimiento dudaba. Los tiempos se mantienen como se transcribieron.",
     "word": "Palabra en {{start}} s"
+  },
+  "htmlLayer": {
+    "name": "Nombre de la capa",
+    "nameHint": "Los maps se refieren a la capa como @nombre. Solo letras, cifras y _.",
+    "html": "HTML",
+    "css": "CSS",
+    "fields": "Insertar un campo",
+    "fieldsEmpty": "Aún no hay campos: añade variables o una escena de formulario para rellenar la capa.",
+    "insert": "Insertar {{name}}",
+    "source": {
+      "field": "Campo de la plantilla",
+      "variable": "Variable",
+      "form": "Campo de formulario"
+    },
+    "box": "Caja",
+    "width": "Ancho",
+    "height": "Alto",
+    "preview": "Vista previa",
+    "previewAlt": "La capa HTML tal como la dibuja el render",
+    "drawing": "Dibujando…",
+    "failed": "No se pudo dibujar la vista previa: {{error}}",
+    "clean": "Todo lo de esta capa se renderiza.",
+    "advisories": "Lo que el render descarta o recorta",
+    "advisory": {
+      "html_unsupported_css": "CSS descartado",
+      "html_unsupported_markup": "Marcado eliminado",
+      "html_overflow": "Contenido recortado",
+      "html_font_unknown": "Fuente desconocida",
+      "html_missing_field": "Campo sin valor"
+    },
+    "remove": "Eliminar la capa"
   }
 }

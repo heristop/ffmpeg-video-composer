@@ -32,6 +32,10 @@ describe('promptSchema', () => {
     expect(trimmed).toContain('"words"');
   });
 
+  it('keeps HTML layer inputs, which the browser draws', () => {
+    expect(trimmed).toContain('"animation","image","html"');
+  });
+
   it('leaves the input schema untouched', () => {
     const input = { properties: { transcribe: { type: 'object' }, words: { type: 'array' } } };
 

@@ -18,6 +18,29 @@ describe('apply-descriptor helpers', () => {
     }
   });
 
+  it('an agent descriptor with an HTML layer round-trips through the builder whole', () => {
+    const state = STARTER_PRESETS[0].build();
+    const descriptor = buildDescriptor(state);
+    const sections = descriptor.sections ?? [];
+    const index = sections.findIndex((section) => section.type === 'color_background');
+    const card = {
+      name: 'price_tag',
+      type: 'html' as const,
+      html: '<div class="tag">{{ price }}</div>',
+      css: '.tag { padding: 12px; color: $color.fg }',
+      width: 320,
+      height: 96,
+      options: { position: '64:64', start: 0.4, motion: { type: 'rise' as const, duration: 0.5 } },
+    };
+    const withCard = {
+      ...descriptor,
+      sections: sections.map((section, i) => (i === index ? { ...section, inputs: [card] } : section)),
+    };
+
+    expect(index).toBeGreaterThanOrEqual(0);
+    expect(droppedPointers(withCard, buildDescriptor(rehydrate(withCard, state)))).toEqual([]);
+  });
+
   it('droppedPointers names leaves that did not survive, never builder-assigned section names', () => {
     expect(
       droppedPointers(

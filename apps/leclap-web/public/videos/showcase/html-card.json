@@ -1,0 +1,274 @@
+{
+  "meta": {
+    "name": "Real-estate listing",
+    "description": "A three-scene listing reel laid out in HTML and CSS over interior photos: an address card and price tag, a spec panel with a stat row and feature chips, then the agent's contact card under an open-visit badge. Every fact comes from a typed field.",
+    "creativeDirection": "Audience: estate agents who post listings as short videos. Direction: the photos carry the mood, the cards carry the facts, one idea per scene. Scene one says where and how much: the address card rises bottom left once the push-in has started, the price tag slides in from the right half a second later. Scene two says what you get: a stat row (rooms, area, floor) and feature chips settle on the right while the camera drifts. Scene three says what to do: the open-visit badge drops in, then the agent's card with a round portrait. Push and zoom-through transitions keep the reel moving; nothing waits more than a beat. Copy comes from the fields, so the same template lists any property. Review: text crisp at 720p, round corners, nothing cut at a card's edge, the price never covers the lamp, and every layer is hidden until its entrance."
+  },
+  "global": {
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "theme": {
+      "extends": "leclap",
+      "fonts": {
+        "body": "rubik"
+      }
+    },
+    "transition": {
+      "type": "cut"
+    },
+    "fields": {
+      "address": {
+        "type": "text",
+        "default": "12 rue des Lilas",
+        "maxLength": 40,
+        "label": {
+          "en": "Address"
+        }
+      },
+      "city": {
+        "type": "text",
+        "default": "Lyon 3e · 69003",
+        "maxLength": 40,
+        "label": {
+          "en": "City"
+        }
+      },
+      "price": {
+        "type": "text",
+        "default": "420 000 €",
+        "maxLength": 20,
+        "label": {
+          "en": "Price"
+        }
+      },
+      "rooms": {
+        "type": "text",
+        "default": "4",
+        "maxLength": 6,
+        "label": {
+          "en": "Rooms"
+        }
+      },
+      "area": {
+        "type": "text",
+        "default": "92 m²",
+        "maxLength": 12,
+        "label": {
+          "en": "Living area"
+        }
+      },
+      "floor": {
+        "type": "text",
+        "default": "3rd",
+        "maxLength": 8,
+        "label": {
+          "en": "Floor"
+        }
+      },
+      "visit": {
+        "type": "text",
+        "default": "Saturday 10–12",
+        "maxLength": 24,
+        "label": {
+          "en": "Open visit"
+        }
+      },
+      "agent": {
+        "type": "text",
+        "default": "Claire Dumas",
+        "maxLength": 28,
+        "label": {
+          "en": "Agent"
+        }
+      },
+      "agency": {
+        "type": "text",
+        "default": "Maison Lumière",
+        "maxLength": 32,
+        "label": {
+          "en": "Agency"
+        }
+      },
+      "phone": {
+        "type": "text",
+        "default": "04 72 00 12 34",
+        "maxLength": 20,
+        "label": {
+          "en": "Phone"
+        }
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "address",
+      "type": "image_background",
+      "purpose": "Where the property is and what it costs.",
+      "options": {
+        "pictureUrl": "/assets/backgrounds/sage-wall.jpg",
+        "duration": 4
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "transition": {
+        "type": "push-left",
+        "duration": 0.5
+      },
+      "inputs": [
+        {
+          "name": "address_card",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"card\"><span class=\"tag\">For sale</span><h2>{{ address }}</h2><p>{{ city }}</p></div></div>",
+          "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 34px } .card { flex-grow: 1; display: flex; flex-direction: column; gap: 6px; padding: 26px 32px 30px; border-radius: 28px; background: $color.surface@0.94; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35)} .tag { color: $color.accent; font: 600 20px $font.body; text-transform: uppercase; letter-spacing: 3px } h2 { margin: 4px 0 0; color: $color.fg; font: 64px $font.display; line-height: 1 } p { margin: 0; color: $color.muted; font: 400 24px $font.body }",
+          "width": 608,
+          "height": 264,
+          "options": {
+            "position": "32:420",
+            "start": 0.3,
+            "motion": {
+              "type": "rise",
+              "delay": 0.3,
+              "duration": 0.7,
+              "distance": 48,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "price_tag",
+          "type": "html",
+          "html": "<div class=\"price\"><small>Asking price</small><strong>{{ price }}</strong></div>",
+          "css": ".price { display: flex; flex-direction: column; align-items: flex-end; padding: 16px 24px; border-radius: 20px; background: $color.accent } small { color: $color.bg; font: 600 16px $font.body; text-transform: uppercase; letter-spacing: 2px } strong { color: $color.bg; font: 52px $font.display; line-height: 1.1 }",
+          "width": 300,
+          "height": 120,
+          "options": {
+            "position": "56:56",
+            "start": 0.9,
+            "motion": {
+              "type": "slide-left",
+              "delay": 0.9,
+              "duration": 0.6,
+              "distance": 80,
+              "easing": "ease-out"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "details",
+      "type": "image_background",
+      "purpose": "What the property offers, in figures and features.",
+      "options": {
+        "pictureUrl": "/assets/backgrounds/cafe-table.jpg",
+        "duration": 3.8
+      },
+      "camera": {
+        "preset": "drift-left",
+        "amount": 0.04,
+        "includeText": false
+      },
+      "transition": {
+        "type": "zoom-through",
+        "duration": 0.5
+      },
+      "inputs": [
+        {
+          "name": "spec_stats",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"row\"><div class=\"stat\"><strong>{{ rooms }}</strong><span>rooms</span></div><div class=\"stat\"><strong>{{ area }}</strong><span>living area</span></div><div class=\"stat\"><strong>{{ floor }}</strong><span>floor, lift</span></div></div></div>",
+          "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 34px } .row { flex-grow: 1; display: flex; gap: 12px } .stat { display: flex; flex-direction: column; flex-grow: 1; padding: 18px 22px 20px; border-radius: 20px; background: $color.surface@0.94; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35)} strong { color: $color.fg; font: 56px $font.display; line-height: 1; white-space: nowrap } span { margin-top: 4px; color: $color.muted; font: 400 20px $font.body }",
+          "width": 588,
+          "height": 184,
+          "options": {
+            "position": "660:120",
+            "start": 0.5,
+            "motion": {
+              "type": "rise",
+              "delay": 0.5,
+              "duration": 0.6,
+              "distance": 40,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "spec_chips",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"panel\"><span class=\"label\">Highlights</span><div class=\"chips\"><span class=\"chip\">Balcony</span><span class=\"chip\">Parquet floors</span><span class=\"chip\">South facing</span><span class=\"chip\">Cellar</span><span class=\"chip\">Fibre</span></div></div></div>",
+          "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 34px } .panel { flex-grow: 1; display: flex; flex-direction: column; gap: 14px; padding: 22px 24px 24px; border-radius: 20px; background: $color.surface@0.94; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35)} .label { color: $color.accent; font: 600 18px $font.body; text-transform: uppercase; letter-spacing: 3px } .chips { display: flex; flex-wrap: wrap; gap: 10px } .chip { padding: 8px 16px; border-radius: 999px; border: 2px solid $color.brand@0.6; color: $color.fg; font: 500 22px $font.body }",
+          "width": 588,
+          "height": 224,
+          "options": {
+            "position": "660:290",
+            "start": 0.9,
+            "motion": {
+              "type": "rise",
+              "delay": 0.9,
+              "duration": 0.6,
+              "distance": 40,
+              "easing": "ease-out"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "visit",
+      "type": "image_background",
+      "purpose": "Who to call and when to come.",
+      "options": {
+        "pictureUrl": "/assets/backgrounds/warm-bokeh.jpg",
+        "duration": 3.6
+      },
+      "camera": {
+        "preset": "push-in",
+        "amount": 0.05,
+        "includeText": false
+      },
+      "inputs": [
+        {
+          "name": "visit_badge",
+          "type": "html",
+          "html": "<div class=\"badge\"><span class=\"dot\"></span><span class=\"label\">Open visit</span><strong>{{ visit }}</strong></div>",
+          "css": ".badge { display: flex; align-items: center; align-self: center; gap: 12px; padding: 14px 26px; border-radius: 999px; background: $color.accent } .dot { width: 14px; height: 14px; border-radius: 7px; background: $color.bg } .label { color: $color.bg; font: 600 20px $font.body; text-transform: uppercase; letter-spacing: 2px } strong { color: $color.bg; font: 40px $font.display; line-height: 1 }",
+          "width": 480,
+          "height": 72,
+          "options": {
+            "position": "400:180",
+            "start": 0.5,
+            "motion": {
+              "type": "rise",
+              "delay": 0.5,
+              "duration": 0.5,
+              "distance": 32,
+              "easing": "ease-out"
+            }
+          }
+        },
+        {
+          "name": "agent_card",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"card\"><img class=\"portrait\" src=\"/assets/backgrounds/golden-hour.jpg\" /><div class=\"who\"><span class=\"role\">Your agent</span><h3>{{ agent }}</h3><p>{{ agency }}</p><span class=\"phone\">{{ phone }}</span></div></div></div>",
+          "css": ".wrap { display: flex; align-items: flex-start; padding: 0 24px 34px } .card { flex-grow: 1; display: flex; align-items: center; gap: 28px; padding: 26px 34px 26px 26px; border-radius: 28px; background: $color.surface@0.95; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35)} .portrait { width: 132px; height: 132px; border-radius: 66px; object-fit: cover; object-position: 40% 30%; border: 4px solid $color.accent } .who { display: flex; flex-direction: column } .role { color: $color.accent; font: 600 16px $font.body; text-transform: uppercase; letter-spacing: 3px } h3 { margin: 4px 0 0; color: $color.fg; font: 52px $font.display; line-height: 1 } p { margin: 2px 0 0; color: $color.muted; font: 400 22px $font.body } .phone { margin-top: 10px; color: $color.fg; font: 500 26px $font.mono; letter-spacing: 1px }",
+          "width": 648,
+          "height": 234,
+          "options": {
+            "position": "316:280",
+            "start": 0.9,
+            "motion": {
+              "type": "rise",
+              "delay": 0.9,
+              "duration": 0.6,
+              "distance": 40,
+              "easing": "ease-out"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

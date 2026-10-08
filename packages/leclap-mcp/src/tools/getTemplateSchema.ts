@@ -120,6 +120,14 @@ const GUIDE = [
     '({ url, at, duration, from?, audio: a|b|mix, fit }) while the main clip keeps running (keep/trimSilence/' +
     'cutaways do not combine with clip/speedRamp/freeze). probe_media reports hdr/vfr/rotation; ' +
     'get_motion_catalog lists footage.take rules.',
+  'HTML layers: an inputs[] entry { name, type: "html", html, css?, width, height, options } lays out a card, ' +
+    'badge, price tag or stat row with HTML + CSS (flexbox subset: tag/.class/descendant selectors, Satori) and ' +
+    'composites it like an image: options.position/scale/motion/start/duration as usual. {{ field }} values are ' +
+    'HTML-escaped; $color.*/$font.* tokens work inside css; fonts come from the registry, images from template ' +
+    'assets (no remote URLs, no scripts). Node, the browser and the phone render them, byte for byte alike; a ' +
+    'host with no rasteriser registered reports html_unavailable. ' +
+    'validate_template warns html_unsupported_css/markup, html_font_unknown, html_missing_field and (measured) ' +
+    'html_overflow; get_motion_catalog html lists the subset and recipes; render_frames previews the layer.',
   'Note: any non-"cut" transition triggers a full-timeline re-encode (costly on WASM/on-device); ' +
     'cut-only templates use a fast stream-copy concat.',
   'Strings may contain `{{ variables }}` (from global.variables), `{{ colorN }}` (1-indexed from ' +

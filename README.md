@@ -107,7 +107,7 @@ To hand a template to a person, `leclap studio template.json` (or the MCP `open_
 `leclap.dev/studio/builder#t=…` link that opens it in the web builder. The template travels in the URL
 fragment, which browsers never send to a server: nothing is uploaded.
 
-The installed CLI and MCP expose all **47 showcase samples** (37 native, 10 Remotion), including creative
+The installed CLI and MCP expose all **51 showcase samples** (41 native, 10 Remotion), including creative
 direction and required clips, copy, fonts and assets. Exported descriptor JSON embeds referenced partials;
 supply your own media before rendering. Registered Remotion effects require the configured MCP
 Node/Chromium backend and, where indicated, a trusted operator catalog. Discovery itself needs neither

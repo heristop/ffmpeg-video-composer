@@ -9,3 +9,6 @@
 
 /ffmpeg-core/*
   Cache-Control: public, max-age=31536000, immutable
+
+/html-engine/*
+  Cache-Control: public, max-age=31536000, immutable

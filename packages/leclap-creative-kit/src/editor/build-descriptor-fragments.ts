@@ -17,6 +17,7 @@ import type {
   FootageEdits,
   WatermarkChoice,
 } from './model';
+import { htmlInputsFrom, type HtmlLayer } from './html-layer';
 import { motionBlocksOf, type MotionBlocks } from './motion-passthrough';
 import { pruneEmpty } from './prune';
 
@@ -168,16 +169,18 @@ function imageInputFrom(overlay: ImageOverlay, index: number): NonNullable<Secti
   };
 }
 
-// Animations + image overlays composited over a visual section, in z-order: animations first (array
-// order), then images on top (array order). Spread AFTER visualExtras to override its animation-only
+// Animations, image overlays and HTML layers composited over a visual section, in z-order: animations
+// first (array order), then images, then HTML layers on top. Spread AFTER visualExtras to override its animation-only
 // `inputs`. Shared by video / color / image sections so each composites its overlays identically.
 export function overlayInputsFrom(section: {
   animations?: AnimationOverlay[];
   images?: ImageOverlay[];
+  htmlLayers?: HtmlLayer[];
 }): NonNullable<Section['inputs']> {
   return [
     ...animationInputsFrom(section.animations),
     ...(section.images ?? []).map((image, i) => imageInputFrom(image, i)),
+    ...htmlInputsFrom(section.htmlLayers),
   ];
 }
 

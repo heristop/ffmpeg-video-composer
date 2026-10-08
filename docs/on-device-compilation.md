@@ -114,6 +114,40 @@ graph TD
 
 `CoreCompilationService` stages bundled fonts, music, videos, animations, backgrounds, and watermarks into the cache assets directory, maps recorded clips to real paths, and invokes `compileReactNative`. The native adapter can inject `-progress <file>` and poll output time every 500 ms for intra-segment progress. An `AbortSignal` listener calls the native `cancel()` hook during compilation; it is removed when the call settles.
 
+### HTML layers
+
+Hermes has no WebAssembly, so HTML layers (`inputs[].type: "html"`) are drawn in a hidden
+`react-native-webview`. The engine build writes `dist/html-rasteriser.html` (5.2 MB, about 1.9 MB gzipped): the
+same Satori + resvg + HarfBuzz pipeline as Node, with its three WebAssembly modules inlined.
+`scripts/copy-core-assets.ts` stages it as `apps/leclap-expo/assets/html-rasteriser/html-rasteriser.html`
+(build the engine first; the staged copy is not committed).
+
+`CoreCompilationService` registers the app's rasteriser with `registerHtmlRasteriser` before each compile.
+When the descriptor has an HTML layer, `<HtmlRasterView />` (mounted in the root layout) opens the page while
+the other assets stage. The page is reused for every layer of the render and torn down when the compile ends.
+Layers go over `postMessage` one at a time as JSON: the element tree, the box, and each font's bytes in base64
+the first time the page needs them. The PNG comes back in base64. A page built against other engine versions
+is refused, and a WebView process that dies fails its layer, so the next layer opens a new page.
+
+The PNGs match Node's byte for byte; `tests/html-card-sample.test.ts` and the device check pin the same
+hashes. Run the check with `leclap://ffmpeg-spike?check=html` (or the **HTML layers** button). It compiles the
+`html-card` sample and logs the page load time, each layer's time, and whether its bytes match Node's.
+
+Measured with the debug build and Metro, on a host under heavy load:
+
+| Device                             | Page ready | Price tag 300×120           | Card 560×300 with a 40 px shadow |
+| ---------------------------------- | ---------- | --------------------------- | -------------------------------- |
+| iPhone 16 Pro simulator (iOS 18.6) | 0.9–1.5 s  | 14–16 ms (9–11 ms drawing)  | 1.7–1.9 s                        |
+| Pixel 3a emulator (API 34, arm64)  | 2.1–2.5 s  | 73–83 ms (42–67 ms drawing) | 7–25 s                           |
+
+A layer without a large shadow fits the 150 ms budget. A big `box-shadow` blur costs about the same on Node
+(2–3 s for that card), so it comes from resvg's blur, not from the WebView. The page is kept on screen
+(one pixel, nearly transparent) and loaded from its file: Android barely ran an off-screen page, and handing
+it 5 MB as an inline string took the emulator 20–60 s.
+
+The table was measured on the first, one-scene `html-card`. The sample is now a three-scene reel of six layers
+whose cards keep their shadows to a 24 px blur for that reason; the check reports each layer by its box size.
+
 ---
 
 ## Build toolchain — producing the engine
@@ -198,14 +232,15 @@ The supported filter inventory and device compatibility rewrites are **generated
 
 ## Key files
 
-| Concern                                    | Path                                                                                                                                        |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Local compile entry + capability gate      | `apps/leclap-expo/src/services/compile/{compileOnDevice,capability,ffmpegAvailability}.ts`                                                  |
-| On-device service (builds config + engine) | `apps/leclap-expo/src/services/compile/CoreCompilationService.ts`                                                                           |
-| Expo native module (JS surface)            | `apps/leclap-expo/modules/leclap-ffmpeg/index.ts` (+ Android Kotlin, iOS Swift, `jniLibs/`)                                                 |
-| Core RN entrypoint                         | `packages/ffmpeg-video-composer/src/reactnative.ts`                                                                                         |
-| FFmpeg adapter (core ⇄ engine)             | `packages/ffmpeg-video-composer/src/platform/ffmpeg/FFmpegDeviceAdapter.ts`                                                                 |
-| Device filesystem adapter                  | `packages/ffmpeg-video-composer/src/platform/filesystem/FilesystemExpoAdapter.ts`                                                           |
-| Rust engine crate                          | `packages/ffmpeg-engine/{Cargo.toml, src/lib.rs, csrc/ffmpeg_shim.c, build.rs}`                                                             |
-| FFmpeg build toolchain                     | `scripts/ffmpeg/{versions.env, common.sh, build-engine.sh, build-deps.sh, build-host.sh, build-android.sh, build-ios.sh, patch-fftools.sh}` |
-| In-app smoke test                          | `apps/leclap-expo/app/(fullscreen)/ffmpeg-spike.tsx`                                                                                        |
+| Concern                                    | Path                                                                                                                                                                              |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local compile entry + capability gate      | `apps/leclap-expo/src/services/compile/{compileOnDevice,capability,ffmpegAvailability}.ts`                                                                                        |
+| On-device service (builds config + engine) | `apps/leclap-expo/src/services/compile/CoreCompilationService.ts`                                                                                                                 |
+| Expo native module (JS surface)            | `apps/leclap-expo/modules/leclap-ffmpeg/index.ts` (+ Android Kotlin, iOS Swift, `jniLibs/`)                                                                                       |
+| Core RN entrypoint                         | `packages/ffmpeg-video-composer/src/reactnative.ts`                                                                                                                               |
+| FFmpeg adapter (core ⇄ engine)             | `packages/ffmpeg-video-composer/src/platform/ffmpeg/FFmpegDeviceAdapter.ts`                                                                                                       |
+| Device filesystem adapter                  | `packages/ffmpeg-video-composer/src/platform/filesystem/FilesystemExpoAdapter.ts`                                                                                                 |
+| Rust engine crate                          | `packages/ffmpeg-engine/{Cargo.toml, src/lib.rs, csrc/ffmpeg_shim.c, build.rs}`                                                                                                   |
+| FFmpeg build toolchain                     | `scripts/ffmpeg/{versions.env, common.sh, build-engine.sh, build-deps.sh, build-host.sh, build-android.sh, build-ios.sh, patch-fftools.sh}`                                       |
+| In-app smoke test                          | `apps/leclap-expo/app/(fullscreen)/ffmpeg-spike.tsx`                                                                                                                              |
+| HTML layer rasteriser (WebView)            | `apps/leclap-expo/src/services/compile/html-raster/`, `apps/leclap-expo/src/components/compile/html-raster-view.tsx`, `packages/ffmpeg-video-composer/src/html-raster-webview.ts` |

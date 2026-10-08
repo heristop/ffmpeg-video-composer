@@ -1,7 +1,8 @@
-import { singleton } from 'tsyringe';
+import { container, singleton } from 'tsyringe';
 import type { TemplateAssets } from '../types';
 import type { TemplateDescriptor } from '../../schemas/template.schemas';
 import { BaseTemplateValidator, type ValidationResult } from '../../services/BaseTemplateValidator';
+import { HTML_RASTERISER } from '../html/html-rasteriser';
 
 function isTemplateDescriptor(data: unknown): data is TemplateDescriptor {
   return typeof data === 'object' && data !== null && !('name' in data && 'type' in data);
@@ -15,12 +16,15 @@ class Template {
     musics: {},
     inputs: [],
   };
-  private readonly validator: BaseTemplateValidator;
-
-  constructor() {
-    // Template is the browser / on-device validation path: those engines cannot analyze music nor
-    // transcribe speech (both are pinned before compile).
-    this.validator = new BaseTemplateValidator({ beatsAnalysis: false, transcription: false });
+  // Template is the browser / on-device validation path: those engines cannot analyze music nor transcribe
+  // speech (both are pinned before compile). They draw HTML layers once the host registered a rasteriser
+  // (the browser compile with its WebAssembly loader, the phone's WebView page), read at each validation.
+  private get validator(): BaseTemplateValidator {
+    return new BaseTemplateValidator({
+      beatsAnalysis: false,
+      transcription: false,
+      htmlLayers: container.isRegistered(HTML_RASTERISER),
+    });
   }
 
   init = (): void => {

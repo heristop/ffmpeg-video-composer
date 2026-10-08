@@ -36,9 +36,17 @@ export interface ShapeSpec {
 export interface Input {
   name: string;
   url?: string;
-  type?: 'animation' | 'image';
+  type?: 'animation' | 'image' | 'html';
   /** Editor-only shape recipe when this image input is a builder-rasterized shape; ignored by the engine. */
   shape?: ShapeSpec;
+  /** HTML layer (`type: "html"`): markup; `{{ var }}` values are HTML-escaped. */
+  html?: string;
+  /** HTML layer: stylesheet of tag, `.class` and descendant rules (the supported subset). */
+  css?: string;
+  /** HTML layer: box width in output pixels (max 1920). */
+  width?: number;
+  /** HTML layer: box height in output pixels (max 1920). */
+  height?: number;
   options?: InputOptions;
   filters?: Filter[];
 }

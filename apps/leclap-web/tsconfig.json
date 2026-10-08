@@ -32,6 +32,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "scripts"],
+  // The engine's ambient declarations travel with its sources this app compiles (harfbuzzjs's files, which the
+  // HTML layer rasteriser's shaper shim imports, ship no types).
+  "include": ["src", "scripts", "../../packages/ffmpeg-video-composer/src/types"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

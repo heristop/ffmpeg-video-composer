@@ -6,7 +6,7 @@ import { useCallback, useEffect, useReducer } from 'react';
 // text sugar) so a single selection state drives the inspector for all of them. The sugar kinds
 // (caption/titleCard/lowerThird) are per-section singletons — their index is always 0.
 export interface ElementRef {
-  kind: 'text' | 'layer' | 'image' | 'animation' | 'effect' | 'caption' | 'titleCard' | 'lowerThird';
+  kind: 'text' | 'layer' | 'image' | 'animation' | 'html' | 'effect' | 'caption' | 'titleCard' | 'lowerThird';
   index: number;
 }
 

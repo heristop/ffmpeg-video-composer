@@ -30,7 +30,13 @@ export type { MotionGuide } from './catalog-guides';
 export type { GenreDoctrine, MotionGenre } from './catalog-doctrine';
 export type { BlueprintRole, MotionBlueprint } from './catalog-blueprints';
 export { partialCatalog, type PartialSummary } from './catalog-partials';
-import { COMPOSITING, COMPOSITING_RULES, type CompositingCatalog } from './catalog-compositing';
+import {
+  COMPOSITING,
+  COMPOSITING_RULES,
+  htmlCatalog,
+  type CompositingCatalog,
+  type HtmlCatalog,
+} from './catalog-compositing';
 import { captionCatalog, type CaptionCatalog } from '../captions/catalog';
 import { audioCatalog, type AudioCatalog } from '../audio/catalog';
 import { TIMING } from './catalog-timing';
@@ -161,6 +167,8 @@ export interface MotionCatalog {
   starter: typeof STARTER;
   /** One story, several formats: `formats` overrides, `$format` values, merge rules (core/formats). */
   formats: typeof FORMATS_GUIDE;
+  /** HTML layers (`inputs[].type: "html"`): the supported subset and layout recipes. */
+  html: HtmlCatalog;
 }
 
 const BASIC_TRANSITIONS: Record<string, string> = {
@@ -277,5 +285,6 @@ export function motionCatalog(): MotionCatalog {
     footage: fullFootageCatalog(),
     starter: STARTER,
     formats: FORMATS_GUIDE,
+    html: htmlCatalog(),
   };
 }

@@ -30,6 +30,7 @@ vi.mock('@/lib/logger', () => ({
 }));
 vi.mock('@/domain/valueObjects/videoEdits', () => ({ applyVideoEdits: vi.fn() }));
 vi.mock('@/infrastructure/ffmpeg-core', () => ({ loadSelfHostedCore: vi.fn() }));
+vi.mock('@/infrastructure/html-engine', () => ({ loadSelfHostedHtmlWasm: vi.fn() }));
 vi.mock('@/services/browserMediaService', () => ({ browserMediaService: {} }));
 vi.mock('@/application/usecases/materializeTemplateMedia', () => ({ materializeTemplateMedia: vi.fn() }));
 vi.mock('@/application/usecases/applyMediaChoices', () => ({ applyMediaChoices: vi.fn() }));
@@ -56,6 +57,19 @@ describe('compileVideo abort signal', () => {
     mocks.compile.mockResolvedValue('/tmp/build/out.mp4');
 
     await expect(coreCompilationService.compileVideo(config, vi.fn())).resolves.toMatchObject({ url: 'blob:out' });
+  });
+
+  it('hands the engine the self-hosted ffmpeg core and html rasteriser', async () => {
+    const { loadSelfHostedCore } = await import('@/infrastructure/ffmpeg-core');
+    const { loadSelfHostedHtmlWasm } = await import('@/infrastructure/html-engine');
+    mocks.compile.mockResolvedValue('/tmp/build/out.mp4');
+
+    await coreCompilationService.compileVideo(config, vi.fn());
+
+    expect(mocks.compile.mock.calls[0][3]).toEqual({
+      loadFFmpegCore: loadSelfHostedCore,
+      loadHtmlWasm: loadSelfHostedHtmlWasm,
+    });
   });
 
   it('stops before touching the filesystem when aborted up front', async () => {

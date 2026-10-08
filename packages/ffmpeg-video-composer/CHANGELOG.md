@@ -11,6 +11,35 @@ Upgrading from v2? See the [migration guide](MIGRATION.md#upgrading-from-v2-to-v
 
 ### Added
 
+- HTML layers, on Node, in the browser and on the phone. An `inputs[]` entry of `type: "html"` takes `html`,
+  `css`, `width` and `height` and lays out a card, badge, price tag or stat row in a flexbox subset of CSS
+  (tag, `.class` and descendant selectors). The markup is sanitised (no scripts, iframes, forms, SVG, event
+  handlers or links), `{{ name }}` placeholders are filled HTML-escaped from typed fields, variables and form
+  values, and `$color.*` / `$font.*` tokens resolve in `css` and `html`. Fonts come from the registry
+  (variable fonts are pinned to static weights with HarfBuzz); images must be template assets or PNG/JPEG data
+  URIs. Satori, resvg and HarfBuzz draw the layer at 2× into a transparent PNG named by content hash
+  (`html:<hash>`, cached per process), which composites as a still image, so `position`, `scale`, `start` and
+  `motion` work unchanged. One pipeline (`core/html/satori-raster.ts`) runs on every host, so a layer's PNG is
+  byte-identical everywhere; only where its WebAssembly comes from differs:
+  - Node reads it from `node_modules`.
+  - The browser engine (`compileBrowser`) takes it from the host through `BrowserCompileOptions.loadHtmlWasm`
+    (the web app serves it under `/html-engine/<version>/`); the engine never fetches it from a third party.
+    It loads on the first HTML layer, in lazy chunks. `renderHtmlLayerPreview(request, { loadHtmlWasm })`
+    draws one layer with the advisories its render reports, for a live preview.
+  - Hermes has no WebAssembly, so the React Native entry takes a rasteriser from the host
+    (`registerHtmlRasteriser`). The build ships `dist/html-rasteriser.html`, one self-contained page (5.2 MB,
+    the pipeline and its WebAssembly inlined) that a hidden WebView runs, spoken to with
+    `createRasterSession` / `readRasterReply` (JSON messages, PNG and fonts as base64, each font sent once per
+    page).
+
+  A host with no rasteriser registered (a browser compile without `loadHtmlWasm`, a React Native host that
+  registered none) refuses the template with `html_unavailable`; validators that only check templates (the
+  MCP server, the CLI) accept HTML layers. Validation also fails on `html_too_large` (a side over 1920 px).
+  Advisories `html_unsupported_css`, `html_unsupported_markup`, `html_font_unknown`, `html_missing_field` and
+  `html_overflow` (measured in the Node geometry checks); `motionCatalog().html` lists the subset and four
+  recipes. Samples: `html-card` (a listing reel), `html-testimonial` (a Reels quote card), `html-speaker` (a
+  conference lower third) and `html-stats` (a square stat dashboard), in `examples/motion-design/`.
+
 - Composed sound effects. An `sfx` cue takes a `sound` instead of an `id`: layers of `tone`, `noise`,
   `strike` and `silence` shaped by envelopes, filter chains, glides, drive, pan and sequences, with
   whole-sound saturate/crush/room/echo, bounded to 4 s and 8 layers. A pure TypeScript synth renders it
@@ -62,8 +91,8 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
   synchronous and platform-neutral; matches a `node:crypto` digest of the same JSON byte for byte.
 - `findingLine`, `invalidTemplateText` and `summarizeErrors` (Node entry): the plain-text renderings of
   validation findings `@leclap/mcp` uses, now shared with other agent surfaces.
-- Effects tour (`examples/motion-design/effects-tour.json`): a six-minute tour of every motion effect in ten chapters (chapter 5 now shows every fx primitive), first in the Effects & editing showcase (47 samples).
-- `samples`: new `effects` category with 11 native samples (FX pack, word captions, formats, kinetic fills, split layouts, right-to-left type, emoji type, beat grid, theme/roles/safe zones, footage editing, sound design).
+- Effects tour (`examples/motion-design/effects-tour.json`): a six-minute tour of every motion effect in ten chapters (chapter 5 now shows every fx primitive), first in the Effects & editing showcase (51 samples).
+- `samples`: new `effects` category with 16 native samples (effects tour, FX pack, word captions, formats, kinetic fills, split layouts, right-to-left type, emoji type, beat grid, theme/roles/safe zones, footage editing, sound design, and four HTML layer samples: listing reel, testimonial, speaker card, stats dashboard).
 - Determinism contract. `global.seed` roots every procedural effect. A deterministic encoder profile
   (bit-exact muxing, pinned libx264 threads) is applied to every command through one adapter tap; it is on
   by default and `ProjectConfig.deterministic: false` opts out. A render manifest is delivered through
@@ -242,6 +271,8 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
 
 ### Fixed
 
+- Two HTML layers of one section asking for the same font no longer race: the second could read the font
+  half-copied and fail with "could not instance the variable font".
 - Karaoke captions that enlarge the spoken word (`loud`, `neon`, pop) leave room for it on both sides, so it no
   longer overlaps its neighbours or leaves a narrow portrait frame; the line stays still as the highlight moves.
 - A composed note shorter than its attack plus release (a tick, a fast roll) is audible instead of silent, and

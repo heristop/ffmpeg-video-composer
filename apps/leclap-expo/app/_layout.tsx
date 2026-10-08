@@ -17,6 +17,7 @@ import { I18nextProvider } from 'react-i18next';
 import { QueryProvider } from '@/src/providers/QueryProvider';
 import { OfflineProvider } from '@/src/providers/OfflineProvider';
 import { CompileProgressOverlay } from '@/src/components/compile/CompileProgressOverlay';
+import { HtmlRasterView } from '@/src/components/compile/html-raster-view';
 import i18n from '@/src/i18n';
 import config from '../tamagui.config';
 
@@ -80,6 +81,8 @@ export default function RootLayout() {
             </Stack>
             {/* Global on-device compile experience — overlays any screen while a render is in flight. */}
             <CompileProgressOverlay />
+            {/* Hidden WebView the engine draws HTML layers in, mounted only while a render needs it. */}
+            <HtmlRasterView />
           </OfflineProvider>
         </QueryProvider>
       </I18nextProvider>
