@@ -1,0 +1,13 @@
+click -> first live camera frame (requestVideoFrameCallback), production build, headless Chromium fake device
+before cold: n=12 median=552ms min=327 max=1510  values=[327, 431, 476, 489, 523, 532, 571, 793, 926, 1038, 1208, 1510]
+after  cold: n=9 median=220ms min=120 max=311  values=[120, 153, 158, 197, 220, 247, 248, 261, 311]
+before warm: n=12 median=141ms min=97 max=306  values=[97, 99, 102, 113, 115, 128, 154, 163, 186, 192, 281, 306]
+after  warm: n=9 median=133ms min=86 max=378  values=[86, 119, 121, 126, 133, 213, 224, 294, 378]
+
+First getUserMedia of a fresh page, with and without an earlier enumerateDevices (gum-probe.mjs, 3 fresh browsers each):
+both (video+audio) cold : 560 / 658 / 574 ms
+enumerateDevices 1.5 s earlier, then both : 120 / 46 / 54 ms   (enumerateDevices itself: 1201 / 456 / 176 ms, off the click path)
+permissions.query earlier, then both : 561 / 1223 / 653 ms     (no effect)
+
+Main thread: no long task (>50 ms) between the click and the first frame in the production build, before or after.
+Measured on a loaded host (load average 20-40) with Chromium's fake capture device; real cameras add their own startup on top.

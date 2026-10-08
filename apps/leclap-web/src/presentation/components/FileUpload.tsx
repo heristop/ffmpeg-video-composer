@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { CameraCapture } from '@/presentation/components/CameraCapture';
 import { Button, Badge } from '@/presentation/components/ui';
+import { useCameraWarmUp } from '@/lib/camera-warm-up';
 import type { FramingGuideConfig } from 'ffmpeg-video-composer/src/core/types.d.ts';
 import type { CaptureMode, TemplateOrientation } from '@leclap/creative-kit';
 
@@ -124,33 +125,39 @@ interface RecordWithCameraProps {
 
 // The record-with-camera alternative to uploading, behind an "or" rule — except in the compact intake,
 // where the two sit as a plain pair under the takes and the rule would only add height.
-const RecordWithCamera = ({ compact, disabled, onOpen, t }: RecordWithCameraProps) => (
-  <>
-    {!compact && (
-      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
-        <span className="flex-1 h-px bg-foreground/10" />
-        {t('upload.or')}
-        <span className="flex-1 h-px bg-foreground/10" />
-      </div>
-    )}
+const RecordWithCamera = ({ compact, disabled, onOpen, t }: RecordWithCameraProps) => {
+  // Warm the browser's capture devices while this entry is on screen, so the first open isn't slow.
+  const warmUpProps = useCameraWarmUp(!disabled);
 
-    <Button
-      type="button"
-      variant="outline"
-      onClick={onOpen}
-      disabled={disabled}
-      className={clsx(
-        'group w-full',
-        compact ? 'px-4 py-2.5' : 'px-4 py-3 sm:px-6 sm:py-4',
-        !disabled &&
-          'border-brand-500/30 bg-brand-500/10 text-brand-700 dark:text-brand-200 hover:bg-brand-500/20 hover:border-brand-500/50 hover:-translate-y-0.5'
+  return (
+    <>
+      {!compact && (
+        <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
+          <span className="flex-1 h-px bg-foreground/10" />
+          {t('upload.or')}
+          <span className="flex-1 h-px bg-foreground/10" />
+        </div>
       )}
-    >
-      <VideoIcon className="transition-transform duration-300 group-hover:scale-110" />
-      {t('upload.recordWithCamera')}
-    </Button>
-  </>
-);
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={onOpen}
+        disabled={disabled}
+        {...warmUpProps}
+        className={clsx(
+          'group w-full',
+          compact ? 'px-4 py-2.5' : 'px-4 py-3 sm:px-6 sm:py-4',
+          !disabled &&
+            'border-brand-500/30 bg-brand-500/10 text-brand-700 dark:text-brand-200 hover:bg-brand-500/20 hover:border-brand-500/50 hover:-translate-y-0.5'
+        )}
+      >
+        <VideoIcon className="transition-transform duration-300 group-hover:scale-110" />
+        {t('upload.recordWithCamera')}
+      </Button>
+    </>
+  );
+};
 
 export const FileUpload = ({
   onFilesUploaded,

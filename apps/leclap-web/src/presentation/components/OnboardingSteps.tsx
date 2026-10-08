@@ -15,6 +15,7 @@ import type { CompilationProgress, CompilationResult } from '@/application/useca
 import type { CompileFailure } from '@/application/usecases/compile-failure';
 import { CompileFailureText } from '@/presentation/components/compile-failure-text';
 import type { ClipSource } from '@/presentation/components/onboarding.logic';
+import { useCameraWarmUp } from '@/lib/camera-warm-up';
 
 // Every step's heading carries the id the dialog is labelled by, and takes focus when its step opens
 // (Onboarding.tsx): a script-focused heading draws no ring, like the error pages' headings.
@@ -160,6 +161,8 @@ export const CreateStep = ({
   const { t } = useTranslation('onboarding');
   const { hoverProps: recordHoverProps } = useIconHover();
   const { ref: uploadRef, hoverProps: uploadHoverProps } = useIconHover();
+  // Warm the browser's capture devices while the clip choice is on screen (see camera-warm-up.ts).
+  const warmUpProps = useCameraWarmUp(videoFile === null);
 
   return (
     <div>
@@ -221,6 +224,7 @@ export const CreateStep = ({
         <div role="group" aria-labelledby="ob-clip-label" className="grid grid-cols-2 gap-3 mb-6">
           <button
             onClick={onOpenCamera}
+            {...warmUpProps}
             aria-label={t('create.recordAria')}
             className="tap group/tile flex min-h-[5.5rem] flex-col items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-brand-500/10 text-brand-700 dark:text-brand-200 transition-[transform,background-color,box-shadow,border-color] duration-300 ease-[var(--ease-spring)] hover:-translate-y-0.5 hover:border-brand-500/50 hover:bg-brand-500/20 hover:shadow-[var(--shadow-glow)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/30"
             {...recordHoverProps}
