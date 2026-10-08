@@ -19,6 +19,7 @@ import { capabilityFindings } from './capability-validation';
 import { createFootageAnalyzer } from './footage-analysis-node';
 import { descriptorAssetFiles, renderRoots } from './render-manifest-node';
 import { registerBeatsAnalyzer } from './beats-analysis-node';
+import { registerTranscription } from './transcribe-node/register-transcription';
 
 export interface NodeRenderContext {
   /** First line of `ffmpeg -version`, or null when the adapter runs no binary (or it could not run). */
@@ -73,6 +74,8 @@ export async function prepareNodeRender(setup: NodeRenderSetup): Promise<NodeRen
   assertOutputIsNotInput(setup.buildDir, setup.config, setup.descriptor);
   // The director measures `global.beats: { analyze: 'music' }` with it once the music is on disk.
   registerBeatsAnalyzer();
+  // …and pins `subtitles.transcribe` with whisper.cpp once the clips are probed.
+  registerTranscription();
 
   const binary = setup.adapter.binaries?.ffmpeg;
   const versionLine = binary ? await ffmpegVersionLine(binary) : null;

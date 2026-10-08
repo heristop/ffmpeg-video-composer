@@ -10,6 +10,7 @@ import type { ValidationError } from './validation/types';
 import { validateTimeRefs } from './time-ref-validation';
 import { validateLayouts } from './layout-validation';
 import { validateSubtitles } from './subtitles-validation';
+import { validateTranscribeSources } from './transcribe-validation';
 import { validateTakeEdits } from './take-validation';
 import { validateFootage } from './footage-validation';
 
@@ -273,6 +274,7 @@ export function validateDescriptorRules(template: TemplateDescriptor): Validatio
     ...validateTimeRefs(template),
     ...validateLayouts(template),
     ...validateSubtitles(template),
+    ...validateTranscribeSources(template),
     ...validateTakeEdits(template),
     ...validateFootage(template),
   ];

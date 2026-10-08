@@ -1,0 +1,17 @@
+1
+00:00:00,400 --> 00:00:02,520
+Every word you say becomes a caption,
+
+2
+00:00:02,540 --> 00:00:04,740
+the speech is transcribed
+on your own machine,
+
+3
+00:00:05,090 --> 00:00:06,600
+the words are pinned in the template,
+
+4
+00:00:06,860 --> 00:00:09,040
+and the next render
+looks exactly the same.

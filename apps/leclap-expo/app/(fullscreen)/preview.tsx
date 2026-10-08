@@ -17,7 +17,7 @@ import { useVideoRect } from '@/src/features/editor/preview/useVideoRect';
 import { parseOrientation } from '@/src/features/templates/orientationMeta';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PreviewToolbar } from '@/src/features/editor/preview/PreviewToolbar';
-import { TrimEditPanel, CropEditPanel } from '@/src/features/editor/preview/EditPanels';
+import { TrimEditPanel, CropEditPanel, CaptionsEditPanel } from '@/src/features/editor/preview/EditPanels';
 import { PreviewLoading, PreviewError, PreviewNoVideo } from '@/src/features/editor/preview/PreviewStates';
 
 // Resolve the guard/early-return screen (loading / error / no-video) before the main editor renders.
@@ -72,7 +72,7 @@ export default function PreviewPage() {
     status,
   });
 
-  const { canEdit, saving, handleRetake, handleDone } = usePreviewActions({
+  const { canEdit, canCaption, captionsActive, saving, handleRetake, handleDone } = usePreviewActions({
     project,
     projectId,
     sectionName,
@@ -173,8 +173,22 @@ export default function PreviewPage() {
               enterMode('crop');
             }}
             onRetake={handleRetake}
+            canCaption={canCaption}
+            captionsActive={captionsActive}
+            onCaptions={() => {
+              enterMode('captions');
+            }}
           />
         )}
+
+        <CaptionsEditPanel
+          visible={mode === 'captions'}
+          project={project}
+          sectionName={sectionName}
+          clipPath={videoUri}
+          saveProjectMutation={saveProjectMutation}
+          onClose={applyMode}
+        />
 
         {mode === 'trim' && (
           <TrimEditPanel

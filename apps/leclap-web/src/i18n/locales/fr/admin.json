@@ -1301,5 +1301,11 @@
     "replaceBody": "Il s’ouvre comme un nouveau brouillon à la place de celui-ci. Enregistre d’abord ce brouillon si tu veux le garder.",
     "replaceConfirm": "L’ouvrir",
     "replaceCancel": "Garder ce brouillon"
+  },
+  "pinnedCaptions": {
+    "label": "Sous-titres",
+    "summary": "{{count}} mots figés · {{unsure}} à vérifier",
+    "hint": "Mots transcrits depuis le clip (sur le téléphone ou avec leclap transcribe). Corrigez un mot mal entendu sur place ; les mots en ambre sont ceux dont la reconnaissance doutait. Les horaires restent ceux de la transcription.",
+    "word": "Mot à {{start}} s"
   }
 }

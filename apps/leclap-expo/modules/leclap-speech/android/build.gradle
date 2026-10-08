@@ -1,0 +1,20 @@
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+group = 'expo.modules.leclapspeech'
+version = '0.1.0'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+
+android {
+  namespace "expo.modules.leclapspeech"
+  compileSdkVersion rootProject.hasProperty("compileSdkVersion") ? rootProject.compileSdkVersion : 36
+
+  defaultConfig {
+    minSdkVersion 24
+    targetSdkVersion rootProject.hasProperty("targetSdkVersion") ? rootProject.targetSdkVersion : 36
+  }
+}

@@ -118,6 +118,7 @@ export const render = defineCommand({
     },
     qc: { type: 'boolean', description: 'Check the output (format + content); exit 1 on a failure', default: false },
     cache: { type: 'string', description: 'Per-section render cache directory' },
+    downloadModel: { type: 'boolean', description: 'Allow the one-time whisper model download', default: false },
   },
   async run({ args, rawArgs }) {
     const json = args.json;
@@ -128,6 +129,9 @@ export const render = defineCommand({
     // silent, logs teed to a file + live region). JSON mode is always silent.
     setEngineLogLevel(verbose ? 'info' : 'silent');
     process.env.LECLAP_CLI_UI = '1';
+
+    // subtitles.transcribe resolves during the render (whisper.cpp); the model download is opt-in.
+    if (args.downloadModel) process.env.LECLAP_WHISPER_DOWNLOAD = '1';
 
     await ensureTemplateExists(args.template, json);
 

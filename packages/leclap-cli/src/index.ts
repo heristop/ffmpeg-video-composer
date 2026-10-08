@@ -20,6 +20,7 @@ import { snapshot } from './commands/snapshot.js';
 import { compare } from './commands/compare.js';
 import { timeline } from './commands/timeline.js';
 import { resolve } from './commands/resolve.js';
+import { transcribe } from './commands/transcribe.js';
 
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
   version: string;
@@ -41,6 +42,7 @@ const main = defineCommand({
     compare,
     timeline,
     resolve,
+    transcribe,
   },
 });
 

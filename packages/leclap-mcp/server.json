@@ -152,6 +152,10 @@
             "description": "Render a composed or preset sfx sound with the engine synth: length, levels, centroid, attack, advisories, spectrogram and waveform PNGs."
           },
           {
+            "name": "transcribe_media",
+            "description": "Transcribe the speech of a local audio/video file with whisper.cpp on this machine: word timings, SRT, language and confidence to pin into subtitles.words."
+          },
+          {
             "name": "get_capabilities",
             "description": "Report what the local FFmpeg really renders (drawtext, LUTs, transitions, loudness, encoders), each with a fix."
           },
@@ -181,7 +185,7 @@
           }
         ],
         "prompts": ["compose-video"],
-        "notes": "Nineteen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, patching and rendering; callers cannot select executable source through effect JSON. patch_template remains registered when Remotion is disabled."
+        "notes": "Twenty tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, patching and rendering; callers cannot select executable source through effect JSON. patch_template remains registered when Remotion is disabled."
       }
     }
   }

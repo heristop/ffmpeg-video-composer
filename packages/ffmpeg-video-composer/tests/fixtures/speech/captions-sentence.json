@@ -1,0 +1,20 @@
+{
+  "sentence": "Captions turn every spoken word into text on the screen, right on the phone.",
+  "source": "macOS AVSpeechSynthesizer (com.apple.voice.compact.en-US.Samantha) written to a buffer; each start is the sample position at which the synthesizer reported willSpeakRange for the word, plus the 0.5 s lead added before encoding to 16 kHz mono AAC (0.5 s of trailing silence).",
+  "words": [
+    { "text": "Captions", "start": 0.511 },
+    { "text": "turn", "start": 1.034 },
+    { "text": "every", "start": 1.278 },
+    { "text": "spoken", "start": 1.533 },
+    { "text": "word", "start": 2.032 },
+    { "text": "into", "start": 2.253 },
+    { "text": "text", "start": 2.497 },
+    { "text": "on", "start": 2.88 },
+    { "text": "the", "start": 3.031 },
+    { "text": "screen,", "start": 3.112 },
+    { "text": "right", "start": 3.843 },
+    { "text": "on", "start": 4.076 },
+    { "text": "the", "start": 4.227 },
+    { "text": "phone.", "start": 4.308 }
+  ]
+}

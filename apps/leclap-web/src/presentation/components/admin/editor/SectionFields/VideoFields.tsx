@@ -5,7 +5,7 @@
 // one click away. The finishing controls (Effects, Section audio, Camera guide) live in collapsed
 // disclosures that only appear in Advanced mode; recorder-only controls hide in clip mode.
 import { useState } from 'react';
-import { Music, Camera, SwitchCamera, Type } from '@/presentation/components/icons';
+import { Music, Camera, SwitchCamera } from '@/presentation/components/icons';
 import { SparklesIcon } from '@/presentation/components/icons/sparkles';
 import { useTranslation } from 'react-i18next';
 import { Checkbox } from '@/presentation/components/ui';
@@ -21,7 +21,7 @@ import { NumberField } from './NumberField';
 import { SpeedField } from './SpeedField';
 import { FitField } from './fit-field';
 import { SectionAudioFields } from './SectionAudioFields';
-import { LowerThirdField } from './LowerThirdField';
+import { VideoTextFields } from './video-text-fields';
 import { CaptureModeField } from './CaptureModeField';
 import { ChromaKeyField } from './ChromaKeyField';
 import { VisualEffects } from './VisualEffects';
@@ -209,20 +209,7 @@ export const VideoFields = ({ section, orientation, variables, onChange, inputCl
       {!isClip && (
         <RecorderPromptFields section={section} variables={variables} onChange={onChange} inputCls={inputCls} />
       )}
-      <SectionDisclosure
-        label={t('disclosure.lowerThird')}
-        icon={<Type className="size-4 shrink-0 text-brand-500" aria-hidden />}
-        summary={section.lowerThird?.title?.en ?? section.lowerThird?.badge?.en ?? t('lowerThird.summaryEmpty')}
-      >
-        <LowerThirdField
-          lowerThird={section.lowerThird}
-          onChange={(lowerThird) => {
-            onChange({ lowerThird });
-          }}
-          variables={variables}
-          inputCls={inputCls}
-        />
-      </SectionDisclosure>
+      <VideoTextFields section={section} variables={variables} onChange={onChange} inputCls={inputCls} />
       {advanced && (
         <div className="space-y-2">
           <SectionDisclosure

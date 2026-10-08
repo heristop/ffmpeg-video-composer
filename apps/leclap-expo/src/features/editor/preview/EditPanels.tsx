@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import TrimPanel, { type TrimRange } from '@/src/features/editor/components/TrimPanel';
 import { styles } from './previewStyles';
 
+/** Bottom panel shown in captions mode (on-device transcription + word editor). */
+export { SectionCaptions as CaptionsEditPanel } from '@/src/features/captions/section-captions';
+
 interface TrimEditPanelProps {
   duration: number;
   value: TrimRange;

@@ -1301,5 +1301,11 @@
     "replaceBody": "Se abre como un borrador nuevo en lugar de este. Guarda primero este borrador si quieres conservarlo.",
     "replaceConfirm": "Abrirla",
     "replaceCancel": "Conservar este borrador"
+  },
+  "pinnedCaptions": {
+    "label": "Subtítulos",
+    "summary": "{{count}} palabras fijadas · {{unsure}} por revisar",
+    "hint": "Palabras transcritas del clip (en el teléfono o con leclap transcribe). Corrige una palabra mal oída en su sitio; las palabras en ámbar son las que el reconocimiento dudaba. Los tiempos se mantienen como se transcribieron.",
+    "word": "Palabra en {{start}} s"
   }
 }

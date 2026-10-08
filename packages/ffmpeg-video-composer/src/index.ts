@@ -183,7 +183,7 @@ async function runConstruction(
   const director = container.resolve(TemplateDirector).config(projectConfig, templateDescriptor);
   // Subscribe to the director's OWN emitter (the Node EventManager hands out a fresh emitter per
   // connect(), so reconnecting would miss its events) and detach once the compile settles.
-  const listeners = attachCompilationListeners(director.events, reporter?.onProgress);
+  const listeners = attachCompilationListeners(director.events, reporter?.onProgress, reporter?.signal);
 
   try {
     // Output-is-input guard, FFmpeg version, section cache (services/render-setup-node.ts).

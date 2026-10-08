@@ -41,3 +41,30 @@ export {
 } from './schemas/fields.schemas';
 // Template links: a descriptor in the web builder's URL fragment (leclap studio, MCP open_in_builder).
 export * from './core/template-link';
+// Auto-captions: the platform-neutral transcript helpers, and whisper.cpp transcription on Node
+// (services/transcribe-node): one media file, or a template's `subtitles.transcribe` requests pinned.
+export * from './core/captions/transcript-exports';
+export {
+  transcribeMediaFile,
+  fileDigest,
+  type TranscribeMediaOptions,
+} from './services/transcribe-node/transcribe-media-node';
+export {
+  transcribeTemplate,
+  clipOfSection,
+  type TranscribeTemplateOptions,
+  type TranscribeTemplateResult,
+} from './services/transcribe-node/transcribe-template-node';
+export {
+  WHISPER_MODELS,
+  DEFAULT_WHISPER_MODEL,
+  ensureWhisperModel,
+  whisperCacheDir,
+  type WhisperModelName,
+} from './services/transcribe-node/whisper-models';
+export {
+  detectWhisperBackend,
+  transcriberUnavailable,
+  type WhisperBackend,
+} from './services/transcribe-node/whisper-detect';
+export type { TranscriptPin } from './director/transcription';

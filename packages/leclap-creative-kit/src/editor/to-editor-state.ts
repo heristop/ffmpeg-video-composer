@@ -30,7 +30,8 @@ import { editorMotionFrom, motionBlocksOf, type MotionBlocks } from './motion-pa
 import { editorFormatsFrom } from './formats-passthrough';
 import { overlaysFromFilters, videoFilterStateFrom } from './overlay-parsing';
 import { pruneEmpty } from './prune';
-import { editorIdentityFrom } from './template-meta';
+import { editorIdentityFrom, renameTranscripts } from './template-meta';
+import { emittedSectionNames } from './build-descriptor';
 import { animationsFrom, choiceFromMarker, imagesFrom, overlayOptionsFrom, watermarkFrom } from './to-editor-overlay';
 
 function formSectionFrom(s: Section): EditorSection {
@@ -301,24 +302,37 @@ function musicSectionsFrom(global: TemplateDescriptor['global']): EditorSection[
   return [{ kind: 'music', allowed, allowUpload }];
 }
 
-function editorSectionsFrom(descriptor: TemplateDescriptor): EditorSection[] {
+type ImportedSection = { section: EditorSection; origin?: string };
+
+// Editor sections, each with the descriptor name it was imported from (music has none).
+function editorSectionsFrom(descriptor: TemplateDescriptor): ImportedSection[] {
   const { global: g, sections: storedSections = [] } = descriptor;
   const allowedBackgrounds = g?.allowedBackgrounds ?? [];
   const allowUploadBackground = Boolean(g?.allowUploadBackground);
 
-  const positional = storedSections
-    .map((s) => {
-      if (isPartialSection(s)) return partialSectionFrom(s);
+  const positional = storedSections.flatMap((s): ImportedSection[] => {
+    if (isPartialSection(s)) return [{ section: partialSectionFrom(s), origin: s.name }];
 
-      if (isRenderableSection(s)) return storedSectionToEditor(s, allowedBackgrounds, allowUploadBackground);
+    const section = isRenderableSection(s) ? storedSectionToEditor(s, allowedBackgrounds, allowUploadBackground) : null;
 
-      return null;
-    })
-    .filter((s): s is EditorSection => s !== null);
+    return section ? [{ section, origin: s.name }] : [];
+  });
 
-  const sections = [...musicSectionsFrom(g), ...positional];
+  const sections = [...musicSectionsFrom(g).map((section) => ({ section })), ...positional];
 
-  return sections.length > 0 ? sections : [newSection('video')];
+  return sections.length > 0 ? sections : [{ section: newSection('video') }];
+}
+
+// The builder renames every section on export (talk → video_1): pinned transcripts follow their sections.
+function importedIdentity(template: EditableTemplate, imported: ImportedSection[]) {
+  const identity = editorIdentityFrom(template);
+
+  if (!identity.resolved) return identity;
+
+  const emitted = emittedSectionNames(imported.map(({ section }) => section));
+  const origins = imported.map((entry) => entry.origin);
+
+  return { ...identity, resolved: renameTranscripts(identity.resolved, origins, emitted) };
 }
 
 export function toEditorState(template: EditableTemplate | null): EditorState {
@@ -338,16 +352,17 @@ export function toEditorState(template: EditableTemplate | null): EditorState {
   }
 
   const global = template.descriptor.global;
+  const imported = editorSectionsFrom(template.descriptor);
   const colorsList = colorsListFrom(global);
   const watermark = watermarkFrom(global);
 
   return {
     id: template.id,
-    ...editorIdentityFrom(template),
+    ...importedIdentity(template, imported),
     ...(editorMotionFrom(template.descriptor.global) ? { motion: editorMotionFrom(template.descriptor.global) } : {}),
     ...(editorFormatsFrom(template.descriptor) ? { formats: editorFormatsFrom(template.descriptor) } : {}),
     orientation: template.orientation,
-    sections: editorSectionsFrom(template.descriptor),
+    sections: imported.map(({ section }) => section),
     globalVariables: globalVariablesFrom(global),
     audio: audioFrom(global),
     defaultTransition: defaultTransitionFrom(global),

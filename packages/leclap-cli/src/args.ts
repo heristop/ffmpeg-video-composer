@@ -10,6 +10,7 @@ export const KNOWN_COMMANDS = [
   'style',
   'studio',
   'beats',
+  'transcribe',
   'snapshot',
   'compare',
   'timeline',

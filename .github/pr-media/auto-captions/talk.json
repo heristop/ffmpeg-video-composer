@@ -1,0 +1,44 @@
+{
+  "meta": {
+    "name": "Auto-captions",
+    "description": "A talking clip captioned from its own audio: transcribed once on this machine, pinned as words, then drawn as boxed karaoke captions.",
+    "creativeDirection": "Direction: a vertical social clip where the voice drives the type. A short title card, then the talk with boxed captions in the lower third, legible over the footage, each spoken word turning yellow as it is said. Review: the highlight never runs ahead of the voice, no phrase exceeds two lines, captions stay inside the platform safe zone."
+  },
+  "global": {
+    "platform": "tiktok",
+    "orientation": "portrait",
+    "theme": "leclap",
+    "fps": 30,
+    "seed": 7,
+    "musicEnabled": false,
+    "audio": { "sourceVolume": 1, "musicVolume": 0 },
+    "transition": { "type": "fade", "duration": 0.3 }
+  },
+  "sections": [
+    {
+      "name": "intro",
+      "type": "color_background",
+      "options": { "backgroundColor": "$color.bg", "duration": 1.8 },
+      "titleCard": {
+        "kicker": { "en": "AUTO-CAPTIONS" },
+        "headline": { "en": "Say it once" },
+        "subtitle": { "en": "Transcribed on your device" },
+        "align": "center",
+        "stagger": 0.12,
+        "reveal": { "type": "rise", "delay": 0.1, "duration": 0.4, "distance": 30, "easing": "ease-out" },
+        "fade": { "in": false, "out": false }
+      }
+    },
+    {
+      "name": "talk",
+      "type": "video",
+      "options": { "videoUrl": "videos/talk.mp4", "duration": 9.7 },
+      "subtitles": {
+        "transcribe": { "from": "self", "language": "en" },
+        "style": "boxed",
+        "size": 50,
+        "karaoke": "word"
+      }
+    }
+  ]
+}

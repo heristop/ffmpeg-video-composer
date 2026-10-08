@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import { vi, beforeEach, describe, it, expect } from 'vitest';
+import { container } from 'tsyringe';
 import TemplateDirector from '@/director/TemplateDirector';
+import { TRANSCRIPTION_SERVICE, type TranscriptionService } from '@/director/transcribe-sections';
 import { SectionError } from '@/core/errors/section-error';
 import type { IEventEmitter } from '@/platform/AbstractEventManager';
 import type { FFMpegInfos, ProjectConfig, Section, TemplateDescriptor } from '@/core/types';
@@ -739,6 +741,37 @@ describe('TemplateDirector.construct', () => {
     expect(result).toBeNull();
     // finalize/concat must be skipped once the build is stopped
     expect(videoEditor.concat).not.toHaveBeenCalled();
+  });
+});
+
+describe('TemplateDirector transcription cancel', () => {
+  it('aborts the running transcription when the render is cancelled', async () => {
+    const shared = new SharedEmitter();
+    const { director, template, filesystem } = makeDirectorOn(shared);
+    let seen: AbortSignal | undefined;
+    const service: TranscriptionService = {
+      transcribe: async (_file, request) => {
+        seen = request.signal;
+        shared.emit('task-cancelled');
+
+        return { engine: 'whisper.cpp', words: [] };
+      },
+      digest: async () => 'sha256:clip',
+    };
+    Object.assign(filesystem, { getSource: vi.fn(async () => '/clips/clip.mp4') });
+    container.register(TRANSCRIPTION_SERVICE, { useValue: service });
+    template.descriptor = {
+      sections: [{ name: 'clip', type: 'video', options: { duration: 4 }, subtitles: { transcribe: {} } }],
+    } as unknown as TemplateDescriptor;
+
+    try {
+      await director.construct();
+    } finally {
+      container.reset();
+    }
+
+    expect(seen?.aborted).toBe(true);
+    expect(shared.listenerCount('task-cancelled')).toBe(0);
   });
 });
 

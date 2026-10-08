@@ -1300,5 +1300,11 @@
     "replaceBody": "It opens as a new draft in place of this one. Save this draft first if you want to keep it.",
     "replaceConfirm": "Open it",
     "replaceCancel": "Keep this draft"
+  },
+  "pinnedCaptions": {
+    "label": "Captions",
+    "summary": "{{count}} pinned words · {{unsure}} to check",
+    "hint": "Words transcribed from the clip (on the phone or with leclap transcribe). Fix a misheard word in place; amber words are the ones the recogniser was unsure of. Timings stay as transcribed.",
+    "word": "Word at {{start}} s"
   }
 }

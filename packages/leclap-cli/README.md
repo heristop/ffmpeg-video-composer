@@ -29,6 +29,7 @@ leclap samples export <id> # raw descriptor JSON to stdout (or --output <new-fil
 leclap verify <manifest>  # check a video against its render manifest (--rerender to re-render and compare)
 leclap style <reference>  # derive a theme + style guide from an image or clip (--json, --out style-guide.md)
 leclap beats <audio>      # tempo, beat grid, confidence and drop/build cues for global.beats (--json)
+leclap transcribe <t|media> # speech → word-timed captions with whisper.cpp, pinned into the template (--srt, --json)
 leclap snapshot <template> # render and save still frames (PNG) of chosen moments, contact sheets
 leclap compare <a> <b>    # the same moment of several templates in one labelled grid
 leclap timeline <template> # sections, motion events, beats and cues on video seconds (--json)
@@ -249,6 +250,27 @@ warning: whatever page that origin serves can read the template in the fragment,
 when you trust it (a local dev server is fine). `leclap studio open <template>` is the explicit form;
 `leclap studio status` and `leclap studio pass` remain the gate commands, so a template file cannot be named
 `status`, `pass` or `open` without the explicit form.
+
+## `transcribe` — captions from speech
+
+```bash
+leclap transcribe promo.json --video talk=talk.mov   # pin every subtitles.transcribe request in place
+leclap transcribe promo.json --section talk --out pinned.json --language fr --model tiny
+leclap transcribe promo.json --force                 # re-transcribe sections that are already pinned
+leclap transcribe talk.mov --srt                     # a media file: its SRT (--json: words, language, confidence)
+leclap transcribe talk.mov --download-model          # first run: fetch the whisper model once
+```
+
+Runs [whisper.cpp](https://github.com/ggml-org/whisper.cpp) on this machine: the audio never leaves it.
+It needs the whisper.cpp CLI (`brew install whisper-cpp`, or `whisper-cli` on `PATH`, or
+`LECLAP_WHISPER_CLI`) or an FFmpeg built with `--enable-whisper`. The model (`base` by default, 148 MB;
+`tiny` 78 MB) is downloaded only with `--download-model`, into `~/.cache/leclap/whisper`, and checked
+against its published SHA-256. A template's requests are replaced by `subtitles.words` and recorded in
+`meta.resolved.transcripts` (engine, model, language, clip digest, date), so every render reads the same
+words; review them before publishing. A pin whose clip changed is reported as `transcript_stale`, one
+whose section was re-cut since (clip, speed, ramp, freeze, trim, duration) as `transcript_edit_changed`.
+`leclap render` resolves an unpinned request on the fly (and `--download-model` allows the model
+download there too). See [auto-captions](../../docs/template-configuration.md#auto-captions-transcribe-then-pin).
 
 ## `studio` — a production folder
 

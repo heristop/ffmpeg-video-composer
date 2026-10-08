@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { META_INTENT_FIELDS } from './section-intent.schemas';
+import { ResolvedRecordsSchema } from './transcribe.schemas';
 
 // The descriptor's `meta` block: human-facing metadata plus the authoring intent (brief, purpose rule).
 export const TemplateMetaSchema = z
@@ -18,6 +19,7 @@ export const TemplateMetaSchema = z
           'Implement the direction explicitly in sections, filters and effect props.'
       ),
     ...META_INTENT_FIELDS,
+    resolved: ResolvedRecordsSchema.optional(),
   })
   .strict()
   .describe('Optional human-facing metadata embedded in the descriptor; behavioral catalog fields are derived.');

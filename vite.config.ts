@@ -336,6 +336,7 @@ export default defineConfig({
         files: [
           'apps/leclap-expo/src/features/editor/components/ExportSheet.test.ts',
           'apps/leclap-expo/src/features/editor/preview/PreviewPage.test.ts',
+          'apps/leclap-expo/src/features/captions/captions-panel.test.ts',
           'apps/leclap-expo/src/components/clappy/clappy-motion.test.ts',
           'apps/leclap-expo/src/hooks/use-motion-preferences.test.ts',
         ],

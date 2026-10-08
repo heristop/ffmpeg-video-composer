@@ -85,6 +85,10 @@
       "title": "Kompilierungsfehler",
       "message": "Ein unerwarteter Fehler ist aufgetreten: {{error}}",
       "unknownError": "Unbekannter Fehler"
+    },
+    "captionsPending": {
+      "title": "Untertitel prüfen",
+      "message": "Diese Vorlage untertitelt, was du sagst. Öffne {{steps}}, schalte Untertitel ein und prüfe die Wörter, dann erstelle das Video."
     }
   }
 }

@@ -111,6 +111,9 @@ const GUIDE = [
     'of the section playing then, so "beat:n", "bar:n" and "cue:drop" land on the music. Section lengths may ' +
     'be options.duration { beats: n } / { bars: n }. global.beats { analyze: "music" } measures the track at ' +
     'compose time on this Node server. When usable is false (calm or ambient music), pace by phrases instead of beats.',
+  'Captions from speech: subtitles { transcribe: { from?: "self" | section, language? } } is pinned into ' +
+    'subtitles.words by compose_video (whisper.cpp on this server); or call transcribe_media on the clip and pin ' +
+    'the words yourself (subtract clip.from). Transcribe once, then pin; have the user review low-confidence words.',
   'Recorded footage (video/project_video): look accepts { preset, strength } for the LUT looks; grade.lut ' +
     '{ url, strength? } applies a user .cube (e.g. Log → Rec.709) first; options.trimSilence cuts silent edges ' +
     'and long pauses (Node analysis; elsewhere pass options.keep [[from,to],…]); cutaways[] overlay B-roll ' +

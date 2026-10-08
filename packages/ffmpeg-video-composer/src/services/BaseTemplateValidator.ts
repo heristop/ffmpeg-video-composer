@@ -19,6 +19,7 @@ import { expandPartialsSafe } from '@/core/partials';
 import { resolveThemeDescriptor } from '@/core/theme/resolve';
 import { resolveSectionDurations } from '@/core/timing/durations';
 import { validateBeatsAnalysis } from './time-ref-validation';
+import { validateTranscription } from './transcribe-validation';
 import { usesFormats } from '@/core/formats/resolve';
 import { validateEachFormat } from './validation/format-validation';
 import { validateWithFields } from './validation/field-validation';
@@ -57,6 +58,11 @@ export interface ValidatorOptions {
    * Default true.
    */
   beatsAnalysis?: boolean;
+  /**
+   * Whether the host resolves `subtitles.transcribe` itself (the Node compile does, with a transcriber
+   * installed). False on the browser and on-device engines: transcribe_unavailable. Default true.
+   */
+  transcription?: boolean;
 }
 
 export class BaseTemplateValidator {
@@ -248,6 +254,7 @@ export class BaseTemplateValidator {
     return [
       ...this.validateSectionReferences(template),
       ...validateBeatsAnalysis(template, this.options.beatsAnalysis ?? true),
+      ...validateTranscription(template, this.options.transcription ?? true),
       ...validateDescriptorRules(lowered),
     ];
   }

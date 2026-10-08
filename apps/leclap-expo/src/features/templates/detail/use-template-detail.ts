@@ -11,6 +11,7 @@ import { needsMediaStep } from '@/src/services/media/mediaStepHelpers';
 import { getSectionInfo } from '@/src/features/templates/detail/section-status';
 import { computeAllDone } from '@/src/features/templates/detail/progress';
 import { compileTemplate } from '@/src/features/templates/detail/compile-template';
+import { applyCaptionPins } from '@/src/features/captions/caption-store';
 import { buildHeaderDescription, defaultMusicChoice } from '@/src/features/templates/detail/header-description';
 
 type HandlerCtx = {
@@ -159,10 +160,27 @@ function useCompileHandler(ctx: CompileCtx) {
 
   return () => {
     if (!project || !template) return;
+
+    // The device engine never transcribes: pin the reviewed on-device captions, and stop on a step whose
+    // template still asks for a transcription nobody has run yet, or whose clip was retaken since.
+    const { descriptor: templateDescriptor, pending } = applyCaptionPins(
+      compileTemplate(template.content, project.formData),
+      project
+    );
+
+    if (pending.length > 0) {
+      Alert.alert(
+        t('alerts.captionsPending.title'),
+        t('alerts.captionsPending.message', { steps: pending.join(', ') })
+      );
+
+      return;
+    }
+
     onDeviceCompilation.mutate(
       {
         projectId: project.id,
-        templateDescriptor: compileTemplate(template.content, project.formData),
+        templateDescriptor,
         recordedVideos: project.recordedVideos,
         mediaChoices,
         qualityTier,

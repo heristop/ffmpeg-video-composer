@@ -14,10 +14,12 @@ Upgrading from v2? See the [migration guide](MIGRATION.md#upgrading-from-v2-to-v
 - Composed sound effects. An `sfx` cue takes a `sound` instead of an `id`: layers of `tone`, `noise`,
   `strike` and `silence` shaped by envelopes, filter chains, glides, drive, pan and sequences, with
   whole-sound saturate/crush/room/echo, bounded to 4 s and 8 layers. A pure TypeScript synth renders it
-  (identical on Node, browsers and Hermes, seeded by `global.seed` and the cue path) to `build/sfx/<hash>.wav`,
+  (deterministic per platform and matching across Node, browsers and Hermes up to the last bit, seeded by
+  `global.seed` and the cue path) to `build/sfx/<hash>.wav`,
   mixed like a library file. Every library sound is also a recipe (`SOUND_PRESETS`); `sound.preset` varies one
-  by `pitch`, `length`, `brightness` and `room`, while `id` cues keep playing the shipped files. Advisories
-  `sound_clipped`, `sound_harsh`, `sound_muddy`, `sound_long`, `sound_repeated` and `sound_overlap`;
+  by `pitch`, `length`, `brightness` and `room`, while `id` cues keep playing the shipped files. A sound's notes
+  add up to at most 32 s of audio, so its render cost stays bounded. Advisories `sound_silent`, `sound_clipped`,
+  `sound_harsh`, `sound_muddy`, `sound_long`, `sound_repeated` and `sound_overlap`;
   `motionCatalog().audio.compose`; `renderSound`, `analyzeChannels`, `soundSpec` and `SoundSchema` exports.
 - Typed template fields: `global.fields` declares a template's inputs (map or list of `{ name, type, default?,
 required?, maxLength?, min?, max?, options?, label?, description? }`, types text, color, url, media, number,
@@ -34,6 +36,23 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
   filtergraph separators is refused in a raw filter value. Validation without values returns the authored
   descriptor; the resolved descriptor drops `global.fields`, so resolution is idempotent. A form field bound
   to a non-text declared field may omit `maxLength`.
+- Auto-captions: `subtitles.transcribe: { from?, language?, model? }` asks for a section's speech as word
+  timings. Transcribe once, then pin: a Node resolve pass (whisper.cpp — the `whisper-cli` binary with DTW word
+  alignment, else an FFmpeg built with `--enable-whisper`) replaces the request with `subtitles.words` and records
+  engine, model, language, clip digest and date in `meta.resolved.transcripts`; renders only read pinned words.
+  Word times are mapped from clip to section seconds through `clip`, `speed`, speed ramps, freeze holds and kept
+  take windows. The Node compile resolves an unpinned request itself; the browser and on-device engines report
+  `transcribe_unavailable`. New advisories `transcript_low_confidence` and `transcript_stale` (the clip changed
+  since the pin), new error `invalid_transcribe_source`, and optional `confidence` on words. Node exports
+  `transcribeMediaFile`, `transcribeTemplate`, `ensureWhisperModel` (models downloaded once on explicit opt-in to
+  `~/.cache/leclap/whisper`, SHA-256-verified, never bundled) and the platform-neutral `mapTranscriptWords`,
+  `pinTranscript`, `transcriptSrt` (also on the React Native entry). Pins also record a fingerprint of the
+  section's edits, and `transcript_edit_changed` reports a pin whose clip, speed, trim, ramp or freeze changed
+  since. `CompileReporter.signal` (Node) cancels a build, transcription included.
+- Template links (Node entry): `createBuilderLink`, `encodeTemplatePayload` / `decodeTemplatePayload` and
+  `mediaToRebind` carry a template, compressed, in a builder URL's `#t=` fragment (never sent to a server),
+  listing the media only the source machine can read (local paths, `file:`, `media://`, unsupported schemes).
+  A base URL other than `https://leclap.dev` adds a warning, since that page can read the fragment.
 - `applyJsonPatch(doc, operations, { maxOps })` and `parsePointer(pointer)` (Node entry): RFC 6902 JSON
   Patch (`add`, `remove`, `replace`, `move`, `copy`, `test`) over RFC 6901 pointers (`-` append, `~0`/`~1`
   escapes). Atomic (runs on a copy, the input is never mutated); rejects `__proto__`/`prototype`/`constructor`
@@ -223,6 +242,10 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
 
 ### Fixed
 
+- Karaoke captions that enlarge the spoken word (`loud`, `neon`, pop) leave room for it on both sides, so it no
+  longer overlaps its neighbours or leaves a narrow portrait frame; the line stays still as the highlight moves.
+- A composed note shorter than its attack plus release (a tick, a fast roll) is audible instead of silent, and
+  jittered, accelerating rolls keep every hit.
 - Zooms and pans (camera rig, Ken Burns, pulse, `resolve`, `zoom-through`) no longer stutter: `zoompan`
   cropped a whole-pixel window, so a slow push-in held for one to four frames and then jumped by up to a
   pixel, sometimes backwards. Every zoom now lowers to an exact sub-pixel zoom with the same on-device

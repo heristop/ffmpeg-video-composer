@@ -85,6 +85,10 @@
       "title": "Compilation Error",
       "message": "An unexpected error occurred: {{error}}",
       "unknownError": "Unknown error"
+    },
+    "captionsPending": {
+      "title": "Captions to review",
+      "message": "This template captions what you say. Open {{steps}}, turn on Captions and check the words, then create the video."
     }
   }
 }

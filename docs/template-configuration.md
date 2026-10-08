@@ -509,7 +509,7 @@ A section's `caption` field renders a styled lower-third / overlay as a `drawtex
 
 ## Subtitles (word-timed captions)
 
-A section's `subtitles` turns copy plus timing into designed captions, on every section type. Give it speech-to-text `words` (`[{ text, start, end }]`, section seconds), authored `cues` (`[{ at, end, text, words? }]`; `at`/`end` accept [time references](#time-references)) or an inline `srt` (SRT or WebVTT text).
+A section's `subtitles` turns copy plus timing into designed captions, on every section type. Give it speech-to-text `words` (`[{ text, start, end, confidence? }]`, section seconds; or [`transcribe`](#auto-captions-transcribe-then-pin) to get them from the clip), authored `cues` (`[{ at, end, text, words? }]`; `at`/`end` accept [time references](#time-references)) or an inline `srt` (SRT or WebVTT text).
 
 ![Every caption DNA style](./media/gallery/caption-styles.webp)
 
@@ -535,6 +535,56 @@ Words are grouped into phrases: a new phrase starts after a pause ≥ `group.pau
 | `font` / `color` / `activeColor`                                        | Overrides (bundled font only; colours accept `$color.*`).                                                                                    |
 
 Everything lowers to `drawtext` / `drawbox` gated by `enable` windows. Errors: `invalid_srt`, `invalid_word_timings` (out of order, or overlapping by more than 0.02 s), `invalid_subtitle_cue`, `subtitle_font_unmeasurable`. Advisories: `caption_split`, `caption_shrunk`, `subtitle_past_end`, `caption_crown_repeated`. See [`examples/motion-design/word-captions.json`](../examples/motion-design/word-captions.json).
+
+### Auto-captions: `transcribe`, then pin
+
+`subtitles.transcribe` asks for the section's own speech instead of authored words. Transcription is not deterministic across engines, models and OS versions, and renders are, so it is a **resolve pass**: it runs once, writes `words` (with a `confidence` per word) into the descriptor, and every later render reads those pinned words like authored ones.
+
+```jsonc
+"subtitles": {
+  "transcribe": { "from": "self", "language": "en" },   // "self" (default) or the name of a video section
+  "style": "loud",
+  "karaoke": "word"
+}
+```
+
+| Field      | Description                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------------- |
+| `from`     | `"self"` (default): this section's own clip. A section name: that `video` / `project_video` clip. |
+| `language` | BCP-47 (`en`, `fr-FR`). Omitted: detected, then recorded in the pin.                              |
+| `model`    | Whisper model on Node: `tiny`, `base` (default), `small`.                                         |
+
+Pinning replaces `transcribe` with `words` and records how they were made in `meta.resolved.transcripts[<section>]`: `{ from, engine, model, language, digest, edit, at, confidence }` (`digest` is the SHA-256 of the source clip; `edit` fingerprints the source section's `clip`, `keep`, `trimSilence`, `speedRamp`, `freeze`, `speed` and `duration`, the edits the words were mapped through; older pins without it are not checked). A resolved template never holds both: `transcribe` next to `words`, `cues` or `srt` is a validation error.
+
+```jsonc
+"meta": { "resolved": { "transcripts": { "talk": {
+  "from": "talk", "engine": "whisper.cpp", "model": "base", "language": "en",
+  "digest": "sha256:0e7a…", "edit": "fnv1a:3c9a51e2", "at": "2026-10-07T14:31:08.458Z", "confidence": 0.956
+} } } }
+```
+
+Word times are recognised in clip seconds and mapped to section seconds through the source section's edits, in the order the lowering applies them: `clip` range (or the kept windows of `keep` / `trimSilence`), `speedRamp`, `freeze` holds, then `speed`; words outside the kept footage are dropped, and words past `duration` are cut.
+
+**Where it runs.** Audio never leaves the device; there is no cloud speech API.
+
+| Surface         | Engine                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node (CLI, MCP) | [whisper.cpp](https://github.com/ggml-org/whisper.cpp) (MIT). Detection order: `LECLAP_WHISPER_CLI`, then `whisper-cli` / `whisper-cpp` on `PATH` (word times from its DTW alignment), then an FFmpeg built with `--enable-whisper` (its `whisper` filter times phrases only: words are spread over each phrase and karaoke is turned off). `LECLAP_WHISPER_ENGINE=cli\|ffmpeg` forces one. |
+| Phone (Expo)    | The OS recogniser, on device only (iOS `SFSpeechRecognizer` with `requiresOnDeviceRecognition`, Android 13+ on-device `SpeechRecognizer`), from the Captions toggle on a video step; the app pins the words before compiling.                                                                                                                                                               |
+| Browser         | Not yet: validation reports `transcribe_unavailable`. Pin the words first (the builder edits pinned words).                                                                                                                                                                                                                                                                                 |
+
+**Models (Node).** Never bundled. Downloaded once, only on an explicit opt-in (`leclap transcribe --download-model`, `leclap render --download-model` or `LECLAP_WHISPER_DOWNLOAD=1`), from `huggingface.co/ggerganov/whisper.cpp` into `~/.cache/leclap/whisper` (`LECLAP_WHISPER_DIR`, else `$XDG_CACHE_HOME/leclap/whisper`), and SHA-256-verified against the published checksum. `LECLAP_WHISPER_MODEL` points at a ggml model file of your own. Without a model the pass fails with `whisper_model_missing`; without whisper.cpp, with `transcriber_unavailable` and install instructions (`brew install whisper-cpp` on macOS).
+
+**Pin, then review.**
+
+```bash
+leclap transcribe promo.json --video talk=talk.mov   # pins every request in place (--out to write elsewhere)
+leclap transcribe talk.mov --srt                     # a media file: prints its SRT (--json: words + language)
+```
+
+`leclap render` (and the MCP `compose_video`) also resolves an unpinned request on the fly and logs the pin, but only `leclap transcribe` (or the `transcribe_media` MCP tool) keeps the words in the template, so the next render is identical. Show the words to a human before publishing: recognisers mishear names and jargon.
+
+Errors: `invalid_transcribe_source` (`from` is not a clip section), `transcribe_unavailable` (browser and on-device engines). Advisories: `transcript_low_confidence` (mean word confidence under 0.6: review the words), `transcript_stale` (the clip's digest no longer matches the pin: re-transcribe with `leclap transcribe --force`; reported by the Node render and `leclap transcribe`), `transcript_edit_changed` (the source section's edits no longer match the pin's `edit` fingerprint, so the words may sit at the wrong times: re-transcribe with `--force`; reported by every Node render and `leclap transcribe`).
 
 ## Fonts
 

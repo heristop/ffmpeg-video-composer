@@ -4,19 +4,14 @@
 import type { Filter, ProjectBuildInfos, ProjectConfig, Section } from '@/core/types';
 import DefaultConfig from '@/core/default.config';
 import { footagePlan, hasFootageEdits, type FootagePlan } from '@/core/footage/plan';
+import { sourceLengthFor } from '@/core/footage/source-length';
 import { footageAudioChain, footageVideoFilters } from './footage-lowering';
 
 const FOOTAGE_TYPES = new Set(['video', 'project_video']);
 
 /** The full source length of the clip a section plays, when it was probed. */
 export function sourceLengthOf(section: Section, buildInfos: ProjectBuildInfos): number | undefined {
-  const lengths = buildInfos.sourceDurations ?? {};
-
-  if (section.type === 'project_video') return lengths[section.name];
-
-  const reused = section.options?.useVideoSection;
-
-  return section.type === 'video' && reused ? lengths[reused] : undefined;
+  return sourceLengthFor(section, buildInfos.sourceDurations);
 }
 
 /** The section's footage plan, or null when it edits nothing (the section then lowers as before). */

@@ -32,7 +32,7 @@ pnpm workspaces (`apps/*`, `packages/*`, plus `examples/llm-remotion-title`); no
 | `apps/leclap-expo`               | `@leclap/expo`                            | Expo / React Native app — on-device native-engine compiles, Tamagui UI _(reference)_.                                                |
 | `apps/leclap-web`                | `@leclap/web`                             | React 19 + Vite + Tailwind web app — in-browser FFmpeg via WASM _(reference)_.                                                       |
 
-The user-facing CLI is `@leclap/cli` (`leclap render|init|validate|samples|verify|snapshot|compare|timeline|resolve|style|beats|studio|diagnose`). The `compile`/`diagnose` monorepo dev scripts still live in `packages/ffmpeg-video-composer` (root `pnpm compile` / `pnpm diagnose` delegate to them).
+The user-facing CLI is `@leclap/cli` (`leclap render|init|validate|samples|verify|snapshot|compare|timeline|resolve|style|beats|transcribe|studio|diagnose`). The `compile`/`diagnose` monorepo dev scripts still live in `packages/ffmpeg-video-composer` (root `pnpm compile` / `pnpm diagnose` delegate to them).
 
 ## Setup
 

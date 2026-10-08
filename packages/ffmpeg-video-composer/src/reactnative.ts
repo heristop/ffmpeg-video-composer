@@ -248,3 +248,5 @@ export type {
   ResolvedEffectProvenance,
   ResolvedTemplateEffects,
 } from './core/resolve-template-effects';
+// Auto-captions: transcript time mapping, pinning and the pin record (core/captions/transcript-exports.ts).
+export * from './core/captions/transcript-exports';

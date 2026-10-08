@@ -1300,5 +1300,11 @@
     "replaceBody": "Sie öffnet sich als neuer Entwurf anstelle dieses Entwurfs. Speichere diesen Entwurf zuerst, wenn du ihn behalten willst.",
     "replaceConfirm": "Öffnen",
     "replaceCancel": "Entwurf behalten"
+  },
+  "pinnedCaptions": {
+    "label": "Untertitel",
+    "summary": "{{count}} festgelegte Wörter · {{unsure}} zu prüfen",
+    "hint": "Aus dem Clip transkribierte Wörter (auf dem Handy oder mit leclap transcribe). Korrigiere ein falsch verstandenes Wort direkt; bernsteinfarbene Wörter waren für die Erkennung unsicher. Die Zeiten bleiben wie transkribiert.",
+    "word": "Wort bei {{start}} s"
   }
 }

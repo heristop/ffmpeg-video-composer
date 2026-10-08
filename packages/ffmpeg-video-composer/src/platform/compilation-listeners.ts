@@ -13,9 +13,12 @@ export interface CompilationListeners {
 // Node `compile()` so both forward the director's per-segment progress (0..1) identically. The emitter
 // can be a singleton (browser) reused across compilations, so `detach()` must be called once a
 // compilation settles to stop listeners accumulating and double-firing on the next run.
+//
+// An aborted `signal` cancels the compilation: it emits `task-cancelled` on the same emitter.
 export function attachCompilationListeners(
   emitter: IEventEmitter,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
+  signal?: AbortSignal
 ): CompilationListeners {
   let compilationError: unknown = null;
 
@@ -27,14 +30,22 @@ export function attachCompilationListeners(
     onProgress?.(typeof fraction === 'number' ? fraction : 0);
   }
 
+  function onAbort(): void {
+    emitter.emit('task-cancelled');
+  }
+
   emitter.on('task-stopped', onStopped);
   emitter.on('compilation-progress', onProgressEvent);
+  signal?.addEventListener('abort', onAbort, { once: true });
+
+  if (signal?.aborted) onAbort();
 
   return {
     getError: () => compilationError,
     detach: () => {
       emitter.off?.('task-stopped', onStopped);
       emitter.off?.('compilation-progress', onProgressEvent);
+      signal?.removeEventListener('abort', onAbort);
     },
   };
 }

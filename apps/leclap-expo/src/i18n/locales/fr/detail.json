@@ -85,6 +85,10 @@
       "title": "Erreur de compilation",
       "message": "Une erreur inattendue est survenue : {{error}}",
       "unknownError": "Erreur inconnue"
+    },
+    "captionsPending": {
+      "title": "Sous-titres à vérifier",
+      "message": "Ce modèle sous-titre ce que vous dites. Ouvrez {{steps}}, activez Sous-titres et vérifiez les mots, puis créez la vidéo."
     }
   }
 }

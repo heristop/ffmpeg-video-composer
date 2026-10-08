@@ -1,0 +1,34 @@
+$ leclap transcribe .github/pr-media/auto-captions/talk.json \
+    --video talk=.github/pr-media/auto-captions/talk.mp4 \
+    --out .github/pr-media/auto-captions/talk.pinned.json
+✓ talk: pinned 30 words (whisper.cpp base, en, confidence 0.927)
+  › wrote .github/pr-media/auto-captions/talk.pinned.json
+
+# talk.pinned.json, section "talk": `transcribe` is replaced by the words (first 4 of 30)
+"subtitles": {
+  "words": [
+    {"text": "Every", "start": 0.4, "end": 0.58, "confidence": 0.8677},
+    {"text": "word", "start": 0.58, "end": 0.86, "confidence": 0.997},
+    {"text": "you", "start": 0.86, "end": 1, "confidence": 0.9972},
+    {"text": "say", "start": 1, "end": 1.44, "confidence": 0.9974},
+    …
+  ],
+  "style": "boxed",
+  "size": 50,
+  "karaoke": "word"
+}
+
+# talk.pinned.json, meta.resolved
+"resolved": {
+  "transcripts": {
+    "talk": {
+      "from": "talk",
+      "engine": "whisper.cpp",
+      "model": "base",
+      "language": "en",
+      "digest": "sha256:e945f354f48a50ad81c0fe4d699813a9e25075cbf4f3ef5348d7f01a4dbb755c",
+      "at": "2026-10-07T18:58:44.950Z",
+      "confidence": 0.927
+    }
+  }
+}

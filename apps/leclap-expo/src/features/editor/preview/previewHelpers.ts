@@ -1,7 +1,7 @@
 import type { NormalizedCrop, VideoRect } from '@/src/features/editor/components/CropOverlay';
 import type { TrimRange } from '@/src/features/editor/components/TrimPanel';
 
-export type EditMode = 'view' | 'trim' | 'crop';
+export type EditMode = 'view' | 'trim' | 'crop' | 'captions';
 
 export const FULL_CROP: NormalizedCrop = { x: 0, y: 0, w: 1, h: 1 };
 

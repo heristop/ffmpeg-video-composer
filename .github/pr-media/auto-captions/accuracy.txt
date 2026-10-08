@@ -1,0 +1,36 @@
+Auto-captions: what was said vs what was pinned
+================================================
+
+Source   talk.mp4 (9.7 s, 720x1280, mono AAC 48 kHz). The voice is macOS `say -v Samantha -r 185`,
+         delayed 0.4 s, with 0.6 s of silence after it.
+Engine   whisper.cpp (whisper-cli, Homebrew) with ggml-base.bin, language "en", DTW word times.
+         `leclap transcribe` took about 1.4 s wall time on this Mac (Apple silicon, under load).
+
+Said      Every word you say becomes a caption. The speech is transcribed on your own machine,
+          the words are pinned in the template, and the next render looks exactly the same.
+Pinned    Every word you say becomes a caption, the speech is transcribed on your own machine,
+          the words are pinned in the template, and the next render looks exactly the same.
+
+Words     30 said, 30 pinned, 30 matching (case and punctuation ignored): word error rate 0 %.
+          One punctuation difference: the full stop after "caption" came back as a comma.
+Confidence  mean 0.927 (recorded in meta.resolved.transcripts.talk). Lowest: "the" 0.57 and
+          "words" 0.58 (5.09-5.42 s), right after a pause; both are correct. No word is under the
+          0.6 mean threshold of the transcript_low_confidence advisory, which is not raised.
+
+Timing    Checked against the clip's own silences (ffmpeg silencedetect, -40 dB, >= 0.12 s): the
+          word that follows each silence should start where the silence ends.
+
+          silence in the clip      next pinned word           start error
+          0.000-0.405 s (lead)     "Every"     0.40 s         -0.005 s
+          2.290-2.536 s            "the"       2.54 s         +0.004 s
+          4.864-5.084 s            "the"       5.09 s         +0.006 s
+          6.655-6.863 s            "and"       6.86 s         -0.003 s
+          9.093-9.707 s (tail)     "same." ends 9.04 s        -0.053 s (end)
+
+          Word starts land within 10 ms of the speech onsets. Word ends are looser: "caption,"
+          is pinned to end at 2.52 s although the voice stops at 2.29 s (whisper's DTW stretches
+          the last word of a phrase over the pause), so the highlight can linger a little on the
+          word before a pause. The next word's highlight still starts on time.
+
+Repeatability  Transcribing the same clip again gives the same 30 words and times; only the "at"
+          timestamp of the pin changes.

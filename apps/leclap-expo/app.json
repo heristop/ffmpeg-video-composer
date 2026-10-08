@@ -13,7 +13,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "LeClap needs access to your camera to record videos for your projects",
         "NSMicrophoneUsageDescription": "LeClap needs access to your microphone to record audio for your videos",
-        "NSPhotoLibraryUsageDescription": "LeClap needs access to your photo library to save and import your videos"
+        "NSPhotoLibraryUsageDescription": "LeClap needs access to your photo library to save and import your videos",
+        "NSSpeechRecognitionUsageDescription": "LeClap turns the speech in your clips into captions, on your device: the audio never leaves your phone"
       },
       "bundleIdentifier": "com.heristop.leclap"
     },

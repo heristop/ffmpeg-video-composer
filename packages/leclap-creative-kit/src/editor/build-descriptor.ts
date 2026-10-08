@@ -174,6 +174,17 @@ function descriptorFor({ section, index }: IndexedSection): DescriptorSection | 
 // Descriptor sections, in editor order. music sections produce nothing here —
 // they are folded into the global media fields.
 function mapEditorSections(sections: EditorSection[]): DescriptorSection[] {
+  return indexSections(sections)
+    .map(descriptorFor)
+    .filter((s): s is Section => s !== null);
+}
+
+/** The name buildDescriptor gives each editor section (undefined for music), aligned with `sections`. */
+export function emittedSectionNames(sections: EditorSection[]): Array<string | undefined> {
+  return indexSections(sections).map((indexed) => descriptorFor(indexed)?.name);
+}
+
+function indexSections(sections: EditorSection[]): IndexedSection[] {
   let videoIndex = 0;
   let clipIndex = 0;
   let imageIndex = 0;
@@ -191,7 +202,7 @@ function mapEditorSections(sections: EditorSection[]): DescriptorSection[] {
     return { section, index: (descIndex += 1) };
   });
 
-  return counted.map(descriptorFor).filter((s): s is Section => s !== null);
+  return counted;
 }
 
 // The emitted names of the sections a whole-video text overlay can target (global.overlays[].sections):

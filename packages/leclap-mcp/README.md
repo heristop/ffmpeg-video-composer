@@ -29,6 +29,7 @@ video models, which sample rather than render.
 | `extract_style`         | Reference image/clip under the media dir → `{ theme, styleGuide, confidence }`: palette roles + WCAG contrast, grain, pacing (palette and pacing only)                                        |
 | `analyze_music`         | Measure a local music file → `{ bpm, offset, beatsPerBar, confidence, usable, cues, globalBeats }` for `global.beats` and `cue:drop`                                                          |
 | `analyze_sound`         | Render an `sfx[].sound` (composed, or a preset with variations) → length, peak/RMS dBFS, centroid, high/low energy shares, attack, advisories + spectrogram and waveform PNGs                 |
+| `transcribe_media`      | Transcribe a local audio/video file's speech with whisper.cpp, locally → `{ words, srt, language, confidence, advice }` to pin into `subtitles.words`                                         |
 | `get_capabilities`      | Local FFmpeg capability report (listings + one-frame probes) → each feature yes/no/unknown with a fix                                                                                         |
 | `open_in_builder`       | Template → a `leclap.dev/studio/builder#t=…` link for a person to edit it; the template rides in the URL fragment (never sent to a server) → `{ url, length, mediaToRebind, warnings }`       |
 | `render_remotion_clip`  | _(bonus, opt-in)_ Render a composition from **your own** Remotion project → an mp4 clip for a `project_video` section                                                                         |
@@ -201,9 +202,9 @@ time; see the [template reference](../../docs/template-configuration.md#typed-fi
 `render_frames` refuse a missing required value or one that fails its type before rendering; and
 `get_resolved_template` shows the descriptor those `fields` produce.
 
-Nineteen tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`,
+Twenty tools are always registered: `ping`, `list_samples`, `get_sample`, `get_template_schema`,
 `get_motion_catalog`, `report_catalog_gap`, `get_timeline`, `get_resolved_template`, `validate_template`, `compose_video`,
-`render_frames`, `patch_template`, `edit_template`, `probe_media`, `extract_style`, `analyze_music`, `analyze_sound`, `get_capabilities` and `open_in_builder`. Opt-in adds
+`render_frames`, `patch_template`, `edit_template`, `probe_media`, `extract_style`, `analyze_music`, `analyze_sound`, `transcribe_media`, `get_capabilities` and `open_in_builder`. Opt-in adds
 `get_effect_schema`, `render_preview` and `render_remotion_clip`. Patch availability does not bypass
 effect-backend validation.
 
@@ -223,8 +224,16 @@ vocabulary to in-browser agents through [WebMCP](../../docs/webmcp.md): `get_tem
 `get_motion_catalog`, `list_samples`, `get_sample`, `validate_template`, `get_timeline`, `edit_template`
 and `render_frames` mean the same there, and both surfaces compute the same `revision` for the same JSON.
 
+**Captions from speech: pin, then review.** `transcribe_media` runs whisper.cpp on the host (the audio
+never leaves it) and returns `{ words, srt, language, confidence, advice }`, word times in seconds into
+the file. Either pin them into the section's `subtitles.words` (subtract `clip.from`), or put
+`subtitles: { transcribe: { from: "self" } }` on the section and let `compose_video` transcribe and pin
+before it renders. Show the words to the user before publishing; `lowConfidence: true` means some were
+likely misheard. The tool never downloads a model: the operator fetches it once with
+`leclap transcribe --download-model` (or sets `LECLAP_WHISPER_DOWNLOAD=1` in the server environment).
+
 Each render writes to `<output-dir>/<renderId>/`. Local input files (`userVideoPaths`,
-`probe_media`, `extract_style`, `analyze_music`) must resolve **inside** the media-dir (symlink-safe containment check). The
+`probe_media`, `extract_style`, `analyze_music`, `transcribe_media`) must resolve **inside** the media-dir (symlink-safe containment check). The
 media-dir default is deliberately narrow — pointing it at `~` would let any tool call read the
 whole home directory. `render_remotion_clip` executes your project's own JS, so it is registered
 only when the opt-in is set (`--allow-remotion` or `LECLAP_MCP_ALLOW_REMOTION=1`); `leclap init

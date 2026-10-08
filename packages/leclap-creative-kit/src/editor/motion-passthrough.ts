@@ -19,10 +19,10 @@ import type { FieldsDeclaration } from 'ffmpeg-video-composer/src/schemas/fields
 export type MotionEase = EasingSpecInput;
 export type { EditorFormats } from './formats-passthrough';
 
-/** Template meta the editor carries verbatim (creative direction, brief, purpose requirement). */
+/** Template meta the editor carries verbatim (creative direction, brief, purpose requirement, resolve-pass pins). */
 export type EditorMeta = Pick<
   NonNullable<TemplateDescriptor['meta']>,
-  'creativeDirection' | 'brief' | 'requirePurpose'
+  'creativeDirection' | 'brief' | 'requirePurpose' | 'resolved'
 >;
 
 // Footage edits the builder has no controls for yet (blur fill tuning, crop focus, clip range, speed

@@ -186,6 +186,13 @@ export const mcpDoc: McpDoc = {
       when: 'Use while composing an sfx sound: iterate until the numbers match the intent (a warm pop: centroid under 2 kHz, attack under 10 ms), then place it in the template.',
     },
     {
+      name: 'transcribe_media',
+      args: 'path, language?, model?',
+      purpose:
+        'Transcribes the speech of a local audio or video file with whisper.cpp on the host — the audio never leaves the machine — into word timings (seconds into the file), an SRT, the language and the mean confidence.',
+      when: 'Use for captions: transcribe once, pin the words into subtitles.words (or put subtitles.transcribe on the section and let compose_video pin them), then have the user review them. Needs whisper.cpp and a model the operator downloaded once with leclap transcribe --download-model.',
+    },
+    {
       name: 'get_capabilities',
       args: 'no arguments',
       purpose:

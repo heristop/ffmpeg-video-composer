@@ -85,6 +85,10 @@
       "title": "Errore di compilazione",
       "message": "Si è verificato un errore imprevisto: {{error}}",
       "unknownError": "Errore sconosciuto"
+    },
+    "captionsPending": {
+      "title": "Sottotitoli da controllare",
+      "message": "Questo modello sottotitola ciò che dici. Apri {{steps}}, attiva Sottotitoli e controlla le parole, poi crea il video."
     }
   }
 }

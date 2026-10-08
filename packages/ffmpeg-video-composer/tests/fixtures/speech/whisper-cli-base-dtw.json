@@ -1,0 +1,310 @@
+{
+  "model": {
+    "type": "base",
+    "multilingual": true,
+    "vocab": 51865,
+    "audio": {
+      "ctx": 1500,
+      "state": 512,
+      "head": 8,
+      "layer": 6
+    },
+    "text": {
+      "ctx": 448,
+      "state": 512,
+      "head": 8,
+      "layer": 6
+    },
+    "mels": 80,
+    "ftype": 1
+  },
+  "params": {
+    "model": "ggml-base.bin",
+    "language": "auto",
+    "translate": false
+  },
+  "result": {
+    "language": "en"
+  },
+  "transcription": [
+    {
+      "timestamps": {
+        "from": "00:00:00,000",
+        "to": "00:00:04,540"
+      },
+      "offsets": {
+        "from": 0,
+        "to": 4540
+      },
+      "text": " Captions turn every spoken word into text on the screen, right on the phone.",
+      "tokens": [
+        {
+          "text": "[_BEG_]",
+          "timestamps": {
+            "from": "00:00:00,000",
+            "to": "00:00:00,000"
+          },
+          "offsets": {
+            "from": 0,
+            "to": 0
+          },
+          "id": 50364,
+          "p": 0.785546,
+          "t_dtw": -1
+        },
+        {
+          "text": " Capt",
+          "timestamps": {
+            "from": "00:00:00,000",
+            "to": "00:00:00,300"
+          },
+          "offsets": {
+            "from": 0,
+            "to": 300
+          },
+          "id": 9480,
+          "p": 0.899144,
+          "t_dtw": 76
+        },
+        {
+          "text": "ions",
+          "timestamps": {
+            "from": "00:00:00,510",
+            "to": "00:00:00,600"
+          },
+          "offsets": {
+            "from": 510,
+            "to": 600
+          },
+          "id": 626,
+          "p": 0.976798,
+          "t_dtw": 100
+        },
+        {
+          "text": " turn",
+          "timestamps": {
+            "from": "00:00:00,600",
+            "to": "00:00:00,900"
+          },
+          "offsets": {
+            "from": 600,
+            "to": 900
+          },
+          "id": 1261,
+          "p": 0.962739,
+          "t_dtw": 124
+        },
+        {
+          "text": " every",
+          "timestamps": {
+            "from": "00:00:00,900",
+            "to": "00:00:01,280"
+          },
+          "offsets": {
+            "from": 900,
+            "to": 1280
+          },
+          "id": 633,
+          "p": 0.991004,
+          "t_dtw": 152
+        },
+        {
+          "text": " spoken",
+          "timestamps": {
+            "from": "00:00:01,280",
+            "to": "00:00:01,740"
+          },
+          "offsets": {
+            "from": 1280,
+            "to": 1740
+          },
+          "id": 10759,
+          "p": 0.898769,
+          "t_dtw": 198
+        },
+        {
+          "text": " word",
+          "timestamps": {
+            "from": "00:00:01,740",
+            "to": "00:00:02,040"
+          },
+          "offsets": {
+            "from": 1740,
+            "to": 2040
+          },
+          "id": 1349,
+          "p": 0.98894,
+          "t_dtw": 226
+        },
+        {
+          "text": " into",
+          "timestamps": {
+            "from": "00:00:02,040",
+            "to": "00:00:02,340"
+          },
+          "offsets": {
+            "from": 2040,
+            "to": 2340
+          },
+          "id": 666,
+          "p": 0.98727,
+          "t_dtw": 248
+        },
+        {
+          "text": " text",
+          "timestamps": {
+            "from": "00:00:02,340",
+            "to": "00:00:02,640"
+          },
+          "offsets": {
+            "from": 2340,
+            "to": 2640
+          },
+          "id": 2487,
+          "p": 0.980507,
+          "t_dtw": 330
+        },
+        {
+          "text": " on",
+          "timestamps": {
+            "from": "00:00:02,640",
+            "to": "00:00:02,780"
+          },
+          "offsets": {
+            "from": 2640,
+            "to": 2780
+          },
+          "id": 322,
+          "p": 0.995194,
+          "t_dtw": 334
+        },
+        {
+          "text": " the",
+          "timestamps": {
+            "from": "00:00:02,860",
+            "to": "00:00:03,020"
+          },
+          "offsets": {
+            "from": 2860,
+            "to": 3020
+          },
+          "id": 264,
+          "p": 0.997322,
+          "t_dtw": 334
+        },
+        {
+          "text": " screen",
+          "timestamps": {
+            "from": "00:00:03,020",
+            "to": "00:00:03,480"
+          },
+          "offsets": {
+            "from": 3020,
+            "to": 3480
+          },
+          "id": 2568,
+          "p": 0.998058,
+          "t_dtw": 352
+        },
+        {
+          "text": ",",
+          "timestamps": {
+            "from": "00:00:03,480",
+            "to": "00:00:03,580"
+          },
+          "offsets": {
+            "from": 3480,
+            "to": 3580
+          },
+          "id": 11,
+          "p": 0.80294,
+          "t_dtw": 376
+        },
+        {
+          "text": " right",
+          "timestamps": {
+            "from": "00:00:03,830",
+            "to": "00:00:03,930"
+          },
+          "offsets": {
+            "from": 3830,
+            "to": 3930
+          },
+          "id": 558,
+          "p": 0.857318,
+          "t_dtw": 402
+        },
+        {
+          "text": " on",
+          "timestamps": {
+            "from": "00:00:03,930",
+            "to": "00:00:04,020"
+          },
+          "offsets": {
+            "from": 3930,
+            "to": 4020
+          },
+          "id": 322,
+          "p": 0.99701,
+          "t_dtw": 420
+        },
+        {
+          "text": " the",
+          "timestamps": {
+            "from": "00:00:04,020",
+            "to": "00:00:04,160"
+          },
+          "offsets": {
+            "from": 4020,
+            "to": 4160
+          },
+          "id": 264,
+          "p": 0.998833,
+          "t_dtw": 432
+        },
+        {
+          "text": " phone",
+          "timestamps": {
+            "from": "00:00:04,160",
+            "to": "00:00:04,300"
+          },
+          "offsets": {
+            "from": 4160,
+            "to": 4300
+          },
+          "id": 2593,
+          "p": 0.996814,
+          "t_dtw": 452
+        },
+        {
+          "text": ".",
+          "timestamps": {
+            "from": "00:00:04,410",
+            "to": "00:00:04,540"
+          },
+          "offsets": {
+            "from": 4410,
+            "to": 4540
+          },
+          "id": 13,
+          "p": 0.771379,
+          "t_dtw": 452
+        },
+        {
+          "text": "[_TT_227]",
+          "timestamps": {
+            "from": "00:00:04,540",
+            "to": "00:00:04,540"
+          },
+          "offsets": {
+            "from": 4540,
+            "to": 4540
+          },
+          "id": 50591,
+          "p": 0.0219794,
+          "t_dtw": -1
+        }
+      ]
+    }
+  ]
+}

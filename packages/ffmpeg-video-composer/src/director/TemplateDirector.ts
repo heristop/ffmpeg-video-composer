@@ -31,6 +31,7 @@ import {
 } from './prepare-build';
 import { assertCanProbe, renderNeeds } from './render-needs';
 import { recordSectionLengths } from './footage-durations';
+import { transcribeBuild } from './transcribe-build';
 import { VIDEO_SEGMENT_TYPES } from '../editor/utils/section-types';
 import type Project from '../core/models/Project';
 import type Template from '../core/models/Template';
@@ -194,6 +195,7 @@ class TemplateDirector {
     const needs = renderNeeds(this.template.descriptor.global, this.project.buildInfos);
     assertCanProbe(this.ffmpegAdapter, needs, videoSegments);
     await timer.span('director:calculateTotalLength', () => this.calculateTotalLength(videoSegments));
+    this.template.descriptor = await transcribeBuild(this.template, videoSegments, this.footageDeps(), this.project);
 
     const { global } = this.template.descriptor;
     const fps = this.project.config.videoConfig?.fps ?? 30;
@@ -234,9 +236,7 @@ class TemplateDirector {
     // Order: probed source → clip range / ramp / freeze (director/footage-durations.ts) → keep windows /
     // trimSilence / HDR tone-map (director/footage-plan.ts). The two edit families never share a section.
     const fps = this.project.config.videoConfig?.fps ?? 30;
-    recordSectionLengths(segments, buildInfos, fps, (note) => {
-      this.logger.warn(note);
-    });
+    recordSectionLengths(segments, buildInfos, fps, this.logger.warn.bind(this.logger));
     await applyTakePlans(this.footageDeps(), segments, buildInfos);
 
     // Each non-cut boundary cross-dissolves, overlapping its two clips and shortening the rendered
@@ -369,6 +369,7 @@ class TemplateDirector {
     logger: this.logger,
     mediaCache: this.template.assets.inputs as unknown as Record<string, string>,
     analyzer: this.project.footageAnalyzer,
+    events: this.emitter,
   });
 
   addToQueue = async (section: Section): Promise<void> => {

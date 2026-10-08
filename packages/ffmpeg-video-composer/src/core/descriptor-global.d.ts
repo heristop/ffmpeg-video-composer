@@ -1,5 +1,5 @@
-// Whole-video overlay descriptor types (global.overlays, global.animations, global.watermark), split from
-// types.d.ts for the max-lines budget and re-exported there.
+// Whole-video overlay descriptor types (global.overlays, global.animations, global.watermark) and the
+// template's `meta`, split from types.d.ts for the max-lines budget and re-exported there.
 import type { Reveal, TextEffect } from './descriptor-text';
 import type { FontInput } from './fonts';
 import type { OverlayFit, OverlayFlip, Translation } from './filter-types';
@@ -57,4 +57,30 @@ export interface Watermark {
   opacity?: number;
   /** Inset from the frame edges in output pixels, 0..200 (default 24). */
   margin?: number;
+}
+
+export interface TemplateMeta {
+  name?: string;
+  description?: string;
+  creativeDirection?: string;
+  /** The production brief (one-liner or path); opts into the section_without_purpose advisory. */
+  brief?: string;
+  /** Ask every rendering section for a `purpose` (advisory). */
+  requirePurpose?: boolean;
+  /** What resolve passes pinned: transcripts by section name (mirrors TranscriptRecordSchema, schemas/transcribe.schemas.ts). */
+  resolved?: {
+    transcripts?: Record<
+      string,
+      {
+        from: string;
+        engine: string;
+        model?: string;
+        language?: string;
+        digest?: string;
+        at?: string;
+        confidence?: number;
+        edit?: string;
+      }
+    >;
+  };
 }

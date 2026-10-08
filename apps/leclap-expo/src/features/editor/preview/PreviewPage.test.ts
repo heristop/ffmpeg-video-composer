@@ -41,7 +41,12 @@ jest.mock('@/src/features/editor/preview/usePreviewState', () => ({
   usePreviewState: () => ({ mode: 'view', trim: { start: 0, end: 3 }, crop: { x: 0, y: 0, w: 1, h: 1 } }),
 }));
 jest.mock('@/src/features/editor/preview/usePreviewActions', () => ({
-  usePreviewActions: () => ({ canEdit: Boolean(params.sectionName), saving: false }),
+  usePreviewActions: () => ({
+    canEdit: Boolean(params.sectionName),
+    canCaption: Boolean(params.sectionName),
+    captionsActive: false,
+    saving: false,
+  }),
 }));
 jest.mock('@/src/features/editor/preview/useVideoRect', () => ({
   useVideoRect: () => ({ videoRect: {}, containerWidth: previewSize.width, containerHeight: previewSize.height }),
@@ -50,6 +55,7 @@ jest.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) =>
 jest.mock('@/src/features/editor/preview/EditPanels', () => ({
   TrimEditPanel: 'TrimEditPanel',
   CropEditPanel: 'CropEditPanel',
+  CaptionsEditPanel: 'CaptionsEditPanel',
 }));
 jest.mock('@/src/features/editor/preview/PreviewStates', () => ({
   PreviewLoading: 'PreviewLoading',
@@ -101,4 +107,16 @@ it('keeps export out of recorded-section previews', () => {
   });
   expect(tree.root.findByType(PreviewToolbar).props.onExport).toBeUndefined();
   expect(tree.root.findAllByType('ExportSheet' as never)).toHaveLength(0);
+});
+it('offers the captions editor on a recorded video step, hidden until opened', () => {
+  params = { videoUri: 'file:///clip.mp4', sectionName: 'intro' };
+  act(() => {
+    tree = TestRenderer.create(React.createElement(PreviewPage));
+  });
+  expect(tree.root.findByType(PreviewToolbar).props).toMatchObject({ canCaption: true, captionsActive: false });
+  expect(tree.root.findByType('CaptionsEditPanel' as never).props).toMatchObject({
+    visible: false,
+    sectionName: 'intro',
+    clipPath: 'file:///clip.mp4',
+  });
 });

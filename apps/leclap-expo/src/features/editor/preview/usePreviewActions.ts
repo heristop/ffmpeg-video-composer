@@ -4,6 +4,7 @@ import type { useSaveProject } from '@/src/hooks/useProjects';
 import type { Project } from '@/src/types';
 import type { NormalizedCrop } from '@/src/features/editor/components/CropOverlay';
 import type { TrimRange } from '@/src/features/editor/components/TrimPanel';
+import { hasSectionCaptions, isCaptionable } from '@/src/features/captions/caption-store';
 import { isCropApplied, isTrimApplied } from './previewHelpers';
 
 interface UsePreviewActionsArgs {
@@ -19,6 +20,10 @@ interface UsePreviewActionsArgs {
 
 export interface PreviewActions {
   canEdit: boolean;
+  /** A recorded video step: the captions editor is offered. */
+  canCaption: boolean;
+  /** The step has pinned captions. */
+  captionsActive: boolean;
   saving: boolean;
   handleRetake: () => void;
   handleDone: () => Promise<void>;
@@ -42,6 +47,8 @@ export function usePreviewActions({
   const [saving, setSaving] = useState(false);
 
   const canEdit = Boolean(projectId && sectionName && project?.recordedVideos[sectionName]);
+  const canCaption = canEdit && isCaptionable(project, sectionName);
+  const captionsActive = hasSectionCaptions(project, sectionName);
 
   const persistEdits = async () => {
     if (!canEdit || !project || !sectionName) return;
@@ -126,5 +133,5 @@ export function usePreviewActions({
     }
   };
 
-  return { canEdit, saving, handleRetake, handleDone };
+  return { canEdit, canCaption, captionsActive, saving, handleRetake, handleDone };
 }

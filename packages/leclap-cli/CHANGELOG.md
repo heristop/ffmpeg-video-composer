@@ -14,7 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   prints the descriptor a render would see and exits 1 listing every value it would refuse.
 - `leclap studio <template> [--open] [--base <url>] [--json]` prints a link that opens the template in the
   web builder. The template travels compressed in the URL fragment, which browsers never send to a server;
-  media only this machine can read are listed to re-bind. `--open` starts the platform's browser opener.
+  media only this machine can read are listed to re-bind. `--open` starts the platform's browser opener;
+  flags may come before the template.
+- `leclap transcribe <template|media>`: pins every `subtitles.transcribe` request of a template into
+  `subtitles.words` with whisper.cpp, locally (`--section`, `--language`, `--model tiny|base|small`, `--force`,
+  `--out`, `--video section=path`, `--json`), or prints a media file's words / SRT (`--json`, `--srt`).
+  `--download-model` fetches the model once (checksum-verified); `leclap render --download-model` allows the
+  same when a render resolves an unpinned request.
 - `leclap samples list --category effects`; the catalog now has 46 samples.
 - `leclap render --qc` prints output QC findings and exits non-zero on a failing check (`--json`
   includes the report); `--cache <dir>` reuses unchanged sections across renders. `--output` is written

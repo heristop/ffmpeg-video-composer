@@ -25,7 +25,18 @@ describe('promptSchema', () => {
     expect(Object.keys(cue.properties as object)).not.toContain('sound');
   });
 
-  it('leaves the engine schema itself untouched', () => {
+  it('drops the fields this browser cannot honour or a model should never author', () => {
+    expect(full).toContain('"transcribe"');
+    expect(trimmed).not.toContain('"transcribe"');
+    expect(trimmed).not.toContain('"resolved"');
+    expect(trimmed).toContain('"words"');
+  });
+
+  it('leaves the input schema untouched', () => {
+    const input = { properties: { transcribe: { type: 'object' }, words: { type: 'array' } } };
+
+    expect(promptSchema(input)).toEqual({ properties: { words: { type: 'array' } } });
+    expect(input.properties).toHaveProperty('transcribe');
     expect(JSON.stringify(templateDescriptorJsonSchema)).toBe(full);
   });
 });

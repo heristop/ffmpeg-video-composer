@@ -14,8 +14,13 @@ describe('render worker', () => {
   const originalSend = process.send;
   const originalListeners = new Set(process.listeners('message'));
 
+  const originalTerm = new Set(process.listeners('SIGTERM'));
+
   afterEach(() => {
     process.send = originalSend;
+    for (const listener of process.listeners('SIGTERM')) {
+      if (!originalTerm.has(listener)) process.removeListener('SIGTERM', listener);
+    }
     for (const listener of process.listeners('message')) {
       if (!originalListeners.has(listener)) process.removeListener('message', listener);
     }
@@ -82,5 +87,25 @@ describe('render worker', () => {
     process.emit('message', { projectConfig: {}, template: {} } as never, undefined);
 
     await expect(sent).resolves.toMatchObject({ ok: true, outputPath: output, sizeBytes: 3, qc });
+  });
+
+  it('cancels the running compile on SIGTERM, so its transcriber and encoder children are killed', async () => {
+    vi.resetModules();
+    let signal: AbortSignal | undefined;
+    compileMock.mockImplementation(
+      (_config: unknown, _template: unknown, reporter?: { signal?: AbortSignal }) =>
+        new Promise(() => {
+          signal = reporter?.signal;
+        })
+    );
+    const exit = vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
+
+    await import('../src/worker/renderWorker');
+    process.emit('message', { projectConfig: {}, template: {} } as never, undefined);
+    await vi.waitFor(() => expect(signal).toBeDefined());
+    process.emit('SIGTERM', 'SIGTERM');
+
+    expect(signal?.aborted).toBe(true);
+    await vi.waitFor(() => expect(exit).toHaveBeenCalled());
   });
 });

@@ -5,7 +5,8 @@
     "saveAndClose": "Vorschau speichern und schließen",
     "trim": "Zuschneiden",
     "crop": "Beschneiden",
-    "retake": "Neu aufnehmen"
+    "retake": "Neu aufnehmen",
+    "captions": "Untertitel"
   },
   "trim": {
     "title": "Clip zuschneiden"
@@ -53,5 +54,19 @@
   "sheet": {
     "close": "Schließen",
     "dismiss": "Panel schließen"
+  },
+  "captions": {
+    "title": "Untertitel",
+    "toggle": "Untertitel aus deiner Stimme",
+    "privacy": "Einschalten, um diesen Clip aus deiner Sprache zu untertiteln. Alles läuft auf diesem Handy: Der Ton verlässt es nie.",
+    "working": "Dein Clip wird auf diesem Handy angehört…",
+    "tapToFix": "Tippe auf ein Wort, um es zu korrigieren.",
+    "coarse": "Dieses Handy liefert nur Satz-Zeitmarken: Die Untertitel leuchten satzweise auf. Tippe auf ein Wort, um es zu korrigieren.",
+    "retry": "Erneut versuchen",
+    "errors": {
+      "unavailable": "Spracherkennung auf dem Gerät ist für deine Sprache auf diesem Handy nicht verfügbar.",
+      "permission": "Erlaube die Spracherkennung in den Einstellungen, um deine Clips zu untertiteln.",
+      "empty": "In diesem Clip wurde keine Sprache erkannt."
+    }
   }
 }

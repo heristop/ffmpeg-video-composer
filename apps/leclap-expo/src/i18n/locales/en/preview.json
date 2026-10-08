@@ -5,7 +5,8 @@
     "saveAndClose": "Save and close preview",
     "trim": "Trim",
     "crop": "Crop",
-    "retake": "Retake"
+    "retake": "Retake",
+    "captions": "Captions"
   },
   "trim": {
     "title": "Trim clip"
@@ -53,5 +54,19 @@
   "sheet": {
     "close": "Close",
     "dismiss": "Dismiss"
+  },
+  "captions": {
+    "title": "Captions",
+    "toggle": "Captions from your voice",
+    "privacy": "Turn on to caption this clip from what you say. It runs on this phone: the audio never leaves it.",
+    "working": "Listening to your clip on this phone…",
+    "tapToFix": "Tap a word to fix it.",
+    "coarse": "This phone gave phrase timings only: captions highlight by phrase. Tap a word to fix it.",
+    "retry": "Try again",
+    "errors": {
+      "unavailable": "On-device speech recognition is not available for your language on this phone.",
+      "permission": "Allow speech recognition in Settings to caption your clips.",
+      "empty": "No speech was recognised in this clip."
+    }
   }
 }

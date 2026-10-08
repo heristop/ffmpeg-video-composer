@@ -5,7 +5,8 @@
     "saveAndClose": "Enregistrer et fermer l’aperçu",
     "trim": "Rogner",
     "crop": "Recadrer",
-    "retake": "Refaire"
+    "retake": "Refaire",
+    "captions": "Sous-titres"
   },
   "trim": {
     "title": "Rogner le clip"
@@ -53,5 +54,19 @@
   "sheet": {
     "close": "Fermer",
     "dismiss": "Fermer le panneau"
+  },
+  "captions": {
+    "title": "Sous-titres",
+    "toggle": "Sous-titres depuis votre voix",
+    "privacy": "Activez pour sous-titrer ce clip à partir de ce que vous dites. Tout se passe sur ce téléphone : le son ne le quitte jamais.",
+    "working": "Écoute de votre clip sur ce téléphone…",
+    "tapToFix": "Touchez un mot pour le corriger.",
+    "coarse": "Ce téléphone ne donne que le minutage des phrases : les sous-titres s’éclairent par phrase. Touchez un mot pour le corriger.",
+    "retry": "Réessayer",
+    "errors": {
+      "unavailable": "La reconnaissance vocale sur l’appareil n’est pas disponible pour votre langue sur ce téléphone.",
+      "permission": "Autorisez la reconnaissance vocale dans les Réglages pour sous-titrer vos clips.",
+      "empty": "Aucune parole n’a été reconnue dans ce clip."
+    }
   }
 }

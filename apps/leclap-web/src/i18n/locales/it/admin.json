@@ -1301,5 +1301,11 @@
     "replaceBody": "Si apre come nuova bozza al posto di questa. Salva prima questa bozza se vuoi conservarla.",
     "replaceConfirm": "Aprilo",
     "replaceCancel": "Tieni questa bozza"
+  },
+  "pinnedCaptions": {
+    "label": "Sottotitoli",
+    "summary": "{{count}} parole fissate · {{unsure}} da controllare",
+    "hint": "Parole trascritte dal clip (sul telefono o con leclap transcribe). Correggi sul posto una parola fraintesa; le parole in ambra sono quelle su cui il riconoscimento era incerto. I tempi restano quelli trascritti.",
+    "word": "Parola a {{start}} s"
   }
 }

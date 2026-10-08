@@ -5,7 +5,8 @@
     "saveAndClose": "Guardar y cerrar vista previa",
     "trim": "Recortar",
     "crop": "Encuadrar",
-    "retake": "Volver a grabar"
+    "retake": "Volver a grabar",
+    "captions": "Subtítulos"
   },
   "trim": {
     "title": "Recortar clip"
@@ -53,5 +54,19 @@
   "sheet": {
     "close": "Cerrar",
     "dismiss": "Cerrar el panel"
+  },
+  "captions": {
+    "title": "Subtítulos",
+    "toggle": "Subtítulos a partir de tu voz",
+    "privacy": "Actívalo para subtitular este clip a partir de lo que dices. Todo ocurre en este teléfono: el audio nunca sale de él.",
+    "working": "Escuchando tu clip en este teléfono…",
+    "tapToFix": "Toca una palabra para corregirla.",
+    "coarse": "Este teléfono solo da tiempos por frase: los subtítulos se resaltan por frase. Toca una palabra para corregirla.",
+    "retry": "Reintentar",
+    "errors": {
+      "unavailable": "El reconocimiento de voz en el dispositivo no está disponible para tu idioma en este teléfono.",
+      "permission": "Permite el reconocimiento de voz en Ajustes para subtitular tus clips.",
+      "empty": "No se ha reconocido ninguna voz en este clip."
+    }
   }
 }

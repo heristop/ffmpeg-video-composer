@@ -55,10 +55,21 @@ function sendProgress(message: ProgressMessage): void {
   process.send?.(message);
 }
 
+// The parent stops a render with SIGTERM (renderRunner killChild). Aborting the compile first kills what
+// it spawned through the signal (the transcription pass's whisper run), which a bare exit would orphan;
+// the parent still SIGKILLs after its grace period.
+const cancellation = new AbortController();
+
+process.on('SIGTERM', () => {
+  cancellation.abort();
+  process.exit(143);
+});
+
 async function runJob(job: RenderJob): Promise<WorkerResult> {
   // compile() resolves null on failure and hands the cause (e.g. which section failed) to onError.
   const failure: { error?: Error; qc?: QcReport } = {};
   const outputPath = await compile(job.projectConfig, job.template, {
+    signal: cancellation.signal,
     onProgress: createProgressReporter(sendProgress),
     onError: (error) => {
       failure.error = error;

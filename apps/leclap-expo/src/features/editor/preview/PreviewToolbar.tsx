@@ -40,6 +40,10 @@ interface PreviewToolbarProps {
   onTrim: () => void;
   onCrop: () => void;
   onRetake: () => void;
+  /** A recorded video step: offers the on-device captions editor. */
+  canCaption?: boolean;
+  captionsActive?: boolean;
+  onCaptions?: () => void;
 }
 
 /** Recorded clips offer editing; finished outputs offer export. */
@@ -53,6 +57,9 @@ export function PreviewToolbar({
   onTrim,
   onCrop,
   onRetake,
+  canCaption,
+  captionsActive,
+  onCaptions,
 }: PreviewToolbarProps) {
   const { t } = useTranslation('preview');
 
@@ -72,6 +79,14 @@ export function PreviewToolbar({
         {onExport && <ToolButton icon="share-outline" label={t('export.title')} onPress={onExport} />}
         {canEdit && <ToolButton icon="cut-outline" label={t('toolbar.trim')} active={trimActive} onPress={onTrim} />}
         {canEdit && <ToolButton icon="crop-outline" label={t('toolbar.crop')} active={cropActive} onPress={onCrop} />}
+        {canCaption && onCaptions && (
+          <ToolButton
+            icon="chatbox-ellipses-outline"
+            label={t('toolbar.captions')}
+            active={captionsActive}
+            onPress={onCaptions}
+          />
+        )}
         {canEdit && <ToolButton icon="refresh" label={t('toolbar.retake')} onPress={onRetake} />}
       </View>
     </>

@@ -48,6 +48,20 @@ const unknownFilterDescriptor = {
 } as unknown as TemplateDescriptor;
 
 describe('compile() reporter', () => {
+  it('cancels the build when the reporter signal is aborted', async () => {
+    const controller = new AbortController();
+    const errors: Error[] = [];
+    controller.abort();
+
+    const out = await compile(projectConfig(), load('gradient'), {
+      signal: controller.signal,
+      onError: (error) => errors.push(error),
+    });
+
+    expect(out).toBeNull();
+    expect(errors).toEqual([]);
+  }, 60000);
+
   it('forwards 0..1 progress and engine log lines', async () => {
     const descriptor = load('gradient');
 

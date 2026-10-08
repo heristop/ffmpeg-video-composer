@@ -29,6 +29,62 @@
         "requirePurpose": {
           "description": "When true, every rendering section should declare a `purpose` (advisory section_without_purpose).",
           "type": "boolean"
+        },
+        "resolved": {
+          "type": "object",
+          "properties": {
+            "transcripts": {
+              "description": "Pinned transcripts by section name, written by the transcription pass.",
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "description": "The section whose clip was transcribed."
+                  },
+                  "engine": {
+                    "type": "string",
+                    "description": "Recogniser that produced the words: whisper.cpp, ios-speech, android-speech…"
+                  },
+                  "model": {
+                    "description": "Model the engine used (whisper: tiny, base, small).",
+                    "type": "string"
+                  },
+                  "language": {
+                    "description": "Language spoken, as requested or detected.",
+                    "type": "string"
+                  },
+                  "digest": {
+                    "description": "sha256:<hex> of the source clip; a different clip makes the pin stale (transcript_stale).",
+                    "type": "string"
+                  },
+                  "edit": {
+                    "description": "Fingerprint of the source section's edits (clip, keep, trimSilence, speedRamp, freeze, speed, duration) the words were mapped through; different edits now report transcript_edit_changed.",
+                    "type": "string"
+                  },
+                  "at": {
+                    "description": "When the words were pinned (ISO 8601).",
+                    "type": "string"
+                  },
+                  "confidence": {
+                    "description": "Mean word confidence, 0..1.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": ["from", "engine"],
+                "additionalProperties": false,
+                "description": "How a section's pinned words were transcribed."
+              }
+            }
+          },
+          "additionalProperties": false,
+          "description": "What resolve passes pinned into this descriptor; renders only read the pinned values."
         }
       },
       "additionalProperties": false
@@ -27752,6 +27808,12 @@
                       "type": "number",
                       "minimum": 0,
                       "description": "When the word ends, in seconds from the section start."
+                    },
+                    "confidence": {
+                      "description": "Recogniser confidence, 0..1 (speech-to-text).",
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
                     }
                   },
                   "required": ["text", "start", "end"],
@@ -27791,12 +27853,42 @@
                 "type": "number",
                 "minimum": 0,
                 "description": "When the word ends, in seconds from the section start."
+              },
+              "confidence": {
+                "description": "Recogniser confidence, 0..1 (speech-to-text).",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
               }
             },
             "required": ["text", "start", "end"],
             "additionalProperties": false,
             "description": "One word with its timing, e.g. from speech-to-text."
           }
+        },
+        "transcribe": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "description": "Whose speech: \"self\" (default, this section's own clip) or the name of a video section.",
+              "type": "string",
+              "minLength": 1
+            },
+            "language": {
+              "description": "Spoken language as BCP-47 (\"en\", \"fr-FR\"); omitted = detected, then recorded in the pin.",
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 35,
+              "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+            },
+            "model": {
+              "description": "Whisper model on Node: tiny (fast) or base (default, more accurate) or small.",
+              "type": "string",
+              "enum": ["tiny", "base", "small"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Transcribe this section's speech into word timings. Resolved once, before rendering, into `words` (Node: `leclap transcribe`); the browser and on-device engines need the words pinned."
         },
         "timing": {
           "description": "Karaoke timing: \"words\" uses word timings when present; \"even\" shares each cue by character count (default words when present, else even).",

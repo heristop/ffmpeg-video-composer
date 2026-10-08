@@ -12,7 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `analyze_sound`: renders an `sfx[].sound` (composed layers, or a library preset varied by pitch, length,
   brightness and room) with the engine synth and returns its length, peak and RMS dBFS, raw
   pre-normalisation peak, spectral centroid, energy above 8 kHz / under 250 Hz, attack time and the sound
-  advisories it raises, plus a spectrogram and a waveform PNG. Seventeen tools are now always registered.
+  advisories it raises, plus a spectrogram and a waveform PNG. An optional `cue` path
+  (`sections.intro.sfx[0]`) seeds the render exactly like the mix; a silent sound reports −120 dB and
+  `sound_silent`. Seventeen tools are now always registered.
 
 - Typed template fields: `get_resolved_template` returns the descriptor `compose_video` would render for
   the given `fields` (declared `global.fields` filled with typed values) or every value it would refuse;
@@ -22,7 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `open_in_builder`: returns a `https://leclap.dev/studio/builder#t=v1.…` link that opens the template in
   the web builder for a person to edit, with `mediaToRebind` (local paths and uploads the browser cannot
   read) and `warnings`. The template travels compressed in the URL fragment, which browsers never send to a
-  server; `baseUrl` targets a locale prefix or a local dev server. Nineteen tools are now always registered.
+  server; `baseUrl` targets a locale prefix or a local dev server, with a warning off `https://leclap.dev`.
+  Nineteen tools are now always registered.
+- `transcribe_media`: transcribe a local audio/video file's speech with whisper.cpp on the host → words, SRT,
+  language, mean confidence and the "pin, then review" advice. `compose_video` resolves `subtitles.transcribe`
+  before rendering. The model is never downloaded by the tool: the operator opts in once
+  (`leclap transcribe --download-model` or `LECLAP_WHISPER_DOWNLOAD=1`). Twenty tools are now always registered.
 - `edit_template`: an RFC 6902 JSON Patch over inline template JSON under `expectedRevision` (stale →
   `revision_conflict`), all-or-nothing and validated after applying; returns the template, its new
   `revision` and `changedPaths`. The web builder's WebMCP tools share the name, operations and revision,

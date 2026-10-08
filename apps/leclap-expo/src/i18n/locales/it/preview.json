@@ -5,7 +5,8 @@
     "saveAndClose": "Salva e chiudi l'anteprima",
     "trim": "Taglia",
     "crop": "Ritaglia",
-    "retake": "Rigira"
+    "retake": "Rigira",
+    "captions": "Sottotitoli"
   },
   "trim": {
     "title": "Taglia il clip"
@@ -53,5 +54,19 @@
   "sheet": {
     "close": "Chiudi",
     "dismiss": "Chiudi pannello"
+  },
+  "captions": {
+    "title": "Sottotitoli",
+    "toggle": "Sottotitoli dalla tua voce",
+    "privacy": "Attiva per sottotitolare questo clip da ciò che dici. Tutto avviene su questo telefono: l’audio non lo lascia mai.",
+    "working": "Ascolto del tuo clip su questo telefono…",
+    "tapToFix": "Tocca una parola per correggerla.",
+    "coarse": "Questo telefono fornisce solo i tempi delle frasi: i sottotitoli si evidenziano per frase. Tocca una parola per correggerla.",
+    "retry": "Riprova",
+    "errors": {
+      "unavailable": "Il riconoscimento vocale sul dispositivo non è disponibile per la tua lingua su questo telefono.",
+      "permission": "Consenti il riconoscimento vocale nelle Impostazioni per sottotitolare i tuoi clip.",
+      "empty": "Nessuna voce riconosciuta in questo clip."
+    }
   }
 }

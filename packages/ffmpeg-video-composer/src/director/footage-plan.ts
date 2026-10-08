@@ -6,10 +6,13 @@
 import type { FFMpegInfos, KeepRange, ProjectBuildInfos, Section, SectionFootage } from '@/core/types';
 import { TONEMAP_FILTERS, type FootageAnalyzer } from '@/core/footage/analyzer';
 import { clipKeepRanges, computeKeepRanges, keptDuration, resolveTrimSilence } from '@/core/footage/keep-ranges';
+import type { IEventEmitter } from '../platform/AbstractEventManager';
 import { footageSource, probeFootage, type FootageSourceDeps } from './footage-source';
 
 export interface FootagePlanDeps extends FootageSourceDeps {
   analyzer: FootageAnalyzer | null;
+  /** The build's emitter: long host work (the transcription pass) stops on its `task-cancelled`. */
+  events?: IEventEmitter;
 }
 
 /** Advisory code logged when an HDR clip renders on the SDR pipeline without a tone-map. */

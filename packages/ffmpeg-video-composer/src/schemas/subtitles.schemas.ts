@@ -3,6 +3,7 @@ import { TranslationSchema } from './global.schemas';
 import { timeValue } from './time.schemas';
 import { CAPTION_DNA_IDS } from '../core/captions/dna';
 import { CAPTION_POSITIONS } from './text.schemas';
+import { TranscribeSchema } from './transcribe.schemas';
 
 // ── subtitles: word-timed captions ─────────────────────────────────────────────────
 //
@@ -18,6 +19,7 @@ export const WordTimingSchema = z
     text: z.string().min(1).describe('The word as spoken, with its punctuation ("world," / "done.").'),
     start: z.number().min(0).describe('When the word starts, in seconds from the section start.'),
     end: z.number().min(0).describe('When the word ends, in seconds from the section start.'),
+    confidence: z.number().min(0).max(1).optional().describe('Recogniser confidence, 0..1 (speech-to-text).'),
   })
   .strict()
   .describe('One word with its timing, e.g. from speech-to-text.');
@@ -93,6 +95,7 @@ export const SubtitlesSchema = z
       'Word timings for the whole section (speech-to-text output). Alone, they are grouped into cues by `group`; ' +
         'with `cues` / `srt`, they time the karaoke inside each cue.'
     ),
+    transcribe: TranscribeSchema.optional(),
     timing: z
       .enum(['words', 'even'])
       .optional()
@@ -148,8 +151,16 @@ export const SubtitlesSchema = z
     activeColor: z.string().optional().describe('Active-word colour overriding the DNA (hex or $color.* token).'),
   })
   .strict()
-  .refine((value) => value.cues !== undefined || value.srt !== undefined || value.words !== undefined, {
-    message: 'subtitles need cues, srt or words',
+  .refine(
+    (value) =>
+      value.cues !== undefined ||
+      value.srt !== undefined ||
+      value.words !== undefined ||
+      value.transcribe !== undefined,
+    { message: 'subtitles need cues, srt, words or transcribe' }
+  )
+  .refine((value) => value.transcribe === undefined || (value.cues ?? value.srt ?? value.words) === undefined, {
+    message: 'use either transcribe or words/cues/srt: transcribing pins words that replace the request',
   })
   .refine((value) => value.cues === undefined || value.srt === undefined, {
     message: 'use either cues or srt, not both',

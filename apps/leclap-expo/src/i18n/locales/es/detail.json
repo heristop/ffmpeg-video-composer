@@ -85,6 +85,10 @@
       "title": "Error de compilación",
       "message": "Ocurrió un error inesperado: {{error}}",
       "unknownError": "Error desconocido"
+    },
+    "captionsPending": {
+      "title": "Subtítulos por revisar",
+      "message": "Esta plantilla subtitula lo que dices. Abre {{steps}}, activa Subtítulos y revisa las palabras; luego crea el vídeo."
     }
   }
 }

@@ -68,7 +68,7 @@ export type {
 import type { Filter, Input, Map, Translation } from './filter-types';
 // Whole-video overlays (global.overlays / animations / watermark) live in a sibling for the budget too.
 export type { GlobalTextOverlay, GlobalAnimation, WatermarkPosition, Watermark } from './descriptor-global';
-import type { GlobalTextOverlay, GlobalAnimation, Watermark } from './descriptor-global';
+import type { GlobalTextOverlay, GlobalAnimation, TemplateMeta, Watermark } from './descriptor-global';
 
 export type LogParams = Record<string, unknown>;
 
@@ -88,6 +88,9 @@ export type CompileReporter = {
   // Node only. Called with the output QC report (core/qc) after a successful render when
   // `ProjectConfig.qc` is set; the same report is also recorded in the manifest's `qc` field.
   onQc?: (report: QcReport) => void;
+  // Node only. Aborting it cancels the build, as the `task-cancelled` event does: the transcription pass
+  // kills its whisper run and no further segment renders; compile() then resolves null.
+  signal?: AbortSignal;
 };
 export type ProjectConfig = {
   buildDir?: string;
@@ -162,16 +165,6 @@ export interface TemplateDescriptor {
   sections?: DescriptorSection[];
   /** Per-format compositions of the same story: patches applied when that orientation renders (core/formats). */
   formats?: TemplateFormats;
-}
-
-interface TemplateMeta {
-  name?: string;
-  description?: string;
-  creativeDirection?: string;
-  /** The production brief (one-liner or path); opts into the section_without_purpose advisory. */
-  brief?: string;
-  /** Ask every rendering section for a `purpose` (advisory). */
-  requirePurpose?: boolean;
 }
 
 export interface TemplateDescriptorGlobal {
