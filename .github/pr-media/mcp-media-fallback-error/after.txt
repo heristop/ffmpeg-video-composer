@@ -1,0 +1,16 @@
+Same compose_video call, same media dir and proxy setting. The tool answers before any render starts:
+
+isError: true
+Media "bg.png" is not in the media dir (/tmp/leclap-repro/media). A local path is never fetched remotely:
+copy the file under the media dir and reference it by its path there (relative, or absolute under it), or
+use an http(s) URL.
+
+The engine (CLI, or any Node render) gives the same kind of answer when it meets such a path itself:
+
+"bg.png" was not found in the assets dir (/tmp/leclap-repro/media). A local path is never fetched remotely:
+copy the file into the assets dir, or reference it by an http(s) URL.
+
+and a catalog path that the catalog cannot serve now says so, with the cause:
+
+"pictures/mine.png" is not in the assets dir (/tmp/leclap-repro/media) and the asset catalog could not serve
+it (https://self-signed.badssl.com/pictures/mine.png): self-signed certificate in certificate chain

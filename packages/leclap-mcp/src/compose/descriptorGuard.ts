@@ -3,6 +3,7 @@ import path from 'node:path';
 import type { TemplateDescriptor } from 'ffmpeg-video-composer';
 
 import { assertWithinMediaDir } from './pathGuard.js';
+import { assertMediaRefsLocal } from './media-refs.js';
 
 // compose_video schema-validates the descriptor but then forwards its filter chain to ffmpeg
 // VERBATIM (FilterSchema.type is a raw filter name, and the scalar `value` becomes `type=value`;
@@ -188,8 +189,9 @@ async function containFontfile(fontfile: string, mediaDir: string): Promise<stri
   }
 }
 
-// Reject dangerous filter types + file/URL-bearing scalar values, and confirm every path-like
-// fontfile stays under the media dir. Async because containment is realpath-checked (symlink-safe).
+// Reject dangerous filter types + file/URL-bearing scalar values, confirm every path-like fontfile
+// stays under the media dir, and that every local media path is there (media-refs.ts). Async because
+// containment is realpath-checked (symlink-safe).
 export async function assertDescriptorSafe(descriptor: TemplateDescriptor, mediaDir: string): Promise<GuardResult> {
   const escape = findFilterEscape(descriptor);
 
@@ -205,5 +207,5 @@ export async function assertDescriptorSafe(descriptor: TemplateDescriptor, media
     return { ok: false, message: failure };
   }
 
-  return { ok: true };
+  return assertMediaRefsLocal(descriptor, mediaDir);
 }

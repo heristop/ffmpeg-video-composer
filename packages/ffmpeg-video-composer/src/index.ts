@@ -286,7 +286,7 @@ export {
   type FontRef,
   type FontInput,
 } from './core/fonts';
-export { assetBaseUrl, fontAssetUrl, musicAssetUrl } from './core/asset-source';
+export { assetBaseUrl, fontAssetUrl, isCatalogAssetPath, musicAssetUrl } from './core/asset-source';
 export {
   expandPartials,
   expandPartialsSafe,

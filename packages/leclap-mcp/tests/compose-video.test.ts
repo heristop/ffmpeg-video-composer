@@ -204,6 +204,74 @@ describe('compose_video handler', () => {
   });
 });
 
+// A background the author meant as a local file (`bg.png`) but which is not in the media dir used to reach
+// the engine, which fetched it from the remote asset catalog: the tool answered with the network's error
+// ("self-signed certificate in certificate chain" behind a TLS-intercepting proxy, else a 404).
+describe('compose_video media references', () => {
+  const picture = (pictureUrl: string) => ({
+    global: { orientation: 'landscape', musicEnabled: false },
+    sections: [{ name: 'intro', type: 'image_background', options: { pictureUrl, duration: 1 } }],
+  });
+
+  it.each(['bg.png', 'images/bg.png', './bg.png', '/elsewhere/bg.png', 'file:///elsewhere/bg.png'])(
+    'rejects %s, missing from the media dir, before rendering and names both',
+    async (ref) => {
+      const result = (await setup()({ template: picture(ref) })) as { isError?: boolean; content: { text: string }[] };
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain(ref);
+      expect(result.content[0].text).toContain(mediaDir);
+      expect(result.content[0].text).not.toContain('certificate');
+      expect(runRenderMock).not.toHaveBeenCalled();
+    }
+  );
+
+  it('rejects a local path held by a variable or an input the same way', async () => {
+    const template = {
+      global: { orientation: 'landscape', musicEnabled: false, variables: { logo: 'logo.png' } },
+      sections: [
+        {
+          name: 'intro',
+          type: 'color_background',
+          options: { backgroundColor: '#000000', duration: 1 },
+          inputs: [{ name: 'logo', type: 'image', url: '{{ logo }}', options: {} }],
+        },
+      ],
+    };
+    const result = (await setup()({ template })) as { isError?: boolean; content: { text: string }[] };
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('logo.png');
+    expect(runRenderMock).not.toHaveBeenCalled();
+  });
+
+  it('renders a media path present in the media dir, a remote URL and a catalog path', async () => {
+    runRenderMock.mockResolvedValue({
+      ok: true,
+      outputPath: '/tmp/leclap-compose-test/out.mp4',
+      durationSeconds: 1,
+      sizeBytes: 1,
+      videoCodec: 'h264',
+      audioCodec: null,
+    });
+    await fs.mkdir(path.join(mediaDir, 'images'));
+    await fs.writeFile(path.join(mediaDir, 'images', 'bg.png'), 'stub');
+
+    for (const ref of [
+      'images/bg.png',
+      path.join(mediaDir, 'images', 'bg.png'),
+      'https://example.com/bg.png',
+      'pictures/logo.png',
+    ]) {
+      const result = (await setup()({ template: picture(ref) })) as { isError?: boolean };
+
+      expect(result.isError, ref).toBeUndefined();
+    }
+
+    expect(runRenderMock).toHaveBeenCalledTimes(4);
+  });
+});
+
 const renderOk = {
   ok: true as const,
   outputPath: '/tmp/render/output.mp4',

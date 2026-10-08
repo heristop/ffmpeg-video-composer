@@ -354,6 +354,48 @@ describe('FilesystemNodeAdapter.fetch catalog-relative fallback', () => {
     await expect(makeAdapter().fetch('/etc/passwd')).rejects.toThrow();
     expect(mockedAxios).not.toHaveBeenCalled();
   });
+
+  // A media path the author meant as local (`bg.png` next to their other media) used to be fetched from
+  // the remote catalog when it was missing, so the error was the network's (a 404, or "self-signed
+  // certificate" behind a TLS-intercepting proxy) instead of "this file is not in the assets dir".
+  it('never fetches a local path the catalog cannot hold, and names it and the assets dir', async () => {
+    const stageDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vp-local-'));
+    const adapter = makeAdapter();
+    adapter.setAssetsDir(stageDir);
+
+    for (const ref of ['bg.png', 'images/bg.png', './bg.png', '~/bg.png']) {
+      const failure = adapter.fetch(ref);
+
+      await expect(failure).rejects.toThrow(ref);
+      await expect(failure).rejects.toThrow(`not found in the assets dir (${stageDir})`);
+    }
+
+    expect(mockedAxios).not.toHaveBeenCalled();
+    await fs.rm(stageDir, { recursive: true, force: true });
+  });
+
+  it('names the assets dir when an absolute path is outside it', async () => {
+    const stageDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vp-abs-'));
+    const adapter = makeAdapter();
+    adapter.setAssetsDir(stageDir);
+
+    await expect(adapter.fetch('/etc/passwd')).rejects.toThrow(`assets dir (${stageDir})`);
+    await fs.rm(stageDir, { recursive: true, force: true });
+  });
+
+  it('says the catalog could not serve a missing catalog path, with the cause', async () => {
+    mockedAxios.mockRejectedValue(new Error('self-signed certificate in certificate chain'));
+    const stageDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vp-cat-miss-'));
+    const adapter = makeAdapter();
+    adapter.setAssetsDir(stageDir);
+
+    const failure = adapter.fetch('pictures/mine.png');
+
+    await expect(failure).rejects.toThrow(`"pictures/mine.png" is not in the assets dir (${stageDir})`);
+    await expect(failure).rejects.toThrow('asset catalog');
+    await expect(failure).rejects.toThrow('self-signed certificate in certificate chain');
+    await fs.rm(stageDir, { recursive: true, force: true });
+  });
 });
 
 describe('FilesystemNodeAdapter.fetchAndRead SSRF guard', () => {

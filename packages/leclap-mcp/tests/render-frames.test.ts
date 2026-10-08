@@ -160,6 +160,21 @@ describe('render_frames handler', () => {
     expect(escaping).toMatchObject({ isError: true });
     expect(runSnapshotMock).not.toHaveBeenCalled();
   });
+
+  it('refuses a background missing from the media dir before rendering, naming it and the media dir', async () => {
+    const { handler } = capture();
+    const result = (await handler({
+      template: {
+        global: { orientation: 'landscape', musicEnabled: false },
+        sections: [{ name: 'intro', type: 'image_background', options: { pictureUrl: 'bg.png', duration: 1 } }],
+      },
+    })) as { isError?: boolean; content: { text: string }[] };
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('bg.png');
+    expect(result.content[0].text).toContain(mediaDir);
+    expect(runSnapshotMock).not.toHaveBeenCalled();
+  });
 });
 
 describe('snapshot worker job', () => {

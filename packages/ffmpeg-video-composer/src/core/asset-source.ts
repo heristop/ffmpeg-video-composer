@@ -34,3 +34,34 @@ export function sfxAssetUrl(file: string, env?: Record<string, string | undefine
 export function catalogAssetUrl(relativePath: string, env?: Record<string, string | undefined>): string {
   return `${assetBaseUrl(env)}/${relativePath.replace(/^\/+/, '')}`;
 }
+
+// The public library's top-level dirs: only a reference under one of them can be served by the catalog.
+const CATALOG_DIRS = new Set([
+  'animations',
+  'backgrounds',
+  'covers',
+  'emoji',
+  'fonts',
+  'musics',
+  'pictures',
+  'sfx',
+  'videos',
+]);
+
+// Whether a reference is catalog-relative (`pictures/logo.png`). Anything else without a scheme — `bg.png`,
+// `./bg.png`, `~/bg.png`, an absolute path — is a local path, which a remote fetch can never satisfy.
+export function isCatalogAssetPath(ref: string): boolean {
+  const segments = ref.split('/');
+
+  return segments.length > 1 && CATALOG_DIRS.has(segments[0]) && !segments.includes('..');
+}
+
+// A catalog path with no local copy that the catalog could not serve either: the network's own error (a
+// 404, a proxy's certificate) alone hides that the file was first looked for in the assets dir.
+export function catalogMissError(ref: string, remote: string, assetsDir: string | undefined, cause: unknown): Error {
+  const reason = cause instanceof Error ? cause.message : String(cause);
+
+  return new Error(
+    `"${ref}" is not in the assets dir (${assetsDir ?? 'unset'}) and the asset catalog could not serve it (${remote}): ${reason}`
+  );
+}

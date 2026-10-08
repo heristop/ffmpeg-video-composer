@@ -286,7 +286,10 @@ is deprecated in the current revision, and stdout is reserved for JSON-RPC frami
 
 Security is inherited from the core: FFmpeg runs via `execFile` (no shell); remote template URLs are
 SSRF-guarded (private/metadata IPs + redirects blocked, http(s) only); descriptors are
-`safeParse`-validated; local file paths are containment-checked against the media dir.
+`safeParse`-validated; local file paths are containment-checked against the media dir. A media path
+that is neither an http(s) URL nor a catalog path (`pictures/…`, `videos/…`) must exist under the media dir:
+`compose_video`, `render_frames` and `render_preview` reject it before rendering, naming the path and the media
+dir, and it is never fetched remotely.
 
 ## Tests
 

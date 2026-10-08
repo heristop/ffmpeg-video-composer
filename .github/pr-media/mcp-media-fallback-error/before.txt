@@ -1,0 +1,14 @@
+compose_video, media dir /tmp/leclap-repro/media, template:
+  { "sections": [{ "name": "intro", "type": "image_background",
+                   "options": { "pictureUrl": "bg.png", "duration": 1 } }] }
+bg.png is not in the media dir. The engine treated it as a catalog path and fetched it from the
+remote asset catalog; behind a TLS-intercepting proxy (reproduced with
+FVC_ASSET_BASE_URL=https://self-signed.badssl.com) the tool returned, after starting a render:
+
+isError: true
+Section "intro" failed: self-signed certificate in certificate chain
+{"level":30,...,"msg":"[intro][Media] fetching asset intro"}
+{"level":50,...,"msg":"self-signed certificate in certificate chain"}
+{"level":50,...,"msg":"Section \"intro\" failed: self-signed certificate in certificate chain"}
+
+Without a proxy, the same template failed with "Request failed with status code 404".

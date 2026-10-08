@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assetBaseUrl, catalogAssetUrl, fontAssetUrl, musicAssetUrl } from '@/core/asset-source';
+import { assetBaseUrl, catalogAssetUrl, fontAssetUrl, isCatalogAssetPath, musicAssetUrl } from '@/core/asset-source';
 
 describe('asset-source', () => {
   it('defaults to the GitHub LFS-resolving raw URL (not raw.githubusercontent)', () => {
@@ -40,5 +40,25 @@ describe('asset-source', () => {
     expect(musicAssetUrl('x.mp3', { FVC_ASSET_BASE_URL: 'https://mirror.test/lib' })).toBe(
       'https://mirror.test/lib/musics/x.mp3'
     );
+  });
+
+  it('tells a catalog-relative path from a local path the catalog cannot hold', () => {
+    for (const ref of ['pictures/logo.png', 'videos/outro.mp4', 'animations/x.apng', 'musics/a.mp3']) {
+      expect(isCatalogAssetPath(ref), ref).toBe(true);
+    }
+
+    for (const ref of [
+      'bg.png',
+      'images/bg.png',
+      './pictures/bg.png',
+      '../pictures/bg.png',
+      '~/bg.png',
+      '/abs/bg.png',
+    ]) {
+      expect(isCatalogAssetPath(ref), ref).toBe(false);
+    }
+
+    expect(isCatalogAssetPath('pictures/../../etc/passwd')).toBe(false);
+    expect(isCatalogAssetPath('https://a/pictures/x.png')).toBe(false);
   });
 });

@@ -11,7 +11,7 @@ import axios, { type AxiosResponse, type ResponseType } from 'axios';
 import AbstractFilesystem from './AbstractFilesystem';
 import { assertSafeRemoteUrl } from './url-guard';
 import { creativeKitCandidates, isBundledAssetName, sourceLayoutCandidates } from './bundled-asset-paths';
-import { catalogAssetUrl } from '../../core/asset-source';
+import { catalogAssetUrl, catalogMissError, isCatalogAssetPath } from '../../core/asset-source';
 import type AbstractLogger from '../../platform/logging/AbstractLogger';
 
 // Cap on redirect hops the guarded follower will chase before giving up. Bounds
@@ -139,14 +139,16 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
       return real;
     }
 
-    throw new Error(`Refusing to read a file outside the staged media directories: ${url}`);
+    throw new Error(
+      `Refusing to read a file outside the staged media directories: ${url} is not under the assets dir (${this.assetsDir ?? 'unset'})`
+    );
   };
 
   // Decide how fetch() satisfies a reference. Returns null when it was served from a local staged copy
   // (already written to `dest`), otherwise the remote URL to download. An http(s) URL passes through; a
   // reference with no staged copy is resolved against the public asset library when it's a bare
   // catalog-relative path (videos/…, pictures/…), while absolute/schemed paths re-raise the staging
-  // rejection (never silently remapped to a remote).
+  // rejection and any other local path (`bg.png`) fails here: neither is ever remapped to a remote.
   private readonly resolveFetchUrl = async (url: string, dest: string): Promise<string | null> => {
     if (/^https?:\/\//i.test(url)) {
       return url;
@@ -162,6 +164,13 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
 
     if (url.startsWith('/') || url.includes('://')) {
       await this.resolveStagedPath(this.localCandidate(url));
+    }
+
+    if (!isCatalogAssetPath(url)) {
+      throw new Error(
+        `"${url}" was not found in the assets dir (${this.assetsDir ?? 'unset'}). A local path is never fetched ` +
+          'remotely: copy the file into the assets dir, or reference it by an http(s) URL.'
+      );
     }
 
     return catalogAssetUrl(url);
@@ -180,7 +189,9 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
 
     // SSRF guard: reject non-http(s) schemes and private/reserved destinations
     // (cloud metadata, loopback, RFC1918, ...) — re-checked on every redirect hop.
-    const response = await requestWithGuardedRedirects(remote, 'stream');
+    const response = await requestWithGuardedRedirects(remote, 'stream').catch((error: unknown) => {
+      throw remote === url ? error : catalogMissError(url, remote, this.assetsDir, error);
+    });
 
     const writer = createWriteStream(dest);
 
