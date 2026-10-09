@@ -7,37 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-09
+
 ### Removed
 
-- Breaking: seven tools are gone, merged into others or dropped, because every tool's name and
+- Breaking: four 0.4.0 tools are gone, merged into others or dropped, because every tool's name and
   description is sent to the agent on every turn and overlapping tools dilute its choice. No aliases;
   call the replacement:
 
-  | Removed                     | Call instead                                                            |
-  | --------------------------- | ----------------------------------------------------------------------- |
-  | `ping`                      | the MCP protocol `ping` request                                         |
-  | `report_catalog_gap`        | nothing: `get_motion_catalog { query }` logs a query that matches none  |
-  | `get_resolved_template`     | `validate_template { template, include: ["resolved"], fields, format }` |
-  | `get_timeline`              | `validate_template { template, include: ["timeline"], format }`         |
-  | `patch_template { edits }`  | `edit_template { template, expectedRevision, effectProps: edits }`      |
-  | `list_samples { …filters }` | `get_samples { …filters }`                                              |
-  | `get_sample { id }`         | `get_samples { id }`                                                    |
+  | Removed                     | Call instead                                                       |
+  | --------------------------- | ------------------------------------------------------------------ |
+  | `ping`                      | the MCP protocol `ping` request                                    |
+  | `patch_template { edits }`  | `edit_template { template, expectedRevision, effectProps: edits }` |
+  | `list_samples { …filters }` | `get_samples { …filters }`                                         |
+  | `get_sample { id }`         | `get_samples { id }`                                               |
 
-  Fourteen tools are now always registered (seventeen with the Remotion opt-in).
+  Fourteen tools are always registered (seventeen with the Remotion opt-in): `analyze_music`,
+  `analyze_sound`, `compose_video`, `edit_template`, `extract_style`, `get_capabilities`,
+  `get_motion_catalog`, `get_samples`, `get_template_schema`, `open_in_builder`, `probe_media`,
+  `render_frames`, `transcribe_media` and `validate_template`, plus `get_effect_schema`,
+  `render_preview` and `render_remotion_clip` with Remotion.
 
 ### Changed
 
+- `get_samples` replaces `list_samples` and `get_sample`: without `id` it lists (it accepts `category:
+"effects"`; 51 packaged samples), with `id` it returns the sample and its template, plus a
+  `partialCatalog` summary.
 - `validate_template` takes `include: ["resolved" | "timeline"]`, plus `fields` and `format` for them:
-  `resolved` is `{ descriptor, values }` as `get_resolved_template` returned it (a refused field value is
-  still an error), `timeline` is what `get_timeline` returned. Without `include`, validation is unchanged.
-- `edit_template` takes `effectProps` (`[{ section, props }]`, the former `patch_template` edits), applied
-  after the JSON Patch `operations` in the same revision-guarded, all-or-nothing batch and checked by the
-  effect backend; it returns `changedSections`. `operations` is optional when `effectProps` is given.
-- `get_samples` replaces `list_samples` and `get_sample`: without `id` it lists, with `id` it returns the
-  sample and its template.
-- `get_motion_catalog` appends a query that matches nothing to the catalog gap log
-  (`--catalog-gap-log` / `LECLAP_MCP_CATALOG_GAP_LOG`, still confined to the output dir); its `gap` no
-  longer points at another tool.
+  `resolved` is `{ descriptor, values }`, the descriptor `compose_video` would render for the given
+  `fields` (a refused field value is still an error), and `timeline` is the resolved section timeline.
+  Without `include`, validation is unchanged.
+- Template revisions (`expectedRevision` / `revision`) and the validation finding text now come from the
+  engine (`templateRevision`, `invalidTemplateText`), so other surfaces compute the same revision for the
+  same JSON; values are unchanged.
+- Built on `ffmpeg-video-composer` 3: `validate_template`, `edit_template` and `compose_video` reject
+  templates with unknown keys (`unknown_key`) and text a bundled font cannot draw (`font_missing_glyphs`),
+  which 0.4.0 accepted.
 
 ### Added
 
@@ -47,34 +52,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `html_font_unknown`, `html_missing_field` and a measured `html_overflow`, and fails on `html_too_large`.
   `get_template_schema` documents the input and `get_motion_catalog` lists the CSS subset and four layout
   recipes under `html`.
-
 - `analyze_sound`: renders an `sfx[].sound` (composed layers, or a library preset varied by pitch, length,
   brightness and room) with the engine synth and returns its length, peak and RMS dBFS, raw
   pre-normalisation peak, spectral centroid, energy above 8 kHz / under 250 Hz, attack time and the sound
   advisories it raises, plus a spectrogram and a waveform PNG. An optional `cue` path
   (`sections.intro.sfx[0]`) seeds the render exactly like the mix; a silent sound reports −120 dB and
-  `sound_silent`. Seventeen tools are now always registered.
-
-- Typed template fields: `get_resolved_template` returns the descriptor `compose_video` would render for
-  the given `fields` (declared `global.fields` filled with typed values) or every value it would refuse;
-  `compose_video` and `render_frames` take `fields` as strings, numbers or booleans and refuse a missing
-  required or ill-typed value before rendering; `validate_template` lists the declared contract as `fields`
-  and reports `field_undefined`, `field_unused`, `field_type_mismatch` and `field_missing_required`.
+  `sound_silent`.
+- Typed template fields: `compose_video` and `render_frames` take `fields` (declared `global.fields`) as
+  strings, numbers or booleans and refuse a missing required or ill-typed value before rendering;
+  `validate_template` lists the declared contract as `fields`, reports `field_undefined`, `field_unused`,
+  `field_type_mismatch` and `field_missing_required`, and with `include: ["resolved"]` returns the
+  descriptor the given values produce or every value it would refuse.
 - `open_in_builder`: returns a `https://leclap.dev/studio/builder#t=v1.…` link that opens the template in
   the web builder for a person to edit, with `mediaToRebind` (local paths and uploads the browser cannot
   read) and `warnings`. The template travels compressed in the URL fragment, which browsers never send to a
   server; `baseUrl` targets a locale prefix or a local dev server, with a warning off `https://leclap.dev`.
-  Nineteen tools are now always registered.
 - `transcribe_media`: transcribe a local audio/video file's speech with whisper.cpp on the host → words, SRT,
   language, mean confidence and the "pin, then review" advice. `compose_video` resolves `subtitles.transcribe`
   before rendering. The model is never downloaded by the tool: the operator opts in once
-  (`leclap transcribe --download-model` or `LECLAP_WHISPER_DOWNLOAD=1`). Twenty tools are now always registered.
+  (`leclap transcribe --download-model` or `LECLAP_WHISPER_DOWNLOAD=1`).
 - `edit_template`: an RFC 6902 JSON Patch over inline template JSON under `expectedRevision` (stale →
   `revision_conflict`), all-or-nothing and validated after applying; returns the template, its new
-  `revision` and `changedPaths`. The web builder's WebMCP tools share the name, operations and revision,
-  along with `get_template_schema`, `get_motion_catalog`, `list_samples`, `get_sample`, `validate_template`,
-  `get_timeline` and `render_frames`. Sixteen tools are now always registered.
-- `list_samples` accepts `category: "effects"`; 46 packaged samples.
+  `revision` and `changedPaths`. It also takes `effectProps` (`[{ section, props }]`, the former
+  `patch_template` edits), applied after the `operations` in the same batch and checked by the effect
+  backend, and then returns `changedSections`; `operations` is optional when `effectProps` is given. The
+  web builder's WebMCP tools share the name, operations and revision, along with `get_template_schema`,
+  `get_motion_catalog`, `validate_template` and `render_frames`.
 - `compose_video` runs the engine's output QC and returns it in `structuredContent.qc` with a one-line
   verdict.
 - `get_motion_catalog` returns the engine's motion catalog: kinetic typography presets with
@@ -87,15 +90,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   built-in themes, delivery platforms and the time-reference grammar; the registry manifest lists it.
 - `get_template_schema` describes `global.platform`; the `compose-video` prompt adds motion pacing rules.
 - New always-registered tools: `extract_style` (theme and style guide from a reference under the media
-  dir), `analyze_music` (beat grid and cues), `get_capabilities` (local FFmpeg capability report),
-  `render_frames` (PNG frames, contact sheets, safe zones, variant and look grids), `get_timeline` and
-  `report_catalog_gap`.
-- `get_motion_catalog` accepts `{ query, kind? }` and returns ranked matches, with a pointer to
-  `report_catalog_gap` when nothing matches; `--catalog-gap-log` / `LECLAP_MCP_CATALOG_GAP_LOG` sets the log.
-- `compose_video`, `render_frames` and `get_timeline` accept `format`; the template is resolved to that
-  format before validation, the sandbox guard and the render.
+  dir), `analyze_music` (beat grid and cues), `get_capabilities` (local FFmpeg capability report) and
+  `render_frames` (PNG frames, contact sheets, safe zones, variant and look grids).
+- `get_motion_catalog` accepts `{ query, kind? }` and returns ranked matches; a query that matches nothing
+  is appended to the catalog gap log (`--catalog-gap-log` / `LECLAP_MCP_CATALOG_GAP_LOG`, confined to the
+  output dir).
+- `compose_video` and `render_frames` accept `format`; the template is resolved to that format before
+  validation, the sandbox guard and the render. `validate_template` takes it for `include`.
 - `validate_template` adds `featureWarnings` from the local capability probe and reports
-  `partial_compressed`; `get_sample` adds a `partialCatalog` summary.
+  `partial_compressed`.
 - `probe_media` reports `hdr`, `colorPrimaries`, `colorTransfer`, `bitDepth`, `vfr` and `rotation`.
 - The `get_template_schema` guide covers formats, footage editing, subtitles, voice/automation/sfx, music
   timing, motion roles and section purpose, trails, the new graphics, whips, lower-third styles, fills,
@@ -105,15 +108,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 "fx"` searches them. `get_template_schema` and the `compose-video` prompt steer agents to compose motion
   from these primitives, tuned to the brief, and `validate_template` returns the sameness lint
   (`fx_untuned`, `effect_repeated`, `library_animation_sample`, `effect_off_theme`, `decor_overload`).
-
-### Changed
-
-- Template revisions (`expectedRevision` / `revision`) and the validation finding text now come from the
-  engine (`templateRevision`, `invalidTemplateText`), so other surfaces compute the same revision for the
-  same JSON; values are unchanged.
-- Built on `ffmpeg-video-composer` 3: `validate_template`, `edit_template` and `compose_video` reject
-  templates with unknown keys (`unknown_key`) and text a bundled font cannot draw (`font_missing_glyphs`),
-  which 0.4.0 accepted.
 
 ## [0.4.0] - 2026-10-03
 

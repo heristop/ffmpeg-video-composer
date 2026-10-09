@@ -212,9 +212,9 @@ Fourteen tools are always registered: `get_samples`, `get_template_schema`, `get
 `analyze_music`, `analyze_sound`, `transcribe_media`, `get_capabilities` and `open_in_builder`. Opt-in adds
 `get_effect_schema`, `render_preview` and `render_remotion_clip`. Effect-prop edits do not bypass
 effect-backend validation. Every tool's name and description is sent to the agent on each turn, so the
-surface stays small: 0.5.0 folded `get_resolved_template` and `get_timeline` into `validate_template`,
-`patch_template` into `edit_template`, `list_samples` and `get_sample` into `get_samples`, and dropped
-`ping` (MCP has a protocol ping) and `report_catalog_gap` (see the [CHANGELOG](./CHANGELOG.md) migration table).
+surface stays small: 0.5.0 folded `patch_template` into `edit_template`, `list_samples` and `get_sample`
+into `get_samples`, and dropped `ping` (MCP has a protocol ping); see the [CHANGELOG](./CHANGELOG.md)
+migration table.
 
 `open_in_builder` hands a template to a person: it returns
 `https://leclap.dev/studio/builder#t=v1.…` (`baseUrl` for a locale prefix such as `/fr` or a local dev server),

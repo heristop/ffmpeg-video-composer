@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-09
+
 ### Added
 
 - Typed template fields: `leclap render --set name=value` (repeatable) fills a declared `global.fields`
@@ -21,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--out`, `--video section=path`, `--json`), or prints a media file's words / SRT (`--json`, `--srt`).
   `--download-model` fetches the model once (checksum-verified); `leclap render --download-model` allows the
   same when a render resolves an unpinned request.
-- `leclap samples list --category effects`; the catalog now has 46 samples.
+- `leclap samples list --category effects`; the catalog now has 51 samples.
 - `leclap render --qc` prints output QC findings and exits non-zero on a failing check (`--json`
   includes the report); `--cache <dir>` reuses unchanged sections across renders. `--output` is written
   atomically and refused when it equals the template or a `--video` input.

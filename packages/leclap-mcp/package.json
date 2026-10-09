@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.0.0",
-    "ffmpeg-video-composer": "^2.5.0",
+    "ffmpeg-video-composer": "^3.0.0",
     "reflect-metadata": "^0.2.2",
     "zod": "^4.4.3"
   },

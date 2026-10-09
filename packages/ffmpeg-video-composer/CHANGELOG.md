@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-10-09
+
+A motion, effects, footage, audio and agent-tooling release: HTML layers, composed sound effects, typed
+template fields, auto-captions, per-format compositions and a determinism contract. Validation is stricter
+and renders are no longer byte-identical to 2.5.0, hence the major version.
+
 Upgrading from v2? See the [migration guide](MIGRATION.md#upgrading-from-v2-to-v3).
 
 ### Added
@@ -16,8 +22,8 @@ Upgrading from v2? See the [migration guide](MIGRATION.md#upgrading-from-v2-to-v
   (tag, `.class` and descendant selectors). The markup is sanitised (no scripts, iframes, forms, SVG, event
   handlers or links), `{{ name }}` placeholders are filled HTML-escaped from typed fields, variables and form
   values, and `$color.*` / `$font.*` tokens resolve in `css` and `html`. Fonts come from the registry
-  (variable fonts are pinned to static weights with HarfBuzz); images must be template assets or PNG/JPEG data
-  URIs. Satori, resvg and HarfBuzz draw the layer at 2× into a transparent PNG named by content hash
+  (variable fonts are pinned to static weights with HarfBuzz; layers of one section may share a font); images
+  must be template assets or PNG/JPEG data URIs. Satori, resvg and HarfBuzz draw the layer at 2× into a transparent PNG named by content hash
   (`html:<hash>`, cached per process), which composites as a still image, so `position`, `scale`, `start` and
   `motion` work unchanged. One pipeline (`core/html/satori-raster.ts`) runs on every host, so a layer's PNG is
   byte-identical everywhere; only where its WebAssembly comes from differs:
@@ -42,12 +48,14 @@ Upgrading from v2? See the [migration guide](MIGRATION.md#upgrading-from-v2-to-v
 
 - Composed sound effects. An `sfx` cue takes a `sound` instead of an `id`: layers of `tone`, `noise`,
   `strike` and `silence` shaped by envelopes, filter chains, glides, drive, pan and sequences, with
-  whole-sound saturate/crush/room/echo, bounded to 4 s and 8 layers. A pure TypeScript synth renders it
-  (deterministic per platform and matching across Node, browsers and Hermes up to the last bit, seeded by
-  `global.seed` and the cue path) to `build/sfx/<hash>.wav`,
-  mixed like a library file. Every library sound is also a recipe (`SOUND_PRESETS`); `sound.preset` varies one
-  by `pitch`, `length`, `brightness` and `room`, while `id` cues keep playing the shipped files. A sound's notes
-  add up to at most 32 s of audio, so its render cost stays bounded. Advisories `sound_silent`, `sound_clipped`,
+  whole-sound saturate/crush/room/echo, bounded to 4 s and 8 layers. A pure TypeScript synth renders it,
+  seeded by `global.seed` and the cue path, to `build/sfx/<hash>.wav`, mixed like a library file: the same
+  sound and seed give the same file on a given platform, while Node, browsers and Hermes can differ in the
+  last bit (each JavaScript engine computes `Math.sin` and `Math.exp` its own way). A note shorter than its
+  attack plus release (a tick, a fast roll) stays audible, and jittered, accelerating rolls keep every hit.
+  Every library sound is also a recipe (`SOUND_PRESETS`); `sound.preset` varies one by `pitch`, `length`,
+  `brightness` and `room`, while `id` cues keep playing the shipped files. A sound's notes add up to at most
+  32 s of audio, so its render cost stays bounded. Advisories `sound_silent`, `sound_clipped`,
   `sound_harsh`, `sound_muddy`, `sound_long`, `sound_repeated` and `sound_overlap`;
   `motionCatalog().audio.compose`; `renderSound`, `analyzeChannels`, `soundSpec` and `SoundSchema` exports.
 - Typed template fields: `global.fields` declares a template's inputs (map or list of `{ name, type, default?,
@@ -164,19 +172,23 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
   cover `focus` (anchors, points, keyframed pans), `clip` in/out points, `speedRamp` presets or keys with
   `rampAudio`, `freeze` frames with an optional flash, `trimSilence` (Node `silencedetect`) and explicit
   `keep` windows, and `cutaways[]` B-roll with `a`/`b`/`mix` audio. Edited lengths drive the timeline,
-  transitions, music and QC. New validation codes (including `take_edit_combination`) and advisories;
+  transitions, music and QC; an edited clip pads its audio only up to the edited length, so the audio never
+  overruns the picture. New validation codes (including `take_edit_combination`) and advisories;
   `motionCatalog().footage`.
 - `look: { preset, strength }` dials a LUT look toward the untouched footage, and `grade.lut: { url, strength? }`
   applies a user `.cube` (single `lut3d`, parsing errors name the line).
 - Media probes report HDR (`pq`, `hlg`, `dolby-vision`), colour primaries and transfer, bit depth, VFR and
-  rotation; HDR clips are tone-mapped to SDR on Node when the build has `zscale` and `tonemap`, otherwise
-  the render logs `hdr_source_sdr_pipeline`.
+  rotation; HDR clips are tone-mapped to SDR on Node when the build has `zscale` and `tonemap` (read from
+  the `-filters` listing of FFmpeg 7 and of FFmpeg 8 and later), otherwise the render logs
+  `hdr_source_sdr_pipeline`.
 - Word-timed `sections[].subtitles` from words, cues or SRT/WebVTT: phrase grouping, fit-then-balanced
   wrapping, splitting, platform safe zones, six caption styles (`clean`, `loud`, `keynote`, `documentary`,
   `boxed`, `neon`), karaoke `word` / `fill` / `pop` and a crown line, lowered to `drawtext` / `drawbox`.
   Errors `invalid_srt`, `invalid_word_timings`, `invalid_subtitle_cue`, `subtitle_font_unmeasurable`;
   advisories `caption_split`, `caption_shrunk`, `subtitle_past_end`, `caption_crown_repeated`;
   `motionCatalog().captions`. Opt-in `caption.wrap` / `caption.fit` and `kinetic[].wrap: "balanced"`.
+  Karaoke styles that enlarge the spoken word (`loud`, `neon`, pop) leave room for it on both sides, and the
+  line stays still as the highlight moves.
 - Audio polish: `options.voice` presets (`clean`, `broadcast`, `warm`, `rumble-cut`, `room-gate`),
   `options.audioAutomation` and `global.audio.automation` (music bed, before ducking), section and global
   `sfx` from ten bundled sounds, `global.audio.sfx: "auto"` (whooshes, hits and risers from the motion),
@@ -193,7 +205,11 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
   `section_without_purpose`.
 - Motion FX: kinetic `trail` echoes, `whip-left|right|up|down` designed transitions, `glitch`, `focus`,
   `progress`, `ticker` and `bars-chart` graphics, and `lowerThird.style` (`clean-bar`, `side-rule`,
-  `kicker`, `stack-bars`, `pill`); `motionCatalog().lowerThirds` and `kinetic.trail`.
+  `kicker`, `stack-bars`, `pill`); `motionCatalog().lowerThirds` and `kinetic.trail`. Whips model a 144°
+  shutter: the blur follows the push's real speed, ramps in and out with the ease, is centred on its frame
+  and is capped at 4.5 % of the travel axis.
+- `above: true` graphics are drawn after the section's own authored `filters` and masks, so an authored mask
+  or a text plate does not hide them. An `underline` and an fx on a `text:<i>` target default to above.
 - Compositing: `kinetic[].fill` (gradient, texture or shimmer inside the letters, through `alphamerge`) and
   `sections[].layout` split screens and before/after wipes; errors `unknown_layout_source`,
   `layout_unsupported_section`, `layout_wipe_out_of_range`; advisory `mask_unavailable`;
@@ -234,7 +250,9 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
   on-device filters with fallbacks (compile-time sprites without `gradients`), has a reduced-motion form, and
   is skipped with `fx_target`, `mask_unavailable` or `fx_skipped` when it cannot render. `motionCatalog().fx`
   (and `searchMotionCatalog` kind `fx`) lists each primitive's parameters, defaults and design intent from
-  `FX_DOCS`; that prose is loaded lazily, outside the browser's eager load.
+  `FX_DOCS`; that prose is loaded lazily, outside the browser's eager load. `leak`, `bloom` and
+  `vignette-breathe` dither their soft light with a fine static grain, so they do not band after libx264
+  encoding at crf 23.
 - Strokes: `frame`, `corners` and `underline` draw even-pixel strokes that trace from the top-left with a head
   fade and leave before `until`, and take `target`, `clearance` (24), `radius`, `trace`, `exit`,
   `exitDuration` and `contrast` (`auto` | `shadow` | `none`); `corners` adds `spread`, `underline` adds round
@@ -257,13 +275,7 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
   - text drawn with a bundled font that lacks its glyphs fails with `font_missing_glyphs`.
 - **Breaking:** renders are no longer byte-identical to 2.5.0: the deterministic encoder profile is on by
   default (`ProjectConfig.deterministic: false` restores the previous encoder settings), every section is
-  conformed to CFR, zooms are rendered at sub-pixel precision and `above: true` graphics change their
-  draw order (below). Pin golden files again after upgrading.
-- `above: true` graphics are drawn after the section's own authored `filters` and masks, so an authored mask
-  or a text plate no longer hides them. An `underline` and an fx on a `text:<i>` target default to above.
-- Whip transitions model a 144° shutter: the blur follows the push's real speed, ramps in and out with the
-  ease (no threshold), is centred on its frame and is capped at 4.5 % of the travel axis. Defaults peak at
-  the same blur as before.
+  conformed to CFR and zooms are rendered at sub-pixel precision. Pin golden files again after upgrading.
 - Five bundled app templates draw their cards with HTML layers (in the `samples` catalog too): Interview's
   lower third (name, role and an "On the record" badge in one padded box), Product Launch's offer tag, spec
   card and call-to-action pill, Web App Promo's feature chips, App Tutorial's numbered step badges and Story
@@ -278,39 +290,29 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
 
 - A letterboxed clip (`fit: "letterbox"` or `forceOriginalAspectRatio`) under an image, animation or HTML
   input keeps its bars: the overlay path cover-cropped the footage to fill the frame.
-- Two HTML layers of one section asking for the same font no longer race: the second could read the font
-  half-copied and fail with "could not instance the variable font".
-- Karaoke captions that enlarge the spoken word (`loud`, `neon`, pop) leave room for it on both sides, so it no
-  longer overlaps its neighbours or leaves a narrow portrait frame; the line stays still as the highlight moves.
-- A composed note shorter than its attack plus release (a tick, a fast roll) is audible instead of silent, and
-  jittered, accelerating rolls keep every hit.
 - Zooms and pans (camera rig, Ken Burns, pulse, `resolve`, `zoom-through`) no longer stutter: `zoompan`
   cropped a whole-pixel window, so a slow push-in held for one to four frames and then jumped by up to a
   pixel, sometimes backwards. Every zoom now lowers to an exact sub-pixel zoom with the same on-device
-  filters, at about the same cost.
-- Eased camera, Ken Burns and pulse zooms no longer hold their first and last frames still before a half-pixel jump: a moving exact zoom rests at a 1.5 px over-scan that fades out by zoom 1.05.
-- `leak`, `bloom` and `vignette-breathe` no longer band after H.264 encoding: their soft-light dither is a fine static grain that survives libx264 at crf 23. Only renders using these effects change; their files grow somewhat.
+  filters, at about the same cost; a moving zoom rests at a 1.5 px over-scan that fades out by zoom 1.05, so
+  eased zooms do not hold their first and last frames before a half-pixel jump.
 - A cut between sections that also use designed transitions is joined with `concat`: the 0.001 s xfade shorter than a frame ended the output early on FFmpeg 6.x.
-- A command FFmpeg cannot start (E2BIG, ENOENT) reports the system error instead of an empty failure.
 - No false text-collision warning for a global overlay on back-to-back sections (sub-millisecond overlaps are ignored).
-- Node renders pass a filtergraph longer than 64 KB through a script file (`-filter_script:v`, `-filter_complex_script`): a long stepped or per-frame graph no longer fails to spawn with E2BIG, and a spawn failure now reports its reason instead of an empty error.
+- Node renders pass a filtergraph longer than 64 KB through a file, so a long stepped or per-frame graph no
+  longer fails to spawn with E2BIG: `-/filter_complex <file>` (and `-/vf`, `-/af`) on FFmpeg 7.0 and later,
+  `-filter_complex_script` / `-filter_script` on FFmpeg 6 (`ffmpeg-static`). A command FFmpeg cannot start
+  (E2BIG, ENOENT) reports the system error instead of an empty failure.
 - FFmpeg 8 no longer crashes on animated text sizes: a drawtext whose `fontsize` changes over time (kinetic scale presets, the karaoke word pop, `animate.scale`) is drawn as one constant-size drawtext per run of frames.
-- A footage-edited clip pads its audio only up to the edited length (`apad=whole_dur`), so `-shortest` no longer lets the audio overrun the picture on FFmpeg 8.
 - Backslashes in drawtext text (captions, title cards, overlays, kinetic counter prefix/suffix) render
   literally instead of being swallowed; escaping is shared and verified against a real FFmpeg.
 - FFmpeg 7.1+: Rec.709 tags are set through libx264 parameters, avoiding an unintended colour conversion.
 - `project_video` sections whose audio is shorter than the video no longer lose video frames to
   `-shortest` (the clip's audio is padded).
 - Normalisation now runs when music is enabled but no track resolves.
-- FFmpeg 9 support. A filtergraph longer than 64 KB goes through `-/filter_complex <file>` (and `-/vf`, `-/af`)
-  on FFmpeg 7.0 and later, because FFmpeg 9 removed `-filter_complex_script` and `-filter_script`. FFmpeg 6
-  (`ffmpeg-static`) keeps the script options.
+- FFmpeg 9 support: long filtergraphs no longer use `-filter_complex_script` / `-filter_script`, which FFmpeg 9
+  removed (see above).
 - FFmpeg 9: a music mix no longer loses its last 0.1 s of video. With the video stream-copied, FFmpeg 9's
   `-shortest` dropped the last frames, so the mix now ends at the planned timeline length (`-t`) on every
   release, and still reads the segment list directly. Version checks now live in `core/ffmpeg-version.ts`.
-- HDR clips are tone-mapped again on FFmpeg 8 and later builds that have `zscale`. The engine's
-  `-filters` parser expected the three-character flag column FFmpeg 7 printed, so it found no filters
-  and logged `hdr_source_sdr_pipeline`.
 
 ## [2.5.0] - 2026-10-03
 
