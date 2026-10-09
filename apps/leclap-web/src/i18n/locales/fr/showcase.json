@@ -1,7 +1,7 @@
 {
   "title": "Du mouvement. Avec intention.",
   "intro": "Explorez le mouvement. Prenez le modèle. Faites-le vôtre.",
-  "featuredPreview": "Aperçu du modèle sélectionné",
+  "featuredPreview": "Film à la une",
   "play": "Lire la vidéo",
   "previewOf": "Aperçu de {{title}}",
   "playSample": "Voir {{title}}",
@@ -41,5 +41,10 @@
     "overlays": "Incrustations",
     "app-demos": "Démos d’apps",
     "evidence": "Preuves de revue"
+  },
+  "shapes": {
+    "landscape": "Paysage",
+    "portrait": "Portrait",
+    "square": "Carré"
   }
 }

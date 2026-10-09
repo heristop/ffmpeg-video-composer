@@ -3,7 +3,17 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bundledVideoFor, fieldsFor, videoFor } from '../../../../../../examples/showcase/fixtures.ts';
-import { SHOWCASE_SAMPLES, filterSamples, selectedSample, validCategory } from './catalog';
+import {
+  HTML_SAMPLE_IDS,
+  HTML_SAMPLES_AFTER,
+  LIBRARY_SAMPLES,
+  SHOWCASE_SAMPLES,
+  placeAfter,
+  sampleShape,
+  filterSamples,
+  selectedSample,
+  validCategory,
+} from './catalog';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../../..');
 
@@ -33,6 +43,41 @@ describe('showcase catalog', () => {
 
   it('lists the effects tour second, after Drink & Code', () => {
     expect(SHOWCASE_SAMPLES.slice(0, 2).map((sample) => sample.id)).toEqual(['drink-and-code', 'effects-tour']);
+  });
+
+  it('lists the HTML-layer samples right after Type impact, then keeps the catalog order', () => {
+    const ids = filterSamples('all', '').map((sample) => sample.id);
+    expect(ids.slice(0, 7)).toEqual([
+      'drink-and-code',
+      'effects-tour',
+      'type-impact',
+      'html-card',
+      'html-testimonial',
+      'html-speaker',
+      'html-stats',
+    ]);
+    expect(ids.slice(7)).toEqual(
+      SHOWCASE_SAMPLES.map((sample) => sample.id).filter(
+        (id) => !HTML_SAMPLE_IDS.includes(id) && !['drink-and-code', 'effects-tour', 'type-impact'].includes(id)
+      )
+    );
+    expect(LIBRARY_SAMPLES).toHaveLength(SHOWCASE_SAMPLES.length);
+  });
+
+  it('places only samples the catalog has, and leaves the catalog order alone', () => {
+    const ids = new Set(SHOWCASE_SAMPLES.map((sample) => sample.id));
+    for (const id of [...HTML_SAMPLE_IDS, HTML_SAMPLES_AFTER]) expect(ids.has(id)).toBe(true);
+    expect(SHOWCASE_SAMPLES[0].id).toBe('drink-and-code');
+    expect(placeAfter(SHOWCASE_SAMPLES, ['missing'], 'type-impact')).toEqual(SHOWCASE_SAMPLES);
+    expect(placeAfter(SHOWCASE_SAMPLES, HTML_SAMPLE_IDS, 'missing')).toEqual(SHOWCASE_SAMPLES);
+  });
+
+  it('sizes each sample by the orientation it was made in, not its letterboxed preview', () => {
+    const shapeOf = (id: string) => sampleShape(selectedSample(id));
+    expect(shapeOf('html-testimonial')).toBe('portrait');
+    expect(shapeOf('story-reel')).toBe('portrait');
+    expect(shapeOf('square-promo')).toBe('square');
+    expect(shapeOf('html-card')).toBe('landscape');
   });
 
   it('renders forms without options and keeps fixture values within authoring limits', () => {

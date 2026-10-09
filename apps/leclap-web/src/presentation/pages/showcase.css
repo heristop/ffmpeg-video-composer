@@ -28,3 +28,86 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+/* The sample dialog (components/showcase/sample-dialog.tsx). Its layer keeps clear of the notch and the home
+   indicator; the screen takes the sample's own ratio (--sample-ratio) at the largest size that fits beside
+   the dialog's other rows (mobile: the title above, a glimpse of the details below) or its side column
+   (desktop), and the film's control bar wherever that sits under the screen (index.css, `.film-bar`). Open and close are short fades with a slight rise; reduced motion is instant (index.css). */
+.showcase-dialog-viewport {
+  --dialog-gap: 0.5rem;
+  padding: max(var(--dialog-gap), env(safe-area-inset-top)) max(var(--dialog-gap), env(safe-area-inset-right))
+    max(var(--dialog-gap), env(safe-area-inset-bottom)) max(var(--dialog-gap), env(safe-area-inset-left));
+}
+
+.showcase-dialog {
+  --screen-gap: 0.75rem;
+  --dialog-gap: 0.5rem;
+  --film-bar: 4.75rem;
+  --frame-x: calc(
+    2 * var(--dialog-gap) + 2 * var(--screen-gap) + env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px)
+  );
+  --frame-y: calc(
+    2 * var(--dialog-gap) + 2 * var(--screen-gap) + 7.5rem + var(--film-bar) + env(safe-area-inset-top, 0px) +
+      env(safe-area-inset-bottom, 0px)
+  );
+}
+
+.showcase-dialog-screen {
+  width: min(calc(100dvw - var(--frame-x)), calc((100dvh - var(--frame-y)) * var(--sample-ratio)));
+}
+
+@media (min-width: 40rem) {
+  .showcase-dialog-viewport,
+  .showcase-dialog {
+    --dialog-gap: 1rem;
+  }
+
+  .showcase-dialog {
+    --screen-gap: 1rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .showcase-dialog {
+    --frame-x: calc(2 * var(--dialog-gap) + 2 * var(--screen-gap) + 20rem);
+    --frame-y: calc(2 * var(--dialog-gap) + 2 * var(--screen-gap) + var(--film-bar));
+    max-height: calc(100dvh - 2 * var(--dialog-gap));
+  }
+}
+
+/* With a hovering pointer, a large screen's bar lies over its foot and takes no height of its own. */
+@media (min-width: 64rem) and (hover: hover) {
+  .showcase-dialog {
+    --film-bar: 0rem;
+  }
+}
+
+@keyframes showcase-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+@keyframes showcase-dialog-out {
+  to {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+
+.showcase-dialog[data-state='open'] {
+  animation: showcase-dialog-in 0.24s var(--ease-out-expo) backwards;
+}
+
+.showcase-dialog[data-state='closed'] {
+  animation: showcase-dialog-out 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.showcase-dialog-overlay[data-state='open'] {
+  animation: sheet-fade-in 0.24s var(--ease-smooth) backwards;
+}
+
+.showcase-dialog-overlay[data-state='closed'] {
+  animation: sheet-fade-out 0.18s var(--ease-smooth) forwards;
+}

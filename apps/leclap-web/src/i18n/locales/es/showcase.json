@@ -1,7 +1,7 @@
 {
   "title": "Hecho para moverse.",
   "intro": "Explora el movimiento. Elige la plantilla. Hazla tuya.",
-  "featuredPreview": "Vista previa de la muestra seleccionada",
+  "featuredPreview": "Película destacada",
   "play": "Reproducir vídeo",
   "previewOf": "Vista previa de {{title}}",
   "playSample": "Ver {{title}}",
@@ -41,5 +41,10 @@
     "overlays": "Superposiciones",
     "app-demos": "Demos de apps",
     "evidence": "Pruebas de revisión"
+  },
+  "shapes": {
+    "landscape": "Horizontal",
+    "portrait": "Vertical",
+    "square": "Cuadrado"
   }
 }

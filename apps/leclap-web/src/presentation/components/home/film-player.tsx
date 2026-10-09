@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useInView } from '@/hooks/useInView';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { playWithSound, readSound, tellVideo } from '@/lib/landing-sound';
-import { FilmScreen, FilmStage, useFilmSound } from '@/presentation/components/film-frame';
+import { ControlPill, FilmScreen, FilmStage, useFilmSound, type FilmShape } from '@/presentation/components/film-frame';
 import { FilmPlaybackControls, FilmFeedback, type FilmPlayerLabels } from './film-player-controls';
 import { useFilmCaptions, useFilmVisibility } from './use-film-captions';
-import { OptionalSeekBar, activeSeekLabels, type SeekLabels } from './seek-bar';
+import { SeekBar, activeSeekLabels, type SeekLabels } from './seek-bar';
+import { filmPlayback } from './film-playback.logic';
 import type { FilmAsset } from './films';
 
 interface FilmPlayerProps {
@@ -24,10 +25,24 @@ interface FilmPlayerProps {
   startRequested?: boolean;
   /** Show a seek bar along the bottom edge (showcase samples); the landing films keep the plain pill. */
   seekLabels?: SeekLabels;
+  /** The film's frame: landscape by default, portrait or square for a sample made that way. */
+  shape?: FilmShape;
+  /** A frame that stays put, without the scroll reveal and the glow: a film inside a dialog. */
+  still?: boolean;
+  /** Set aside by the page (a dialog over it, or its own dialog closing): it pauses until it isn't. */
+  suspended?: boolean;
 }
 
 // Nothing streams before the frame nears the viewport, even where the element already exists (reduced motion).
 const preloadWhen = (near: boolean): 'metadata' | 'none' => (near ? 'metadata' : 'none');
+
+// Where the pill goes: into the seek bar's row when the film has one (from the first render, so the frame never
+// changes shape as the film mounts), in the screen's corner otherwise.
+const controlLayout = (
+  seek: SeekLabels | undefined,
+  control: ReactNode,
+  barWith: (seek: SeekLabels, pill: ReactNode) => ReactNode
+): { control?: ReactNode; bar?: ReactNode } => (seek ? { bar: barWith(seek, control) } : { control });
 
 type SaveDataNavigator = Navigator & { connection?: { saveData?: boolean } };
 
@@ -52,6 +67,9 @@ export const FilmPlayer = ({
   playback = 'ambient',
   startRequested = false,
   seekLabels,
+  shape,
+  still,
+  suspended,
 }: FilmPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const reduced = useReducedMotion();
@@ -102,13 +120,22 @@ export const FilmPlayer = ({
 
     if (!video) return;
 
-    if (!inView || held) {
+    const next = filmPlayback({
+      inView,
+      held,
+      suspended: suspended === true,
+      reduced,
+      requested: startRequested,
+      hidden: document.hidden,
+    });
+
+    if (next === 'pause') {
       video.pause();
 
       return;
     }
 
-    if ((reduced && !startRequested) || document.hidden) return;
+    if (next === 'rest') return;
 
     if (!muted && !heard.current) {
       heard.current = true;
@@ -119,7 +146,7 @@ export const FilmPlayer = ({
       heard.current = false;
       refuse();
     });
-  }, [inView, held, reduced, shouldLoad, muted, refuse, startRequested]);
+  }, [inView, held, suspended, reduced, shouldLoad, muted, refuse, startRequested]);
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -184,13 +211,17 @@ export const FilmPlayer = ({
   );
 
   return (
-    <FilmStage frameRef={setFrameRef} className={className}>
+    <FilmStage frameRef={setFrameRef} className={className} still={still}>
       <FilmScreen
+        shape={shape}
         badge={badge}
-        control={control}
         controlLabel={title}
         paused={paused}
-        raised={activeSeekLabels(seekLabels, reduced, mounted) !== undefined}
+        {...controlLayout(activeSeekLabels(seekLabels, reduced, true), control, (seek, pill) => (
+          <SeekBar videoRef={videoRef} mounted={mounted} labels={seek}>
+            <ControlPill label={title}>{pill}</ControlPill>
+          </SeekBar>
+        ))}
       >
         {!mounted && (
           <img
@@ -251,11 +282,6 @@ export const FilmPlayer = ({
           </video>
         )}
         <FilmFeedback waiting={waiting} failed={failed} labels={labels} cue={cue} captions={captions && !reduced} />
-        <OptionalSeekBar
-          videoRef={videoRef}
-          mounted={mounted}
-          labels={activeSeekLabels(seekLabels, reduced, mounted)}
-        />
       </FilmScreen>
     </FilmStage>
   );

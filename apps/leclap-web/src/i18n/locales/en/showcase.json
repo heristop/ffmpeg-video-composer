@@ -1,7 +1,7 @@
 {
   "title": "Made to move.",
   "intro": "Explore the motion. Take the template. Make it yours.",
-  "featuredPreview": "Selected sample preview",
+  "featuredPreview": "Featured film",
   "play": "Play film",
   "previewOf": "Preview of {{title}}",
   "playSample": "Watch {{title}}",
@@ -41,5 +41,10 @@
     "overlays": "Overlays",
     "app-demos": "App demos",
     "evidence": "Review evidence"
+  },
+  "shapes": {
+    "landscape": "Landscape",
+    "portrait": "Portrait",
+    "square": "Square"
   }
 }

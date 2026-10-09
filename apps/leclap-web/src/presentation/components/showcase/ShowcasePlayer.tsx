@@ -1,8 +1,20 @@
 import { useTranslation } from 'react-i18next';
 import { FilmPlayer } from '@/presentation/components/home/film-player';
-import { mediaPath, type ShowcaseSample } from './catalog';
+import { mediaPath, sampleShape, type ShowcaseSample } from './catalog';
 
-export function ShowcasePlayer({ sample, requested }: { sample: ShowcaseSample; requested: boolean }) {
+export function ShowcasePlayer({
+  sample,
+  requested,
+  suspended = false,
+  still = false,
+}: {
+  sample: ShowcaseSample;
+  requested: boolean;
+  /** Paused while set aside: under the sample dialog, or as that dialog closes. */
+  suspended?: boolean;
+  /** Inside the dialog: no scroll reveal. */
+  still?: boolean;
+}) {
   const { t } = useTranslation('showcase');
   const { t: home } = useTranslation('home');
 
@@ -13,6 +25,9 @@ export function ShowcasePlayer({ sample, requested }: { sample: ShowcaseSample; 
       title={t('previewOf', { title: sample.title })}
       playback="requested"
       startRequested={requested}
+      shape={sampleShape(sample)}
+      still={still}
+      suspended={suspended}
       labels={{
         play: t('playSample', { title: sample.title }),
         pause: home('film.pause'),

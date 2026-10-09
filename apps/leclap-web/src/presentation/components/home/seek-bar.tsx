@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { cn } from '@/lib/utils';
 import { formatClock, keySeekTarget, pointerTime } from './seek-bar.logic';
 
 // The film player's seek bar (showcase samples): a hairline just above the screen's sprocket edge, the played part in
 // the brand gradient over the buffered part. Hovered, focused or dragged it thickens and shows its thumb, and a
-// time bubble follows the pointer; a glass chip in the corner reads the position. Everything that moves is a
+// time bubble follows the pointer; a glass chip beside the player's pill reads the position. Everything that moves is a
 // transform or an opacity on the site's ease-out-expo curve, so nothing reflows. It is a real slider: arrows
 // step 5 s, Page Up / Page Down a tenth, Home / End the ends. Under reduced motion the player keeps the
 // native controls instead, so this bar is never mounted there.
@@ -90,24 +90,18 @@ export const activeSeekLabels = (
   mounted: boolean
 ): SeekLabels | undefined => (labels && !reduced && mounted ? labels : undefined);
 
-/** The seek bar, or nothing without labels. */
-export const OptionalSeekBar = ({
-  labels,
-  ...props
-}: {
-  videoRef: RefObject<HTMLVideoElement | null>;
-  mounted: boolean;
-  labels: SeekLabels | undefined;
-}) => (labels ? <SeekBar labels={labels} {...props} /> : null);
-
+// The seek bar under the row that reads the position and holds the player's pill (`children`): one bar the
+// frame lays over the screen's foot or under it (FilmScreen's `bar`).
 export const SeekBar = ({
   videoRef,
   mounted,
   labels,
+  children,
 }: {
   videoRef: RefObject<HTMLVideoElement | null>;
   mounted: boolean;
   labels: SeekLabels;
+  children?: ReactNode;
 }) => {
   const time = useMediaTime(videoRef, mounted);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -137,7 +131,19 @@ export const SeekBar = ({
   const total = formatClock(time.duration);
 
   return (
-    <>
+    <div className="film-bar">
+      <div className="flex min-h-10 items-center justify-between gap-3 px-3">
+        <span
+          aria-hidden="true"
+          className={cn(
+            'pointer-events-none rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium tabular-nums text-white/90 ring-1 ring-white/15 backdrop-blur-sm transition-opacity duration-200',
+            time.duration === 0 && 'opacity-0'
+          )}
+        >
+          {now} / {total}
+        </span>
+        {children}
+      </div>
       <div
         ref={trackRef}
         role="slider"
@@ -149,7 +155,7 @@ export const SeekBar = ({
         aria-valuetext={labels.position(now, total)}
         aria-disabled={time.duration === 0}
         data-dragging={dragging || undefined}
-        className="group/seek absolute inset-x-4 bottom-3 z-10 h-5 cursor-pointer touch-none outline-none"
+        className="group/seek relative mx-4 h-5 cursor-pointer touch-none outline-none"
         onKeyDown={(event) => {
           const target = keySeekTarget(event.key, time.current, time.duration);
 
@@ -199,15 +205,6 @@ export const SeekBar = ({
           </span>
         )}
       </div>
-      <span
-        aria-hidden="true"
-        className={cn(
-          'pointer-events-none absolute bottom-12 left-4 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium tabular-nums text-white/90 ring-1 ring-white/15 backdrop-blur-sm transition-opacity duration-200',
-          time.duration === 0 && 'opacity-0'
-        )}
-      >
-        {now} / {total}
-      </span>
-    </>
+    </div>
   );
 };

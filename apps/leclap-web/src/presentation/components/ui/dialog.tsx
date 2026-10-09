@@ -27,23 +27,27 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 interface DialogContentProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
   // Above a sheet that is already open (a confirmation over a drawer): the scrim then dims the sheet too.
   raised?: boolean;
+  // Extra classes for the scrim and for the centring layer around the panel (its padding, say).
+  overlayClassName?: string;
+  containerClassName?: string;
 }
 
 const DialogContent = React.forwardRef<React.ComponentRef<typeof DialogPrimitive.Content>, DialogContentProps>(
-  ({ className, children, onCloseAutoFocus, raised = false, ...props }, ref) => {
+  ({ className, children, onCloseAutoFocus, raised = false, overlayClassName, containerClassName, ...props }, ref) => {
     const { t } = useTranslation('common');
     const returnFocus = useReturnFocus(onCloseAutoFocus);
 
     return (
       <DialogPortal>
-        <DialogOverlay className={raised ? 'z-[60]' : undefined} />
+        <DialogOverlay className={cn(raised && 'z-[60]', overlayClassName)} />
         {/* Grid-center the panel on whole pixels instead of `translate(-50%,-50%)`: a percentage translate
           lands the box on a half-pixel at some viewport widths / zoom / DPR, which blurs antialiased text.
           `pointer-events-none` lets outside clicks fall through to the overlay so Radix still closes. */}
         <div
           className={cn(
             'dark pointer-events-none fixed inset-0 grid place-items-center overflow-y-auto p-4',
-            raised ? 'z-[61]' : 'z-[59]'
+            raised ? 'z-[61]' : 'z-[59]',
+            containerClassName
           )}
         >
           <DialogPrimitive.Content

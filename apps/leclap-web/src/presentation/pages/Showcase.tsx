@@ -1,11 +1,18 @@
-import { useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, Play, Search, Plus, X, SearchX } from 'lucide-react';
 import { Seo } from '@/presentation/components/Seo';
 import { Button } from '@/presentation/components/ui/button';
 import { ShowcasePlayer } from '@/presentation/components/showcase/ShowcasePlayer';
-import { SampleSource } from '@/presentation/components/showcase/SampleSource';
+import { SampleFacts } from '@/presentation/components/showcase/sample-facts';
+import { SampleDialog } from '@/presentation/components/showcase/sample-dialog';
+import {
+  OPENED_STATE,
+  closeRoute,
+  dialogSample,
+  withSample,
+  withoutSample,
+} from '@/presentation/components/showcase/sample-dialog.logic';
 import {
   CATEGORIES,
   SHOWCASE_SAMPLES,
@@ -13,7 +20,6 @@ import {
   selectedSample,
   validCategory,
   mediaPath,
-  type ShowcaseSample,
 } from '@/presentation/components/showcase/catalog';
 import './showcase.css';
 
@@ -21,13 +27,13 @@ export function Showcase() {
   const { t } = useTranslation('showcase');
   const { t: seo } = useTranslation('seo');
   const [params, setParams] = useSearchParams();
-  const [playRequest, requestPlay] = useState(0);
-  const playerRef = useRef<HTMLElement>(null);
-  const sample = selectedSample(params.get('sample'));
+  const location = useLocation();
+  // The page's own film, at the top. Every sample, this one included, plays in place in the dialog.
+  const featured = selectedSample(null);
+  const opened = dialogSample(params);
   const category = validCategory(params.get('category'));
   const query = params.get('q') ?? '';
   const samples = filterSamples(category, query);
-  const native = !sample.source.includes('llm-remotion-title');
 
   const updateFilter = (key: string, value: string) => {
     setParams(
@@ -44,22 +50,20 @@ export function Showcase() {
     );
   };
 
-  const select = (next: ShowcaseSample) => {
-    requestPlay((value) => value + 1);
-    setParams(
-      (current) => {
-        const result = new URLSearchParams(current);
-        result.set('sample', next.id);
+  // A card pushes its sample's entry, so the browser's back closes the dialog; the page stays where it was.
+  const open = (id: string) => {
+    setParams((current) => withSample(current, id), { preventScrollReset: true, state: OPENED_STATE });
+  };
 
-        return result;
-      },
-      { preventScrollReset: true }
-    );
-    playerRef.current?.scrollIntoView({
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
-      block: 'start',
-    });
-    playerRef.current?.focus({ preventScroll: true });
+  // Closing steps back over the entry a card pushed; a dialog reached by a link closes without a new entry.
+  const close = () => {
+    if (closeRoute(location.state) === 'back') {
+      globalThis.history.back();
+
+      return;
+    }
+
+    setParams(withoutSample, { replace: true, preventScrollReset: true });
   };
 
   return (
@@ -71,34 +75,15 @@ export function Showcase() {
         </h1>
         <p className="max-w-[32ch] text-lg leading-relaxed text-muted-foreground">{t('intro')}</p>
       </header>
-      <section
-        ref={playerRef}
-        tabIndex={-1}
-        aria-label={t('featuredPreview')}
-        className="showcase-feature scroll-mt-24 outline-none"
-      >
+      <section aria-label={t('featuredPreview')} className="showcase-feature">
         <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,2.7fr)_minmax(240px,1fr)] lg:gap-9">
-          <ShowcasePlayer key={`${sample.id}:${playRequest}`} sample={sample} requested={playRequest > 0} />
+          <ShowcasePlayer sample={featured} requested={false} suspended={opened !== undefined} />
           <div className="flex min-w-0 flex-col gap-5 lg:pt-2">
             <div>
-              <h2 className="mb-3 text-3xl font-medium leading-tight sm:text-4xl">{sample.title}</h2>
-              <p className="text-lg leading-relaxed text-muted-foreground">{sample.description}</p>
+              <h2 className="mb-3 text-3xl font-medium leading-tight sm:text-4xl">{featured.title}</h2>
+              <p className="text-lg leading-relaxed text-muted-foreground">{featured.description}</p>
             </div>
-            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-              <span>{t(`categories.${sample.category}`)}</span>
-              <span aria-hidden="true">/</span>
-              <span>{native ? t('native') : 'Remotion'}</span>
-            </div>
-            <SampleSource key={sample.id} sample={sample} />
-            {sample.source.startsWith('packages/leclap-creative-kit/') && (
-              <Link
-                to={`/studio/new?template=${sample.id}`}
-                className="inline-flex min-h-11 w-fit items-center gap-2 rounded-md text-base text-brand-700 underline-offset-4 hover:underline dark:text-brand-300 focus-visible:outline-2 focus-visible:outline-brand-500"
-              >
-                {t('useTemplate')}
-                <ArrowUpRight size={17} aria-hidden="true" />
-              </Link>
-            )}
+            <SampleFacts sample={featured} />
           </div>
         </div>
       </section>
@@ -158,15 +143,14 @@ export function Showcase() {
                 <button
                   type="button"
                   onClick={() => {
-                    select(item);
+                    open(item.id);
                   }}
                   aria-label={t('playSample', { title: item.title })}
-                  aria-current={item.id === sample.id ? 'true' : undefined}
+                  aria-haspopup="dialog"
+                  data-sample-tile={item.id}
                   className="showcase-tile group block w-full rounded-xl text-left outline-none focus-visible:ring-4 focus-visible:ring-brand-500/40"
                 >
-                  <div
-                    className={`relative aspect-video overflow-hidden rounded-xl bg-gray-900 ${item.id === sample.id ? 'ring-2 ring-brand-500 ring-offset-4 ring-offset-background' : ''}`}
-                  >
+                  <div className="relative aspect-video overflow-hidden rounded-xl bg-gray-900">
                     <img
                       src={mediaPath(item, 'webp')}
                       alt=""
@@ -229,6 +213,7 @@ export function Showcase() {
           </Link>
         </Button>
       </section>
+      <SampleDialog sample={opened} onClose={close} />
     </div>
   );
 }

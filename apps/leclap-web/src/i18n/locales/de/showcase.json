@@ -1,7 +1,7 @@
 {
   "title": "Für Bewegung gemacht.",
   "intro": "Bewegung entdecken. Vorlage nehmen. Etwas Eigenes machen.",
-  "featuredPreview": "Vorschau des ausgewählten Beispiels",
+  "featuredPreview": "Hervorgehobener Film",
   "play": "Film abspielen",
   "previewOf": "Vorschau von {{title}}",
   "playSample": "{{title}} ansehen",
@@ -41,5 +41,10 @@
     "overlays": "Overlays",
     "app-demos": "App-Demos",
     "evidence": "Review-Nachweise"
+  },
+  "shapes": {
+    "landscape": "Querformat",
+    "portrait": "Hochformat",
+    "square": "Quadratisch"
   }
 }

@@ -1462,6 +1462,63 @@ body {
   }
 }
 
+/* A showcase film's controls (film-frame.tsx FilmScreen `bar`, seek-bar.tsx): by default a bar under the
+   screen, so nothing covers the film. Only on a screen at least 360 px tall, with a pointer that can hover,
+   does the bar lie over the screen's foot instead, and there it fades out while the film plays unless the
+   pointer is over the frame or focus is in the bar. The frame is a size container; each shape's width
+   threshold is the width at which its screen reaches 360 px tall. */
+.film-frame {
+  container: film / inline-size;
+}
+
+.film-bar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 0 0.25rem;
+  transition: opacity 0.2s var(--ease-smooth);
+}
+
+@media (hover: hover) {
+  @container film (width >= 640px) {
+    .film-frame[data-shape='landscape'] .film-bar {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+    }
+
+    .film-frame[data-shape='landscape'][data-playing]:not(:hover) .film-bar:not(:focus-within) {
+      opacity: 0;
+    }
+  }
+
+  @container film (width >= 360px) {
+    .film-frame[data-shape='square'] .film-bar {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+    }
+
+    .film-frame[data-shape='square'][data-playing]:not(:hover) .film-bar:not(:focus-within) {
+      opacity: 0;
+    }
+  }
+
+  @container film (width >= 203px) {
+    .film-frame[data-shape='portrait'] .film-bar {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+    }
+
+    .film-frame[data-shape='portrait'][data-playing]:not(:hover) .film-bar:not(:focus-within) {
+      opacity: 0;
+    }
+  }
+}
+
 /* Living brand glow — a low-opacity aurora that drifts and breathes behind a section so the surface
    feels lit rather than static. translate + scale only (GPU-cheap); frozen under reduced-motion. */
 @keyframes aurora-drift {
@@ -1595,10 +1652,11 @@ html.theme-vt::view-transition-new(root) {
 /* Professional, accessible focus ring (keyboard navigation only). Controls that carry their own
    indicator opt out (the gradient field border, or the studio-range thumb ring) so they don't also
    get this outer outline — every other focusable keeps the outline for keyboard a11y. So do the
-   landmarks a script focuses to announce them (the skip link's main, an error page's heading): they
-   are not stops in the tab order, and a ring around a whole heading reads as a selection. Roving
-   widgets also sit at tabindex="-1" but are reached by arrow keys, so they keep the ring. */
-:focus-visible:not(.field-focus-gradient):not(.studio-range):not(:is(main, h1, h2)[tabindex='-1']) {
+   landmarks a script focuses to announce them (the skip link's main, an error page's heading, a
+   dialog's panel): they are not stops in the tab order, and a ring around a whole heading reads as a
+   selection. Roving widgets also sit at tabindex="-1" but are reached by arrow keys, so they keep
+   the ring. */
+:focus-visible:not(.field-focus-gradient):not(.studio-range):not(:is(main, h1, h2, [role='dialog'])[tabindex='-1']) {
   outline: 2px solid var(--color-brand-500);
   outline-offset: 2px;
 }
