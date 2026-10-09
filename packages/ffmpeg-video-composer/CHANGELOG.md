@@ -264,6 +264,11 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
 - Whip transitions model a 144° shutter: the blur follows the push's real speed, ramps in and out with the
   ease (no threshold), is centred on its frame and is capped at 4.5 % of the travel axis. Defaults peak at
   the same blur as before.
+- Five bundled app templates draw their cards with HTML layers (in the `samples` catalog too): Interview's
+  lower third (name, role and an "On the record" badge in one padded box), Product Launch's offer tag, spec
+  card and call-to-action pill, Web App Promo's feature chips, App Tutorial's numbered step badges and Story
+  Reel's chapter cards (story progress segments and "01 / 03" above each caption, inside the Reels and TikTok
+  safe zones). Field and form names are unchanged.
 - Browser entry: `zod` is no longer inlined into `dist/browser.js`. It is imported from the `zod`
   runtime dependency (like `tslib`), so the host's bundler shares one copy with the app. Validation
   also no longer loads the background sugar presets or the rounded-panel PNG encoder at startup.
@@ -271,6 +276,8 @@ required?, maxLength?, min?, max?, options?, label?, description? }`, types text
 
 ### Fixed
 
+- A letterboxed clip (`fit: "letterbox"` or `forceOriginalAspectRatio`) under an image, animation or HTML
+  input keeps its bars: the overlay path cover-cropped the footage to fill the frame.
 - Two HTML layers of one section asking for the same font no longer race: the second could read the font
   half-copied and fail with "could not instance the variable font".
 - Karaoke captions that enlarge the spoken word (`loud`, `neon`, pop) leave room for it on both sides, so it no

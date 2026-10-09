@@ -42,15 +42,15 @@
     {
       "id": "web-app-promo",
       "source": "packages/leclap-creative-kit/src/templates/web-app-promo.json",
-      "duration": 10.5,
+      "duration": 10.518005,
       "hasAudio": true,
       "orientation": "landscape",
       "backend": "native",
-      "sha256": "cfaf696370de35094f8c1875ee53d92615de864e0acf61e0bde155a42c484751",
-      "templateSha256": "f2b651492115de1d1c3623d0e71623be9e72935ead27dfb86ef5506fb7f0c24f",
+      "sha256": "79f0b0ba10305d134b2349038c76979f83fc1873085f7c6fe46595023b95bfd1",
+      "templateSha256": "a1492defc27bd1b34f609f2b61a2d207513ae8ed6f4000bb960da811115c64a6",
       "mediaSource": "examples/showcase/media/leclap-canvas.mp4",
       "media": "Bundled catalog / demo app fixtures",
-      "bytes": 360036
+      "bytes": 372528
     },
     {
       "id": "square-promo",
@@ -71,23 +71,23 @@
       "hasAudio": true,
       "orientation": "portrait",
       "backend": "native",
-      "sha256": "c1252bcdecddd6cd3aae387b2dfcc56428f69449ef3d6a3b25459cb103588aca",
-      "templateSha256": "130508adc0f143996c7a5d98254451e3493b27bbe79cf67cbe0772847ef4898b",
+      "sha256": "85cfeab36cde7d9dc29203cf55216e5fd8d95a661bb0ca1a06387fb11b0f7e00",
+      "templateSha256": "534e216faa5007a827080f2c59335ec33b5890b2c61d7ffb2490466e544a3e7d",
       "mediaSource": "examples/showcase/media/moo-mug.mp4",
       "media": "Bundled catalog / demo app fixtures",
-      "bytes": 213542
+      "bytes": 217041
     },
     {
       "id": "app-tutorial",
       "source": "packages/leclap-creative-kit/src/templates/app-tutorial.json",
-      "duration": 12.585011,
+      "duration": 12.608005,
       "hasAudio": true,
       "orientation": "square",
       "backend": "native",
-      "sha256": "9954abf39ab0d8089842f3a9c1f6f68d2878edeadafed94f38375f1afb93f67d",
-      "templateSha256": "0bd86a4934172f8f3180b3d12f948808c2f82e817ccf8f267e61bfef510ba92a",
+      "sha256": "e665e10f4dea91d03d5a29650d173d27a3d3ae512bc01ad469f6841538ded6a6",
+      "templateSha256": "34c9f43a3164af71854c3ace2f88cd768dbbfdcb1faab6ca37eea7864eaf4d20",
       "media": "Bundled catalog / demo app fixtures",
-      "bytes": 265386
+      "bytes": 266371
     },
     {
       "id": "story-reel",
@@ -96,11 +96,11 @@
       "hasAudio": true,
       "orientation": "portrait",
       "backend": "native",
-      "sha256": "c11a1f976bcb0df2e1d507d90a83f8abf93103f54c4a2f06578e2316334a2127",
-      "templateSha256": "b7839cbf2a8d229fc81e7eab5c5908035a38736290cbc96a10a5162722df9287",
+      "sha256": "e4b9e382ab6b674f44bd25d7b5d2aa063f25de61058b3c3471509a7dd60d6114",
+      "templateSha256": "faa40f358133856d61ea3cb19c0a0e903bcbaf2182c4bade02ba6a3407bf54e9",
       "mediaSource": "packages/leclap-creative-kit/src/library/videos/video_portrait.mp4",
       "media": "Bundled catalog / demo app fixtures",
-      "bytes": 503153
+      "bytes": 499950
     },
     {
       "id": "fast-curious",
@@ -117,14 +117,14 @@
     {
       "id": "interview",
       "source": "packages/leclap-creative-kit/src/templates/interview.json",
-      "duration": 15.833333,
+      "duration": 15.833008,
       "hasAudio": true,
       "orientation": "landscape",
       "backend": "native",
-      "sha256": "20bbff417a9e81d389de2f4692a976726eb599317d06768047a70053bbf5403e",
-      "templateSha256": "b75358e756e01af938679c637794ef33c98a43cc2494ce14588830309df4ba73",
+      "sha256": "a9fd3338720960b2e351307e27a5feaf36bdb7481af7e8662bb267a8f5b8b271",
+      "templateSha256": "0671a523d5e490dd96fbf07eead8e1a0b46cbce88ac66ea3bdbe75c4a9c7d9ea",
       "media": "Bundled catalog / demo app fixtures",
-      "bytes": 967197
+      "bytes": 969256
     },
     {
       "id": "photo-backdrop",

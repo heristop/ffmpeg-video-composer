@@ -47,7 +47,9 @@ export interface BuiltPrompt {
   schemaTruncated: boolean;
 }
 
-export const DEFAULT_PROMPT_BUDGET = 150_000;
+// Raised from 150_000 when the product-launch sample gained its HTML offer card, so the
+// product-launch brief still carries that sample and the whole schema.
+export const DEFAULT_PROMPT_BUDGET = 151_000;
 // The schema never takes more than this, even with room to spare: past it the model reads noise.
 const SCHEMA_CAP = 96_000;
 const MIN_SCHEMA = 12_000;

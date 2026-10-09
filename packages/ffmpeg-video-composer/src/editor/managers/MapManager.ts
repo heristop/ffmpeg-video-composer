@@ -12,6 +12,7 @@ import type FormattersManager from './FormatterManager';
 import type FilterManager from './FilterManager';
 import { escapeRegExp } from './VariableManager';
 import { isBackgroundInput } from '../utils/background-input';
+import { resolveFit } from '../utils/reframe';
 
 // Section.inputs is typed as Input[] for schema purposes, but at runtime it holds
 // MapAnimationInput objects indexed by string keys (used as a keyed record).
@@ -91,12 +92,15 @@ class MapManager {
 
     // unshift keeps the normalize pad defined before the background map that consumes it. COVER (scale up
     // to fill, then crop the overflow) preserves the clip's aspect — a bare `scale=W:H` would stretch a
-    // source whose ratio differs from the output (e.g. a portrait clip under a 1:1 square template).
+    // source whose ratio differs from the output (e.g. a portrait clip under a 1:1 square template). A
+    // letterboxed section keeps the whole frame with bars instead, as it does without overlays.
     if (videoScale) {
       const normalizedPad = `${name}_norm`;
-      this.segment.filtersMapList.unshift(
-        `[${videoStream}]scale=${videoScale}:force_original_aspect_ratio=increase,crop=${videoScale},setsar=1[${normalizedPad}]`
-      );
+      const fit =
+        resolveFit(this.currentSection.options) === 'letterbox'
+          ? `force_original_aspect_ratio=decrease,pad=${videoScale}:(ow-iw)/2:(oh-ih)/2`
+          : `force_original_aspect_ratio=increase,crop=${videoScale}`;
+      this.segment.filtersMapList.unshift(`[${videoStream}]scale=${videoScale}:${fit},setsar=1[${normalizedPad}]`);
       baseStream = normalizedPad;
     }
 

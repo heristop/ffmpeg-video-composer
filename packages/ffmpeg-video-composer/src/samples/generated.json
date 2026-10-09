@@ -3369,16 +3369,6 @@
         },
         {
           "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[1].filters[4].values.fontfile"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[2].filters[7].values.fontfile"
-        },
-        {
-          "kind": "font",
           "reference": "BebasNeue.ttf",
           "path": "sections[3].filters[0].values.fontfile"
         },
@@ -3431,6 +3421,15 @@
             "ratio": 8,
             "attack": 20,
             "release": 400
+          }
+        },
+        "theme": {
+          "colors": {
+            "bg": "#10141e",
+            "fg": "#ffffff",
+            "muted": "#c9d3ea",
+            "surface": "#1a2030",
+            "brand": "#91a7ff"
           }
         }
       },
@@ -3553,32 +3552,6 @@
               }
             },
             {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "{{ form_1_feature }}"
-                },
-                "fontfile": "Oswald.ttf",
-                "fontsize": 28,
-                "fontcolor": "#c9d3ea",
-                "x": 84,
-                "y": 425
-              },
-              "reveal": {
-                "type": "rise",
-                "delay": 0.2,
-                "duration": 0.4,
-                "distance": 24,
-                "easing": "ease-out"
-              },
-              "exit": {
-                "type": "fade",
-                "after": 1.98,
-                "duration": 0.16,
-                "easing": "ease-out"
-              }
-            },
-            {
               "type": "setsar",
               "value": "1"
             },
@@ -3590,7 +3563,28 @@
           "transition": {
             "type": "zoom-through",
             "duration": 0.6
-          }
+          },
+          "inputs": [
+            {
+              "name": "feature_chip",
+              "type": "html",
+              "html": "<div class=\"row\"><div class=\"chip\"><span class=\"tag\">Feature</span><span class=\"text\">{{ form_1_feature }}</span></div></div>",
+              "css": ".row { display: flex; align-items: center; height: 100% } .chip { display: flex; align-items: center; gap: 14px; padding: 8px 24px 8px 8px; border-radius: 999px; border: 2px solid $color.brand@0.55; background: $color.surface@0.9 } .tag { padding: 6px 14px; border-radius: 999px; background: $color.brand; color: $color.bg; font: 600 18px $font.body; text-transform: uppercase; letter-spacing: 2px } .text { color: $color.fg; font: 400 28px $font.body }",
+              "width": 900,
+              "height": 80,
+              "options": {
+                "position": "76:400",
+                "start": 0.2,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.2,
+                  "duration": 0.4,
+                  "distance": 24,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
         },
         {
           "name": "video_1",
@@ -3648,26 +3642,6 @@
               "value": "1"
             },
             {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "{{ form_1_feature }}"
-                },
-                "fontfile": "Oswald.ttf",
-                "fontsize": 28,
-                "fontcolor": "#ffffff",
-                "x": 80,
-                "y": 22
-              },
-              "reveal": {
-                "type": "rise",
-                "delay": 0.28,
-                "duration": 0.35,
-                "distance": 18,
-                "easing": "ease-out"
-              }
-            },
-            {
               "type": "scale",
               "value": "output"
             }
@@ -3697,6 +3671,27 @@
               "intensity": 0.5,
               "color": "$color.fg",
               "above": true
+            }
+          ],
+          "inputs": [
+            {
+              "name": "feature_label",
+              "type": "html",
+              "html": "<div class=\"row\"><div class=\"chip\"><span class=\"tag\">Feature</span><span class=\"text\">{{ form_1_feature }}</span></div></div>",
+              "css": ".row { display: flex; align-items: center; height: 100% } .chip { display: flex; align-items: center; gap: 10px; padding: 4px 18px 4px 4px; border-radius: 999px; border: 2px solid $color.brand@0.55; background: $color.surface@0.9 } .tag { padding: 4px 10px; border-radius: 999px; background: $color.brand; color: $color.bg; font: 600 14px $font.body; text-transform: uppercase; letter-spacing: 2px } .text { color: $color.fg; font: 400 22px $font.body }",
+              "width": 900,
+              "height": 48,
+              "options": {
+                "position": "80:6",
+                "start": 0.28,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.28,
+                  "duration": 0.35,
+                  "distance": 18,
+                  "easing": "ease-out"
+                }
+              }
             }
           ]
         },
@@ -4388,16 +4383,6 @@
         {
           "kind": "font",
           "reference": "BebasNeue.ttf",
-          "path": "sections[3].filters[0].values.fontfile"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[3].filters[1].values.fontfile"
-        },
-        {
-          "kind": "font",
-          "reference": "BebasNeue.ttf",
           "path": "sections[3].kinetic[0].font"
         },
         {
@@ -4449,6 +4434,15 @@
             "ratio": 8,
             "attack": 20,
             "release": 400
+          }
+        },
+        "theme": {
+          "colors": {
+            "bg": "#090909",
+            "fg": "#ffffff",
+            "surface": "#1a1814",
+            "brand": "#c8bc9c",
+            "accent": "#e7a23b"
           }
         }
       },
@@ -4522,12 +4516,6 @@
                 "delay": 0,
                 "duration": 0.2,
                 "easing": "ease-out"
-              },
-              "exit": {
-                "type": "fade",
-                "after": 1.84,
-                "duration": 0.18,
-                "easing": "ease-out"
               }
             },
             {
@@ -4548,12 +4536,6 @@
                 "duration": 0.32,
                 "easing": "ease-out",
                 "distance": 42
-              },
-              "exit": {
-                "type": "fade",
-                "after": 1.84,
-                "duration": 0.18,
-                "easing": "ease-out"
               }
             },
             {
@@ -4574,12 +4556,6 @@
                 "duration": 0.26,
                 "easing": "ease-out",
                 "distance": 20
-              },
-              "exit": {
-                "type": "fade",
-                "after": 1.84,
-                "duration": 0.18,
-                "easing": "ease-out"
               }
             }
           ],
@@ -4647,7 +4623,7 @@
               "direction": "down",
               "ease": "cubic-bezier(0.3, 0, 0.3, 1)",
               "intensity": 0.6,
-              "color": "#ffffff"
+              "color": "$color.fg"
             }
           ]
         },
@@ -4658,47 +4634,7 @@
             "backgroundColor": "#090909",
             "duration": 2.1
           },
-          "filters": [
-            {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "{{ form_1_name }}"
-                },
-                "fontfile": "BebasNeue.ttf",
-                "fontsize": 64,
-                "fontcolor": "#ffffff",
-                "x": "(w-text_w)/2",
-                "y": 590
-              },
-              "reveal": {
-                "type": "rise",
-                "delay": 0.11,
-                "duration": 0.28,
-                "easing": "ease-out",
-                "distance": 22
-              }
-            },
-            {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "MAKE IT YOURS"
-                },
-                "fontfile": "Oswald.ttf",
-                "fontsize": 32,
-                "fontcolor": "#c8bc9c",
-                "x": "(w-text_w)/2",
-                "y": 780
-              },
-              "reveal": {
-                "type": "fade",
-                "delay": 0.18,
-                "duration": 0.22,
-                "easing": "ease-out"
-              }
-            }
-          ],
+          "filters": [],
           "graphics": [
             {
               "type": "underline",
@@ -4708,7 +4644,7 @@
               "thickness": 6,
               "origin": "center",
               "at": 0.7,
-              "color": "#c8bc9c",
+              "color": "$color.brand",
               "caps": "round",
               "settle": 0.03,
               "exit": "none"
@@ -4735,6 +4671,27 @@
               "size": 88,
               "color": "#c8bc9c",
               "y": 440
+            }
+          ],
+          "inputs": [
+            {
+              "name": "offer_card",
+              "type": "html",
+              "html": "<div><b>THE OFFER</b><p><span>{{ form_1_name }}</span>{{ form_1_tagline }}</p><em>MAKE IT YOURS</em></div>",
+              "css": "div{display:flex;flex-direction:column;align-items:center;color:$color.brand;font:300 26px $font.body}b{padding:8px 20px;border:2px solid $color.brand;border-radius:8px 99px 99px 8px;font:500 22px $font.body;letter-spacing:4px}p{display:flex;align-items:center;margin:172px 0 0;padding:14px 24px;border:1px solid $color.brand@0.35;border-radius:14px;background:$color.surface}span{margin-right:16px;color:$color.fg;font:48px $font.display}em{margin-top:62px;padding:12px 34px;border-radius:99px;background:$color.brand;color:$color.bg;font:600 28px $font.body;letter-spacing:3px}",
+              "width": 720,
+              "height": 500,
+              "options": {
+                "position": "0:352",
+                "start": 0.14,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.14,
+                  "duration": 0.32,
+                  "distance": 22,
+                  "easing": "ease-out"
+                }
+              }
             }
           ]
         }
@@ -4815,16 +4772,6 @@
         {
           "kind": "font",
           "reference": "BebasNeue.ttf",
-          "path": "sections[1].filters[2].values.fontfile"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[1].filters[3].values.fontfile"
-        },
-        {
-          "kind": "font",
-          "reference": "BebasNeue.ttf",
           "path": "sections[3].filters[0].values.fontfile"
         },
         {
@@ -4833,27 +4780,15 @@
           "path": "sections[3].filters[1].values.fontfile"
         },
         {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[3].filters[2].values.fontfile"
-        },
-        {
           "kind": "music",
           "reference": "the-builder.mp3",
           "path": "global.music.name"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[2].caption.filters[0].values.fontfile",
-          "source": "preset"
         }
       ],
       "effects": [],
       "setup": [
         "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
         "Preview media is not included. Supply or replace the listed authored asset references; relative references remain unchanged and must resolve in your configured assets/media directory.",
-        "Font assets marked source=preset are effective engine-resolved filenames from text presets and authored font overrides. Supply these font files; family-based font references also include their family, weight and style for resolution.",
         "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
       ]
     },
@@ -4883,6 +4818,14 @@
             "ratio": 8,
             "attack": 20,
             "release": 400
+          }
+        },
+        "theme": {
+          "colors": {
+            "bg": "#edf4ed",
+            "fg": "#172c25",
+            "muted": "#436354",
+            "surface": "#c8e4d7"
           }
         }
       },
@@ -4923,13 +4866,6 @@
             "duration": 1.8,
             "layers": [
               {
-                "color": "#c8e4d7",
-                "x": 64,
-                "y": 64,
-                "w": 120,
-                "h": 120
-              },
-              {
                 "color": "#172c25",
                 "x": 64,
                 "y": 280,
@@ -4939,57 +4875,6 @@
             ]
           },
           "filters": [
-            {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "01"
-                },
-                "fontfile": "BebasNeue.ttf",
-                "fontsize": 72,
-                "fontcolor": "#172c25",
-                "x": 88,
-                "y": 86
-              },
-              "reveal": {
-                "type": "fade",
-                "delay": 0,
-                "duration": 0.18,
-                "easing": "ease-out"
-              },
-              "exit": {
-                "type": "fade",
-                "after": 1.61,
-                "duration": 0.17,
-                "easing": "ease-out"
-              }
-            },
-            {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "QUICK LESSON"
-                },
-                "fontfile": "Oswald.ttf",
-                "fontsize": 28,
-                "fontcolor": "#436354",
-                "x": 224,
-                "y": 105
-              },
-              "reveal": {
-                "type": "slide-right",
-                "delay": 0.07,
-                "duration": 0.24,
-                "distance": 14,
-                "easing": "ease-out"
-              },
-              "exit": {
-                "type": "fade",
-                "after": 1.59,
-                "duration": 0.17,
-                "easing": "ease-out"
-              }
-            },
             {
               "type": "drawtext",
               "values": {
@@ -5056,12 +4941,33 @@
               "width": 300,
               "thickness": 6,
               "at": 0.6,
-              "color": "#436354",
+              "color": "$color.muted",
               "caps": "round",
               "settle": 0.03,
               "exit": "fade",
               "exitDuration": 0.17,
               "until": 1.78
+            }
+          ],
+          "inputs": [
+            {
+              "name": "lesson_badge",
+              "type": "html",
+              "html": "<div class=\"row\"><span class=\"num\">01</span><div class=\"col\"><span class=\"kicker\">Quick lesson</span><span class=\"of\">Step 1 of 2</span></div></div>",
+              "css": ".row { display: flex; align-items: center; gap: 24px; height: 100% } .num { display: flex; align-items: center; justify-content: center; width: 120px; height: 120px; border-radius: 30px; background: $color.fg; color: $color.bg; font: 67px $font.display; letter-spacing: 1px } .col { display: flex; flex-direction: column; gap: 6px } .kicker { padding: 6px 16px; border-radius: 999px; background: $color.surface; color: $color.fg; font: 500 26px $font.body; text-transform: uppercase; letter-spacing: 2px } .of { padding-left: 4px; color: $color.muted; font: 400 22px $font.body }",
+              "width": 640,
+              "height": 140,
+              "options": {
+                "position": "64:54",
+                "start": 0.04,
+                "motion": {
+                  "type": "slide-right",
+                  "delay": 0.04,
+                  "duration": 0.3,
+                  "distance": 14,
+                  "easing": "ease-out"
+                }
+              }
             }
           ]
         },
@@ -5081,31 +4987,32 @@
             "countdownDuration": 2,
             "forceOriginalAspectRatio": true
           },
-          "caption": {
-            "text": {
-              "en": "01  /  {{ form_1_step }}"
-            },
-            "style": "bar",
-            "position": "bottom",
-            "align": "left",
-            "font": "oswald",
-            "fontsize": 32,
-            "color": "#edf4ed",
-            "boxColor": "#172c25",
-            "boxOpacity": 0.92,
-            "reveal": {
-              "type": "slide-right",
-              "delay": 0.15,
-              "duration": 0.24,
-              "easing": "ease-out",
-              "distance": 24
-            }
-          },
           "transition": {
             "type": "push-left",
             "duration": 0.5,
             "ease": "$smooth"
-          }
+          },
+          "inputs": [
+            {
+              "name": "step_card",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"card\"><span class=\"num\">01</span><span class=\"text\">{{ form_1_step }}</span></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-end; height: 100% } .card { display: flex; align-items: center; gap: 20px; padding: 12px 30px 12px 12px; border-radius: 22px; background: $color.fg@0.94 } .num { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 16px; background: $color.surface; color: $color.fg; font: 40px $font.display; letter-spacing: 1px } .text { color: $color.bg; font: 400 34px $font.body }",
+              "width": 952,
+              "height": 100,
+              "options": {
+                "position": "64:910",
+                "start": 0.15,
+                "motion": {
+                  "type": "slide-right",
+                  "delay": 0.15,
+                  "duration": 0.24,
+                  "distance": 24,
+                  "easing": "ease-out"
+                }
+              }
+            }
+          ]
         },
         {
           "name": "outro",
@@ -5162,26 +5069,6 @@
                 "duration": 0.22,
                 "easing": "ease-out"
               }
-            },
-            {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "02  /  TRY IT IN YOUR APP"
-                },
-                "fontfile": "Oswald.ttf",
-                "fontsize": 30,
-                "fontcolor": "#172c25",
-                "x": 64,
-                "y": 810
-              },
-              "reveal": {
-                "type": "slide-right",
-                "delay": 0.24,
-                "duration": 0.26,
-                "distance": 18,
-                "easing": "ease-out"
-              }
             }
           ],
           "graphics": [
@@ -5190,8 +5077,8 @@
               "effect": "ripple",
               "variant": "tap",
               "target": {
-                "x": 416,
-                "y": 806,
+                "x": 478,
+                "y": 812,
                 "w": 40,
                 "h": 40
               },
@@ -5202,8 +5089,29 @@
               "press": 0.1,
               "stroke": 4,
               "halo": 3,
-              "color": "#436354",
+              "color": "$color.muted",
               "intensity": 1
+            }
+          ],
+          "inputs": [
+            {
+              "name": "next_step",
+              "type": "html",
+              "html": "<div class=\"row\"><span class=\"num\">02</span><span class=\"text\">Try it in your app</span></div>",
+              "css": ".row { display: flex; align-items: center; gap: 20px; height: 100% } .num { display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 18px; background: $color.fg; color: $color.bg; font: 44px $font.display; letter-spacing: 1px } .text { padding: 10px 22px; border-radius: 999px; border: 2px solid $color.muted@0.6; color: $color.fg; font: 500 30px $font.body; text-transform: uppercase; letter-spacing: 2px }",
+              "width": 700,
+              "height": 96,
+              "options": {
+                "position": "64:784",
+                "start": 0.24,
+                "motion": {
+                  "type": "slide-right",
+                  "delay": 0.24,
+                  "duration": 0.26,
+                  "distance": 18,
+                  "easing": "ease-out"
+                }
+              }
             }
           ]
         }
@@ -5306,49 +5214,15 @@
       ],
       "assets": [
         {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[1].filters[1].values.fontfile"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[2].filters[1].values.fontfile"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[3].filters[1].values.fontfile"
-        },
-        {
           "kind": "music",
           "reference": "indie-rock-dreamy.mp3",
           "path": "global.music.name"
-        },
-        {
-          "kind": "font",
-          "reference": "BebasNeue.ttf",
-          "path": "sections[1].caption.filters[0].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "BebasNeue.ttf",
-          "path": "sections[2].caption.filters[0].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "BebasNeue.ttf",
-          "path": "sections[3].caption.filters[0].values.fontfile",
-          "source": "preset"
         }
       ],
       "effects": [],
       "setup": [
         "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
         "Preview media is not included. Supply or replace the listed authored asset references; relative references remain unchanged and must resolve in your configured assets/media directory.",
-        "Font assets marked source=preset are effective engine-resolved filenames from text presets and authored font overrides. Supply these font files; family-based font references also include their family, weight and style for resolution.",
         "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
       ]
     },
@@ -5379,6 +5253,12 @@
             "ratio": 8,
             "attack": 20,
             "release": 400
+          }
+        },
+        "theme": {
+          "colors": {
+            "bg": "#0b0e24",
+            "fg": "#ffffff"
           }
         }
       },
@@ -5422,29 +5302,6 @@
           "name": "video_1",
           "type": "project_video",
           "look": "vivid-pop",
-          "caption": {
-            "text": {
-              "en": "{{ form_1_scene1 }}"
-            },
-            "style": "bold",
-            "position": "lower-third",
-            "align": "left",
-            "effect": {
-              "shadow": true
-            },
-            "font": "bebas",
-            "fontsize": 44,
-            "boxColor": "#0b0e24",
-            "boxOpacity": 0.7,
-            "reveal": {
-              "type": "slide-right",
-              "delay": 0.07,
-              "duration": 0.34,
-              "easing": "ease-out-back",
-              "distance": 40
-            },
-            "box": true
-          },
           "title": {
             "en": "Scene 1"
           },
@@ -5460,35 +5317,6 @@
           "filters": [
             {
               "type": "vignette"
-            },
-            {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "1 / 3"
-                },
-                "fontcolor": "#ffffff",
-                "fontsize": 36,
-                "x": "w-text_w-44",
-                "y": 80,
-                "fontfile": "Oswald.ttf",
-                "box": 1,
-                "boxcolor": "#0b0e24@0.55",
-                "boxborderw": 10
-              },
-              "reveal": {
-                "type": "slide-left",
-                "delay": 0,
-                "duration": 0.16,
-                "easing": "ease-out",
-                "distance": 24
-              },
-              "exit": {
-                "type": "fade",
-                "after": 3.88,
-                "duration": 0.12,
-                "easing": "ease-out"
-              }
             }
           ],
           "transition": {
@@ -5507,35 +5335,33 @@
               "ramp": 0.3,
               "intensity": 0.75
             }
+          ],
+          "inputs": [
+            {
+              "name": "chapter_1_card",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span class=\"seg on\"></span><span class=\"seg\"></span><span class=\"seg\"></span><b>01 / 03</b></div><p>{{ form_1_scene1 }}</p></div></div>",
+              "css": ".wrap { display: flex; width: 100%; height: 100%; align-items: flex-end; justify-content: flex-start } .card { display: flex; flex-direction: column; max-width: 536px; padding: 14px 24px 12px; border-radius: 16px; background: $color.bg@0.74; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) } .top { display: flex; align-items: center; gap: 6px } .seg { width: 30px; height: 5px; border-radius: 3px; background: $color.fg@0.3 } .seg.on { background: $color.fg } b { margin-left: 10px; color: $color.fg@0.8; font: 500 20px $font.body; letter-spacing: 3px } p { margin: 6px 0 0; color: $color.fg; font: 46px $font.display; line-height: 1.05; letter-spacing: 1px }",
+              "width": 584,
+              "height": 180,
+              "options": {
+                "position": "36:816",
+                "start": 0.07,
+                "motion": {
+                  "type": "slide-right",
+                  "delay": 0.07,
+                  "duration": 0.34,
+                  "distance": 40,
+                  "easing": "ease-out-back"
+                }
+              }
+            }
           ]
         },
         {
           "name": "video_2",
           "type": "project_video",
           "look": "vivid-pop",
-          "caption": {
-            "text": {
-              "en": "{{ form_1_scene2 }}"
-            },
-            "style": "bold",
-            "position": "top",
-            "align": "right",
-            "effect": {
-              "shadow": true
-            },
-            "font": "bebas",
-            "fontsize": 44,
-            "boxColor": "#0b0e24",
-            "boxOpacity": 0.7,
-            "reveal": {
-              "type": "slide-left",
-              "delay": 0.07,
-              "duration": 0.34,
-              "easing": "ease-out-back",
-              "distance": 40
-            },
-            "box": true
-          },
           "title": {
             "en": "Scene 2"
           },
@@ -5551,35 +5377,6 @@
           "filters": [
             {
               "type": "vignette"
-            },
-            {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "2 / 3"
-                },
-                "fontcolor": "#ffffff",
-                "fontsize": 36,
-                "x": 44,
-                "y": 240,
-                "fontfile": "Oswald.ttf",
-                "box": 1,
-                "boxcolor": "#0b0e24@0.55",
-                "boxborderw": 10
-              },
-              "reveal": {
-                "type": "slide-right",
-                "delay": 0,
-                "duration": 0.2,
-                "distance": 24,
-                "easing": "ease-out"
-              },
-              "exit": {
-                "type": "fade",
-                "after": 3.88,
-                "duration": 0.12,
-                "easing": "ease-out"
-              }
             }
           ],
           "transition": {
@@ -5613,35 +5410,33 @@
               "fall": 0.6,
               "intensity": 1
             }
+          ],
+          "inputs": [
+            {
+              "name": "chapter_2_card",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span class=\"seg on\"></span><span class=\"seg on\"></span><span class=\"seg\"></span><b>02 / 03</b></div><p>{{ form_1_scene2 }}</p></div></div>",
+              "css": ".wrap { display: flex; width: 100%; height: 100%; align-items: flex-start; justify-content: flex-end } .card { display: flex; flex-direction: column; max-width: 536px; padding: 14px 24px 12px; border-radius: 16px; background: $color.bg@0.74; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) } .top { display: flex; align-items: center; gap: 6px } .seg { width: 30px; height: 5px; border-radius: 3px; background: $color.fg@0.3 } .seg.on { background: $color.fg } b { margin-left: 10px; color: $color.fg@0.8; font: 500 20px $font.body; letter-spacing: 3px } p { margin: 6px 0 0; color: $color.fg; font: 46px $font.display; line-height: 1.05; letter-spacing: 1px }",
+              "width": 584,
+              "height": 180,
+              "options": {
+                "position": "36:136",
+                "start": 0.07,
+                "motion": {
+                  "type": "slide-left",
+                  "delay": 0.07,
+                  "duration": 0.34,
+                  "distance": 40,
+                  "easing": "ease-out-back"
+                }
+              }
+            }
           ]
         },
         {
           "name": "video_3",
           "type": "project_video",
           "look": "vivid-pop",
-          "caption": {
-            "text": {
-              "en": "{{ form_1_scene3 }}"
-            },
-            "style": "bold",
-            "position": "bottom",
-            "align": "center",
-            "effect": {
-              "shadow": true
-            },
-            "font": "bebas",
-            "fontsize": 44,
-            "boxColor": "#0b0e24",
-            "boxOpacity": 0.7,
-            "reveal": {
-              "type": "rise",
-              "delay": 0.07,
-              "duration": 0.34,
-              "easing": "ease-out-back",
-              "distance": 32
-            },
-            "box": true
-          },
           "title": {
             "en": "Scene 3"
           },
@@ -5657,29 +5452,6 @@
           "filters": [
             {
               "type": "vignette"
-            },
-            {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "3 / 3"
-                },
-                "fontcolor": "#ffffff",
-                "fontsize": 36,
-                "x": "w-text_w-44",
-                "y": 80,
-                "fontfile": "Oswald.ttf",
-                "box": 1,
-                "boxcolor": "#0b0e24@0.55",
-                "boxborderw": 10
-              },
-              "reveal": {
-                "type": "slide-left",
-                "delay": 0,
-                "duration": 0.16,
-                "easing": "ease-out",
-                "distance": 24
-              }
             }
           ],
           "graphics": [
@@ -5708,6 +5480,27 @@
               "rise": 0.18,
               "fall": 0.6,
               "intensity": 1
+            }
+          ],
+          "inputs": [
+            {
+              "name": "chapter_3_card",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span class=\"seg on\"></span><span class=\"seg on\"></span><span class=\"seg on\"></span><b>03 / 03</b></div><p>{{ form_1_scene3 }}</p></div></div>",
+              "css": ".wrap { display: flex; width: 100%; height: 100%; align-items: flex-end; justify-content: center } .card { display: flex; flex-direction: column; max-width: 518px; padding: 14px 24px 12px; border-radius: 16px; background: $color.bg@0.74; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) } .top { display: flex; align-items: center; gap: 6px } .seg { width: 30px; height: 5px; border-radius: 3px; background: $color.fg@0.3 } .seg.on { background: $color.fg } b { margin-left: 10px; color: $color.fg@0.8; font: 500 20px $font.body; letter-spacing: 3px } p { margin: 6px 0 0; color: $color.fg; font: 46px $font.display; line-height: 1.05; letter-spacing: 1px }",
+              "width": 518,
+              "height": 180,
+              "options": {
+                "position": "101:816",
+                "start": 0.07,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.07,
+                  "duration": 0.34,
+                  "distance": 32,
+                  "easing": "ease-out-back"
+                }
+              }
             }
           ]
         }
@@ -6706,16 +6499,6 @@
           "path": "sections[3].filters[1].values.fontfile"
         },
         {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[3].filters[3].values.fontfile"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[3].filters[4].values.fontfile"
-        },
-        {
           "kind": "video",
           "reference": "https://github.com/heristop/leclap/raw/main/src/shared/assets/videos/leclap_bumper.mp4",
           "path": "sections[4].options.videoUrl"
@@ -7028,45 +6811,6 @@
               }
             },
             {
-              "type": "drawbox",
-              "values": {
-                "x": 0,
-                "y": 566,
-                "w": 8,
-                "h": 116,
-                "c": "#7C83FD@1",
-                "t": "fill"
-              }
-            },
-            {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "{{ form_1_name }}"
-                },
-                "fontcolor": "#f5f5f0",
-                "fontsize": 50,
-                "x": 40,
-                "y": 584,
-                "fontfile": "Oswald.ttf",
-                "alpha": "'if(lt(t,0.3),0,if(lt(t,1.0),(t-0.3)/0.7,1))'"
-              }
-            },
-            {
-              "type": "drawtext",
-              "values": {
-                "text": {
-                  "en": "{{ form_1_title }}"
-                },
-                "fontcolor": "#9aa7c7",
-                "fontsize": 26,
-                "x": 40,
-                "y": 644,
-                "fontfile": "Oswald.ttf",
-                "alpha": "'if(lt(t,0.6),0,if(lt(t,1.3),(t-0.6)/0.7,1))'"
-              }
-            },
-            {
               "type": "fadein",
               "values": {
                 "color": "#0d1b2a"
@@ -7080,25 +6824,6 @@
             }
           ],
           "graphics": [
-            {
-              "type": "fx",
-              "effect": "glass",
-              "target": {
-                "x": 0,
-                "y": 566,
-                "w": 840,
-                "h": 116
-              },
-              "at": 0.2,
-              "duration": 14.8,
-              "tone": "dark",
-              "frost": 0.12,
-              "saturation": 0.45,
-              "highlight": 0.7,
-              "ramp": 0.5,
-              "color": "#0d1b2a",
-              "intensity": 0.6
-            },
             {
               "type": "corners",
               "at": 0.6,
@@ -7118,6 +6843,27 @@
               "spread": 1.04,
               "trace": "clockwise",
               "exit": "expand"
+            }
+          ],
+          "inputs": [
+            {
+              "name": "name_card",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><h2>{{ form_1_name }}</h2><span class=\"badge\">On the record</span></div><p>{{ form_1_title }}</p></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-end; height: 100%; padding: 0 16px 16px 0 } .card { display: flex; flex-direction: column; padding: 16px 28px 18px 24px; border-left: 8px solid $color.brand; border-radius: 0 14px 14px 0; background: $color.bg@0.9; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) } .top { display: flex; align-items: center; gap: 16px } h2 { margin: 0; color: $color.fg; font: 500 50px $font.body; line-height: 1.1 } .badge { padding: 6px 14px; border-radius: 999px; background: $color.brand; color: $color.bg; font: 600 17px $font.body; text-transform: uppercase; letter-spacing: 2px } p { margin: 2px 0 0; color: $color.muted; font: 400 26px $font.body }",
+              "width": 860,
+              "height": 150,
+              "options": {
+                "position": "0:540",
+                "start": 0.6,
+                "motion": {
+                  "type": "slide-right",
+                  "delay": 0.6,
+                  "duration": 0.6,
+                  "distance": 80,
+                  "easing": "ease-out"
+                }
+              }
             }
           ]
         },

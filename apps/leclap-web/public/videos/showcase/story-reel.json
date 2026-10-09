@@ -26,6 +26,12 @@
         "attack": 20,
         "release": 400
       }
+    },
+    "theme": {
+      "colors": {
+        "bg": "#0b0e24",
+        "fg": "#ffffff"
+      }
     }
   },
   "sections": [
@@ -68,29 +74,6 @@
       "name": "video_1",
       "type": "project_video",
       "look": "vivid-pop",
-      "caption": {
-        "text": {
-          "en": "{{ form_1_scene1 }}"
-        },
-        "style": "bold",
-        "position": "lower-third",
-        "align": "left",
-        "effect": {
-          "shadow": true
-        },
-        "font": "bebas",
-        "fontsize": 44,
-        "boxColor": "#0b0e24",
-        "boxOpacity": 0.7,
-        "reveal": {
-          "type": "slide-right",
-          "delay": 0.07,
-          "duration": 0.34,
-          "easing": "ease-out-back",
-          "distance": 40
-        },
-        "box": true
-      },
       "title": {
         "en": "Scene 1"
       },
@@ -106,35 +89,6 @@
       "filters": [
         {
           "type": "vignette"
-        },
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "1 / 3"
-            },
-            "fontcolor": "#ffffff",
-            "fontsize": 36,
-            "x": "w-text_w-44",
-            "y": 80,
-            "fontfile": "Oswald.ttf",
-            "box": 1,
-            "boxcolor": "#0b0e24@0.55",
-            "boxborderw": 10
-          },
-          "reveal": {
-            "type": "slide-left",
-            "delay": 0,
-            "duration": 0.16,
-            "easing": "ease-out",
-            "distance": 24
-          },
-          "exit": {
-            "type": "fade",
-            "after": 3.88,
-            "duration": 0.12,
-            "easing": "ease-out"
-          }
         }
       ],
       "transition": {
@@ -153,35 +107,33 @@
           "ramp": 0.3,
           "intensity": 0.75
         }
+      ],
+      "inputs": [
+        {
+          "name": "chapter_1_card",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span class=\"seg on\"></span><span class=\"seg\"></span><span class=\"seg\"></span><b>01 / 03</b></div><p>{{ form_1_scene1 }}</p></div></div>",
+          "css": ".wrap { display: flex; width: 100%; height: 100%; align-items: flex-end; justify-content: flex-start } .card { display: flex; flex-direction: column; max-width: 536px; padding: 14px 24px 12px; border-radius: 16px; background: $color.bg@0.74; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) } .top { display: flex; align-items: center; gap: 6px } .seg { width: 30px; height: 5px; border-radius: 3px; background: $color.fg@0.3 } .seg.on { background: $color.fg } b { margin-left: 10px; color: $color.fg@0.8; font: 500 20px $font.body; letter-spacing: 3px } p { margin: 6px 0 0; color: $color.fg; font: 46px $font.display; line-height: 1.05; letter-spacing: 1px }",
+          "width": 584,
+          "height": 180,
+          "options": {
+            "position": "36:816",
+            "start": 0.07,
+            "motion": {
+              "type": "slide-right",
+              "delay": 0.07,
+              "duration": 0.34,
+              "distance": 40,
+              "easing": "ease-out-back"
+            }
+          }
+        }
       ]
     },
     {
       "name": "video_2",
       "type": "project_video",
       "look": "vivid-pop",
-      "caption": {
-        "text": {
-          "en": "{{ form_1_scene2 }}"
-        },
-        "style": "bold",
-        "position": "top",
-        "align": "right",
-        "effect": {
-          "shadow": true
-        },
-        "font": "bebas",
-        "fontsize": 44,
-        "boxColor": "#0b0e24",
-        "boxOpacity": 0.7,
-        "reveal": {
-          "type": "slide-left",
-          "delay": 0.07,
-          "duration": 0.34,
-          "easing": "ease-out-back",
-          "distance": 40
-        },
-        "box": true
-      },
       "title": {
         "en": "Scene 2"
       },
@@ -197,35 +149,6 @@
       "filters": [
         {
           "type": "vignette"
-        },
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "2 / 3"
-            },
-            "fontcolor": "#ffffff",
-            "fontsize": 36,
-            "x": 44,
-            "y": 240,
-            "fontfile": "Oswald.ttf",
-            "box": 1,
-            "boxcolor": "#0b0e24@0.55",
-            "boxborderw": 10
-          },
-          "reveal": {
-            "type": "slide-right",
-            "delay": 0,
-            "duration": 0.2,
-            "distance": 24,
-            "easing": "ease-out"
-          },
-          "exit": {
-            "type": "fade",
-            "after": 3.88,
-            "duration": 0.12,
-            "easing": "ease-out"
-          }
         }
       ],
       "transition": {
@@ -259,35 +182,33 @@
           "fall": 0.6,
           "intensity": 1
         }
+      ],
+      "inputs": [
+        {
+          "name": "chapter_2_card",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span class=\"seg on\"></span><span class=\"seg on\"></span><span class=\"seg\"></span><b>02 / 03</b></div><p>{{ form_1_scene2 }}</p></div></div>",
+          "css": ".wrap { display: flex; width: 100%; height: 100%; align-items: flex-start; justify-content: flex-end } .card { display: flex; flex-direction: column; max-width: 536px; padding: 14px 24px 12px; border-radius: 16px; background: $color.bg@0.74; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) } .top { display: flex; align-items: center; gap: 6px } .seg { width: 30px; height: 5px; border-radius: 3px; background: $color.fg@0.3 } .seg.on { background: $color.fg } b { margin-left: 10px; color: $color.fg@0.8; font: 500 20px $font.body; letter-spacing: 3px } p { margin: 6px 0 0; color: $color.fg; font: 46px $font.display; line-height: 1.05; letter-spacing: 1px }",
+          "width": 584,
+          "height": 180,
+          "options": {
+            "position": "36:136",
+            "start": 0.07,
+            "motion": {
+              "type": "slide-left",
+              "delay": 0.07,
+              "duration": 0.34,
+              "distance": 40,
+              "easing": "ease-out-back"
+            }
+          }
+        }
       ]
     },
     {
       "name": "video_3",
       "type": "project_video",
       "look": "vivid-pop",
-      "caption": {
-        "text": {
-          "en": "{{ form_1_scene3 }}"
-        },
-        "style": "bold",
-        "position": "bottom",
-        "align": "center",
-        "effect": {
-          "shadow": true
-        },
-        "font": "bebas",
-        "fontsize": 44,
-        "boxColor": "#0b0e24",
-        "boxOpacity": 0.7,
-        "reveal": {
-          "type": "rise",
-          "delay": 0.07,
-          "duration": 0.34,
-          "easing": "ease-out-back",
-          "distance": 32
-        },
-        "box": true
-      },
       "title": {
         "en": "Scene 3"
       },
@@ -303,29 +224,6 @@
       "filters": [
         {
           "type": "vignette"
-        },
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "3 / 3"
-            },
-            "fontcolor": "#ffffff",
-            "fontsize": 36,
-            "x": "w-text_w-44",
-            "y": 80,
-            "fontfile": "Oswald.ttf",
-            "box": 1,
-            "boxcolor": "#0b0e24@0.55",
-            "boxborderw": 10
-          },
-          "reveal": {
-            "type": "slide-left",
-            "delay": 0,
-            "duration": 0.16,
-            "easing": "ease-out",
-            "distance": 24
-          }
         }
       ],
       "graphics": [
@@ -354,6 +252,27 @@
           "rise": 0.18,
           "fall": 0.6,
           "intensity": 1
+        }
+      ],
+      "inputs": [
+        {
+          "name": "chapter_3_card",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span class=\"seg on\"></span><span class=\"seg on\"></span><span class=\"seg on\"></span><b>03 / 03</b></div><p>{{ form_1_scene3 }}</p></div></div>",
+          "css": ".wrap { display: flex; width: 100%; height: 100%; align-items: flex-end; justify-content: center } .card { display: flex; flex-direction: column; max-width: 518px; padding: 14px 24px 12px; border-radius: 16px; background: $color.bg@0.74; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) } .top { display: flex; align-items: center; gap: 6px } .seg { width: 30px; height: 5px; border-radius: 3px; background: $color.fg@0.3 } .seg.on { background: $color.fg } b { margin-left: 10px; color: $color.fg@0.8; font: 500 20px $font.body; letter-spacing: 3px } p { margin: 6px 0 0; color: $color.fg; font: 46px $font.display; line-height: 1.05; letter-spacing: 1px }",
+          "width": 518,
+          "height": 180,
+          "options": {
+            "position": "101:816",
+            "start": 0.07,
+            "motion": {
+              "type": "rise",
+              "delay": 0.07,
+              "duration": 0.34,
+              "distance": 32,
+              "easing": "ease-out-back"
+            }
+          }
         }
       ]
     }

@@ -66,10 +66,23 @@ function tokenize(value: unknown, tokens: Record<string, string>, key = ''): unk
   return Object.fromEntries(Object.entries(value).map(([k, child]) => [k, tokenize(child, tokens, k)]));
 }
 
+// HTML layers are authored with theme tokens already, so they have no literal twin: both sides drop them.
+type DescriptorSection = NonNullable<TemplateDescriptor['sections']>[number];
+
+function withoutHtmlLayers(section: DescriptorSection): DescriptorSection {
+  if (!('inputs' in section) || !section.inputs) return section;
+
+  return { ...section, inputs: section.inputs.filter((input) => input.type !== 'html') } as DescriptorSection;
+}
+
 function load(id: string): TemplateDescriptor {
   const raw = JSON.parse(fs.readFileSync(path.resolve(templatesDir, `${id}.json`), 'utf8')) as TemplateDescriptor;
 
-  return { ...raw, global: { ...raw.global, musicEnabled: false } } as TemplateDescriptor;
+  return {
+    ...raw,
+    global: { ...raw.global, musicEnabled: false },
+    sections: raw.sections?.map(withoutHtmlLayers),
+  } as TemplateDescriptor;
 }
 
 async function graph(descriptor: TemplateDescriptor): Promise<string[]> {

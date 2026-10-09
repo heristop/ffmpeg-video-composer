@@ -28,6 +28,15 @@
         "attack": 20,
         "release": 400
       }
+    },
+    "theme": {
+      "colors": {
+        "bg": "#090909",
+        "fg": "#ffffff",
+        "surface": "#1a1814",
+        "brand": "#c8bc9c",
+        "accent": "#e7a23b"
+      }
     }
   },
   "sections": [
@@ -100,12 +109,6 @@
             "delay": 0,
             "duration": 0.2,
             "easing": "ease-out"
-          },
-          "exit": {
-            "type": "fade",
-            "after": 1.84,
-            "duration": 0.18,
-            "easing": "ease-out"
           }
         },
         {
@@ -126,12 +129,6 @@
             "duration": 0.32,
             "easing": "ease-out",
             "distance": 42
-          },
-          "exit": {
-            "type": "fade",
-            "after": 1.84,
-            "duration": 0.18,
-            "easing": "ease-out"
           }
         },
         {
@@ -152,12 +149,6 @@
             "duration": 0.26,
             "easing": "ease-out",
             "distance": 20
-          },
-          "exit": {
-            "type": "fade",
-            "after": 1.84,
-            "duration": 0.18,
-            "easing": "ease-out"
           }
         }
       ],
@@ -225,7 +216,7 @@
           "direction": "down",
           "ease": "cubic-bezier(0.3, 0, 0.3, 1)",
           "intensity": 0.6,
-          "color": "#ffffff"
+          "color": "$color.fg"
         }
       ]
     },
@@ -236,47 +227,7 @@
         "backgroundColor": "#090909",
         "duration": 2.1
       },
-      "filters": [
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "{{ form_1_name }}"
-            },
-            "fontfile": "BebasNeue.ttf",
-            "fontsize": 64,
-            "fontcolor": "#ffffff",
-            "x": "(w-text_w)/2",
-            "y": 590
-          },
-          "reveal": {
-            "type": "rise",
-            "delay": 0.11,
-            "duration": 0.28,
-            "easing": "ease-out",
-            "distance": 22
-          }
-        },
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "MAKE IT YOURS"
-            },
-            "fontfile": "Oswald.ttf",
-            "fontsize": 32,
-            "fontcolor": "#c8bc9c",
-            "x": "(w-text_w)/2",
-            "y": 780
-          },
-          "reveal": {
-            "type": "fade",
-            "delay": 0.18,
-            "duration": 0.22,
-            "easing": "ease-out"
-          }
-        }
-      ],
+      "filters": [],
       "graphics": [
         {
           "type": "underline",
@@ -286,7 +237,7 @@
           "thickness": 6,
           "origin": "center",
           "at": 0.7,
-          "color": "#c8bc9c",
+          "color": "$color.brand",
           "caps": "round",
           "settle": 0.03,
           "exit": "none"
@@ -313,6 +264,27 @@
           "size": 88,
           "color": "#c8bc9c",
           "y": 440
+        }
+      ],
+      "inputs": [
+        {
+          "name": "offer_card",
+          "type": "html",
+          "html": "<div><b>THE OFFER</b><p><span>{{ form_1_name }}</span>{{ form_1_tagline }}</p><em>MAKE IT YOURS</em></div>",
+          "css": "div{display:flex;flex-direction:column;align-items:center;color:$color.brand;font:300 26px $font.body}b{padding:8px 20px;border:2px solid $color.brand;border-radius:8px 99px 99px 8px;font:500 22px $font.body;letter-spacing:4px}p{display:flex;align-items:center;margin:172px 0 0;padding:14px 24px;border:1px solid $color.brand@0.35;border-radius:14px;background:$color.surface}span{margin-right:16px;color:$color.fg;font:48px $font.display}em{margin-top:62px;padding:12px 34px;border-radius:99px;background:$color.brand;color:$color.bg;font:600 28px $font.body;letter-spacing:3px}",
+          "width": 720,
+          "height": 500,
+          "options": {
+            "position": "0:352",
+            "start": 0.14,
+            "motion": {
+              "type": "rise",
+              "delay": 0.14,
+              "duration": 0.32,
+              "distance": 22,
+              "easing": "ease-out"
+            }
+          }
         }
       ]
     }

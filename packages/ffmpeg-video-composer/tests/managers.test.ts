@@ -1106,6 +1106,22 @@ describe('MapManager', () => {
       expect(overlay).toContain('[anim_src]');
     });
 
+    it('letterboxes the main video leg when the section keeps the original aspect ratio', () => {
+      const { manager, segment } = build({
+        section: {
+          name: 's',
+          type: 'project_video',
+          filters: [],
+          options: { duration: 10, forceOriginalAspectRatio: true },
+        } as unknown as Section,
+      });
+      manager.addAnimationOverlay(makeAnimInput(), 2, '1080:1080');
+      // an overlay must not turn a letterboxed screen recording into a cropped cover frame
+      expect(segment.filtersMapList).toContain(
+        '[0:v]scale=1080:1080:force_original_aspect_ratio=decrease,pad=1080:1080:(ow-iw)/2:(oh-ih)/2,setsar=1[anim_norm]'
+      );
+    });
+
     it('bakes the section filters into the background so the animation overlays ON TOP (not blurred)', () => {
       const { manager, segment } = build({
         section: {

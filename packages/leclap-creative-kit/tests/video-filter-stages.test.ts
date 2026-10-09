@@ -25,17 +25,12 @@ describe('video filter stages', () => {
     const input = promo as TemplateDescriptor;
     const clip = input.sections?.find((section) => section.type === 'project_video');
     const output = roundTrip(input);
-    expect(output?.filters?.filter((filter) => filter.type !== 'drawtext')).toEqual(
-      clip?.filters?.filter((filter) => filter.type !== 'drawtext')
-    );
+    expect(output?.filters).toEqual(clip?.filters);
     expect(output?.options?.forceAspectRatio).toBe(false);
-    expect(output?.filters?.find((filter) => filter.type === 'drawtext')?.values?.fontfile).toBe(
-      clip?.filters?.find((filter) => filter.type === 'drawtext')?.values?.fontfile
-    );
     expect(output?.filters?.at(-1)).toEqual({ type: 'scale', value: 'output' });
-    expect(output?.filters?.findIndex((filter) => filter.type === 'drawtext')).toBeGreaterThan(
-      output?.filters?.findIndex((filter) => filter.type === 'perspective') ?? -1
-    );
+    // The feature label is an HTML layer composited over the finished screen, so it survives the save whole.
+    expect(output?.inputs).toEqual(clip?.inputs);
+    expect(output?.inputs?.[0]?.type).toBe('html');
   });
 
   it('preserves a filter between two editable overlays without moving it across the text', () => {

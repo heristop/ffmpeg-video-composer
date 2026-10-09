@@ -25,6 +25,15 @@
         "attack": 20,
         "release": 400
       }
+    },
+    "theme": {
+      "colors": {
+        "bg": "#10141e",
+        "fg": "#ffffff",
+        "muted": "#c9d3ea",
+        "surface": "#1a2030",
+        "brand": "#91a7ff"
+      }
     }
   },
   "sections": [
@@ -146,32 +155,6 @@
           }
         },
         {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "{{ form_1_feature }}"
-            },
-            "fontfile": "Oswald.ttf",
-            "fontsize": 28,
-            "fontcolor": "#c9d3ea",
-            "x": 84,
-            "y": 425
-          },
-          "reveal": {
-            "type": "rise",
-            "delay": 0.2,
-            "duration": 0.4,
-            "distance": 24,
-            "easing": "ease-out"
-          },
-          "exit": {
-            "type": "fade",
-            "after": 1.98,
-            "duration": 0.16,
-            "easing": "ease-out"
-          }
-        },
-        {
           "type": "setsar",
           "value": "1"
         },
@@ -183,7 +166,28 @@
       "transition": {
         "type": "zoom-through",
         "duration": 0.6
-      }
+      },
+      "inputs": [
+        {
+          "name": "feature_chip",
+          "type": "html",
+          "html": "<div class=\"row\"><div class=\"chip\"><span class=\"tag\">Feature</span><span class=\"text\">{{ form_1_feature }}</span></div></div>",
+          "css": ".row { display: flex; align-items: center; height: 100% } .chip { display: flex; align-items: center; gap: 14px; padding: 8px 24px 8px 8px; border-radius: 999px; border: 2px solid $color.brand@0.55; background: $color.surface@0.9 } .tag { padding: 6px 14px; border-radius: 999px; background: $color.brand; color: $color.bg; font: 600 18px $font.body; text-transform: uppercase; letter-spacing: 2px } .text { color: $color.fg; font: 400 28px $font.body }",
+          "width": 900,
+          "height": 80,
+          "options": {
+            "position": "76:400",
+            "start": 0.2,
+            "motion": {
+              "type": "rise",
+              "delay": 0.2,
+              "duration": 0.4,
+              "distance": 24,
+              "easing": "ease-out"
+            }
+          }
+        }
+      ]
     },
     {
       "name": "video_1",
@@ -241,26 +245,6 @@
           "value": "1"
         },
         {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "{{ form_1_feature }}"
-            },
-            "fontfile": "Oswald.ttf",
-            "fontsize": 28,
-            "fontcolor": "#ffffff",
-            "x": 80,
-            "y": 22
-          },
-          "reveal": {
-            "type": "rise",
-            "delay": 0.28,
-            "duration": 0.35,
-            "distance": 18,
-            "easing": "ease-out"
-          }
-        },
-        {
           "type": "scale",
           "value": "output"
         }
@@ -290,6 +274,27 @@
           "intensity": 0.5,
           "color": "$color.fg",
           "above": true
+        }
+      ],
+      "inputs": [
+        {
+          "name": "feature_label",
+          "type": "html",
+          "html": "<div class=\"row\"><div class=\"chip\"><span class=\"tag\">Feature</span><span class=\"text\">{{ form_1_feature }}</span></div></div>",
+          "css": ".row { display: flex; align-items: center; height: 100% } .chip { display: flex; align-items: center; gap: 10px; padding: 4px 18px 4px 4px; border-radius: 999px; border: 2px solid $color.brand@0.55; background: $color.surface@0.9 } .tag { padding: 4px 10px; border-radius: 999px; background: $color.brand; color: $color.bg; font: 600 14px $font.body; text-transform: uppercase; letter-spacing: 2px } .text { color: $color.fg; font: 400 22px $font.body }",
+          "width": 900,
+          "height": 48,
+          "options": {
+            "position": "80:6",
+            "start": 0.28,
+            "motion": {
+              "type": "rise",
+              "delay": 0.28,
+              "duration": 0.35,
+              "distance": 18,
+              "easing": "ease-out"
+            }
+          }
         }
       ]
     },

@@ -25,6 +25,14 @@
         "attack": 20,
         "release": 400
       }
+    },
+    "theme": {
+      "colors": {
+        "bg": "#edf4ed",
+        "fg": "#172c25",
+        "muted": "#436354",
+        "surface": "#c8e4d7"
+      }
     }
   },
   "sections": [
@@ -64,13 +72,6 @@
         "duration": 1.8,
         "layers": [
           {
-            "color": "#c8e4d7",
-            "x": 64,
-            "y": 64,
-            "w": 120,
-            "h": 120
-          },
-          {
             "color": "#172c25",
             "x": 64,
             "y": 280,
@@ -80,57 +81,6 @@
         ]
       },
       "filters": [
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "01"
-            },
-            "fontfile": "BebasNeue.ttf",
-            "fontsize": 72,
-            "fontcolor": "#172c25",
-            "x": 88,
-            "y": 86
-          },
-          "reveal": {
-            "type": "fade",
-            "delay": 0,
-            "duration": 0.18,
-            "easing": "ease-out"
-          },
-          "exit": {
-            "type": "fade",
-            "after": 1.61,
-            "duration": 0.17,
-            "easing": "ease-out"
-          }
-        },
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "QUICK LESSON"
-            },
-            "fontfile": "Oswald.ttf",
-            "fontsize": 28,
-            "fontcolor": "#436354",
-            "x": 224,
-            "y": 105
-          },
-          "reveal": {
-            "type": "slide-right",
-            "delay": 0.07,
-            "duration": 0.24,
-            "distance": 14,
-            "easing": "ease-out"
-          },
-          "exit": {
-            "type": "fade",
-            "after": 1.59,
-            "duration": 0.17,
-            "easing": "ease-out"
-          }
-        },
         {
           "type": "drawtext",
           "values": {
@@ -197,12 +147,33 @@
           "width": 300,
           "thickness": 6,
           "at": 0.6,
-          "color": "#436354",
+          "color": "$color.muted",
           "caps": "round",
           "settle": 0.03,
           "exit": "fade",
           "exitDuration": 0.17,
           "until": 1.78
+        }
+      ],
+      "inputs": [
+        {
+          "name": "lesson_badge",
+          "type": "html",
+          "html": "<div class=\"row\"><span class=\"num\">01</span><div class=\"col\"><span class=\"kicker\">Quick lesson</span><span class=\"of\">Step 1 of 2</span></div></div>",
+          "css": ".row { display: flex; align-items: center; gap: 24px; height: 100% } .num { display: flex; align-items: center; justify-content: center; width: 120px; height: 120px; border-radius: 30px; background: $color.fg; color: $color.bg; font: 67px $font.display; letter-spacing: 1px } .col { display: flex; flex-direction: column; gap: 6px } .kicker { padding: 6px 16px; border-radius: 999px; background: $color.surface; color: $color.fg; font: 500 26px $font.body; text-transform: uppercase; letter-spacing: 2px } .of { padding-left: 4px; color: $color.muted; font: 400 22px $font.body }",
+          "width": 640,
+          "height": 140,
+          "options": {
+            "position": "64:54",
+            "start": 0.04,
+            "motion": {
+              "type": "slide-right",
+              "delay": 0.04,
+              "duration": 0.3,
+              "distance": 14,
+              "easing": "ease-out"
+            }
+          }
         }
       ]
     },
@@ -222,31 +193,32 @@
         "countdownDuration": 2,
         "forceOriginalAspectRatio": true
       },
-      "caption": {
-        "text": {
-          "en": "01  /  {{ form_1_step }}"
-        },
-        "style": "bar",
-        "position": "bottom",
-        "align": "left",
-        "font": "oswald",
-        "fontsize": 32,
-        "color": "#edf4ed",
-        "boxColor": "#172c25",
-        "boxOpacity": 0.92,
-        "reveal": {
-          "type": "slide-right",
-          "delay": 0.15,
-          "duration": 0.24,
-          "easing": "ease-out",
-          "distance": 24
-        }
-      },
       "transition": {
         "type": "push-left",
         "duration": 0.5,
         "ease": "$smooth"
-      }
+      },
+      "inputs": [
+        {
+          "name": "step_card",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"card\"><span class=\"num\">01</span><span class=\"text\">{{ form_1_step }}</span></div></div>",
+          "css": ".wrap { display: flex; align-items: flex-end; height: 100% } .card { display: flex; align-items: center; gap: 20px; padding: 12px 30px 12px 12px; border-radius: 22px; background: $color.fg@0.94 } .num { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 16px; background: $color.surface; color: $color.fg; font: 40px $font.display; letter-spacing: 1px } .text { color: $color.bg; font: 400 34px $font.body }",
+          "width": 952,
+          "height": 100,
+          "options": {
+            "position": "64:910",
+            "start": 0.15,
+            "motion": {
+              "type": "slide-right",
+              "delay": 0.15,
+              "duration": 0.24,
+              "distance": 24,
+              "easing": "ease-out"
+            }
+          }
+        }
+      ]
     },
     {
       "name": "outro",
@@ -303,26 +275,6 @@
             "duration": 0.22,
             "easing": "ease-out"
           }
-        },
-        {
-          "type": "drawtext",
-          "values": {
-            "text": {
-              "en": "02  /  TRY IT IN YOUR APP"
-            },
-            "fontfile": "Oswald.ttf",
-            "fontsize": 30,
-            "fontcolor": "#172c25",
-            "x": 64,
-            "y": 810
-          },
-          "reveal": {
-            "type": "slide-right",
-            "delay": 0.24,
-            "duration": 0.26,
-            "distance": 18,
-            "easing": "ease-out"
-          }
         }
       ],
       "graphics": [
@@ -331,8 +283,8 @@
           "effect": "ripple",
           "variant": "tap",
           "target": {
-            "x": 416,
-            "y": 806,
+            "x": 478,
+            "y": 812,
             "w": 40,
             "h": 40
           },
@@ -343,8 +295,29 @@
           "press": 0.1,
           "stroke": 4,
           "halo": 3,
-          "color": "#436354",
+          "color": "$color.muted",
           "intensity": 1
+        }
+      ],
+      "inputs": [
+        {
+          "name": "next_step",
+          "type": "html",
+          "html": "<div class=\"row\"><span class=\"num\">02</span><span class=\"text\">Try it in your app</span></div>",
+          "css": ".row { display: flex; align-items: center; gap: 20px; height: 100% } .num { display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 18px; background: $color.fg; color: $color.bg; font: 44px $font.display; letter-spacing: 1px } .text { padding: 10px 22px; border-radius: 999px; border: 2px solid $color.muted@0.6; color: $color.fg; font: 500 30px $font.body; text-transform: uppercase; letter-spacing: 2px }",
+          "width": 700,
+          "height": 96,
+          "options": {
+            "position": "64:784",
+            "start": 0.24,
+            "motion": {
+              "type": "slide-right",
+              "delay": 0.24,
+              "duration": 0.26,
+              "distance": 18,
+              "easing": "ease-out"
+            }
+          }
         }
       ]
     }
