@@ -118,6 +118,19 @@ html {
   scroll-padding-top: 5rem;
 }
 
+/* While a modal locks scrolling (react-remove-scroll tags the body), the page has no scrollbar: drop the
+   reserved gutter too, or it stays as a bright strip beside the dimmed overlay. The body then takes the
+   gutter's width as a margin (measured by lib/page-scrollbar.ts), and fixed bars read the same width through
+   the lock's variable, so nothing behind the overlay moves. */
+html:has(> body[data-scroll-locked]) {
+  scrollbar-gutter: auto;
+}
+
+html:has(> body[data-scroll-locked]) > body[data-scroll-locked] {
+  margin-right: var(--page-scrollbar-width, 0px) !important;
+  --removed-body-scroll-bar-size: var(--page-scrollbar-width, 0px);
+}
+
 /* Lenis (marketing routes) tags the root while it's mounted and owns easing from
    there — the native smooth scroll would fight its rAF-driven position. */
 html.lenis {

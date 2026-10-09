@@ -7,6 +7,7 @@ import i18n, { i18nReady } from '@/i18n';
 import App from '@/App';
 import { isBot } from '@/lib/isBot';
 import { watchSystemTheme } from '@/lib/theme';
+import { watchPageScrollbar } from '@/lib/page-scrollbar';
 
 const rootElement = document.getElementById('root');
 
@@ -16,6 +17,9 @@ if (!rootElement) {
 
 // Default theme is the OS color scheme: follow it live until the user picks one via the toggle.
 watchSystemTheme();
+
+// A modal hides the page scrollbar without moving the page behind it (index.css reads this width).
+watchPageScrollbar();
 
 // The active language's bundle is a lazy chunk (see i18n/index.ts), and it has to be in memory
 // before the first paint: rendering early would show English and then swap once the chunk lands.
