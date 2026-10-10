@@ -5,6 +5,8 @@ vi.mock('expo-file-system/legacy', () => ({
   documentDirectory: 'file:///docs/',
   cacheDirectory: 'file:///cache/',
   downloadAsync: vi.fn(async () => ({ status: 200 })),
+  readAsStringAsync: vi.fn(),
+  EncodingType: { Base64: 'base64' },
 }));
 
 import * as FileSystem from 'expo-file-system/legacy';
@@ -59,5 +61,17 @@ describe('FilesystemExpoAdapter.fetchAndRead', () => {
     await expect(
       new FilesystemExpoAdapter().fetchAndRead('https://fonts.googleapis.com/css2?family=Inter')
     ).rejects.toThrow(/429/);
+  });
+});
+
+describe('FilesystemExpoAdapter.readFile', () => {
+  // expo-file-system hands a file over as padded base64. A JPEG whose length is not a multiple of three
+  // lost its last bytes (its EOI marker) on the way: the HTML layer's portrait then drew as nothing on the
+  // phone, and its PNG differed from Node's.
+  it.each([1, 2, 3, 149_144])('returns the %i bytes of the file unchanged', async (length) => {
+    const bytes = Uint8Array.from({ length }, (_, index) => (index * 37 + 0xd9) & 255);
+    vi.mocked(FileSystem.readAsStringAsync).mockResolvedValueOnce(Buffer.from(bytes).toString('base64'));
+
+    expect(await new FilesystemExpoAdapter().readFile('/cache/leclap-assets/backgrounds/photo.jpg')).toEqual(bytes);
   });
 });

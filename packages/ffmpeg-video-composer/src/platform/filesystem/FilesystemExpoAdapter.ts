@@ -1,4 +1,5 @@
 import * as FileSystem from 'expo-file-system/legacy';
+import { base64ToBytes, bytesToBase64 } from '../../editor/html/base64';
 import AbstractFilesystem from './AbstractFilesystem';
 
 /**
@@ -157,47 +158,6 @@ class FilesystemExpoAdapter extends AbstractFilesystem {
 
     return response.text();
   };
-}
-
-// Minimal base64 ↔ bytes (Hermes has no Buffer). Used only by readFile/writeFile, which the native
-// engine path rarely hits (it reads real paths directly rather than bridging file contents).
-const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-function bytesToBase64(bytes: Uint8Array): string {
-  let out = '';
-
-  for (let i = 0; i < bytes.length; i += 3) {
-    const a = bytes[i];
-    const b = i + 1 < bytes.length ? bytes[i + 1] : 0;
-    const c = i + 2 < bytes.length ? bytes[i + 2] : 0;
-    out += B64[a >> 2] + B64[((a & 3) << 4) | (b >> 4)];
-    out += i + 1 < bytes.length ? B64[((b & 15) << 2) | (c >> 6)] : '=';
-    out += i + 2 < bytes.length ? B64[c & 63] : '=';
-  }
-
-  return out;
-}
-
-function base64ToBytes(b64: string): Uint8Array {
-  const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
-  const len = Math.floor((clean.length * 3) / 4);
-  const bytes = new Uint8Array(len);
-  let p = 0;
-
-  for (let i = 0; i < clean.length; i += 4) {
-    const n =
-      (B64.indexOf(clean[i]) << 18) |
-      (B64.indexOf(clean[i + 1]) << 12) |
-      (B64.indexOf(clean[i + 2]) << 6) |
-      B64.indexOf(clean[i + 3]);
-    bytes[p++] = (n >> 16) & 0xff;
-
-    if (p < len) bytes[p++] = (n >> 8) & 0xff;
-
-    if (p < len) bytes[p++] = n & 0xff;
-  }
-
-  return bytes;
 }
 
 export default FilesystemExpoAdapter;
