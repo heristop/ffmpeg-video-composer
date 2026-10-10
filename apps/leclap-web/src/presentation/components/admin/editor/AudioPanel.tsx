@@ -3,7 +3,8 @@
 // dynaudnorm) and speech-ducking with an advanced fine-tune (threshold/ratio/attack/
 // release, the descriptor's DuckingSchema object form). All map to state.audio (AudioMix).
 // Per-section music volume overrides and audio fades are on each visual section card
-// via SectionAudioFields — they map to EditorSection.musicVolume / .audioFade.
+// via SectionAudioFields — they map to EditorSection.musicVolume / .audioFade. Whole-video sound
+// effects (global.sfx, the editor's audio.cues) sit in a collapsed group below the mix.
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MicIcon } from '@/presentation/components/icons/mic';
@@ -11,6 +12,9 @@ import { Checkbox } from '@/presentation/components/ui';
 import type { AudioMix, DuckingSettings } from '../templateEditorModel';
 import { RangeSlider, SegmentedControl, VolumeSlider, type SegmentOption } from './controls';
 import { SectionDisclosure } from './SectionDisclosure';
+import { sfxSummary } from './sectionHints';
+import { SfxCuesPanel } from './sfx-cues-panel';
+import { GLOBAL_SFX_MAX } from './sfx-cues.logic';
 
 // Engine defaults for the fine-tune knobs (DuckingSchema descriptions) — used to seed the sliders
 // so opening "advanced" starts from what `true` already does.
@@ -56,6 +60,12 @@ export const AudioPanel = ({ audio, onChange }: AudioPanelProps) => {
 
   const set = (p: Partial<AudioMix>) => {
     onChange({ ...audio, ...p });
+  };
+
+  const setCues = (cues: AudioMix['cues']) => {
+    const { cues: _drop, ...rest } = audio;
+
+    onChange(cues ? { ...rest, cues } : rest);
   };
 
   const setNormalize = (choice: NormalizeChoice) => {
@@ -121,6 +131,12 @@ export const AudioPanel = ({ audio, onChange }: AudioPanelProps) => {
             }}
           />
         )}
+      </div>
+      {/* global.sfx: sounds on the whole-video timeline (the editor keeps them as audio.cues). */}
+      <div className="mt-4">
+        <SectionDisclosure label={t('sfx.globalLabel')} summary={sfxSummary(t, audio.cues)}>
+          <SfxCuesPanel cues={audio.cues} max={GLOBAL_SFX_MAX} hint={t('sfx.globalHint')} onChange={setCues} />
+        </SectionDisclosure>
       </div>
     </div>
   );

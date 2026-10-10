@@ -110,6 +110,15 @@ export function audioSummary(
   return parts.length > 0 ? parts.join(' · ') : t('summaryChip.default');
 }
 
+// "Sound effects" group summary: the cue count, or "None".
+export function sfxSummary(t: TFunction<'admin'>, cues: readonly unknown[] | undefined): string {
+  const count = cues?.length ?? 0;
+
+  if (count === 0) return t('summaryChip.none');
+
+  return t('sfx.count', { count });
+}
+
 // "Camera guide" group summary: the silhouette position, or "Off".
 export function framingSummary(t: TFunction<'admin'>, guide: FramingGuide | undefined): string {
   if (!guide) return t('summaryChip.off');

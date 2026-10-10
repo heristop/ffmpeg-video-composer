@@ -5,7 +5,7 @@
 // one click away. The finishing controls (Effects, Section audio, Camera guide) live in collapsed
 // disclosures that only appear in Advanced mode; recorder-only controls hide in clip mode.
 import { useState } from 'react';
-import { Music, Camera, SwitchCamera } from '@/presentation/components/icons';
+import { Camera, SwitchCamera } from '@/presentation/components/icons';
 import { SparklesIcon } from '@/presentation/components/icons/sparkles';
 import { useTranslation } from 'react-i18next';
 import { Checkbox } from '@/presentation/components/ui';
@@ -15,12 +15,12 @@ import { FramingGuidePicker } from '../FramingGuidePicker';
 import { MotionPanel } from '../MotionPanel';
 import { SectionDisclosure } from '../SectionDisclosure';
 import { useIsAdvanced } from '../useBuilderMode';
-import { effectsSummary, audioSummary, framingSummary, captureSummary } from '../sectionHints';
+import { effectsSummary, framingSummary, captureSummary } from '../sectionHints';
 import { ClipSourceControl, type ClipSource } from './clip-source-control';
 import { NumberField } from './NumberField';
 import { SpeedField } from './SpeedField';
 import { FitField } from './fit-field';
-import { SectionAudioFields } from './SectionAudioFields';
+import { SectionSoundDisclosures } from './section-sound-disclosures';
 import { VideoTextFields } from './video-text-fields';
 import { CaptureModeField } from './CaptureModeField';
 import { ChromaKeyField } from './ChromaKeyField';
@@ -250,13 +250,7 @@ export const VideoFields = ({ section, orientation, variables, onChange, inputCl
               }}
             />
           </SectionDisclosure>
-          <SectionDisclosure
-            label={t('disclosure.audio')}
-            icon={<Music className="size-4 shrink-0 text-brand-500" aria-hidden />}
-            summary={audioSummary(t, section.audioFade, section.musicVolume !== undefined)}
-          >
-            <SectionAudioFields section={section} onChange={onChange} inputCls={inputCls} />
-          </SectionDisclosure>
+          <SectionSoundDisclosures section={section} onChange={onChange} inputCls={inputCls} />
           {!isClip && <CameraDisclosures section={section} orientation={orientation} onChange={onChange} />}
         </div>
       )}

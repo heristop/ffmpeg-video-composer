@@ -1,16 +1,16 @@
 // Field block for a color_background section. Essentials (always visible): duration. The per-element
 // editors (background layers, animations) now live in the left panel's element inspector; finishing
-// controls (Effects, Section audio) live in collapsed disclosures that only appear in Advanced mode.
-import { Music, Type } from '@/presentation/components/icons';
+// controls (Effects, Section audio, Sound effects) live in collapsed disclosures that only appear in Advanced mode.
+import { Type } from '@/presentation/components/icons';
 import { SparklesIcon } from '@/presentation/components/icons/sparkles';
 import { useTranslation } from 'react-i18next';
 import type { EditorSection, Orientation } from '../../templateEditorModel';
 import { SectionDisclosure } from '../SectionDisclosure';
 import { useIsAdvanced } from '../useBuilderMode';
-import { effectsSummary, audioSummary } from '../sectionHints';
+import { effectsSummary } from '../sectionHints';
 import { MotionPanel } from '../MotionPanel';
 import { NumberField } from './NumberField';
-import { SectionAudioFields } from './SectionAudioFields';
+import { SectionSoundDisclosures } from './section-sound-disclosures';
 import { TitleCardField } from './TitleCardField';
 import { VisualEffects } from './VisualEffects';
 
@@ -82,13 +82,7 @@ export const ColorFields = ({ section, variables, onChange, inputCls }: ColorFie
               }}
             />
           </SectionDisclosure>
-          <SectionDisclosure
-            label={t('disclosure.audio')}
-            icon={<Music className="size-4 shrink-0 text-brand-500" aria-hidden />}
-            summary={audioSummary(t, section.audioFade, section.musicVolume !== undefined)}
-          >
-            <SectionAudioFields section={section} onChange={onChange} inputCls={inputCls} />
-          </SectionDisclosure>
+          <SectionSoundDisclosures section={section} onChange={onChange} inputCls={inputCls} />
         </div>
       )}
     </div>

@@ -47,6 +47,8 @@ describe('audio polish round-trip through the editor', () => {
     expect(back.sections[0].options.voice).toBe('clean');
     expect(back.sections[0].options.audioAutomation).toEqual([{ at: 1, volume: 0.5 }]);
     expect(back.sections[0].sfx).toEqual(source.sections[0].sfx);
+    // The named moments a "cue:drop" time points at travel with the sound effects that use them.
+    expect(back.sections[0].cues).toEqual({ drop: 1.5 });
     expect(TemplateDescriptorSchema.safeParse(source).success).toBe(true);
   });
 

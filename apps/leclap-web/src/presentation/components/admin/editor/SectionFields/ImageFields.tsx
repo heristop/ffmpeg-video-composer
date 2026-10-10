@@ -1,7 +1,6 @@
 // Field block for an image_background section. Essentials (always visible): duration + the media
 // picker (allowed images + upload). Finishing controls (Effects incl. Ken Burns motion, Section
 // audio) live in collapsed disclosures that only appear in Advanced mode.
-import { Music } from '@/presentation/components/icons';
 import { SparklesIcon } from '@/presentation/components/icons/sparkles';
 import { useTranslation } from 'react-i18next';
 import { Checkbox } from '@/presentation/components/ui';
@@ -10,10 +9,10 @@ import { MediaPicker } from '../../MediaPicker';
 import { MotionPanel } from '../MotionPanel';
 import { SectionDisclosure } from '../SectionDisclosure';
 import { useIsAdvanced } from '../useBuilderMode';
-import { effectsSummary, audioSummary } from '../sectionHints';
+import { effectsSummary } from '../sectionHints';
 import { NumberField } from './NumberField';
 import { FitField } from './fit-field';
-import { SectionAudioFields } from './SectionAudioFields';
+import { SectionSoundDisclosures } from './section-sound-disclosures';
 import { VisualEffects } from './VisualEffects';
 
 type ImageSection = Extract<EditorSection, { kind: 'image' }>;
@@ -92,13 +91,7 @@ export const ImageFields = ({ section, onChange, inputCls }: ImageFieldsProps) =
               }}
             />
           </SectionDisclosure>
-          <SectionDisclosure
-            label={t('disclosure.audio')}
-            icon={<Music className="size-4 shrink-0 text-brand-500" aria-hidden />}
-            summary={audioSummary(t, section.audioFade, section.musicVolume !== undefined)}
-          >
-            <SectionAudioFields section={section} onChange={onChange} inputCls={inputCls} />
-          </SectionDisclosure>
+          <SectionSoundDisclosures section={section} onChange={onChange} inputCls={inputCls} />
         </div>
       )}
     </div>

@@ -73,6 +73,12 @@ const destinations: CopyDest[] = [
     dest: resolve(root, 'apps/leclap-web/public/assets/musics'),
   },
   {
+    // The sound-effect library (plain blobs, a few KB each), served at /assets/sfx/<file> for the builder's
+    // sound-effects preview.
+    src: resolve(libDir, 'sfx'),
+    dest: resolve(root, 'apps/leclap-web/public/assets/sfx'),
+  },
+  {
     // Music cover art (<track id>.webp), served at /assets/covers/<file> for the music picker.
     src: resolve(libDir, 'covers'),
     dest: resolve(root, 'apps/leclap-web/public/assets/covers'),

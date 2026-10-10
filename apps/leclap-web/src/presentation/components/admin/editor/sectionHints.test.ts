@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { TFunction } from 'i18next';
-import { captureSummary } from './sectionHints';
+import { captureSummary, sfxSummary } from './sectionHints';
 
 const t = ((key: string, options?: { count?: number }) => {
   if (key === 'capture.summaryModes') return `${options?.count} modes`;
@@ -23,5 +23,19 @@ describe('captureSummary', () => {
 
   it('joins mode and restriction', () => {
     expect(captureSummary(t, 'upload', ['back', 'upload'])).toBe('capture.mode.upload · 2 modes');
+  });
+});
+
+describe('sfxSummary', () => {
+  const tc = ((key: string, options?: { count?: number }) =>
+    key === 'sfx.count' ? `${options?.count} sounds` : key) as TFunction<'admin'>;
+
+  it('reads None with no cues', () => {
+    expect(sfxSummary(tc, undefined)).toBe('summaryChip.none');
+    expect(sfxSummary(tc, [])).toBe('summaryChip.none');
+  });
+
+  it('counts the cues', () => {
+    expect(sfxSummary(tc, [{}, {}])).toBe('2 sounds');
   });
 });

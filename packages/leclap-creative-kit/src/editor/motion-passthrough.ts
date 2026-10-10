@@ -1,7 +1,8 @@
 // Motion fields the builder has no controls for yet (kinetic typography, the section camera, animated
-// graphics, word-timed subtitles, sound effects, designed-transition easing, global.seed, global.motion
-// tokens, the global.theme, the global.platform delivery target and the global.fields input contract). The editor carries them
-// through in descriptor shape, so opening a template in the builder and saving it never strips them.
+// graphics, word-timed subtitles, the section cues that "cue:<name>" times point at, designed-transition easing,
+// global.seed, global.motion tokens, the global.theme, the global.platform delivery target and the global.fields
+// input contract). The editor carries them through in descriptor shape, so opening a template in the builder and
+// saving it never strips them. Sound effects are carried here too; the builder's sound-effects panel edits them.
 
 import type { SectionOptions, TemplateDescriptor } from 'ffmpeg-video-composer/src/core/types.d.ts';
 import type { KineticBlock } from 'ffmpeg-video-composer/src/schemas/kinetic.schemas.ts';
@@ -39,6 +40,8 @@ export interface MotionBlocks {
   subtitles?: Subtitles;
   /** Section sound effects, carried verbatim. */
   sfx?: SfxCue[];
+  /** Named moments in the section ("cue:<name>" time references), carried verbatim. */
+  cues?: Record<string, number>;
   /** Why the section exists (authoring metadata). */
   purpose?: string;
   /** Narrative role: hook, problem, product-intro, reveal, proof, cta, outro, bridge. */
@@ -77,6 +80,7 @@ export function motionBlocksOf(source: MotionBlocks): MotionBlocks {
     ...(source.graphics ? { graphics: source.graphics } : {}),
     ...(source.subtitles ? { subtitles: source.subtitles } : {}),
     ...(source.sfx ? { sfx: source.sfx } : {}),
+    ...(source.cues ? { cues: source.cues } : {}),
     ...(source.purpose?.trim() ? { purpose: source.purpose.trim() } : {}),
     ...(source.role ? { role: source.role } : {}),
   };

@@ -35,6 +35,22 @@ describe('edit_template', () => {
     expect(port.getState()).toBe(before);
   });
 
+  it('reaches section and whole-video sound effects, which the builder keeps (the sfx panel edits them)', async () => {
+    const { port, call, revision } = await setup();
+    const result = await call('edit_template', {
+      expectedRevision: revision,
+      operations: [
+        { op: 'add', path: '/sections/0/sfx', value: [{ id: 'whoosh', at: 'end - 0.5', volume: 1.2 }] },
+        { op: 'add', path: '/global/sfx', value: [{ id: 'ding', at: 1 }] },
+      ],
+    });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.data.dropped ?? []).toEqual([]);
+    expect(port.getState().sections[0]).toMatchObject({ sfx: [{ id: 'whoosh', at: 'end - 0.5', volume: 1.2 }] });
+    expect(port.getState().audio.cues).toEqual([{ id: 'ding', at: 1 }]);
+  });
+
   it('rejects a stale revision with revision_conflict and commits nothing', async () => {
     const { port, call } = await setup();
     const result = await call('edit_template', {
