@@ -32,7 +32,7 @@ export interface CaptionDna {
   activeScale: number;
   position: CaptionPosition;
   effect?: CaptionDnaEffect;
-  /** A plate behind each line, with corners rounded in steps (padding and radius as fractions of size). */
+  /** A plate behind each line, with corners rounded row by row (padding and radius as fractions of size). */
   box?: { color: string; padding: number; radius: number };
   entrance: { type: CaptionEntrance; duration: number; distance: number; easing: string };
   /** The payoff line: drawn larger, in its own colour (and case). */

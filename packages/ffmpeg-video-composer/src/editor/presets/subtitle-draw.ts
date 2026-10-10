@@ -1,5 +1,5 @@
 // Drawing primitives for subtitles: the colour a DNA token paints, the time window a filter is enabled
-// in, the cue's entrance (a reveal preset), a positioned drawtext and the stepped rounded plate behind a
+// in, the cue's entrance (a reveal preset), a positioned drawtext and the rounded plate behind a
 // line. Every number goes through `fmt`, so the same plan always writes the same bytes.
 
 import type { Filter } from '@/core/types';
@@ -11,8 +11,6 @@ import type { PlacedLine } from '@/core/captions/plan';
 import { applyTextEffect, revealToExpr } from './text';
 
 const FALLBACK_COLOR = '#FFFFFF';
-/** Rounded corners are drawn as this many stepped strips per corner. */
-const CORNER_STEPS = 3;
 /** Vertical plate padding relative to the horizontal one. */
 const PLATE_VERTICAL = 0.55;
 
@@ -113,16 +111,88 @@ function rect({ x, y, w, h }: Rect, color: string, enable: string): Filter {
   return { type: 'drawbox', values: { x: fmt(x), y: fmt(y), w: fmt(w), h: fmt(h), color, t: 'fill', enable } };
 }
 
-// Horizontal inset of corner strip `step` (0 = outermost row) for a quarter circle of radius r.
-function cornerInset(radius: number, step: number): number {
-  const mid = radius - ((step + 0.5) * radius) / CORNER_STEPS;
+/** Samples per pixel side when measuring how much of a corner pixel the arc covers. */
+const COVERAGE_SAMPLES = 8;
+/** Edge-pixel opacity is quantised to this many levels, so neighbouring pixels can share a box. */
+const COVERAGE_LEVELS = 8;
 
-  return Math.round(radius - Math.sqrt(radius * radius - mid * mid));
+// How much of pixel (col, row) of a top-left corner of radius r (circle centre at (r, r)) lies inside the
+// arc, in COVERAGE_LEVELS steps: 0 outside, COVERAGE_LEVELS fully inside.
+function pixelCoverage(radius: number, col: number, row: number): number {
+  const n = COVERAGE_SAMPLES;
+  let inside = 0;
+
+  for (let k = 0; k < n * n; k++) {
+    const dx = radius - col - ((k % n) + 0.5) / n;
+    const dy = radius - row - (Math.floor(k / n) + 0.5) / n;
+
+    if (dx * dx + dy * dy <= radius * radius) inside++;
+  }
+
+  return Math.round((inside / (n * n)) * COVERAGE_LEVELS);
+}
+
+interface CornerRun {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  /** Coverage in COVERAGE_LEVELS steps; COVERAGE_LEVELS is a solid strip reaching the plate's middle. */
+  level: number;
+}
+
+// A top-left corner of radius r as runs in corner coordinates. Per pixel row: the partly covered pixels,
+// each at its coverage (neighbours at the same level share a run), then a solid strip from the first fully
+// covered pixel to the corner's inner edge. A run identical to the one right above it extends that one.
+function cornerRuns(radius: number): CornerRun[] {
+  const runs: CornerRun[] = [];
+
+  for (let y = 0; y < radius; y++) {
+    const row: CornerRun[] = [];
+
+    for (let x = 0; x < radius; x++) {
+      const level = pixelCoverage(radius, x, y);
+      const last = row.at(-1);
+
+      if (level === COVERAGE_LEVELS) {
+        row.push({ x, y, w: radius - x, h: 1, level });
+        break;
+      }
+
+      if (last?.level === level && last.x + last.w === x) {
+        last.w++;
+        continue;
+      }
+
+      if (level > 0) row.push({ x, y, w: 1, h: 1, level });
+    }
+
+    for (const run of row) {
+      const above = runs.find((m) => m.x === run.x && m.w === run.w && m.level === run.level && m.y + m.h === y);
+
+      if (above) {
+        above.h++;
+        continue;
+      }
+
+      runs.push(run);
+    }
+  }
+
+  return runs;
+}
+
+// `#rrggbb@a` at `level` of its opacity.
+function colorAtLevel(color: string, level: number): string {
+  const [hex, alpha = '1'] = color.split('@');
+
+  return level === COVERAGE_LEVELS ? color : `${hex}@${fmt((Number(alpha) * level) / COVERAGE_LEVELS)}`;
 }
 
 /**
- * A plate behind one line: a filled rectangle whose corners are rounded in CORNER_STEPS stepped strips.
- * Edges are whole pixels and the strips never overlap, so a translucent plate has no seams.
+ * A plate behind one line: a filled rectangle with anti-aliased rounded corners. Each corner pixel the
+ * arc crosses is drawn at the share of it the arc covers; whole-pixel edges and runs that never overlap
+ * keep a translucent plate free of seams.
  */
 export function plateFilters(
   line: PlacedLine,
@@ -137,20 +207,19 @@ export function plateFilters(
   const right = Math.round(line.x + line.width + padX);
   const top = Math.round(line.top - padY);
   const bottom = Math.round(line.top + size + padY);
-  const radius = Math.round(Math.min(box.radius * size, (bottom - top) / 2, (right - left) / 2));
-  const rows = Array.from({ length: CORNER_STEPS + 1 }, (_, j) => Math.round((j * radius) / CORNER_STEPS));
-  const strips = rows.slice(0, -1).flatMap((from, j) => {
-    const inset = cornerInset(radius, j);
-    const height = rows[j + 1] - from;
+  const radius = Math.floor(Math.min(box.radius * size, (bottom - top) / 2, (right - left) / 2));
+  // A solid run reaching the corner's inner edge spans the plate to the mirrored edge in one box.
+  const strips = cornerRuns(radius).flatMap(({ x, y, w, h, level }) => {
+    const paint = colorAtLevel(color, level);
+    const solid = level === COVERAGE_LEVELS;
+    const width = solid ? right - left - 2 * x : w;
+    const mirrored = solid ? [] : [{ x: right - x - w, w }];
+    const xs = [{ x: left + x, w: width }, ...mirrored];
 
-    if (height <= 0) return [];
-
-    const w = right - left - 2 * inset;
-
-    return [
-      rect({ x: left + inset, y: top + from, w, h: height }, color, enable),
-      rect({ x: left + inset, y: bottom - rows[j + 1], w, h: height }, color, enable),
-    ];
+    return xs.flatMap((span) => [
+      rect({ x: span.x, y: top + y, w: span.w, h }, paint, enable),
+      rect({ x: span.x, y: bottom - y - h, w: span.w, h }, paint, enable),
+    ]);
   });
   const body = rect({ x: left, y: top + radius, w: right - left, h: bottom - top - 2 * radius }, color, enable);
 

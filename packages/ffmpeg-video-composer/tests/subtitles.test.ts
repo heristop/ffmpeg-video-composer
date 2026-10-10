@@ -323,14 +323,55 @@ describe('subtitle lowering', () => {
     expect(texts[0]).toMatchObject({ text: 'Make every word land.', fontfile: 'Oswald.ttf' });
   });
 
-  it('boxed: a seamless stepped plate per line behind the words', () => {
+  it('boxed: a seamless rounded plate per line behind the words', () => {
     const filters = subtitlesToFilters({ ...track, style: 'boxed' }, ctx());
     const boxes = values(filters, 'drawbox');
 
-    expect(boxes).toHaveLength(7);
     expect(boxes[0].color).toBe('#141416@0.82');
-    expect(filters.findIndex((f) => f.type === 'drawtext')).toBe(7);
+    expect(filters.findIndex((f) => f.type === 'drawtext')).toBe(boxes.length);
     for (const box of boxes) expect(Number(box.w)).toBeGreaterThan(0);
+  });
+
+  it('boxed: the plate corners are anti-aliased, edge pixels drawn at their coverage of the arc', () => {
+    const boxes = values(subtitlesToFilters({ ...track, style: 'boxed' }, ctx()), 'drawbox').map((box) => {
+      const [, alpha] = String(box.color).split('@');
+
+      return { x: Number(box.x), y: Number(box.y), w: Number(box.w), h: Number(box.h), alpha: Number(alpha) };
+    });
+    const plate = boxes[0].alpha;
+    const left = Math.min(...boxes.map((box) => box.x));
+    const right = Math.max(...boxes.map((box) => box.x + box.w));
+    const top = Math.min(...boxes.map((box) => box.y));
+    const bottom = Math.max(...boxes.map((box) => box.y + box.h));
+    const radius = boxes[0].y - top;
+    // The exact area of row `fromEdge` of a rounded rectangle, by fine numeric integration.
+    const exactRow = (fromEdge: number): number => {
+      const samples = 256;
+      let cut = 0;
+
+      for (let k = 0; k < samples; k++) {
+        const y = fromEdge + (k + 0.5) / samples;
+        const dy = Math.max(0, radius - y);
+
+        cut += radius - Math.sqrt(radius * radius - dy * dy);
+      }
+
+      return right - left - (2 * cut) / samples;
+    };
+
+    expect(radius).toBeGreaterThan(3);
+    expect(boxes.some((box) => box.alpha > 0 && box.alpha < plate)).toBe(true);
+    for (let row = top; row < bottom; row++) {
+      const coverage = new Map<number, number>();
+
+      for (const box of boxes.filter((b) => row >= b.y && row < b.y + b.h)) {
+        for (let x = box.x; x < box.x + box.w; x++) coverage.set(x, (coverage.get(x) ?? 0) + box.alpha / plate);
+      }
+      const drawn = [...coverage.values()].reduce((sum, c) => sum + c, 0);
+
+      for (const c of coverage.values()) expect(c, `row ${row}`).toBeLessThanOrEqual(1 + 1e-9);
+      expect(Math.abs(drawn - exactRow(Math.min(row - top, bottom - 1 - row))), `row ${row}`).toBeLessThan(0.3);
+    }
   });
 
   it('resolves theme colours against global.theme', () => {
