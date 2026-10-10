@@ -66,9 +66,15 @@ function inputLabel(source: LayoutSource, key: string, env: LayoutEnv): string |
 function paneChain(ref: string, index: number, size: Rect, env: LayoutEnv, self: string): FilterGraphChain {
   const out = `${P}p${index}`;
   const source = classifyLayoutSource(ref, env.sections, env.self) ?? { kind: 'color', color: '#000000' };
-  const label = source.kind === 'self' ? self : inputLabel(source, `layout_${index}`, env);
 
-  if (label) return { inputs: [label], filters: cover(size.w, size.h), outputs: [out] };
+  if (source.kind === 'self') return { inputs: [self], filters: cover(size.w, size.h), outputs: [out] };
+
+  // A media or clip pane runs at the section's frame rate: a looped still arrives at the image demuxer's 25 fps,
+  // and the wipe's crop (timed on this leg) would drift from the overlay and snap back every few frames.
+  const fps: Filter = { type: 'fps', value: String(env.fps) };
+  const label = inputLabel(source, `layout_${index}`, env);
+
+  if (label) return { inputs: [label], filters: [fps, ...cover(size.w, size.h)], outputs: [out] };
 
   const color = source.kind === 'color' ? env.color(source.color) : 'black';
 

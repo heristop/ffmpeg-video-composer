@@ -201,7 +201,7 @@ describe('section layouts', () => {
 
     expect(text).toMatch(/^split=2\[lay_c\]\[lay_self0\];/);
     expect(text).toContain('[lay_self0]scale=1280:240:force_original_aspect_ratio=increase,crop=1280:240,setsar=1');
-    expect(text).toContain('[3:v]scale=1280:240');
+    expect(text).toContain('[3:v]fps=30,scale=1280:240');
     expect(text).toContain('[lay_o1][lay_p2]overlay=0:480,drawbox=');
     expect(text).not.toContain('alphamerge');
   });
@@ -221,6 +221,17 @@ describe('section layouts', () => {
     expect(text).toContain(`crop=w=1280:h=720:x='${edge}':y=0[lay_a]`);
     expect(text).toContain(`overlay=x='${edge}':y=0`);
     expect(render(layoutToFilters(layout, env())[0])).toBe(text);
+  });
+
+  it('runs media and clip panes at the section frame rate, so the wipe crop and overlay step together', () => {
+    // A still loops at the image demuxer's 25 fps: a crop timed on that leg drifts from the 30 fps overlay
+    // and the revealed picture snaps back every few frames.
+    const layout: SectionLayout = { type: 'before-after', before: 'photo', after: 'clip', wipe: { at: 1 } };
+    const text = render(layoutToFilters(layout, env())[0]);
+    const panes = text.split(';').filter((chain) => /^\[\d+:v\]/.test(chain));
+
+    expect(panes.length).toBeGreaterThan(0);
+    for (const pane of panes) expect(pane).toMatch(/^\[\d+:v\]fps=30,scale=/);
   });
 
   it('validates sources, section types and wipe timing', () => {
