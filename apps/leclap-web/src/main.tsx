@@ -8,6 +8,7 @@ import App from '@/App';
 import { isBot } from '@/lib/isBot';
 import { watchSystemTheme } from '@/lib/theme';
 import { watchPageScrollbar } from '@/lib/page-scrollbar';
+import { cameraDebugRequested, installCameraDebug } from '@/lib/camera-debug';
 
 const rootElement = document.getElementById('root');
 
@@ -20,6 +21,9 @@ watchSystemTheme();
 
 // A modal hides the page scrollbar without moving the page behind it (index.css reads this width).
 watchPageScrollbar();
+
+// `?debugCamera=1` times the camera's record start on the visitor's own hardware (see camera-debug.ts).
+if (cameraDebugRequested(window.location.search)) installCameraDebug();
 
 // The active language's bundle is a lazy chunk (see i18n/index.ts), and it has to be in memory
 // before the first paint: rendering early would show English and then swap once the chunk lands.

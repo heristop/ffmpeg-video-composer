@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { TemplateOrientation } from '@leclap/creative-kit';
+import { warmUpVideoEncoder } from '@/lib/video-encoder-warm-up';
 
 export type Mode = 'loading' | 'ready' | 'countdown' | 'recording' | 'preview' | 'error';
 
@@ -434,6 +435,9 @@ export function useCameraCapture(
       setMode('loading');
       stopTracks(streamRef.current);
       streamRef.current = null;
+
+      // Set up the H.264 encoder while the camera opens, so the first take doesn't freeze the preview.
+      warmUpVideoEncoder(pickMimeType()).catch(() => {});
 
       try {
         // Ask the camera for a frame matching the template orientation (honored on mobile; desktop
