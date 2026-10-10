@@ -3,6 +3,7 @@
 // CSS the subset dropped, the fonts the registry does not know, and content taller than the box.
 
 import { fillHtmlPlaceholders, prepareHtmlLayer, type PreparedHtmlLayer } from '@/core/html/html-layer';
+import type { CustomFontFace } from '@/core/html/template-fonts';
 
 export type HtmlLayerFindingCode =
   | 'html_unsupported_markup'
@@ -29,17 +30,19 @@ export interface HtmlLayerSource {
 export function prepareWithFindings(
   input: HtmlLayerSource,
   lookup: (name: string) => string | undefined,
-  defaultFamily: string
+  defaultFamily: string,
+  custom: readonly CustomFontFace[] = []
 ): { prepared: PreparedHtmlLayer; findings: HtmlLayerFinding[] } {
   const filled = fillHtmlPlaceholders(input.html ?? '', lookup);
   const css = input.css ?? '';
   const prepared = prepareHtmlLayer(
     { html: filled.html, css, width: input.width ?? 0, height: input.height ?? 0 },
-    defaultFamily
+    defaultFamily,
+    custom
   );
   const fonts = prepared.unknownFonts.map((name): HtmlLayerFinding => ({
     code: 'html_font_unknown',
-    message: `font "${name}" is not in the font registry, ${defaultFamily} is used instead`,
+    message: `font "${name}" is neither declared in global.fonts nor in the font registry, ${defaultFamily} is used instead`,
     source: css.includes(name) ? 'css' : 'html',
   }));
   const missing = filled.missing.map((name): HtmlLayerFinding => ({

@@ -117,6 +117,7 @@ class TemplateDirector {
 
     this.filesystemAdapter.setBuildDir(this.project.config.buildDir ?? 'build');
     this.filesystemAdapter.setAssetsDir(this.project.config.assetsDir ?? 'assets');
+    this.filesystemAdapter.setFontDirs(this.project.config.fontDirs ?? []);
 
     this.project.applyDefault();
     // Resolve orientation + fps ONCE, here — the single point where the descriptor and the project config meet.

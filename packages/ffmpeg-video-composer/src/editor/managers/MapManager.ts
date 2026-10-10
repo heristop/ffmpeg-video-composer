@@ -314,7 +314,8 @@ class MapManager {
 
     switch (this.currentSection.type) {
       case 'project_video':
-        increment = 0;
+        // A muted clip is preceded by the blank-audio input (ProjectVideoSegment.videoInputIndex).
+        increment = this.currentSection.options?.muteSection === true ? 1 : 0;
         break;
       case 'video': {
         // 0 is used by fake audio when a video section is reused and not muted

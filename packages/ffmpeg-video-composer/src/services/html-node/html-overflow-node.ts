@@ -6,6 +6,7 @@
 import { defaultHtmlFamily } from '@/core/html/html-fonts';
 import { fillHtmlPlaceholders, inlineImages, prepareHtmlLayer } from '@/core/html/html-layer';
 import type { RasterFont } from '@/core/html/html-rasteriser';
+import { declaredFontFaces, templateFontSpecs, type CustomFontFace } from '@/core/html/template-fonts';
 import { resolveThemeDescriptor } from '@/core/theme/resolve';
 import type { TemplateDescriptor } from '../../schemas/template.schemas';
 import { withFieldDefaults } from '../field-advisories';
@@ -32,7 +33,7 @@ async function fontsFor(faces: { family: string; file: string; weights: number[]
 
 async function overflowOf(
   use: HtmlInputUse,
-  context: { family: string; variables: Record<string, string>; loadFont: FontLoader }
+  context: { family: string; variables: Record<string, string>; loadFont: FontLoader; custom: CustomFontFace[] }
 ): Promise<GeometryWarning[]> {
   const { input } = use;
   const width = typeof input.width === 'number' ? input.width : 0;
@@ -42,7 +43,9 @@ async function overflowOf(
     (name) => context.variables[name]
   );
   const css = typeof input.css === 'string' ? input.css : '';
-  const prepared = prepareHtmlLayer({ html: html.html, css, width, height }, context.family);
+  // A template face is laid out under its own family; its bytes are not read here, so a layer using one is
+  // not measured (no overflow guessed from a stand-in face).
+  const prepared = prepareHtmlLayer({ html: html.html, css, width, height }, context.family, context.custom);
   const fonts = await fontsFor(prepared.faces, context.loadFont);
 
   if (!fonts || width <= 0 || height <= 0) return [];
@@ -71,7 +74,12 @@ export async function htmlOverflowWarnings(
   if (htmlInputs(descriptor).length === 0) return [];
 
   const resolved = resolveThemeDescriptor(withFieldDefaults(descriptor)) as Bag;
-  const context = { family: defaultHtmlFamily(resolved.global), variables: variablesOf(resolved.global), loadFont };
+  const context = {
+    family: defaultHtmlFamily(resolved.global),
+    variables: variablesOf(resolved.global),
+    loadFont,
+    custom: declaredFontFaces(templateFontSpecs(resolved.global)),
+  };
   const found = await Promise.all(htmlInputs(resolved).map((use) => overflowOf(use, context)));
 
   return found.flat();

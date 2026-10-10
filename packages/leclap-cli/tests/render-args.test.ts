@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
-import { parseKeyValues, buildProjectConfig, withOrientation, collectRepeated } from '../src/render-args';
+import { parseKeyValues, buildProjectConfig, withOrientation, collectRepeated, fontDirsFor } from '../src/render-args';
 
 describe('withOrientation', () => {
   const template = {
@@ -132,5 +132,26 @@ describe('collectRepeated', () => {
 
   it('ignores flags with a longer name and a trailing flag with no value', () => {
     expect(collectRepeated(['--fields', 'x=1', '--field'], 'field')).toEqual([]);
+  });
+});
+
+describe('template font dirs', () => {
+  it('resolves global.fonts against the template directory first, then each --fonts dir', () => {
+    expect(fontDirsFor('/work', 'templates/promo.json', ['brand/fonts', '/opt/fonts'])).toEqual([
+      path.resolve('/work/templates'),
+      path.resolve('/work/brand/fonts'),
+      path.resolve('/opt/fonts'),
+    ]);
+  });
+
+  it('lists a dir once', () => {
+    expect(fontDirsFor('/work', 'promo.json', ['.'])).toEqual([path.resolve('/work')]);
+  });
+
+  it('hands them to the render as ProjectConfig.fontDirs', () => {
+    const config = buildProjectConfig('/work', { fonts: ['fonts'] }, 'tpl/a.json');
+
+    expect(config.fontDirs).toEqual([path.resolve('/work/tpl'), path.resolve('/work/fonts')]);
+    expect(buildProjectConfig('/work', {}).fontDirs).toBeUndefined();
   });
 });

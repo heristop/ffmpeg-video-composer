@@ -5,6 +5,7 @@
 import { defaultHtmlFamily } from '@/core/html/html-fonts';
 import { HTML_LAYER_DENSITY, inlineImages } from '@/core/html/html-layer';
 import type { HtmlRasteriser, RasterFont } from '@/core/html/html-rasteriser';
+import type { TemplateFontFace } from '@/core/html/template-fonts';
 import { resolveThemeDescriptor } from '@/core/theme/resolve';
 import { overflowFinding, prepareWithFindings, type HtmlLayerFinding } from './html-layer-findings';
 
@@ -20,6 +21,8 @@ export interface HtmlLayerPreviewRequest {
   values?: Readonly<Record<string, string>>;
   /** The bytes of a registry font file. */
   loadFont: (file: string) => Promise<Uint8Array>;
+  /** The template's own faces (`global.fonts`), already loaded (loadTemplateFonts). */
+  templateFonts?: readonly TemplateFontFace[];
   /** A template image (`<img src>`, CSS `url()`) as a `data:` URI, or null when it cannot be read. */
   readImage?: (ref: string) => Promise<string | null>;
 }
@@ -65,11 +68,15 @@ export async function previewHtmlLayer(
   const { prepared, findings } = prepareWithFindings(
     { html, css, width: request.width, height: request.height },
     valueLookup(request.values ?? {}),
-    defaultHtmlFamily(global)
+    defaultHtmlFamily(global),
+    request.templateFonts
   );
   const element = inlineImages(prepared.element, await imageMap(prepared.imageRefs, request));
   const fonts: RasterFont[] = await Promise.all(
-    prepared.faces.map(async (face) => ({ ...face, data: await request.loadFont(face.file) }))
+    prepared.faces.map(async (face) => ({
+      ...face,
+      data: request.templateFonts?.find((font) => font.file === face.file)?.data ?? (await request.loadFont(face.file)),
+    }))
   );
   const raster = await rasteriser.render({
     element,

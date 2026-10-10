@@ -7,6 +7,7 @@ abstract class AbstractFilesystem {
   protected segmentName: string | undefined;
   protected buildDir: string | undefined;
   protected assetsDir: string | undefined;
+  protected fontDirs: string[] = [];
 
   abstract getAssetsPath(dir: string): Promise<string>;
   abstract getBuildPath(buildDir: string): Promise<string>;
@@ -88,6 +89,25 @@ abstract class AbstractFilesystem {
   resolveLocalAsset(_url: string): Promise<string | null> {
     return Promise.resolve(null);
   }
+
+  // The bytes of a template font (`global.fonts[].src` that is not a data URI), or null when there is no such
+  // file in the places this host allows. Never fetched over the network. The Node adapter confines it to the
+  // font dirs and the assets dir; other hosts read what resolveLocalAsset finds (nothing, by default: they
+  // take data URIs).
+  async readTemplateFont(src: string): Promise<Uint8Array | null> {
+    const local = await this.resolveLocalAsset(src);
+
+    return local ? this.readFile(local) : null;
+  }
+
+  // Where a template font may be read from: the font dirs, then the assets dir.
+  protected fontRoots(): string[] {
+    return [...this.fontDirs, this.assetsDir ?? ''].filter(Boolean);
+  }
+
+  setFontDirs = (fontDirs: readonly string[]) => {
+    this.fontDirs = [...fontDirs];
+  };
 
   setBuildDir = (buildDir: string) => {
     this.buildDir = buildDir;

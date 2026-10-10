@@ -10,13 +10,17 @@ import type { LayerElement } from './html-element';
 export const HTML_RASTERISER = 'htmlRasteriser';
 
 export interface RasterFont {
-  /** The registry CSS family the layer's styles name. */
+  /** The CSS family the layer's styles name (a registry family, or a template's `global.fonts` family). */
   family: string;
-  /** The registry `.ttf` file (identity for caching). */
+  /** The registry `.ttf` file, or a template face's `template-<hash>.ttf` (identity for caching). */
   file: string;
   data: Uint8Array;
   /** Weights text may use: a variable face is instanced at each, a static face is used as it is. */
   weights: number[];
+  /** A template face's declared weight: registered under it (a variable face is pinned to it) instead of its own. */
+  weight?: number;
+  /** A template face's declared style (default normal). */
+  style?: 'normal' | 'italic';
 }
 
 export interface HtmlRasterRequest {

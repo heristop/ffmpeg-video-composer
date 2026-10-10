@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-10
+
+### Added
+
+- `global.fonts` support. `--fonts-dir` / `LECLAP_MCP_FONTS_DIR` adds a read-only directory template fonts
+  resolve in, before the media dir; nothing outside the two is read (realpath-checked) and fonts are never
+  fetched. `validate_template` and `compose_video` refuse a declared font that is missing, outside those
+  dirs, not a TTF/OTF/WOFF font, WOFF2 or over 8 MB, naming the entry and the fix.
+- `get_template_schema` describes `global.fonts` in its schema and guide.
+
+### Changed
+
+- Requires `ffmpeg-video-composer` ^3.0.1.
+
 ## [0.5.0] - 2026-10-09
 
 ### Removed

@@ -17,6 +17,7 @@ import {
   TextEffectSchema,
 } from './effects.schemas';
 import { PLATFORM_NAMES } from '../core/platforms';
+import { TemplateFontsSchema } from './template-fonts.schemas';
 
 export const TranslationSchema = z
   .record(z.string(), z.string())
@@ -230,6 +231,7 @@ export const GlobalConfigSchema = z
       ),
     motion: MotionTokensSchema.optional(),
     theme: ThemeSchema.optional(),
+    fonts: TemplateFontsSchema.optional(),
     beats: BeatsSchema.optional(),
     fps: z
       .number()

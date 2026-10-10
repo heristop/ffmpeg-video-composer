@@ -9,6 +9,8 @@ import type AbstractFilesystem from '../../platform/filesystem/AbstractFilesyste
 import type AbstractLogger from '../../platform/logging/AbstractLogger';
 import { HTML_LAYER_DENSITY, htmlLayerKey, inlineImages, type PreparedHtmlLayer } from '@/core/html/html-layer';
 import { HTML_RASTERISER, type HtmlRasteriser, type RasterFont } from '@/core/html/html-rasteriser';
+import type { LayerFontFace } from '@/core/html/html-fonts';
+import type { TemplateFontFace } from '@/core/html/template-fonts';
 import { overflowFinding, prepareWithFindings } from '../../services/html-raster/html-layer-findings';
 import { bytesToBase64 } from './base64';
 
@@ -32,6 +34,8 @@ export interface HtmlStageContext {
   defaultFamily: string;
   /** The bytes of a registry font file, staged through the engine's font sources. */
   loadFont: (file: string) => Promise<Uint8Array>;
+  /** The template's own faces (`global.fonts`), loaded: a `font-family` naming their family uses them. */
+  templateFonts?: readonly TemplateFontFace[];
   rasteriser: HtmlRasteriser | null;
   /** Rendered layers kept across renders by hash (default: one per process). */
   memory?: Map<string, Uint8Array>;
@@ -75,7 +79,7 @@ async function imageMap(refs: string[], ctx: HtmlStageContext): Promise<Map<stri
 }
 
 function prepare(input: HtmlLayerInput, ctx: HtmlStageContext): PreparedHtmlLayer {
-  const { prepared, findings } = prepareWithFindings(input, ctx.lookup, ctx.defaultFamily);
+  const { prepared, findings } = prepareWithFindings(input, ctx.lookup, ctx.defaultFamily, ctx.templateFonts);
 
   for (const finding of findings) ctx.logger.warn(`[${ctx.section}][Html] ${finding.code}: ${finding.message}`);
 
@@ -102,6 +106,20 @@ async function draw(
   return raster.png;
 }
 
+// A face's identity in the layer's hash. A template face's file is the hash of its bytes, so a changed font
+// file names a different layer; its declared weight and style are part of how it draws.
+function faceIdentity(face: LayerFontFace): string {
+  const declared = `${face.weight === undefined ? '' : `#${face.weight}`}${face.style === 'italic' ? 'i' : ''}`;
+
+  return `${face.file}@${face.weights.join('/')}${declared}`;
+}
+
+function fontBytes(face: LayerFontFace, ctx: HtmlStageContext): Promise<Uint8Array> {
+  const own = ctx.templateFonts?.find((font) => font.file === face.file);
+
+  return own ? Promise.resolve(own.data) : ctx.loadFont(face.file);
+}
+
 /** Renders (or reuses) the layer's PNG under `ctx.dir`; returns its `html:<hash>` url and staged path. */
 export async function stageHtmlLayer(input: HtmlLayerInput, ctx: HtmlStageContext): Promise<StagedHtmlLayer> {
   const { rasteriser } = ctx;
@@ -116,7 +134,7 @@ export async function stageHtmlLayer(input: HtmlLayerInput, ctx: HtmlStageContex
   const element = inlineImages(prepared.element, await imageMap(prepared.imageRefs, ctx));
   const width = input.width ?? 0;
   const height = input.height ?? 0;
-  const faces = prepared.faces.map((face) => `${face.file}@${face.weights.join('/')}`);
+  const faces = prepared.faces.map(faceIdentity);
   const key = htmlLayerKey({ element, fonts: faces, width, height, renderer: rasteriser.version });
   const path = `${ctx.dir}/html-${key}.png`;
   const staged = { url: `html:${key}`, path };
@@ -125,7 +143,7 @@ export async function stageHtmlLayer(input: HtmlLayerInput, ctx: HtmlStageContex
 
   const memory = ctx.memory ?? PROCESS_MEMORY;
   const fonts: RasterFont[] = await Promise.all(
-    prepared.faces.map(async (face) => ({ ...face, data: await ctx.loadFont(face.file) }))
+    prepared.faces.map(async (face) => ({ ...face, data: await fontBytes(face, ctx) }))
   );
   const png =
     memory.get(key) ?? (await draw({ element, width, height, density: HTML_LAYER_DENSITY, fonts }, rasteriser, ctx));

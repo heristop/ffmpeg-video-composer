@@ -101,6 +101,7 @@ export const render = defineCommand({
     orientation: { type: 'string', description: 'Override orientation: landscape | portrait | square' },
     ...FORMAT_ARGS,
     assets: { type: 'string', description: 'Assets directory (default ./assets)' },
+    fonts: { type: 'string', description: 'A dir for global.fonts after the template dir (repeatable)' },
     build: { type: 'string', description: 'Build/output directory (default ./build)' },
     watch: { type: 'boolean', description: 'Re-render when the template or its assets change', default: false },
     quiet: { type: 'boolean', alias: 'q', description: 'Print only the final result', default: false },
@@ -147,6 +148,7 @@ export const render = defineCommand({
       deterministic: args.deterministic,
       qc: args.qc,
       cache: args.cache,
+      fonts: repeatedFlag(rawArgs, args.fonts, 'fonts'),
     };
 
     const mode = { quiet, json, verbose, watch: args.watch, output: args.output, manifest: args.manifest };
@@ -174,7 +176,7 @@ interface ModeFlags {
 function buildOptions(templatePath: string, flags: RenderFlags, mode: ModeFlags): RenderOptions {
   try {
     const outputAbs = mode.output ? path.resolve(process.cwd(), mode.output) : undefined;
-    const projectConfig = buildProjectConfig(process.cwd(), flags);
+    const projectConfig = buildProjectConfig(process.cwd(), flags, templatePath);
     assertOutputIsNotInput(outputAbs, [templatePath, ...Object.values(projectConfig.userVideoPaths ?? {})]);
 
     return {

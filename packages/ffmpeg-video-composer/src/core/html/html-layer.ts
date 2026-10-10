@@ -13,6 +13,7 @@ import { layerFonts, type LayerFontFace } from './html-fonts';
 import { parseHtml } from './html-parse';
 import { sanitiseHtml, type HtmlFinding } from './html-sanitise';
 import { styleTree } from './html-styles';
+import type { CustomFontFace } from './template-fonts';
 
 import { HTML_LAYER_DENSITY, HTML_LAYOUT_VERSION } from './limits';
 
@@ -32,7 +33,7 @@ export interface PreparedHtmlLayer {
   imageRefs: string[];
   /** Markup and CSS the sanitiser and the subset dropped. */
   findings: HtmlFinding[];
-  /** `font-family` names the registry does not know (they fall back to the default family). */
+  /** `font-family` names neither the template nor the registry knows (they fall back to the default family). */
   unknownFonts: string[];
 }
 
@@ -111,8 +112,15 @@ export function inlineImages(element: LayerElement, images: ReadonlyMap<string, 
   };
 }
 
-/** Prepares a layer whose placeholders and theme tokens are already resolved. */
-export function prepareHtmlLayer(spec: HtmlLayerSpec, defaultFamily: string): PreparedHtmlLayer {
+/**
+ * Prepares a layer whose placeholders and theme tokens are already resolved. `custom` are the template's own
+ * faces (`global.fonts`): a `font-family` naming one of their families uses them.
+ */
+export function prepareHtmlLayer(
+  spec: HtmlLayerSpec,
+  defaultFamily: string,
+  custom: readonly CustomFontFace[] = []
+): PreparedHtmlLayer {
   const sanitised = sanitiseHtml(parseHtml(spec.html));
   const sheet = parseStylesheet(spec.css ?? '');
   const styled = styleTree(sanitised.nodes, sheet);
@@ -121,7 +129,7 @@ export function prepareHtmlLayer(spec: HtmlLayerSpec, defaultFamily: string): Pr
     height: spec.height,
     fontFamily: defaultFamily,
   });
-  const fonts = layerFonts(laidOut, defaultFamily);
+  const fonts = layerFonts(laidOut, defaultFamily, custom);
 
   return {
     element: fonts.element,
@@ -134,7 +142,7 @@ export function prepareHtmlLayer(spec: HtmlLayerSpec, defaultFamily: string): Pr
 
 export interface HtmlLayerKeyParts {
   element: LayerElement;
-  /** Face identities (`file@weight`). */
+  /** Face identities (`file@weights`, a template face's declared weight and style appended). */
   fonts: string[];
   width: number;
   height: number;

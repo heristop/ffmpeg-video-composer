@@ -18,6 +18,7 @@ import { templateRevision } from '../effects/template-revision.js';
 import type { McpConfig } from '../config.js';
 import { assertWithinMediaDir } from '../compose/pathGuard.js';
 import { assertDescriptorSafe } from '../compose/descriptorGuard.js';
+import { mediaRoots, withReadableFonts } from '../compose/template-fonts.js';
 import { fieldsArg, fieldValues, type FieldArgs } from '../compose/field-values.js';
 import { validateTemplate } from '../compose/validation.js';
 import { runRender, type RenderResult } from '../compose/renderRunner.js';
@@ -186,7 +187,7 @@ async function buildProjectConfig(
     // media dir IS this server's library: pointing assetsDir at the fresh buildDir instead used
     // to make the engine reject descriptor assets under LECLAP_MCP_MEDIA_DIR that probe_media
     // and the fontfile guard both explicitly allow.
-    assetsDir: config.mediaDir,
+    ...mediaRoots(config),
     userVideoPaths,
     fields: fieldValues(args.fields),
     currentLocale: args.locale,
@@ -282,7 +283,7 @@ export async function prepareCompose(
   const args = prepareComposeTemplate(authored, templateRevision);
 
   if ('isError' in args) return args;
-  const descriptor = resolveDescriptor(args);
+  const descriptor = await withReadableFonts(resolveDescriptor(args), config);
 
   if ('isError' in descriptor) return descriptor;
 

@@ -4,6 +4,8 @@ import type { FFmpegCoreLoader } from './platform/ffmpeg/FFmpegWasmAdapter';
 import type { ProjectConfig, TemplateDescriptor } from './core/types';
 import type { HtmlWasmLoader } from './core/html/html-engine';
 import type { HtmlLayerPreview, HtmlLayerPreviewRequest } from './services/html-raster/html-layer-preview';
+import type { TemplateFontFace, TemplateFontSpec } from './core/html/template-fonts';
+import type { TemplateFontReader } from './core/html/template-font-load';
 
 export interface BrowserCompileOptions {
   /**
@@ -51,6 +53,23 @@ export async function renderHtmlLayerPreview(
 
 export type { HtmlLayerPreview, HtmlLayerPreviewRequest, HtmlWasmLoader };
 export type { HtmlLayerFinding } from './services/html-raster/html-layer-findings';
+export {
+  templateFontSpecs,
+  TemplateFontError,
+  TEMPLATE_FONT_MAX_BYTES,
+  type TemplateFontFace,
+  type TemplateFontSpec,
+} from './core/html/template-fonts';
+
+/** A template's `global.fonts` loaded for renderHtmlLayerPreview; the loader is fetched on first use. */
+export async function loadTemplateFonts(
+  specs: readonly TemplateFontSpec[],
+  read: TemplateFontReader
+): Promise<TemplateFontFace[]> {
+  const { loadTemplateFonts: load } = await import('./core/html/template-font-load');
+
+  return load(specs, read);
+}
 
 export {
   default as FFmpegWasmAdapter,

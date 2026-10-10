@@ -251,6 +251,10 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
     }
   };
 
+  override async readTemplateFont(src: string): Promise<Uint8Array | null> {
+    return (await import('./template-font-read')).readTemplateFontWithin(this.fontRoots(), src);
+  }
+
   // The local path a descriptor asset reference maps to. A `/assets/...` reference is a web-rooted
   // asset path (what the web builder emits) and maps under assetsDir; a `/...` path WITHOUT the
   // `/assets/` marker is a real absolute device path, used as-is; a relative path is assets-relative.

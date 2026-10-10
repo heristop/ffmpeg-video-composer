@@ -134,7 +134,12 @@ function blockEnd(css: string, open: number): number {
 // An at-rule at `at`: skipped to its `;` or past its block. Returns where parsing resumes.
 function skipAtRule(css: string, at: number, findings: HtmlFinding[]): number {
   const name = /^@[\w-]+/.exec(css.slice(at))?.[0] ?? '@';
-  findings.push(cssFinding(`css ${name}: at-rules are not supported`));
+  const fontFace =
+    name.toLowerCase() === '@font-face'
+      ? '; declare the font in global.fonts ({ family, src }) and name its family in font-family'
+      : '';
+
+  findings.push(cssFinding(`css ${name}: at-rules are not supported${fontFace}`));
 
   const semicolon = css.indexOf(';', at);
   const brace = css.indexOf('{', at);

@@ -14,6 +14,11 @@ export interface McpConfig {
   effectCacheMaxBytes?: number;
   outputDir: string;
   mediaDir: string;
+  /**
+   * Optional read-only directory `global.fonts[].src` may resolve in, before the media dir (--fonts-dir /
+   * LECLAP_MCP_FONTS_DIR). Template fonts are read from it and the media dir only, never fetched.
+   */
+  fontsDir?: string;
   renderTimeoutMs: number;
   /**
    * Enable the render_remotion_clip tool. It bundles and EXECUTES a caller-supplied Remotion entry
@@ -112,6 +117,12 @@ function nonEmpty(value: string | undefined): string | undefined {
   return value !== undefined && value.trim() !== '' ? value : undefined;
 }
 
+function fontsDirConfig(argv: readonly string[]): Pick<McpConfig, 'fontsDir'> {
+  const fontsDir = nonEmpty(readFlag(argv, '--fonts-dir') ?? process.env.LECLAP_MCP_FONTS_DIR);
+
+  return fontsDir ? { fontsDir: path.resolve(fontsDir) } : {};
+}
+
 function gapLogConfig(argv: readonly string[]): Pick<McpConfig, 'catalogGapLog'> {
   const catalogGapLog = nonEmpty(readFlag(argv, '--catalog-gap-log') ?? process.env.LECLAP_MCP_CATALOG_GAP_LOG);
 
@@ -144,6 +155,7 @@ export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
   return {
     outputDir: path.resolve(outputDir),
     mediaDir: path.resolve(mediaDir),
+    ...fontsDirConfig(argv),
     renderTimeoutMs,
     effectCacheMaxBytes: resolveEffectCacheBudget(
       readFlag(argv, '--effect-cache-max-bytes') ?? process.env.LECLAP_MCP_EFFECT_CACHE_MAX_BYTES

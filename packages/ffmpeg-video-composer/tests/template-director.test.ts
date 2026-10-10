@@ -120,6 +120,7 @@ function makeFilesystem() {
   return {
     setBuildDir: vi.fn(),
     setAssetsDir: vi.fn(),
+    setFontDirs: vi.fn(),
     getBuildDir: vi.fn(() => '/build'),
     getAssetsDir: vi.fn((t: string) => `/assets/${t}`),
     write: vi.fn(async () => undefined),

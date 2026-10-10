@@ -313,6 +313,7 @@ export { createBundledFontLoader } from './services/geometry/bundled-font-loader
 // the MCP server share. The browser and React-Native entries never see it — it reaches disk and
 // network. Its geometry imports are type-only, so the lazy `import('./geometry')` still holds.
 export { geometryApproxNote, nodeGeometryWarnings } from './services/geometry/node-geometry';
+export { templateFontErrors, type TemplateFontCheckOptions } from './services/html-node/template-fonts-node';
 export type { RenderCheckOptions, RenderedGeometry } from './services/geometry/render-check';
 export { default as TeeLogAdapter } from './platform/logging/TeeLogAdapter';
 export {

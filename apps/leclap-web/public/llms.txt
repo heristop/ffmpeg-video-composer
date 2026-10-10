@@ -87,6 +87,7 @@ For PR or MR evidence: collect a real walkthrough and review focus, author the t
 | --- | --- | --- |
 | `--output-dir` | `LECLAP_MCP_OUTPUT_DIR` | `~/.leclap/renders` |
 | `--media-dir` | `LECLAP_MCP_MEDIA_DIR` | `~/.leclap/media` |
+| `--fonts-dir` | `LECLAP_MCP_FONTS_DIR` | Unset; `global.fonts` read from the media dir |
 | `--render-timeout-ms` | `LECLAP_MCP_RENDER_TIMEOUT_MS` | `600000` ms |
 | `--allow-remotion` | `LECLAP_MCP_ALLOW_REMOTION` | Off |
 | `--remotion-entry` | `LECLAP_MCP_REMOTION_ENTRY` | Unset |

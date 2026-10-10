@@ -1,23 +1,30 @@
-// Fonts of an HTML layer come from the engine's font registry (core/fonts.ts) only: a `font-family` stack
-// resolves to its first registry family (by family name, label, id or file), generic families map onto
+// Fonts of an HTML layer come from the template's own faces (`global.fonts`, core/html/template-fonts.ts) and
+// the engine's font registry (core/fonts.ts): a `font-family` stack resolves to its first family a template
+// declares, else its first registry family (by family name, label, id or file); generic families map onto
 // bundled faces, and anything else falls back to the default family and is reported (html_font_unknown).
+// A template's family wins over a registry family of the same name.
 
 import { FONTS, findFont, findFontByFile, type FontEntry } from '../fonts';
 import { resolveTheme } from '../theme/resolve';
 import type { ThemeSpec } from '../theme/themes';
 import { styleValue, type LayerElement } from './html-element';
+import type { CustomFontFace } from './template-fonts';
 
 export interface LayerFontFace {
-  /** The registry's CSS family name, as the layer's styles now spell it. */
+  /** The CSS family name (registry or template), as the layer's styles now spell it. */
   family: string;
-  /** The registry's `.ttf` file. */
+  /** The registry's `.ttf` file, or a template face's file (CustomFontFace.file). */
   file: string;
   /** The weights text may ask for; a variable face is instanced at each, a static one used as it is. */
   weights: number[];
+  /** A template face's declared weight: the weight it is registered under (a variable face is pinned to it). */
+  weight?: number;
+  /** A template face's declared style. */
+  style?: 'normal' | 'italic';
 }
 
 export interface ResolvedStack {
-  /** The registry family the stack resolves to; null for the default family. */
+  /** The family the stack resolves to (a template's or the registry's); null for the default family. */
   family: string | null;
   unknown: string[];
 }
@@ -50,8 +57,14 @@ function entryNamed(name: string): FontEntry | undefined {
   );
 }
 
-/** The registry family of a CSS `font-family` stack, and the names in it nothing resolves. */
-export function resolveFontStack(stack: string): ResolvedStack {
+function customNamed(name: string, custom: readonly CustomFontFace[]): string | undefined {
+  const wanted = name.toLowerCase();
+
+  return custom.find((face) => face.family.toLowerCase() === wanted)?.family;
+}
+
+/** The family of a CSS `font-family` stack (template faces first, then the registry), and the names nothing resolves. */
+export function resolveFontStack(stack: string, custom: readonly CustomFontFace[] = []): ResolvedStack {
   const unknown: string[] = [];
   const names = stack
     .split(',')
@@ -60,6 +73,9 @@ export function resolveFontStack(stack: string): ResolvedStack {
 
   for (const name of names) {
     const lowered = name.toLowerCase();
+    const declared = customNamed(name, custom);
+
+    if (declared !== undefined) return { family: declared, unknown };
 
     if (Object.hasOwn(GENERIC, lowered)) return { family: GENERIC[lowered], unknown };
 
@@ -86,6 +102,7 @@ function weightOf(value: string | undefined): number | null {
 }
 
 interface Walk {
+  custom: readonly CustomFontFace[];
   defaultFamily: string;
   families: Set<string>;
   weights: Set<number>;
@@ -100,7 +117,7 @@ function rewrite(element: LayerElement, walk: Walk): LayerElement {
   if (weight !== null) walk.weights.add(weight);
 
   if (stack !== undefined) {
-    const resolved = resolveFontStack(stack);
+    const resolved = resolveFontStack(stack, walk.custom);
     style.fontFamily = resolved.family ?? walk.defaultFamily;
     walk.families.add(style.fontFamily);
 
@@ -112,22 +129,44 @@ function rewrite(element: LayerElement, walk: Walk): LayerElement {
   return { type: element.type, props: { ...element.props, style, ...(children && { children }) } };
 }
 
+function facesOf(family: string, weights: number[], custom: readonly CustomFontFace[]): LayerFontFace[] {
+  const declared = custom.filter((face) => face.family === family);
+
+  if (declared.length > 0) {
+    return declared.map((face) => ({
+      family,
+      file: face.file,
+      weights,
+      ...(face.weight !== undefined && { weight: face.weight }),
+      ...(face.style !== undefined && { style: face.style }),
+    }));
+  }
+
+  const entry = entryNamed(family);
+
+  return entry ? [{ family: entry.cssFamily, file: entry.file, weights }] : [];
+}
+
 /**
- * The layer with every `font-family` rewritten to a registry family, the faces (and weights) to load,
- * and the families nothing resolved. `defaultFamily` is a registry CSS family.
+ * The layer with every `font-family` rewritten to a template or registry family, the faces (and weights) to
+ * load, and the families nothing resolved. `defaultFamily` is a registry CSS family; `custom` are the
+ * template's declared faces (`global.fonts`), which win over a registry family of the same name.
  */
 export function layerFonts(
   element: LayerElement,
-  defaultFamily: string
+  defaultFamily: string,
+  custom: readonly CustomFontFace[] = []
 ): { element: LayerElement; faces: LayerFontFace[]; unknown: string[] } {
-  const walk: Walk = { defaultFamily, families: new Set([defaultFamily]), weights: new Set(BASE_WEIGHTS), unknown: [] };
+  const walk: Walk = {
+    custom,
+    defaultFamily,
+    families: new Set([defaultFamily]),
+    weights: new Set(BASE_WEIGHTS),
+    unknown: [],
+  };
   const rewritten = rewrite(element, walk);
   const weights = [...walk.weights].sort((a, b) => a - b);
-  const faces = [...walk.families].sort().flatMap((family) => {
-    const entry = entryNamed(family);
-
-    return entry ? [{ family: entry.cssFamily, file: entry.file, weights }] : [];
-  });
+  const faces = [...walk.families].sort().flatMap((family) => facesOf(family, weights, custom));
 
   return { element: rewritten, faces, unknown: walk.unknown };
 }

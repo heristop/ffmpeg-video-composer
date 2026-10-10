@@ -8,6 +8,8 @@ import type Segment from '../../core/models/Segment';
 import type { FontRequest } from '../../core/models/Segment';
 import type { MapAnimationInput } from '@/core/types';
 import { defaultHtmlFamily } from '@/core/html/html-fonts';
+import { templateFontSpecs, type TemplateFontFace } from '@/core/html/template-fonts';
+import { loadTemplateFonts } from '@/core/html/template-font-load';
 import { registeredHtmlRasteriser, stageHtmlLayer, type HtmlLayerInput } from './stage-html-layer';
 
 export interface HtmlAssetDeps {
@@ -22,6 +24,23 @@ export interface HtmlAssetDeps {
 }
 
 export type HtmlInputItem = MapAnimationInput & HtmlLayerInput;
+
+// The template's own fonts are read once per render (its global), however many layers use them, and a
+// failed read fails every layer the same way.
+const TEMPLATE_FONTS = new WeakMap<object, Promise<TemplateFontFace[]>>();
+
+function templateFonts(deps: HtmlAssetDeps): Promise<TemplateFontFace[]> {
+  const specs = templateFontSpecs(deps.global);
+
+  if (specs.length === 0 || deps.global === null || typeof deps.global !== 'object') return Promise.resolve([]);
+
+  const loaded =
+    TEMPLATE_FONTS.get(deps.global) ?? loadTemplateFonts(specs, (src) => deps.filesystem.readTemplateFont(src));
+
+  TEMPLATE_FONTS.set(deps.global, loaded);
+
+  return loaded;
+}
 
 // The PNG is drawn at 2×: scaled back to the box unless the author chose a scale. Authored inputs may
 // omit options altogether (the schema has them optional).
@@ -48,6 +67,7 @@ export async function stageHtmlInput(item: HtmlInputItem, deps: HtmlAssetDeps): 
 
       return filesystem.readFile(`${segment.fontsDir}/${file}`);
     },
+    templateFonts: await templateFonts(deps),
     rasteriser: registeredHtmlRasteriser(),
   });
 

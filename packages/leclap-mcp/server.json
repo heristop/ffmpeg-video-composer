@@ -3,7 +3,7 @@
   "name": "dev.leclap/video",
   "title": "LeClap",
   "description": "Compose and render video from one JSON template. Deterministic, runs locally, no generative model.",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "websiteUrl": "https://leclap.dev",
   "repository": {
     "url": "https://github.com/heristop/leclap",
@@ -15,7 +15,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@leclap/mcp",
-      "version": "0.5.0",
+      "version": "0.5.1",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
@@ -31,6 +31,13 @@
         {
           "name": "LECLAP_MCP_MEDIA_DIR",
           "description": "Allowlisted directory the server may read source media from. Defaults to ~/.leclap/media.",
+          "format": "filepath",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "LECLAP_MCP_FONTS_DIR",
+          "description": "Optional read-only directory a template's global.fonts files may be read from, before the media dir. Fonts are never fetched.",
           "format": "filepath",
           "isRequired": false,
           "isSecret": false

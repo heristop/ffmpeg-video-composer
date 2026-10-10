@@ -6,11 +6,13 @@ import {
   geometryApproxNote,
   nodeGeometryWarnings,
   renderedGeometryWarnings,
+  templateFontErrors,
   type GeometryWarning,
   type MotionWarning,
 } from 'ffmpeg-video-composer';
 import { setEngineLogLevel } from '../log.js';
 import { resolveAssetsDir } from '../resolve-assets-dir.js';
+import { collectRepeated, fontDirsFor } from '../render-args.js';
 import { success, fail, step, hint } from '../ui.js';
 import { wordmark } from '../theme.js';
 
@@ -142,11 +144,16 @@ export const validate = defineCommand({
       description: 'Also render the sections with text and measure its contrast from pixels (needs FFmpeg; seconds)',
       default: false,
     },
+    fonts: {
+      type: 'string',
+      description: "A directory global.fonts[].src may resolve in, after the template's own (repeatable)",
+    },
   },
-  async run({ args }) {
+  async run({ args, rawArgs }) {
     const json = args.json;
+    const fontDirs = fontDirsFor(process.cwd(), args.template, repeatedFonts(rawArgs));
 
-    const result = await runValidation(args.template, json, args.render);
+    const result = await runValidation(args.template, json, args.render, fontDirs);
 
     const output = json ? `${JSON.stringify(result)}\n` : `${formatValidation(result).join('\n')}\n`;
     process.stdout.write(output);
@@ -159,9 +166,19 @@ export const validate = defineCommand({
   },
 });
 
+// Every --fonts value; a programmatic run may pass no rawArgs.
+function repeatedFonts(rawArgs: readonly string[] | undefined): string[] {
+  return rawArgs ? collectRepeated(rawArgs, 'fonts') : [];
+}
+
 // Load + validate, mapping a missing file or JSON syntax error into a structured result (so both the
 // human and --json paths render it uniformly). Prints the wordmark only in the human path.
-async function runValidation(templatePath: string, json: boolean, render: boolean): Promise<ValidationResult> {
+async function runValidation(
+  templatePath: string,
+  json: boolean,
+  render: boolean,
+  fontDirs: string[] = []
+): Promise<ValidationResult> {
   if (!json) process.stdout.write(wordmark());
 
   let data: unknown;
@@ -177,8 +194,21 @@ async function runValidation(templatePath: string, json: boolean, render: boolea
   }
 
   const validator = new TemplateValidator();
+  const result = await attachFontErrors(await attachGeometryWarnings(validator, data, render), data, fontDirs);
 
-  return attachMotionWarnings(validator, data, await attachGeometryWarnings(validator, data, render));
+  return attachMotionWarnings(validator, data, result);
+}
+
+// The files global.fonts declares, opened where a `leclap render` of this template would read them (the
+// template's directory, --fonts, then <cwd>/assets): a missing, unreadable or non-font file fails validation.
+async function attachFontErrors(
+  result: ValidationResult,
+  data: unknown,
+  fontDirs: string[]
+): Promise<ValidationResult> {
+  const errors = await templateFontErrors(data, { assetsDir: resolveAssetsDir(process.cwd()), fontDirs });
+
+  return errors.length === 0 ? result : { ...result, success: false, errors: [...(result.errors ?? []), ...errors] };
 }
 
 // Render-free and synchronous; only for a parsed descriptor (a schema failure has nothing to time).

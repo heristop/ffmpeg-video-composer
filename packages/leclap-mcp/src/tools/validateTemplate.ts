@@ -24,6 +24,7 @@ import { capabilityWarnings } from '../compose/capabilities.js';
 import { featureNote, featureWarningsSchema } from './featureWarnings.js';
 import { fieldContract, fieldContractSchema, formFields } from '../compose/field-values.js';
 import { extrasInput, extrasOutput, validateExtras, withExtras, type ExtrasArgs } from './validate-extras.js';
+import { withReadableFonts } from '../compose/template-fonts.js';
 
 const inputSchema = z.object({
   template: z.record(z.string(), z.unknown()),
@@ -87,7 +88,7 @@ const outputSchema = z.object({
 
 type ValidateArgs = ExtrasArgs & { render?: boolean };
 type RenderSummary = { measured: number; seconds: number; unavailable?: string };
-type RenderConfig = Pick<McpConfig, 'mediaDir' | 'outputDir' | 'renderTimeoutMs'> & EffectConfig;
+type RenderConfig = Pick<McpConfig, 'mediaDir' | 'outputDir' | 'renderTimeoutMs' | 'fontsDir'> & EffectConfig;
 type ToolError = {
   isError: true;
   content: [{ type: 'text'; text: string }];
@@ -337,7 +338,7 @@ async function summary(
 }
 
 export async function handleValidate(args: ValidateArgs, config: RenderConfig, ctx?: ServerContext) {
-  const resolved = resolveDescriptor(args);
+  const resolved = await withReadableFonts(resolveDescriptor(args), config);
 
   if ('isError' in resolved) {
     return resolved;
@@ -371,7 +372,8 @@ export function registerValidateTemplate(server: McpServer, config: RenderConfig
         'small, lacks contrast, or sits over footage with no box/outline/shadow — see the `geometry` field — and ' +
         'flags motion pacing (monotonous eases, front-loaded beats, dead air, flat tempo) and stock motion ' +
         '(untuned or repeated effects, library sample animations) in `motionWarnings`; ' +
-        'section `assert` entries that fail are errors; `featureWarnings` lists what the local FFmpeg cannot ' +
+        'section `assert` entries that fail are errors, and so is a global.fonts file that is missing, outside the ' +
+        'fonts/media dirs, not a TTF/OTF/WOFF font, WOFF2 or over 8 MB; `featureWarnings` lists what the local FFmpeg cannot ' +
         'render (feature_unavailable, see get_capabilities). ' +
         'Pass `render: true` to also render the text-bearing sections and measure contrast from real pixels ' +
         '(seconds; settles text over images, grades and looks). `include` adds the descriptor a render starts ' +

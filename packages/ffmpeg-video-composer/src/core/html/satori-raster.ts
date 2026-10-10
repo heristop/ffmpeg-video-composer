@@ -47,24 +47,38 @@ function sharedEngines(loadWasm: HtmlWasmLoader): Promise<Engines> {
   return engines;
 }
 
+// A face's own bytes as the ArrayBuffer Satori takes: a view into a larger buffer (a decoded data URI, an
+// unpacked WOFF) is copied out rather than handing Satori the whole buffer.
+function arrayBufferOf(data: Uint8Array): ArrayBuffer {
+  if (data.byteOffset === 0 && data.byteLength === data.buffer.byteLength) return data.buffer as ArrayBuffer;
+
+  const copy = new Uint8Array(data.byteLength);
+
+  copy.set(data);
+
+  return copy.buffer;
+}
+
 function satoriFonts(fonts: RasterFont[], hb: HbSubset, instances: Map<string, Uint8Array>): SatoriFont[] {
   return fonts.flatMap((font) => {
-    if (!isVariableFont(font.data)) {
-      const weight = faceWeight(font.data) as SatoriFont['weight'];
+    const style = font.style ?? ('normal' as const);
 
-      return [{ name: font.family, data: font.data.buffer as ArrayBuffer, weight, style: 'normal' as const }];
+    if (!isVariableFont(font.data)) {
+      const weight = (font.weight ?? faceWeight(font.data)) as SatoriFont['weight'];
+
+      return [{ name: font.family, data: arrayBufferOf(font.data), weight, style }];
     }
 
-    return font.weights.map((weight) => {
+    return (font.weight === undefined ? font.weights : [font.weight]).map((weight) => {
       const key = `${font.file}@${weight}:${font.data.byteLength}`;
       const data = instances.get(key) ?? instanceFont(hb, font.data, weight);
       instances.set(key, data);
 
       return {
         name: font.family,
-        data: data.buffer as ArrayBuffer,
+        data: arrayBufferOf(data),
         weight: weight as SatoriFont['weight'],
-        style: 'normal' as const,
+        style,
       };
     });
   });

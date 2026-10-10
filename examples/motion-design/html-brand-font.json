@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "creativeDirection": "A brand price card set in the brand's own typefaces rather than a bundled one: a display face for the headline, a script for the sign-off. Review: every line is drawn in its declared face, none in the Rubik fallback."
+  },
+  "global": {
+    "orientation": "landscape",
+    "musicEnabled": false,
+    "fonts": [
+      { "family": "Brand Display", "src": "Righteous.ttf" },
+      { "family": "Brand Script", "src": "Lobster.ttf" }
+    ]
+  },
+  "sections": [
+    {
+      "name": "brand_card",
+      "type": "color_background",
+      "options": { "backgroundColor": "#14213d", "duration": 3 },
+      "inputs": [
+        {
+          "name": "offer",
+          "type": "html",
+          "html": "<div class=\"card\"><span class=\"kicker\">This week only</span><h2>Fresh bread, 1,20 €</h2><p class=\"sign\">Your neighbourhood bakery</p></div>",
+          "css": ".card { display: flex; flex-direction: column; gap: 8px; padding: 32px 40px; border-radius: 28px; background: #fca311; color: #14213d } .kicker { font: 24px \"Brand Display\"; text-transform: uppercase; letter-spacing: 2px } h2 { margin: 0; font: 64px \"Brand Display\" } .sign { margin: 0; font: 40px \"Brand Script\" }",
+          "width": 900,
+          "height": 260,
+          "options": { "position": "190:230", "motion": { "type": "rise", "duration": 0.6 } }
+        }
+      ]
+    }
+  ]
+}

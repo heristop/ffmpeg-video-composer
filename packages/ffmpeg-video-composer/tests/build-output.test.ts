@@ -330,14 +330,16 @@ describe('Build Output', () => {
     // The size a page actually loads before its first compile: browser.js plus every chunk it imports
     // statically (lazy `import()` chunks are fetched later). Guards the shared chunk from regrowing.
     // Typed fields (~18 KB) are eager: the browser validator resolves and coerces them synchronously.
-    it('browser entry eager load (browser.js + static chunks) should be under 625KB', async () => {
+    // So are template fonts (~7 KB: the global.fonts schema, its rules and advisories, font-family resolution);
+    // loading the font files (WOFF inflate, hashing) stays in a lazy chunk.
+    it('browser entry eager load (browser.js + static chunks) should be under 632KB', async () => {
       const files = await browserEagerFiles();
       const sizes = await Promise.all(
         [...files.keys()].map(async (file) => (await stat(path.join(DIST_DIR, file))).size)
       );
       const total = sizes.reduce((a, b) => a + b, 0);
 
-      expect(total).toBeLessThan(625 * 1024);
+      expect(total).toBeLessThan(632 * 1024);
       console.log(`  browser eager load: ${(total / 1024).toFixed(2)} KB across ${files.size} files`);
     });
 

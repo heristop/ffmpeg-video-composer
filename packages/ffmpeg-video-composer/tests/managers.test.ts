@@ -920,6 +920,12 @@ describe('MapManager', () => {
       expect(manager.getVideoInputIncrement()).toBe(0);
     });
 
+    // A muted project_video prepends a blank-audio input, so the recorded clip is input 1.
+    it('returns 1 for a muted project_video', () => {
+      const { manager } = build({ section: { name: 's', type: 'project_video', options: { muteSection: true } } });
+      expect(manager.getVideoInputIncrement()).toBe(1);
+    });
+
     it('returns 0 for a fresh video section (no reuse)', () => {
       const { manager } = build({ section: { name: 's', type: 'video' } });
       expect(manager.getVideoInputIncrement()).toBe(0);

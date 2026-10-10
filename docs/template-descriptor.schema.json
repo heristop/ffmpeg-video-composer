@@ -556,6 +556,43 @@
         "theme": {
           "$ref": "#/$defs/Theme"
         },
+        "fonts": {
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "family": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "pattern": "^[^,;{}\"'<>]+$",
+                "description": "The CSS family name HTML layers select it by (font-family: \"Ubuntu\"); it wins over a bundled family of the same name."
+              },
+              "src": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The font file: a path relative to the template's font roots (the CLI: the template's directory, then --fonts; the MCP server: --fonts-dir) or the assets dir, an absolute path inside one of them, or a base64 data: URI. TrueType (.ttf), OpenType (.otf) or WOFF (.woff), at most 8 MB; WOFF2 is refused (convert it to .ttf first)."
+              },
+              "weight": {
+                "description": "The weight this face is used for, 100..900 (default: the weight the file itself declares).",
+                "type": "integer",
+                "minimum": 100,
+                "maximum": 900,
+                "multipleOf": 100
+              },
+              "style": {
+                "description": "The style this face is used for (default normal).",
+                "type": "string",
+                "enum": ["normal", "italic"]
+              }
+            },
+            "required": ["family", "src"],
+            "additionalProperties": false,
+            "description": "A font face an HTML layer can select by family."
+          },
+          "description": "Font faces the template brings for its HTML layers ({ family, src, weight?, style? }, one entry per weight/style of a family). An HTML layer selects one with font-family in its css; it wins over a bundled family of the same name. Drawn text (drawtext, kinetic, captions) keeps the font registry. CSS @font-face is not supported: declare the face here."
+        },
         "beats": {
           "$ref": "#/$defs/Beats"
         },

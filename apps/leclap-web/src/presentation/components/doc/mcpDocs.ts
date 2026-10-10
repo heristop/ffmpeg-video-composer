@@ -194,6 +194,14 @@ export const mcpDoc: McpDoc = {
         'The containment root for local input files. The default is deliberately narrow: pointing it at your home directory would let any tool call read the whole of $HOME.',
     },
     {
+      label: 'Template fonts',
+      flag: '--fonts-dir',
+      env: 'LECLAP_MCP_FONTS_DIR',
+      fallback: 'Unset; the media dir only',
+      detail:
+        "A read-only directory a template's global.fonts files resolve in, before the media dir. Nothing outside the two is read, and fonts are never fetched.",
+    },
+    {
       label: 'Remotion opt-in',
       flag: '--allow-remotion',
       env: 'LECLAP_MCP_ALLOW_REMOTION',

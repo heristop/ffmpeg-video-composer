@@ -172,6 +172,7 @@ keep working — the stdio entry serves both eras from the same tool definitions
 | ----------------------------- | -------------------------- | ----------------------------------- | ------------------------------------------------- |
 | Output dir                    | `--output-dir`             | `LECLAP_MCP_OUTPUT_DIR`             | `~/.leclap/renders`                               |
 | Media allowlist / assets root | `--media-dir`              | `LECLAP_MCP_MEDIA_DIR`              | `~/.leclap/media`                                 |
+| Template fonts dir            | `--fonts-dir`              | `LECLAP_MCP_FONTS_DIR`              | Unset; `global.fonts` read from the media dir     |
 | Remotion opt-in               | `--allow-remotion`         | `LECLAP_MCP_ALLOW_REMOTION`         | Off                                               |
 | Stage/worker timeout          | `--render-timeout-ms`      | `LECLAP_MCP_RENDER_TIMEOUT_MS`      | `600000` ms (10 min)                              |
 | Trusted Remotion entry        | `--remotion-entry`         | `LECLAP_MCP_REMOTION_ENTRY`         | Unset                                             |
@@ -179,6 +180,10 @@ keep working — the stdio entry serves both eras from the same tool definitions
 | Operator effect catalog       | `--effect-catalog`         | `LECLAP_MCP_EFFECT_CATALOG`         | Unset; builtin contracts only                     |
 | Effect cache bytes            | `--effect-cache-max-bytes` | `LECLAP_MCP_EFFECT_CACHE_MAX_BYTES` | `536870912` (512 MiB); `0` disables caching       |
 | Catalog gap log               | `--catalog-gap-log`        | `LECLAP_MCP_CATALOG_GAP_LOG`        | `catalog-gaps.jsonl`, always under the output dir |
+
+The fonts dir is read-only: a template's `global.fonts[].src` resolves there first, then in the media
+dir, and nowhere else (realpath-checked, so a traversal or a symlink out is refused); fonts are never
+fetched. `validate_template` and `compose_video` both fail on a declared font they cannot read.
 
 Precedence is flag → environment → default. Paths resolve from the server's working directory;
 supplied `~` values are not expanded. A bare `--allow-remotion`, `=true` / `=1`, or environment

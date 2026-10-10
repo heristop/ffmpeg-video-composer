@@ -5,6 +5,7 @@ const validateTemplateMock = vi.fn();
 const getMotionWarningsMock = vi.fn((): unknown[] => []);
 const nodeGeometryWarningsMock = vi.fn();
 const renderedGeometryWarningsMock = vi.fn();
+const templateFontErrorsMock = vi.fn(async (..._args: unknown[]): Promise<unknown[]> => []);
 
 vi.mock('ffmpeg-video-composer', () => ({
   TemplateValidator: vi.fn().mockImplementation(function TemplateValidatorMock() {
@@ -16,6 +17,7 @@ vi.mock('ffmpeg-video-composer', () => ({
   geometryApproxNote: (w: { approx: boolean }) => (w.approx ? ' (approx: font unavailable, width estimated)' : ''),
   nodeGeometryWarnings: (...args: unknown[]) => nodeGeometryWarningsMock(...args),
   renderedGeometryWarnings: (...args: unknown[]) => renderedGeometryWarningsMock(...args),
+  templateFontErrors: (...args: unknown[]) => templateFontErrorsMock(...args),
 }));
 
 vi.mock('node:fs/promises', () => ({
@@ -224,6 +226,53 @@ describe('validate command exit code with geometry warnings', () => {
     await validate.run?.({ args: { template: 'template.json', json: true } } as never);
 
     expect(nodeGeometryWarningsMock).toHaveBeenCalledWith({ sections: [] }, expect.anything());
+  });
+});
+
+describe('template fonts', () => {
+  let writeSpy: ReturnType<typeof vi.spyOn>;
+  let previousExitCode: typeof process.exitCode;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    previousExitCode = process.exitCode;
+    process.exitCode = undefined;
+    writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+  });
+
+  afterEach(() => {
+    process.exitCode = previousExitCode;
+    writeSpy.mockRestore();
+  });
+
+  it('opens global.fonts from the template dir, then --fonts, then ./assets, and fails on a file it cannot use', async () => {
+    const finding = {
+      path: 'global.fonts[0].src',
+      code: 'font_not_found',
+      message: 'global.fonts[0] (Ubuntu): "Ubuntu.ttf" was not found',
+      kind: 'judgement',
+    };
+    validateTemplateMock.mockReturnValue({ success: true, data: { sections: [] } });
+    nodeGeometryWarningsMock.mockResolvedValue([]);
+    templateFontErrorsMock.mockResolvedValueOnce([finding]);
+
+    const { validate } = await import('../src/commands/validate');
+    await validate.run?.({
+      args: { template: 'tpl/promo.json', json: true },
+      rawArgs: ['tpl/promo.json', '--fonts', 'brand'],
+    } as never);
+
+    const [, options] = templateFontErrorsMock.mock.calls[0] as unknown as [
+      unknown,
+      { fontDirs: string[]; assetsDir: string },
+    ];
+    const out = JSON.parse(writeSpy.mock.calls.map((c: unknown[]) => String(c[0])).join(''));
+
+    expect(options.fontDirs).toEqual([`${process.cwd()}/tpl`, `${process.cwd()}/brand`]);
+    expect(options.assetsDir).toBe(`${process.cwd()}/assets`);
+    expect(out.success).toBe(false);
+    expect(out.errors).toEqual([finding]);
+    expect(process.exitCode).toBe(1);
   });
 });
 

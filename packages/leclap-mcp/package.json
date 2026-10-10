@@ -1,6 +1,6 @@
 {
   "name": "@leclap/mcp",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "MCP server exposing ffmpeg-video-composer as agent-callable video composition tools",
   "mcpName": "dev.leclap/video",
   "keywords": [
@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.0.0",
-    "ffmpeg-video-composer": "^3.0.0",
+    "ffmpeg-video-composer": "^3.0.1",
     "reflect-metadata": "^0.2.2",
     "zod": "^4.4.3"
   },

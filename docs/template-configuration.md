@@ -72,6 +72,7 @@ Project-wide defaults and the options a builder/editor exposes to end users. `gl
 | `musicEnabled`          | `boolean`                               | Whether background music is enabled (default `true`).                                                                                          |
 | `music`                 | `{ name: string, url?: string }`        | Default background track. Omit `url` to use an app-managed track.                                                                              |
 | `animations`            | `GlobalAnimation[]`                     | Whole-video overlays, composited over the whole video (see [Whole-video animations](#whole-video-animations)).                                 |
+| `fonts`                 | `TemplateFont[]`                        | Font faces the template brings for its HTML layers, `{ family, src, weight?, style? }` (see [Template fonts](#template-fonts-globalfonts)).    |
 | `overlays`              | `GlobalTextOverlay[]`                   | Whole-video TEXT overlays — a brand watermark authored once, drawn on every section (see [Global decorations](#global-decorations)).           |
 | `look`                  | look preset                             | Colour-grade preset applied across every section (whole-video look).                                                                           |
 | `grade`                 | `Grade`                                 | Fine-grained colour grade applied across every section.                                                                                        |
@@ -969,11 +970,35 @@ An `inputs[]` entry of `type: "html"` lays out a card, a badge, a price tag or a
 - **Box** — `width` and `height` are required and set the layer's box; the PNG is drawn at 2× and scaled back into the box unless you set `options.scale`. A side over 1920 fails validation with `html_too_large`. An html input takes no `url`.
 - **Copy** — `{{ name }}` placeholders take typed [`global.fields`](#typed-fields-globalfields), variables and form values. Every value is HTML-escaped, so copy can never add markup. A placeholder with no value stays as written and is reported as `html_missing_field`.
 - **Theme** — `$color.*` (with `@alpha`, as `rgba()`) and `$font.*` tokens work in `css` and `html`, and the [theme](#themes) checks them like any other token.
-- **Fonts** — `font-family` takes the [registry](#fonts) families and the generic families (`sans-serif` and `system-ui` use the theme body font, `serif` Playfair Display, `monospace` Roboto Mono, `cursive` Pacifico). Any other family falls back to the theme's body font and is reported as `html_font_unknown`. Variable fonts (Rubik, Oswald, Playfair, Roboto Mono) are pinned to the static weights the layer uses.
+- **Fonts** — `font-family` takes the families the template declares in [`global.fonts`](#template-fonts-globalfonts), the [registry](#fonts) families and the generic families (`sans-serif` and `system-ui` use the theme body font, `serif` Playfair Display, `monospace` Roboto Mono, `cursive` Pacifico). A declared family wins over a registry family of the same name. Any other family falls back to the theme's body font and is reported as `html_font_unknown`. Variable fonts (Rubik, Oswald, Playfair, Roboto Mono, or a declared variable face) are pinned to the static weights the layer uses. CSS `@font-face` is not supported: declare the face in `global.fonts`.
 - **Images** — `<img src>` and CSS `url()` take a template asset (a relative path or `/assets/…`) or a PNG/JPEG data URI. Remote URLs and absolute paths are refused.
 - **Markup** — the allowed tags keep `class` and `style` (`<img>` also keeps `src`, `alt`, `width` and `height`). `<script>`, `<iframe>`, `<form>`, `<svg>` and similar are dropped with their content, other unknown tags are unwrapped and keep their text, and event handlers and `href` are removed. Each removal is reported as `html_unsupported_markup`.
 - **CSS** — a flexbox subset. Selectors are tag, `.class`, `tag.class` and descendants, applied by specificity; `#id`, pseudo-classes, `>` `+` `~` and `@` rules are not supported. Properties cover flex layout, `position: relative | absolute`, box sizes, margins, padding and gaps, borders and radii, text (font, `text-align`, `text-transform`, `letter-spacing`, `line-height`, `text-shadow`, `line-clamp`, `white-space`…), backgrounds and gradients, `box-shadow`, `opacity`, `transform`, `filter`, `clip-path`, masks and custom properties. Grid, floats, `z-index`, animations, transitions and `calc()` are not. Each dropped declaration is reported as `html_unsupported_css`. `get_motion_catalog` (MCP) lists the full subset under `html`, with four layout recipes.
 - **Overflow** — validation lays the layer out and reports `html_overflow` when the content is larger than the box.
+
+#### Template fonts (`global.fonts`)
+
+A template can bring its own font files, for a brand typeface the registry does not carry. Each entry is one face; a family with a regular and a bold face takes two entries:
+
+```jsonc
+"global": {
+  "fonts": [
+    { "family": "Ubuntu", "src": "fonts/Ubuntu-Regular.ttf", "weight": 400 },
+    { "family": "Ubuntu", "src": "fonts/Ubuntu-Bold.ttf", "weight": 700 },
+    { "family": "Ubuntu", "src": "fonts/Ubuntu-Italic.ttf", "weight": 400, "style": "italic" },
+  ],
+},
+// …then, in an HTML layer: "css": ".total { font: 700 48px Ubuntu }"
+```
+
+- **`family`** — the name `font-family` selects it by, matched case-insensitively. It wins over a bundled family of the same name.
+- **`src`** — a TrueType (`.ttf`), OpenType (`.otf`) or WOFF (`.woff`) file, or a base64 `data:font/ttf;base64,…` URI. At most 8 MB. **WOFF2 is refused** (`font_woff2_unsupported`): Satori and HarfBuzz read neither WOFF2 nor its Brotli-packed tables, so convert it once, e.g. `fonttools ttLib.woff2 decompress Brand.woff2` (`pip install fonttools brotli`) or `woff2_decompress Brand.woff2`. A URL is refused: fonts are never fetched.
+- **Where a path resolves** — a relative `src` is looked up in each font dir in turn, then in the assets dir; an absolute one must lie inside one of them, after symlinks are resolved. Nothing else is read, not even the temp and build dirs other media may be staged from. The CLI's font dirs are the template file's own directory, then each `--fonts <dir>`; the MCP server's is `--fonts-dir` (`LECLAP_MCP_FONTS_DIR`), before its media dir; a host passes `ProjectConfig.fontDirs`. The browser and the phone take `data:` URIs.
+- **`weight` / `style`** — the weight (`100`–`900`) and style (`normal` / `italic`) this face is used for. Without a weight a static face uses the one its file declares, and a variable face is pinned to the weights the layer asks for.
+- **Scope** — HTML layers only. Drawn text (`drawtext`, kinetic, captions, title cards) keeps the [registry](#fonts).
+- **Determinism** — a layer drawn with a template font is named by the hash of the font's bytes, so the same file gives the same frames, and an edited file under the same name is drawn again.
+
+Validation reports a `src` that is WOFF2 (`font_woff2_unsupported`) or names no font format (`font_format`), and warns about a declared family no HTML layer selects (`font_unused`). `leclap validate` and the MCP `validate_template` also open each file the way a render would, and fail on one that is missing or outside the font dirs (`font_not_found`), damaged (`font_unreadable`), not a font (`font_format`) or over the limit (`font_too_large`). See [`html-brand-font.json`](../examples/motion-design/html-brand-font.json) (render it with `--fonts packages/leclap-creative-kit/src/library/fonts`).
 
 A layer is a still: animate it with `options.motion`. `rise` and `slide-*` only move the layer, so set `start` to the same time as the motion `delay` when the layer should not be visible before it moves in. Inline text and inline elements in one paragraph are laid out word by word on flexbox, so the browser's exact line breaks are not guaranteed.
 

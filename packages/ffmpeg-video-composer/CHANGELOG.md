@@ -7,8 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.1] - 2026-10-10
+
+### Added
+
+- Template fonts for HTML layers. `global.fonts` declares the faces a template brings,
+  `{ family, src, weight?, style? }`, one entry per weight or style; an HTML layer selects one with
+  `font-family` in its `css`, and a declared family wins over a bundled family of the same name. `src` is a
+  TrueType (`.ttf`), OpenType (`.otf`) or WOFF (`.woff`, unpacked to TrueType by the engine's own pure-JS
+  inflate, no new dependency) file, or a base64
+  `data:` URI, at most 8 MB. WOFF2 is refused with the command that converts it (Satori and HarfBuzz read
+  neither WOFF2 nor its Brotli tables). Drawn text (drawtext, kinetic, captions) keeps the font registry.
+- `ProjectConfig.fontDirs` (Node): read-only directories a `src` path resolves in, before the assets dir. A
+  relative `src` is looked up in each in turn, an absolute one must lie inside one of them, and symlinks are
+  resolved before the check. Template fonts are never fetched over the network, and the temp and build dirs
+  other staged media may come from are not searched.
+- A layer drawn with a template font is named by the hash of the font's bytes: the same font file gives the
+  same frames, and a changed file under the same name is drawn again rather than reused.
+- Validation: `font_woff2_unsupported` and `font_format` for a `src` that is WOFF2 or no font, `font_too_large`
+  for an oversized data URI, and the `font_unused` advisory for a declared family no HTML layer selects.
+  `templateFontErrors(descriptor, { assetsDir, fontDirs })` (Node entry) opens the files the way a render
+  reads them and reports `font_not_found`, `font_unreadable`, `font_format`, `font_woff2_unsupported` and
+  `font_too_large`. `loadTemplateFonts` and `templateFontSpecs` are exported from the Node and browser
+  entries; `renderHtmlLayerPreview` takes the loaded faces as `templateFonts`.
+
+### Changed
+
+- CSS `@font-face` is still dropped, and its `html_unsupported_css` finding now points at `global.fonts`.
+  `html_font_unknown` says the family is neither declared in `global.fonts` nor in the registry.
+
 ### Fixed
 
+- A muted `project_video` section (`muteSection: true`) with layers (HTML, image or animation inputs, `@video`
+  maps, chroma key) no longer fails with "Stream specifier ':v' … matches no streams". The muted section
+  puts its silent audio input first, so the recorded clip is input 1, but the overlay graph still read the
+  video from input 0 and numbered the layers from 1.
 - The phone's HTML layer page (`dist/html-rasteriser.html`) loads on older WebViews again: it called
   `Promise.withResolvers` (Chrome 119, Safari 17.4), so every HTML layer failed on an Android System WebView
   before 119 or iOS before 17.4. The page now supports Android System WebView 87+ and iOS 16.4+: its build

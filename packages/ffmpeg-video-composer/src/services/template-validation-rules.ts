@@ -14,6 +14,7 @@ import { validateTranscribeSources } from './transcribe-validation';
 import { validateTakeEdits } from './take-validation';
 import { validateFootage } from './footage-validation';
 import { validateHtmlBoxes } from './html-validation';
+import { validateTemplateFonts } from './template-fonts-validation';
 
 export type { ValidationError, ValidationFindingKind } from './validation/types';
 
@@ -279,5 +280,6 @@ export function validateDescriptorRules(template: TemplateDescriptor): Validatio
     ...validateTakeEdits(template),
     ...validateFootage(template),
     ...validateHtmlBoxes(template),
+    ...validateTemplateFonts(template),
   ];
 }

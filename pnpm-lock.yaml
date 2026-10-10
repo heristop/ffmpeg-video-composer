@@ -736,7 +736,7 @@ importers:
         specifier: ^0.2.2
         version: 0.2.2
       ffmpeg-video-composer:
-        specifier: ^3.0.0
+        specifier: ^3.0.1
         version: link:../ffmpeg-video-composer
       picocolors:
         specifier: ^1.1.1
@@ -788,7 +788,7 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       ffmpeg-video-composer:
-        specifier: ^3.0.0
+        specifier: ^3.0.1
         version: link:../ffmpeg-video-composer
       reflect-metadata:
         specifier: ^0.2.2

@@ -28,6 +28,22 @@ export interface RenderFlags {
   qc?: boolean;
   /** `--cache <dir>`: per-section render cache (resolved vs cwd). */
   cache?: string;
+  /** Repeatable `--fonts <dir>`: directories `global.fonts[].src` may resolve in, after the template's own. */
+  fonts?: string[];
+}
+
+/**
+ * Where a template's `global.fonts[].src` paths resolve (ProjectConfig.fontDirs): the template's own
+ * directory first, so a src is relative to the template file, then each `--fonts` dir (resolved vs cwd).
+ * The engine reads nothing outside these and the assets dir.
+ */
+export function fontDirsFor(cwd: string, templatePath: string | undefined, fonts: readonly string[] = []): string[] {
+  const dirs = [
+    ...(templatePath ? [path.dirname(path.resolve(cwd, templatePath))] : []),
+    ...fonts.map((dir) => path.resolve(cwd, dir)),
+  ];
+
+  return [...new Set(dirs)];
 }
 
 // Every value of a repeatable flag, read from raw argv in order. citty parses a repeated string flag
@@ -78,7 +94,11 @@ export function parseKeyValues(pairs: string[] | undefined, label: string): Reco
 
 // Assemble the ProjectConfig for a render. buildDir/assetsDir default to cwd-relative dirs; the rest of
 // the config is only set when the matching flag was passed, so unset flags leave engine defaults intact.
-export function buildProjectConfig(cwd: string, flags: RenderFlags): ProjectConfig & { buildDir: string } {
+export function buildProjectConfig(
+  cwd: string,
+  flags: RenderFlags,
+  templatePath?: string
+): ProjectConfig & { buildDir: string } {
   const buildDir = flags.build ? path.resolve(cwd, flags.build) : path.resolve(cwd, 'build');
   const assetsDir = flags.assets ? path.resolve(cwd, flags.assets) : path.resolve(cwd, 'assets');
 
@@ -87,6 +107,11 @@ export function buildProjectConfig(cwd: string, flags: RenderFlags): ProjectConf
     assetsDir,
     fields: { ...parseKeyValues(flags.field, 'field'), ...parseKeyValues(flags.set, 'set') },
   };
+  const fontDirs = fontDirsFor(cwd, templatePath, flags.fonts);
+
+  if (fontDirs.length > 0) {
+    config.fontDirs = fontDirs;
+  }
 
   const videos = parseKeyValues(flags.video, 'video');
 

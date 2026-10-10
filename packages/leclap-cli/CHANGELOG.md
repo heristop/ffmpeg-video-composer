@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-10
+
+### Added
+
+- `global.fonts` support: `leclap render` and `leclap validate` resolve a template font's `src` against
+  the template's own directory first, then each `--fonts <dir>` (repeatable), then the assets dir, and read
+  nothing outside them. `leclap validate` opens the declared files and fails on one that is missing,
+  outside those dirs, not a TTF/OTF/WOFF font, WOFF2 or over 8 MB.
+
+### Changed
+
+- Requires `ffmpeg-video-composer` ^3.0.1.
+
 ## [0.4.0] - 2026-10-09
 
 ### Added

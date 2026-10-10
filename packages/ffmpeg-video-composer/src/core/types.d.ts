@@ -95,6 +95,12 @@ export type CompileReporter = {
 export type ProjectConfig = {
   buildDir?: string;
   assetsDir?: string;
+  /**
+   * Node only. Read-only directories a `global.fonts[].src` path may resolve in, before the assets dir: a
+   * relative src is looked up in each in order, an absolute one must lie inside one of them (or the assets
+   * dir). The CLI passes the template's own directory and `--fonts`; the MCP server its `--fonts-dir`.
+   */
+  fontDirs?: string[];
   music?: MusicConfig;
   /** Values for form fields and declared `global.fields` (coerced to each field's type). */
   fields?: Record<string, string>;

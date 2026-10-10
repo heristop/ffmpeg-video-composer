@@ -123,10 +123,12 @@ const GUIDE = [
   'HTML layers: an inputs[] entry { name, type: "html", html, css?, width, height, options } lays out a card, ' +
     'badge, price tag or stat row with HTML + CSS (flexbox subset: tag/.class/descendant selectors, Satori) and ' +
     'composites it like an image: options.position/scale/motion/start/duration as usual. {{ field }} values are ' +
-    'HTML-escaped; $color.*/$font.* tokens work inside css; fonts come from the registry, images from template ' +
+    'HTML-escaped; $color.*/$font.* tokens work inside css; fonts come from the registry or from global.fonts ' +
+    '[{ family, src, weight?, style? }] (a brand .ttf/.otf/.woff in the fonts or media dir, or a data: URI; WOFF2 is ' +
+    'refused, CSS @font-face is not supported) selected by font-family; images from template ' +
     'assets (no remote URLs, no scripts). Node, the browser and the phone render them, byte for byte alike; a ' +
     'host with no rasteriser registered reports html_unavailable. ' +
-    'validate_template warns html_unsupported_css/markup, html_font_unknown, html_missing_field and (measured) ' +
+    'validate_template warns html_unsupported_css/markup, html_font_unknown, font_unused, html_missing_field and (measured) ' +
     'html_overflow; get_motion_catalog html lists the subset and recipes; render_frames previews the layer.',
   'Note: any non-"cut" transition triggers a full-timeline re-encode (costly on WASM/on-device); ' +
     'cut-only templates use a fast stream-copy concat.',

@@ -10,6 +10,9 @@ export interface WireFont {
   family: string;
   file: string;
   weights: number[];
+  /** A template face's declared weight and style (RasterFont). */
+  weight?: number;
+  style?: 'normal' | 'italic';
   /** Identity of the bytes within a session. */
   key: string;
   /** base64, on the first request of the session that uses this font only. */
@@ -44,7 +47,14 @@ export function createRasterSession(): RasterSession {
     message(request) {
       const fonts = request.fonts.map((font): WireFont => {
         const key = `${font.file}:${font.data.byteLength}`;
-        const wire = { family: font.family, file: font.file, weights: font.weights, key };
+        const wire: WireFont = {
+          family: font.family,
+          file: font.file,
+          weights: font.weights,
+          ...(font.weight !== undefined && { weight: font.weight }),
+          ...(font.style !== undefined && { style: font.style }),
+          key,
+        };
 
         if (sent.has(key)) return wire;
 
@@ -83,6 +93,13 @@ export function receiveFonts(
     const data = store.get(font.key) ?? base64ToBytes(font.data ?? '');
     store.set(font.key, data);
 
-    return { family: font.family, file: font.file, weights: font.weights, data };
+    return {
+      family: font.family,
+      file: font.file,
+      weights: font.weights,
+      ...(font.weight !== undefined && { weight: font.weight }),
+      ...(font.style !== undefined && { style: font.style }),
+      data,
+    };
   });
 }
