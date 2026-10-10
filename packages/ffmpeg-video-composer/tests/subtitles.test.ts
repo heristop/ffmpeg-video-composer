@@ -332,46 +332,34 @@ describe('subtitle lowering', () => {
     for (const box of boxes) expect(Number(box.w)).toBeGreaterThan(0);
   });
 
-  it('boxed: the plate corners are anti-aliased, edge pixels drawn at their coverage of the arc', () => {
-    const boxes = values(subtitlesToFilters({ ...track, style: 'boxed' }, ctx()), 'drawbox').map((box) => {
-      const [, alpha] = String(box.color).split('@');
-
-      return { x: Number(box.x), y: Number(box.y), w: Number(box.w), h: Number(box.h), alpha: Number(alpha) };
-    });
-    const plate = boxes[0].alpha;
+  it('boxed: the plate corners follow the arc row by row, not in a few coarse steps', () => {
+    const boxes = values(subtitlesToFilters({ ...track, style: 'boxed' }, ctx()), 'drawbox').map((box) => ({
+      x: Number(box.x),
+      y: Number(box.y),
+      w: Number(box.w),
+      h: Number(box.h),
+    }));
     const left = Math.min(...boxes.map((box) => box.x));
-    const right = Math.max(...boxes.map((box) => box.x + box.w));
     const top = Math.min(...boxes.map((box) => box.y));
     const bottom = Math.max(...boxes.map((box) => box.y + box.h));
     const radius = boxes[0].y - top;
-    // The exact area of row `fromEdge` of a rounded rectangle, by fine numeric integration.
-    const exactRow = (fromEdge: number): number => {
-      const samples = 256;
-      let cut = 0;
-
-      for (let k = 0; k < samples; k++) {
-        const y = fromEdge + (k + 0.5) / samples;
-        const dy = Math.max(0, radius - y);
-
-        cut += radius - Math.sqrt(radius * radius - dy * dy);
-      }
-
-      return right - left - (2 * cut) / samples;
-    };
 
     expect(radius).toBeGreaterThan(3);
-    expect(boxes.some((box) => box.alpha > 0 && box.alpha < plate)).toBe(true);
     for (let row = top; row < bottom; row++) {
-      const coverage = new Map<number, number>();
+      const covering = boxes.filter((box) => row >= box.y && row < box.y + box.h);
+      const fromEdge = Math.min(row - top, bottom - 1 - row);
+      const dy = radius - fromEdge - 0.5;
+      const inset = fromEdge >= radius ? 0 : Math.round(radius - Math.sqrt(radius * radius - dy * dy));
 
-      for (const box of boxes.filter((b) => row >= b.y && row < b.y + b.h)) {
-        for (let x = box.x; x < box.x + box.w; x++) coverage.set(x, (coverage.get(x) ?? 0) + box.alpha / plate);
-      }
-      const drawn = [...coverage.values()].reduce((sum, c) => sum + c, 0);
-
-      for (const c of coverage.values()) expect(c, `row ${row}`).toBeLessThanOrEqual(1 + 1e-9);
-      expect(Math.abs(drawn - exactRow(Math.min(row - top, bottom - 1 - row))), `row ${row}`).toBeLessThan(0.3);
+      expect(covering, `row ${row}`).toHaveLength(1);
+      expect(covering[0].x - left, `row ${row}`).toBe(inset);
     }
+  });
+
+  it('boxed: a plate costs a few dozen drawboxes, not hundreds (each is evaluated on every frame)', () => {
+    const plates = values(subtitlesToFilters({ ...track, style: 'boxed' }, ctx()), 'drawbox');
+
+    expect(plates.length).toBeLessThanOrEqual(25);
   });
 
   it('resolves theme colours against global.theme', () => {
