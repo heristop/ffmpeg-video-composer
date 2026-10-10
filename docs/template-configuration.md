@@ -554,6 +554,8 @@ Everything lowers to `drawtext` / `drawbox` gated by `enable` windows. Errors: `
 | `language` | BCP-47 (`en`, `fr-FR`). Omitted: detected, then recorded in the pin.                              |
 | `model`    | Whisper model on Node: `tiny`, `base` (default), `small`.                                         |
 
+Transcription reads the clip file, not the mix, so it works on a muted section too. A `video` section is silent unless `options.muteSection` is `false`: set it when the captioned voice should be heard (a `project_video` keeps its sound by default).
+
 Pinning replaces `transcribe` with `words` and records how they were made in `meta.resolved.transcripts[<section>]`: `{ from, engine, model, language, digest, edit, at, confidence }` (`digest` is the SHA-256 of the source clip; `edit` fingerprints the source section's `clip`, `keep`, `trimSilence`, `speedRamp`, `freeze`, `speed` and `duration`, the edits the words were mapped through; older pins without it are not checked). A resolved template never holds both: `transcribe` next to `words`, `cues` or `srt` is a validation error.
 
 ```jsonc

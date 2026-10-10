@@ -71,7 +71,8 @@
       "type": "video",
       "options": {
         "videoUrl": "videos/talk.mp4",
-        "duration": 9.7
+        "duration": 9.7,
+        "muteSection": false
       },
       "subtitles": {
         "style": "boxed",

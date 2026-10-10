@@ -32,7 +32,7 @@
     {
       "name": "talk",
       "type": "video",
-      "options": { "videoUrl": "videos/talk.mp4", "duration": 9.7 },
+      "options": { "videoUrl": "videos/talk.mp4", "duration": 9.7, "muteSection": false },
       "subtitles": {
         "transcribe": { "from": "self", "language": "en" },
         "style": "boxed",
