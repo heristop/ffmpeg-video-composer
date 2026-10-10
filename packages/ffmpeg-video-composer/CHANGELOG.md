@@ -38,6 +38,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Files read on the phone (React Native) keep their last bytes: the Expo filesystem adapter decoded base64 with
+  its own helper, which turned the final one or two bytes of any file whose size is not a multiple of 3 into
+  `0xFF`. An image inside an HTML layer (a JPEG losing its end marker) drew blank on the phone, and fonts or
+  other staged files could be cut the same way. The adapter now uses the engine's shared base64 helpers.
 - A muted `project_video` section (`muteSection: true`) with layers (HTML, image or animation inputs, `@video`
   maps, chroma key) no longer fails with "Stream specifier ':v' … matches no streams". The muted section
   puts its silent audio input first, so the recorded clip is input 1, but the overlay graph still read the
