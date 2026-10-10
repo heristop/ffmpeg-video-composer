@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The phone's HTML layer page (`dist/html-rasteriser.html`) loads on older WebViews again: it called
+  `Promise.withResolvers` (Chrome 119, Safari 17.4), so every HTML layer failed on an Android System WebView
+  before 119 or iOS before 17.4. The page now supports Android System WebView 87+ and iOS 16.4+: its build
+  targets them and it polyfills `Array.prototype.at` for Satori where missing. Rendered bytes are unchanged.
+
 ## [3.0.0] - 2026-10-09
 
 A motion, effects, footage, audio and agent-tooling release: HTML layers, composed sound effects, typed

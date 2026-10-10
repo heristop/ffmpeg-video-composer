@@ -8,13 +8,14 @@
 // inlines its own copy of this file, and that copy must see the bytes the rasteriser hands over too.
 import createHarfBuzz from 'harfbuzzjs/hb.js';
 import hbjs from 'harfbuzzjs/hbjs.js';
+import { deferred, type Deferred } from '../../core/deferred';
 import type { HtmlWasmLoader } from '../../core/html/html-engine';
 
-type Slot = PromiseWithResolvers<BufferSource>;
+type Slot = Deferred<BufferSource>;
 
 const SLOT = Symbol.for('ffmpeg-video-composer.harfbuzz-shaper');
 const scope = globalThis as typeof globalThis & { [SLOT]?: Slot };
-const slot = (scope[SLOT] ??= Promise.withResolvers<BufferSource>());
+const slot = (scope[SLOT] ??= deferred<BufferSource>());
 
 /** Hands HarfBuzz's shaping build to Satori; only the first call counts. */
 export function provideHarfbuzzShaper(wasm: BufferSource): void {

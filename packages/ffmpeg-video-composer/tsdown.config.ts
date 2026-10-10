@@ -244,7 +244,9 @@ export default defineConfig([
     sourcemap: false,
     minify: true,
     outDir: 'dist',
-    target: 'es2020',
+    // The oldest WebViews the app supports (docs/on-device-compilation.md#html-layers): syntax is lowered for
+    // them, and src/html-raster-webview/compat.ts adds the built-ins its dependencies call that they lack.
+    target: ['chrome87', 'safari16.4'],
     platform: 'browser',
     inputOptions: {
       // Satori's harfbuzzjs resolves to the shared shim (harfbuzzShaper, as in the browser build), which the

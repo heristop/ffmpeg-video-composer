@@ -28,17 +28,51 @@ const CARD = {
   height: 240,
 };
 
+// The oldest engines the page supports (docs/on-device-compilation.md#html-layers): Android System WebView
+// 87 (Satori needs its Intl.Segmenter) and iOS 16.4's WKWebView (the app's deployment target). Built-ins newer
+// than either, deleted from the page's context to stand in for such a WebView; the page polyfills what its
+// dependencies need, so it must still draw the golden bytes without them.
+const NEWER_THAN_BASELINE = [
+  'Promise.withResolvers', // Chrome 119, Safari 17.4
+  'Promise.try', // Chrome 128, Safari 18.2
+  'Array.prototype.at', // Chrome 92
+  'String.prototype.at', // Chrome 92
+  'Array.prototype.findLast', // Chrome 97
+  'Array.prototype.findLastIndex', // Chrome 97
+  'Array.prototype.toSorted', // Chrome 110
+  'Array.prototype.toReversed', // Chrome 110
+  'Array.prototype.toSpliced', // Chrome 110
+  'Array.prototype.with', // Chrome 110
+  'Array.fromAsync', // Chrome 121, Safari 16.4
+  'Object.hasOwn', // Chrome 93
+  'Object.groupBy', // Chrome 117, Safari 17.4
+  'Map.groupBy', // Chrome 117, Safari 17.4
+  'structuredClone', // Chrome 98
+  'String.prototype.isWellFormed', // Chrome 111, Safari 16.4
+  'String.prototype.toWellFormed', // Chrome 111, Safari 16.4
+];
+
+// Calls to those built-ins in the bundled script, apart from `.at(`: Satori calls `Array.prototype.at`, which
+// the page polyfills, and postcss's containers have an `at()` method of their own.
+const NEWER_THAN_BASELINE_CALLS = NEWER_THAN_BASELINE.filter((name) => !name.endsWith('.at')).map((name) => ({
+  name,
+  pattern: name.includes('.prototype.')
+    ? new RegExp(String.raw`\.${name.split('.').at(-1)}\(`)
+    : new RegExp(String.raw`(?<![\w$.])${name.replaceAll('.', String.raw`\.`)}\b`),
+}));
+
 function scripts(html: string): string[] {
   return [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
 }
 
 interface FakeWebView {
+  evaluate(code: string): unknown;
   dispatch(text: string): void;
   next(test: (reply: RasterPageReply) => boolean): Promise<RasterPageReply>;
 }
 
 // The page in a bare context: a window with addEventListener, a document, and the bridge it posts to.
-function loadPage(html: string): FakeWebView {
+function loadPage(html: string, { strip = [] as string[] } = {}): FakeWebView {
   const replies: RasterPageReply[] = [];
   const listeners: ((event: { data: string }) => void)[] = [];
   const target = {
@@ -57,9 +91,16 @@ function loadPage(html: string): FakeWebView {
   });
   Object.assign(context, { window: context, self: context, addEventListener: target.addEventListener });
 
+  for (const name of strip) {
+    const owner = name.split('.').slice(0, -1).join('.') || 'globalThis';
+
+    vm.runInContext(`delete ${owner}.${name.split('.').at(-1)}`, context);
+  }
+
   for (const code of scripts(html)) vm.runInContext(code, context);
 
   return {
+    evaluate: (code) => vm.runInContext(code, context),
     dispatch: (text) => {
       for (const listener of listeners) listener({ data: text });
     },
@@ -89,33 +130,57 @@ describe('HTML layer WebView page (dist)', () => {
     expect(html).toContain('__LECLAP_RASTER_WASM__');
   });
 
-  it('announces its renderer and draws the Node golden bytes from the app messages', async () => {
-    const page = loadPage(fs.readFileSync(PAGE, 'utf8'));
+  it('calls no built-in newer than the oldest supported WebView', () => {
+    const [, code] = scripts(fs.readFileSync(PAGE, 'utf8'));
+    const found = NEWER_THAN_BASELINE_CALLS.filter(({ pattern }) => pattern.test(code)).map(({ name }) => name);
 
-    await expect(page.next((reply) => reply.type !== 'rendered')).resolves.toEqual({
-      type: 'ready',
-      version: HTML_RENDERER_VERSION,
-    });
+    expect(found).toEqual([]);
+  });
 
-    const layer = prepareHtmlLayer(CARD, 'Rubik');
-    const fonts = layer.faces.map((face) => ({
-      ...face,
-      data: new Uint8Array(fs.readFileSync(path.join(fontsDir, face.file))),
-    }));
-    const session = createRasterSession();
-    const request = {
-      element: layer.element,
-      width: CARD.width,
-      height: CARD.height,
-      density: HTML_LAYER_DENSITY,
-      fonts,
-    };
+  it('polyfills what its dependencies call on the oldest supported WebView, invisibly', () => {
+    const page = loadPage(fs.readFileSync(PAGE, 'utf8'), { strip: NEWER_THAN_BASELINE });
 
-    for (const message of [session.message(request), session.message(request)]) {
-      page.dispatch(JSON.stringify(message));
-      const raster = readRasterReply(await page.next((reply) => 'id' in reply && reply.id === message.id));
+    // Satori's gradient stops (`stops.at(-1)`), which the golden card doesn't reach.
+    expect(page.evaluate('JSON.stringify([-1, 0, 1.7, 3, -4].map((index) => [1, 2, 3].at(index)))')).toBe(
+      '[3,1,2,null,null]'
+    );
+    expect(page.evaluate("Object.getOwnPropertyDescriptor(Array.prototype, 'at').enumerable")).toBe(false);
+  });
 
-      expect(sha256Hex(raster.png)).toBe(CARD_GOLDEN);
-    }
-  }, 30_000);
+  it.each([
+    ['a current WebView', []],
+    ['the oldest supported WebView', NEWER_THAN_BASELINE],
+  ])(
+    'announces its renderer and draws the Node golden bytes from the app messages in %s',
+    async (_, strip) => {
+      const page = loadPage(fs.readFileSync(PAGE, 'utf8'), { strip });
+
+      await expect(page.next((reply) => reply.type !== 'rendered')).resolves.toEqual({
+        type: 'ready',
+        version: HTML_RENDERER_VERSION,
+      });
+
+      const layer = prepareHtmlLayer(CARD, 'Rubik');
+      const fonts = layer.faces.map((face) => ({
+        ...face,
+        data: new Uint8Array(fs.readFileSync(path.join(fontsDir, face.file))),
+      }));
+      const session = createRasterSession();
+      const request = {
+        element: layer.element,
+        width: CARD.width,
+        height: CARD.height,
+        density: HTML_LAYER_DENSITY,
+        fonts,
+      };
+
+      for (const message of [session.message(request), session.message(request)]) {
+        page.dispatch(JSON.stringify(message));
+        const raster = readRasterReply(await page.next((reply) => 'id' in reply && reply.id === message.id));
+
+        expect(sha256Hex(raster.png)).toBe(CARD_GOLDEN);
+      }
+    },
+    30_000
+  );
 });

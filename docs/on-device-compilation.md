@@ -122,6 +122,16 @@ same Satori + resvg + HarfBuzz pipeline as Node, with its three WebAssembly modu
 `scripts/copy-core-assets.ts` stages it as `apps/leclap-expo/assets/html-rasteriser/html-rasteriser.html`
 (build the engine first; the staged copy is not committed).
 
+The page runs on the phone's own web engine, which the app does not ship, so it supports a baseline:
+**Android System WebView 87 or later** (Satori needs `Intl.Segmenter`, new in 87; Android 7+ updates the
+WebView from the Play Store) and **iOS 16.4 or later** (the app's deployment target; WKWebView is Safari's
+engine). The page build targets `chrome87` and `safari16.4`, so newer syntax is lowered, and
+`src/html-raster-webview/compat.ts` adds the built-ins its dependencies call that those engines lack
+(`Array.prototype.at`, for Satori's gradients), only where missing. The engine's own code avoids newer
+built-ins (`core/deferred.ts` stands in for `Promise.withResolvers`, Chrome 119 / Safari 17.4).
+`tests/html-raster-webview-page.test.ts` fails the build when the bundled page calls a built-in newer than the
+baseline, and draws the golden card with those built-ins deleted.
+
 `CoreCompilationService` registers the app's rasteriser with `registerHtmlRasteriser` before each compile.
 When the descriptor has an HTML layer, `<HtmlRasterView />` (mounted in the root layout) opens the page while
 the other assets stage. The page is reused for every layer of the render and torn down when the compile ends.

@@ -4,6 +4,7 @@
 // import resolves to the shared shim (platform/html/harfbuzz-shaper). Messages are raster-messages.ts JSON:
 // requests arrive through the WebView's postMessage, replies leave through window.ReactNativeWebView.
 
+import './html-raster-webview/compat';
 import { HTML_RENDERER_VERSION, type HtmlWasm } from './core/html/html-engine';
 import { createRasterPage } from './core/html/raster-page';
 import { createSatoriRasteriser, preloadHtmlEngines } from './core/html/satori-raster';
