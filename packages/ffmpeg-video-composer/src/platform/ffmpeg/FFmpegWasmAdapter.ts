@@ -256,24 +256,31 @@ class FFmpegWasmAdapter extends AbstractFFmpeg implements VirtualFilesystemFFmpe
   }
 
   /**
-   * For a concat-demuxer command (`-f concat -i <list>`), read the list from the filesystem adapter
-   * and return the segment file paths it references (`file '<path>'` lines). These are not present
-   * in the command args, so without this they never reach MEMFS and the concat aborts.
+   * The concat-demuxer lists a command reads: the `-i` following each `-f concat` (other input options,
+   * such as `-safe 0`, may sit between them). A segment command can read one after other `-f` inputs.
+   */
+  static concatListPaths(args: string[]): string[] {
+    return args.flatMap((arg, index) => {
+      if (arg !== '-f' || args[index + 1] !== 'concat') return [];
+
+      const input = args.indexOf('-i', index);
+
+      return input === -1 || input + 1 >= args.length ? [] : [args[input + 1]];
+    });
+  }
+
+  /**
+   * For a concat-demuxer command (`-f concat -i <list>`), read each list from the filesystem adapter and
+   * return the files it references (`file '<path>'` lines). These are not present in the command args, so
+   * without this they never reach MEMFS and the concat aborts.
    */
   private async collectConcatSegmentPaths(args: string[]): Promise<string[]> {
-    const formatIndex = args.indexOf('-f');
+    const lists = await Promise.all(FFmpegWasmAdapter.concatListPaths(args).map((list) => this.readConcatList(list)));
 
-    if (formatIndex === -1 || args[formatIndex + 1] !== 'concat') {
-      return [];
-    }
+    return lists.flat();
+  }
 
-    const inputIndex = args.indexOf('-i', formatIndex);
-    const listPath = inputIndex === -1 ? undefined : args[inputIndex + 1];
-
-    if (listPath === undefined) {
-      return [];
-    }
-
+  private async readConcatList(listPath: string): Promise<string[]> {
     try {
       if (!(await this.fs.stat(listPath))) {
         return [];

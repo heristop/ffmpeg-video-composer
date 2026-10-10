@@ -7,6 +7,9 @@ import { ExtraInputs } from '../utils/extra-inputs';
 import type { MaskSugarContext } from './sugar-context';
 import { lowerFx } from './fx';
 import { lowerStroke } from './stroke-graphics';
+import { htmlCaptionFilters } from './subtitles-html';
+
+export { HTML_RASTERISER } from '@/core/html/html-rasteriser';
 
 /** A fresh per-segment registry of extra inputs. */
 export function createExtraInputs(): ExtraInputs {
@@ -20,6 +23,8 @@ export interface CompositingOptions {
   /** The segment's colour resolution (variables, colour lists). */
   formatColor: (color: string) => string;
   warn: (message: string) => void;
+  /** Whether the host registered an HTML rasteriser (HTML captions fall back to drawbox without one). */
+  htmlLayers?: boolean;
 }
 
 // A resolved colour reduced to characters that are inert inside a filter option.
@@ -36,7 +41,9 @@ export function compositingContext(options: CompositingOptions): MaskSugarContex
     color: (color) => safeColor(options.formatColor(color)),
     warn: options.warn,
     has: (filter) => hasFilter(caps, filter),
+    htmlLayers: options.htmlLayers,
     effects: lowerFx,
     strokes: lowerStroke,
+    captions: htmlCaptionFilters,
   };
 }

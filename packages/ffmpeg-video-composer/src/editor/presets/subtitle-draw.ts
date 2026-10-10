@@ -8,11 +8,10 @@ import { parseThemeRef, resolveTheme, resolveThemeRef } from '@/core/theme/resol
 import { DEFAULT_THEME, type ResolvedTheme, type ThemeSpec } from '@/core/theme/themes';
 import type { CaptionDna, CaptionDnaEffect } from '@/core/captions/dna';
 import type { PlacedLine } from '@/core/captions/plan';
+import { plateBounds } from '@/core/captions/plate';
 import { applyTextEffect, revealToExpr } from './text';
 
 const FALLBACK_COLOR = '#FFFFFF';
-/** Vertical plate padding relative to the horizontal one. */
-const PLATE_VERTICAL = 0.55;
 
 export type Paint = (value: string) => string;
 
@@ -147,13 +146,7 @@ export function plateFilters(
   color: string,
   enable: string
 ): Filter[] {
-  const padX = box.padding * size;
-  const padY = padX * PLATE_VERTICAL;
-  const left = Math.round(line.x - padX);
-  const right = Math.round(line.x + line.width + padX);
-  const top = Math.round(line.top - padY);
-  const bottom = Math.round(line.top + size + padY);
-  const radius = Math.floor(Math.min(box.radius * size, (bottom - top) / 2, (right - left) / 2));
+  const { left, right, top, bottom, radius } = plateBounds(line, size, box);
   const strips = cornerStrips(radius).flatMap(({ from, height, inset }) => {
     const w = right - left - 2 * inset;
 

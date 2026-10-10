@@ -11,7 +11,8 @@ import { cutawayMedia } from '../footage/cutaway-media';
 import { isBackgroundInput, markBackgroundInput } from '../utils/background-input';
 import { fnv1a32 } from '@/core/determinism/hash';
 import { generatedImage } from '../presets/generated-images';
-import { stageHtmlInput, type HtmlAssetDeps } from '../html/html-input-stage';
+import { stageCaptionInput, stageHtmlInput, type HtmlAssetDeps } from '../html/html-input-stage';
+import type { CaptionTrack } from '@/core/captions/caption-html';
 import { extensionFromUrl, frameInName, frameInUrl, mediaName } from '../utils/media-naming';
 import { findFontByFile, DEFAULT_FONT_WEIGHT, type FontRef } from '@/core/fonts';
 import { googleCssUrl, extractTtfUrl, GOOGLE_FONTS_USER_AGENT } from '@/core/google-fonts';
@@ -153,6 +154,9 @@ class AssetManager {
     // Single-file media — animations (.apng/.webp/.gif/.webm) are fetched like any other asset.
     await this.fetchMedia(item);
   };
+
+  /** Rasterises a section's HTML caption track (subtitles.renderer "html"); returns its `-i` fragment. */
+  stageCaptionTrack = (track: CaptionTrack): Promise<string> => stageCaptionInput(track, this.htmlDeps());
 
   private readonly htmlDeps = (): HtmlAssetDeps => ({
     filesystem: this.filesystemAdapter,

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseFontMetrics, measureTextWidth } from '@/core/font-metrics';
+import { parseFontMetrics, measureTextWidth, parseVerticalMetrics } from '@/core/font-metrics';
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 // Rubik is the engine's DEFAULT_FONT_ID and already lives in creative-kit; the assertions below
@@ -187,5 +187,12 @@ describe('font metrics', () => {
     expect(fromView).not.toBeNull();
     expect(fromView.unitsPerEm).toBe(direct.unitsPerEm);
     expect(measureTextWidth(fromView, 'Hello world', 48)).toBe(measureTextWidth(direct, 'Hello world', 48));
+  });
+
+  it('reads the hhea ascender and descender as fractions of the size, and the weight class', () => {
+    // Rubik: unitsPerEm 1000, hhea ascender 935, descender -250; a variable face whose default instance
+    // (what drawtext draws) is its 300 Light.
+    expect(parseVerticalMetrics(readFileSync(fontPath))).toEqual({ ascent: 0.935, descent: 0.25, weight: 300 });
+    expect(parseVerticalMetrics(new Uint8Array(8))).toBeNull();
   });
 });

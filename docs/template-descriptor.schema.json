@@ -30643,6 +30643,11 @@
         "activeColor": {
           "description": "Active-word colour overriding the DNA (hex or $color.* token).",
           "type": "string"
+        },
+        "renderer": {
+          "description": "drawbox (default): drawtext / drawbox filters. html: rasterised through the HTML layers, same layout and timing (drawbox where the host draws no HTML).",
+          "type": "string",
+          "enum": ["drawbox", "html"]
         }
       },
       "additionalProperties": false,

@@ -1,6 +1,6 @@
 // Wires an HTML layer input into the asset stage (AssetManager.fetchAssets): the stage context from the
 // build's collaborators, the staged `html:<hash>` url written back on the input, and the PNG (drawn at 2×)
-// scaled to the layer's box unless the author set a scale.
+// scaled to the layer's box unless the author set a scale. HTML caption tracks stage through the same context.
 
 import type AbstractFilesystem from '../../platform/filesystem/AbstractFilesystem';
 import type AbstractLogger from '../../platform/logging/AbstractLogger';
@@ -10,7 +10,14 @@ import type { MapAnimationInput } from '@/core/types';
 import { defaultHtmlFamily } from '@/core/html/html-fonts';
 import { templateFontSpecs, type TemplateFontFace } from '@/core/html/template-fonts';
 import { loadTemplateFonts } from '@/core/html/template-font-load';
-import { registeredHtmlRasteriser, stageHtmlLayer, type HtmlLayerInput } from './stage-html-layer';
+import type { CaptionTrack } from '@/core/captions/caption-html';
+import {
+  registeredHtmlRasteriser,
+  stageHtmlLayer,
+  type HtmlLayerInput,
+  type HtmlStageContext,
+} from './stage-html-layer';
+import { stageCaptionTrack } from './stage-caption-track';
 
 export interface HtmlAssetDeps {
   filesystem: AbstractFilesystem;
@@ -53,9 +60,11 @@ function withBoxScale(
   return { ...options, scale } as MapAnimationInput['options'];
 }
 
-export async function stageHtmlInput(item: HtmlInputItem, deps: HtmlAssetDeps): Promise<void> {
+// The stage context of an HTML layer from the build's collaborators.
+async function stageContext(deps: HtmlAssetDeps): Promise<HtmlStageContext> {
   const { filesystem, segment } = deps;
-  const staged = await stageHtmlLayer(item, {
+
+  return {
     filesystem,
     logger: deps.logger,
     dir: segment.panelsDir,
@@ -69,9 +78,18 @@ export async function stageHtmlInput(item: HtmlInputItem, deps: HtmlAssetDeps): 
     },
     templateFonts: await templateFonts(deps),
     rasteriser: registeredHtmlRasteriser(),
-  });
+  };
+}
+
+export async function stageHtmlInput(item: HtmlInputItem, deps: HtmlAssetDeps): Promise<void> {
+  const staged = await stageHtmlLayer(item, await stageContext(deps));
 
   item.url = staged.url;
   item.options = withBoxScale(item.options, item);
   deps.cache[staged.url] = staged.path;
+}
+
+/** Stages a section's HTML caption track (subtitles.renderer "html"); returns its `-i` fragment. */
+export async function stageCaptionInput(track: CaptionTrack, deps: HtmlAssetDeps): Promise<string> {
+  return (await stageCaptionTrack(track, await stageContext(deps))).arg;
 }

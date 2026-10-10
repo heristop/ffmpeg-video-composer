@@ -2,6 +2,8 @@ import type { LayoutSectionRef } from '@/core/layout/sources';
 import type { Filter, Section } from '@/core/types';
 import type { FxGraphic } from '../../schemas/fx.schemas';
 import type { Graphic } from '../../schemas/graphics.schemas';
+import type { CaptionTrack } from '@/core/captions/caption-html';
+import type { HtmlCaptionRequest } from './subtitles-html';
 
 /** One fx graphic to lower (editor/presets/fx.ts): the element, its window and where it sits. */
 export type FxRequest = {
@@ -42,14 +44,14 @@ export type SugarContext = {
   sections?: readonly LayoutSectionRef[];
 };
 
-export type ExtraInputSource = { url: string; still: boolean } | { clip: string };
+export type ExtraInputSource = { url: string; still: boolean } | { clip: string } | { captions: CaptionTrack };
 
 export type MaskSugarContext = {
   /** The build has alphamerge (fills); false on an on-device engine built without it. */
   available: boolean;
   /**
    * Registers media as an extra `-i` of this segment under `key` — a URL/path (`still` images are
-   * looped) or another section's recorded clip — returning its `input:<key>` sub-graph label, or null
+   * looped), another section's recorded clip or an HTML caption track (one timed image stream) — returning its `input:<key>` sub-graph label, or null
    * when this segment can't take extra inputs. Registering a key twice returns the same label.
    */
   input: (key: string, source: ExtraInputSource) => string | null;
@@ -59,6 +61,14 @@ export type MaskSugarContext = {
   warn: (message: string) => void;
   /** True when the active FFmpeg build has the filter (device allowlist, host probe). */
   has?: (filter: string) => boolean;
+  /** False when the host registered no HTML rasteriser: HTML captions fall back to drawbox. */
+  htmlLayers?: boolean;
+  /**
+   * Lowers `subtitles.renderer: "html"` (editor/presets/subtitles-html.ts), compile path only like `effects`,
+   * so the caption raster planning stays out of the browser's eager load; without it (validation) the
+   * drawbox lowering draws the captions, at the same place.
+   */
+  captions?: (request: HtmlCaptionRequest) => Filter[] | null;
   /**
    * Lowers fx graphics (editor/presets/fx.ts). Only the compile path provides it, so the effect modules stay
    * out of the browser's eager load; without it (validation) fx graphics lower to nothing, as they draw no text.

@@ -61,7 +61,9 @@ const GUIDE = [
     'legibility and `karaoke` (word, fill, pop or false); each cue is shrunk to fit `maxLines` balanced lines, ' +
     'split when it still overflows, held for `minDuration`, and kept inside the global.platform safe zones. ' +
     '`crown` ("auto" or a phrase) enlarges the one payoff line. validate_template reports caption_split / ' +
-    'caption_shrunk / subtitle_past_end in motionWarnings. The caption sugar also accepts wrap ("balanced") and fit.',
+    'caption_shrunk / subtitle_past_end in motionWarnings. `renderer` "html" draws the same captions through the ' +
+    'HTML layers (CSS rounded plates, soft shadows) instead of the default "drawbox". The caption sugar also ' +
+    'accepts wrap ("balanced") and fit.',
   'Motion roles: tag elements with `role` (micro, panel, camera, headline, accent, mascot) on kinetic blocks, ' +
     'graphics, drawtext filters, titleCard, lowerThird and camera instead of hand-picking eases; the role fills ' +
     'the ease (and duration) the element leaves unset, global.motion.roles overrides a role, and `$role.<name>` ' +

@@ -19,6 +19,7 @@ import {
   compositingContext,
   createEmojiPlan,
   createExtraInputs,
+  HTML_RASTERISER,
   type EmojiPlan,
   type SugarContext,
 } from './presets/registry';
@@ -414,6 +415,11 @@ class SegmentBuilder {
   };
 
   private readonly stageExtraInput = async (key: string, source: ExtraInputSource): Promise<string> => {
+    // An HTML caption track: its rasters played as one timed image stream (editor/html/stage-caption-track.ts).
+    if ('captions' in source) {
+      return this.assetManager.stageCaptionTrack(source.captions);
+    }
+
     if ('clip' in source) {
       const clip = this.project.config.userVideoPaths?.[source.clip] ?? this.filesystemAdapter.getSource(source.clip);
 
@@ -639,6 +645,7 @@ class SegmentBuilder {
       features: this.project.engineFeatures,
       extras: this.extras,
       formatColor: this.formattersManager.formatColor,
+      htmlLayers: container.isRegistered(HTML_RASTERISER),
       warn: (message) => {
         this.logger.warn(`[${this.section.name}]${message}`);
       },
