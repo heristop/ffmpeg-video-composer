@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
-import { Asset } from 'expo-asset';
 // Import the PRE-BUILT output (decorators compiled) — not the raw src — so Metro/Hermes never sees
 // the core's tsyringe decorators. reflect-metadata is loaded once at the app entry (app/_layout.tsx).
 import { compileReactNative, registerHtmlRasteriser, type NativeEngine } from 'ffmpeg-video-composer/reactnative';
@@ -18,6 +17,7 @@ import {
 import * as Leclap from '@/modules/leclap-ffmpeg';
 import type { CompileInput, CompileOptions, CompileResult, CompileService } from './CompileService';
 import { htmlRasterHost } from './html-raster/html-raster-host';
+import { stageBundledAsset } from './bundled-asset';
 
 const toPath = (uri: string): string => uri.replace(/^file:\/\//, '');
 const toUri = (p: string): string => (p.startsWith('file://') ? p : `file://${p}`);
@@ -48,16 +48,8 @@ async function stageBundledMusic(name: string | undefined, assetsDir: string): P
 
   if (!(fileName in MUSIC_ASSETS)) return;
 
-  const assetModule = MUSIC_ASSETS[fileName];
-
-  const destination = `${assetsDir}/musics/${fileName}`;
-
-  if ((await FileSystem.getInfoAsync(toUri(destination))).exists) return;
-
-  const asset = await Asset.fromModule(assetModule).downloadAsync();
-
   await FileSystem.makeDirectoryAsync(toUri(`${assetsDir}/musics`), { intermediates: true }).catch(() => {});
-  await FileSystem.copyAsync({ from: toUri(asset.localUri ?? asset.uri), to: toUri(destination) });
+  await stageBundledAsset(MUSIC_ASSETS[fileName], `${assetsDir}/musics/${fileName}`);
 }
 
 // Stage the bundled drawtext fonts into `assetsDir/fonts` so the core resolves them locally
@@ -70,12 +62,7 @@ async function stageBundledFonts(assetsDir: string): Promise<void> {
 
   await Promise.all(
     Object.entries(FONT_ASSETS).map(async ([fileName, assetModule]) => {
-      const destination = `${fontsDir}/${fileName}`;
-
-      if ((await FileSystem.getInfoAsync(toUri(destination))).exists) return;
-
-      const asset = await Asset.fromModule(assetModule).downloadAsync();
-      await FileSystem.copyAsync({ from: toUri(asset.localUri ?? asset.uri), to: toUri(destination) });
+      await stageBundledAsset(assetModule, `${fontsDir}/${fileName}`);
     })
   );
 }
@@ -90,12 +77,7 @@ async function stageBundledEmoji(assetsDir: string): Promise<void> {
 
   await Promise.all(
     Object.entries(EMOJI_ASSETS).map(async ([fileName, assetModule]) => {
-      const destination = `${emojiDir}/${fileName}`;
-
-      if ((await FileSystem.getInfoAsync(toUri(destination))).exists) return;
-
-      const asset = await Asset.fromModule(assetModule).downloadAsync();
-      await FileSystem.copyAsync({ from: toUri(asset.localUri ?? asset.uri), to: toUri(destination) });
+      await stageBundledAsset(assetModule, `${emojiDir}/${fileName}`);
     })
   );
 }
@@ -112,12 +94,7 @@ async function stageBundledVideos(assetsDir: string): Promise<void> {
 
   await Promise.all(
     Object.entries(VIDEO_ASSETS).map(async ([fileName, assetModule]) => {
-      const destination = `${videosDir}/${fileName}`;
-
-      if ((await FileSystem.getInfoAsync(toUri(destination))).exists) return;
-
-      const asset = await Asset.fromModule(assetModule).downloadAsync();
-      await FileSystem.copyAsync({ from: toUri(asset.localUri ?? asset.uri), to: toUri(destination) });
+      await stageBundledAsset(assetModule, `${videosDir}/${fileName}`);
     })
   );
 }
@@ -158,12 +135,7 @@ async function stageBundledAnimations(descriptor: CompileInput['descriptor'], as
 
   await Promise.all(
     [...files].map(async (file) => {
-      const destination = `${animationsDir}/${file}`;
-
-      if ((await FileSystem.getInfoAsync(toUri(destination))).exists) return;
-
-      const asset = await Asset.fromModule(ANIMATION_ASSETS[file]).downloadAsync();
-      await FileSystem.copyAsync({ from: toUri(asset.localUri ?? asset.uri), to: toUri(destination) });
+      await stageBundledAsset(ANIMATION_ASSETS[file], `${animationsDir}/${file}`);
     })
   );
 }
@@ -253,12 +225,7 @@ async function stageBundledImages(descriptor: CompileInput['descriptor'], assets
 
   await Promise.all(
     [...files].map(async (file) => {
-      const destination = `${backgroundsDir}/${file}`;
-
-      if ((await FileSystem.getInfoAsync(toUri(destination))).exists) return;
-
-      const asset = await Asset.fromModule(BACKGROUND_ASSETS[file]).downloadAsync();
-      await FileSystem.copyAsync({ from: toUri(asset.localUri ?? asset.uri), to: toUri(destination) });
+      await stageBundledAsset(BACKGROUND_ASSETS[file], `${backgroundsDir}/${file}`);
     })
   );
 }
@@ -285,12 +252,7 @@ async function stageBundledWatermark(descriptor: CompileInput['descriptor'], ass
   const backgroundsDir = `${assetsDir}/backgrounds`;
   await FileSystem.makeDirectoryAsync(toUri(backgroundsDir), { intermediates: true }).catch(() => {});
 
-  const destination = `${backgroundsDir}/${file}`;
-
-  if ((await FileSystem.getInfoAsync(toUri(destination))).exists) return;
-
-  const asset = await Asset.fromModule(BACKGROUND_ASSETS[file]).downloadAsync();
-  await FileSystem.copyAsync({ from: toUri(asset.localUri ?? asset.uri), to: toUri(destination) });
+  await stageBundledAsset(BACKGROUND_ASSETS[file], `${backgroundsDir}/${file}`);
 }
 
 // Prepare the on-device build/asset dirs and the ProjectConfig the core compiles against.

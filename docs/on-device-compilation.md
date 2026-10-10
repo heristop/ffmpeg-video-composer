@@ -112,7 +112,7 @@ graph TD
 
 `compileOnDevice()` checks availability via the native module's `version()` and returns an error when the engine is absent (for example, Expo Go). `describeOnDeviceCapability()` currently returns `{ capable: true }`; it does not reject animation maps. The old ZIP-frame overlay path has been replaced by single-file APNG/WebM overlays. Engine failures are returned to the caller, with no server fallback.
 
-`CoreCompilationService` stages bundled fonts, music, videos, animations, backgrounds, and watermarks into the cache assets directory, maps recorded clips to real paths, and invokes `compileReactNative`. The native adapter can inject `-progress <file>` and poll output time every 500 ms for intra-segment progress. An `AbortSignal` listener calls the native `cancel()` hook during compilation; it is removed when the call settles.
+`CoreCompilationService` stages bundled fonts, emoji, music, videos, animations, backgrounds, and watermarks into the cache assets directory through one helper (`bundled-asset.ts`). In an Android release build, expo-asset gives a bundled image its drawable resource name as `localUri` instead of a file. The helper therefore uses `localUri` only when it is a `file://` file that exists, and otherwise copies the resource out through ExpoAsset's native download. It then maps recorded clips to real paths, and invokes `compileReactNative`. The native adapter can inject `-progress <file>` and poll output time every 500 ms for intra-segment progress. An `AbortSignal` listener calls the native `cancel()` hook during compilation; it is removed when the call settles.
 
 ### HTML layers
 

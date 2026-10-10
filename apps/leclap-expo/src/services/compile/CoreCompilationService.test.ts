@@ -70,6 +70,13 @@ jest.mock('./html-raster/html-raster-host', () => ({
 
 const input = { descriptor: { sections: [] }, clips: {} } as unknown as CompileInput;
 
+// Nothing staged in the assets dir yet; the bundled assets themselves are readable files (expo-asset's copy).
+function notYetStaged(): void {
+  (FileSystem.getInfoAsync as unknown as MockFn).mockImplementation(async (uri: string) => ({
+    exists: uri.startsWith('file:///asset/'),
+  }));
+}
+
 beforeEach(() => jest.clearAllMocks());
 
 describe('CoreCompilationService abort wiring', () => {
@@ -167,7 +174,7 @@ describe('CoreCompilationService bundled-asset staging', () => {
   it('stages the bundled fonts and default music into the assets dir when not present', async () => {
     // Not yet staged → the core would otherwise abort (missing font → drawtext rc=-22, or
     // "Music URL is not provided" for the track).
-    (FileSystem.getInfoAsync as unknown as MockFn).mockResolvedValue({ exists: false });
+    notYetStaged();
     (compileReactNative as unknown as MockFn).mockResolvedValue('/cache/out.mp4');
 
     await new CoreCompilationService().compile(withMusic);
@@ -198,7 +205,7 @@ describe('CoreCompilationService watermark staging', () => {
   } as unknown as CompileInput;
 
   it('stages a library watermark into assetsDir/backgrounds and rewrites its url', async () => {
-    (FileSystem.getInfoAsync as unknown as MockFn).mockResolvedValue({ exists: false });
+    notYetStaged();
     (compileReactNative as unknown as MockFn).mockResolvedValue('/cache/out.mp4');
 
     await new CoreCompilationService().compile(withLibraryWatermark);
@@ -217,7 +224,7 @@ describe('CoreCompilationService watermark staging', () => {
   });
 
   it('does not stage or rewrite a URL watermark (fetched remotely by the core)', async () => {
-    (FileSystem.getInfoAsync as unknown as MockFn).mockResolvedValue({ exists: false });
+    notYetStaged();
     (compileReactNative as unknown as MockFn).mockResolvedValue('/cache/out.mp4');
 
     const withUrlWatermark = {
@@ -249,7 +256,7 @@ describe('CoreCompilationService watermark staging', () => {
 
 describe('CoreCompilationService image_background staging', () => {
   it('stages a bundled image_background pictureUrl so the segment can render', async () => {
-    (FileSystem.getInfoAsync as unknown as MockFn).mockResolvedValue({ exists: false });
+    notYetStaged();
     (compileReactNative as unknown as MockFn).mockResolvedValue('/cache/out.mp4');
 
     const withImageBackground = {
@@ -273,7 +280,7 @@ describe('CoreCompilationService image_background staging', () => {
   });
 
   it('stages a bundled background an HTML layer draws as an image', async () => {
-    (FileSystem.getInfoAsync as unknown as MockFn).mockResolvedValue({ exists: false });
+    notYetStaged();
     (compileReactNative as unknown as MockFn).mockResolvedValue('/cache/out.mp4');
 
     const withHtmlImage = {
