@@ -9,7 +9,7 @@
 // the first frame whose time reaches it. Pure.
 
 import { parseEasing } from '../motion/easing';
-import { activeWindow, popBump, type ActiveSpan } from './karaoke';
+import { activeWindow, POP_EASE, POP_SECONDS, type ActiveSpan } from './karaoke';
 import type { PlacedCue, SubtitlePlan } from './plan';
 
 /** Steps an entrance is sampled into (the settled cue is the last). */
@@ -39,6 +39,13 @@ export interface CaptionSlide {
 }
 
 type Plan = Pick<SubtitlePlan, 'cues' | 'style'>;
+
+/** The pop bump at `elapsed` seconds into the word's active window: 0 → 1 (peak) → 0, eased like drawtext's. */
+function popBump(elapsed: number): number {
+  if (elapsed < 0 || elapsed >= POP_SECONDS) return 0;
+
+  return Math.sin(Math.PI * POP_EASE.fn(elapsed / POP_SECONDS));
+}
 
 /** The first frame whose time reaches `seconds`. */
 export function frameAt(seconds: number, fps: number): number {

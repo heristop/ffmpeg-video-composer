@@ -128,6 +128,15 @@ describe('captionHtml', () => {
     expect(clean.words[0].props.style.textShadow).toMatch(/^2px 3px \d+px rgba\(0,0,0,0\.55\)$/);
   });
 
+  // A blurred text shadow is the costliest thing a raster draws: a wide glow made neon ~15× slower than loud.
+  it('caps a glow blur so its raster stays cheap', () => {
+    const neon = render(plan({ style: 'neon', size: 120 }), SETTLED);
+    const blur = Number(/^0px 0px (\d+)px /.exec(neon.words[0].props.style.textShadow)?.[1]);
+
+    expect(blur).toBeGreaterThan(0);
+    expect(blur).toBeLessThanOrEqual(8);
+  });
+
   it('draws a rounded plate behind each line of a boxed DNA', () => {
     const planned = plan({ style: 'boxed', cues: [{ at: 1, end: 3, text: 'A much longer caption that will wrap' }] });
     const { band, prepared } = render(planned, SETTLED);

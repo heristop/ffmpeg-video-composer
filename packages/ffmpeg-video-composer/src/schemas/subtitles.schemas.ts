@@ -156,8 +156,7 @@ export const SubtitlesSchema = z
       .enum(SUBTITLE_RENDERERS)
       .optional()
       .describe(
-        'drawbox (default): drawtext / drawbox filters. html: rasterised through the HTML layers, same layout and ' +
-          'timing (drawbox where the host draws no HTML).'
+        'drawbox (filters) or html (rasterised, same layout). Default: html for a DNA with a plate, else drawbox.'
       ),
   })
   .strict()

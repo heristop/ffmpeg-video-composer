@@ -30645,7 +30645,7 @@
           "type": "string"
         },
         "renderer": {
-          "description": "drawbox (default): drawtext / drawbox filters. html: rasterised through the HTML layers, same layout and timing (drawbox where the host draws no HTML).",
+          "description": "drawbox (filters) or html (rasterised, same layout). Default: html for a DNA with a plate, else drawbox.",
           "type": "string",
           "enum": ["drawbox", "html"]
         }

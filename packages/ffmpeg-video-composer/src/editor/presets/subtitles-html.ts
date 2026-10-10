@@ -26,16 +26,18 @@ export interface HtmlCaptionRequest {
   palette: CaptionPalette;
   effect: CaptionDnaEffect | undefined;
   ctx: SugarContext;
+  /** `renderer: "html"` was authored (not the plated-DNA default): only then is a fallback worth a warning. */
+  explicit: boolean;
 }
 
 /** The filters compositing the caption track, or null when the drawbox renderer must draw it instead. */
-export function htmlCaptionFilters({ plan, palette, effect, ctx }: HtmlCaptionRequest): Filter[] | null {
+export function htmlCaptionFilters({ plan, palette, effect, ctx, explicit }: HtmlCaptionRequest): Filter[] | null {
   const masks = ctx.masks;
 
   if (!masks) return null;
 
   if (masks.htmlLayers === false) {
-    masks.warn(UNAVAILABLE);
+    if (explicit) masks.warn(UNAVAILABLE);
 
     return null;
   }

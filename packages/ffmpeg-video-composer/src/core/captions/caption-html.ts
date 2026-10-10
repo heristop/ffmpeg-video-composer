@@ -61,7 +61,9 @@ export interface CaptionTrack {
 }
 
 /** A shadow with no offset is a glow; one with an offset a soft drop shadow (blur as a share of the size). */
-const GLOW_BLUR = 0.3;
+const GLOW_BLUR = 0.17;
+/** A glow's blur stops here (output px): resvg's cost grows with the blur, and a wider one adds little. */
+const GLOW_MAX = 8;
 const SHADOW_BLUR = 0.06;
 /** Room around the drawn copy for strokes, shadows and a growing word, as a share of the largest size. */
 const BAND_MARGIN = 0.45;
@@ -104,7 +106,7 @@ export function captionLook(
 function effectReach(look: CaptionLook, size: number): number {
   const outline = look.effect?.outline?.width ?? 0;
   const shadow = look.effect?.shadow;
-  const offset = shadow ? Math.max(Math.abs(shadow.dx), Math.abs(shadow.dy)) + size * GLOW_BLUR : 0;
+  const offset = shadow ? Math.max(Math.abs(shadow.dx), Math.abs(shadow.dy)) + GLOW_MAX * 2 : 0;
 
   return size * BAND_MARGIN + outline * 2 + offset + look.entrance.distance;
 }
@@ -201,7 +203,8 @@ export interface CaptionHtmlRequest {
 function textEffect(look: CaptionLook, size: number): Array<[string, string | undefined]> {
   const { outline, shadow } = look.effect ?? {};
   const glow = shadow?.dx === 0 && shadow.dy === 0;
-  const blur = shadow ? Math.max(1, Math.round(size * (glow ? GLOW_BLUR : SHADOW_BLUR))) : 0;
+  const glowBlur = Math.min(GLOW_MAX, size * GLOW_BLUR);
+  const blur = shadow ? Math.max(1, Math.round(glow ? glowBlur : size * SHADOW_BLUR)) : 0;
 
   return [
     ['text-shadow', shadow && `${px(shadow.dx)} ${px(shadow.dy)} ${px(blur)} ${cssColor(shadow.color)}`],

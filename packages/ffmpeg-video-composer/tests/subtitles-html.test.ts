@@ -63,10 +63,29 @@ describe('subtitles.renderer', () => {
 
   it('keeps the drawtext / drawbox lowering when the renderer is drawbox', () => {
     const { context, inputs } = masks();
-    const filters = subtitlesToFilters(TRACK, ctx(context));
+    const filters = subtitlesToFilters({ ...TRACK, renderer: 'drawbox' }, ctx(context));
 
     expect(types(filters)).toEqual(['drawbox', 'drawtext']);
     expect(inputs).toEqual([]);
+  });
+
+  // drawbox can't anti-alias a plate's corners cheaply: a DNA with a plate defaults to html where it can draw.
+  it('defaults a plated DNA to html and a plain one to drawbox', () => {
+    const plated = masks();
+    const plain = masks();
+
+    expect(types(subtitlesToFilters(TRACK, ctx(plated.context)))).toEqual(['graph']);
+    expect(plated.inputs).toHaveLength(1);
+    expect(types(subtitlesToFilters({ ...TRACK, style: 'clean' }, ctx(plain.context)))).toEqual(['drawtext']);
+    expect(plain.inputs).toEqual([]);
+  });
+
+  it('falls back from the default html to drawbox silently where the host cannot draw HTML', () => {
+    const { context, inputs, warn } = masks({ htmlLayers: false });
+
+    expect(types(subtitlesToFilters(TRACK, ctx(context)))).toEqual(['drawbox', 'drawtext']);
+    expect(inputs).toEqual([]);
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it('composites one raster track over the frame when the renderer is html', () => {

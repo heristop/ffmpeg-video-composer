@@ -165,7 +165,10 @@ export function subtitlesToFilters(subtitles: Subtitles | undefined, ctx: SugarC
   const paint = painter(ctx.theme);
   const colors = palette(subtitles, plan.style, paint);
   const effect = paintedEffect(plan.style.dna.effect, paint);
-  const html = subtitles.renderer === 'html' ? ctx.masks?.captions?.({ plan, palette: colors, effect, ctx }) : null;
+  const explicit = subtitles.renderer === 'html';
+  // A plated DNA defaults to html: drawbox can't anti-alias the plate's corners cheaply.
+  const wantsHtml = explicit || (subtitles.renderer === undefined && plan.style.dna.box !== undefined);
+  const html = wantsHtml ? ctx.masks?.captions?.({ plan, palette: colors, effect, ctx, explicit }) : null;
 
   if (html) return html;
 
