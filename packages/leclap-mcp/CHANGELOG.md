@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.5.1] - 2026-10-10
+## [0.6.0] - 2026-10-10
 
 ### Added
 
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Requires `ffmpeg-video-composer` ^3.0.1.
+- Requires `ffmpeg-video-composer` ^3.1.0.
 
 ## [0.5.0] - 2026-10-09
 

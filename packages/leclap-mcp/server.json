@@ -3,7 +3,7 @@
   "name": "dev.leclap/video",
   "title": "LeClap",
   "description": "Compose and render video from one JSON template. Deterministic, runs locally, no generative model.",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "websiteUrl": "https://leclap.dev",
   "repository": {
     "url": "https://github.com/heristop/leclap",
@@ -15,7 +15,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@leclap/mcp",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
