@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { bundledVideoFor, fieldsFor, videoFor } from './fixtures.ts';
-import { previewVideoArgs } from './preview-export.ts';
+import { encodePreview } from './preview-export.ts';
 import { loadDescriptor } from './load-descriptor.ts';
 import { prepareSynthetic, prerenderedFor, previewMedia, withVariables } from './synthetic-media.ts';
 
@@ -176,7 +176,8 @@ async function saveManifest() {
       {
         schemaVersion: 1,
         renderer: 'examples/showcase/render-previews.mjs',
-        preview: '960x540, H264, 24fps, AAC audio when present; original orientation letterboxed',
+        preview:
+          '960x540, H264, 24fps (effects-tour: its own 30fps), AAC audio when present; original orientation letterboxed',
         samples: catalog.samples.flatMap((sample) => (byId.has(sample.id) ? [byId.get(sample.id)] : [])),
       },
       null,
@@ -284,7 +285,7 @@ async function renderSample(sample) {
   const registered = expanded.sections.some((section) => section.type === 'effect');
   const output = await renderOutput(sample, original, registered);
   const video = path.join(publicDir, `${sample.id}.mp4`);
-  ffmpeg(previewVideoArgs(output, video));
+  encodePreview(sample.id, output, video, { ffmpeg, probe, work });
   const metadata = probe(video);
   const duration = Number(metadata.format.duration);
   const posterTime = Math.min(POSTER_AT[sample.id] ?? 1.4, duration / 3);

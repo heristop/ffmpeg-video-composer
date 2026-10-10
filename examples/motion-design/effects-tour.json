@@ -578,7 +578,7 @@
       "purpose": "Play the rendered compositing and light chapter.",
       "options": {
         "videoUrl": "{{ chapter_05 }}",
-        "duration": 40.1
+        "duration": 40.9
       },
       "transition": {
         "type": "push-up",

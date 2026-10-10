@@ -8,20 +8,22 @@ import { playWithSound, readSound, tellVideo } from '@/lib/landing-sound';
 import { Button } from '@/presentation/components/ui';
 import { FilmScreen, FilmStage, FrameButton, SoundControl, useFilmSound } from '@/presentation/components/film-frame';
 import { SectionHeading } from '@/presentation/components/home/section-heading';
+import { effectsReelSources } from '@/presentation/components/home/promo-orientation.logic';
+import { usePromoOrientation } from '@/presentation/components/home/use-promo-orientation';
 
-// The clip is a 19-second highlight reel cut from the effects tour (examples/motion-design/effects-tour.json),
-// an actual LeClap render (1280x720) under public/videos/home, over a bundled lo-fi track. It plays as an
+// The clip is a highlight reel cut from the effects tour (examples/motion-design/effects-tour.json, cut by
+// examples/motion-design/effects-reel.sh), an actual LeClap render under public/videos/home, over a bundled lo-fi
+// track; a phone held upright gets its 9:16 cut in a portrait frame (promo-orientation.logic.ts). It plays as an
 // ambient loop to show the product's output up front, with the landing's one sound: muted until the
 // visitor turns it on, here or anywhere else on the page. The corner pill turns the sound on and
 // pauses it (as on the films, a visitor's pause sticks). Served VP9/WebM first (smaller) with an
 // H.264/MP4 fallback for older Safari/iOS. The file is lazy-mounted only as the frame nears the
 // viewport, so it never costs an above-the-fold visitor. Reduced-motion users get a paused player
 // with native controls.
-const VIDEO_SRC_WEBM = '/videos/home/effects-reel.webm';
-const VIDEO_SRC_MP4 = '/videos/home/effects-reel.mp4';
-
 export const HomeShowcase = () => {
   const { t } = useTranslation('home');
+  const orientation = usePromoOrientation();
+  const reel = effectsReelSources(orientation);
   const videoRef = useRef<HTMLVideoElement>(null);
   // Two IntersectionObservers on the same frame: one fires early (300px ahead) to start fetching the
   // clip; the other toggles as the frame enters/leaves the viewport (not once) so playback can pause
@@ -106,6 +108,7 @@ export const HomeShowcase = () => {
         <FilmStage frameRef={setFrameRef} className="mt-12 sm:mt-16">
           {/* No corner badge: the reel's own top-left labels name each effect, and a pill there would cover them. */}
           <FilmScreen
+            shape={orientation}
             controlLabel={t('showcase.badge')}
             paused={paused}
             control={
@@ -134,9 +137,12 @@ export const HomeShowcase = () => {
             )}
 
             {mounted && (
+              // Keyed by the cut: a turned phone loads the other file instead of cropping this one.
               <video
+                key={reel.mp4}
                 ref={setVideoEl}
                 className="h-full w-full object-cover"
+                poster={reel.poster}
                 autoPlay={!reduced}
                 loop
                 playsInline
@@ -163,8 +169,8 @@ export const HomeShowcase = () => {
                     : undefined
                 }
               >
-                <source src={VIDEO_SRC_WEBM} type="video/webm" />
-                <source src={VIDEO_SRC_MP4} type="video/mp4" />
+                <source src={reel.webm} type="video/webm" />
+                <source src={reel.mp4} type="video/mp4" />
               </video>
             )}
           </FilmScreen>

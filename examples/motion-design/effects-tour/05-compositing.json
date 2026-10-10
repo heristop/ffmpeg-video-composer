@@ -186,7 +186,7 @@
       "type": "color_background",
       "options": {
         "backgroundColor": "#141416",
-        "duration": 3.8
+        "duration": 4.6
       },
       "layout": {
         "type": "before-after",
@@ -194,9 +194,9 @@
         "after": "backgrounds/desk-flatlay.jpg",
         "wipe": {
           "at": 0.9,
-          "duration": 1.4,
+          "duration": 2.2,
           "direction": "right",
-          "ease": "ease-in-out-cubic"
+          "ease": "ease-in-out-sine"
         },
         "divider": {
           "color": "#FFFFFF",
@@ -243,7 +243,7 @@
           },
           "exit": {
             "preset": "fade",
-            "at": 1.7
+            "at": 2.1
           }
         },
         {
@@ -255,7 +255,7 @@
           "align": "left",
           "x": 60,
           "y": 100,
-          "delay": 1.5,
+          "delay": 1.9,
           "color": "#FFF685",
           "effect": {
             "shadow": {

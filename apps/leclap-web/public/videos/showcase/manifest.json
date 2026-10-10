@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "renderer": "examples/showcase/render-previews.mjs",
-  "preview": "960x540, H264, 24fps, AAC audio when present; original orientation letterboxed",
+  "preview": "960x540, H264, 24fps (effects-tour: its own 30fps), AAC audio when present; original orientation letterboxed",
   "samples": [
     {
       "id": "drink-and-code",
@@ -18,14 +18,14 @@
     {
       "id": "effects-tour",
       "source": "examples/motion-design/effects-tour.json",
-      "duration": 418.795011,
+      "duration": 419.909002,
       "hasAudio": true,
       "orientation": "landscape",
       "backend": "native",
-      "sha256": "11ae705310798377b14c0a399049424e3b003fe2739478fc02b6930dade3cf72",
-      "templateSha256": "77da394eb63c65fc98594702811c36fcb0c27ed81066720c0bcfd26f9e4906f8",
+      "sha256": "a975e415eb22e2d9c407086e2b6a5996e2276320d241c6a1861404c6f6f5ae6a",
+      "templateSha256": "805c0c9aead83ebca6a24e55dca8d952aa1272d7716eb7ed26c0ab9f4b937564",
       "media": "Synthetic clips from bundled photos (FFmpeg) and lavfi audio",
-      "bytes": 24091003
+      "bytes": 23718894
     },
     {
       "id": "type-impact",

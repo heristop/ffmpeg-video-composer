@@ -116,13 +116,17 @@
         {
           "name": "watermark",
           "default": "pictures/logo.png",
-          "placeholders": ["{{ watermark }}"],
+          "placeholders": [
+            "{{ watermark }}"
+          ],
           "source": "global"
         },
         {
           "name": "videoOutro",
           "default": "videos/outro.mp4",
-          "placeholders": ["{{ videoOutro }}"],
+          "placeholders": [
+            "{{ videoOutro }}"
+          ],
           "source": "global"
         },
         {
@@ -133,76 +137,103 @@
         },
         {
           "name": "colorsList",
-          "default": ["rgb(41 37 36)", "rgb(250 250 249)"],
+          "default": [
+            "rgb(41 37 36)",
+            "rgb(250 250 249)"
+          ],
           "placeholders": [],
           "source": "global"
         },
         {
           "name": "form_1_firstname",
           "default": "Emily",
-          "placeholders": ["{{ form_1_firstname }}"],
+          "placeholders": [
+            "{{ form_1_firstname }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_lastname",
           "default": "Parker",
-          "placeholders": ["{{ form_1_lastname }}"],
+          "placeholders": [
+            "{{ form_1_lastname }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_job",
           "default": "Fullstack Developer",
-          "placeholders": ["{{ form_1_job }}"],
+          "placeholders": [
+            "{{ form_1_job }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_2_keyword1",
           "default": "Javascript",
-          "placeholders": ["{{ form_2_keyword1 }}"],
+          "placeholders": [
+            "{{ form_2_keyword1 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_2_keyword2",
           "default": "Typescript",
-          "placeholders": ["{{ form_2_keyword2 }}"],
+          "placeholders": [
+            "{{ form_2_keyword2 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_2_keyword3",
           "default": "Rust",
-          "placeholders": ["{{ form_2_keyword3 }}"],
+          "placeholders": [
+            "{{ form_2_keyword3 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_2_keyword4",
           "default": "Caffeine",
-          "placeholders": ["{{ form_2_keyword4 }}"],
+          "placeholders": [
+            "{{ form_2_keyword4 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_3_keyword1",
           "default": "Coffee Shop",
-          "placeholders": ["{{ form_3_keyword1 }}"],
+          "placeholders": [
+            "{{ form_3_keyword1 }}"
+          ],
           "source": "global"
         },
         {
           "name": "color1",
-          "placeholders": ["{{ color1 }}"],
+          "placeholders": [
+            "{{ color1 }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "color2",
-          "placeholders": ["{{ color2 }}"],
+          "placeholders": [
+            "{{ color2 }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "transitionDuration",
-          "placeholders": ["{{ transitionDuration }}"],
+          "placeholders": [
+            "{{ transitionDuration }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "transitionStartTime",
-          "placeholders": ["{{ transitionStartTime }}"],
+          "placeholders": [
+            "{{ transitionStartTime }}"
+          ],
           "source": "runtime"
         }
       ],
@@ -501,7 +532,10 @@
           "watermark": "pictures/logo.png",
           "videoOutro": "videos/outro.mp4",
           "animatedIcon": "animations/animation_icons.apng",
-          "colorsList": ["rgb(41 37 36)", "rgb(250 250 249)"],
+          "colorsList": [
+            "rgb(41 37 36)",
+            "rgb(250 250 249)"
+          ],
           "form_1_firstname": "Emily",
           "form_1_lastname": "Parker",
           "form_1_job": "Fullstack Developer",
@@ -568,7 +602,9 @@
           ],
           "maps": [
             {
-              "inputs": ["@watermark"],
+              "inputs": [
+                "@watermark"
+              ],
               "filters": [
                 {
                   "type": "scale",
@@ -578,24 +614,35 @@
                   }
                 }
               ],
-              "outputs": ["scaled_logo"]
+              "outputs": [
+                "scaled_logo"
+              ]
             },
             {
-              "inputs": ["@video"],
+              "inputs": [
+                "@video"
+              ],
               "options": {
                 "useSectionFilters": true
               },
-              "outputs": ["video"]
+              "outputs": [
+                "video"
+              ]
             },
             {
-              "inputs": ["video", "scaled_logo"],
+              "inputs": [
+                "video",
+                "scaled_logo"
+              ],
               "filters": [
                 {
                   "type": "overlay",
                   "value": "80:72"
                 }
               ],
-              "outputs": ["final"]
+              "outputs": [
+                "final"
+              ]
             }
           ],
           "filters": [
@@ -757,24 +804,35 @@
           ],
           "maps": [
             {
-              "inputs": ["0:v"],
-              "outputs": ["base"],
+              "inputs": [
+                "0:v"
+              ],
+              "outputs": [
+                "base"
+              ],
               "options": {
                 "useSectionFilters": true
               }
             },
             {
-              "inputs": ["base", "1:v"],
+              "inputs": [
+                "base",
+                "1:v"
+              ],
               "filters": [
                 {
                   "type": "overlay",
                   "value": "x=40:y='if(lt(t,5.3),460+(1-(if(lt(t,0.12),0,if(lt(t,0.5),(t-0.12)/0.38,1))))*70,460+(if(lt(t,5.9),(t-5.3)/0.6,1))*280)'"
                 }
               ],
-              "outputs": ["carded"]
+              "outputs": [
+                "carded"
+              ]
             },
             {
-              "inputs": ["carded"],
+              "inputs": [
+                "carded"
+              ],
               "filters": [
                 {
                   "type": "drawtext",
@@ -811,7 +869,9 @@
                   }
                 }
               ],
-              "outputs": ["final"]
+              "outputs": [
+                "final"
+              ]
             }
           ],
           "filters": [
@@ -936,24 +996,35 @@
           ],
           "maps": [
             {
-              "inputs": ["0:v"],
-              "outputs": ["base"],
+              "inputs": [
+                "0:v"
+              ],
+              "outputs": [
+                "base"
+              ],
               "options": {
                 "useSectionFilters": true
               }
             },
             {
-              "inputs": ["base", "1:v"],
+              "inputs": [
+                "base",
+                "1:v"
+              ],
               "filters": [
                 {
                   "type": "overlay",
                   "value": "x=48:y='150+(1-(if(lt(t,0.12),0,if(lt(t,0.5),(t-0.12)/0.38,1))))*70'"
                 }
               ],
-              "outputs": ["carded"]
+              "outputs": [
+                "carded"
+              ]
             },
             {
-              "inputs": ["carded"],
+              "inputs": [
+                "carded"
+              ],
               "filters": [
                 {
                   "type": "drawtext",
@@ -1043,7 +1114,9 @@
                   }
                 }
               ],
-              "outputs": ["final"]
+              "outputs": [
+                "final"
+              ]
             }
           ],
           "filters": [
@@ -1101,30 +1174,41 @@
           ],
           "maps": [
             {
-              "inputs": ["1:v"],
+              "inputs": [
+                "1:v"
+              ],
               "filters": [
                 {
                   "type": "setpts",
                   "value": "0.25*PTS"
                 }
               ],
-              "outputs": ["sped"],
+              "outputs": [
+                "sped"
+              ],
               "options": {
                 "useSectionFilters": true
               }
             },
             {
-              "inputs": ["sped", "2:v"],
+              "inputs": [
+                "sped",
+                "2:v"
+              ],
               "filters": [
                 {
                   "type": "overlay",
                   "value": "x=48:y='474+(1-(if(lt(t,0.12),0,if(lt(t,0.5),(t-0.12)/0.38,1))))*70'"
                 }
               ],
-              "outputs": ["carded"]
+              "outputs": [
+                "carded"
+              ]
             },
             {
-              "inputs": ["carded"],
+              "inputs": [
+                "carded"
+              ],
               "filters": [
                 {
                   "type": "drawtext",
@@ -1161,7 +1245,9 @@
                   }
                 }
               ],
-              "outputs": ["final"]
+              "outputs": [
+                "final"
+              ]
             }
           ],
           "filters": [
@@ -1301,139 +1387,185 @@
         {
           "name": "leclap_mark",
           "default": "pictures/leclap-mark.png",
-          "placeholders": ["{{ leclap_mark }}"],
+          "placeholders": [
+            "{{ leclap_mark }}"
+          ],
           "source": "global"
         },
         {
           "name": "opening_wall",
           "default": "videos/effects-tour/opening-wall.mp4",
-          "placeholders": ["{{ opening_wall }}"],
+          "placeholders": [
+            "{{ opening_wall }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_01",
           "default": "videos/effects-tour/01-type.mp4",
-          "placeholders": ["{{ chapter_01 }}"],
+          "placeholders": [
+            "{{ chapter_01 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_02",
           "default": "videos/effects-tour/02-camera-graphics.mp4",
-          "placeholders": ["{{ chapter_02 }}"],
+          "placeholders": [
+            "{{ chapter_02 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_03",
           "default": "videos/effects-tour/03-transitions.mp4",
-          "placeholders": ["{{ chapter_03 }}"],
+          "placeholders": [
+            "{{ chapter_03 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_04",
           "default": "videos/effects-tour/04-captions.mp4",
-          "placeholders": ["{{ chapter_04 }}"],
+          "placeholders": [
+            "{{ chapter_04 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_05",
           "default": "videos/effects-tour/05-compositing.mp4",
-          "placeholders": ["{{ chapter_05 }}"],
+          "placeholders": [
+            "{{ chapter_05 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_leclap",
           "default": "videos/effects-tour/06-theme-a-leclap.mp4",
-          "placeholders": ["{{ chapter_06_leclap }}"],
+          "placeholders": [
+            "{{ chapter_06_leclap }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_midnight",
           "default": "videos/effects-tour/06-theme-b-midnight.mp4",
-          "placeholders": ["{{ chapter_06_midnight }}"],
+          "placeholders": [
+            "{{ chapter_06_midnight }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_editorial",
           "default": "videos/effects-tour/06-theme-c-editorial.mp4",
-          "placeholders": ["{{ chapter_06_editorial }}"],
+          "placeholders": [
+            "{{ chapter_06_editorial }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_bold",
           "default": "videos/effects-tour/06-theme-d-bold.mp4",
-          "placeholders": ["{{ chapter_06_bold }}"],
+          "placeholders": [
+            "{{ chapter_06_bold }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_neon",
           "default": "videos/effects-tour/06-theme-e-neon.mp4",
-          "placeholders": ["{{ chapter_06_neon }}"],
+          "placeholders": [
+            "{{ chapter_06_neon }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_paper",
           "default": "videos/effects-tour/06-theme-f-paper.mp4",
-          "placeholders": ["{{ chapter_06_paper }}"],
+          "placeholders": [
+            "{{ chapter_06_paper }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_sunset",
           "default": "videos/effects-tour/06-theme-g-sunset.mp4",
-          "placeholders": ["{{ chapter_06_sunset }}"],
+          "placeholders": [
+            "{{ chapter_06_sunset }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_ocean",
           "default": "videos/effects-tour/06-theme-h-ocean.mp4",
-          "placeholders": ["{{ chapter_06_ocean }}"],
+          "placeholders": [
+            "{{ chapter_06_ocean }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_mono",
           "default": "videos/effects-tour/06-theme-i-mono.mp4",
-          "placeholders": ["{{ chapter_06_mono }}"],
+          "placeholders": [
+            "{{ chapter_06_mono }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_candy",
           "default": "videos/effects-tour/06-theme-j-candy.mp4",
-          "placeholders": ["{{ chapter_06_candy }}"],
+          "placeholders": [
+            "{{ chapter_06_candy }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_retro",
           "default": "videos/effects-tour/06-theme-k-retro.mp4",
-          "placeholders": ["{{ chapter_06_retro }}"],
+          "placeholders": [
+            "{{ chapter_06_retro }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_corporate",
           "default": "videos/effects-tour/06-theme-l-corporate.mp4",
-          "placeholders": ["{{ chapter_06_corporate }}"],
+          "placeholders": [
+            "{{ chapter_06_corporate }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_07",
           "default": "videos/effects-tour/07-looks.mp4",
-          "placeholders": ["{{ chapter_07 }}"],
+          "placeholders": [
+            "{{ chapter_07 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_08",
           "default": "videos/effects-tour/08-footage.mp4",
-          "placeholders": ["{{ chapter_08 }}"],
+          "placeholders": [
+            "{{ chapter_08 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_09",
           "default": "videos/effects-tour/09-sound.mp4",
-          "placeholders": ["{{ chapter_09 }}"],
+          "placeholders": [
+            "{{ chapter_09 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_10",
           "default": "videos/effects-tour/10-music.mp4",
-          "placeholders": ["{{ chapter_10 }}"],
+          "placeholders": [
+            "{{ chapter_10 }}"
+          ],
           "source": "global"
         }
       ],
@@ -1801,7 +1933,11 @@
               "color": "#F5F3F7",
               "fill": {
                 "gradient": {
-                  "stops": ["#7C83FD", "#C9CBFF", "#7C83FD"],
+                  "stops": [
+                    "#7C83FD",
+                    "#C9CBFF",
+                    "#7C83FD"
+                  ],
                   "angle": 90
                 },
                 "sweep": {
@@ -2284,7 +2420,7 @@
           "purpose": "Play the rendered compositing and light chapter.",
           "options": {
             "videoUrl": "{{ chapter_05 }}",
-            "duration": 40.1
+            "duration": 40.9
           },
           "transition": {
             "type": "push-up",
@@ -3295,7 +3431,10 @@
             "en": "Upload a landscape screen recording. A shallow perspective reveal settles into a readable screen, with a subtle forward drift and a caption outside the capture."
           },
           "captureMode": "screen",
-          "allowedCaptureModes": ["screen", "upload"],
+          "allowedCaptureModes": [
+            "screen",
+            "upload"
+          ],
           "forceAspectRatio": false,
           "forceOriginalAspectRatio": false
         }
@@ -3337,22 +3476,30 @@
       "variables": [
         {
           "name": "form_1_app",
-          "placeholders": ["{{ form_1_app }}"],
+          "placeholders": [
+            "{{ form_1_app }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_promise",
-          "placeholders": ["{{ form_1_promise }}"],
+          "placeholders": [
+            "{{ form_1_promise }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_feature",
-          "placeholders": ["{{ form_1_feature }}"],
+          "placeholders": [
+            "{{ form_1_feature }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_cta",
-          "placeholders": ["{{ form_1_cta }}"],
+          "placeholders": [
+            "{{ form_1_cta }}"
+          ],
           "source": "form"
         }
       ],
@@ -3407,7 +3554,11 @@
         "music": {
           "name": "lofi-study.mp3"
         },
-        "allowedMusic": ["the-builder", "lofi-study", "lofi-chill"],
+        "allowedMusic": [
+          "the-builder",
+          "lofi-study",
+          "lofi-chill"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "cut"
@@ -3602,7 +3753,10 @@
             "countdownDuration": 2,
             "forceOriginalAspectRatio": false,
             "captureMode": "screen",
-            "allowedCaptureModes": ["screen", "upload"]
+            "allowedCaptureModes": [
+              "screen",
+              "upload"
+            ]
           },
           "camera": {
             "preset": "push-in",
@@ -3849,17 +4003,23 @@
         {
           "name": "brand",
           "default": "YOUR LOGO",
-          "placeholders": ["{{ brand }}"],
+          "placeholders": [
+            "{{ brand }}"
+          ],
           "source": "global"
         },
         {
           "name": "form_1_headline",
-          "placeholders": ["{{ form_1_headline }}"],
+          "placeholders": [
+            "{{ form_1_headline }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_subtitle",
-          "placeholders": ["{{ form_1_subtitle }}"],
+          "placeholders": [
+            "{{ form_1_subtitle }}"
+          ],
           "source": "form"
         }
       ],
@@ -3935,7 +4095,13 @@
         "music": {
           "name": "lofi-study.mp3"
         },
-        "allowedMusic": ["lofi-study", "chill-hip-hop", "party-dance", "lofi-hip-hop", "indie-rock-dreamy"],
+        "allowedMusic": [
+          "lofi-study",
+          "chill-hip-hop",
+          "party-dance",
+          "lofi-hip-hop",
+          "indie-rock-dreamy"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "cut"
@@ -3969,7 +4135,9 @@
               "distance": 24,
               "easing": "ease-out"
             },
-            "sections": ["video_1"]
+            "sections": [
+              "video_1"
+            ]
           }
         ]
       },
@@ -4350,17 +4518,23 @@
         },
         {
           "name": "form_1_name",
-          "placeholders": ["{{ form_1_name }}"],
+          "placeholders": [
+            "{{ form_1_name }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_tagline",
-          "placeholders": ["{{ form_1_tagline }}"],
+          "placeholders": [
+            "{{ form_1_tagline }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_price",
-          "placeholders": ["{{ form_1_price }}"],
+          "placeholders": [
+            "{{ form_1_price }}"
+          ],
           "source": "form"
         }
       ],
@@ -4420,7 +4594,13 @@
         "music": {
           "name": "lofi-study.mp3"
         },
-        "allowedMusic": ["lofi-study", "chill-hip-hop", "the-builder", "indie-rock-dreamy", "once-in-paris"],
+        "allowedMusic": [
+          "lofi-study",
+          "chill-hip-hop",
+          "the-builder",
+          "indie-rock-dreamy",
+          "once-in-paris"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "cut"
@@ -4749,12 +4929,16 @@
       "variables": [
         {
           "name": "form_1_topic",
-          "placeholders": ["{{ form_1_topic }}"],
+          "placeholders": [
+            "{{ form_1_topic }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_step",
-          "placeholders": ["{{ form_1_step }}"],
+          "placeholders": [
+            "{{ form_1_step }}"
+          ],
           "source": "form"
         }
       ],
@@ -4804,7 +4988,13 @@
         "music": {
           "name": "the-builder.mp3"
         },
-        "allowedMusic": ["the-builder", "lofi-hip-hop", "point-being", "lofi-study", "lofi-chill"],
+        "allowedMusic": [
+          "the-builder",
+          "lofi-hip-hop",
+          "point-being",
+          "lofi-study",
+          "lofi-chill"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "cut"
@@ -5198,17 +5388,23 @@
       "variables": [
         {
           "name": "form_1_scene1",
-          "placeholders": ["{{ form_1_scene1 }}"],
+          "placeholders": [
+            "{{ form_1_scene1 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_scene2",
-          "placeholders": ["{{ form_1_scene2 }}"],
+          "placeholders": [
+            "{{ form_1_scene2 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_scene3",
-          "placeholders": ["{{ form_1_scene3 }}"],
+          "placeholders": [
+            "{{ form_1_scene3 }}"
+          ],
           "source": "form"
         }
       ],
@@ -5238,7 +5434,13 @@
         "music": {
           "name": "indie-rock-dreamy.mp3"
         },
-        "allowedMusic": ["indie-rock-dreamy", "lofi-chill", "lofi-hip-hop", "cafe-jazz", "dreamy-fall-people"],
+        "allowedMusic": [
+          "indie-rock-dreamy",
+          "lofi-chill",
+          "lofi-hip-hop",
+          "cafe-jazz",
+          "dreamy-fall-people"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "cut"
@@ -5571,42 +5773,56 @@
         {
           "name": "optionA1",
           "default": "Tea",
-          "placeholders": ["{{ optionA1 }}"],
+          "placeholders": [
+            "{{ optionA1 }}"
+          ],
           "source": "global"
         },
         {
           "name": "optionB1",
           "default": "Coffee",
-          "placeholders": ["{{ optionB1 }}"],
+          "placeholders": [
+            "{{ optionB1 }}"
+          ],
           "source": "global"
         },
         {
           "name": "optionA2",
           "default": "Beach",
-          "placeholders": ["{{ optionA2 }}"],
+          "placeholders": [
+            "{{ optionA2 }}"
+          ],
           "source": "global"
         },
         {
           "name": "optionB2",
           "default": "Mountains",
-          "placeholders": ["{{ optionB2 }}"],
+          "placeholders": [
+            "{{ optionB2 }}"
+          ],
           "source": "global"
         },
         {
           "name": "optionA3",
           "default": "Cats",
-          "placeholders": ["{{ optionA3 }}"],
+          "placeholders": [
+            "{{ optionA3 }}"
+          ],
           "source": "global"
         },
         {
           "name": "optionB3",
           "default": "Dogs",
-          "placeholders": ["{{ optionB3 }}"],
+          "placeholders": [
+            "{{ optionB3 }}"
+          ],
           "source": "global"
         },
         {
           "name": "form_1_firstname",
-          "placeholders": ["{{ form_1_firstname }}"],
+          "placeholders": [
+            "{{ form_1_firstname }}"
+          ],
           "source": "form"
         }
       ],
@@ -5769,7 +5985,13 @@
         "music": {
           "name": "chill-hip-hop.mp3"
         },
-        "allowedMusic": ["chill-hip-hop", "lofi-study", "lofi-hip-hop", "party-dance", "indie-rock-dreamy"],
+        "allowedMusic": [
+          "chill-hip-hop",
+          "lofi-study",
+          "lofi-hip-hop",
+          "party-dance",
+          "indie-rock-dreamy"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "push-left",
@@ -6173,7 +6395,10 @@
               "offset": 0.4
             }
           ],
-          "jobs": ["compare", "ask"],
+          "jobs": [
+            "compare",
+            "ask"
+          ],
           "useWhen": "A this-or-that question, poll or A/B choice that should feel loud and playful.",
           "avoidWhen": "Calm, premium or accessibility-sensitive pacing: the colour swap strobes every 0.4 s.",
           "sections": [
@@ -6333,7 +6558,10 @@
               "offset": 0.5
             }
           ],
-          "jobs": ["brand", "close"],
+          "jobs": [
+            "brand",
+            "close"
+          ],
           "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
           "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
           "sections": [
@@ -6448,27 +6676,37 @@
       "variables": [
         {
           "name": "form_1_name",
-          "placeholders": ["{{ form_1_name }}"],
+          "placeholders": [
+            "{{ form_1_name }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_title",
-          "placeholders": ["{{ form_1_title }}"],
+          "placeholders": [
+            "{{ form_1_title }}"
+          ],
           "source": "form"
         },
         {
           "name": "transitionDuration",
-          "placeholders": ["{{ transitionDuration }}"],
+          "placeholders": [
+            "{{ transitionDuration }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "transitionStartTime",
-          "placeholders": ["{{ transitionStartTime }}"],
+          "placeholders": [
+            "{{ transitionStartTime }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "form_1_question",
-          "placeholders": ["{{ form_1_question }}"],
+          "placeholders": [
+            "{{ form_1_question }}"
+          ],
           "source": "form"
         }
       ],
@@ -6546,7 +6784,13 @@
         "music": {
           "name": "lofi-sentimental-jazz.mp3"
         },
-        "allowedMusic": ["lofi-sentimental-jazz", "cafe-jazz", "lofi-chill", "lofi-cafe", "dreamy-fall-people"],
+        "allowedMusic": [
+          "lofi-sentimental-jazz",
+          "cafe-jazz",
+          "lofi-chill",
+          "lofi-cafe",
+          "dreamy-fall-people"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "fade",
@@ -6886,7 +7130,10 @@
               "offset": 0.5
             }
           ],
-          "jobs": ["brand", "close"],
+          "jobs": [
+            "brand",
+            "close"
+          ],
           "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
           "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
           "sections": [
@@ -6989,22 +7236,30 @@
       "variables": [
         {
           "name": "form_1_quote",
-          "placeholders": ["{{ form_1_quote }}"],
+          "placeholders": [
+            "{{ form_1_quote }}"
+          ],
           "source": "form"
         },
         {
           "name": "transitionDuration",
-          "placeholders": ["{{ transitionDuration }}"],
+          "placeholders": [
+            "{{ transitionDuration }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "transitionStartTime",
-          "placeholders": ["{{ transitionStartTime }}"],
+          "placeholders": [
+            "{{ transitionStartTime }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "form_1_name",
-          "placeholders": ["{{ form_1_name }}"],
+          "placeholders": [
+            "{{ form_1_name }}"
+          ],
           "source": "form"
         }
       ],
@@ -7055,7 +7310,13 @@
         "music": {
           "name": "dreamy-fall-people.mp3"
         },
-        "allowedMusic": ["dreamy-fall-people", "lofi-cafe", "lofi-sentimental-jazz", "cafe-jazz", "lofi-chill"],
+        "allowedMusic": [
+          "dreamy-fall-people",
+          "lofi-cafe",
+          "lofi-sentimental-jazz",
+          "cafe-jazz",
+          "lofi-chill"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "dissolve",
@@ -7271,7 +7532,10 @@
               "offset": 0.5
             }
           ],
-          "jobs": ["brand", "close"],
+          "jobs": [
+            "brand",
+            "close"
+          ],
           "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
           "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
           "sections": [
@@ -7370,7 +7634,9 @@
       "variables": [
         {
           "name": "form_1_firstname",
-          "placeholders": ["{{ form_1_firstname }}"],
+          "placeholders": [
+            "{{ form_1_firstname }}"
+          ],
           "source": "form"
         }
       ],
@@ -7435,7 +7701,13 @@
         "music": {
           "name": "party-dance.mp3"
         },
-        "allowedMusic": ["party-dance", "chill-hip-hop", "lofi-study", "indie-rock-dreamy", "cafe-jazz"],
+        "allowedMusic": [
+          "party-dance",
+          "chill-hip-hop",
+          "lofi-study",
+          "indie-rock-dreamy",
+          "cafe-jazz"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "fade",
@@ -7633,7 +7905,10 @@
               "offset": 0.5
             }
           ],
-          "jobs": ["brand", "close"],
+          "jobs": [
+            "brand",
+            "close"
+          ],
           "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
           "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
           "sections": [
@@ -7732,7 +8007,9 @@
       "variables": [
         {
           "name": "form_1_firstname",
-          "placeholders": ["{{ form_1_firstname }}"],
+          "placeholders": [
+            "{{ form_1_firstname }}"
+          ],
           "source": "form"
         }
       ],
@@ -7797,7 +8074,13 @@
         "music": {
           "name": "party-dance.mp3"
         },
-        "allowedMusic": ["party-dance", "chill-hip-hop", "lofi-study", "indie-rock-dreamy", "cafe-jazz"],
+        "allowedMusic": [
+          "party-dance",
+          "chill-hip-hop",
+          "lofi-study",
+          "indie-rock-dreamy",
+          "cafe-jazz"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "fade",
@@ -7992,7 +8275,10 @@
               "offset": 0.5
             }
           ],
-          "jobs": ["brand", "close"],
+          "jobs": [
+            "brand",
+            "close"
+          ],
           "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
           "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
           "sections": [
@@ -8070,7 +8356,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -8140,7 +8428,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -8210,7 +8500,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -8280,7 +8572,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -8350,7 +8644,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -8420,7 +8716,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -8490,7 +8788,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -9634,7 +9934,9 @@
         {
           "id": "leclap.title-reveal",
           "version": "1.0.0",
-          "sections": ["intro"],
+          "sections": [
+            "intro"
+          ],
           "customCatalog": false
         }
       ],
@@ -9729,7 +10031,9 @@
         {
           "id": "leclap.web-app-promo",
           "version": "1.0.0",
-          "sections": ["promo"],
+          "sections": [
+            "promo"
+          ],
           "customCatalog": false
         }
       ],
@@ -9763,7 +10067,11 @@
               "subheadline": "Turn your product into a story worth watching.",
               "cta": "Start creating",
               "displayUrl": "leclap.dev",
-              "features": ["Design with intent", "Move with precision", "Ship something remarkable"],
+              "features": [
+                "Design with intent",
+                "Move with precision",
+                "Ship something remarkable"
+              ],
               "accent": "#B9A2FF",
               "backgroundColor": "#111120",
               "textColor": "#FFFFFF",
@@ -9811,7 +10119,9 @@
         {
           "id": "studio.product-reveal",
           "version": "1.0.0",
-          "sections": ["product"],
+          "sections": [
+            "product"
+          ],
           "customCatalog": true
         }
       ],
@@ -10668,19 +10978,25 @@
         {
           "name": "project",
           "default": "Example project",
-          "placeholders": ["{{ project }}"],
+          "placeholders": [
+            "{{ project }}"
+          ],
           "source": "global"
         },
         {
           "name": "change",
           "default": "Keyboard navigation",
-          "placeholders": ["{{ change }}"],
+          "placeholders": [
+            "{{ change }}"
+          ],
           "source": "global"
         },
         {
           "name": "reviewFocus",
           "default": "Focus order and visible focus states",
-          "placeholders": ["{{ reviewFocus }}"],
+          "placeholders": [
+            "{{ reviewFocus }}"
+          ],
           "source": "global"
         }
       ],
@@ -10937,31 +11253,41 @@
         {
           "name": "project",
           "default": "Example project",
-          "placeholders": ["{{ project }}"],
+          "placeholders": [
+            "{{ project }}"
+          ],
           "source": "global"
         },
         {
           "name": "change",
           "default": "Describe the change",
-          "placeholders": ["{{ change }}"],
+          "placeholders": [
+            "{{ change }}"
+          ],
           "source": "global"
         },
         {
           "name": "beforeCaption",
           "default": "What was wrong",
-          "placeholders": ["{{ beforeCaption }}"],
+          "placeholders": [
+            "{{ beforeCaption }}"
+          ],
           "source": "global"
         },
         {
           "name": "afterCaption",
           "default": "What changed",
-          "placeholders": ["{{ afterCaption }}"],
+          "placeholders": [
+            "{{ afterCaption }}"
+          ],
           "source": "global"
         },
         {
           "name": "reviewFocus",
           "default": "What the reviewer should check",
-          "placeholders": ["{{ reviewFocus }}"],
+          "placeholders": [
+            "{{ reviewFocus }}"
+          ],
           "source": "global"
         }
       ],
@@ -11363,7 +11689,10 @@
         },
         {
           "name": "geom.canvas",
-          "default": ["1280", "720"],
+          "default": [
+            "1280",
+            "720"
+          ],
           "placeholders": [],
           "source": "global"
         },
@@ -11393,13 +11722,21 @@
         },
         {
           "name": "geom.card",
-          "default": ["286", "322", "414", "448"],
+          "default": [
+            "286",
+            "322",
+            "414",
+            "448"
+          ],
           "placeholders": [],
           "source": "global"
         },
         {
           "name": "geom.rule",
-          "default": ["166", "4"],
+          "default": [
+            "166",
+            "4"
+          ],
           "placeholders": [],
           "source": "global"
         },
@@ -11477,7 +11814,12 @@
         },
         {
           "name": "limit.badgeVocabulary",
-          "default": ["BEFORE", "AFTER", "AVANT", "APRÈS"],
+          "default": [
+            "BEFORE",
+            "AFTER",
+            "AVANT",
+            "APRÈS"
+          ],
           "placeholders": [],
           "source": "global"
         }
@@ -11553,13 +11895,24 @@
           "size.panelDesc": "19",
           "size.introBadge": "22",
           "size.introDesc": "22",
-          "geom.canvas": ["1280", "720"],
+          "geom.canvas": [
+            "1280",
+            "720"
+          ],
           "geom.cardMargin": "80",
           "geom.panelWidth": "320",
           "geom.panelPad": "40",
           "geom.badgePad": "11",
-          "geom.card": ["286", "322", "414", "448"],
-          "geom.rule": ["166", "4"],
+          "geom.card": [
+            "286",
+            "322",
+            "414",
+            "448"
+          ],
+          "geom.rule": [
+            "166",
+            "4"
+          ],
           "geom.lineSpacing": "7",
           "geom.introRule": "334",
           "geom.introRowY": "390",
@@ -11572,7 +11925,12 @@
           "motion.stagger": "0.14",
           "limit.titleLines": "3",
           "limit.descLines": "6",
-          "limit.badgeVocabulary": ["BEFORE", "AFTER", "AVANT", "APRÈS"]
+          "limit.badgeVocabulary": [
+            "BEFORE",
+            "AFTER",
+            "AVANT",
+            "APRÈS"
+          ]
         }
       },
       "partials": [
@@ -11754,7 +12112,9 @@
             "duration": 1.8
           },
           "camera": {
-            "hits": [0.35]
+            "hits": [
+              0.35
+            ]
           },
           "graphics": [
             {
@@ -11862,8 +12222,18 @@
             {
               "type": "bars-chart",
               "at": 0.3,
-              "values": [12, 28, 19, 42],
-              "labels": ["Q1", "Q2", "Q3", "Q4"],
+              "values": [
+                12,
+                28,
+                19,
+                42
+              ],
+              "labels": [
+                "Q1",
+                "Q2",
+                "Q3",
+                "Q4"
+              ],
               "x": 300,
               "y": 140,
               "width": 680,
@@ -12208,7 +12578,9 @@
           "camera": {
             "preset": "push-in",
             "amount": 0.06,
-            "hits": [0.6]
+            "hits": [
+              0.6
+            ]
           },
           "graphics": [
             {
@@ -12641,7 +13013,11 @@
               "color": "#9EA3FF",
               "fill": {
                 "gradient": {
-                  "stops": ["#7C83FD", "#C9CBFF", "#7C83FD"],
+                  "stops": [
+                    "#7C83FD",
+                    "#C9CBFF",
+                    "#7C83FD"
+                  ],
                   "angle": 90
                 },
                 "sweep": {
@@ -12710,7 +13086,11 @@
           },
           "layout": {
             "type": "split",
-            "sources": ["backgrounds/rocky-coast.jpg", "backgrounds/forest-sea.jpg", "backgrounds/green-forest.jpg"],
+            "sources": [
+              "backgrounds/rocky-coast.jpg",
+              "backgrounds/forest-sea.jpg",
+              "backgrounds/green-forest.jpg"
+            ],
             "gap": 12
           },
           "graphics": [
@@ -12754,7 +13134,10 @@
           "layout": {
             "type": "split",
             "direction": "vertical",
-            "sources": ["backgrounds/laptop-desk.jpg", "backgrounds/desk-flatlay.jpg"],
+            "sources": [
+              "backgrounds/laptop-desk.jpg",
+              "backgrounds/desk-flatlay.jpg"
+            ],
             "divider": {
               "color": "#FFF685",
               "width": 6
@@ -13133,7 +13516,9 @@
             "duration": 2.8
           },
           "camera": {
-            "hits": [0.75]
+            "hits": [
+              0.75
+            ]
           },
           "kinetic": [
             {
@@ -13450,7 +13835,16 @@
             }
           },
           "camera": {
-            "hits": ["beat:9", "beat:10", "beat:11", "beat:12", "beat:13", "beat:14", "beat:15", "beat:16"]
+            "hits": [
+              "beat:9",
+              "beat:10",
+              "beat:11",
+              "beat:12",
+              "beat:13",
+              "beat:14",
+              "beat:15",
+              "beat:16"
+            ]
           },
           "graphics": [
             {
@@ -13809,13 +14203,17 @@
         {
           "name": "broll",
           "default": "videos/video_2.mp4",
-          "placeholders": ["{{ broll }}"],
+          "placeholders": [
+            "{{ broll }}"
+          ],
           "source": "global"
         },
         {
           "name": "lut",
           "default": "luts/warm-print.cube",
-          "placeholders": ["{{ lut }}"],
+          "placeholders": [
+            "{{ lut }}"
+          ],
           "source": "global"
         }
       ],
@@ -14257,7 +14655,9 @@
           "camera": {
             "preset": "push-in",
             "amount": 0.1,
-            "hits": ["cue:drop"]
+            "hits": [
+              "cue:drop"
+            ]
           },
           "graphics": [
             {
@@ -14360,52 +14760,72 @@
       "variables": [
         {
           "name": "address",
-          "placeholders": ["{{ address }}"],
+          "placeholders": [
+            "{{ address }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "city",
-          "placeholders": ["{{ city }}"],
+          "placeholders": [
+            "{{ city }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "price",
-          "placeholders": ["{{ price }}"],
+          "placeholders": [
+            "{{ price }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "rooms",
-          "placeholders": ["{{ rooms }}"],
+          "placeholders": [
+            "{{ rooms }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "area",
-          "placeholders": ["{{ area }}"],
+          "placeholders": [
+            "{{ area }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "floor",
-          "placeholders": ["{{ floor }}"],
+          "placeholders": [
+            "{{ floor }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "visit",
-          "placeholders": ["{{ visit }}"],
+          "placeholders": [
+            "{{ visit }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "agent",
-          "placeholders": ["{{ agent }}"],
+          "placeholders": [
+            "{{ agent }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "agency",
-          "placeholders": ["{{ agency }}"],
+          "placeholders": [
+            "{{ agency }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "phone",
-          "placeholders": ["{{ phone }}"],
+          "placeholders": [
+            "{{ phone }}"
+          ],
           "source": "placeholder"
         }
       ],
@@ -14729,47 +15149,65 @@
       "variables": [
         {
           "name": "quote_lead",
-          "placeholders": ["{{ quote_lead }}"],
+          "placeholders": [
+            "{{ quote_lead }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "quote_highlight",
-          "placeholders": ["{{ quote_highlight }}"],
+          "placeholders": [
+            "{{ quote_highlight }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "quote_tail",
-          "placeholders": ["{{ quote_tail }}"],
+          "placeholders": [
+            "{{ quote_tail }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "customer",
-          "placeholders": ["{{ customer }}"],
+          "placeholders": [
+            "{{ customer }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "customer_role",
-          "placeholders": ["{{ customer_role }}"],
+          "placeholders": [
+            "{{ customer_role }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "rating",
-          "placeholders": ["{{ rating }}"],
+          "placeholders": [
+            "{{ rating }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "shop",
-          "placeholders": ["{{ shop }}"],
+          "placeholders": [
+            "{{ shop }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "offer",
-          "placeholders": ["{{ offer }}"],
+          "placeholders": [
+            "{{ offer }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "cta",
-          "placeholders": ["{{ cta }}"],
+          "placeholders": [
+            "{{ cta }}"
+          ],
           "source": "placeholder"
         }
       ],
@@ -15040,52 +15478,72 @@
       "variables": [
         {
           "name": "event_first",
-          "placeholders": ["{{ event_first }}"],
+          "placeholders": [
+            "{{ event_first }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "event_second",
-          "placeholders": ["{{ event_second }}"],
+          "placeholders": [
+            "{{ event_second }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "event_date",
-          "placeholders": ["{{ event_date }}"],
+          "placeholders": [
+            "{{ event_date }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "event_venue",
-          "placeholders": ["{{ event_venue }}"],
+          "placeholders": [
+            "{{ event_venue }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "speaker",
-          "placeholders": ["{{ speaker }}"],
+          "placeholders": [
+            "{{ speaker }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "speaker_role",
-          "placeholders": ["{{ speaker_role }}"],
+          "placeholders": [
+            "{{ speaker_role }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "talk_title",
-          "placeholders": ["{{ talk_title }}"],
+          "placeholders": [
+            "{{ talk_title }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "talk_time",
-          "placeholders": ["{{ talk_time }}"],
+          "placeholders": [
+            "{{ talk_time }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "talk_room",
-          "placeholders": ["{{ talk_room }}"],
+          "placeholders": [
+            "{{ talk_room }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "talk_track",
-          "placeholders": ["{{ talk_track }}"],
+          "placeholders": [
+            "{{ talk_track }}"
+          ],
           "source": "placeholder"
         }
       ],
@@ -15382,37 +15840,51 @@
       "variables": [
         {
           "name": "product",
-          "placeholders": ["{{ product }}"],
+          "placeholders": [
+            "{{ product }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "release",
-          "placeholders": ["{{ release }}"],
+          "placeholders": [
+            "{{ release }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "samples",
-          "placeholders": ["{{ samples }}"],
+          "placeholders": [
+            "{{ samples }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "tools",
-          "placeholders": ["{{ tools }}"],
+          "placeholders": [
+            "{{ tools }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "platforms",
-          "placeholders": ["{{ platforms }}"],
+          "placeholders": [
+            "{{ platforms }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "fonts",
-          "placeholders": ["{{ fonts }}"],
+          "placeholders": [
+            "{{ fonts }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "claim",
-          "placeholders": ["{{ claim }}"],
+          "placeholders": [
+            "{{ claim }}"
+          ],
           "source": "placeholder"
         }
       ],

@@ -12,6 +12,7 @@ import { FilmPlayer } from './film-player';
 import { filmAsset, filmLang } from './films';
 import { ChapterList, PINNED_QUERY, useActiveChapter } from './scroll-chapters';
 import { SectionHeading } from './section-heading';
+import { usePromoOrientation } from './use-promo-orientation';
 
 // The agentic-development deep dive: the loop in four chapters beside a pinned pull request, whose step rail
 // follows the chapters while the real evidence plays inside it — a LeClap engine render of before/after
@@ -28,7 +29,8 @@ export const AgenticDeepDive = () => {
   const pinned = useMediaQuery(PINNED_QUERY);
   const [nearRef, near] = useInView<HTMLElement>({ rootMargin: '600px 0px' });
   const lang = filmLang(i18n.resolvedLanguage);
-  const film = filmAsset('agentic', i18n.resolvedLanguage);
+  const orientation = usePromoOrientation();
+  const film = filmAsset('agentic', i18n.resolvedLanguage, orientation);
   const chapters = STEPS.map((key) => ({
     key,
     title: t(`agentic.chapters.${key}.title`),
@@ -83,6 +85,7 @@ export const AgenticDeepDive = () => {
           key={film.mp4}
           className="mt-8"
           film={film}
+          shape={orientation}
           title={t('agentic.filmName')}
           badge={t('agentic.filmBadge')}
           captionsLabel={t('film.captions')}
