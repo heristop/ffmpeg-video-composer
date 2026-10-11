@@ -43,6 +43,12 @@ seconds with native ffprobe. Unit tests also reject invalid duration, frame rate
 audio and failed native calls. Hydrate the bundled sample from Git LFS and start Metro first.
 A simulator/emulator check does not replace signed release builds or physical-device testing.
 
+The `leclap://all-templates-test` device check compiles every bundled template through
+`compileOnDevice`, one after another in one process, with the bundled sample clip in each recorded
+slot (`?only=interview,story-reel` narrows it). Each template logs a `LECLAP_ALLTEMPLATES <id>=OK|FAIL`
+line with its render time, so a run reads from `adb logcat` or the simulator log. With a Release build
+installed, `maestro test apps/leclap-expo/.maestro/all-templates.yaml` runs it and fails on any FAIL.
+
 ## Why
 
 The native backend embeds the FFmpeg `ffmpeg`/`ffprobe` programs (pinned to n8.0, with `drawtext` enabled) in a Rust library. It is another `AbstractFFmpeg` implementation in the existing director/builder pipeline: shared managers build commands, and the backend executes them. Runtime support depends on the built codecs/filters and available media, rather than a promise that every descriptor renders offline.
@@ -253,4 +259,5 @@ The supported filter inventory and device compatibility rewrites are **generated
 | Rust engine crate                          | `packages/ffmpeg-engine/{Cargo.toml, src/lib.rs, csrc/ffmpeg_shim.c, build.rs}`                                                                                                   |
 | FFmpeg build toolchain                     | `scripts/ffmpeg/{versions.env, common.sh, build-engine.sh, build-deps.sh, build-host.sh, build-android.sh, build-ios.sh, patch-fftools.sh}`                                       |
 | In-app smoke test                          | `apps/leclap-expo/app/(fullscreen)/ffmpeg-spike.tsx`                                                                                                                              |
+| All-templates device check                 | `apps/leclap-expo/app/(fullscreen)/all-templates-test.tsx`, `apps/leclap-expo/.maestro/all-templates.yaml`                                                                        |
 | HTML layer rasteriser (WebView)            | `apps/leclap-expo/src/services/compile/html-raster/`, `apps/leclap-expo/src/components/compile/html-raster-view.tsx`, `packages/ffmpeg-video-composer/src/html-raster-webview.ts` |
