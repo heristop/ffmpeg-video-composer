@@ -1,0 +1,11 @@
+# Device check: compile every bundled template on the device (app/(fullscreen)/all-templates-test.tsx).
+# Run against an installed Release build: maestro test apps/leclap-expo/.maestro/all-templates.yaml
+# A slow emulator can take several minutes per template, hence the long wait.
+appId: com.heristop.leclap
+---
+- openLink: leclap://all-templates-test
+- extendedWaitUntil:
+    visible: 'DONE .*'
+    timeout: 1800000
+- assertVisible: 'DONE (\d+)/\1 OK'
+- assertNotVisible: 'FAIL .*'
