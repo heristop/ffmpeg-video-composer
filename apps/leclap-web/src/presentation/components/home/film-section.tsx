@@ -11,6 +11,7 @@ export const FilmSection = () => {
   // A phone held upright gets the 9:16 cut in a portrait frame.
   const orientation = usePromoOrientation();
   const film = filmAsset('showcase', i18n.resolvedLanguage, orientation);
+  const lang = filmLang(i18n.resolvedLanguage);
 
   return (
     <section id="film" className="relative overflow-hidden bg-background py-24 text-foreground sm:py-32 lg:py-40">
@@ -33,7 +34,7 @@ export const FilmSection = () => {
           title={t('film.name')}
           badge={t('film.badge')}
           captionsLabel={t('film.captions')}
-          captionsLang={filmLang(i18n.resolvedLanguage)}
+          captionsLang={lang}
           labels={{
             play: t('film.play'),
             pause: t('film.pause'),

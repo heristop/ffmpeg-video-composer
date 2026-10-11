@@ -17,7 +17,6 @@
     "eyebrow": "En action",
     "title": "Chaque effet tient dans un modèle",
     "subtitle": "Reflets, scintillements, cadres, mouvements de caméra et coupes sur le temps : chacun tient en une ligne de modèle, et rend pareil dans ton navigateur, sur ton ordinateur et sur ton téléphone.",
-    "badge": "Démo des effets · faite avec LeClap",
     "videoAria": "Une démo des effets de mouvement de LeClap, lue en boucle",
     "play": "Lire le rendu",
     "pause": "Mettre le rendu en pause",
@@ -28,8 +27,7 @@
   },
   "sound": {
     "on": "Activer le son",
-    "off": "Couper le son",
-    "volume": "Volume"
+    "off": "Couper le son"
   },
   "film": {
     "eyebrow": "Le film",

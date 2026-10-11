@@ -3,6 +3,7 @@
 // augmentation in src/types/react-i18next.d.ts.
 import common from './common.json';
 import showcase from './showcase.json';
+import player from './player.json';
 import home from './home.json';
 import about from './about.json';
 import compare from './compare.json';
@@ -24,6 +25,7 @@ import agent from './agent.json';
 export const en = {
   common,
   showcase,
+  player,
   home,
   about,
   compare,

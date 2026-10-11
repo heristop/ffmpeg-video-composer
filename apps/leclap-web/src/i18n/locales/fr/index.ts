@@ -6,6 +6,7 @@
 // so a missing translation fails typecheck rather than silently falling back to English.
 import common from './common.json';
 import showcase from './showcase.json';
+import player from './player.json';
 import home from './home.json';
 import about from './about.json';
 import compare from './compare.json';
@@ -32,6 +33,7 @@ type LocaleShape<T> = { [K in keyof T]: T[K] extends string ? string : LocaleSha
 export const fr = {
   common,
   showcase,
+  player,
   home,
   about,
   compare,

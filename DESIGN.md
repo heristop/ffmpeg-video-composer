@@ -50,6 +50,16 @@ Surfaces and text are **semantic tokens** that default to **light** in `@theme` 
 - **Elevation:** brand-tinted shadows — `--shadow-md`, `--shadow-lg`, and `--shadow-glow` (a lavender glow). Surfaces use restrained glassmorphism over the ink canvas.
 - **Radii:** `sm 6px · md 8px · lg 12px · xl 16px · 2xl 20px`.
 
+## Video player
+
+Every video in the web app plays in one player family ([`apps/leclap-web/src/presentation/components/player/`](apps/leclap-web/src/presentation/components/player/)): the studio result, test renders, camera takes, the landing films and reel, and the showcase. It speaks the app's language rather than a stock player's:
+
+- **Film-strip timeline:** the played part in the brand gradient over a lavender-tinted track (buffered a paler tint), a hairline notch where each template scene starts, sprocket perforations underneath, and the app's playhead thumb (off-white ringed in rose). Hover or scrub floats a frame from that moment, framed like a monitor, with a mono pill reading the scene and the time.
+- **Controls:** glass capsules like the header's pills; play/pause morph; the speed is a lavender chip whose figure rolls as it changes (0.5×–2×, kept for the session, pitch preserved); time in the slates' mono; captions; picture-in-picture (standard API, Safari's presentation mode as the fallback, hidden in Firefox); fullscreen. All 44 px.
+- **Cover and moments:** the poster wears a title card (LeClap chip, frame shape, length, the title in Oswald) inside the program monitor's corner brackets; the centre button is the brand-gradient call to action with its glow; a clapperboard claps as playback starts; Clappy runs the loader and calls "cut" on an error; fullscreen turns cinematic (large title, display-face timecode).
+- **Tokens:** `--color-player-ink` / `--color-player-fg` (theme-constant, over footage, always on a scrim) plus the brand scales; menus use the app's dark popover surface. Motion is 150–300 ms on transform and opacity, still under reduced motion.
+- **Behaviour:** controls fade over a playing video after 2.5 s without pointer movement and return on move, tap or keyboard focus; space/k, ←/→, j/l, ↑/↓, 0–9, m, f, c, p (picture-in-picture), `<`/`>`. Mini frames shed the time, speed, frame preview, perforations, title and Clappy, never play, sound, seek or fullscreen.
+
 ---
 
 Part of the [LeClap monorepo](README.md). Recording/UI overlays (framing guide) and in-video captions are documented in the [template configuration reference](docs/template-configuration.md).

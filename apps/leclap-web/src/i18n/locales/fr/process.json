@@ -90,14 +90,7 @@
   "export": {
     "preview": {
       "videoAriaLabel": "Vidéo rendue",
-      "label": "Vidéo rendue",
-      "pause": "Mettre en pause",
-      "play": "Lire la vidéo",
-      "mute": "Couper le son",
-      "unmute": "Activer le son",
-      "volume": "Volume",
-      "exitFullscreen": "Quitter le plein écran",
-      "enterFullscreen": "Passer en plein écran"
+      "label": "Vidéo rendue"
     },
     "actions": {
       "download": "Télécharger la vidéo",

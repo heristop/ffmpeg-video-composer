@@ -8,8 +8,6 @@
   "loading": "Cargando vista previa",
   "videoError": "No se pudo cargar la vista previa. Inténtalo de nuevo.",
   "retry": "Reintentar",
-  "seek": "Avanzar en la vista previa",
-  "position": "{{current}} de {{total}}",
   "native": "JSON nativo",
   "downloadJson": "Descargar JSON",
   "retrySource": "Recargar fuente",

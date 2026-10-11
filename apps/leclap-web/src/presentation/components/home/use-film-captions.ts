@@ -1,6 +1,8 @@
 import { useEffect, useState, type RefObject } from 'react';
 
-export function useFilmCaptions(videoRef: RefObject<HTMLVideoElement | null>, reduced: boolean, mounted: boolean) {
+// The film's captions, drawn by the player over its screen (film-player.tsx) rather than by the browser, so they
+// rise clear of the controls: the track stays hidden and its active cue is read out as it changes.
+export function useFilmCaptions(videoRef: RefObject<HTMLVideoElement | null>, mounted: boolean) {
   const [captions, setCaptions] = useState(true);
   const [cue, setCue] = useState('');
 
@@ -9,11 +11,6 @@ export function useFilmCaptions(videoRef: RefObject<HTMLVideoElement | null>, re
 
     if (!track) return () => {};
 
-    if (reduced) {
-      track.mode = 'showing';
-
-      return () => {};
-    }
     track.mode = 'hidden';
     const onCueChange = () => {
       const active = track.activeCues?.[0];
@@ -24,7 +21,7 @@ export function useFilmCaptions(videoRef: RefObject<HTMLVideoElement | null>, re
     return () => {
       track.removeEventListener('cuechange', onCueChange);
     };
-  }, [videoRef, reduced, mounted]);
+  }, [videoRef, mounted]);
 
   return { captions, setCaptions, cue };
 }
