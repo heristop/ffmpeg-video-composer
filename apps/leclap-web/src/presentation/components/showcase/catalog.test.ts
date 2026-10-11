@@ -7,8 +7,10 @@ import {
   HTML_SAMPLE_IDS,
   HTML_SAMPLES_AFTER,
   LIBRARY_SAMPLES,
+  SHAPE_ASPECT,
   SHOWCASE_SAMPLES,
   placeAfter,
+  sampleDuration,
   sampleShape,
   filterSamples,
   selectedSample,
@@ -164,5 +166,18 @@ describe('showcase catalog', () => {
           .toString()
       ).toBe('WEBP');
     }
+  });
+});
+
+describe('sampleDuration and SHAPE_ASPECT', () => {
+  it('reads a sample’s length from the preview manifest, for a poster that preloads nothing', () => {
+    const tour = SHOWCASE_SAMPLES.find((sample) => sample.id === 'effects-tour');
+
+    expect(tour && sampleDuration(tour)).toBeGreaterThan(400);
+    expect(sampleDuration({ ...SHOWCASE_SAMPLES[0], id: 'nope' })).toBeUndefined();
+  });
+
+  it('names each shape as the title card prints it', () => {
+    expect(SHAPE_ASPECT).toEqual({ landscape: '16:9', portrait: '9:16', square: '1:1' });
   });
 });

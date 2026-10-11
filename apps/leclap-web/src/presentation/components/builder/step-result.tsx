@@ -68,6 +68,7 @@ export const StepResult = ({ processedVideo, title, orientation, onBack, onReset
             url={processedVideo.url}
             fill
             label={null}
+            title={title}
             onMetadata={({ width, height }) => {
               if (width > 0 && height > 0) setFrame({ width, height });
             }}

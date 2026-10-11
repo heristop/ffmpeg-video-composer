@@ -17,7 +17,6 @@
     "eyebrow": "Guardalo in azione",
     "title": "Ogni effetto sta in un modello",
     "subtitle": "Bagliori, scintille, cornici, movimenti di camera e tagli a tempo: ognuno è una riga di modello, e appare uguale nel browser, sul computer e sul telefono.",
-    "badge": "Reel degli effetti · fatto con LeClap",
     "videoAria": "Un reel degli effetti di movimento di LeClap, riprodotto in loop",
     "play": "Riproduci il render",
     "pause": "Metti in pausa il render",
@@ -28,8 +27,7 @@
   },
   "sound": {
     "on": "Attiva l’audio",
-    "off": "Disattiva l’audio",
-    "volume": "Volume"
+    "off": "Disattiva l’audio"
   },
   "film": {
     "eyebrow": "Il film",

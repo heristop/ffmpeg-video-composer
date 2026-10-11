@@ -73,6 +73,16 @@ export function sampleShape(sample: ShowcaseSample): FilmShape {
   return shape === 'portrait' || shape === 'square' ? shape : 'landscape';
 }
 
+// The length of each preview, from the manifest: the player's title card prints it before anything has loaded.
+const DURATIONS = new Map(previews.samples.map((preview) => [preview.id, preview.duration]));
+
+export function sampleDuration(sample: ShowcaseSample): number | undefined {
+  return DURATIONS.get(sample.id);
+}
+
+// How the player's title card names each shape.
+export const SHAPE_ASPECT: Record<FilmShape, string> = { landscape: '16:9', portrait: '9:16', square: '1:1' };
+
 // Width over height of each shape, for sizing a screen to fit the viewport.
 export const SHAPE_RATIO: Record<FilmShape, number> = { landscape: 16 / 9, portrait: 9 / 16, square: 1 };
 

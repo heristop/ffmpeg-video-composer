@@ -90,14 +90,7 @@
   "export": {
     "preview": {
       "videoAriaLabel": "Gerendertes Video",
-      "label": "Gerendertes Video",
-      "pause": "Video pausieren",
-      "play": "Video abspielen",
-      "mute": "Stummschalten",
-      "unmute": "Ton an",
-      "volume": "Lautstärke",
-      "exitFullscreen": "Vollbild verlassen",
-      "enterFullscreen": "Vollbild starten"
+      "label": "Gerendertes Video"
     },
     "actions": {
       "download": "Video herunterladen",

@@ -8,8 +8,6 @@
   "loading": "Vorschau wird geladen",
   "videoError": "Die Vorschau konnte nicht geladen werden. Erneut versuchen.",
   "retry": "Erneut versuchen",
-  "seek": "In der Vorschau springen",
-  "position": "{{current}} von {{total}}",
   "native": "Natives JSON",
   "downloadJson": "JSON herunterladen",
   "retrySource": "Quelle erneut laden",

@@ -17,7 +17,6 @@
     "eyebrow": "In Aktion sehen",
     "title": "Jeder Effekt steckt in einer Vorlage",
     "subtitle": "Lichtlecks, Glanzlichter, Rahmen, Kamerafahrten und Schnitte im Takt: Jeder ist eine Zeile in einer Vorlage und sieht im Browser, auf dem Computer und auf dem Handy gleich aus.",
-    "badge": "Effekt-Reel · mit LeClap gemacht",
     "videoAria": "Ein Reel mit LeClap-Bewegungseffekten, läuft in Schleife",
     "play": "Render abspielen",
     "pause": "Render pausieren",
@@ -28,8 +27,7 @@
   },
   "sound": {
     "on": "Ton an",
-    "off": "Ton aus",
-    "volume": "Lautstärke"
+    "off": "Ton aus"
   },
   "film": {
     "eyebrow": "Der Film",

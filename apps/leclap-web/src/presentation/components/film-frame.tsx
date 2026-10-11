@@ -1,4 +1,13 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -6,14 +15,15 @@ import { useInView } from '@/hooks/useInView';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { useSound } from '@/hooks/use-sound';
-import { changedByVisitor, markSoundFound, setSoundEnabled, setSoundVolume, tellVideo } from '@/lib/landing-sound';
+import { changedByVisitor, setSoundEnabled, setSoundVolume, tellVideo } from '@/lib/landing-sound';
 import { Volume2, VolumeX } from '@/presentation/components/icons';
+import { PlayerVolumeSlider } from '@/presentation/components/player/player-controls';
 import { perforationMaskStyle, perforationTileStyle } from '@/lib/film-strip';
 
 // The home page's one frame for video: a clip-path-rounded screen with a glass label pill, sprocket-hole
-// film edges and a glass control pill — shared by the in-browser render showcase and the films, so every
-// video on the page reads as the same object, at the same size, arriving the same way, and speaks with
-// the landing's one sound (lib/landing-sound.ts).
+// film edges and the LeClap player's control bar (components/player) — shared by the in-browser render
+// showcase, the effects reel and the films, so every video on the page reads as the same object, at the same
+// size, arriving the same way, and speaks with the landing's one sound (lib/landing-sound.ts).
 
 /** A beat after a frame's video is seen playing muted, its sound button arrives labelled... */
 const HINT_DELAY_MS = 400;
@@ -93,88 +103,68 @@ const SCREEN_ASPECT: Record<FilmShape, string> = {
 
 /** The rounded clip: a clip-path because Chrome lets composited children (the <video>) escape an overflow clip
  * inside 3D-transformed ancestors, and the compositor always honours clip-path. */
-const FRAME_CLIP = 'rounded-[inherit] bg-black [clip-path:inset(0_round_0.75rem)] sm:[clip-path:inset(0_round_1rem)]';
+const FRAME_CLIP =
+  'rounded-[inherit] bg-player-ink [clip-path:inset(0_round_0.75rem)] sm:[clip-path:inset(0_round_1rem)]';
+
+const SHAPE_RATIO: Record<FilmShape, number> = { landscape: 16 / 9, portrait: 9 / 16, square: 1 };
+
+type FrameProps = HTMLAttributes<HTMLDivElement> & { 'data-chrome'?: string; 'data-fullscreen'?: string };
 
 /**
- * The glass control pill: a named group, so three frames' "Mute" buttons stay tell-apart for a screen reader,
- * and its buttons sit far enough apart that their 44 px hit areas meet without overlapping.
- */
-export const ControlPill = ({
-  label,
-  className,
-  children,
-}: {
-  /** Which video these controls drive. */
-  label?: string;
-  className?: string;
-  children: ReactNode;
-}) => (
-  <div
-    role="group"
-    aria-label={label}
-    className={cn(
-      'flex items-center gap-3 rounded-full bg-black/60 px-1.5 py-1 ring-1 ring-white/15 backdrop-blur-sm',
-      className
-    )}
-  >
-    {children}
-  </div>
-);
-
-/**
- * The screen itself, its control pill in the corner. With a `bar` (a showcase film's seek bar and pill), the
- * frame holds the screen and the bar: the bar lies over the screen's foot only where the screen is large and a
- * pointer can hover, and hides there while the film plays; on a small screen or a touch device it sits under
- * the screen, so no control ever covers a small film (index.css, `.film-frame`).
+ * The screen itself. With a `bar` (the player's controls), the frame holds the screen and the bar: the bar lies
+ * over the screen's foot only where the screen is large and a pointer can hover, and fades there over a playing
+ * film once the pointer rests; on a small screen or a touch device it sits under the screen, so no control ever
+ * covers a small film (index.css, `.film-frame`). Fullscreen always lays it over the screen. `frameRef` and
+ * `frameProps` reach the frame, which is what goes fullscreen and answers the player's keys.
  */
 export const FilmScreen = ({
   shape = 'landscape',
   badge,
-  control,
-  controlLabel,
   paused = false,
   bar,
+  frameRef,
+  frameProps,
   children,
 }: {
   /** The screen's aspect: landscape unless the film was made otherwise. */
   shape?: FilmShape;
   /** The label pill, if any. */
   badge?: string;
-  /** The corner control pill, if any. */
-  control?: ReactNode;
-  /** The accessible name of the control group: which video these controls drive. */
-  controlLabel?: string;
   /** Whether the video is stopped: the sprocket holes stop with it, like film in a projector. */
   paused?: boolean;
-  /** Controls laid out with the screen rather than in its corner. */
+  /** The player's control bar. */
   bar?: ReactNode;
+  frameRef?: RefObject<HTMLDivElement | null>;
+  frameProps?: FrameProps;
   children: ReactNode;
 }) => {
   const screen = (
-    <div className={cn('relative overflow-hidden', SCREEN_ASPECT[shape], !bar && FRAME_CLIP)}>
+    <div className={cn('film-screen relative overflow-hidden', SCREEN_ASPECT[shape], !bar && FRAME_CLIP)}>
       {children}
 
       {badge && (
-        <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/65 px-3 py-1 text-xs font-medium text-white/90 ring-1 ring-white/15 backdrop-blur-sm">
+        <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-player-ink/65 px-3 py-1 text-xs font-medium text-player-fg/90 ring-1 ring-player-fg/15 backdrop-blur-sm">
           {badge}
         </span>
       )}
 
       <FilmEdge side="top" paused={paused} />
       <FilmEdge side="bottom" paused={paused} />
-
-      {control && (
-        <ControlPill label={controlLabel} className="absolute bottom-3 right-3">
-          {control}
-        </ControlPill>
-      )}
     </div>
   );
 
   if (!bar) return screen;
 
+  const { className, ...rest } = frameProps ?? {};
+
   return (
-    <div className={cn('film-frame relative', FRAME_CLIP)} data-shape={shape} data-playing={paused ? undefined : ''}>
+    <div
+      ref={frameRef}
+      {...rest}
+      className={cn('film-frame group/player relative', FRAME_CLIP, className)}
+      data-shape={shape}
+      style={{ '--film-ratio': SHAPE_RATIO[shape] } as CSSProperties}
+    >
       {screen}
       {bar}
     </div>
@@ -191,8 +181,8 @@ const FilmEdge = ({ side, paused }: { side: 'top' | 'bottom'; paused: boolean })
     aria-hidden="true"
     className={
       side === 'top'
-        ? 'pointer-events-none absolute inset-x-0 top-0 h-3 bg-linear-to-b from-black/55 to-transparent'
-        : 'pointer-events-none absolute inset-x-0 bottom-0 h-3 bg-linear-to-t from-black/55 to-transparent'
+        ? 'pointer-events-none absolute inset-x-0 top-0 h-3 bg-linear-to-b from-player-ink/55 to-transparent'
+        : 'pointer-events-none absolute inset-x-0 bottom-0 h-3 bg-linear-to-t from-player-ink/55 to-transparent'
     }
   >
     <span className="absolute inset-0 overflow-hidden" style={perforationMaskStyle}>
@@ -205,38 +195,6 @@ const FilmEdge = ({ side, paused }: { side: 'top' | 'bottom'; paused: boolean })
       />
     </span>
   </span>
-);
-
-/**
- * A round glass button for the control pill: 32 px visible, 44 px hit area. Keyboard focus takes the site-wide
- * brand outline (index.css) just inside the pill's edge, over a dark ring that fills the outline's offset, so
- * the indicator keeps its contrast over a white frame. No colour transition here: it would replace the `tap`
- * press spring's transform transition. Any press in the pill also tells the landing's sound that the visitor
- * has found the frame's controls, so no frame hints at the sound button again.
- */
-export const FrameButton = ({
-  label,
-  onClick,
-  pressed,
-  children,
-}: {
-  label: string;
-  onClick: () => void;
-  pressed?: boolean;
-  children: ReactNode;
-}) => (
-  <button
-    type="button"
-    onClick={() => {
-      markSoundFound();
-      onClick();
-    }}
-    aria-label={label}
-    aria-pressed={pressed}
-    className="tap relative grid h-8 w-8 place-items-center rounded-full text-white/85 before:absolute before:-inset-1.5 before:content-[''] hover:text-white focus-visible:ring-2 focus-visible:ring-black/80 [&_svg]:size-4"
-  >
-    {children}
-  </button>
 );
 
 /**
@@ -371,13 +329,12 @@ const useSoundHint = ({
 };
 
 /**
- * The frame's sound button, first in the pill, with a volume slider that opens to its left on hover or
- * keyboard focus. Until the visitor has found the landing's sound, the button first arrives labelled: "Sound
- * on" unfolds leftward out of the muted speaker on a lit chip, with one soft ping, then settles back into the
- * icon (useSoundHint). It grows away from the pill's anchored corner, so the play and captions buttons never
- * move under a pointer, and it is the same button throughout, so keyboard focus survives the settle and its
- * name always carries the label a sighted visitor reads. The slider animates only its width, margins and
- * opacity, stays shut while the label shows, and speaks its level as a percentage rather than "0.7".
+ * The frame's sound button, beside play in the player's bar, with the player's volume slider after it where the bar
+ * has room. Until the visitor has found the landing's sound, the button first arrives labelled: "Sound on" unfolds
+ * rightward out of the muted speaker on a lit chip, with one soft ping, then settles back into the icon
+ * (useSoundHint). It grows away from play, so play never moves under a pointer, and it is the same button
+ * throughout, so keyboard focus survives the settle and its name always carries the label a sighted visitor reads.
+ * The label animates only its grid track and opacity; the slider stays shut while the label shows.
  */
 export const SoundControl = ({
   muted,
@@ -402,7 +359,7 @@ export const SoundControl = ({
   return (
     <div
       ref={viewRef}
-      className="group/vol flex flex-row-reverse items-center"
+      className="flex items-center"
       onPointerEnter={() => {
         setHovered(true);
       }}
@@ -420,57 +377,47 @@ export const SoundControl = ({
           setFocused(false);
         }}
         aria-label={muted ? t('sound.on') : t('sound.off')}
-        className="tap group/snd relative flex h-8 items-center rounded-full before:absolute before:-inset-1.5 before:content-[''] focus-visible:ring-2 focus-visible:ring-black/80"
+        title={muted ? t('sound.on') : t('sound.off')}
+        data-player-mute=""
+        className="tap group/snd relative flex h-11 min-w-11 cursor-pointer items-center rounded-full transition-[transform,background-color] duration-150 hover:bg-player-fg/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
       >
         {/* The lit chip the label arrives on; it fades back into the glass as the label settles. */}
         <span
           aria-hidden="true"
           className={cn(
-            'absolute inset-0 rounded-full bg-brand-50 transition-[opacity,background-color] duration-300 group-hover/snd:bg-brand-100',
+            'absolute inset-x-0 inset-y-1.5 rounded-full bg-brand-50 transition-[opacity,background-color] duration-300 group-hover/snd:bg-brand-100',
             labelled ? 'opacity-100' : 'opacity-0'
           )}
         />
         {labelled && (
-          <span aria-hidden="true" className="sound-ping pointer-events-none absolute inset-0 rounded-full" />
+          <span
+            aria-hidden="true"
+            className="sound-ping pointer-events-none absolute inset-x-0 inset-y-1.5 rounded-full"
+          />
         )}
         <span
-          aria-hidden="true"
           className={cn(
-            'relative grid ease-[var(--ease-out-expo)] transition-[grid-template-columns,opacity]',
-            labelled ? 'grid-cols-[1fr] opacity-100 duration-500' : 'grid-cols-[0fr] opacity-0 duration-300'
-          )}
-        >
-          <span className="min-w-0 overflow-hidden">
-            <span className="block whitespace-nowrap pl-3.5 text-xs font-semibold tracking-[0.02em] text-brand-900 sm:text-sm">
-              {t('sound.on')}
-            </span>
-          </span>
-        </span>
-        <span
-          className={cn(
-            'relative grid size-8 place-items-center transition-colors duration-300 [&_svg]:size-4',
-            labelled ? 'text-brand-900' : 'text-white/85 group-hover/snd:text-white'
+            'relative grid size-11 place-items-center transition-colors duration-300 [&_svg]:size-5',
+            labelled ? 'text-brand-900' : 'text-player-fg/85 group-hover/snd:text-player-fg'
           )}
         >
           {muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
         </span>
+        <span
+          aria-hidden="true"
+          className={cn(
+            'relative -ml-1.5 grid ease-[var(--ease-out-expo)] transition-[grid-template-columns,opacity]',
+            labelled ? 'grid-cols-[1fr] opacity-100 duration-500' : 'grid-cols-[0fr] opacity-0 duration-300'
+          )}
+        >
+          <span className="min-w-0 overflow-hidden">
+            <span className="block whitespace-nowrap pr-3.5 text-xs font-semibold tracking-[0.02em] text-brand-900 sm:text-sm">
+              {t('sound.on')}
+            </span>
+          </span>
+        </span>
       </button>
-      <input
-        type="range"
-        min={0}
-        max={1}
-        step={0.05}
-        value={muted ? 0 : volume}
-        onChange={(event) => {
-          onVolume(Number(event.target.value));
-        }}
-        aria-label={t('sound.volume')}
-        aria-valuetext={`${Math.round((muted ? 0 : volume) * 100)}%`}
-        className={cn(
-          'h-1 w-0 cursor-pointer appearance-none rounded-full bg-white/30 opacity-0 accent-white transition-[width,margin,opacity] duration-200 focus-visible:ml-1.5 focus-visible:mr-2 focus-visible:w-20 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-black/80',
-          !labelled && 'group-hover/vol:ml-1.5 group-hover/vol:mr-2 group-hover/vol:w-20 group-hover/vol:opacity-100'
-        )}
-      />
+      {!labelled && <PlayerVolumeSlider level={muted ? 0 : volume} onVolume={onVolume} />}
     </div>
   );
 };
