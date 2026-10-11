@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.1.0] - 2026-10-10
+## [3.1.0] - 2026-10-11
 
 ### Added
 
@@ -50,6 +50,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Promise.withResolvers` (Chrome 119, Safari 17.4), so every HTML layer failed on an Android System WebView
   before 119 or iOS before 17.4. The page now supports Android System WebView 87+ and iOS 16.4+: its build
   targets them and it polyfills `Array.prototype.at` for Satori where missing. Rendered bytes are unchanged.
+- The before/after wipe (and `split` panes) no longer stutters. A still or clip pane arrived at the image
+  demuxer's 25 fps and was never conformed to the section's frame rate, so the wipe's `crop`, timed on that
+  leg, drifted from the `overlay` at the output rate: the revealed picture crept a few pixels a frame, then
+  snapped back every 6 frames at 30 fps. Media and clip panes now run at the section frame rate.
+- Boxed caption plates draw their rounded corners row by row instead of in three coarse steps, so the corners
+  no longer look pixelated when the frame is scaled up. Each plate line stays within about 25 `drawbox`
+  filters: an anti-aliased version cost 77 to 193 per line and made long boxed transcripts render many times
+  slower, so it was not kept.
 
 ## [3.0.0] - 2026-10-09
 
