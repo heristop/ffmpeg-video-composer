@@ -9,25 +9,23 @@ import { useOnboardingCompile, type OnboardingStep } from '@/hooks/useOnboarding
 import { useSampleTemplate } from '@/hooks/useSampleTemplate';
 import { setHeroVideo } from '@/services/heroVideoStore';
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll';
+import type { TemplateOrientation } from '@leclap/creative-kit';
 import {
   closesOnBackdrop,
   closesOnEscape,
   focusAfterClipPicked,
+  sampleFormatFor,
   type ClipSource,
 } from '@/presentation/components/onboarding.logic';
 
 // The onboarding makes a first video from the built-in "Present Yourself" template so newcomers see
-// the whole flow (record → compile → download) in one guided pass. One concept, two orientation
-// variations: we match the variation to how the app is actually shown — its live viewport shape —
-// rather than the physical device, so the recorded clip fills the frame instead of being letter-boxed.
-// Both record one clip; the name typed at the record step lands in the template's first form field.
-const LANDSCAPE_TEMPLATE_ID = 'present-yourself';
-const PORTRAIT_TEMPLATE_ID = 'present-yourself-portrait';
+// the whole flow (record → compile → download) in one guided pass. One template, two formats: portrait
+// on a phone held upright, landscape on a desktop (sampleFormatFor). It records one clip; the name typed
+// at the record step lands in the template's first form field.
+const SAMPLE_TEMPLATE_ID = 'present-yourself';
 
-// Reflect the app's actual viewport (window aspect) — not the device-orientation media query, which
-// is always "landscape" on desktop regardless of how the window is sized.
-const pickSampleTemplateId = (): string =>
-  window.innerHeight > window.innerWidth ? PORTRAIT_TEMPLATE_ID : LANDSCAPE_TEMPLATE_ID;
+const pickSampleFormat = (): TemplateOrientation =>
+  sampleFormatFor({ width: window.innerWidth, height: window.innerHeight });
 
 // A friendly sample first name shown as the field's *placeholder* (not a prefilled value, so the user
 // never has to clear it). If they skip typing, this same name is used so the title card is never empty.
@@ -130,14 +128,15 @@ export const Onboarding = ({ onDone }: OnboardingProps) => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [clipSource, setClipSource] = useState<ClipSource>('camera');
   const [showCamera, setShowCamera] = useState(false);
-  // Chosen once when the modal opens so a mid-flow rotation can't swap the template underfoot.
-  const [sampleTemplateId] = useState(pickSampleTemplateId);
-  const { template, recordingConfig } = useSampleTemplate(sampleTemplateId);
+  // Chosen once when the modal opens so a mid-flow rotation can't swap the format underfoot.
+  const [sampleFormat] = useState(pickSampleFormat);
+  const { template, recordingConfig } = useSampleTemplate(SAMPLE_TEMPLATE_ID, sampleFormat);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // The compile flow (step state + start/stop around the in-browser compile) lives in its own hook;
   // `stop` cancels an in-flight compile and closes the dialog.
   const { step, setStep, progress, result, failure, start, stop } = useOnboardingCompile({
-    sampleTemplateId,
+    sampleTemplateId: SAMPLE_TEMPLATE_ID,
+    sampleFormat,
     template,
     onClose: onDone,
   });

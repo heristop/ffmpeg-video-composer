@@ -5,7 +5,6 @@ import AppTutorial from './templates/app-tutorial.json';
 import FastCurious from './templates/fast-curious.json';
 import Interview from './templates/interview.json';
 import PhotoBackdrop from './templates/photo-backdrop.json';
-import PresentYourselfPortrait from './templates/present-yourself-portrait.json';
 import PresentYourself from './templates/present-yourself.json';
 import ProductLaunch from './templates/product-launch.json';
 import SquarePromo from './templates/square-promo.json';
@@ -13,14 +12,13 @@ import StoryReel from './templates/story-reel.json';
 import WebAppPromo from './templates/web-app-promo.json';
 
 export const TEMPLATE_DESCRIPTORS: Record<string, TemplateDescriptor> = {
-  'app-tutorial': AppTutorial,
+  'app-tutorial': AppTutorial as TemplateDescriptor,
   'fast-curious': FastCurious as TemplateDescriptor,
   interview: Interview as TemplateDescriptor,
   'photo-backdrop': PhotoBackdrop as TemplateDescriptor,
-  'present-yourself-portrait': PresentYourselfPortrait as TemplateDescriptor,
   'present-yourself': PresentYourself as TemplateDescriptor,
-  'product-launch': ProductLaunch,
-  'square-promo': SquarePromo,
-  'story-reel': StoryReel,
-  'web-app-promo': WebAppPromo,
+  'product-launch': ProductLaunch as TemplateDescriptor,
+  'square-promo': SquarePromo as TemplateDescriptor,
+  'story-reel': StoryReel as TemplateDescriptor,
+  'web-app-promo': WebAppPromo as TemplateDescriptor,
 };

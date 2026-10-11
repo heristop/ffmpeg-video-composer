@@ -1,7 +1,17 @@
-// The onboarding dialog's rules, kept pure so they unit-test without a DOM: which steps close on a click
-// beside the panel or on Escape, and where keyboard focus goes once the camera or the file picker hands it
-// back.
+// The onboarding dialog's rules, kept pure so they unit-test without a DOM: which format the sample renders
+// in, which steps close on a click beside the panel or on Escape, and where keyboard focus goes once the
+// camera or the file picker hands it back.
+import type { TemplateOrientation } from '@leclap/creative-kit';
 import type { OnboardingStep } from '@/hooks/useOnboardingCompile';
+
+/**
+ * The sample's format, from the shape the app is shown in rather than the physical device: a phone held
+ * upright records and renders portrait, a desktop window landscape, so the clip fills the frame instead of
+ * being letter-boxed. The device-orientation media query would not do: it reads "landscape" on every
+ * desktop, however the window is sized.
+ */
+export const sampleFormatFor = ({ width, height }: { width: number; height: number }): TemplateOrientation =>
+  height > width ? 'portrait' : 'landscape';
 
 /** Where the intro clip came from: the camera, or a file the visitor imported. */
 export type ClipSource = 'camera' | 'file';

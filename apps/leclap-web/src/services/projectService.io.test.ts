@@ -63,7 +63,7 @@ const TEMPLATE = {
 } as Template;
 
 vi.mock('@/services/templateService', () => ({
-  templateService: { getAllTemplates: vi.fn(async () => [TEMPLATE]) },
+  templateService: { getTemplate: vi.fn(async () => TEMPLATE) },
 }));
 
 const file = (name: string, bytes: number[]): File => new File([new Uint8Array(bytes)], name, { type: 'video/mp4' });
@@ -76,7 +76,7 @@ describe('projectService IO orchestration', () => {
     state.projects.clear();
     state.counter.n = 0;
     (projectBlobStore.put as Mock).mockClear();
-    vi.mocked(templateService.getAllTemplates).mockResolvedValue([TEMPLATE]);
+    vi.mocked(templateService.getTemplate).mockResolvedValue(TEMPLATE);
   });
 
   it('saves a draft: writes the clip blob and records its metadata', async () => {
@@ -261,10 +261,19 @@ describe('projectService IO orchestration', () => {
 
   it('reports template-removed when the project references a missing template', async () => {
     const saved = await saveDraft(modelWith({ clipsBySection: {} }), TEMPLATE);
-    vi.mocked(templateService.getAllTemplates).mockResolvedValueOnce([]);
+    vi.mocked(templateService.getTemplate).mockResolvedValueOnce(null);
 
     const result = await loadProject(saved.id);
 
     expect(result).toEqual({ ok: false, reason: 'template-removed' });
+  });
+
+  it('reopens the template in the format the project was saved in', async () => {
+    const saved = await saveDraft(modelWith({ clipsBySection: {} }), TEMPLATE);
+
+    await loadProject(saved.id);
+
+    // The template service maps a retired variant id (present-yourself-portrait) to its merged template.
+    expect(templateService.getTemplate).toHaveBeenCalledWith('tpl-1', 'portrait');
   });
 });

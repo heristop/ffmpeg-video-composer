@@ -14,6 +14,8 @@ export interface Template {
   name: string;
   description: string;
   orientation: TemplateOrientation;
+  // Built-in templates: every format the template composes (its own orientation included).
+  formats?: TemplateOrientation[];
   hasForm: boolean;
   complexity: 'simple' | 'intermediate' | 'advanced';
   // 'sample' = built-in template; 'user' = created by the user (localStorage).
@@ -65,6 +67,7 @@ class TemplateService {
       name: coreTemplate.name,
       description: coreTemplate.description,
       orientation: coreTemplate.orientation,
+      formats: coreTemplate.formats,
       hasForm: coreTemplate.hasForm,
       complexity: coreTemplate.complexity,
       source: 'sample',
@@ -95,7 +98,8 @@ class TemplateService {
     }
   }
 
-  async getTemplate(templateId: string): Promise<Template | null> {
+  // `format` opens a built-in template in one of the formats it composes (see coreTemplateService).
+  async getTemplate(templateId: string, format?: TemplateOrientation): Promise<Template | null> {
     // User-created templates (localStorage) take precedence and carry their own descriptor.
     const userTemplate = userTemplateService.get(templateId);
 
@@ -104,7 +108,7 @@ class TemplateService {
     }
 
     try {
-      const coreTemplate = await coreTemplateService.getTemplate(templateId);
+      const coreTemplate = await coreTemplateService.getTemplate(templateId, format);
 
       if (!coreTemplate) {
         return null;
@@ -115,6 +119,7 @@ class TemplateService {
         name: coreTemplate.name,
         description: coreTemplate.description,
         orientation: coreTemplate.orientation,
+        formats: coreTemplate.formats,
         hasForm: coreTemplate.hasForm,
         complexity: coreTemplate.complexity,
         source: 'sample',

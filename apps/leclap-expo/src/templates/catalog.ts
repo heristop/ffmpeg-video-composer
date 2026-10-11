@@ -1,4 +1,5 @@
 import type { Template, TemplateDescriptor } from '@/src/types';
+import { resolveTemplateRef } from '@leclap/creative-kit';
 import { expandPartialsSafe } from '@leclap/creative-kit/partials';
 import { SAMPLE_TEMPLATES, type CatalogTemplate } from './sampleTemplates';
 import type { UserTemplate } from '@/src/stores/useUserTemplateStore';
@@ -36,6 +37,17 @@ export const buildCatalog = (userTemplates: UserTemplate[]): Template[] => [
   ...SAMPLE_TEMPLATES.map(toTemplate),
 ];
 
-/** Resolve a single template by name across user templates then samples. */
-export const findInCatalog = (userTemplates: UserTemplate[], name: string): Template | undefined =>
-  buildCatalog(userTemplates).find((t) => t.name === name);
+/**
+ * Resolve a single template by name across user templates then samples. A project saved on a retired
+ * variant ("Present Yourself (Portrait)") opens the sample that absorbed it.
+ */
+export const findInCatalog = (userTemplates: UserTemplate[], name: string): Template | undefined => {
+  const catalog = buildCatalog(userTemplates);
+  const named = catalog.find((t) => t.name === name);
+
+  if (named) return named;
+
+  const { id } = resolveTemplateRef(name);
+
+  return catalog.find((t) => t.source === 'sample' && t.id === id);
+};

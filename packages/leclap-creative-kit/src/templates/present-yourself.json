@@ -165,6 +165,7 @@
           "intensity": 1
         },
         {
+          "id": "name-glow",
           "type": "fx",
           "effect": "edge-glow",
           "target": {
@@ -189,5 +190,76 @@
       "type": "partial",
       "ref": "logo-bumper"
     }
-  ]
+  ],
+  "formats": {
+    "portrait": {
+      "sections": {
+        "intro": {
+          "camera": {
+            "amount": 0.12
+          },
+          "titleCard": {
+            "headlineStyle": {
+              "fontsize": 76
+            }
+          }
+        },
+        "video_1": {
+          "graphics": {
+            "byId": {
+              "name-glow": {
+                "target": {
+                  "x": 0,
+                  "y": 1024,
+                  "w": 720,
+                  "h": 256
+                }
+              }
+            }
+          }
+        },
+        "logo_bumper": {
+          "options": {
+            "videoUrl": "https://github.com/heristop/leclap/raw/main/src/shared/assets/videos/leclap_bumper_portrait.mp4"
+          },
+          "filters": [
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 0,
+                "w": 720,
+                "h": 10,
+                "c": "#7C83FD@1",
+                "t": "fill"
+              }
+            },
+            {
+              "type": "drawbox",
+              "values": {
+                "x": 0,
+                "y": 1270,
+                "w": 720,
+                "h": 10,
+                "c": "#FF8AAE@1",
+                "t": "fill"
+              }
+            },
+            {
+              "type": "fadein",
+              "values": {
+                "color": "#0b0b0f"
+              }
+            },
+            {
+              "type": "fadeout",
+              "values": {
+                "color": "#0b0b0f"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
 }

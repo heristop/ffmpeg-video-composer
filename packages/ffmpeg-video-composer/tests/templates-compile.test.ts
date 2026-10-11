@@ -4,12 +4,14 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { compile } from '@/index';
 import type { ProjectConfig, TemplateDescriptor } from '@/core/types';
+import { baseFormat, declaredFormats } from '@/core/formats/resolve';
 import { testBuildDir } from './fixtures/build-dir';
 
 // Smoke-compiles every bundled creative-kit template through the Node engine so a template (or an
 // engine change) that breaks a real render is caught. The shared `partial` outro (logo-bumper) is
 // stripped — it's exercised by the fixture suite — so this isolates each template's own sections
 // (looks, captions, image_background + Ken Burns, countdown cards, lower-thirds, multi project_video).
+// A template composed for several formats compiles once per format.
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '../../..');
 const libDir = path.resolve(repoRoot, 'packages/leclap-creative-kit/src/library');
@@ -49,20 +51,49 @@ const FIELDS: Record<string, string> = {
   optionB3: 'Dogs',
 };
 
+type Format = NonNullable<ProjectConfig['format']>;
+
+const readTemplate = (id: string): TemplateDescriptor =>
+  JSON.parse(fs.readFileSync(path.resolve(templatesDir, `${id}.json`), 'utf8')) as TemplateDescriptor;
+
+// The template without its partial outro, and without the format patches aimed at the outro's sections.
+const ownSections = (raw: TemplateDescriptor): TemplateDescriptor => {
+  const sections = (raw.sections ?? []).filter((s) => s.type !== 'partial');
+  const names = new Set(sections.map((s) => s.name));
+  const formats = Object.entries(raw.formats ?? {}).map(([format, override]) => [
+    format,
+    {
+      ...override,
+      sections: Object.fromEntries(Object.entries(override.sections ?? {}).filter(([name]) => names.has(name))),
+    },
+  ]);
+
+  return { ...raw, sections, ...(raw.formats && { formats: Object.fromEntries(formats) }) };
+};
+
 const TEMPLATE_IDS = fs
   .readdirSync(templatesDir)
   .filter((f) => f.endsWith('.json'))
   .map((f) => f.replace(/\.json$/, ''))
   .sort();
 
-describe('all templates compile (Node smoke)', () => {
-  for (const id of TEMPLATE_IDS) {
-    it(`compiles ${id}`, async () => {
-      const raw = JSON.parse(fs.readFileSync(path.resolve(templatesDir, `${id}.json`), 'utf8')) as TemplateDescriptor;
-      const sections = (raw.sections ?? []).filter((s) => s.type !== 'partial');
-      const descriptor: TemplateDescriptor = { ...raw, sections };
+const CASES = TEMPLATE_IDS.flatMap((id) => {
+  const raw = readTemplate(id);
 
-      const portrait = raw.global?.orientation === 'portrait';
+  return declaredFormats(raw).map((format) => ({
+    id,
+    format,
+    name: format === baseFormat(raw) ? id : `${id} (${format})`,
+  }));
+});
+
+describe('all templates compile (Node smoke)', () => {
+  for (const { id, format, name } of CASES) {
+    it(`compiles ${name}`, async () => {
+      const descriptor = ownSections(readTemplate(id));
+      const { sections = [] } = descriptor;
+
+      const portrait = format === 'portrait';
       const clip = path.resolve(videosDir, portrait ? 'video_portrait.mp4' : 'video_1.mp4');
 
       const userVideoPaths: Record<string, string> = {};
@@ -80,10 +111,11 @@ describe('all templates compile (Node smoke)', () => {
         videoConfig: { orientation: portrait ? 'portrait' : 'landscape', scale: '1280:720' },
         fields: FIELDS,
         userVideoPaths,
+        format,
       } as unknown as ProjectConfig;
 
       const out = await compile(projectConfig, descriptor);
-      expect(out, `${id} should compile`).not.toBeNull();
+      expect(out, `${name} should compile`).not.toBeNull();
     }, 180000);
   }
 });
@@ -96,11 +128,16 @@ describe('all templates compile (Node smoke)', () => {
 describe('templates compile with a video-only (no-audio) clip', () => {
   const noAudioClip = path.resolve(videosDir, 'earth-no-audio.mp4');
 
-  for (const id of ['present-yourself-portrait', 'photo-backdrop']) {
-    it(`compiles ${id} when the recorded clip has no audio`, async () => {
-      const raw = JSON.parse(fs.readFileSync(path.resolve(templatesDir, `${id}.json`), 'utf8')) as TemplateDescriptor;
-      const sections = (raw.sections ?? []).filter((s) => s.type !== 'partial');
-      const portrait = raw.global?.orientation === 'portrait';
+  const cases: Array<{ id: string; format: Format }> = [
+    { id: 'present-yourself', format: 'portrait' },
+    { id: 'photo-backdrop', format: 'landscape' },
+  ];
+
+  for (const { id, format } of cases) {
+    it(`compiles ${id} (${format}) when the recorded clip has no audio`, async () => {
+      const descriptor = ownSections(readTemplate(id));
+      const { sections = [] } = descriptor;
+      const portrait = format === 'portrait';
 
       const userVideoPaths: Record<string, string> = {};
       for (const s of sections) {
@@ -117,10 +154,11 @@ describe('templates compile with a video-only (no-audio) clip', () => {
         videoConfig: { orientation: portrait ? 'portrait' : 'landscape', scale: '1280:720' },
         fields: FIELDS,
         userVideoPaths,
+        format,
       } as unknown as ProjectConfig;
 
-      const out = await compile(projectConfig, { ...raw, sections });
-      expect(out, `${id} should compile with a no-audio clip`).not.toBeNull();
+      const out = await compile(projectConfig, descriptor);
+      expect(out, `${id} (${format}) should compile with a no-audio clip`).not.toBeNull();
     }, 180000);
   }
 });

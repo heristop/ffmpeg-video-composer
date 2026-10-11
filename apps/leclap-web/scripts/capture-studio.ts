@@ -19,7 +19,8 @@ const brandMotion = process.env.LECLAP_BRAND_MOTION ?? path.resolve(here, '../..
 const outDir = path.join(brandMotion, 'public/captures');
 const SIZE = { width: 1600, height: 900 };
 // Portrait, so the selfie clip below fills the preview whole instead of a centre-cropped band.
-const TEMPLATE = 'present-yourself-portrait';
+const TEMPLATE = 'present-yourself';
+const FORMAT = 'portrait';
 // The same person the showcase's mobile beat follows (Alex, filming herself) — bright, and one story.
 const SAMPLE = path.join(outDir, 'selfie-wave-source.mp4');
 
@@ -29,7 +30,7 @@ const forEachSeq = async <T>(items: readonly T[], fn: (item: T) => Promise<void>
 };
 
 const editor = async (page: Page): Promise<void> => {
-  await page.goto(`${BASE}/studio/new?template=${TEMPLATE}`);
+  await page.goto(`${BASE}/studio/new?template=${TEMPLATE}&format=${FORMAT}`);
   await page.getByPlaceholder(/enter your (first )?name/i).waitFor({ state: 'visible' });
   await page.waitForTimeout(600);
 };

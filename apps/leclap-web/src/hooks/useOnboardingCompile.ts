@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import type { TemplateOrientation } from '@leclap/creative-kit';
 import { templateService, type Template } from '@/services/templateService';
 import {
   coreCompilationService,
@@ -32,10 +33,11 @@ const sampleFormData = (template: Template, name: string): Record<string, string
 // never reaches the dialog.
 export function useOnboardingCompile(opts: {
   sampleTemplateId: string;
+  sampleFormat: TemplateOrientation;
   template: Template | null;
   onClose: () => void;
 }) {
-  const { sampleTemplateId, template, onClose } = opts;
+  const { sampleTemplateId, sampleFormat, template, onClose } = opts;
   const [step, setStep] = useState<OnboardingStep>('welcome');
   const [progress, setProgress] = useState<CompilationProgress>(initialProgress);
   const [result, setResult] = useState<CompilationResult | null>(null);
@@ -51,7 +53,7 @@ export function useOnboardingCompile(opts: {
     const run = ticket.current;
 
     try {
-      const sampleTemplate = template ?? (await templateService.getTemplate(sampleTemplateId));
+      const sampleTemplate = template ?? (await templateService.getTemplate(sampleTemplateId, sampleFormat));
 
       if (!sampleTemplate) throw new Error(`Sample template "${sampleTemplateId}" could not be loaded.`);
 

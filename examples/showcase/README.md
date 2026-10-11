@@ -1,10 +1,10 @@
 # Motion showcase
 
-The web app’s public `/showcase` page brings together every shared app template and the runnable example compositions. The effects tour is the default selected film, listed second after Drink & Code. Its 51 samples include native JSON typography, effects and editing demos, registered Remotion effects, overlays, app demos and review evidence. Search or filter the library, watch a sample, then open **Direction & source** to read its authored creative direction or download the JSON. Shared app templates also open directly in Studio.
+The web app’s public `/showcase` page brings together every shared app template and the runnable example compositions. The effects tour is the default selected film, listed second after Drink & Code. Its 50 samples include native JSON typography, effects and editing demos, registered Remotion effects, overlays, app demos and review evidence. Search or filter the library, watch a sample, then open **Direction & source** to read its authored creative direction or download the JSON. Shared app templates also open directly in Studio.
 
 The showcase uses the same FilmPlayer and sound/volume controls as the home page. Sound starts muted and can be enabled; narration captions appear only when the film supplies a caption track. Only one film plays at a time. Playback starts on request and pauses when the player leaves the viewport or the tab is hidden. Posters load lazily; previews are 960×540 H.264 at 24 fps with AAC sound when the source has audio, with portrait and square compositions letterboxed. They illustrate the effect with bundled media, synthetic fixtures or the recorded LeClap canvas demo; they are not footage uploaded by a user.
 
-Portrait templates use the bundled portrait source (`video_portrait.mp4`) for every uploaded-video scene, including Story Reel and Present Yourself (Portrait); the renderer selects source footage by template orientation before composition.
+Portrait templates use the bundled portrait source (`video_portrait.mp4`) for every uploaded-video scene, including Story Reel; the renderer selects source footage by template orientation before composition.
 
 Product Launch uses the bundled portrait [Moo Mug product fixture](./media/README.md), with example copy identifying the cow cup.
 

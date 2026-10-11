@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { OnboardingStep } from '@/hooks/useOnboardingCompile';
-import { closesOnBackdrop, closesOnEscape, focusAfterClipPicked } from './onboarding.logic';
+import { closesOnBackdrop, closesOnEscape, focusAfterClipPicked, sampleFormatFor } from './onboarding.logic';
 
 const STEPS: readonly OnboardingStep[] = ['welcome', 'create', 'compiling', 'done', 'error'];
 
@@ -39,5 +39,20 @@ describe('focusAfterClipPicked', () => {
 
   it('hands lost focus back to the control that opened the camera when no clip came back', () => {
     expect(focusAfterClipPicked({ focusInDialog: false, hasClip: false })).toBe('trigger');
+  });
+});
+
+describe('sampleFormatFor', () => {
+  it('records the sample upright on a phone held upright', () => {
+    expect(sampleFormatFor({ width: 390, height: 844 })).toBe('portrait');
+  });
+
+  it('keeps the sample landscape on a desktop window', () => {
+    expect(sampleFormatFor({ width: 1440, height: 900 })).toBe('landscape');
+  });
+
+  it('follows the window, not the device: a phone turned sideways gets landscape', () => {
+    expect(sampleFormatFor({ width: 844, height: 390 })).toBe('landscape');
+    expect(sampleFormatFor({ width: 800, height: 800 })).toBe('landscape');
   });
 });

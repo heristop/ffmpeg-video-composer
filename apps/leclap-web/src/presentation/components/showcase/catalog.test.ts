@@ -98,7 +98,7 @@ describe('showcase catalog', () => {
   });
 
   it('uses portrait source footage for every scene of portrait templates', () => {
-    const templates = ['story-reel', 'product-launch', 'present-yourself-portrait'];
+    const templates = ['story-reel', 'product-launch'];
     for (const id of templates) {
       const template = JSON.parse(
         readFileSync(path.join(root, `packages/leclap-creative-kit/src/templates/${id}.json`), 'utf8')
