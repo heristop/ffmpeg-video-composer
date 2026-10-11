@@ -21,6 +21,7 @@ import {
   DialogClose,
 } from '@/presentation/components/ui';
 import { Seo } from '@/presentation/components/Seo';
+import { VideoPreview } from '@/presentation/components/VideoPreview';
 import { KineticHeading } from '@/presentation/components/kinetic';
 import { Code, DocSection, DocSubsection, Eyebrow, Prose } from '@/presentation/components/doc/DocBlocks';
 import { bezierPath, durationMs, parseCubicBezier, type Bezier } from './design-tokens.logic';
@@ -437,6 +438,20 @@ const ComponentsSection = () => (
       <DocSubsection id="color-picker" title="Color picker">
         <div className="mt-3">
           <ColorPickerDemo />
+        </div>
+      </DocSubsection>
+
+      <DocSubsection id="video-player" title="Video player">
+        <p className="mb-3 max-w-[33rem] text-sm leading-6 text-gray-400">
+          The render result player, in a landscape and a portrait frame.
+        </p>
+        <div className="grid items-start gap-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div data-testid="player-landscape">
+            <VideoPreview url="/videos/showcase/effects-tour.mp4" />
+          </div>
+          <div data-testid="player-portrait" className="mx-auto aspect-[9/16] w-full max-w-60">
+            <VideoPreview url="/videos/films/leclap-agentic-portrait.en.mp4" fill label={null} />
+          </div>
         </div>
       </DocSubsection>
 

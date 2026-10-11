@@ -17,6 +17,7 @@ export function ShowcasePlayer({
 }) {
   const { t } = useTranslation('showcase');
   const { t: home } = useTranslation('home');
+  const shape = sampleShape(sample);
 
   return (
     <FilmPlayer
@@ -25,19 +26,16 @@ export function ShowcasePlayer({
       title={t('previewOf', { title: sample.title })}
       playback="requested"
       startRequested={requested}
-      shape={sampleShape(sample)}
+      shape={shape}
       still={still}
       suspended={suspended}
+      embed={{ ref: { kind: 'sample', id: sample.id }, title: sample.title, shape }}
       labels={{
         play: t('playSample', { title: sample.title }),
         pause: home('film.pause'),
         loading: t('loading'),
         error: t('videoError'),
         retry: t('retry'),
-      }}
-      seekLabels={{
-        seek: t('seek'),
-        position: (current, total) => t('position', { current, total }),
       }}
     />
   );

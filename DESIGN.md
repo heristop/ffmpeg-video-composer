@@ -50,6 +50,14 @@ Surfaces and text are **semantic tokens** that default to **light** in `@theme` 
 - **Elevation:** brand-tinted shadows — `--shadow-md`, `--shadow-lg`, and `--shadow-glow` (a lavender glow). Surfaces use restrained glassmorphism over the ink canvas.
 - **Radii:** `sm 6px · md 8px · lg 12px · xl 16px · 2xl 20px`.
 
+## Video player
+
+Every video in the web app plays in one player family ([`apps/leclap-web/src/presentation/components/player/`](apps/leclap-web/src/presentation/components/player/)): the studio result, test renders, camera takes, the landing films and reel, the showcase and the `/embed/<kind>/<id>` route.
+
+- **Chrome over footage:** `--color-player-ink` / `--color-player-fg` (theme-constant near-black and off-white, used at an alpha for the scrim, glass and tracks); lavender `brand-500` for the played fill and `brand-400` for focus. Menus and the embed dialog use the app's dark popover surface.
+- **Controls:** play, seek (Radix Slider, played over buffered), time in tabular figures, sound, speed (Radix DropdownMenu, 0.5×–2×, kept for the session, pitch preserved), captions, more (embed code, public videos only), fullscreen (the frame itself, iOS falls back to the video). All 44 px; narrow frames shed time, speed and more before anything else.
+- **Behaviour:** controls fade over a playing video after 2.5 s without pointer movement and return on move, tap or keyboard focus; space/k, ←/→, j/l, ↑/↓, 0–9, m, f, c, `<`/`>`. Motion is 150–300 ms on transform and opacity only.
+
 ---
 
 Part of the [LeClap monorepo](README.md). Recording/UI overlays (framing guide) and in-video captions are documented in the [template configuration reference](docs/template-configuration.md).

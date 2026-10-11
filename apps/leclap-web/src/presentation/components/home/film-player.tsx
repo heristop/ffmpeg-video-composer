@@ -1,16 +1,31 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useRef, type MouseEvent, type RefObject } from 'react';
 import { useInView } from '@/hooks/useInView';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { playWithSound, readSound, tellVideo } from '@/lib/landing-sound';
-import { ControlPill, FilmScreen, FilmStage, useFilmSound, type FilmShape } from '@/presentation/components/film-frame';
-import { FilmPlaybackControls, FilmFeedback, type FilmPlayerLabels } from './film-player-controls';
+import { markSoundFound, readSound, tellVideo } from '@/lib/landing-sound';
+import { FilmScreen, FilmStage, SoundControl, type FilmShape } from '@/presentation/components/film-frame';
+import { EmbedDialog, type PlayerEmbed } from '@/presentation/components/player/embed-dialog';
+import { PlayerOverlays, PlayerTransportBar } from '@/presentation/components/player/player-chrome';
+import { useMediaState, type MediaState } from '@/presentation/components/player/use-media-state';
+import { useFullscreen, usePlaybackRate } from '@/presentation/components/player/use-player';
+import { usePlayerUi, type PlayerUi } from '@/presentation/components/player/use-player-chrome';
 import { useFilmCaptions, useFilmVisibility } from './use-film-captions';
-import { SeekBar, activeSeekLabels, type SeekLabels } from './seek-bar';
-import { filmPlayback } from './film-playback.logic';
+import { useFilmPlayer } from './use-film-player';
 import type { FilmAsset } from './films';
 
+export interface FilmPlayerLabels {
+  play: string;
+  pause: string;
+  captions?: string;
+  loading?: string;
+  error?: string;
+  retry?: string;
+}
+
+type FilmSources = Pick<FilmAsset, 'mp4' | 'poster'> & Partial<Pick<FilmAsset, 'captions'>> & { webm?: string };
+
 interface FilmPlayerProps {
-  film: Pick<FilmAsset, 'mp4' | 'poster'> & Partial<Pick<FilmAsset, 'captions'>>;
+  /** The film: an MP4 (and a smaller WebM tried first, if any), its poster and its captions. */
+  film: FilmSources;
   /** Accessible name of the film. */
   title: string;
   /** The frame's label pill, e.g. "The film · 1:18". */
@@ -23,74 +38,92 @@ interface FilmPlayerProps {
   /** Landing films play on view; showcase samples wait for a visitor request. */
   playback?: 'ambient' | 'requested';
   startRequested?: boolean;
-  /** Show a seek bar along the bottom edge (showcase samples); the landing films keep the plain pill. */
-  seekLabels?: SeekLabels;
+  /** Loop even with the sound on (the effects reel); a film otherwise loops only while muted. */
+  loop?: boolean;
   /** The film's frame: landscape by default, portrait or square for a sample made that way. */
   shape?: FilmShape;
   /** A frame that stays put, without the scroll reveal and the glow: a film inside a dialog. */
   still?: boolean;
   /** Set aside by the page (a dialog over it, or its own dialog closing): it pauses until it isn't. */
   suspended?: boolean;
+  /** Offer the embed code: every film here has a public address. */
+  embed?: PlayerEmbed;
 }
 
 // Nothing streams before the frame nears the viewport, even where the element already exists (reduced motion).
-const preloadWhen = (near: boolean): 'metadata' | 'none' => (near ? 'metadata' : 'none');
+const preload = (playback: 'ambient' | 'requested', near: boolean): 'metadata' | 'none' =>
+  playback === 'ambient' && near ? 'metadata' : 'none';
 
-// Where the pill goes: into the seek bar's row when the film has one (from the first render, so the frame never
-// changes shape as the film mounts), in the screen's corner otherwise.
-const controlLayout = (
-  seek: SeekLabels | undefined,
-  control: ReactNode,
-  barWith: (seek: SeekLabels, pill: ReactNode) => ReactNode
-): { control?: ReactNode; bar?: ReactNode } => (seek ? { bar: barWith(seek, control) } : { control });
+// On the landing's sound from the instant it mounts — muted, unless the visitor already turned it on — before the
+// browser weighs autoplay, so the in-view play() goes through. The same state the sound hook applies after every
+// render, so however React orders the two (StrictMode re-attaches refs after effects), they agree.
+const onTheLandingSound = (node: HTMLVideoElement) => {
+  const { enabled, volume } = readSound();
 
-type SaveDataNavigator = Navigator & { connection?: { saveData?: boolean } };
+  tellVideo(node, !enabled, volume);
+  node.setAttribute('muted', '');
+};
 
-// Save-Data visitors get the poster and the play button: nothing streams until they ask for it.
-const prefersSaveData = (): boolean =>
-  (globalThis.navigator as SaveDataNavigator | undefined)?.connection?.saveData === true;
-
-// A film in the page's one video frame (film-frame.tsx), like the in-browser render: it loads as it nears the
-// viewport, plays while on screen and rests off-screen. It speaks with the landing's one sound: muted until
-// the visitor turns it on, here or anywhere else on the page, its captions carrying the narration meanwhile.
-// The first time a film is heard it starts over, so the narration is heard whole, and it no longer loops, so
-// the film ends. The glass pill turns the sound on, plays and pauses, and toggles the captions; a visitor's
-// pause sticks. Reduced motion: the native controls and captions, and nothing plays by itself.
-export const FilmPlayer = ({
+function FilmVideo({
   film,
-  title,
-  badge,
-  captionsLabel,
-  captionsLang,
-  labels,
-  className,
-  playback = 'ambient',
-  startRequested = false,
-  seekLabels,
-  shape,
-  still,
-  suspended,
-}: FilmPlayerProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const reduced = useReducedMotion();
+  videoRef,
+  props,
+  loop,
+  preloadMode,
+  onClick,
+  onDoubleClick,
+  onEnded,
+}: {
+  film: FilmSources;
+  videoRef: (node: HTMLVideoElement | null) => void;
+  props: Pick<FilmPlayerProps, 'title' | 'captionsLang' | 'captionsLabel'>;
+  loop: boolean;
+  preloadMode: 'metadata' | 'none';
+  onClick: () => void;
+  onDoubleClick: () => void;
+  onEnded: () => void;
+}) {
+  return (
+    <video
+      ref={videoRef}
+      className="absolute inset-0 size-full object-cover"
+      poster={film.poster}
+      loop={loop}
+      playsInline
+      preload={preloadMode}
+      aria-label={props.title}
+      onClick={onClick}
+      onDoubleClick={onDoubleClick}
+      onEnded={onEnded}
+    >
+      {film.webm && <source src={film.webm} type="video/webm" />}
+      <source src={film.mp4} type="video/mp4" />
+      {film.captions && (
+        <track kind="captions" src={film.captions} srcLang={props.captionsLang} label={props.captionsLabel} default />
+      )}
+    </video>
+  );
+}
+
+// The narration's captions, over the screen's foot; they rise clear of the controls while those show.
+function FilmCue({ cue }: { cue: string }) {
+  return (
+    <p
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center px-6 transition-transform duration-200 ease-[var(--ease-smooth)] group-data-[chrome=shown]/player:-translate-y-16"
+    >
+      <span className="max-w-3xl rounded-lg bg-player-ink/65 px-3 py-1.5 text-center text-sm font-medium leading-snug text-balance text-player-fg backdrop-blur-sm sm:text-base">
+        {cue}
+      </span>
+    </p>
+  );
+}
+
+// The shared stage refs: the scroll observers want the stage, the player wants the frame.
+function useStageRef() {
   const [loadRef, shouldLoad] = useInView({ rootMargin: '300px' });
   const [playRef, inView] = useInView({ once: false, threshold: 0.35, rootMargin: '0px' });
-  const { muted, volume, toggle, changeVolume, refuse, adopt } = useFilmSound(videoRef);
-  const [paused, setPaused] = useState(true);
-  const [held, setHeld] = useState(() => (playback === 'requested' ? !startRequested : prefersSaveData()));
-  const [waiting, setWaiting] = useState(false);
-  const [failed, setFailed] = useState(false);
-  // Whether the film has played with sound yet: the first time it does, it starts from the top.
-  const heard = useRef(false);
-  // Every control exists before the film does, so a keyboard visitor tabbing down the page lands on them
-  // instead of skipping the frame (focusing one scrolls the frame near, and the film mounts): the pill from
-  // the first render, and under reduced motion the native player itself, which fetches nothing until the
-  // frame nears the viewport.
-  const mounted = shouldLoad || reduced;
-  const { captions, setCaptions, cue } = useFilmCaptions(videoRef, reduced, mounted);
-  useFilmVisibility(videoRef, reduced, startRequested);
-
-  const setFrameRef = useCallback(
+  const setStageRef = useCallback(
     (node: HTMLDivElement | null) => {
       loadRef.current = node;
       playRef.current = node;
@@ -98,191 +131,235 @@ export const FilmPlayer = ({
     [loadRef, playRef]
   );
 
-  // On the landing's sound from the instant it mounts — muted, unless the visitor already turned it on — before
-  // the browser weighs autoplay, so the in-view play() goes through. The same state the sound hook applies
-  // after every render, so however React orders the two (StrictMode re-attaches refs after effects), they agree.
-  const setVideoEl = useCallback((node: HTMLVideoElement | null) => {
-    videoRef.current = node;
+  return { setStageRef, shouldLoad, inView };
+}
 
-    if (!node) return;
+function useVideoElement(videoRef: RefObject<HTMLVideoElement | null>) {
+  return useCallback(
+    (node: HTMLVideoElement | null) => {
+      videoRef.current = node;
 
-    const { enabled, volume: level } = readSound();
+      if (node) onTheLandingSound(node);
+    },
+    [videoRef]
+  );
+}
 
-    tellVideo(node, !enabled, level);
-    node.setAttribute('muted', '');
-  }, []);
+type FilmControls = ReturnType<typeof useFilmPlayer>;
 
-  // On screen it plays with the landing's sound, starting over the first time that sound is on, whether it was
-  // switched on here or elsewhere. A browser that refuses the sound leaves the film unheard, for its own
-  // button to start over. Under reduced motion the film rests off-screen too, but never starts by itself.
-  useEffect(() => {
-    const video = videoRef.current;
+// Any press in the bar tells the landing's sound that the visitor has found the frame's controls, so no frame hints
+// at the sound button again.
+const noticeTheBar = (event: MouseEvent<HTMLElement>) => {
+  if (event.target instanceof Element && event.target.closest('.film-bar')) markSoundFound();
+};
 
-    if (!video) return;
-
-    const next = filmPlayback({
-      inView,
-      held,
-      suspended: suspended === true,
-      reduced,
-      requested: startRequested,
-      hidden: document.hidden,
-    });
-
-    if (next === 'pause') {
-      video.pause();
-
-      return;
-    }
-
-    if (next === 'rest') return;
-
-    if (!muted && !heard.current) {
-      heard.current = true;
-      video.currentTime = 0;
-    }
-
-    playWithSound(video, !muted, () => {
-      heard.current = false;
-      refuse();
-    });
-  }, [inView, held, suspended, reduced, shouldLoad, muted, refuse, startRequested]);
-
-  const togglePlay = () => {
-    const video = videoRef.current;
-
-    if (!video) return;
-
-    if (failed) {
-      video.load();
-      setFailed(false);
-    }
-
-    if (video.paused) {
-      setHeld(false);
-      playWithSound(video, !muted, refuse);
-
-      return;
-    }
-
-    setHeld(true);
-    video.pause();
+// The captions toggle, where the film has captions and a label for the button.
+function captionsToggleFor(
+  props: FilmPlayerProps,
+  on: boolean,
+  setCaptions: (update: (shown: boolean) => boolean) => void
+): { on: boolean; onToggle: () => void } | undefined {
+  const onToggle = () => {
+    setCaptions((shown) => !shown);
   };
 
-  // The first time the sound comes on from this film's own pill, it starts over inside the click, where every
-  // browser allows sound, whether the sound came on through the button or the slider.
-  const hearFromTheTop = () => {
-    const video = videoRef.current;
+  return props.film.captions && props.labels.captions ? { on, onToggle } : undefined;
+}
 
-    if (!video || heard.current) return;
-
-    heard.current = true;
-    video.currentTime = 0;
-    setHeld(false);
-    video.play().catch(() => {});
-  };
-
-  const control = reduced ? undefined : (
-    <FilmPlaybackControls
-      labels={labels}
-      paused={paused}
-      failed={failed}
-      muted={muted}
-      volume={volume}
-      captionsAvailable={Boolean(film.captions)}
+function FilmBar({
+  title,
+  labels,
+  media,
+  player,
+  speed,
+  captions,
+  embeddable,
+  fullscreen,
+  ui,
+  seekTo,
+}: {
+  title: string;
+  labels: FilmPlayerLabels;
+  media: MediaState;
+  player: FilmControls;
+  speed: { rate: number; setRate: (rate: number) => void };
+  captions?: { on: boolean; onToggle: () => void };
+  embeddable: boolean;
+  fullscreen: ReturnType<typeof useFullscreen>;
+  ui: PlayerUi;
+  seekTo: (seconds: number) => void;
+}) {
+  return (
+    <PlayerTransportBar
+      label={title}
+      className="film-bar bg-linear-to-t from-player-ink/85 via-player-ink/50 to-transparent pt-6"
+      media={media}
+      playLabels={{ play: media.failed ? (labels.retry ?? labels.play) : labels.play, pause: labels.pause }}
+      onToggle={player.togglePlay}
+      onSeek={seekTo}
+      onScrub={ui.setScrubbing}
+      sound={
+        <SoundControl
+          muted={player.muted}
+          volume={player.volume}
+          playing={!media.paused}
+          onToggle={player.sound}
+          onVolume={player.level}
+        />
+      }
+      rate={speed.rate}
+      onRate={speed.setRate}
       captions={captions}
-      onPlay={togglePlay}
-      onCaptions={() => {
-        setCaptions((shown) => !shown);
-      }}
-      onSound={() => {
-        const turningOn = muted;
-        toggle();
-
-        if (turningOn) hearFromTheTop();
-      }}
-      onVolume={(next) => {
-        const turningOn = muted && next > 0;
-        changeVolume(next);
-
-        if (turningOn) hearFromTheTop();
-      }}
+      onEmbed={embeddable ? ui.openEmbed : undefined}
+      fullscreen={{ active: fullscreen.active, onToggle: fullscreen.toggle }}
+      portal={fullscreen.element}
+      onMenuOpenChange={ui.setMenuOpen}
+      timeClassName={captions ? '@max-[26rem]/player:hidden' : '@max-[21rem]/player:hidden'}
     />
   );
+}
+
+// What plays on the screen: the poster until the film mounts, then the film, its overlays and its captions.
+function FilmMedia({
+  props,
+  mounted,
+  shouldLoad,
+  setVideoEl,
+  media,
+  player,
+  ui,
+  fullscreen,
+  cue,
+}: {
+  props: FilmPlayerProps;
+  mounted: boolean;
+  shouldLoad: boolean;
+  setVideoEl: (node: HTMLVideoElement | null) => void;
+  media: MediaState;
+  player: FilmControls;
+  ui: PlayerUi;
+  fullscreen: ReturnType<typeof useFullscreen>;
+  /** The caption on screen now, if captions are on. */
+  cue: string;
+}) {
+  const playback = props.playback ?? 'ambient';
 
   return (
-    <FilmStage frameRef={setFrameRef} className={className} still={still}>
+    <>
+      {!mounted && (
+        <img
+          src={props.film.poster}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 size-full object-cover"
+        />
+      )}
+      {mounted && (
+        <FilmVideo
+          film={props.film}
+          videoRef={setVideoEl}
+          props={props}
+          loop={props.loop === true || (playback === 'ambient' && player.muted)}
+          preloadMode={preload(playback, shouldLoad)}
+          onClick={ui.surfaceClick(player.togglePlay)}
+          onDoubleClick={fullscreen.toggle}
+          onEnded={player.ended}
+        />
+      )}
+      <PlayerOverlays
+        media={media}
+        waitingForVisitor={player.held}
+        playLabel={props.labels.play}
+        onToggle={player.togglePlay}
+        onRetry={player.togglePlay}
+        statusLabels={props.labels}
+      />
+      {cue && <FilmCue cue={cue} />}
+    </>
+  );
+}
+
+// A film in the page's one video frame (film-frame.tsx), with the LeClap player's controls: it loads as it nears the
+// viewport, plays while on screen and rests off-screen, with the landing's one sound (use-film-player.ts): muted
+// until the visitor turns it on, here or anywhere else on the page, its captions carrying the narration meanwhile.
+// A visitor's pause sticks. The bar seeks, changes speed, toggles captions, offers the embed code and goes
+// fullscreen; the frame answers the player's keys. Every control exists before the film does, so a keyboard visitor
+// tabbing down the page lands on them (focusing one scrolls the frame near, and the film mounts).
+export const FilmPlayer = (props: FilmPlayerProps) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
+  const { setStageRef, shouldLoad, inView } = useStageRef();
+  const mounted = shouldLoad || reduced;
+  const media = useMediaState(videoRef, mounted);
+  const startRequested = props.startRequested === true;
+  const policy = { playback: props.playback ?? 'ambient', startRequested, inView, reduced, shouldLoad };
+  const player = useFilmPlayer(videoRef, { ...policy, suspended: props.suspended === true }, media);
+  const speed = usePlaybackRate(videoRef);
+  const fullscreen = useFullscreen(frameRef, videoRef);
+  const { captions, setCaptions, cue } = useFilmCaptions(videoRef, mounted);
+  useFilmVisibility(videoRef, reduced, startRequested);
+  const setVideoEl = useVideoElement(videoRef);
+  const captionsToggle = captionsToggleFor(props, captions, setCaptions);
+  const seekTo = (seconds: number) => {
+    if (videoRef.current && media.duration > 0) videoRef.current.currentTime = seconds;
+  };
+  const ui = usePlayerUi({
+    title: props.title,
+    media,
+    fullscreen,
+    handlers: {
+      toggle: player.togglePlay,
+      seekTo,
+      volumeBy: player.volumeBy,
+      mute: player.sound,
+      fullscreen: fullscreen.toggle,
+      captions: captionsToggle?.onToggle,
+      rate: speed.step,
+    },
+  });
+
+  return (
+    <FilmStage frameRef={setStageRef} className={props.className} still={props.still}>
       <FilmScreen
-        shape={shape}
-        badge={badge}
-        controlLabel={title}
-        paused={paused}
-        {...controlLayout(activeSeekLabels(seekLabels, reduced, true), control, (seek, pill) => (
-          <SeekBar videoRef={videoRef} mounted={mounted} labels={seek}>
-            <ControlPill label={title}>{pill}</ControlPill>
-          </SeekBar>
-        ))}
-      >
-        {!mounted && (
-          <img
-            src={film.poster}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 size-full object-cover"
+        shape={props.shape}
+        badge={props.badge}
+        paused={media.paused}
+        frameRef={frameRef}
+        frameProps={{
+          ...ui.frameProps,
+          className: 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400',
+          onClickCapture: noticeTheBar,
+        }}
+        bar={
+          <FilmBar
+            title={props.title}
+            labels={props.labels}
+            media={media}
+            player={player}
+            speed={speed}
+            captions={captionsToggle}
+            embeddable={props.embed !== undefined}
+            fullscreen={fullscreen}
+            ui={ui}
+            seekTo={seekTo}
           />
-        )}
-        {mounted && (
-          <video
-            ref={setVideoEl}
-            className="absolute inset-0 size-full object-cover"
-            poster={film.poster}
-            loop={playback === 'ambient' && muted}
-            playsInline
-            preload={playback === 'requested' ? 'none' : preloadWhen(shouldLoad)}
-            controls={reduced}
-            aria-label={title}
-            onPlay={() => {
-              setPaused(false);
-            }}
-            onPause={() => {
-              setPaused(true);
-            }}
-            onEnded={() => {
-              setHeld(true);
-              setPaused(true);
-            }}
-            onWaiting={() => {
-              setWaiting(true);
-            }}
-            onPlaying={() => {
-              setWaiting(false);
-            }}
-            onCanPlay={() => {
-              setWaiting(false);
-            }}
-            onError={() => {
-              setFailed(true);
-              setWaiting(false);
-              setPaused(true);
-            }}
-            // Under reduced motion the native controls can turn the sound on or off: every video follows.
-            onVolumeChange={
-              reduced
-                ? (event) => {
-                    adopt(event.currentTarget);
-                  }
-                : undefined
-            }
-          >
-            <source src={film.mp4} type="video/mp4" />
-            {film.captions && (
-              <track kind="captions" src={film.captions} srcLang={captionsLang} label={captionsLabel} default />
-            )}
-          </video>
-        )}
-        <FilmFeedback waiting={waiting} failed={failed} labels={labels} cue={cue} captions={captions && !reduced} />
+        }
+      >
+        <FilmMedia
+          props={props}
+          mounted={mounted}
+          shouldLoad={shouldLoad}
+          setVideoEl={setVideoEl}
+          media={media}
+          player={player}
+          ui={ui}
+          fullscreen={fullscreen}
+          cue={captions ? cue : ''}
+        />
       </FilmScreen>
+      {props.embed && <EmbedDialog embed={props.embed} open={ui.embedOpen} onOpenChange={ui.setEmbedOpen} />}
     </FilmStage>
   );
 };

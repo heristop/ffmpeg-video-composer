@@ -90,14 +90,7 @@
   "export": {
     "preview": {
       "videoAriaLabel": "Vídeo renderizado",
-      "label": "Vídeo renderizado",
-      "pause": "Pausar vídeo",
-      "play": "Reproducir vídeo",
-      "mute": "Silenciar",
-      "unmute": "Activar sonido",
-      "volume": "Volumen",
-      "exitFullscreen": "Salir de pantalla completa",
-      "enterFullscreen": "Entrar en pantalla completa"
+      "label": "Vídeo renderizado"
     },
     "actions": {
       "download": "Descargar vídeo",

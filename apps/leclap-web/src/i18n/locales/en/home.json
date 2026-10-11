@@ -17,7 +17,6 @@
     "eyebrow": "See it in action",
     "title": "Every effect, one template away",
     "subtitle": "Light leaks, glints, frames, camera moves and cuts on the beat: each one is a line in a template, and it looks the same in your browser, on your computer and on your phone.",
-    "badge": "Effects reel · made with LeClap",
     "videoAria": "A reel of LeClap motion effects, playing on a loop",
     "play": "Play the render",
     "pause": "Pause the render",
@@ -28,8 +27,7 @@
   },
   "sound": {
     "on": "Sound on",
-    "off": "Mute",
-    "volume": "Volume"
+    "off": "Mute"
   },
   "film": {
     "eyebrow": "The film",

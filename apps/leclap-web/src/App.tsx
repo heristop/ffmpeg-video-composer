@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { Suspense, lazy } from 'react';
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -36,6 +36,8 @@ const CompareRemotion = lazyPage(() => import('@/presentation/pages/compare-remo
 const Legal = lazyPage(() => import('@/presentation/pages/static-pages'), 'Legal');
 const Privacy = lazyPage(() => import('@/presentation/pages/static-pages'), 'Privacy');
 const NotFound = lazyPage(() => import('@/presentation/pages/NotFound'), 'NotFound');
+// The chromeless player other sites frame: no app shell, its own small chunk.
+const EmbedPage = lazyPage(() => import('@/presentation/pages/embed'), 'EmbedPage');
 
 const DocLayout = lazyPage(() => import('@/presentation/pages/doc'), 'DocLayout');
 const DocOverview = lazyPage(() => import('@/presentation/pages/doc'), 'DocOverview');
@@ -82,53 +84,64 @@ function detectBasename(): string | undefined {
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<RootLayout />} errorElement={<RouteError />}>
-      <Route path="/" element={<Home />} />
-      <Route path="/showcase" element={<Showcase />} />
-      <Route path="/studio" element={<StudioHome />} />
-      <Route path="/studio/new" element={<Builder />} />
-      <Route path="/studio/builder" element={<StudioTemplateBuilderPage />} />
-      {/* Legacy path kept so existing bookmarks/links keep working. */}
-      <Route path="/builder" element={<Navigate to="/studio/new" replace />} />
-      {/* Retired page: the saved projects live on the studio home now; old links land on them. */}
-      <Route path="/projects" element={<Navigate to="/studio#projects" replace />} />
-      <Route path="/templates" element={<Admin />} />
-      <Route path="/templates/new" element={<TemplateEditorPage />} />
-      <Route path="/templates/:id/edit" element={<TemplateEditorPage />} />
-      <Route path="/partials" element={<PartialsPage />} />
-      {/* Legacy path kept so existing bookmarks/links keep working. */}
-      <Route path="/admin" element={<Navigate to="/templates" replace />} />
-      <Route path="/design" element={<Design />} />
-      <Route path="/docs/*" element={<DocsAlias />} />
-      <Route path="/doc" element={<DocLayout />}>
-        <Route index element={<DocOverview />} />
-        <Route path="sections" element={<DocSections />} />
-        <Route path="transitions" element={<DocTransitions />} />
-        <Route path="looks" element={<DocLooks />} />
-        <Route path="grade" element={<DocGrade />} />
-        <Route path="motion" element={<DocMotion />} />
-        <Route path="audio" element={<DocAudio />} />
-        <Route path="captions" element={<DocCaptions />} />
-        <Route path="animations" element={<DocAnimations />} />
-        <Route path="filters" element={<DocFilters />} />
-        <Route path="examples" element={<DocExamples />} />
-        <Route path="schema" element={<DocSchema />} />
-        <Route path="cli" element={<DocCli />} />
-        <Route path="mcp" element={<DocMcp />} />
-        <Route path="webmcp" element={<DocWebMcp />} />
-        <Route path="reference" element={<DocReference />} />
-        <Route path="effects" element={<DocEffects />} />
-        <Route path="engine" element={<DocEngine />} />
-        <Route path="creative-direction" element={<DocCreativeDirection />} />
+    <>
+      <Route
+        path="/embed/:kind/:id"
+        element={
+          <Suspense fallback={<div className="fixed inset-0 bg-player-ink" />}>
+            <EmbedPage />
+          </Suspense>
+        }
+        errorElement={<RouteError />}
+      />
+      <Route element={<RootLayout />} errorElement={<RouteError />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/showcase" element={<Showcase />} />
+        <Route path="/studio" element={<StudioHome />} />
+        <Route path="/studio/new" element={<Builder />} />
+        <Route path="/studio/builder" element={<StudioTemplateBuilderPage />} />
+        {/* Legacy path kept so existing bookmarks/links keep working. */}
+        <Route path="/builder" element={<Navigate to="/studio/new" replace />} />
+        {/* Retired page: the saved projects live on the studio home now; old links land on them. */}
+        <Route path="/projects" element={<Navigate to="/studio#projects" replace />} />
+        <Route path="/templates" element={<Admin />} />
+        <Route path="/templates/new" element={<TemplateEditorPage />} />
+        <Route path="/templates/:id/edit" element={<TemplateEditorPage />} />
+        <Route path="/partials" element={<PartialsPage />} />
+        {/* Legacy path kept so existing bookmarks/links keep working. */}
+        <Route path="/admin" element={<Navigate to="/templates" replace />} />
+        <Route path="/design" element={<Design />} />
+        <Route path="/docs/*" element={<DocsAlias />} />
+        <Route path="/doc" element={<DocLayout />}>
+          <Route index element={<DocOverview />} />
+          <Route path="sections" element={<DocSections />} />
+          <Route path="transitions" element={<DocTransitions />} />
+          <Route path="looks" element={<DocLooks />} />
+          <Route path="grade" element={<DocGrade />} />
+          <Route path="motion" element={<DocMotion />} />
+          <Route path="audio" element={<DocAudio />} />
+          <Route path="captions" element={<DocCaptions />} />
+          <Route path="animations" element={<DocAnimations />} />
+          <Route path="filters" element={<DocFilters />} />
+          <Route path="examples" element={<DocExamples />} />
+          <Route path="schema" element={<DocSchema />} />
+          <Route path="cli" element={<DocCli />} />
+          <Route path="mcp" element={<DocMcp />} />
+          <Route path="webmcp" element={<DocWebMcp />} />
+          <Route path="reference" element={<DocReference />} />
+          <Route path="effects" element={<DocEffects />} />
+          <Route path="engine" element={<DocEngine />} />
+          <Route path="creative-direction" element={<DocCreativeDirection />} />
+        </Route>
+        <Route path="/about" element={<About />} />
+        <Route path="/compare/remotion" element={<CompareRemotion />} />
+        {/* Retired page: its story is the home page's agentic section now; old links land there. */}
+        <Route path="/use-cases/agentic-development" element={<Navigate to="/#agentic" replace />} />
+        <Route path="/legal" element={<Legal />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="*" element={<NotFound />} handle={NOT_FOUND_HANDLE} />
       </Route>
-      <Route path="/about" element={<About />} />
-      <Route path="/compare/remotion" element={<CompareRemotion />} />
-      {/* Retired page: its story is the home page's agentic section now; old links land there. */}
-      <Route path="/use-cases/agentic-development" element={<Navigate to="/#agentic" replace />} />
-      <Route path="/legal" element={<Legal />} />
-      <Route path="/privacy" element={<Privacy />} />
-      <Route path="*" element={<NotFound />} handle={NOT_FOUND_HANDLE} />
-    </Route>
+    </>
   ),
   { basename: detectBasename() }
 );

@@ -17,7 +17,6 @@
     "eyebrow": "Míralo en acción",
     "title": "Cada efecto cabe en una plantilla",
     "subtitle": "Destellos de luz, brillos, marcos, movimientos de cámara y cortes al ritmo: cada uno es una línea de plantilla y se ve igual en tu navegador, en tu ordenador y en tu móvil.",
-    "badge": "Reel de efectos · hecho con LeClap",
     "videoAria": "Un reel de efectos de movimiento de LeClap, reproduciéndose en bucle",
     "play": "Reproducir el render",
     "pause": "Pausar el render",
@@ -28,8 +27,7 @@
   },
   "sound": {
     "on": "Activar el sonido",
-    "off": "Silenciar",
-    "volume": "Volumen"
+    "off": "Silenciar"
   },
   "film": {
     "eyebrow": "La película",

@@ -90,6 +90,7 @@ export const AgenticDeepDive = () => {
           badge={t('agentic.filmBadge')}
           captionsLabel={t('film.captions')}
           captionsLang={lang}
+          embed={{ ref: { kind: 'film', id: 'agentic', lang }, title: t('agentic.filmName'), shape: 'landscape' }}
           labels={{
             play: t('film.play'),
             pause: t('film.pause'),

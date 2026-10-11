@@ -8,8 +8,6 @@
   "loading": "Loading preview",
   "videoError": "This preview could not load. Try again.",
   "retry": "Try again",
-  "seek": "Seek in the preview",
-  "position": "{{current}} of {{total}}",
   "native": "Native JSON",
   "downloadJson": "Download JSON",
   "retrySource": "Retry source",

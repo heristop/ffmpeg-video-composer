@@ -210,6 +210,12 @@ body {
   --color-warning: oklch(0.77 0.174 64.1);
   --color-info: oklch(0.658 0.169 248.8);
 
+  /* Video player chrome (components/player): it always sits over footage, so its ink and text are the
+     brand's near-black and off-white in both themes, never the page's surfaces. The scrim, the glass and
+     the tracks are these two at an alpha; progress and focus are the lavender brand-400/500. */
+  --color-player-ink: oklch(0.16 0.008 280);
+  --color-player-fg: oklch(0.976 0.001 286.4);
+
   /* Muted text ramp (LIGHT defaults; dark overrides in `.dark`). Used for text
      hierarchy, not structural borders, with a faint lavender tint. In light
      mode the steps darken (more contrast on white); in dark mode they brighten. */
@@ -1475,13 +1481,14 @@ body {
   }
 }
 
-/* A showcase film's controls (film-frame.tsx FilmScreen `bar`, seek-bar.tsx): by default a bar under the
+/* A film's controls (film-frame.tsx FilmScreen `bar`, components/player): by default a bar under the
    screen, so nothing covers the film. Only on a screen at least 360 px tall, with a pointer that can hover,
-   does the bar lie over the screen's foot instead, and there it fades out while the film plays unless the
-   pointer is over the frame or focus is in the bar. The frame is a size container; each shape's width
-   threshold is the width at which its screen reaches 360 px tall. */
+   does the bar lie over the screen's foot instead, and there it fades out over a playing film once the
+   pointer rests (the frame's `data-chrome="hidden"`, usePlayerChrome), unless focus is in the bar. The frame
+   is a size container; each shape's width threshold is the width at which its screen reaches 360 px tall.
+   Fullscreen always lays the bar over the screen. */
 .film-frame {
-  container: film / inline-size;
+  container: film player / inline-size;
 }
 
 .film-bar {
@@ -1489,9 +1496,11 @@ body {
   z-index: 10;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.5rem 0 0.25rem;
-  transition: opacity 0.2s var(--ease-smooth);
+  gap: 0.125rem;
+  padding: 0.25rem 0 0.125rem;
+  transition:
+    opacity 0.2s var(--ease-smooth),
+    transform 0.2s var(--ease-smooth);
 }
 
 @media (hover: hover) {
@@ -1502,8 +1511,10 @@ body {
       bottom: 0;
     }
 
-    .film-frame[data-shape='landscape'][data-playing]:not(:hover) .film-bar:not(:focus-within) {
+    .film-frame[data-shape='landscape'][data-chrome='hidden'] .film-bar:not(:focus-within) {
       opacity: 0;
+      transform: translateY(0.25rem);
+      pointer-events: none;
     }
   }
 
@@ -1514,8 +1525,10 @@ body {
       bottom: 0;
     }
 
-    .film-frame[data-shape='square'][data-playing]:not(:hover) .film-bar:not(:focus-within) {
+    .film-frame[data-shape='square'][data-chrome='hidden'] .film-bar:not(:focus-within) {
       opacity: 0;
+      transform: translateY(0.25rem);
+      pointer-events: none;
     }
   }
 
@@ -1526,10 +1539,92 @@ body {
       bottom: 0;
     }
 
-    .film-frame[data-shape='portrait'][data-playing]:not(:hover) .film-bar:not(:focus-within) {
+    .film-frame[data-shape='portrait'][data-chrome='hidden'] .film-bar:not(:focus-within) {
       opacity: 0;
+      transform: translateY(0.25rem);
+      pointer-events: none;
     }
   }
+}
+
+/* Fullscreen: the frame fills the screen on the player's ink, the film keeps its shape at the largest size that
+   fits, and the bar lies over its foot, clear of the notch and the home indicator. */
+.film-frame:fullscreen {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: var(--color-player-ink);
+  clip-path: none;
+}
+
+.film-frame:fullscreen > .film-screen {
+  width: min(100vw, calc(100dvh * var(--film-ratio, 1.7778)));
+  clip-path: none;
+}
+
+.film-frame:fullscreen .film-bar {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px);
+}
+
+.film-frame:fullscreen[data-chrome='hidden'] .film-bar:not(:focus-within) {
+  opacity: 0;
+  transform: translateY(0.25rem);
+  pointer-events: none;
+}
+
+.film-frame:fullscreen[data-chrome='hidden'],
+.video-player[data-chrome='hidden'] {
+  cursor: none;
+}
+
+/* The video player's chrome (components/player/video-player.tsx): the scrim and bar over the clip's foot, and
+   the centre button, fade and settle on transform + opacity only, so nothing reflows. */
+.player-fade {
+  transition:
+    opacity 0.2s var(--ease-smooth),
+    transform 0.2s var(--ease-smooth);
+}
+
+.video-player[data-chrome='hidden'] .player-fade:not(:focus-within) {
+  opacity: 0;
+  transform: translateY(0.25rem);
+  pointer-events: none;
+}
+
+.video-player:fullscreen .player-bar {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+  padding-inline: max(0.5rem, env(safe-area-inset-left, 0px)) max(0.5rem, env(safe-area-inset-right, 0px));
+}
+
+/* Native caption cues (the embed and the result player): the brand type on the player's glass. */
+.video-player video::cue {
+  background: color-mix(in oklch, var(--color-player-ink) 72%, transparent);
+  color: var(--color-player-fg);
+  font-family: var(--font-sans);
+}
+
+/* The speed and more menus open with a short rise from their button. */
+@keyframes player-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem) scale(0.97);
+  }
+}
+
+/* A loading spinner only after a beat, so a quick stall never flashes one. */
+@keyframes player-delayed-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.player-delayed {
+  animation: player-delayed-in 0.2s var(--ease-smooth) 0.3s backwards;
 }
 
 /* Living brand glow — a low-opacity aurora that drifts and breathes behind a section so the surface
