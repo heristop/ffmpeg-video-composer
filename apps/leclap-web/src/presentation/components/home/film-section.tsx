@@ -35,7 +35,6 @@ export const FilmSection = () => {
           badge={t('film.badge')}
           captionsLabel={t('film.captions')}
           captionsLang={lang}
-          embed={{ ref: { kind: 'film', id: 'showcase', lang }, title: t('film.name'), shape: 'landscape' }}
           labels={{
             play: t('film.play'),
             pause: t('film.pause'),

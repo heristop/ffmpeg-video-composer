@@ -35,7 +35,6 @@ export const HomeShowcase = () => {
           loop
           title={t('showcase.videoAria')}
           labels={{ play: t('showcase.play'), pause: t('showcase.pause') }}
-          embed={{ ref: { kind: 'reel', id: 'effects' }, title: t('showcase.videoAria'), shape: 'landscape' }}
         />
 
         {/* CTA cluster: the one filled primary, then the three ways to look around as lavender text links with a

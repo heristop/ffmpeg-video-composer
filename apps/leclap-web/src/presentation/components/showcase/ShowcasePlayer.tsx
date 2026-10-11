@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { FilmPlayer } from '@/presentation/components/home/film-player';
-import { mediaPath, sampleShape, type ShowcaseSample } from './catalog';
+import { useTemplateScenes } from '@/presentation/components/player/use-template-scenes';
+import { SHAPE_ASPECT, mediaPath, sampleDuration, sampleShape, type ShowcaseSample } from './catalog';
 
 export function ShowcasePlayer({
   sample,
@@ -18,6 +19,7 @@ export function ShowcasePlayer({
   const { t } = useTranslation('showcase');
   const { t: home } = useTranslation('home');
   const shape = sampleShape(sample);
+  const scenes = useTemplateScenes(mediaPath(sample, 'json'));
 
   return (
     <FilmPlayer
@@ -29,7 +31,9 @@ export function ShowcasePlayer({
       shape={shape}
       still={still}
       suspended={suspended}
-      embed={{ ref: { kind: 'sample', id: sample.id }, title: sample.title, shape }}
+      cardTitle={sample.title}
+      cardMeta={{ shape: SHAPE_ASPECT[shape], duration: sampleDuration(sample) }}
+      scenes={scenes}
       labels={{
         play: t('playSample', { title: sample.title }),
         pause: home('film.pause'),

@@ -12,6 +12,8 @@ export interface PlayerHandlers {
   /** Absent where the video has no captions: `c` then does nothing. */
   captions?: () => void;
   rate: (direction: 1 | -1) => void;
+  /** Absent where the browser has no picture-in-picture: `p` then does nothing. */
+  pip?: () => void;
 }
 
 interface Clock {
@@ -69,13 +71,22 @@ export function runPlayerAction(action: PlayerAction, handlers: PlayerHandlers, 
 
       return;
     }
+    case 'pip': {
+      handlers.pip?.();
+
+      return;
+    }
     default: {
       handlers.rate(action.direction);
     }
   }
 }
 
-/** A frame's keydown: the player's shortcuts, for whatever has focus inside it (or the page, for the embed). */
+// A key for a control this video lacks (captions, picture-in-picture) is left to the page.
+const unhandled = (action: PlayerAction, handlers: PlayerHandlers): boolean =>
+  (action.type === 'captions' && !handlers.captions) || (action.type === 'pip' && !handlers.pip);
+
+/** A frame's keydown: the player's shortcuts, for whatever has focus inside it. */
 export function playerKeyDown(
   event: KeyboardEvent<HTMLElement> | globalThis.KeyboardEvent,
   handlers: PlayerHandlers,
@@ -92,7 +103,7 @@ export function playerKeyDown(
     target: keyTarget(event.target),
   });
 
-  if (!action || (action.type === 'captions' && !handlers.captions)) return;
+  if (!action || unhandled(action, handlers)) return;
 
   event.preventDefault();
   runPlayerAction(action, handlers, time);

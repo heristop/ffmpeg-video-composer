@@ -1,27 +1,28 @@
-import { useRef, useState, type ComponentProps, type ReactNode } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as SliderPrimitive from '@radix-ui/react-slider';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { AlertCircle, Check, Code2, Ellipsis, Loader2, Maximize, Minimize, RotateCcw } from 'lucide-react';
+import { Check, Maximize, Minimize } from 'lucide-react';
 import { Captions, CaptionsOff, Volume2, VolumeX } from '@/presentation/components/icons';
 import { PlayIcon } from '@/presentation/components/icons/play';
 import { PauseIcon } from '@/presentation/components/icons/pause';
 import { cn } from '@/lib/utils';
-import { PLAYBACK_RATES, formatClock, formatRate, fraction, keySeekTarget, pointerTime } from './player.logic';
+import { PLAYBACK_RATES, formatClock, formatRate } from './player.logic';
+import { rateRoll } from './timeline.logic';
 
-// The LeClap player's controls: one set, shared by every player in the app. Each is a real control (Radix where
-// Radix has one: the seek and volume sliders, the speed and more menus) with a translated name, a 44 px target,
-// the brand's lavender for progress and focus, and the player's ink and off-white tokens, never a raw colour.
-// They sit on the player's own scrim, so they read the same over any footage in either theme; the menus they
-// open are the app's dark popover surface, like its dialogs.
+// The LeClap player's controls: one set, shared by every player in the app, in the app's own vocabulary. The
+// buttons sit in glass capsules like the header's pills, press with the app's tap spring and focus with the brand
+// ring; the speed is a brand chip whose figure rolls as it changes; the time reads in the mono of the app's slates;
+// the centre button is the primary call to action, in the brand gradient with its glow. Every control is a real one
+// (Radix where Radix has one) with a translated name and a 44 px target, on the player's ink and off-white tokens.
 
 export const playerButtonVariants = cva(
   [
     'tap relative grid shrink-0 cursor-pointer place-items-center rounded-full text-player-fg/85',
     'transition-[transform,background-color,color] duration-150 ease-[var(--ease-smooth)]',
     'hover:bg-player-fg/12 hover:text-player-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400',
-    'aria-pressed:text-player-fg data-[state=open]:bg-player-fg/15 data-[state=open]:text-player-fg',
+    'aria-pressed:text-brand-200 data-[state=open]:bg-player-fg/15 data-[state=open]:text-player-fg',
     'disabled:pointer-events-none disabled:opacity-40',
   ],
   {
@@ -29,8 +30,12 @@ export const playerButtonVariants = cva(
       size: {
         // 44 px everywhere: on a phone the bar sits over footage, where a miss plays or pauses instead.
         md: 'size-11 [&_svg]:size-5 group-data-[fullscreen]/player:size-12',
-        wide: 'h-11 min-w-11 px-2.5 text-sm font-semibold tabular-nums group-data-[fullscreen]/player:h-12',
-        hero: 'size-16 bg-player-ink/55 text-player-fg ring-1 ring-player-fg/20 backdrop-blur-md hover:bg-player-ink/70 hover:scale-105 focus-visible:ring-4 [&_svg]:size-7 sm:size-[4.5rem] @max-[24rem]/player:size-12 @max-[24rem]/player:[&_svg]:size-5',
+        wide: 'h-11 min-w-11 px-1 group-data-[fullscreen]/player:h-12',
+        hero: [
+          'brand-gradient size-16 text-white shadow-[var(--shadow-glow)] ring-4 ring-brand-300/25 sm:size-[4.5rem]',
+          'hover:scale-105 hover:bg-transparent hover:text-white hover:ring-brand-300/45 focus-visible:ring-4 focus-visible:ring-player-fg/80',
+          '[&_svg]:size-7 @max-[24rem]/player:size-12 @max-[24rem]/player:[&_svg]:size-5',
+        ],
       },
     },
     defaultVariants: { size: 'md' },
@@ -57,7 +62,10 @@ export function PlayerButton({ label, size, className, children, ...props }: Pla
   );
 }
 
-/** Play or pause, in the bar. */
+const MORPH =
+  'absolute grid place-items-center transition-[opacity,transform] duration-200 ease-[var(--ease-out-expo)]';
+
+/** Play or pause, in the bar: the two glyphs morph into each other (a turn and a scale), never a hard swap. */
 export function PlayerPlayButton({
   paused,
   labels,
@@ -69,15 +77,27 @@ export function PlayerPlayButton({
 }) {
   return (
     <PlayerButton label={paused ? labels.play : labels.pause} onClick={onToggle} data-player-play="">
-      {paused ? <PlayIcon size={20} className="translate-x-px" /> : <PauseIcon size={20} />}
+      <span
+        aria-hidden="true"
+        className={cn(MORPH, paused ? 'scale-100 opacity-100' : '-rotate-90 scale-50 opacity-0')}
+      >
+        <PlayIcon size={20} className="translate-x-px" />
+      </span>
+      <span aria-hidden="true" className={cn(MORPH, paused ? 'rotate-90 scale-50 opacity-0' : 'scale-100 opacity-100')}>
+        <PauseIcon size={20} />
+      </span>
     </PlayerButton>
   );
 }
 
-/** The big centre button over the poster and a paused film: the surface's one obvious action. */
+/**
+ * The big centre button over the poster and a paused film: the surface's one call to action, in the brand gradient
+ * with its glow, and a soft halo breathing around it on the poster (still under reduced motion).
+ */
 export function PlayerCenterButton({ label, onToggle }: { label: string; onToggle: () => void }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
+      <span aria-hidden="true" className="player-halo absolute size-16 rounded-full sm:size-[4.5rem]" />
       <PlayerButton size="hero" label={label} onClick={onToggle} className="pointer-events-auto" data-player-center="">
         <PlayIcon size={28} className="translate-x-0.5" />
       </PlayerButton>
@@ -86,99 +106,9 @@ export function PlayerCenterButton({ label, onToggle }: { label: string; onToggl
 }
 
 /**
- * The seek bar: a Radix slider whose track shows what has played (lavender) over what has buffered. Hovered,
- * focused or dragged it thickens (a transform, so nothing reflows) and shows its thumb, and a time bubble follows
- * the pointer. Arrows step 5 s, Page Up/Down a tenth, Home/End the ends; it speaks "1:23 of 6:12".
+ * "0:42 / 6:12" in the mono of the app's slates and tabular figures; in fullscreen the playhead's time grows into the
+ * display face, like a cinema timecode. The seek slider speaks the position, so this is for the eye only.
  */
-export function PlayerSeek({
-  current,
-  duration,
-  buffered,
-  onSeek,
-  onScrub,
-  className,
-}: {
-  current: number;
-  duration: number;
-  buffered: number;
-  onSeek: (seconds: number) => void;
-  /** Whether a drag is under way, so the chrome stays up meanwhile. */
-  onScrub?: (scrubbing: boolean) => void;
-  className?: string;
-}) {
-  const { t } = useTranslation('player');
-  const rootRef = useRef<HTMLSpanElement>(null);
-  const [hover, setHover] = useState<{ x: number; time: number } | null>(null);
-  const loaded = fraction(buffered, duration);
-  const now = formatClock(current);
-  const total = formatClock(duration);
-
-  return (
-    <SliderPrimitive.Root
-      ref={rootRef}
-      value={[Math.min(current, duration)]}
-      max={duration > 0 ? duration : 1}
-      step={0.01}
-      disabled={duration === 0}
-      onValueChange={([next]) => {
-        onSeek(next);
-      }}
-      onPointerDown={() => onScrub?.(true)}
-      onValueCommit={() => onScrub?.(false)}
-      onLostPointerCapture={() => onScrub?.(false)}
-      onKeyDown={(event) => {
-        const target = keySeekTarget(event.key, current, duration);
-
-        if (target === null) return;
-
-        event.preventDefault();
-        onSeek(target);
-      }}
-      onPointerMove={(event) => {
-        const box = rootRef.current?.getBoundingClientRect();
-
-        if (!box) return;
-
-        setHover({
-          x: Math.min(box.width, Math.max(0, event.clientX - box.left)),
-          time: pointerTime(event.clientX, box, duration),
-        });
-      }}
-      onPointerLeave={() => {
-        setHover(null);
-      }}
-      className={cn(
-        'group/seek relative flex h-6 w-full cursor-pointer touch-none select-none items-center data-[disabled]:cursor-default',
-        className
-      )}
-    >
-      <SliderPrimitive.Track className="relative h-1 grow origin-center overflow-hidden rounded-full bg-player-fg/25 transition-transform duration-200 ease-[var(--ease-out-expo)] group-hover/seek:scale-y-150 group-has-[:focus-visible]/seek:scale-y-150">
-        <span
-          aria-hidden="true"
-          className="absolute inset-0 origin-left bg-player-fg/30"
-          style={{ transform: `scaleX(${loaded})` }}
-        />
-        <SliderPrimitive.Range className="absolute h-full bg-brand-500" />
-      </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb
-        aria-label={t('seek')}
-        aria-valuetext={t('position', { current: now, total })}
-        className="block size-3.5 scale-0 rounded-full bg-player-fg shadow-[0_0_0_3px_color-mix(in_oklch,var(--color-player-ink)_35%,transparent)] transition-transform duration-150 ease-[var(--ease-out-expo)] group-hover/seek:scale-100 focus-visible:scale-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-400/60"
-      />
-      {hover && duration > 0 && (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-6 -translate-x-1/2 rounded-md bg-player-ink/80 px-2 py-0.5 text-xs font-medium tabular-nums text-player-fg ring-1 ring-player-fg/15 backdrop-blur-sm"
-          style={{ left: hover.x }}
-        >
-          {formatClock(hover.time)}
-        </span>
-      )}
-    </SliderPrimitive.Root>
-  );
-}
-
-/** "0:42 / 6:12" in tabular figures; the seek slider speaks the position, so this is for the eye only. */
 export function PlayerTime({
   current,
   duration,
@@ -192,20 +122,23 @@ export function PlayerTime({
     <span
       aria-hidden="true"
       className={cn(
-        'whitespace-nowrap px-1.5 text-sm font-medium tabular-nums tracking-wide text-player-fg/90 transition-opacity duration-200',
+        'flex items-baseline gap-1 whitespace-nowrap px-2 font-mono text-xs font-medium tabular-nums tracking-[0.04em] text-player-fg transition-opacity duration-200',
         duration === 0 && 'opacity-0',
         className
       )}
     >
-      {formatClock(current)}
-      <span className="text-player-fg/55"> / {formatClock(duration)}</span>
+      <span className="group-data-[fullscreen]/player:font-display group-data-[fullscreen]/player:text-2xl group-data-[fullscreen]/player:font-semibold group-data-[fullscreen]/player:tracking-normal">
+        {formatClock(current)}
+      </span>
+      <span className="text-player-fg/55">/ {formatClock(duration)}</span>
     </span>
   );
 }
 
 /**
  * The volume slider: a Radix slider beside the speaker button, where the bar has room (a hovering pointer and a wide
- * frame; a phone's volume is its own buttons). It reads 0 while muted and speaks a percentage.
+ * frame; a phone's volume is its own buttons). Its fill is the brand gradient; it reads 0 while muted and speaks a
+ * percentage.
  */
 export function PlayerVolumeSlider({
   level,
@@ -231,13 +164,13 @@ export function PlayerVolumeSlider({
         className
       )}
     >
-      <SliderPrimitive.Track className="relative h-1 grow overflow-hidden rounded-full bg-player-fg/25">
-        <SliderPrimitive.Range className="absolute h-full bg-player-fg" />
+      <SliderPrimitive.Track className="relative h-1 grow overflow-hidden rounded-full bg-brand-300/20">
+        <SliderPrimitive.Range className="brand-gradient absolute h-full" />
       </SliderPrimitive.Track>
       <SliderPrimitive.Thumb
         aria-label={t('volume')}
         aria-valuetext={`${Math.round(level * 100)}%`}
-        className="block size-3 rounded-full bg-player-fg transition-transform duration-150 group-hover/vol:scale-110 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-400/60"
+        className="block size-3 rounded-full border-2 border-secondary-400 bg-player-fg transition-transform duration-150 group-hover/vol:scale-110 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-400/60"
       />
     </SliderPrimitive.Root>
   );
@@ -269,7 +202,7 @@ export function PlayerVolume({
   );
 }
 
-/** Captions on or off: a pressed toggle. */
+/** Captions on or off: a pressed toggle, lit lavender while on. */
 export function PlayerCaptionsButton({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   const { t } = useTranslation('player');
 
@@ -305,7 +238,28 @@ interface MenuProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-/** The speed menu: its button reads the current speed; the menu lists the six, the current one checked. */
+const ROLL: Record<'up' | 'down' | 'none', string> = {
+  up: 'animate-[player-roll-up_0.28s_var(--ease-out-expo)]',
+  down: 'animate-[player-roll-down_0.28s_var(--ease-out-expo)]',
+  none: '',
+};
+
+/** The speed chip: the current speed on a lavender chip, its figure rolling up or down as the speed changes. */
+function RateChip({ rate }: { rate: number }) {
+  const [shown, setShown] = useState({ rate, roll: 'none' as 'up' | 'down' | 'none' });
+
+  if (shown.rate !== rate) setShown({ rate, roll: rateRoll(shown.rate, rate) });
+
+  return (
+    <span className="grid h-7 min-w-11 place-items-center overflow-hidden rounded-full bg-brand-500/25 px-2 font-mono text-xs font-semibold tabular-nums text-brand-100 ring-1 ring-inset ring-brand-300/40 group-data-[fullscreen]/player:h-8">
+      <span key={rate} className={cn('block', ROLL[shown.roll])}>
+        {formatRate(rate)}
+      </span>
+    </span>
+  );
+}
+
+/** The speed menu: its chip reads the current speed; the menu lists the six, the current one checked. */
 export function PlayerRateMenu({
   rate,
   onRate,
@@ -313,18 +267,22 @@ export function PlayerRateMenu({
   onOpenChange,
 }: MenuProps & { rate: number; onRate: (rate: number) => void }) {
   const { t } = useTranslation('player');
-  const shown = formatRate(rate);
 
   return (
     <DropdownMenu.Root modal={false} onOpenChange={onOpenChange}>
       <DropdownMenu.Trigger asChild>
-        <PlayerButton size="wide" label={t('speedValue', { rate: shown })} data-player-rate="">
-          {shown}
+        <PlayerButton
+          size="wide"
+          label={t('speedValue', { rate: formatRate(rate) })}
+          data-player-rate=""
+          className="hover:bg-transparent"
+        >
+          <RateChip rate={rate} />
         </PlayerButton>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal container={container ?? undefined}>
         <DropdownMenu.Content side="top" align="end" sideOffset={8} collisionPadding={8} className={MENU_CONTENT}>
-          <DropdownMenu.Label className="px-3 pb-1 pt-2 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+          <DropdownMenu.Label className="px-3 pb-1 pt-2 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-brand-300">
             {t('speed')}
           </DropdownMenu.Label>
           <DropdownMenu.RadioGroup
@@ -350,75 +308,13 @@ export function PlayerRateMenu({
   );
 }
 
-/** The overflow menu: today the embed code, for a video the site serves publicly. */
-export function PlayerMoreMenu({ onEmbed, container, onOpenChange }: MenuProps & { onEmbed: () => void }) {
-  const { t } = useTranslation('player');
-
-  return (
-    <DropdownMenu.Root modal={false} onOpenChange={onOpenChange}>
-      <DropdownMenu.Trigger asChild>
-        <PlayerButton label={t('more')} data-player-more="">
-          <Ellipsis aria-hidden="true" />
-        </PlayerButton>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Portal container={container ?? undefined}>
-        <DropdownMenu.Content side="top" align="end" sideOffset={8} collisionPadding={8} className={MENU_CONTENT}>
-          <DropdownMenu.Item className={MENU_ITEM} onSelect={onEmbed}>
-            <Code2 aria-hidden="true" className="text-brand-300" />
-            {t('embed')}
-          </DropdownMenu.Item>
-        </DropdownMenu.Content>
-      </DropdownMenu.Portal>
-    </DropdownMenu.Root>
-  );
-}
-
-/** Loading (a spinner, after a beat) and failure (what happened, and a retry), centred on the screen. */
-export function PlayerStatus({
-  waiting,
-  failed,
-  labels,
-  onRetry,
-}: {
-  waiting: boolean;
-  failed: boolean;
-  labels: { loading: string; error: string; retry: string };
-  onRetry: () => void;
-}) {
-  if (failed) {
-    return (
-      <div className="absolute inset-0 z-20 grid place-items-center bg-player-ink/70 p-4">
-        <div role="alert" className="flex max-w-xs flex-col items-center gap-3 text-center text-player-fg">
-          <AlertCircle className="size-7 text-secondary-300" aria-hidden="true" />
-          <p className="text-sm font-medium leading-snug text-balance">{labels.error}</p>
-          <button
-            type="button"
-            onClick={onRetry}
-            className="tap inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full bg-player-fg px-4 text-sm font-semibold text-player-ink transition-[transform,background-color] duration-150 hover:bg-brand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-player-ink [&_svg]:size-4"
-          >
-            <RotateCcw aria-hidden="true" />
-            {labels.retry}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!waiting) return null;
-
-  return (
-    <div role="status" className="player-delayed pointer-events-none absolute inset-0 z-10 grid place-items-center">
-      <span className="grid size-16 place-items-center rounded-full bg-player-ink/55 text-brand-300 ring-1 ring-player-fg/15 backdrop-blur-md">
-        <Loader2 className="size-7 motion-safe:animate-spin" aria-hidden="true" />
-      </span>
-      <span className="sr-only">{labels.loading}</span>
-    </div>
-  );
-}
+/** A glass capsule for a cluster of controls, like the header's pills over the footage. */
+const CAPSULE =
+  'flex items-center rounded-full bg-player-ink/45 p-0.5 ring-1 ring-player-fg/12 backdrop-blur-md shadow-[var(--shadow-md)]';
 
 /**
- * The control bar's layout: the seek bar on top, then the transport on the left (`start`) and the rest on the right
- * (`end`), all on the player's scrim. It is a named group, so several players on one page stay tell-apart.
+ * The control bar's layout: the seek bar on top, then the transport capsule on the left (`start`) and the rest on the
+ * right (`end`), on the player's scrim. It is a named group, so several players on one page stay tell-apart.
  */
 export function PlayerBar({
   label,
@@ -434,11 +330,11 @@ export function PlayerBar({
   className?: string;
 }) {
   return (
-    <div role="group" aria-label={label} className={cn('player-bar flex flex-col px-2 pb-1', className)}>
-      {seek && <div className="px-2">{seek}</div>}
-      <div className="flex items-center justify-between gap-1">
-        <div className="flex min-w-0 items-center">{start}</div>
-        <div className="flex shrink-0 items-center">{end}</div>
+    <div role="group" aria-label={label} className={cn('player-bar flex flex-col gap-1 px-2.5 pb-2', className)}>
+      {seek && <div className="px-1.5">{seek}</div>}
+      <div className="flex items-center justify-between gap-1.5">
+        <div className={cn(CAPSULE, 'min-w-0')}>{start}</div>
+        <div className={cn(CAPSULE, 'shrink-0')}>{end}</div>
       </div>
     </div>
   );

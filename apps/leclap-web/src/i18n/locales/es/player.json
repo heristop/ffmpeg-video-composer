@@ -1,9 +1,7 @@
 {
-  "player": "Reproductor de vídeo",
   "controls": "Controles del vídeo",
   "play": "Reproducir",
   "pause": "Pausa",
-  "replay": "Volver a ver",
   "seek": "Avanzar o retroceder",
   "position": "{{current}} de {{total}}",
   "mute": "Silenciar",
@@ -15,17 +13,12 @@
   "speed": "Velocidad de reproducción",
   "speedValue": "Velocidad de reproducción, {{rate}}",
   "normalSpeed": "Normal",
-  "more": "Más opciones",
-  "embed": "Insertar",
-  "embedTitle": "Insertar este vídeo",
-  "embedDescription": "Pega este código en tu página. Nada se reproduce, ni suena, hasta que el visitante pulse reproducir.",
-  "embedCode": "Código para insertar",
-  "copy": "Copiar código",
-  "copied": "Código copiado",
-  "copyFailed": "No se pudo copiar. Selecciona el código y cópialo tú.",
   "loading": "Cargando vídeo",
   "error": "No se pudo reproducir este vídeo.",
   "retry": "Reintentar",
-  "notFound": "Este vídeo no está disponible.",
-  "watchOn": "Ver en LeClap"
+  "scene": "Escena {{number}}",
+  "pip": "Imagen en imagen",
+  "exitPip": "Salir de imagen en imagen",
+  "pipActive": "Reproduciendo en imagen en imagen",
+  "pipActiveHint": "El vídeo flota en su propia ventana; estos controles lo siguen manejando."
 }

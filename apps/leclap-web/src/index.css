@@ -1601,19 +1601,122 @@ body {
   padding-inline: max(0.5rem, env(safe-area-inset-left, 0px)) max(0.5rem, env(safe-area-inset-right, 0px));
 }
 
-/* Native caption cues (the embed and the result player): the brand type on the player's glass. */
-.video-player video::cue {
-  background: color-mix(in oklch, var(--color-player-ink) 72%, transparent);
-  color: var(--color-player-fg);
-  font-family: var(--font-sans);
-}
-
 /* The speed and more menus open with a short rise from their button. */
 @keyframes player-menu-in {
   from {
     opacity: 0;
     transform: translateY(0.25rem) scale(0.97);
   }
+}
+
+/* The LeClap layer of the player (components/player): the film strip's perforations under the timeline, the
+   halo that breathes around the poster's call to action, the clap that slams on play, the speed chip's rolling
+   figure and the loader's shimmer. Tokens only; reduced motion keeps them still (the global reset, and the clap
+   is never shown). */
+.player-sprockets {
+  background-image: repeating-linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--color-brand-200) 55%, transparent) 0 0.3rem,
+    transparent 0.3rem 0.75rem
+  );
+  border-radius: 1px;
+}
+
+.film-frame[data-chrome='hidden'] .player-fade:not(:focus-within) {
+  opacity: 0;
+  transform: translateY(0.25rem);
+  pointer-events: none;
+}
+
+@keyframes player-halo {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+
+.player-halo {
+  background: radial-gradient(circle, color-mix(in oklch, var(--color-brand-400) 55%, transparent), transparent 70%);
+  animation: player-halo 2.6s var(--ease-smooth) infinite;
+}
+
+@keyframes player-clap-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -60%) scale(0.96);
+  }
+}
+
+@keyframes player-clap-stick {
+  0%,
+  20% {
+    transform: rotate(-28deg);
+  }
+  42% {
+    transform: rotate(2deg);
+  }
+  55%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.player-clap {
+  animation: player-clap-pop 0.7s var(--ease-out-expo) forwards;
+}
+
+.player-clap-stick {
+  animation: player-clap-stick 0.7s var(--ease-spring) forwards;
+}
+
+@keyframes player-roll-up {
+  from {
+    opacity: 0;
+    transform: translateY(70%);
+  }
+}
+
+@keyframes player-roll-down {
+  from {
+    opacity: 0;
+    transform: translateY(-70%);
+  }
+}
+
+@keyframes player-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.player-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--color-player-fg) 35%, transparent),
+    transparent
+  );
+  animation: player-shimmer 1.3s var(--ease-smooth) infinite;
 }
 
 /* A loading spinner only after a beat, so a quick stall never flashes one. */

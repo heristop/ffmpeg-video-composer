@@ -18,6 +18,8 @@ interface VideoPreviewProps {
   // The chip over the corner. Defaults to "Rendered video"; null drops it where that would be
   // untrue or redundant (a raw camera take, a result whose screen already names it).
   label?: string | null;
+  // The title card's title on the poster and in fullscreen (the project's name); defaults to the chip's caption.
+  title?: string;
   // The clip's facts once its metadata has loaded, for callers that list them.
   onMetadata?: (meta: { duration: number; width: number; height: number }) => void;
 }
@@ -41,6 +43,7 @@ export const VideoPreview = ({
   muted = false,
   fill = false,
   label,
+  title,
   onMetadata,
 }: VideoPreviewProps) => {
   const { t } = useTranslation('process');
@@ -54,6 +57,7 @@ export const VideoPreview = ({
       loop={loop}
       muted={muted}
       label={caption ?? undefined}
+      cardTitle={title ?? caption ?? undefined}
       onMetadata={onMetadata}
       className={cn('shadow-[var(--shadow-lg)] ring-1 ring-foreground/10', frameClass(fill))}
       videoClassName={clipClass(fill)}

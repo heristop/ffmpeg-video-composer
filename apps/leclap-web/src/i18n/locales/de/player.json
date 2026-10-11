@@ -1,9 +1,7 @@
 {
-  "player": "Videoplayer",
   "controls": "Videosteuerung",
   "play": "Abspielen",
   "pause": "Pause",
-  "replay": "Erneut abspielen",
   "seek": "Im Video springen",
   "position": "{{current}} von {{total}}",
   "mute": "Stummschalten",
@@ -15,17 +13,12 @@
   "speed": "Wiedergabegeschwindigkeit",
   "speedValue": "Wiedergabegeschwindigkeit, {{rate}}",
   "normalSpeed": "Normal",
-  "more": "Weitere Optionen",
-  "embed": "Einbetten",
-  "embedTitle": "Dieses Video einbetten",
-  "embedDescription": "Füge diesen Code in deine Seite ein. Nichts spielt und nichts ist zu hören, bevor Besucher auf Abspielen drücken.",
-  "embedCode": "Einbettungscode",
-  "copy": "Code kopieren",
-  "copied": "Einbettungscode kopiert",
-  "copyFailed": "Kopieren fehlgeschlagen. Markiere den Code und kopiere ihn selbst.",
   "loading": "Video wird geladen",
   "error": "Dieses Video konnte nicht abgespielt werden.",
   "retry": "Erneut versuchen",
-  "notFound": "Dieses Video ist nicht verfügbar.",
-  "watchOn": "Auf LeClap ansehen"
+  "scene": "Szene {{number}}",
+  "pip": "Bild im Bild",
+  "exitPip": "Bild im Bild beenden",
+  "pipActive": "Wird im Bild-im-Bild-Modus abgespielt",
+  "pipActiveHint": "Das Video schwebt in einem eigenen Fenster; diese Steuerung bedient es weiterhin."
 }

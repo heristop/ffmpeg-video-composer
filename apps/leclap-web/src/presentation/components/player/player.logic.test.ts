@@ -160,6 +160,11 @@ describe('playerKeyAction', () => {
     expect(key('c')).toEqual({ type: 'captions' });
   });
 
+  it('opens or closes picture-in-picture on p', () => {
+    expect(key('p')).toEqual({ type: 'pip' });
+    expect(key('P', { shiftKey: true })).toEqual({ type: 'pip' });
+  });
+
   it('steps the speed on < and >', () => {
     expect(key('<', { shiftKey: true })).toEqual({ type: 'rate', direction: -1 });
     expect(key('>', { shiftKey: true })).toEqual({ type: 'rate', direction: 1 });

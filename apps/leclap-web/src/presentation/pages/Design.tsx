@@ -447,7 +447,7 @@ const ComponentsSection = () => (
         </p>
         <div className="grid items-start gap-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <div data-testid="player-landscape">
-            <VideoPreview url="/videos/showcase/effects-tour.mp4" />
+            <VideoPreview url="/videos/showcase/effects-tour.mp4" title="Effects tour" />
           </div>
           <div data-testid="player-portrait" className="mx-auto aspect-[9/16] w-full max-w-60">
             <VideoPreview url="/videos/films/leclap-agentic-portrait.en.mp4" fill label={null} />

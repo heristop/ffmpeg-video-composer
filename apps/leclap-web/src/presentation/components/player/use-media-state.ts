@@ -15,6 +15,9 @@ export interface MediaState {
   duration: number;
   /** Where the buffered range around the playhead ends. */
   buffered: number;
+  /** The frame's size, once the metadata has loaded (0 before). */
+  width: number;
+  height: number;
 }
 
 const INITIAL: MediaState = {
@@ -25,6 +28,8 @@ const INITIAL: MediaState = {
   current: 0,
   duration: 0,
   buffered: 0,
+  width: 0,
+  height: 0,
 };
 
 const bufferedEnd = (video: HTMLVideoElement): number => {
@@ -66,6 +71,8 @@ export function useMediaState(videoRef: RefObject<HTMLVideoElement | null>, key?
         current: video.currentTime,
         duration: Number.isFinite(video.duration) ? video.duration : 0,
         buffered: bufferedEnd(video),
+        width: video.videoWidth,
+        height: video.videoHeight,
       });
     };
     const tick = () => {

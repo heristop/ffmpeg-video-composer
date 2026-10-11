@@ -3,11 +3,14 @@ import { useInView } from '@/hooks/useInView';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { markSoundFound, readSound, tellVideo } from '@/lib/landing-sound';
 import { FilmScreen, FilmStage, SoundControl, type FilmShape } from '@/presentation/components/film-frame';
-import { EmbedDialog, type PlayerEmbed } from '@/presentation/components/player/embed-dialog';
 import { PlayerOverlays, PlayerTransportBar } from '@/presentation/components/player/player-chrome';
+import type { CardMeta } from '@/presentation/components/player/player-card';
 import { useMediaState, type MediaState } from '@/presentation/components/player/use-media-state';
 import { useFullscreen, usePlaybackRate } from '@/presentation/components/player/use-player';
 import { usePlayerUi, type PlayerUi } from '@/presentation/components/player/use-player-chrome';
+import { sceneShares } from '@/presentation/components/player/timeline.logic';
+import type { TemplateScenes } from '@/presentation/components/player/use-template-scenes';
+import { usePip, type PlayerPip } from '@/presentation/components/player/use-pip';
 import { useFilmCaptions, useFilmVisibility } from './use-film-captions';
 import { useFilmPlayer } from './use-film-player';
 import type { FilmAsset } from './films';
@@ -46,8 +49,12 @@ interface FilmPlayerProps {
   still?: boolean;
   /** Set aside by the page (a dialog over it, or its own dialog closing): it pauses until it isn't. */
   suspended?: boolean;
-  /** Offer the embed code: every film here has a public address. */
-  embed?: PlayerEmbed;
+  /** A title card on the poster (a showcase sample); a landing film's poster is designed already. */
+  cardTitle?: string;
+  /** The card's shape and length before the film's metadata has loaded. */
+  cardMeta?: CardMeta;
+  /** The template's scenes, to mark where each starts on the timeline. */
+  scenes?: TemplateScenes | null;
 }
 
 // Nothing streams before the frame nears the viewport, even where the element already exists (reduced motion).
@@ -168,23 +175,27 @@ function captionsToggleFor(
 
 function FilmBar({
   title,
+  videoRef,
+  markers,
   labels,
   media,
   player,
   speed,
   captions,
-  embeddable,
+  pip,
   fullscreen,
   ui,
   seekTo,
 }: {
   title: string;
+  videoRef: RefObject<HTMLVideoElement | null>;
+  markers: readonly number[];
   labels: FilmPlayerLabels;
   media: MediaState;
   player: FilmControls;
   speed: { rate: number; setRate: (rate: number) => void };
   captions?: { on: boolean; onToggle: () => void };
-  embeddable: boolean;
+  pip: PlayerPip;
   fullscreen: ReturnType<typeof useFullscreen>;
   ui: PlayerUi;
   seekTo: (seconds: number) => void;
@@ -194,8 +205,10 @@ function FilmBar({
       label={title}
       className="film-bar bg-linear-to-t from-player-ink/85 via-player-ink/50 to-transparent pt-6"
       media={media}
+      videoRef={videoRef}
+      markers={markers}
       playLabels={{ play: media.failed ? (labels.retry ?? labels.play) : labels.play, pause: labels.pause }}
-      onToggle={player.togglePlay}
+      onToggle={ui.toggle}
       onSeek={seekTo}
       onScrub={ui.setScrubbing}
       sound={
@@ -210,7 +223,7 @@ function FilmBar({
       rate={speed.rate}
       onRate={speed.setRate}
       captions={captions}
-      onEmbed={embeddable ? ui.openEmbed : undefined}
+      pip={pip}
       fullscreen={{ active: fullscreen.active, onToggle: fullscreen.toggle }}
       portal={fullscreen.element}
       onMenuOpenChange={ui.setMenuOpen}
@@ -229,6 +242,7 @@ function FilmMedia({
   player,
   ui,
   fullscreen,
+  floating,
   cue,
 }: {
   props: FilmPlayerProps;
@@ -239,6 +253,8 @@ function FilmMedia({
   player: FilmControls;
   ui: PlayerUi;
   fullscreen: ReturnType<typeof useFullscreen>;
+  /** The film floats in its picture-in-picture window. */
+  floating: boolean;
   /** The caption on screen now, if captions are on. */
   cue: string;
 }) {
@@ -262,16 +278,22 @@ function FilmMedia({
           props={props}
           loop={props.loop === true || (playback === 'ambient' && player.muted)}
           preloadMode={preload(playback, shouldLoad)}
-          onClick={ui.surfaceClick(player.togglePlay)}
+          onClick={ui.surfaceClick(ui.toggle)}
           onDoubleClick={fullscreen.toggle}
           onEnded={player.ended}
         />
       )}
       <PlayerOverlays
         media={media}
+        title={props.cardTitle ?? props.title}
+        meta={props.cardMeta}
+        posterCard={props.cardTitle !== undefined}
         waitingForVisitor={player.held}
+        fullscreen={fullscreen.active}
+        floating={floating}
+        clap={ui.clap}
         playLabel={props.labels.play}
-        onToggle={player.togglePlay}
+        onToggle={ui.toggle}
         onRetry={player.togglePlay}
         statusLabels={props.labels}
       />
@@ -283,7 +305,7 @@ function FilmMedia({
 // A film in the page's one video frame (film-frame.tsx), with the LeClap player's controls: it loads as it nears the
 // viewport, plays while on screen and rests off-screen, with the landing's one sound (use-film-player.ts): muted
 // until the visitor turns it on, here or anywhere else on the page, its captions carrying the narration meanwhile.
-// A visitor's pause sticks. The bar seeks, changes speed, toggles captions, offers the embed code and goes
+// A visitor's pause sticks. The bar seeks, changes speed, toggles captions, floats in picture-in-picture and goes
 // fullscreen; the frame answers the player's keys. Every control exists before the film does, so a keyboard visitor
 // tabbing down the page lands on them (focusing one scrolls the frame near, and the film mounts).
 export const FilmPlayer = (props: FilmPlayerProps) => {
@@ -298,6 +320,7 @@ export const FilmPlayer = (props: FilmPlayerProps) => {
   const player = useFilmPlayer(videoRef, { ...policy, suspended: props.suspended === true }, media);
   const speed = usePlaybackRate(videoRef);
   const fullscreen = useFullscreen(frameRef, videoRef);
+  const pip = usePip(videoRef, mounted);
   const { captions, setCaptions, cue } = useFilmCaptions(videoRef, mounted);
   useFilmVisibility(videoRef, reduced, startRequested);
   const setVideoEl = useVideoElement(videoRef);
@@ -317,6 +340,7 @@ export const FilmPlayer = (props: FilmPlayerProps) => {
       fullscreen: fullscreen.toggle,
       captions: captionsToggle?.onToggle,
       rate: speed.step,
+      pip: pip.toggle,
     },
   });
 
@@ -335,12 +359,14 @@ export const FilmPlayer = (props: FilmPlayerProps) => {
         bar={
           <FilmBar
             title={props.title}
+            videoRef={videoRef}
+            markers={sceneShares(props.scenes, media.duration)}
             labels={props.labels}
             media={media}
             player={player}
             speed={speed}
             captions={captionsToggle}
-            embeddable={props.embed !== undefined}
+            pip={pip}
             fullscreen={fullscreen}
             ui={ui}
             seekTo={seekTo}
@@ -356,10 +382,10 @@ export const FilmPlayer = (props: FilmPlayerProps) => {
           player={player}
           ui={ui}
           fullscreen={fullscreen}
+          floating={pip.active}
           cue={captions ? cue : ''}
         />
       </FilmScreen>
-      {props.embed && <EmbedDialog embed={props.embed} open={ui.embedOpen} onOpenChange={ui.setEmbedOpen} />}
     </FilmStage>
   );
 };

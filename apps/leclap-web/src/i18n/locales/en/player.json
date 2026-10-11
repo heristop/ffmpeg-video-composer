@@ -1,9 +1,7 @@
 {
-  "player": "Video player",
   "controls": "Video controls",
   "play": "Play",
   "pause": "Pause",
-  "replay": "Play again",
   "seek": "Seek",
   "position": "{{current}} of {{total}}",
   "mute": "Mute",
@@ -15,17 +13,12 @@
   "speed": "Playback speed",
   "speedValue": "Playback speed, {{rate}}",
   "normalSpeed": "Normal",
-  "more": "More options",
-  "embed": "Embed",
-  "embedTitle": "Embed this video",
-  "embedDescription": "Paste this code into your page. Nothing plays, and nothing makes a sound, until a visitor presses play.",
-  "embedCode": "Embed code",
-  "copy": "Copy code",
-  "copied": "Embed code copied",
-  "copyFailed": "Copy failed. Select the code and copy it yourself.",
   "loading": "Loading video",
   "error": "This video could not play.",
   "retry": "Try again",
-  "notFound": "This video is not available.",
-  "watchOn": "Watch on LeClap"
+  "scene": "Scene {{number}}",
+  "pip": "Picture in picture",
+  "exitPip": "Exit picture in picture",
+  "pipActive": "Playing in picture-in-picture",
+  "pipActiveHint": "The video floats in its own window; these controls still drive it."
 }

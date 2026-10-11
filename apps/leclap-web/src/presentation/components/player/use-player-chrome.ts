@@ -117,8 +117,9 @@ export function usePlayerFrame({
 }
 
 /**
- * Everything a player's chrome keeps: its menus and drags (which hold the controls up), the embed dialog, and the
- * frame's props with the player's keyboard wired to `handlers`.
+ * Everything a player's chrome keeps: its menus and drags (which hold the controls up), the clap
+ * (bumped each time the visitor starts the film, by a click, a tap or a key), and the frame's props with the
+ * player's keyboard wired to `handlers`.
  */
 export function usePlayerUi({
   title,
@@ -133,26 +134,25 @@ export function usePlayerUi({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrubbing, setScrubbing] = useState(false);
-  const [embedOpen, setEmbedOpen] = useState(false);
+  const [clap, setClap] = useState(0);
   const chrome = usePlayerChrome({
     playing: !media.paused,
     blocked: media.waiting || media.failed,
     menuOpen,
     scrubbing,
   });
+  const toggle = () => {
+    if (media.paused && !media.failed) setClap((count) => count + 1);
+
+    handlers.toggle();
+  };
   const onKey = (event: KeyboardEvent<HTMLElement> | globalThis.KeyboardEvent) => {
     chrome.wake();
-    playerKeyDown(event, handlers, media);
+    playerKeyDown(event, { ...handlers, toggle }, media);
   };
   const frame = usePlayerFrame({ title, chrome, fullscreen: fullscreen.active, onKey });
 
-  const openEmbed = () => {
-    if (fullscreen.active) fullscreen.toggle();
-
-    setEmbedOpen(true);
-  };
-
-  return { ...frame, chrome, onKey, setMenuOpen, setScrubbing, embedOpen, setEmbedOpen, openEmbed };
+  return { ...frame, chrome, onKey, toggle, clap, setMenuOpen, setScrubbing };
 }
 
 export type PlayerUi = ReturnType<typeof usePlayerUi>;

@@ -52,11 +52,13 @@ Surfaces and text are **semantic tokens** that default to **light** in `@theme` 
 
 ## Video player
 
-Every video in the web app plays in one player family ([`apps/leclap-web/src/presentation/components/player/`](apps/leclap-web/src/presentation/components/player/)): the studio result, test renders, camera takes, the landing films and reel, the showcase and the `/embed/<kind>/<id>` route.
+Every video in the web app plays in one player family ([`apps/leclap-web/src/presentation/components/player/`](apps/leclap-web/src/presentation/components/player/)): the studio result, test renders, camera takes, the landing films and reel, and the showcase. It speaks the app's language rather than a stock player's:
 
-- **Chrome over footage:** `--color-player-ink` / `--color-player-fg` (theme-constant near-black and off-white, used at an alpha for the scrim, glass and tracks); lavender `brand-500` for the played fill and `brand-400` for focus. Menus and the embed dialog use the app's dark popover surface.
-- **Controls:** play, seek (Radix Slider, played over buffered), time in tabular figures, sound, speed (Radix DropdownMenu, 0.5×–2×, kept for the session, pitch preserved), captions, more (embed code, public videos only), fullscreen (the frame itself, iOS falls back to the video). All 44 px; narrow frames shed time, speed and more before anything else.
-- **Behaviour:** controls fade over a playing video after 2.5 s without pointer movement and return on move, tap or keyboard focus; space/k, ←/→, j/l, ↑/↓, 0–9, m, f, c, `<`/`>`. Motion is 150–300 ms on transform and opacity only.
+- **Film-strip timeline:** the played part in the brand gradient over a lavender-tinted track (buffered a paler tint), a hairline notch where each template scene starts, sprocket perforations underneath, and the app's playhead thumb (off-white ringed in rose). Hover or scrub floats a frame from that moment, framed like a monitor, with a mono pill reading the scene and the time.
+- **Controls:** glass capsules like the header's pills; play/pause morph; the speed is a lavender chip whose figure rolls as it changes (0.5×–2×, kept for the session, pitch preserved); time in the slates' mono; captions; picture-in-picture (standard API, Safari's presentation mode as the fallback, hidden in Firefox); fullscreen. All 44 px.
+- **Cover and moments:** the poster wears a title card (LeClap chip, frame shape, length, the title in Oswald) inside the program monitor's corner brackets; the centre button is the brand-gradient call to action with its glow; a clapperboard claps as playback starts; Clappy runs the loader and calls "cut" on an error; fullscreen turns cinematic (large title, display-face timecode).
+- **Tokens:** `--color-player-ink` / `--color-player-fg` (theme-constant, over footage, always on a scrim) plus the brand scales; menus use the app's dark popover surface. Motion is 150–300 ms on transform and opacity, still under reduced motion.
+- **Behaviour:** controls fade over a playing video after 2.5 s without pointer movement and return on move, tap or keyboard focus; space/k, ←/→, j/l, ↑/↓, 0–9, m, f, c, p (picture-in-picture), `<`/`>`. Mini frames shed the time, speed, frame preview, perforations, title and Clappy, never play, sound, seek or fullscreen.
 
 ---
 

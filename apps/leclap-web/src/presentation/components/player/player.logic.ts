@@ -1,6 +1,6 @@
 // The LeClap video player, as plain functions: the clock it prints, where a pointer or a key seeks to, which keys
 // drive it, the speed ladder, when its controls hide, and how it goes fullscreen. Every player in the app (the
-// render result, the landing films, the showcase, the embed) reads these, so they all behave alike.
+// render result, the landing films, the showcase) reads these, so they all behave alike.
 
 const pad = (value: number): string => String(value).padStart(2, '0');
 
@@ -92,6 +92,7 @@ export type PlayerAction =
   | { type: 'mute' }
   | { type: 'fullscreen' }
   | { type: 'captions' }
+  | { type: 'pip' }
   | { type: 'rate'; direction: 1 | -1 };
 
 /** What a key press landed on: enough to tell a field, a button, a slider or a menu apart. */
@@ -150,13 +151,14 @@ const KEY_ACTIONS = new Map<string, PlayerAction>([
   ['m', { type: 'mute' }],
   ['f', { type: 'fullscreen' }],
   ['c', { type: 'captions' }],
+  ['p', { type: 'pip' }],
   ['<', { type: 'rate', direction: -1 }],
   ['>', { type: 'rate', direction: 1 }],
 ]);
 
 /**
  * The player's keyboard: space/k play and pause, ←/→ step 5 s and j/l 10 s, ↑/↓ the volume, 0–9 a tenth of the film,
- * Home/End its ends, m mute, f fullscreen, c captions, </> the speed. Browser shortcuts (⌘, Ctrl, Alt) and keys the
+ * Home/End its ends, m mute, f fullscreen, c captions, p picture-in-picture, </> the speed. Browser shortcuts (⌘, Ctrl, Alt) and keys the
  * focused control answers itself are left alone. Null when the player has nothing to do.
  */
 export function playerKeyAction({ key, ctrlKey, metaKey, altKey, target }: PlayerKey): PlayerAction | null {

@@ -9,6 +9,7 @@ const handlers = (): PlayerHandlers & Record<string, ReturnType<typeof vi.fn>> =
   fullscreen: vi.fn(),
   captions: vi.fn(),
   rate: vi.fn(),
+  pip: vi.fn(),
 });
 
 const clock = { current: 58, duration: 60 };
@@ -48,6 +49,14 @@ describe('runPlayerAction', () => {
     expect(player.captions).toHaveBeenCalledOnce();
     expect(player.volumeBy).toHaveBeenCalledWith(0.1);
     expect(player.rate).toHaveBeenCalledWith(-1);
+  });
+
+  it('routes p to picture-in-picture', () => {
+    const player = handlers();
+
+    runPlayerAction({ type: 'pip' }, player, clock);
+
+    expect(player.pip).toHaveBeenCalledOnce();
   });
 
   it('does nothing for captions on a video without them', () => {
