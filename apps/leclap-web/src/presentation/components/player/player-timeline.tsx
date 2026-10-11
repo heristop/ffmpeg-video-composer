@@ -46,12 +46,15 @@ function FramePreview({
   media,
   markers,
   canvasRef,
+  ready,
 }: {
   hover: Hover | null;
   width: number;
   media: MediaState;
   markers: readonly number[];
   canvasRef: RefObject<HTMLCanvasElement | null>;
+  /** The canvas holds the hovered frame; until then a brand shimmer runs over it. */
+  ready: boolean;
 }) {
   const { t } = useTranslation('player');
   const size = previewSize(media.width, media.height, PREVIEW_EDGE);
@@ -68,8 +71,16 @@ function FramePreview({
       )}
       style={{ left: x }}
     >
-      <span className="block overflow-hidden rounded-lg bg-player-ink shadow-[var(--shadow-glow)] ring-1 ring-brand-300/45 @max-[24rem]/player:hidden">
+      <span className="relative block overflow-hidden rounded-lg bg-player-ink shadow-[var(--shadow-glow)] ring-1 ring-brand-300/45 @max-[24rem]/player:hidden">
         <canvas ref={canvasRef} width={size.width} height={size.height} className="block" />
+        <span
+          className={cn(
+            'absolute inset-0 bg-linear-to-br from-brand-500/25 via-player-ink to-secondary-400/20 transition-opacity duration-200',
+            ready ? 'opacity-0' : 'opacity-100'
+          )}
+        >
+          <span className="player-shimmer absolute inset-0" />
+        </span>
       </span>
       <span className="inline-flex items-center gap-1.5 rounded-full bg-player-ink/90 px-2.5 py-1 font-mono text-[0.7rem] font-medium tabular-nums text-player-fg ring-1 ring-brand-400/50">
         {markers.length > 0 && (
@@ -168,7 +179,14 @@ export function PlayerTimeline({
         aria-valuetext={t('position', { current: now, total })}
         className="block size-3.5 scale-75 rounded-full border-2 border-secondary-400 bg-player-fg shadow-[0_0_0_3px_color-mix(in_oklch,var(--color-player-ink)_40%,transparent)] transition-transform duration-150 ease-[var(--ease-out-expo)] group-hover/seek:scale-110 focus-visible:scale-110 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-400/60"
       />
-      <FramePreview hover={hover} width={width} media={media} markers={markers} canvasRef={preview.canvasRef} />
+      <FramePreview
+        hover={hover}
+        width={width}
+        media={media}
+        markers={markers}
+        canvasRef={preview.canvasRef}
+        ready={hover !== null && preview.shows(hover.time)}
+      />
     </SliderPrimitive.Root>
   );
 }

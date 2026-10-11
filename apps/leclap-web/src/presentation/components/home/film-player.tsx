@@ -227,6 +227,7 @@ function FilmBar({
       fullscreen={{ active: fullscreen.active, onToggle: fullscreen.toggle }}
       portal={fullscreen.element}
       onMenuOpenChange={ui.setMenuOpen}
+      onHoverChange={ui.setOnControls}
       timeClassName={captions ? '@max-[26rem]/player:hidden' : '@max-[21rem]/player:hidden'}
     />
   );

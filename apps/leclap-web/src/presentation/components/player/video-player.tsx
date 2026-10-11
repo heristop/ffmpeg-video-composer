@@ -169,6 +169,7 @@ export function VideoPlayer(props: VideoPlayerProps) {
         fullscreen={{ active: fullscreen.active, onToggle: fullscreen.toggle }}
         portal={fullscreen.element}
         onMenuOpenChange={ui.setMenuOpen}
+        onHoverChange={ui.setOnControls}
       />
     </div>
   );

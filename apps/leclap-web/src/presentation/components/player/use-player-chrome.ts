@@ -9,6 +9,7 @@ interface ChromeInput {
   blocked: boolean;
   menuOpen: boolean;
   scrubbing: boolean;
+  onControls: boolean;
 }
 
 /**
@@ -16,7 +17,7 @@ interface ChromeInput {
  * the frame), and come back on any pointer move, touch or keyboard focus. A menu, a drag on the seek bar, loading
  * or an error keep them up.
  */
-export function usePlayerChrome({ playing, blocked, menuOpen, scrubbing }: ChromeInput) {
+export function usePlayerChrome({ playing, blocked, menuOpen, scrubbing, onControls }: ChromeInput) {
   const [idle, setIdle] = useState(true);
   const [keyboardFocus, setKeyboardFocus] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -53,7 +54,7 @@ export function usePlayerChrome({ playing, blocked, menuOpen, scrubbing }: Chrom
   };
 
   return {
-    shown: controlsShown({ playing, idle, keyboardFocus, menuOpen, scrubbing, blocked }),
+    shown: controlsShown({ playing, idle, keyboardFocus, menuOpen, scrubbing, blocked, onControls }),
     wake,
     rest,
     onFocus,
@@ -134,12 +135,14 @@ export function usePlayerUi({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrubbing, setScrubbing] = useState(false);
+  const [onControls, setOnControls] = useState(false);
   const [clap, setClap] = useState(0);
   const chrome = usePlayerChrome({
     playing: !media.paused,
     blocked: media.waiting || media.failed,
     menuOpen,
     scrubbing,
+    onControls,
   });
   const toggle = () => {
     if (media.paused && !media.failed) setClap((count) => count + 1);
@@ -152,7 +155,7 @@ export function usePlayerUi({
   };
   const frame = usePlayerFrame({ title, chrome, fullscreen: fullscreen.active, onKey });
 
-  return { ...frame, chrome, onKey, toggle, clap, setMenuOpen, setScrubbing };
+  return { ...frame, chrome, onKey, toggle, clap, setMenuOpen, setScrubbing, setOnControls };
 }
 
 export type PlayerUi = ReturnType<typeof usePlayerUi>;

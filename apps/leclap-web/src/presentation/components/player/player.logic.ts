@@ -186,13 +186,15 @@ export interface ChromeState {
   scrubbing: boolean;
   /** Loading or failed: the visitor needs to see what is going on. */
   blocked: boolean;
+  /** A mouse rests on the controls (reading the time, a scrub preview open). */
+  onControls?: boolean;
 }
 
 /** Whether the controls show: always, except over a playing film nobody is touching. */
 export function controlsShown(state: ChromeState): boolean {
   if (!state.playing || state.blocked) return true;
 
-  return !state.idle || state.keyboardFocus || state.menuOpen || state.scrubbing;
+  return !state.idle || state.keyboardFocus || state.menuOpen || state.scrubbing || state.onControls === true;
 }
 
 /** How long a playing film waits for the pointer before its controls fade. */

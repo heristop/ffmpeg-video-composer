@@ -46,6 +46,8 @@ export interface TransportBarProps {
   /** Where menus render: the frame while it is fullscreen. */
   portal?: HTMLElement | null;
   onMenuOpenChange: (open: boolean) => void;
+  /** A mouse rests on the bar, or left it. */
+  onHoverChange?: (hovering: boolean) => void;
   /** When the time readout gives way: a fuller bar (the films' sound hint, captions) sheds it on a wider frame. */
   timeClassName?: string;
 }
@@ -57,6 +59,7 @@ export function PlayerTransportBar(props: TransportBarProps) {
     <PlayerBar
       label={props.label}
       className={props.className}
+      onHoverChange={props.onHoverChange}
       seek={
         <PlayerTimeline
           media={media}
@@ -169,9 +172,7 @@ export function PlayerOverlays({
 
   return (
     <>
-      {(poster || fullscreen) && (
-        <PlayerCover media={media} title={title} meta={meta} fullscreen={fullscreen} />
-      )}
+      {(poster || fullscreen) && <PlayerCover media={media} title={title} meta={meta} fullscreen={fullscreen} />}
       {waitingForVisitor && media.paused && ready && <PlayerCenterButton label={playLabel} onToggle={onToggle} />}
       <PlayerMoments clap={clap} floating={floating} />
       <PlayerStatus media={media} labels={statusLabels} onRetry={onRetry} />

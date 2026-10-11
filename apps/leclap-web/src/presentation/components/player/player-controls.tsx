@@ -322,15 +322,26 @@ export function PlayerBar({
   start,
   end,
   className,
+  onHoverChange,
 }: {
   label: string;
   seek?: ReactNode;
   start: ReactNode;
   end: ReactNode;
   className?: string;
+  /** A mouse rests on the bar, or left it: the controls stay up meanwhile. */
+  onHoverChange?: (hovering: boolean) => void;
 }) {
   return (
-    <div role="group" aria-label={label} className={cn('player-bar flex flex-col gap-1 px-2.5 pb-2', className)}>
+    <div
+      role="group"
+      aria-label={label}
+      className={cn('player-bar flex flex-col gap-1 px-2.5 pb-2', className)}
+      onPointerEnter={(event) => {
+        if (event.pointerType === 'mouse') onHoverChange?.(true);
+      }}
+      onPointerLeave={() => onHoverChange?.(false)}
+    >
       {seek && <div className="px-1.5">{seek}</div>}
       <div className="flex items-center justify-between gap-1.5">
         <div className={cn(CAPSULE, 'min-w-0')}>{start}</div>

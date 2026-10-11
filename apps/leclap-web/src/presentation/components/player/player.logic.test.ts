@@ -209,6 +209,7 @@ describe('controlsShown', () => {
     menuOpen: false,
     scrubbing: false,
     blocked: false,
+    onControls: false,
   };
 
   it('hides the controls once a playing film has sat idle', () => {
@@ -224,6 +225,10 @@ describe('controlsShown', () => {
     expect(controlsShown({ ...playing, keyboardFocus: true })).toBe(true);
     expect(controlsShown({ ...playing, menuOpen: true })).toBe(true);
     expect(controlsShown({ ...playing, scrubbing: true })).toBe(true);
+  });
+
+  it('keeps them up while the pointer rests on them, a scrub preview open', () => {
+    expect(controlsShown({ ...playing, onControls: true })).toBe(true);
   });
 
   it('keeps them up while the film is loading or failed', () => {
