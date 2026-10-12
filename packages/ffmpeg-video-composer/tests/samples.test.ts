@@ -134,14 +134,8 @@ describe('packaged sample catalog', () => {
     expect(app.requirements.assets).toContainEqual(
       expect.objectContaining({ reference: 'lofi-study.mp3', kind: 'music' })
     );
-    expect(getSample('house-evidence').requirements.projectVideos.map(({ name }) => name)).toEqual([
-      'intro',
-      'beforecard',
-      'beforeclip',
-      'aftercard',
-      'afterclip',
-      'outro',
-    ]);
+    // The house evidence video records one clip: build.py composes BEFORE and AFTER side by side into it.
+    expect(getSample('house-evidence').requirements.projectVideos.map(({ name }) => name)).toEqual(['sidebyside']);
     expect(getSample('before-after').requirements.variables).toContainEqual(
       expect.objectContaining({ name: 'change', default: 'Describe the change', placeholders: ['{{ change }}'] })
     );

@@ -423,14 +423,14 @@
     {
       "id": "house-evidence",
       "source": "examples/agentic-pr-video/evidence-skill/template.json",
-      "duration": 20.596009,
+      "duration": 12.33,
+      "hasAudio": true,
       "orientation": "landscape",
       "backend": "native",
-      "sha256": "cfcf18e4a21f0ccb816aa2337d4d9f1a1f9a93895372f05647498f5c105775a6",
-      "templateSha256": "21b4bbb3d39070f577df6562383a5d979d30f13b2b5dd4925ca978fc3b6fb017",
+      "sha256": "3e709f478b8bffe0ece0b9eadcf6565e289cfa07e14209cb112a0d7a2cc3894e",
+      "templateSha256": "2a598cfddb1a8d8cb2289e65871a0ec3b6eae35e1ce84830dbb33cc4f9d2ccbb",
       "media": "Synthetic demo-shop captures and house cards",
-      "bytes": 326720,
-      "hasAudio": true
+      "bytes": 244210
     },
     {
       "id": "fx-pack",
