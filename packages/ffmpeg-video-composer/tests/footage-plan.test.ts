@@ -127,6 +127,15 @@ describe('footage lowering', () => {
     expect(types).toEqual(['trim', 'setpts', 'setpts', 'fps', 'loop', 'setpts']);
   });
 
+  it('rounds the ramp to whole ticks, so a source frame on a half tick never jitters between neighbours', () => {
+    // setpts truncates its float result and fps rounds to the nearest tick: a 120 fps source at 1x lands frames
+    // exactly on half ticks, and float noise then cadenced 5, 3 instead of 4, 4 source frames per output frame.
+    const plan = footagePlan({ clip: { to: 3 }, speedRamp: 'hero' }, 3, 30);
+    const ramp = footageVideoFilters(plan as NonNullable<typeof plan>, 30)[2];
+
+    expect((ramp.values as unknown as { expr: string }).expr).toMatch(/^'round\(\(.*\)\/TB\)'$/);
+  });
+
   it('splits the sound at a silent freeze and appends a continuing one', () => {
     const silent = footagePlan({ clip: { to: 4 }, freeze: [{ at: 1, hold: 0.5 }] }, 6, 30);
     const kept = footagePlan({ clip: { to: 4 }, freeze: [{ at: 1, hold: 0.5, audio: 'continue' }] }, 6, 30);

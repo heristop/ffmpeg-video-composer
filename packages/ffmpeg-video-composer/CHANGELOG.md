@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Speed ramps no longer judder at constant speed. The ramp's `setpts` now rounds to whole ticks instead of
+  truncating, so a source frame that lands on a half tick (a 120 fps clip at 1x) stops falling either side of
+  the frame-rate conform with float noise, which cadenced 5, 3 source frames instead of 4, 4.
+
 ## [3.1.0] - 2026-10-11
 
 ### Added
