@@ -7,7 +7,7 @@
 slate (intro), the two runs side by side and in step, and the closing card (outro).
 
 LeClap draws the slate and the outro from template.json: HTML layers for the board and its fields,
-kinetic type for the headline, the hinged clapper and its clap, and the `frame` highlights. This
+kinetic type for the headline and the ticket, the card's sheen and clap, and the `frame` highlights. This
 script composes what the engine cannot: two exact 4:3 panes playing at once, each trimmed so the
 change lands on the same second, the freeze baked into both, and the pane labels and callouts, all
 measured on real glyph advances so nothing runs off its box. Every colour, size and position comes
@@ -573,29 +573,69 @@ def repo_name():
     return name.removesuffix(".git")
 
 
-def poster(ffmpeg, video, at, v):
-    """<video>.webp beside the render: the frozen comparison with a play button and a download label.
+def probe_seconds(ffmpeg, video):
+    ffprobe = str(pathlib.Path(ffmpeg).with_name("ffprobe")) if "/" in ffmpeg else "ffprobe"
+    out = subprocess.run([ffprobe, "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(video)],
+                         capture_output=True, text=True).stdout.strip()
+    return float(out or 0)
 
-    It is the description's fallback when the video can't be attached as an inline player: the capture,
-    linked to the committed .mp4, so one click downloads it. Drawn with ffmpeg alone (lavfi + geq)."""
+
+def hex_rgb(colour):
+    value = colour.lstrip("#")
+    return tuple(int(value[index:index + 2], 16) for index in (0, 2, 4))
+
+
+def poster(ffmpeg, video, at, v):
+    """<video>.webp beside the render: the frozen comparison above a LeClap player bar.
+
+    The description's fallback when the video can't be attached as an inline player: this capture, linked to
+    the committed .mp4, so one click downloads it. The bar sits BELOW the frame, so nothing hides the evidence:
+    the brand-gradient play button, what the file is (name, length, size), the web player's film-strip timeline
+    filled to the frame shown, and a download chip. Drawn at 2x with ffmpeg alone, then scaled down."""
     out = video.with_suffix(".webp")
-    label = "Download the evidence video"
-    font = v.font_dir / v.s("font.mono")
-    badge = 176
-    half = badge // 2
+    seconds = probe_seconds(ffmpeg, video)
+    size_mb = video.stat().st_size / 1_000_000
+    clock = f"{int(seconds // 60)}:{int(round(seconds % 60)):02d}"
+    meta = f"{video.name}  ·  {clock}  ·  {size_mb:.1f} MB".replace(":", "\\:")
+    display, mono = v.font_dir / v.s("font.display"), v.font_dir / v.s("font.mono")
+    ink, line, fg, muted = (v.s(key).replace("#", "0x") for key in
+                            ("colour.letterbox", "colour.divider", "colour.fg", "colour.muted"))
+    accent = v.s("colour.after").replace("#", "0x")
+    (r0, g0, b0), (r1, g1, b1) = hex_rgb(v.s("colour.after")), hex_rgb("#ffa8bf")
+    width, height, disc = 2560, 176, 112
+    cx = 104
+    track_x0, track_x1, track_y = 1120, 2100, 86
+    filled = track_x0 + int((track_x1 - track_x0) * min(1.0, at / seconds if seconds else 0))
+    sprockets = "".join(f",drawbox=x={x}:y={y}:w=10:h=8:color={line}:t=fill"
+                        for x in range(track_x0, track_x1, 30) for y in (60, 108))
+    chip_x, chip_w = 2190, 320
+    lerp = f"(X/{disc})"
     graph = (
-        f"[1:v]format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='235*lt(hypot(X-{half},Y-{half}),{half - 2})'[disc];"
-        f"[2:v]format=rgba,geq=r=255:g=255:b=255:"
-        f"a='255*gte(X,{half - 22})*lte(abs(Y-{half}),({half + 30}-X)*0.56)'[play];"
-        f"[disc][play]overlay=0:0[badge];"
-        f"[0:v][badge]overlay=(W-w)/2:(H-h)/2-24,"
-        f"drawtext=fontfile='{font}':text='{label}':fontsize=26:fontcolor=white:"
-        f"box=1:boxcolor=0x141416@0.82:boxborderw=14:x=(w-tw)/2:y=(h/2)+{half - 4}"
+        f"[1:v]drawbox=x=0:y=0:w={width}:h=2:color={line}:t=fill"
+        f",drawtext=fontfile='{display}':text='Play the evidence video':fontsize=46:fontcolor={fg}:x=196:y=30"
+        f",drawtext=fontfile='{mono}':text='{meta}':fontsize=26:fontcolor={muted}:x=198:y=104"
+        f",drawbox=x={track_x0}:y={track_y}:w={track_x1 - track_x0}:h=6:color={line}:t=fill"
+        f",drawbox=x={track_x0}:y={track_y}:w={filled - track_x0}:h=6:color={accent}:t=fill"
+        f",drawbox=x={filled - 3}:y={track_y - 14}:w=6:h=34:color={fg}:t=fill{sprockets}"
+        f",drawbox=x={chip_x}:y=44:w={chip_w}:h=88:color={accent}:t=3"
+        f",drawtext=fontfile='{display}':text='DOWNLOAD MP4':fontsize=34:fontcolor={accent}:x={chip_x + 78}:y=67"
+        f",drawbox=x={chip_x + 40}:y=62:w=4:h=30:color={accent}:t=fill[bar];"
+        f"[2:v]format=rgba,geq=r='{r0}+({r1}-{r0})*{lerp}':g='{g0}+({g1}-{g0})*{lerp}':b='{b0}+({b1}-{b0})*{lerp}':"
+        f"a='255*lt(hypot(X-{disc / 2},Y-{disc / 2}),{disc / 2 - 1})'[disc];"
+        f"[3:v]format=rgba,geq=r=20:g=20:b=22:a='255*gte(X,{disc / 2 - 16})*lte(abs(Y-{disc / 2}),({disc / 2 + 24}-X)*0.58)'[play];"
+        f"[4:v]format=rgba,geq=r={r0}:g={g0}:b={b0}:a='255*lte(abs(X-14),(22-Y)*0.62)'[arrow];"
+        f"[disc][play]overlay=0:0[button];"
+        f"[bar][button]overlay={cx - disc // 2}:{(height - disc) // 2}[bar2];"
+        f"[bar2][arrow]overlay={chip_x + 28}:88,scale=1280:-2:flags=lanczos[barsmall];"
+        f"[0:v][barsmall]vstack=inputs=2"
     )
     subprocess.run([ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-ss", f"{at:.3f}", "-i", str(video),
-                    "-f", "lavfi", "-i", f"color=c={v.s('colour.after').replace('#', '0x')}:s={badge}x{badge}",
-                    "-f", "lavfi", "-i", f"color=c=white:s={badge}x{badge}", "-filter_complex", graph,
-                    "-frames:v", "1", "-c:v", "libwebp", "-quality", "85", str(out)], check=True)
+                    "-f", "lavfi", "-i", f"color=c={ink}:s={width}x{height}",
+                    "-f", "lavfi", "-i", f"color=c=black:s={disc}x{disc}",
+                    "-f", "lavfi", "-i", f"color=c=black:s={disc}x{disc}",
+                    "-f", "lavfi", "-i", "color=c=black:s=28x24",
+                    "-filter_complex", graph, "-frames:v", "1", "-c:v", "libwebp", "-quality", "88", str(out)],
+                   check=True)
     print(f"Poster: {out}")
 
 

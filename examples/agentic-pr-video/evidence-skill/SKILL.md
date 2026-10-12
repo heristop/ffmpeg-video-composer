@@ -11,14 +11,14 @@ that composes it, and the traps between a Playwright capture and a finished clip
 
 The video is three parts, joined by 0.5 s fades:
 
-1. **The slate.** A LeClap clapperboard on the ink canvas: the mark, the ticket as the roll, the
-   headline in the brand gradient (Oswald, tracking in), the change in one line, and the BEFORE and
-   AFTER fields. The clapper is open; it claps shut, with a clap, on the cut into the comparison.
+1. **The slate.** A LeClap card on the ink canvas: the mark, the ticket decoding in, the headline in
+   the brand gradient (Oswald, word by word), the change in one line, and the BEFORE and AFTER fields.
+   A sheen crosses the card, with a clap, just before the cut into the comparison.
 2. **The comparison.** BEFORE and AFTER play at the same time, in two exact 4:3 panes, each trimmed so
    the change lands on the same second. With `freeze`, both panes hold on that frame, a `frame` stroke
    in each side's colour rings the changed area and a one-line callout names what each side does.
-3. **The closing card.** The same slate, clapper shut: what to review, the summary again, where to look
-   first, and a small "Made with LeClap".
+3. **The closing card.** The same card: what to review, the summary again, where to look first, and
+   "Made with LeClap" typed in.
 
 It is an example from the LeClap repo, written to be dropped into `.agents/skills/evidence-video/` of
 the app under review. The look is LeClap's on purpose: see "The house look" below before changing it.
@@ -178,7 +178,7 @@ layout that cover-cropped the 4:3 panes.
 **`fit: "letterbox"` on `sidebyside`.** The built clip is already 1280×720, so it changes nothing
 today; it is there so a stray asset is padded rather than cropped.
 
-`dead_air` on the intro is expected: 1 s to 3.9 s is the time to read the slate, and the clap ends it.
+`dead_air` on the intro is expected: the slate holds still to be read, and the sheen and its clap end it.
 `front_loaded` on `sidebyside` is expected too: its motion is the footage.
 
 ### The house look
@@ -191,8 +191,7 @@ The video is LeClap's, so it uses LeClap's tokens (`DESIGN.md` in the LeClap rep
   tier each, luminance-matched (0.34 and 0.36), and both carry ink text at 7:1. Move both or neither.
 - **The brand gradient** (lavender → rose → pastel yellow, the dark theme's `--grad-text`) fills the
   slate headline, and a soft lavender glow sits behind the slate.
-- **The clapper** wears the mark's own stripes (`#fef0a6` and `#8c80d8`, outlined `#5e51ac`). The mark
-  is `apps/leclap-web/public/favicon.svg`, rasterised unrecoloured into `assets/images/leclap-mark.png`
+- **The mark** is `apps/leclap-web/public/favicon.svg`, rasterised unrecoloured into `assets/images/leclap-mark.png`
   (`build.py` finds it in the repo; elsewhere pass `--logo` the SVG or `pwa-512x512.png`).
 - **Type:** Oswald for the headline, badges and pane titles, Rubik for copy, Roboto Mono for slate data
   (the roll, the callouts, "Made with LeClap"). All three are OFL fonts LeClap ships.
@@ -202,14 +201,21 @@ The video is LeClap's, so it uses LeClap's tokens (`DESIGN.md` in the LeClap rep
 The `global.variables` hold the comparison clip's tokens, and the slate's HTML layers carry the same
 values in their CSS, so change both together.
 
-**Motion, with restraint.** Tracking-in on the intro headline, a rise on the outro's, fields that rise
-12 px into place, the clapper's one clap (two still states and the `clap` sound at 3.4 s), and the
-highlight fade during the hold. Nothing moves under text while it is read: the comparison's labels are
+**Motion, with restraint, from the engine's own vocabulary.** On the slate:
+
+- the card fades in (0.3 s), then its header rises in (0.4 s);
+- the ticket decodes with the kinetic `scramble`, and the rules draw from the left (linear `panel`s);
+- the headline cascades word by word (kinetic `cascade`), then the summary rises;
+- the BEFORE then AFTER fields rise 14 px, 0.2 s apart;
+- a lavender `sheen` crosses the card with the `clap` sound at 3.4 s, the beat into the comparison.
+
+The closing card rises its headline, fades the ticket, types "Made with LeClap" and ends on a rose
+sheen. In the comparison, the highlight fades during the hold. Nothing moves under text while it is read: the comparison's labels are
 static, the callouts fade in after the hold starts and out before the runs move again.
 
 ### Why the slate is HTML layers and the comparison is drawtext
 
-The slate is engine-drawn: HTML layers for the board, the fields and the clapper (Satori gives real
+The slate is engine-drawn: HTML layers for the card, its header and the fields (Satori gives real
 font weights, letter-spacing, rounded chips and flex alignment), kinetic type for the headline. It uses
 the registry families Oswald, Rubik and Roboto Mono, which every LeClap engine ships, so it needs no
 `global.fonts` and no network; `global.fonts` is for a face the registry does not carry.

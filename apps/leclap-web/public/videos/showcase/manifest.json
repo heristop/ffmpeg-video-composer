@@ -427,10 +427,10 @@
       "hasAudio": true,
       "orientation": "landscape",
       "backend": "native",
-      "sha256": "3e709f478b8bffe0ece0b9eadcf6565e289cfa07e14209cb112a0d7a2cc3894e",
-      "templateSha256": "2a598cfddb1a8d8cb2289e65871a0ec3b6eae35e1ce84830dbb33cc4f9d2ccbb",
+      "sha256": "ea3c4ccfd0a446f19f9c3693686f49e274fe62a7fcb2ffd645ff093ec1825d81",
+      "templateSha256": "0901eb22a35c9a42074c0a9e2e34dafc19dca4057abc8691597d2cb814e3e5c1",
       "media": "Synthetic demo-shop captures and house cards",
-      "bytes": 244210
+      "bytes": 230013
     },
     {
       "id": "fx-pack",
