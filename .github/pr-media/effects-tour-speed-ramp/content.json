@@ -1,43 +1,36 @@
 {
-  "_note": "Captures are the showcase effects tour (apps/leclap-web/public/videos/showcase/effects-tour.mp4) from 318 s for 15 s, base branch then this branch (make-media.sh). trim 2.4 starts on the hero ramp; the clip runs through montage and bullet.",
-  "ticket": "SPEED-RAMP",
-  "clipSeconds": 7.2,
+  "_note": "The evidence-skill content shape of #112 (side-by-side template): render with that build.py. Captures are make-media.sh's cuts of the showcase effects tour from 318 s; trims start each side on its 0.2x bullet time.",
+  "ticket": "pr-110",
+  "summary": "Slow motion moves on every frame, at every ramp speed",
+  "clipSeconds": 2.4,
   "intro": {
     "headline": "SPEED RAMPS THAT GLIDE"
   },
   "outro": {
-    "headline": "SMOOTH AT EVERY SPEED",
-    "subtitle": "A 300 fps source and ramps rounded to whole ticks"
+    "headline": "WATCH THE BULLET TIME",
+    "subtitle": "The clock and the pan advance on every frame"
   },
   "sides": [
     {
       "side": "before",
       "badge": "BEFORE",
       "capture": "raw/before.mp4",
-      "trim": 2.4,
+      "trim": 8.2,
       "chip": "Slow motion holds frames",
-      "card": {
-        "headline": "SLOW MOTION THAT STEPS",
-        "subtitle": "Each frame held up to five times at 0.2x"
-      },
-      "panel": {
-        "title": "Slow motion that steps",
-        "desc": "The demo clip had 60 real positions a second: slowed to 0.2x, the pan stops and starts. Hero and bullet end mid slow motion."
+      "pane": {
+        "title": "Bullet time on main",
+        "desc": "At 0.2x the pan stops and starts: each frame is held up to five times."
       }
     },
     {
       "side": "after",
       "badge": "AFTER",
       "capture": "raw/after.mp4",
-      "trim": 2.4,
-      "chip": "A fresh frame every frame",
-      "card": {
-        "headline": "SLOW MOTION THAT GLIDES",
-        "subtitle": "A new frame on every tick, at every speed"
-      },
-      "panel": {
-        "title": "Slow motion that glides",
-        "desc": "A 300 fps source and rounded timestamps: the pan moves on every frame. Hero and bullet now show their way back out."
+      "trim": 7.3,
+      "chip": "A new frame every tick",
+      "pane": {
+        "title": "Bullet time on the branch",
+        "desc": "A 300 fps source and rounded timestamps: the pan moves on every frame."
       }
     }
   ]
