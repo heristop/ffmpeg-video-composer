@@ -1,0 +1,44 @@
+{
+  "_note": "Captures are record.mjs's 1024x768 recordings cropped to the header and the player (make-media.sh). trim is a start offset: the loader is up from about 3 s.",
+  "ticket": "PLAYER-LOADER",
+  "clipSeconds": 4.4,
+  "intro": {
+    "headline": "ONE MARK WHILE IT LOADS"
+  },
+  "outro": {
+    "headline": "THE LOGO, NOT THE MASCOT",
+    "subtitle": "The player's loader now wears the header's mark"
+  },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before-crop.mp4",
+      "trim": 3.2,
+      "chip": "Clappy runs over the meter",
+      "card": {
+        "headline": "A MASCOT ON THE METER",
+        "subtitle": "A stall showed Clappy running his lane"
+      },
+      "panel": {
+        "title": "A mascot on the meter",
+        "desc": "When the film stalls, Clappy runs his lane over the buffer meter: a second character next to the logo in the header."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after-crop.mp4",
+      "trim": 3.2,
+      "chip": "The header's mark claps",
+      "card": {
+        "headline": "THE HEADER'S MARK",
+        "subtitle": "It claps once a beat until the film plays"
+      },
+      "panel": {
+        "title": "The header's mark",
+        "desc": "The same LeClap mark as the header claps once a beat over the meter. The meter still fills with what has buffered."
+      }
+    }
+  ]
+}
