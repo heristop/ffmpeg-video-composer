@@ -8,54 +8,79 @@
 // waits for GitHub to insert the attachment link, reads it, then restores the box: nothing is posted. The caller
 // then writes the URL into the description with `gh pr edit`.
 //
-// Usage: paste this function, then call it, e.g.
+// Usage: paste this file, then call it, e.g.
 //   await attachVideo('https://raw.githubusercontent.com/heristop/leclap/<full-sha>/.github/pr-media/<slug>/evidence.mp4')
-async function attachVideo(rawUrl, name = rawUrl.split('/').pop()) {
-  const ATTACHMENT = /https:\/\/github\.com\/user-attachments\/assets\/[0-9a-f-]+/;
-  const textarea =
+
+const ATTACHMENT = /https:\/\/github\.com\/user-attachments\/assets\/[0-9a-f-]+/;
+const TIMEOUT_MS = 120_000;
+
+function commentBox() {
+  const box =
     document.querySelector('#new_comment_field') ??
     document.querySelector('textarea[name="comment[body]"]') ??
     [...document.querySelectorAll('textarea')].findLast((field) => field.offsetParent !== null);
 
-  if (!textarea) throw new Error('No comment box on this page: open the PR conversation, logged in.');
+  if (!box) throw new Error('No comment box on this page: open the PR conversation, logged in.');
 
+  return box;
+}
+
+async function fetchVideo(rawUrl, name) {
   const response = await fetch(rawUrl);
 
   if (!response.ok) throw new Error(`Fetching ${rawUrl} failed: ${response.status}. Is the commit pushed?`);
 
-  const file = new File([await response.blob()], name, { type: 'video/mp4' });
   const transfer = new DataTransfer();
 
-  transfer.items.add(file);
-  const before = textarea.value;
-  const form = textarea.closest('form, file-attachment, [class*="MarkdownEditor"]') ?? document;
-  const input = form.querySelector('input[type="file"]');
+  transfer.items.add(new File([await response.blob()], name, { type: 'video/mp4' }));
 
-  // The editor's own file input when it has one; a drop on the field otherwise (both are GitHub's drag-and-drop path).
-  if (input) {
-    input.files = transfer.files;
-    input.dispatchEvent(new Event('change', { bubbles: true }));
-  }
-
-  if (!input)
-    textarea.dispatchEvent(new DragEvent('drop', { dataTransfer: transfer, bubbles: true, cancelable: true }));
-
-  const deadline = Date.now() + 120_000;
-
-  while (Date.now() < deadline) {
-    const match = textarea.value.match(ATTACHMENT);
-
-    if (match) {
-      const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
-
-      setter.call(textarea, before);
-      textarea.dispatchEvent(new Event('input', { bubbles: true }));
-
-      return match[0];
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-
-  throw new Error('GitHub inserted no attachment link within 2 minutes: check the file is under 10 MB.');
+  return transfer;
 }
+
+// The editor's own file input when it has one; a drop on the field otherwise (both are GitHub's drag-and-drop path).
+function drop(box, transfer) {
+  const scope = box.closest('form, file-attachment, [class*="MarkdownEditor"]') ?? document;
+  const input = scope.querySelector('input[type="file"]');
+
+  if (!input) {
+    box.dispatchEvent(new DragEvent('drop', { dataTransfer: transfer, bubbles: true, cancelable: true }));
+
+    return;
+  }
+
+  input.files = transfer.files;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function waitForLink(box, deadline) {
+  const match = box.value.match(ATTACHMENT);
+
+  if (match) return Promise.resolve(match[0]);
+
+  if (Date.now() > deadline) {
+    return Promise.reject(new Error('GitHub inserted no attachment link within 2 minutes: is the file under 10 MB?'));
+  }
+
+  return new Promise((resolve) => {
+    setTimeout(resolve, 500);
+  }).then(() => waitForLink(box, deadline));
+}
+
+// Put the box back as it was. setRangeText changes the text without the value setter, so a React-driven editor still
+// sees the change on the input event and keeps its state in step.
+function restore(box, text) {
+  box.setRangeText(text, 0, box.value.length, 'end');
+  box.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+globalThis.attachVideo = async (rawUrl, name = rawUrl.split('/').pop()) => {
+  const box = commentBox();
+  const before = box.value;
+
+  drop(box, await fetchVideo(rawUrl, name));
+  const link = await waitForLink(box, Date.now() + TIMEOUT_MS);
+
+  restore(box, before);
+
+  return link;
+};
