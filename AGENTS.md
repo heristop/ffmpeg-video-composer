@@ -117,6 +117,7 @@ Repo-specific skills live in [`.agents/skills/`](./.agents/skills/). Load the ma
 - **monorepo-dev-workflow** — building, testing, linting, formatting, or running any app/package.
 - **cross-platform-ffmpeg** — working across Node/Static/WASM FFmpeg, the PlatformBridge, or browser/RN constraints.
 - **ondevice-ffmpeg-engine** — building/modifying/consuming the on-device engine (`packages/ffmpeg-engine` + the `leclap-ffmpeg` native module), the `run`/`probe`/`cancel` API, uniffi bindings, or `scripts/ffmpeg`.
+- **pr-evidence** — opening or updating a PR that touches `apps/leclap-web` or `apps/leclap-expo`: its description must carry before/after snapshots and a before/after evidence video rendered with LeClap.
 
 ## Gotchas
 
