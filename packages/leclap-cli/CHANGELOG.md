@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Requires `ffmpeg-video-composer` ^3.1.0.
+- `leclap samples`: the three evidence samples (`house-evidence`, `pr-evidence`, `before-after`) take LeClap's
+  evidence look; `house-evidence` now takes one `sidebyside` clip, and the other two a `ticket` variable.
 
 ## [0.4.0] - 2026-10-09
 
