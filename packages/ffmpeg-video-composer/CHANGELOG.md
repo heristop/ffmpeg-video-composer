@@ -7,12 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-- Speed ramps no longer judder at constant speed. The ramp's `setpts` now rounds to whole ticks instead of
-  truncating, so a source frame that lands on a half tick (a 120 fps clip at 1x) stops falling either side of
-  the frame-rate conform with float noise, which cadenced 5, 3 source frames instead of 4, 4.
-
 ## [3.1.0] - 2026-10-11
 
 ### Added
@@ -41,9 +35,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - CSS `@font-face` is still dropped, and its `html_unsupported_css` finding now points at `global.fonts`.
   `html_font_unknown` says the family is neither declared in `global.fonts` nor in the registry.
+- The packaged evidence samples (`house-evidence`, `pr-evidence`, `before-after`) take LeClap's evidence look:
+  ink cards, BEFORE in rose and AFTER in lavender, Oswald headlines in the brand gradient and engine motion
+  (kinetic `scramble` and `cascade`, drawn rules, a `sheen`). `house-evidence` now records one `sidebyside`
+  clip, BEFORE and AFTER composed side by side, instead of six sections; `pr-evidence` and `before-after`
+  keep their sections and gain a `ticket` variable.
 
 ### Fixed
 
+- Speed ramps no longer judder at constant speed. The ramp's `setpts` now rounds to whole ticks instead of
+  truncating, so a source frame that lands on a half tick (a 120 fps clip at 1x) stops falling either side of
+  the frame-rate conform with float noise, which cadenced 5, 3 source frames instead of 4, 4.
 - Files read on the phone (React Native) keep their last bytes: the Expo filesystem adapter decoded base64 with
   its own helper, which turned the final one or two bytes of any file whose size is not a multiple of 3 into
   `0xFF`. An image inside an HTML layer (a JPEG losing its end marker) drew blank on the phone, and fonts or
