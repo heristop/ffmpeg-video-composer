@@ -55,7 +55,9 @@ export function footageVideoFilters(plan: FootagePlan, fps: number): Filter[] {
 
   if (trim.length > 0 || plan.pieces) filters.push(setpts('PTS-STARTPTS'));
 
-  if (plan.pieces) filters.push(setpts(`'(${rampExpr(plan.pieces)})/TB'`));
+  // Rounded to whole ticks: setpts truncates its float result, and a source frame on a half tick (120 fps at 1x)
+  // would otherwise fall either side of the fps conform with float noise, cadencing 5, 3 instead of 4, 4.
+  if (plan.pieces) filters.push(setpts(`'round((${rampExpr(plan.pieces)})/TB)'`));
 
   if (plan.pieces || plan.freezes.length > 0) filters.push({ type: 'fps', value: fps });
 

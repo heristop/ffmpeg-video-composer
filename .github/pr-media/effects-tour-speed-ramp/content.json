@@ -1,0 +1,55 @@
+{
+  "_note": "The evidence-skill content shape of #112: render with that build.py. Captures are make-media.sh's cuts of the showcase effects tour from 318 s, cropped to the clock (crop=480:360:480:180, scale=1024:768); trims start each side on its 0.2x bullet time.",
+  "ticket": "pr-110",
+  "summary": "In 0.2x bullet time, every frame now moves",
+  "clipSeconds": 2.4,
+  "freeze": {
+    "at": 1.2,
+    "hold": 2
+  },
+  "intro": {
+    "headline": "SPEED RAMPS THAT GLIDE"
+  },
+  "outro": {
+    "headline": "WATCH THE CLOCK",
+    "subtitle": "Before, it stalls on one value; after, it ticks every frame"
+  },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before-clock.mp4",
+      "trim": 8.2,
+      "highlight": {
+        "x": 556,
+        "y": 470,
+        "w": 372,
+        "h": 232
+      },
+      "callout": "The clock stalls",
+      "chip": "Frames held up to 5 times",
+      "pane": {
+        "title": "Bullet time on main",
+        "desc": "A 30 fps source at 0.2x: the clock and the waves stop, then jump."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after-clock.mp4",
+      "trim": 7.3,
+      "highlight": {
+        "x": 536,
+        "y": 470,
+        "w": 432,
+        "h": 232
+      },
+      "callout": "It ticks every frame",
+      "chip": "A new frame every tick",
+      "pane": {
+        "title": "Bullet time on the branch",
+        "desc": "A 300 fps source and rounded timestamps: every frame moves on."
+      }
+    }
+  ]
+}
