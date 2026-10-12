@@ -64,7 +64,7 @@ describe('packaged samples command outside the repository', () => {
     const effect = await run(['show', 'editorial-type']);
     expect(effect.stdout).toContain('studio.editorial-type@1.0.0');
     expect(effect.stdout).toMatch(/operator|catalog/);
-    expect((await run(['show', 'pr-evidence'])).stdout).toContain('Anton.ttf');
+    expect((await run(['show', 'present-yourself'])).stdout).toContain('Anton.ttf');
   });
   it('writes a descriptor only to a new output path and preserves an existing file', async () => {
     const output = path.join(cwd, 'sample.json');

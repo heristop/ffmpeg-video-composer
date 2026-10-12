@@ -10352,7 +10352,7 @@
     "source": "examples/agentic-pr-video/template.json",
     "orientation": "landscape",
     "backend": "native",
-    "creativeDirection": "Audience: a pull-request reviewer. Direction: evidence-first presentation with restrained dark surfaces and clear type. Move from implementation context to the actual recorded behavior, then state what the reviewer should inspect. Keep the walkthrough unobstructed and use captions only for verified change context. Favor calm timing and cuts over promotional motion. Avoid invented test results, simulated interactions and decorative camera moves. Review the recording, readable context, review-focus text, scene joins and final evidence card.",
+    "creativeDirection": "Audience: a pull-request reviewer. Brand: LeClap, on its ink canvas, with the lavender to pink gradient, Oswald for headlines and chips, Rubik for copy and Roboto Mono for slate data. Hierarchy: the change, then the project, then the review focus. Motion: the card fades in, its header rises, the ticket decodes, the rules draw from the left and the headline cascades; one lavender sheen marks the cut into the recording. The walkthrough plays ungraded and unobstructed, with one ink label in its bottom-left corner. Nothing moves under text that is being read. Avoid invented test results, simulated interactions and camera moves. Review: the recording, the label, the review-focus card and the closing card.",
     "showcasePath": "/showcase?sample=pr-evidence",
     "preview": {
       "video": "/videos/showcase/pr-evidence.mp4",
@@ -10365,10 +10365,10 @@
           "name": "walkthrough",
           "duration": 12,
           "title": {
-            "en": "Recorded implementation walkthrough"
+            "en": "Recorded walkthrough"
           },
           "description": {
-            "en": "Use a real screen recording from the change under review"
+            "en": "A real screen recording of the change under review"
           },
           "forceAspectRatio": true
         }
@@ -10379,6 +10379,12 @@
           "name": "project",
           "default": "Example project",
           "placeholders": ["{{ project }}"],
+          "source": "global"
+        },
+        {
+          "name": "ticket",
+          "default": "PR #123",
+          "placeholders": ["{{ ticket }}"],
           "source": "global"
         },
         {
@@ -10394,73 +10400,10 @@
           "source": "global"
         }
       ],
-      "assets": [
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[0].titleCard.filters[0].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[0].titleCard.filters[1].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[0].titleCard.filters[3].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[1].lowerThird.filters[2].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[1].lowerThird.filters[3].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[2].titleCard.filters[0].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[2].titleCard.filters[1].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[2].titleCard.filters[3].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[3].titleCard.filters[0].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[3].titleCard.filters[2].values.fontfile",
-          "source": "preset"
-        }
-      ],
+      "assets": [],
       "effects": [],
       "setup": [
         "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
-        "Preview media is not included. Supply or replace the listed authored asset references; relative references remain unchanged and must resolve in your configured assets/media directory.",
-        "Font assets marked source=preset are effective engine-resolved filenames from text presets and authored font overrides. Supply these font files; family-based font references also include their family, weight and style for resolution.",
         "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
       ]
     },
@@ -10468,12 +10411,13 @@
       "meta": {
         "name": "Agentic PR Evidence",
         "description": "A short, review-focused video that an agent can render from implementation evidence and attach to a pull or merge request.",
-        "creativeDirection": "Audience: a pull-request reviewer. Direction: evidence-first presentation with restrained dark surfaces and clear type. Move from implementation context to the actual recorded behavior, then state what the reviewer should inspect. Keep the walkthrough unobstructed and use captions only for verified change context. Favor calm timing and cuts over promotional motion. Avoid invented test results, simulated interactions and decorative camera moves. Review the recording, readable context, review-focus text, scene joins and final evidence card."
+        "creativeDirection": "Audience: a pull-request reviewer. Brand: LeClap, on its ink canvas, with the lavender to pink gradient, Oswald for headlines and chips, Rubik for copy and Roboto Mono for slate data. Hierarchy: the change, then the project, then the review focus. Motion: the card fades in, its header rises, the ticket decodes, the rules draw from the left and the headline cascades; one lavender sheen marks the cut into the recording. The walkthrough plays ungraded and unobstructed, with one ink label in its bottom-left corner. Nothing moves under text that is being read. Avoid invented test results, simulated interactions and camera moves. Review: the recording, the label, the review-focus card and the closing card."
       },
       "global": {
         "orientation": "landscape",
         "variables": {
           "project": "Example project",
+          "ticket": "PR #123",
           "change": "Keyboard navigation",
           "reviewFocus": "Focus order and visible focus states"
         },
@@ -10491,113 +10435,471 @@
         {
           "name": "intro",
           "type": "color_background",
-          "titleCard": {
-            "kicker": {
-              "en": "{{ project }}"
-            },
-            "headline": {
-              "en": "{{ change }}"
-            },
-            "subtitle": {
-              "en": "Implementation evidence"
-            },
-            "accent": "#8b91ff",
-            "reveal": "slide-left",
-            "effect": {
-              "shadow": true,
-              "outline": true
-            }
-          },
           "options": {
-            "backgroundColor": "#0f1117",
-            "duration": 2
-          }
+            "duration": 3.4,
+            "backgroundColor": "#141416"
+          },
+          "inputs": [
+            {
+              "name": "stage",
+              "type": "html",
+              "width": 1280,
+              "height": 720,
+              "html": "<div class=\"stage\"></div>",
+              "css": ".stage { width: 1280px; height: 720px; background-image: radial-gradient(70% 60% at 50% 42%, rgba(124, 131, 253, 0.16), rgba(124, 131, 253, 0)) }",
+              "options": {
+                "position": "0:0"
+              }
+            },
+            {
+              "name": "card",
+              "type": "html",
+              "width": 960,
+              "height": 384,
+              "html": "<div class=\"card\"></div>",
+              "css": ".card { width: 960px; height: 384px; background-color: #1d1e21; border: 2px solid #323337; border-radius: 20px }",
+              "options": {
+                "position": "160:192",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "header",
+              "type": "html",
+              "width": 480,
+              "height": 40,
+              "html": "<div class=\"head\"><img class=\"mark\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAMAAAC7IEhfAAABgFBMVEWnm7q+s9+IX6m8sHHmsLoBAQDwzefp1O/VyvTY1PluV6z0d5b5iaTxytn/+pO2o9Pp2K3+lq3tyErza4r//KR0abcTEQnqxor+0zn/92vv2pKGesrl18/Wyq3rxXByZzL35ov/51D92UhZS6yTh8r75XOEdq7x46cyKxP6yzbIveVrVx64rG2ylzjv2HDZyc5zac9XRxhdUa2waKQjIBRvaEZVTSTvyLYhHAnbt0LkuzvJtdz/9FpiWCqLgU+3dajk1IO4rLTGt615cLfPZ5aomcvo4PnOgqxWUThrXCOEbCVvTqORUpz+g5xjXkCdkci1pVUzMCKpiix3cE3bsjS1YZqIdi/TeqV/dMmtW5immKbCpM3Qcp/a1tyShuGznUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4T0J0AAAAYHRSTlP///+u/wD+//7+/////v///P/y////Dvz///b//P38bPH//v//+v/+LP//aq2u7P3/U///HGVP/RzX5f//WoL/1/////////9OZID///9Y/60sqXXi/4P////////9/60XG9eQAAAChElEQVR42n3V53qiQBgFYJJdcZgEJKwUQZBqixo1do0tvdfNJtl2/3ex4wwiYNzzS31ez4w4fFCJWB4v2s/P7YvH+OdU+I10V1G5NA6nVu6kDVAam0gUsjgF9NIcS5/Btslx/G8mSJbnOLO9BqUviDGxIFqRorA15QphksRhsiY3bYVhy+R4EFW+5Tm1tYLSNOwIOWOAL6crWFlzZ+AeOqe+rCxhjlNBZINnwIXinIKkU+VyBEqeCSKFZc1x3HT6o0lg1vQkDMdoYRBmME+5Wh7CFPk9NM+NF1CqoUJfJpmU6MBZupB3RJ/hypqE4FGGX0KQEuHH6R/UdryVXIVWM0cIPmQOfIiYyKd12NSGyXDobOYBwZoHcJitplN33Tx0y8lYaK+WoIqeShwQtw+3m1AbgiB0sLZXpDpki4Apw/OvEweKMJTTYJMdKpfRl3BycCi69VlB17R5Yf6m6XNI+xcokwsgAPD95Ob4vu7qulundF2rz2YY0nQUMpoDY3HyxBE4WsLjyV4s56iRxnCUozoj1V9anOztRrL3A7IEqqMOVbQCeLgbSwBrVpFKCF4Ab3ciuf3lQ9YT0D/z1zrw4fedWE4giwu7VnVxKCz5PxA3ytbiUCQEG1fSbzffYnkXcSNrC/jgvpJKegivo5fxGv5EhSwqfCW3Aq5E3yynYhlihwrJrZC4tAyAN51cO18LZ1iXy9u1avtyLWiPhl1dTYq+LW9yst0PjZSeoBifOtZQhF54SPX6isCu13UFpd+LzceqLcgxysoC2V90kO4PFMHoBpbtGoIy2P90NF8NlJJgyDiGUFIGV9KGYZ9oPL2USgpKqfTy1Nj8VFik2NhHaRTjj49/UxdnhjUzvaUAAAAASUVORK5CYII=\" width=\"40\" height=\"40\" /><span class=\"brand\">LeClap</span><span class=\"kind\">WALKTHROUGH</span></div>",
+              "css": ".head { display: flex; align-items: center; width: 480px; height: 40px; gap: 12px } .mark { width: 40px; height: 40px } .brand { font: 500 28px Oswald; line-height: 40px; color: #f7f7f8 } .kind { margin-left: 18px; font: 400 14px Roboto Mono; letter-spacing: 3px; line-height: 42px; color: #afb0b4 }",
+              "options": {
+                "position": "206:230",
+                "start": 0.4,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.4,
+                  "duration": 0.5,
+                  "distance": 10,
+                  "easing": "$expo"
+                }
+              }
+            },
+            {
+              "name": "summary",
+              "type": "html",
+              "width": 864,
+              "height": 40,
+              "html": "<p class=\"summary\">{{ project }}, recorded on the branch under review</p>",
+              "css": ".summary { margin: 0; width: 864px; height: 40px; font: 400 24px Rubik; line-height: 40px; white-space: nowrap; color: #f7f7f8 }",
+              "options": {
+                "position": "208:408",
+                "start": 1.15,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1.15,
+                  "duration": 0.55,
+                  "distance": 14,
+                  "easing": "$expo"
+                }
+              }
+            },
+            {
+              "name": "focus_field",
+              "type": "html",
+              "width": 864,
+              "height": 40,
+              "html": "<div class=\"field\"><span class=\"chip after\">REVIEW FOCUS</span><span class=\"copy\">{{ reviewFocus }}</span></div>",
+              "css": ".field { display: flex; align-items: center; width: 864px; height: 40px; gap: 16px } .chip { display: flex; justify-content: center; align-items: center; height: 36px; padding: 0 14px; border-radius: 6px; font: 400 20px Oswald; letter-spacing: 1px; color: #141416 } .before { background-color: #f96f99 } .after { background-color: #9298fb } .copy { font: 400 20px Rubik; white-space: nowrap; color: #afb0b4 }",
+              "options": {
+                "position": "208:496",
+                "start": 1.55,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1.55,
+                  "duration": 0.5,
+                  "distance": 14,
+                  "easing": "$expo"
+                }
+              }
+            }
+          ],
+          "kinetic": [
+            {
+              "text": {
+                "en": "{{ change }}"
+              },
+              "preset": "cascade",
+              "font": "oswald",
+              "size": 64,
+              "color": "#f7f7f8",
+              "fill": {
+                "gradient": {
+                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "angle": 90
+                }
+              },
+              "align": "left",
+              "x": 208,
+              "y": 328,
+              "maxWidth": 864,
+              "delay": 0.5,
+              "role": "headline"
+            },
+            {
+              "text": {
+                "en": "{{ ticket }}"
+              },
+              "preset": "scramble",
+              "font": "mono",
+              "size": 18,
+              "color": "#aeb2fb",
+              "align": "right",
+              "x": 1074,
+              "y": 238,
+              "delay": 0.7
+            }
+          ],
+          "graphics": [
+            {
+              "type": "panel",
+              "at": 0.45,
+              "duration": 0.5,
+              "x": 206,
+              "y": 294,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "panel",
+              "at": 1.35,
+              "duration": 0.5,
+              "x": 206,
+              "y": 470,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "fx",
+              "effect": "sheen",
+              "target": {
+                "x": 160,
+                "y": 192,
+                "w": 960,
+                "h": 384,
+                "radius": 20
+              },
+              "at": 2.6,
+              "duration": 0.7,
+              "width": 0.16,
+              "tilt": 18,
+              "color": "#aeb2fb",
+              "intensity": 0.9
+            }
+          ]
         },
         {
           "name": "walkthrough",
           "type": "project_video",
-          "look": "cool",
-          "lowerThird": {
-            "title": {
-              "en": "{{ reviewFocus }}"
-            },
-            "badge": {
-              "en": "REVIEW FOCUS"
-            },
-            "accent": "#ff8aae",
-            "reveal": "rise",
-            "effect": {
-              "shadow": true,
-              "outline": true
-            }
-          },
           "title": {
-            "en": "Recorded implementation walkthrough"
+            "en": "Recorded walkthrough"
           },
           "description": {
-            "en": "Use a real screen recording from the change under review"
+            "en": "A real screen recording of the change under review"
           },
           "options": {
             "duration": 12,
             "forceAspectRatio": true
           },
-          "filters": [
+          "inputs": [
             {
-              "type": "vignette"
+              "name": "label",
+              "type": "html",
+              "width": 800,
+              "height": 56,
+              "html": "<div class=\"wrap\"><div class=\"bar\"><span class=\"chip after\">REVIEW FOCUS</span><span class=\"title\">{{ reviewFocus }}</span></div></div>",
+              "css": ".wrap { display: flex; width: 800px; height: 56px } .bar { display: flex; align-items: center; height: 56px; gap: 14px; padding: 0 22px 0 10px; background-color: rgba(20, 20, 22, 0.92); border: 1px solid #323337; border-radius: 12px } .chip { display: flex; justify-content: center; align-items: center; height: 36px; padding: 0 12px; border-radius: 6px; font: 400 20px Oswald; letter-spacing: 1px; color: #141416 } .before { background-color: #f96f99 } .after { background-color: #9298fb } .title { font: 400 24px Oswald; white-space: nowrap; color: #f7f7f8 }",
+              "options": {
+                "position": "32:632",
+                "start": 0.4,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.4,
+                  "duration": 0.45,
+                  "distance": 10,
+                  "easing": "$expo"
+                }
+              }
             }
           ]
         },
         {
           "name": "review",
           "type": "color_background",
-          "titleCard": {
-            "kicker": {
-              "en": "WHAT TO REVIEW"
-            },
-            "headline": {
-              "en": "{{ reviewFocus }}"
-            },
-            "subtitle": {
-              "en": "Watch the behavior, then inspect the diff"
-            },
-            "accent": "#fff685",
-            "align": "left",
-            "reveal": "rise",
-            "effect": {
-              "shadow": true,
-              "outline": true
-            }
-          },
           "options": {
-            "backgroundColor": "#171923",
-            "duration": 3
-          }
+            "duration": 3,
+            "backgroundColor": "#141416"
+          },
+          "inputs": [
+            {
+              "name": "stage",
+              "type": "html",
+              "width": 1280,
+              "height": 720,
+              "html": "<div class=\"stage\"></div>",
+              "css": ".stage { width: 1280px; height: 720px; background-image: radial-gradient(70% 60% at 50% 42%, rgba(255, 138, 174, 0.12), rgba(255, 138, 174, 0)) }",
+              "options": {
+                "position": "0:0"
+              }
+            },
+            {
+              "name": "card",
+              "type": "html",
+              "width": 960,
+              "height": 384,
+              "html": "<div class=\"card\"></div>",
+              "css": ".card { width: 960px; height: 384px; background-color: #1d1e21; border: 2px solid #323337; border-radius: 20px }",
+              "options": {
+                "position": "160:192"
+              }
+            },
+            {
+              "name": "header",
+              "type": "html",
+              "width": 480,
+              "height": 40,
+              "html": "<div class=\"head\"><img class=\"mark\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAMAAAC7IEhfAAABgFBMVEWnm7q+s9+IX6m8sHHmsLoBAQDwzefp1O/VyvTY1PluV6z0d5b5iaTxytn/+pO2o9Pp2K3+lq3tyErza4r//KR0abcTEQnqxor+0zn/92vv2pKGesrl18/Wyq3rxXByZzL35ov/51D92UhZS6yTh8r75XOEdq7x46cyKxP6yzbIveVrVx64rG2ylzjv2HDZyc5zac9XRxhdUa2waKQjIBRvaEZVTSTvyLYhHAnbt0LkuzvJtdz/9FpiWCqLgU+3dajk1IO4rLTGt615cLfPZ5aomcvo4PnOgqxWUThrXCOEbCVvTqORUpz+g5xjXkCdkci1pVUzMCKpiix3cE3bsjS1YZqIdi/TeqV/dMmtW5immKbCpM3Qcp/a1tyShuGznUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4T0J0AAAAYHRSTlP///+u/wD+//7+/////v///P/y////Dvz///b//P38bPH//v//+v/+LP//aq2u7P3/U///HGVP/RzX5f//WoL/1/////////9OZID///9Y/60sqXXi/4P////////9/60XG9eQAAAChElEQVR42n3V53qiQBgFYJJdcZgEJKwUQZBqixo1do0tvdfNJtl2/3ex4wwiYNzzS31ez4w4fFCJWB4v2s/P7YvH+OdU+I10V1G5NA6nVu6kDVAam0gUsjgF9NIcS5/Btslx/G8mSJbnOLO9BqUviDGxIFqRorA15QphksRhsiY3bYVhy+R4EFW+5Tm1tYLSNOwIOWOAL6crWFlzZ+AeOqe+rCxhjlNBZINnwIXinIKkU+VyBEqeCSKFZc1x3HT6o0lg1vQkDMdoYRBmME+5Wh7CFPk9NM+NF1CqoUJfJpmU6MBZupB3RJ/hypqE4FGGX0KQEuHH6R/UdryVXIVWM0cIPmQOfIiYyKd12NSGyXDobOYBwZoHcJitplN33Tx0y8lYaK+WoIqeShwQtw+3m1AbgiB0sLZXpDpki4Apw/OvEweKMJTTYJMdKpfRl3BycCi69VlB17R5Yf6m6XNI+xcokwsgAPD95Ob4vu7qulundF2rz2YY0nQUMpoDY3HyxBE4WsLjyV4s56iRxnCUozoj1V9anOztRrL3A7IEqqMOVbQCeLgbSwBrVpFKCF4Ab3ciuf3lQ9YT0D/z1zrw4fedWE4giwu7VnVxKCz5PxA3ytbiUCQEG1fSbzffYnkXcSNrC/jgvpJKegivo5fxGv5EhSwqfCW3Aq5E3yynYhlihwrJrZC4tAyAN51cO18LZ1iXy9u1avtyLWiPhl1dTYq+LW9yst0PjZSeoBifOtZQhF54SPX6isCu13UFpd+LzceqLcgxysoC2V90kO4PFMHoBpbtGoIy2P90NF8NlJJgyDiGUFIGV9KGYZ9oPL2USgpKqfTy1Nj8VFik2NhHaRTjj49/UxdnhjUzvaUAAAAASUVORK5CYII=\" width=\"40\" height=\"40\" /><span class=\"brand\">LeClap</span><span class=\"kind\">WHAT TO REVIEW</span></div>",
+              "css": ".head { display: flex; align-items: center; width: 480px; height: 40px; gap: 12px } .mark { width: 40px; height: 40px } .brand { font: 500 28px Oswald; line-height: 40px; color: #f7f7f8 } .kind { margin-left: 18px; font: 400 14px Roboto Mono; letter-spacing: 3px; line-height: 42px; color: #afb0b4 }",
+              "options": {
+                "position": "206:230"
+              }
+            },
+            {
+              "name": "summary",
+              "type": "html",
+              "width": 864,
+              "height": 40,
+              "html": "<p class=\"summary\">Watch the behavior, then read the diff.</p>",
+              "css": ".summary { margin: 0; width: 864px; height: 40px; font: 400 24px Rubik; line-height: 40px; white-space: nowrap; color: #f7f7f8 }",
+              "options": {
+                "position": "208:408",
+                "start": 0.6,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.6,
+                  "duration": 0.5,
+                  "distance": 12,
+                  "easing": "$expo"
+                }
+              }
+            }
+          ],
+          "kinetic": [
+            {
+              "text": {
+                "en": "{{ reviewFocus }}"
+              },
+              "preset": "rise",
+              "font": "oswald",
+              "size": 56,
+              "color": "#f7f7f8",
+              "fill": {
+                "gradient": {
+                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "angle": 90
+                }
+              },
+              "align": "left",
+              "x": 208,
+              "y": 328,
+              "maxWidth": 864,
+              "delay": 0.2,
+              "role": "headline"
+            },
+            {
+              "text": {
+                "en": "{{ ticket }}"
+              },
+              "preset": "fade",
+              "font": "mono",
+              "size": 18,
+              "color": "#aeb2fb",
+              "align": "right",
+              "x": 1074,
+              "y": 238,
+              "delay": 0.15
+            }
+          ],
+          "graphics": [
+            {
+              "type": "panel",
+              "at": 0,
+              "duration": 0.5,
+              "x": 206,
+              "y": 294,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "panel",
+              "at": 0,
+              "duration": 0.5,
+              "x": 206,
+              "y": 470,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            }
+          ]
         },
         {
           "name": "outro",
           "type": "color_background",
-          "titleCard": {
-            "headline": {
-              "en": "EVIDENCE ATTACHED"
-            },
-            "subtitle": {
-              "en": "Code, context, and behavior in one review"
-            },
-            "accent": "#8b91ff",
-            "align": "center",
-            "reveal": "rise",
-            "fade": {
-              "out": false
-            },
-            "effect": {
-              "shadow": true,
-              "outline": true
-            }
-          },
           "options": {
-            "backgroundColor": "#0f1117",
-            "duration": 2
-          }
+            "duration": 2.8,
+            "backgroundColor": "#141416"
+          },
+          "inputs": [
+            {
+              "name": "stage",
+              "type": "html",
+              "width": 1280,
+              "height": 720,
+              "html": "<div class=\"stage\"></div>",
+              "css": ".stage { width: 1280px; height: 720px; background-image: radial-gradient(70% 60% at 50% 42%, rgba(255, 138, 174, 0.12), rgba(255, 138, 174, 0)) }",
+              "options": {
+                "position": "0:0"
+              }
+            },
+            {
+              "name": "card",
+              "type": "html",
+              "width": 960,
+              "height": 384,
+              "html": "<div class=\"card\"></div>",
+              "css": ".card { width: 960px; height: 384px; background-color: #1d1e21; border: 2px solid #323337; border-radius: 20px }",
+              "options": {
+                "position": "160:192"
+              }
+            },
+            {
+              "name": "header",
+              "type": "html",
+              "width": 480,
+              "height": 40,
+              "html": "<div class=\"head\"><img class=\"mark\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAMAAAC7IEhfAAABgFBMVEWnm7q+s9+IX6m8sHHmsLoBAQDwzefp1O/VyvTY1PluV6z0d5b5iaTxytn/+pO2o9Pp2K3+lq3tyErza4r//KR0abcTEQnqxor+0zn/92vv2pKGesrl18/Wyq3rxXByZzL35ov/51D92UhZS6yTh8r75XOEdq7x46cyKxP6yzbIveVrVx64rG2ylzjv2HDZyc5zac9XRxhdUa2waKQjIBRvaEZVTSTvyLYhHAnbt0LkuzvJtdz/9FpiWCqLgU+3dajk1IO4rLTGt615cLfPZ5aomcvo4PnOgqxWUThrXCOEbCVvTqORUpz+g5xjXkCdkci1pVUzMCKpiix3cE3bsjS1YZqIdi/TeqV/dMmtW5immKbCpM3Qcp/a1tyShuGznUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4T0J0AAAAYHRSTlP///+u/wD+//7+/////v///P/y////Dvz///b//P38bPH//v//+v/+LP//aq2u7P3/U///HGVP/RzX5f//WoL/1/////////9OZID///9Y/60sqXXi/4P////////9/60XG9eQAAAChElEQVR42n3V53qiQBgFYJJdcZgEJKwUQZBqixo1do0tvdfNJtl2/3ex4wwiYNzzS31ez4w4fFCJWB4v2s/P7YvH+OdU+I10V1G5NA6nVu6kDVAam0gUsjgF9NIcS5/Btslx/G8mSJbnOLO9BqUviDGxIFqRorA15QphksRhsiY3bYVhy+R4EFW+5Tm1tYLSNOwIOWOAL6crWFlzZ+AeOqe+rCxhjlNBZINnwIXinIKkU+VyBEqeCSKFZc1x3HT6o0lg1vQkDMdoYRBmME+5Wh7CFPk9NM+NF1CqoUJfJpmU6MBZupB3RJ/hypqE4FGGX0KQEuHH6R/UdryVXIVWM0cIPmQOfIiYyKd12NSGyXDobOYBwZoHcJitplN33Tx0y8lYaK+WoIqeShwQtw+3m1AbgiB0sLZXpDpki4Apw/OvEweKMJTTYJMdKpfRl3BycCi69VlB17R5Yf6m6XNI+xcokwsgAPD95Ob4vu7qulundF2rz2YY0nQUMpoDY3HyxBE4WsLjyV4s56iRxnCUozoj1V9anOztRrL3A7IEqqMOVbQCeLgbSwBrVpFKCF4Ab3ciuf3lQ9YT0D/z1zrw4fedWE4giwu7VnVxKCz5PxA3ytbiUCQEG1fSbzffYnkXcSNrC/jgvpJKegivo5fxGv5EhSwqfCW3Aq5E3yynYhlihwrJrZC4tAyAN51cO18LZ1iXy9u1avtyLWiPhl1dTYq+LW9yst0PjZSeoBifOtZQhF54SPX6isCu13UFpd+LzceqLcgxysoC2V90kO4PFMHoBpbtGoIy2P90NF8NlJJgyDiGUFIGV9KGYZ9oPL2USgpKqfTy1Nj8VFik2NhHaRTjj49/UxdnhjUzvaUAAAAASUVORK5CYII=\" width=\"40\" height=\"40\" /><span class=\"brand\">LeClap</span><span class=\"kind\">EVIDENCE</span></div>",
+              "css": ".head { display: flex; align-items: center; width: 480px; height: 40px; gap: 12px } .mark { width: 40px; height: 40px } .brand { font: 500 28px Oswald; line-height: 40px; color: #f7f7f8 } .kind { margin-left: 18px; font: 400 14px Roboto Mono; letter-spacing: 3px; line-height: 42px; color: #afb0b4 }",
+              "options": {
+                "position": "206:230"
+              }
+            },
+            {
+              "name": "summary",
+              "type": "html",
+              "width": 864,
+              "height": 40,
+              "html": "<p class=\"summary\">Code, context and behavior in one review.</p>",
+              "css": ".summary { margin: 0; width: 864px; height: 40px; font: 400 24px Rubik; line-height: 40px; white-space: nowrap; color: #f7f7f8 }",
+              "options": {
+                "position": "208:408",
+                "start": 0.9,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.9,
+                  "duration": 0.5,
+                  "distance": 12,
+                  "easing": "$expo"
+                }
+              }
+            }
+          ],
+          "kinetic": [
+            {
+              "text": {
+                "en": "EVIDENCE ATTACHED"
+              },
+              "preset": "rise",
+              "font": "oswald",
+              "size": 64,
+              "color": "#f7f7f8",
+              "fill": {
+                "gradient": {
+                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "angle": 90
+                }
+              },
+              "align": "left",
+              "x": 208,
+              "y": 328,
+              "maxWidth": 864,
+              "delay": 0.5,
+              "role": "headline"
+            },
+            {
+              "text": {
+                "en": "{{ ticket }}"
+              },
+              "preset": "fade",
+              "font": "mono",
+              "size": 18,
+              "color": "#aeb2fb",
+              "align": "right",
+              "x": 1074,
+              "y": 238,
+              "delay": 0.15
+            },
+            {
+              "text": {
+                "en": "Made with LeClap"
+              },
+              "preset": "typewriter",
+              "font": "mono",
+              "size": 14,
+              "color": "#aeb2fb",
+              "align": "right",
+              "x": 1074,
+              "y": 508,
+              "delay": 1.2
+            }
+          ],
+          "graphics": [
+            {
+              "type": "panel",
+              "at": 0,
+              "duration": 0.5,
+              "x": 206,
+              "y": 294,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "panel",
+              "at": 0,
+              "duration": 0.5,
+              "x": 206,
+              "y": 470,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            }
+          ]
         }
       ]
     }
@@ -10610,7 +10912,7 @@
     "source": "examples/agentic-pr-video/before-after.json",
     "orientation": "landscape",
     "backend": "native",
-    "creativeDirection": "Audience: a pull-request reviewer comparing behavior. Direction: a factual before-and-after demonstration using matched captures and clear labels. Keep framing and visual treatment consistent between both recordings so the change is easy to judge. Use quiet transitions and concise context rather than dramatic reveals. Avoid changing crop to exaggerate an improvement, invented findings and covering the changed control. Review both captures, the comparison boundary, reviewer instructions and the final evidence card.",
+    "creativeDirection": "Audience: a pull-request reviewer comparing behavior. Brand: LeClap, on its ink canvas, with the lavender to pink gradient, Oswald for headlines and chips, Rubik for copy and Roboto Mono for slate data. BEFORE is rose, AFTER is lavender, both with ink text. Hierarchy: the change, then what was wrong and what changed. Motion: the card fades in, its header rises, the ticket decodes, the rules draw from the left, the headline cascades and the BEFORE then AFTER fields rise; a lavender sheen marks the cut into the first recording, and a wipe hands BEFORE over to AFTER. Both recordings play ungraded with the same framing, each with one ink label in its bottom-left corner that never covers the changed control. Nothing moves under text that is being read. Avoid changing crop to flatter the fix and invented findings. Review: both captures, the wipe, the labels and the closing card.",
     "showcasePath": "/showcase?sample=before-after",
     "preview": {
       "video": "/videos/showcase/before-after.mp4",
@@ -10626,13 +10928,13 @@
             "en": "Before the change"
           },
           "description": {
-            "en": "A recording of the behavior the change fixes"
+            "en": "The behavior the change fixes, on the base branch"
           },
           "forceAspectRatio": true
         },
         {
           "name": "after",
-          "duration": 4.2,
+          "duration": 4.8,
           "title": {
             "en": "After the change"
           },
@@ -10648,6 +10950,12 @@
           "name": "project",
           "default": "Example project",
           "placeholders": ["{{ project }}"],
+          "source": "global"
+        },
+        {
+          "name": "ticket",
+          "default": "PR #123",
+          "placeholders": ["{{ ticket }}"],
           "source": "global"
         },
         {
@@ -10675,73 +10983,10 @@
           "source": "global"
         }
       ],
-      "assets": [
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[0].titleCard.filters[0].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[0].titleCard.filters[1].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[0].titleCard.filters[3].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[1].lowerThird.filters[2].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[1].lowerThird.filters[3].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[2].lowerThird.filters[2].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[2].lowerThird.filters[3].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[3].titleCard.filters[0].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[3].titleCard.filters[1].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Oswald.ttf",
-          "path": "sections[3].titleCard.filters[3].values.fontfile",
-          "source": "preset"
-        }
-      ],
+      "assets": [],
       "effects": [],
       "setup": [
         "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
-        "Preview media is not included. Supply or replace the listed authored asset references; relative references remain unchanged and must resolve in your configured assets/media directory.",
-        "Font assets marked source=preset are effective engine-resolved filenames from text presets and authored font overrides. Supply these font files; family-based font references also include their family, weight and style for resolution.",
         "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
       ]
     },
@@ -10749,12 +10994,13 @@
       "meta": {
         "name": "Agentic PR Evidence — Before / After",
         "description": "A short review video an agent renders for a UI change: the change named, the old behavior, a wipe to the new behavior, and what the reviewer should check.",
-        "creativeDirection": "Audience: a pull-request reviewer comparing behavior. Direction: a factual before-and-after demonstration using matched captures and clear labels. Keep framing and visual treatment consistent between both recordings so the change is easy to judge. Use quiet transitions and concise context rather than dramatic reveals. Avoid changing crop to exaggerate an improvement, invented findings and covering the changed control. Review both captures, the comparison boundary, reviewer instructions and the final evidence card."
+        "creativeDirection": "Audience: a pull-request reviewer comparing behavior. Brand: LeClap, on its ink canvas, with the lavender to pink gradient, Oswald for headlines and chips, Rubik for copy and Roboto Mono for slate data. BEFORE is rose, AFTER is lavender, both with ink text. Hierarchy: the change, then what was wrong and what changed. Motion: the card fades in, its header rises, the ticket decodes, the rules draw from the left, the headline cascades and the BEFORE then AFTER fields rise; a lavender sheen marks the cut into the first recording, and a wipe hands BEFORE over to AFTER. Both recordings play ungraded with the same framing, each with one ink label in its bottom-left corner that never covers the changed control. Nothing moves under text that is being read. Avoid changing crop to flatter the fix and invented findings. Review: both captures, the wipe, the labels and the closing card."
       },
       "global": {
         "orientation": "landscape",
         "variables": {
           "project": "Example project",
+          "ticket": "PR #123",
           "change": "Describe the change",
           "beforeCaption": "What was wrong",
           "afterCaption": "What changed",
@@ -10774,26 +11020,194 @@
         {
           "name": "intro",
           "type": "color_background",
-          "titleCard": {
-            "kicker": {
-              "en": "{{ project }}"
-            },
-            "headline": {
-              "en": "{{ change }}"
-            },
-            "subtitle": {
-              "en": "Before / after — recorded for review"
-            },
-            "accent": "#8b91ff",
-            "reveal": "slide-left",
-            "effect": {
-              "shadow": true
-            }
-          },
           "options": {
-            "backgroundColor": "#0f1117",
-            "duration": 1.6
-          }
+            "duration": 3.6,
+            "backgroundColor": "#141416"
+          },
+          "inputs": [
+            {
+              "name": "stage",
+              "type": "html",
+              "width": 1280,
+              "height": 720,
+              "html": "<div class=\"stage\"></div>",
+              "css": ".stage { width: 1280px; height: 720px; background-image: radial-gradient(70% 60% at 50% 42%, rgba(124, 131, 253, 0.16), rgba(124, 131, 253, 0)) }",
+              "options": {
+                "position": "0:0"
+              }
+            },
+            {
+              "name": "card",
+              "type": "html",
+              "width": 960,
+              "height": 384,
+              "html": "<div class=\"card\"></div>",
+              "css": ".card { width: 960px; height: 384px; background-color: #1d1e21; border: 2px solid #323337; border-radius: 20px }",
+              "options": {
+                "position": "160:192",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "header",
+              "type": "html",
+              "width": 480,
+              "height": 40,
+              "html": "<div class=\"head\"><img class=\"mark\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAMAAAC7IEhfAAABgFBMVEWnm7q+s9+IX6m8sHHmsLoBAQDwzefp1O/VyvTY1PluV6z0d5b5iaTxytn/+pO2o9Pp2K3+lq3tyErza4r//KR0abcTEQnqxor+0zn/92vv2pKGesrl18/Wyq3rxXByZzL35ov/51D92UhZS6yTh8r75XOEdq7x46cyKxP6yzbIveVrVx64rG2ylzjv2HDZyc5zac9XRxhdUa2waKQjIBRvaEZVTSTvyLYhHAnbt0LkuzvJtdz/9FpiWCqLgU+3dajk1IO4rLTGt615cLfPZ5aomcvo4PnOgqxWUThrXCOEbCVvTqORUpz+g5xjXkCdkci1pVUzMCKpiix3cE3bsjS1YZqIdi/TeqV/dMmtW5immKbCpM3Qcp/a1tyShuGznUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4T0J0AAAAYHRSTlP///+u/wD+//7+/////v///P/y////Dvz///b//P38bPH//v//+v/+LP//aq2u7P3/U///HGVP/RzX5f//WoL/1/////////9OZID///9Y/60sqXXi/4P////////9/60XG9eQAAAChElEQVR42n3V53qiQBgFYJJdcZgEJKwUQZBqixo1do0tvdfNJtl2/3ex4wwiYNzzS31ez4w4fFCJWB4v2s/P7YvH+OdU+I10V1G5NA6nVu6kDVAam0gUsjgF9NIcS5/Btslx/G8mSJbnOLO9BqUviDGxIFqRorA15QphksRhsiY3bYVhy+R4EFW+5Tm1tYLSNOwIOWOAL6crWFlzZ+AeOqe+rCxhjlNBZINnwIXinIKkU+VyBEqeCSKFZc1x3HT6o0lg1vQkDMdoYRBmME+5Wh7CFPk9NM+NF1CqoUJfJpmU6MBZupB3RJ/hypqE4FGGX0KQEuHH6R/UdryVXIVWM0cIPmQOfIiYyKd12NSGyXDobOYBwZoHcJitplN33Tx0y8lYaK+WoIqeShwQtw+3m1AbgiB0sLZXpDpki4Apw/OvEweKMJTTYJMdKpfRl3BycCi69VlB17R5Yf6m6XNI+xcokwsgAPD95Ob4vu7qulundF2rz2YY0nQUMpoDY3HyxBE4WsLjyV4s56iRxnCUozoj1V9anOztRrL3A7IEqqMOVbQCeLgbSwBrVpFKCF4Ab3ciuf3lQ9YT0D/z1zrw4fedWE4giwu7VnVxKCz5PxA3ytbiUCQEG1fSbzffYnkXcSNrC/jgvpJKegivo5fxGv5EhSwqfCW3Aq5E3yynYhlihwrJrZC4tAyAN51cO18LZ1iXy9u1avtyLWiPhl1dTYq+LW9yst0PjZSeoBifOtZQhF54SPX6isCu13UFpd+LzceqLcgxysoC2V90kO4PFMHoBpbtGoIy2P90NF8NlJJgyDiGUFIGV9KGYZ9oPL2USgpKqfTy1Nj8VFik2NhHaRTjj49/UxdnhjUzvaUAAAAASUVORK5CYII=\" width=\"40\" height=\"40\" /><span class=\"brand\">LeClap</span><span class=\"kind\">BEFORE / AFTER</span></div>",
+              "css": ".head { display: flex; align-items: center; width: 480px; height: 40px; gap: 12px } .mark { width: 40px; height: 40px } .brand { font: 500 28px Oswald; line-height: 40px; color: #f7f7f8 } .kind { margin-left: 18px; font: 400 14px Roboto Mono; letter-spacing: 3px; line-height: 42px; color: #afb0b4 }",
+              "options": {
+                "position": "206:230",
+                "start": 0.4,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.4,
+                  "duration": 0.5,
+                  "distance": 10,
+                  "easing": "$expo"
+                }
+              }
+            },
+            {
+              "name": "summary",
+              "type": "html",
+              "width": 864,
+              "height": 40,
+              "html": "<p class=\"summary\">{{ project }}, both runs recorded for review</p>",
+              "css": ".summary { margin: 0; width: 864px; height: 40px; font: 400 24px Rubik; line-height: 40px; white-space: nowrap; color: #f7f7f8 }",
+              "options": {
+                "position": "208:408",
+                "start": 1.15,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1.15,
+                  "duration": 0.55,
+                  "distance": 14,
+                  "easing": "$expo"
+                }
+              }
+            },
+            {
+              "name": "before_field",
+              "type": "html",
+              "width": 416,
+              "height": 40,
+              "html": "<div class=\"field\"><span class=\"chip before\">BEFORE</span><span class=\"copy\">{{ beforeCaption }}</span></div>",
+              "css": ".field { display: flex; align-items: center; width: 416px; height: 40px; gap: 16px } .chip { display: flex; justify-content: center; align-items: center; height: 36px; padding: 0 14px; border-radius: 6px; font: 400 20px Oswald; letter-spacing: 1px; color: #141416 } .before { background-color: #f96f99 } .after { background-color: #9298fb } .copy { font: 400 20px Rubik; white-space: nowrap; color: #afb0b4 }",
+              "options": {
+                "position": "208:496",
+                "start": 1.55,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1.55,
+                  "duration": 0.5,
+                  "distance": 14,
+                  "easing": "$expo"
+                }
+              }
+            },
+            {
+              "name": "after_field",
+              "type": "html",
+              "width": 416,
+              "height": 40,
+              "html": "<div class=\"field\"><span class=\"chip after\">AFTER</span><span class=\"copy\">{{ afterCaption }}</span></div>",
+              "css": ".field { display: flex; align-items: center; width: 416px; height: 40px; gap: 16px } .chip { display: flex; justify-content: center; align-items: center; height: 36px; padding: 0 14px; border-radius: 6px; font: 400 20px Oswald; letter-spacing: 1px; color: #141416 } .before { background-color: #f96f99 } .after { background-color: #9298fb } .copy { font: 400 20px Rubik; white-space: nowrap; color: #afb0b4 }",
+              "options": {
+                "position": "656:496",
+                "start": 1.75,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1.75,
+                  "duration": 0.5,
+                  "distance": 14,
+                  "easing": "$expo"
+                }
+              }
+            }
+          ],
+          "kinetic": [
+            {
+              "text": {
+                "en": "{{ change }}"
+              },
+              "preset": "cascade",
+              "font": "oswald",
+              "size": 64,
+              "color": "#f7f7f8",
+              "fill": {
+                "gradient": {
+                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "angle": 90
+                }
+              },
+              "align": "left",
+              "x": 208,
+              "y": 328,
+              "maxWidth": 864,
+              "delay": 0.5,
+              "role": "headline"
+            },
+            {
+              "text": {
+                "en": "{{ ticket }}"
+              },
+              "preset": "scramble",
+              "font": "mono",
+              "size": 18,
+              "color": "#aeb2fb",
+              "align": "right",
+              "x": 1074,
+              "y": 238,
+              "delay": 0.7
+            }
+          ],
+          "graphics": [
+            {
+              "type": "panel",
+              "at": 0.45,
+              "duration": 0.5,
+              "x": 206,
+              "y": 294,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "panel",
+              "at": 1.35,
+              "duration": 0.5,
+              "x": 206,
+              "y": 470,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "fx",
+              "effect": "sheen",
+              "target": {
+                "x": 160,
+                "y": 192,
+                "w": 960,
+                "h": 384,
+                "radius": 20
+              },
+              "at": 2.8,
+              "duration": 0.7,
+              "width": 0.16,
+              "tilt": 18,
+              "color": "#aeb2fb",
+              "intensity": 0.9
+            }
+          ]
         },
         {
           "name": "before",
@@ -10802,46 +11216,41 @@
             "type": "wipeleft",
             "duration": 0.6
           },
-          "lowerThird": {
-            "title": {
-              "en": "{{ beforeCaption }}"
-            },
-            "badge": {
-              "en": "BEFORE"
-            },
-            "accent": "#ff5f6d",
-            "reveal": "rise",
-            "effect": {
-              "shadow": true
-            }
-          },
           "title": {
             "en": "Before the change"
           },
           "description": {
-            "en": "A recording of the behavior the change fixes"
+            "en": "The behavior the change fixes, on the base branch"
           },
           "options": {
             "duration": 3.8,
             "forceAspectRatio": true
-          }
+          },
+          "inputs": [
+            {
+              "name": "label",
+              "type": "html",
+              "width": 800,
+              "height": 56,
+              "html": "<div class=\"wrap\"><div class=\"bar\"><span class=\"chip before\">BEFORE</span><span class=\"title\">{{ beforeCaption }}</span></div></div>",
+              "css": ".wrap { display: flex; width: 800px; height: 56px } .bar { display: flex; align-items: center; height: 56px; gap: 14px; padding: 0 22px 0 10px; background-color: rgba(20, 20, 22, 0.92); border: 1px solid #323337; border-radius: 12px } .chip { display: flex; justify-content: center; align-items: center; height: 36px; padding: 0 12px; border-radius: 6px; font: 400 20px Oswald; letter-spacing: 1px; color: #141416 } .before { background-color: #f96f99 } .after { background-color: #9298fb } .title { font: 400 24px Oswald; white-space: nowrap; color: #f7f7f8 }",
+              "options": {
+                "position": "32:632",
+                "start": 0.4,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.4,
+                  "duration": 0.45,
+                  "distance": 10,
+                  "easing": "$expo"
+                }
+              }
+            }
+          ]
         },
         {
           "name": "after",
           "type": "project_video",
-          "lowerThird": {
-            "title": {
-              "en": "{{ afterCaption }}"
-            },
-            "badge": {
-              "en": "AFTER"
-            },
-            "accent": "#34d399",
-            "reveal": "rise",
-            "effect": {
-              "shadow": true
-            }
-          },
           "title": {
             "en": "After the change"
           },
@@ -10849,37 +11258,167 @@
             "en": "The same walkthrough on the branch under review"
           },
           "options": {
-            "duration": 4.2,
+            "duration": 4.8,
             "forceAspectRatio": true
-          }
+          },
+          "inputs": [
+            {
+              "name": "label",
+              "type": "html",
+              "width": 800,
+              "height": 56,
+              "html": "<div class=\"wrap\"><div class=\"bar\"><span class=\"chip after\">AFTER</span><span class=\"title\">{{ afterCaption }}</span></div></div>",
+              "css": ".wrap { display: flex; width: 800px; height: 56px } .bar { display: flex; align-items: center; height: 56px; gap: 14px; padding: 0 22px 0 10px; background-color: rgba(20, 20, 22, 0.92); border: 1px solid #323337; border-radius: 12px } .chip { display: flex; justify-content: center; align-items: center; height: 36px; padding: 0 12px; border-radius: 6px; font: 400 20px Oswald; letter-spacing: 1px; color: #141416 } .before { background-color: #f96f99 } .after { background-color: #9298fb } .title { font: 400 24px Oswald; white-space: nowrap; color: #f7f7f8 }",
+              "options": {
+                "position": "32:632",
+                "start": 0.7,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.7,
+                  "duration": 0.45,
+                  "distance": 10,
+                  "easing": "$expo"
+                }
+              }
+            }
+          ]
         },
         {
           "name": "review",
           "type": "color_background",
-          "titleCard": {
-            "kicker": {
-              "en": "WHAT TO REVIEW"
-            },
-            "headline": {
-              "en": "{{ reviewFocus }}"
-            },
-            "subtitle": {
-              "en": "Watch the behavior, then read the diff"
-            },
-            "accent": "#fff685",
-            "align": "left",
-            "reveal": "rise",
-            "fade": {
-              "out": false
-            },
-            "effect": {
-              "shadow": true
-            }
-          },
           "options": {
-            "backgroundColor": "#171923",
-            "duration": 2.4
-          }
+            "duration": 3,
+            "backgroundColor": "#141416"
+          },
+          "inputs": [
+            {
+              "name": "stage",
+              "type": "html",
+              "width": 1280,
+              "height": 720,
+              "html": "<div class=\"stage\"></div>",
+              "css": ".stage { width: 1280px; height: 720px; background-image: radial-gradient(70% 60% at 50% 42%, rgba(255, 138, 174, 0.12), rgba(255, 138, 174, 0)) }",
+              "options": {
+                "position": "0:0"
+              }
+            },
+            {
+              "name": "card",
+              "type": "html",
+              "width": 960,
+              "height": 384,
+              "html": "<div class=\"card\"></div>",
+              "css": ".card { width: 960px; height: 384px; background-color: #1d1e21; border: 2px solid #323337; border-radius: 20px }",
+              "options": {
+                "position": "160:192"
+              }
+            },
+            {
+              "name": "header",
+              "type": "html",
+              "width": 480,
+              "height": 40,
+              "html": "<div class=\"head\"><img class=\"mark\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAMAAAC7IEhfAAABgFBMVEWnm7q+s9+IX6m8sHHmsLoBAQDwzefp1O/VyvTY1PluV6z0d5b5iaTxytn/+pO2o9Pp2K3+lq3tyErza4r//KR0abcTEQnqxor+0zn/92vv2pKGesrl18/Wyq3rxXByZzL35ov/51D92UhZS6yTh8r75XOEdq7x46cyKxP6yzbIveVrVx64rG2ylzjv2HDZyc5zac9XRxhdUa2waKQjIBRvaEZVTSTvyLYhHAnbt0LkuzvJtdz/9FpiWCqLgU+3dajk1IO4rLTGt615cLfPZ5aomcvo4PnOgqxWUThrXCOEbCVvTqORUpz+g5xjXkCdkci1pVUzMCKpiix3cE3bsjS1YZqIdi/TeqV/dMmtW5immKbCpM3Qcp/a1tyShuGznUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4T0J0AAAAYHRSTlP///+u/wD+//7+/////v///P/y////Dvz///b//P38bPH//v//+v/+LP//aq2u7P3/U///HGVP/RzX5f//WoL/1/////////9OZID///9Y/60sqXXi/4P////////9/60XG9eQAAAChElEQVR42n3V53qiQBgFYJJdcZgEJKwUQZBqixo1do0tvdfNJtl2/3ex4wwiYNzzS31ez4w4fFCJWB4v2s/P7YvH+OdU+I10V1G5NA6nVu6kDVAam0gUsjgF9NIcS5/Btslx/G8mSJbnOLO9BqUviDGxIFqRorA15QphksRhsiY3bYVhy+R4EFW+5Tm1tYLSNOwIOWOAL6crWFlzZ+AeOqe+rCxhjlNBZINnwIXinIKkU+VyBEqeCSKFZc1x3HT6o0lg1vQkDMdoYRBmME+5Wh7CFPk9NM+NF1CqoUJfJpmU6MBZupB3RJ/hypqE4FGGX0KQEuHH6R/UdryVXIVWM0cIPmQOfIiYyKd12NSGyXDobOYBwZoHcJitplN33Tx0y8lYaK+WoIqeShwQtw+3m1AbgiB0sLZXpDpki4Apw/OvEweKMJTTYJMdKpfRl3BycCi69VlB17R5Yf6m6XNI+xcokwsgAPD95Ob4vu7qulundF2rz2YY0nQUMpoDY3HyxBE4WsLjyV4s56iRxnCUozoj1V9anOztRrL3A7IEqqMOVbQCeLgbSwBrVpFKCF4Ab3ciuf3lQ9YT0D/z1zrw4fedWE4giwu7VnVxKCz5PxA3ytbiUCQEG1fSbzffYnkXcSNrC/jgvpJKegivo5fxGv5EhSwqfCW3Aq5E3yynYhlihwrJrZC4tAyAN51cO18LZ1iXy9u1avtyLWiPhl1dTYq+LW9yst0PjZSeoBifOtZQhF54SPX6isCu13UFpd+LzceqLcgxysoC2V90kO4PFMHoBpbtGoIy2P90NF8NlJJgyDiGUFIGV9KGYZ9oPL2USgpKqfTy1Nj8VFik2NhHaRTjj49/UxdnhjUzvaUAAAAASUVORK5CYII=\" width=\"40\" height=\"40\" /><span class=\"brand\">LeClap</span><span class=\"kind\">WHAT TO REVIEW</span></div>",
+              "css": ".head { display: flex; align-items: center; width: 480px; height: 40px; gap: 12px } .mark { width: 40px; height: 40px } .brand { font: 500 28px Oswald; line-height: 40px; color: #f7f7f8 } .kind { margin-left: 18px; font: 400 14px Roboto Mono; letter-spacing: 3px; line-height: 42px; color: #afb0b4 }",
+              "options": {
+                "position": "206:230"
+              }
+            },
+            {
+              "name": "summary",
+              "type": "html",
+              "width": 864,
+              "height": 40,
+              "html": "<p class=\"summary\">Watch both runs, then read the diff.</p>",
+              "css": ".summary { margin: 0; width: 864px; height: 40px; font: 400 24px Rubik; line-height: 40px; white-space: nowrap; color: #f7f7f8 }",
+              "options": {
+                "position": "208:408",
+                "start": 0.6,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.6,
+                  "duration": 0.5,
+                  "distance": 12,
+                  "easing": "$expo"
+                }
+              }
+            }
+          ],
+          "kinetic": [
+            {
+              "text": {
+                "en": "{{ reviewFocus }}"
+              },
+              "preset": "rise",
+              "font": "oswald",
+              "size": 64,
+              "color": "#f7f7f8",
+              "fill": {
+                "gradient": {
+                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "angle": 90
+                }
+              },
+              "align": "left",
+              "x": 208,
+              "y": 328,
+              "maxWidth": 864,
+              "delay": 0.2,
+              "role": "headline"
+            },
+            {
+              "text": {
+                "en": "{{ ticket }}"
+              },
+              "preset": "fade",
+              "font": "mono",
+              "size": 18,
+              "color": "#aeb2fb",
+              "align": "right",
+              "x": 1074,
+              "y": 238,
+              "delay": 0.15
+            },
+            {
+              "text": {
+                "en": "Made with LeClap"
+              },
+              "preset": "typewriter",
+              "font": "mono",
+              "size": 14,
+              "color": "#aeb2fb",
+              "align": "right",
+              "x": 1074,
+              "y": 508,
+              "delay": 0.9
+            }
+          ],
+          "graphics": [
+            {
+              "type": "panel",
+              "at": 0,
+              "duration": 0.5,
+              "x": 206,
+              "y": 294,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "panel",
+              "at": 0,
+              "duration": 0.5,
+              "x": 206,
+              "y": 470,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            }
+          ]
         }
       ]
     }
@@ -10892,6 +11431,7 @@
     "source": "examples/agentic-pr-video/evidence-skill/template.json",
     "orientation": "landscape",
     "backend": "native",
+    "creativeDirection": "Audience: a reviewer reading a pull request. Brand: LeClap, on its ink canvas, with the lavender to pink gradient, the Oswald display face, Rubik for copy and Roboto Mono for slate data. Hierarchy: the headline, then the one-line summary, then the BEFORE and AFTER fields. Motion: one signature move per card (tracking-in on the intro headline, rise on the outro), a hinged clapper that claps once on the cut into the comparison, and the frame highlight during the freeze. Nothing moves under text that is being read: no push, wipe or camera move, fades only between sections. Review: every label readable while on screen, both panes uncropped, the freeze long enough to read the callouts.",
     "showcasePath": "/showcase?sample=house-evidence",
     "preview": {
       "video": "/videos/showcase/house-evidence.mp4",
@@ -10901,44 +11441,8 @@
     "requirements": {
       "projectVideos": [
         {
-          "name": "intro",
-          "duration": 4.2,
-          "forceAspectRatio": true,
-          "speed": 1,
-          "muteSection": true
-        },
-        {
-          "name": "beforecard",
-          "duration": 3.6,
-          "forceAspectRatio": true,
-          "speed": 1,
-          "muteSection": true
-        },
-        {
-          "name": "beforeclip",
-          "duration": 8,
-          "forceAspectRatio": true,
-          "speed": 1,
-          "muteSection": true
-        },
-        {
-          "name": "aftercard",
-          "duration": 3.6,
-          "forceAspectRatio": true,
-          "speed": 1,
-          "muteSection": true
-        },
-        {
-          "name": "afterclip",
-          "duration": 8,
-          "forceAspectRatio": true,
-          "speed": 1,
-          "muteSection": true
-        },
-        {
-          "name": "outro",
-          "duration": 2.8,
-          "forceAspectRatio": true,
+          "name": "sidebyside",
+          "duration": "{{ clipSeconds }}",
           "speed": 1,
           "muteSection": true
         }
@@ -10947,37 +11451,37 @@
       "variables": [
         {
           "name": "_note",
-          "default": "The house look for the ffmpeg-composed layer. build.py reads these, so a render is reproducible from this file alone. Values are strings because global.variables is record(string, string | string[]). geom.canvas must stay the engine's landscape output size.",
+          "default": "Design tokens for the comparison clip build.py composes with ffmpeg; the slate and the outro carry the same values in their HTML layers, so change both together. Values are strings because global.variables is record(string, string | string[]). Margins and the gutter are 32 px and every vertical step sits on a 4 px grid. Colours are the LeClap dark-theme tokens (DESIGN.md): ink canvas, secondary-500 rose for BEFORE and brand-400 lavender for AFTER, a luminance-matched pair that both carry ink text at AA.",
           "placeholders": [],
           "source": "global"
         },
         {
           "name": "colour.before",
-          "default": "#a4122b",
+          "default": "#f96f99",
           "placeholders": [],
           "source": "global"
         },
         {
           "name": "colour.after",
-          "default": "#085d3a",
+          "default": "#9298fb",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "colour.neutral",
-          "default": "#565cc4",
+          "name": "colour.brand",
+          "default": "#aeb2fb",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "colour.surface",
-          "default": "#ffffff",
+          "name": "colour.canvas",
+          "default": "#141416",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "colour.stage",
-          "default": "#f2f2f5",
+          "name": "colour.letterbox",
+          "default": "#0c0d11",
           "placeholders": [],
           "source": "global"
         },
@@ -10988,26 +11492,26 @@
           "source": "global"
         },
         {
-          "name": "colour.inkSubtle",
-          "default": "#4a4a52",
+          "name": "colour.fg",
+          "default": "#f7f7f8",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "colour.hairline",
-          "default": "#e2e2e8",
+          "name": "colour.muted",
+          "default": "#afb0b4",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "colour.onAccent",
-          "default": "#ffffff",
+          "name": "colour.divider",
+          "default": "#323337",
           "placeholders": [],
           "source": "global"
         },
         {
           "name": "font.display",
-          "default": "ArchivoBlack.ttf",
+          "default": "Oswald.ttf",
           "placeholders": [],
           "source": "global"
         },
@@ -11018,56 +11522,68 @@
           "source": "global"
         },
         {
-          "name": "font.label",
+          "name": "font.mono",
           "default": "RobotoMono.ttf",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "size.kicker",
+          "name": "size.ticket",
+          "default": "16",
+          "placeholders": [],
+          "source": "global"
+        },
+        {
+          "name": "size.signature",
+          "default": "14",
+          "placeholders": [],
+          "source": "global"
+        },
+        {
+          "name": "size.roll",
+          "default": "18",
+          "placeholders": [],
+          "source": "global"
+        },
+        {
+          "name": "size.badge",
           "default": "20",
           "placeholders": [],
           "source": "global"
         },
         {
+          "name": "size.title",
+          "default": "24",
+          "placeholders": [],
+          "source": "global"
+        },
+        {
+          "name": "size.desc",
+          "default": "20",
+          "placeholders": [],
+          "source": "global"
+        },
+        {
+          "name": "size.callout",
+          "default": "16",
+          "placeholders": [],
+          "source": "global"
+        },
+        {
           "name": "size.headline",
-          "default": "48",
+          "default": "64",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "size.subtitle",
-          "default": "22",
+          "name": "size.summary",
+          "default": "24",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "size.panelBadge",
-          "default": "22",
-          "placeholders": [],
-          "source": "global"
-        },
-        {
-          "name": "size.panelTitle",
-          "default": "22",
-          "placeholders": [],
-          "source": "global"
-        },
-        {
-          "name": "size.panelDesc",
-          "default": "19",
-          "placeholders": [],
-          "source": "global"
-        },
-        {
-          "name": "size.introBadge",
-          "default": "22",
-          "placeholders": [],
-          "source": "global"
-        },
-        {
-          "name": "size.introDesc",
-          "default": "22",
+          "name": "size.chip",
+          "default": "20",
           "placeholders": [],
           "source": "global"
         },
@@ -11078,110 +11594,116 @@
           "source": "global"
         },
         {
-          "name": "geom.cardMargin",
-          "default": "80",
+          "name": "geom.margin",
+          "default": "32",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "geom.panelWidth",
-          "default": "320",
+          "name": "geom.headerBaseline",
+          "default": "54",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "geom.panelPad",
-          "default": "40",
+          "name": "geom.markSize",
+          "default": "32",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "geom.badgePad",
-          "default": "11",
+          "name": "geom.pane",
+          "default": ["592", "444"],
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "geom.card",
-          "default": ["286", "322", "414", "448"],
+          "name": "geom.paneX",
+          "default": ["32", "656"],
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "geom.rule",
-          "default": ["166", "4"],
+          "name": "geom.paneY",
+          "default": "152",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "geom.lineSpacing",
-          "default": "7",
+          "name": "geom.labelGap",
+          "default": "16",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "geom.introRule",
-          "default": "334",
+          "name": "geom.chipWidth",
+          "default": "96",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "geom.introRowY",
-          "default": "390",
+          "name": "geom.chipHeight",
+          "default": "36",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "geom.introRowGap",
-          "default": "72",
+          "name": "geom.chipGap",
+          "default": "16",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "motion.easeOutPow",
-          "default": "3",
+          "name": "geom.descBaselines",
+          "default": ["632", "660"],
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "motion.springPow",
-          "default": "5",
+          "name": "geom.calloutGap",
+          "default": "24",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "motion.quick",
-          "default": "0.24",
+          "name": "geom.calloutMark",
+          "default": ["12", "2", "8"],
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "motion.gentle",
-          "default": "0.28",
+          "name": "geom.slateMeasure",
+          "default": "864",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "motion.slow",
-          "default": "0.40",
+          "name": "geom.slateHeader",
+          "default": "272",
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "motion.stagger",
-          "default": "0.14",
+          "name": "geom.highlight",
+          "default": ["8", "8", "4"],
           "placeholders": [],
           "source": "global"
         },
         {
-          "name": "limit.titleLines",
-          "default": "3",
+          "name": "motion.calloutDelay",
+          "default": "0.15",
+          "placeholders": [],
+          "source": "global"
+        },
+        {
+          "name": "motion.calloutFade",
+          "default": "0.2",
           "placeholders": [],
           "source": "global"
         },
         {
           "name": "limit.descLines",
-          "default": "6",
+          "default": "2",
           "placeholders": [],
           "source": "global"
         },
@@ -11190,17 +11712,62 @@
           "default": ["BEFORE", "AFTER", "AVANT", "APRÈS"],
           "placeholders": [],
           "source": "global"
+        },
+        {
+          "name": "summary",
+          "placeholders": ["{{ summary }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "beforeBadge",
+          "placeholders": ["{{ beforeBadge }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "beforeChip",
+          "placeholders": ["{{ beforeChip }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "afterBadge",
+          "placeholders": ["{{ afterBadge }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "afterChip",
+          "placeholders": ["{{ afterChip }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "headline",
+          "placeholders": ["{{ headline }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "ticket",
+          "placeholders": ["{{ ticket }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "clipSeconds",
+          "placeholders": ["{{ clipSeconds }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "outroSubtitle",
+          "placeholders": ["{{ outroSubtitle }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "outroHeadline",
+          "placeholders": ["{{ outroHeadline }}"],
+          "source": "placeholder"
         }
       ],
       "assets": [
         {
-          "kind": "image",
-          "reference": "images/logo.png",
-          "path": "global.watermark.url"
-        },
-        {
           "kind": "font",
-          "reference": "ArchivoBlack.ttf",
+          "reference": "Oswald.ttf",
           "path": "global.variables.font.display"
         },
         {
@@ -11211,7 +11778,12 @@
         {
           "kind": "font",
           "reference": "RobotoMono.ttf",
-          "path": "global.variables.font.label"
+          "path": "global.variables.font.mono"
+        },
+        {
+          "kind": "image",
+          "reference": "images/leclap-mark.png",
+          "path": "sections[1].inputs[0].url"
         }
       ],
       "effects": [],
@@ -11223,130 +11795,525 @@
     },
     "template": {
       "meta": {
-        "name": "Before / after evidence",
-        "description": "House template for a UI change: the defect on the base branch, the fix on the branch under review. build.py composes every card and panel with ffmpeg and hands them over as project_video sections; LeClap does the watermark, the transitions and the join. Every value the engine would otherwise default is pinned on purpose: an evidence video has to render the same today and on a re-run months later, and a silent default change would alter the artifact a change was approved on. The two deliberate omissions are `look` and `grade`: a colour grade would shift the very UI colours the video exists to prove."
+        "name": "LeClap before / after evidence",
+        "description": "House template for a UI change: the defect on the merge base and the fix on the branch, played side by side and in step, between a LeClap slate and its closing card. build.py composes the comparison clip (the two panes, their labels, the baked freeze and the callouts) from global.variables and hands it over as a project_video; LeClap draws the slate, the headline, the frame highlights, the clap and the join. Every value the engine would otherwise default is pinned: an evidence video has to render the same on a re-run months later. The deliberate omissions are `look` and `grade`, because a colour grade would shift the very UI colours the video exists to prove.",
+        "creativeDirection": "Audience: a reviewer reading a pull request. Brand: LeClap, on its ink canvas, with the lavender to pink gradient, the Oswald display face, Rubik for copy and Roboto Mono for slate data. Hierarchy: the headline, then the one-line summary, then the BEFORE and AFTER fields. Motion: one signature move per card (tracking-in on the intro headline, rise on the outro), a hinged clapper that claps once on the cut into the comparison, and the frame highlight during the freeze. Nothing moves under text that is being read: no push, wipe or camera move, fades only between sections. Review: every label readable while on screen, both panes uncropped, the freeze long enough to read the callouts."
       },
       "global": {
         "orientation": "landscape",
         "fps": 30,
+        "seed": 1,
         "musicEnabled": false,
         "transition": {
           "type": "fade",
           "duration": 0.5
         },
-        "watermark": {
-          "url": "images/logo.png",
-          "position": "top-left",
-          "scale": 0.05,
-          "opacity": 0.9,
-          "margin": 22
+        "fields": {
+          "ticket": {
+            "type": "text",
+            "default": "SHOP-123",
+            "maxLength": 32,
+            "description": "The pull or merge request, as the slate's ROLL field, e.g. PR #109."
+          },
+          "headline": {
+            "type": "text",
+            "default": "MAKE ADD TO CART OBVIOUS",
+            "maxLength": 40,
+            "description": "The change, in capitals. build.py refuses a headline wider than one line of the slate."
+          },
+          "summary": {
+            "type": "text",
+            "default": "Add to cart becomes a primary button that opens the cart",
+            "maxLength": 90,
+            "description": "The change in one line: under the intro headline and again on the outro."
+          },
+          "beforeBadge": {
+            "type": "text",
+            "default": "BEFORE",
+            "maxLength": 8,
+            "description": "BEFORE, or its translation."
+          },
+          "afterBadge": {
+            "type": "text",
+            "default": "AFTER",
+            "maxLength": 8,
+            "description": "AFTER, or its translation."
+          },
+          "beforeChip": {
+            "type": "text",
+            "default": "A faint link, no feedback",
+            "maxLength": 48,
+            "description": "What the merge base does, in a few words, beside its badge on the slate."
+          },
+          "afterChip": {
+            "type": "text",
+            "default": "One button, then the cart",
+            "maxLength": 48,
+            "description": "What the branch does, in a few words, beside its badge on the slate."
+          },
+          "outroHeadline": {
+            "type": "text",
+            "default": "REVIEW THE CART DRAWER",
+            "maxLength": 40,
+            "description": "What to review, in capitals."
+          },
+          "outroSubtitle": {
+            "type": "text",
+            "default": "Button contrast first, then focus in the drawer",
+            "maxLength": 80,
+            "description": "Where to look first."
+          },
+          "clipSeconds": {
+            "type": "number",
+            "default": 6,
+            "min": 2,
+            "max": 20,
+            "description": "Length of the two runs in seconds, before any freeze. build.py cuts both captures to it and writes it, plus the hold, into the resolved template, so the cut and the render cannot disagree."
+          }
         },
         "variables": {
-          "_note": "The house look for the ffmpeg-composed layer. build.py reads these, so a render is reproducible from this file alone. Values are strings because global.variables is record(string, string | string[]). geom.canvas must stay the engine's landscape output size.",
-          "colour.before": "#a4122b",
-          "colour.after": "#085d3a",
-          "colour.neutral": "#565cc4",
-          "colour.surface": "#ffffff",
-          "colour.stage": "#f2f2f5",
+          "_note": "Design tokens for the comparison clip build.py composes with ffmpeg; the slate and the outro carry the same values in their HTML layers, so change both together. Values are strings because global.variables is record(string, string | string[]). Margins and the gutter are 32 px and every vertical step sits on a 4 px grid. Colours are the LeClap dark-theme tokens (DESIGN.md): ink canvas, secondary-500 rose for BEFORE and brand-400 lavender for AFTER, a luminance-matched pair that both carry ink text at AA.",
+          "colour.before": "#f96f99",
+          "colour.after": "#9298fb",
+          "colour.brand": "#aeb2fb",
+          "colour.canvas": "#141416",
+          "colour.letterbox": "#0c0d11",
           "colour.ink": "#141416",
-          "colour.inkSubtle": "#4a4a52",
-          "colour.hairline": "#e2e2e8",
-          "colour.onAccent": "#ffffff",
-          "font.display": "ArchivoBlack.ttf",
+          "colour.fg": "#f7f7f8",
+          "colour.muted": "#afb0b4",
+          "colour.divider": "#323337",
+          "font.display": "Oswald.ttf",
           "font.body": "Rubik.ttf",
-          "font.label": "RobotoMono.ttf",
-          "size.kicker": "20",
-          "size.headline": "48",
-          "size.subtitle": "22",
-          "size.panelBadge": "22",
-          "size.panelTitle": "22",
-          "size.panelDesc": "19",
-          "size.introBadge": "22",
-          "size.introDesc": "22",
+          "font.mono": "RobotoMono.ttf",
+          "size.ticket": "16",
+          "size.signature": "14",
+          "size.roll": "18",
+          "size.badge": "20",
+          "size.title": "24",
+          "size.desc": "20",
+          "size.callout": "16",
+          "size.headline": "64",
+          "size.summary": "24",
+          "size.chip": "20",
           "geom.canvas": ["1280", "720"],
-          "geom.cardMargin": "80",
-          "geom.panelWidth": "320",
-          "geom.panelPad": "40",
-          "geom.badgePad": "11",
-          "geom.card": ["286", "322", "414", "448"],
-          "geom.rule": ["166", "4"],
-          "geom.lineSpacing": "7",
-          "geom.introRule": "334",
-          "geom.introRowY": "390",
-          "geom.introRowGap": "72",
-          "motion.easeOutPow": "3",
-          "motion.springPow": "5",
-          "motion.quick": "0.24",
-          "motion.gentle": "0.28",
-          "motion.slow": "0.40",
-          "motion.stagger": "0.14",
-          "limit.titleLines": "3",
-          "limit.descLines": "6",
+          "geom.margin": "32",
+          "geom.headerBaseline": "54",
+          "geom.markSize": "32",
+          "geom.pane": ["592", "444"],
+          "geom.paneX": ["32", "656"],
+          "geom.paneY": "152",
+          "geom.labelGap": "16",
+          "geom.chipWidth": "96",
+          "geom.chipHeight": "36",
+          "geom.chipGap": "16",
+          "geom.descBaselines": ["632", "660"],
+          "geom.calloutGap": "24",
+          "geom.calloutMark": ["12", "2", "8"],
+          "geom.slateMeasure": "864",
+          "geom.slateHeader": "272",
+          "geom.highlight": ["8", "8", "4"],
+          "motion.calloutDelay": "0.15",
+          "motion.calloutFade": "0.2",
+          "limit.descLines": "2",
           "limit.badgeVocabulary": ["BEFORE", "AFTER", "AVANT", "APRÈS"]
         }
       },
-      "partials": [
-        {
-          "id": "pair",
-          "description": "A state card followed by its capture: the unit an evidence video repeats per side. Referenced once per side with a `prefix`, so the shape is declared once. `prefix` concatenates with NO separator, so `before` + `card` resolves assets/videos/beforecard.mp4.",
-          "sections": [
-            {
-              "name": "card",
-              "type": "project_video",
-              "options": {
-                "duration": 3.6,
-                "forceAspectRatio": true,
-                "muteSection": true,
-                "speed": 1,
-                "countdown": false
-              }
-            },
-            {
-              "name": "clip",
-              "type": "project_video",
-              "options": {
-                "duration": 8,
-                "forceAspectRatio": true,
-                "muteSection": true,
-                "speed": 1,
-                "countdown": false
-              }
-            }
-          ]
-        }
-      ],
       "sections": [
         {
           "name": "intro",
+          "type": "color_background",
+          "options": {
+            "duration": 4.4,
+            "backgroundColor": "#141416",
+            "muteSection": true
+          },
+          "inputs": [
+            {
+              "name": "stage",
+              "type": "html",
+              "width": 1280,
+              "height": 720,
+              "html": "<div class=\"stage\"></div>",
+              "css": ".stage { width: 1280px; height: 720px; background-image: radial-gradient(70% 60% at 50% 42%, rgba(124, 131, 253, 0.16), rgba(124, 131, 253, 0)) }",
+              "options": {
+                "position": "0:0"
+              }
+            },
+            {
+              "name": "card",
+              "type": "html",
+              "width": 960,
+              "height": 384,
+              "html": "<div class=\"card\"></div>",
+              "css": ".card { width: 960px; height: 384px; background-color: #1d1e21; border: 2px solid #323337; border-radius: 20px }",
+              "options": {
+                "position": "160:192",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "header",
+              "type": "html",
+              "width": 400,
+              "height": 40,
+              "html": "<div class=\"head\"><img class=\"mark\" src=\"images/leclap-mark.png\" width=\"40\" height=\"40\" /><span class=\"brand\">LeClap</span><span class=\"kind\">EVIDENCE</span></div>",
+              "css": ".head { display: flex; align-items: center; width: 400px; height: 40px; gap: 12px } .mark { width: 40px; height: 40px } .brand { font: 500 28px Oswald; line-height: 40px; color: #f7f7f8 } .kind { margin-left: 18px; font: 400 14px Roboto Mono; letter-spacing: 3px; line-height: 42px; color: #afb0b4 }",
+              "options": {
+                "position": "206:230",
+                "start": 0.4,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.4,
+                  "duration": 0.5,
+                  "distance": 10,
+                  "easing": "$expo"
+                }
+              }
+            },
+            {
+              "name": "summary",
+              "type": "html",
+              "width": 864,
+              "height": 40,
+              "html": "<p class=\"summary\">{{ summary }}</p>",
+              "css": ".summary { margin: 0; width: 864px; height: 40px; font: 400 24px Rubik; line-height: 40px; white-space: nowrap; color: #f7f7f8 }",
+              "options": {
+                "position": "208:408",
+                "start": 1.15,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1.15,
+                  "duration": 0.55,
+                  "distance": 14,
+                  "easing": "$expo"
+                }
+              }
+            },
+            {
+              "name": "before_field",
+              "type": "html",
+              "width": 416,
+              "height": 40,
+              "html": "<div class=\"field\"><span class=\"chip before\">{{ beforeBadge }}</span><span class=\"copy\">{{ beforeChip }}</span></div>",
+              "css": ".field { display: flex; align-items: center; width: 416px; height: 40px; gap: 16px } .chip { display: flex; justify-content: center; align-items: center; width: 96px; height: 36px; border-radius: 6px; font: 400 20px Oswald; letter-spacing: 1px; color: #141416 } .before { background-color: #f96f99 } .after { background-color: #9298fb } .copy { font: 400 20px Rubik; white-space: nowrap; color: #afb0b4 }",
+              "options": {
+                "position": "208:496",
+                "start": 1.55,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1.55,
+                  "duration": 0.5,
+                  "distance": 14,
+                  "easing": "$expo"
+                }
+              }
+            },
+            {
+              "name": "after_field",
+              "type": "html",
+              "width": 416,
+              "height": 40,
+              "html": "<div class=\"field\"><span class=\"chip after\">{{ afterBadge }}</span><span class=\"copy\">{{ afterChip }}</span></div>",
+              "css": ".field { display: flex; align-items: center; width: 416px; height: 40px; gap: 16px } .chip { display: flex; justify-content: center; align-items: center; width: 96px; height: 36px; border-radius: 6px; font: 400 20px Oswald; letter-spacing: 1px; color: #141416 } .before { background-color: #f96f99 } .after { background-color: #9298fb } .copy { font: 400 20px Rubik; white-space: nowrap; color: #afb0b4 }",
+              "options": {
+                "position": "656:496",
+                "start": 1.75,
+                "motion": {
+                  "type": "rise",
+                  "delay": 1.75,
+                  "duration": 0.5,
+                  "distance": 14,
+                  "easing": "$expo"
+                }
+              }
+            }
+          ],
+          "kinetic": [
+            {
+              "text": {
+                "en": "{{ headline }}"
+              },
+              "preset": "cascade",
+              "font": "oswald",
+              "size": 64,
+              "color": "#f7f7f8",
+              "fill": {
+                "gradient": {
+                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "angle": 90
+                }
+              },
+              "align": "left",
+              "x": 208,
+              "y": 328,
+              "maxWidth": 864,
+              "delay": 0.5,
+              "role": "headline"
+            },
+            {
+              "text": {
+                "en": "{{ ticket }}"
+              },
+              "preset": "scramble",
+              "font": "mono",
+              "size": 18,
+              "color": "#aeb2fb",
+              "align": "right",
+              "x": 1074,
+              "y": 238,
+              "delay": 0.7
+            }
+          ],
+          "sfx": [
+            {
+              "id": "clap",
+              "at": 3.4,
+              "volume": 0.5
+            }
+          ],
+          "graphics": [
+            {
+              "type": "panel",
+              "at": 0.45,
+              "duration": 0.5,
+              "x": 206,
+              "y": 294,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "panel",
+              "at": 1.35,
+              "duration": 0.5,
+              "x": 206,
+              "y": 470,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "fx",
+              "effect": "sheen",
+              "target": {
+                "x": 160,
+                "y": 192,
+                "w": 960,
+                "h": 384,
+                "radius": 20
+              },
+              "at": 3.2,
+              "duration": 0.7,
+              "width": 0.16,
+              "tilt": 18,
+              "color": "#aeb2fb",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "name": "sidebyside",
           "type": "project_video",
           "options": {
-            "duration": 4.2,
-            "forceAspectRatio": true,
+            "duration": "{{ clipSeconds }}",
+            "fit": "letterbox",
             "muteSection": true,
             "speed": 1,
             "countdown": false
-          }
-        },
-        {
-          "type": "partial",
-          "ref": "pair",
-          "prefix": "before"
-        },
-        {
-          "type": "partial",
-          "ref": "pair",
-          "prefix": "after"
+          },
+          "inputs": [
+            {
+              "name": "mark",
+              "type": "image",
+              "url": "images/leclap-mark.png",
+              "options": {
+                "position": "32:32",
+                "scale": "32:32"
+              }
+            }
+          ]
         },
         {
           "name": "outro",
-          "type": "project_video",
+          "type": "color_background",
           "options": {
-            "duration": 2.8,
-            "forceAspectRatio": true,
-            "muteSection": true,
-            "speed": 1,
-            "countdown": false
-          }
+            "duration": 3.4,
+            "backgroundColor": "#141416",
+            "muteSection": true
+          },
+          "inputs": [
+            {
+              "name": "stage",
+              "type": "html",
+              "width": 1280,
+              "height": 720,
+              "html": "<div class=\"stage\"></div>",
+              "css": ".stage { width: 1280px; height: 720px; background-image: radial-gradient(70% 60% at 50% 42%, rgba(255, 138, 174, 0.12), rgba(255, 138, 174, 0)) }",
+              "options": {
+                "position": "0:0"
+              }
+            },
+            {
+              "name": "card",
+              "type": "html",
+              "width": 960,
+              "height": 384,
+              "html": "<div class=\"card\"></div>",
+              "css": ".card { width: 960px; height: 384px; background-color: #1d1e21; border: 2px solid #323337; border-radius: 20px }",
+              "options": {
+                "position": "160:192"
+              }
+            },
+            {
+              "name": "header",
+              "type": "html",
+              "width": 400,
+              "height": 40,
+              "html": "<div class=\"head\"><img class=\"mark\" src=\"images/leclap-mark.png\" width=\"40\" height=\"40\" /><span class=\"brand\">LeClap</span><span class=\"kind\">EVIDENCE</span></div>",
+              "css": ".head { display: flex; align-items: center; width: 400px; height: 40px; gap: 12px } .mark { width: 40px; height: 40px } .brand { font: 500 28px Oswald; line-height: 40px; color: #f7f7f8 } .kind { margin-left: 18px; font: 400 14px Roboto Mono; letter-spacing: 3px; line-height: 42px; color: #afb0b4 }",
+              "options": {
+                "position": "206:230"
+              }
+            },
+            {
+              "name": "summary",
+              "type": "html",
+              "width": 864,
+              "height": 40,
+              "html": "<p class=\"summary\">{{ summary }}</p>",
+              "css": ".summary { margin: 0; width: 864px; height: 40px; font: 400 24px Rubik; line-height: 40px; white-space: nowrap; color: #f7f7f8 }",
+              "options": {
+                "position": "208:408",
+                "start": 0.6,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.6,
+                  "duration": 0.5,
+                  "distance": 12,
+                  "easing": "$expo"
+                }
+              }
+            },
+            {
+              "name": "signoff",
+              "type": "html",
+              "width": 864,
+              "height": 40,
+              "html": "<div class=\"row\"><span class=\"focus\">{{ outroSubtitle }}</span></div>",
+              "css": ".row { display: flex; align-items: center; width: 864px; height: 40px } .focus { font: 400 20px Rubik; white-space: nowrap; color: #afb0b4 }",
+              "options": {
+                "position": "208:496",
+                "start": 0.9,
+                "motion": {
+                  "type": "rise",
+                  "delay": 0.9,
+                  "duration": 0.5,
+                  "distance": 12,
+                  "easing": "$expo"
+                }
+              }
+            }
+          ],
+          "kinetic": [
+            {
+              "text": {
+                "en": "{{ outroHeadline }}"
+              },
+              "preset": "rise",
+              "font": "oswald",
+              "size": 64,
+              "color": "#f7f7f8",
+              "fill": {
+                "gradient": {
+                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "angle": 90
+                }
+              },
+              "align": "left",
+              "x": 208,
+              "y": 328,
+              "maxWidth": 864,
+              "delay": 0.2,
+              "role": "headline"
+            },
+            {
+              "text": {
+                "en": "{{ ticket }}"
+              },
+              "preset": "fade",
+              "font": "mono",
+              "size": 18,
+              "color": "#aeb2fb",
+              "align": "right",
+              "x": 1074,
+              "y": 238,
+              "delay": 0.15
+            },
+            {
+              "text": {
+                "en": "Made with LeClap"
+              },
+              "preset": "typewriter",
+              "font": "mono",
+              "size": 14,
+              "color": "#aeb2fb",
+              "align": "right",
+              "x": 1074,
+              "y": 508,
+              "delay": 1.2
+            }
+          ],
+          "graphics": [
+            {
+              "type": "panel",
+              "at": 0,
+              "duration": 0.5,
+              "x": 206,
+              "y": 294,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "panel",
+              "at": 0,
+              "duration": 0.5,
+              "x": 206,
+              "y": 470,
+              "width": 864,
+              "height": 2,
+              "color": "#323337",
+              "from": "left",
+              "ease": "linear"
+            },
+            {
+              "type": "fx",
+              "effect": "sheen",
+              "target": {
+                "x": 160,
+                "y": 192,
+                "w": 960,
+                "h": 384,
+                "radius": 20
+              },
+              "at": 1.9,
+              "duration": 0.8,
+              "width": 0.14,
+              "tilt": 18,
+              "color": "#ffa8bf",
+              "intensity": 0.7
+            }
+          ]
         }
       ]
     }

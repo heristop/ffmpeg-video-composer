@@ -13,8 +13,11 @@ LeClap creates the artifact. Uploading it remains an explicit step in your GitHu
 
 - `walkthrough`: a screen recording of the implementation under review
 - `project`: the project name shown on the opening card
+- `ticket`: the pull or merge request, decoded in the card's corner (`PR #123`)
 - `change`: a concise name for the change
-- `reviewFocus`: the behavior the reviewer should watch
+- `reviewFocus`: the behavior the reviewer should watch, on the opening card, over the recording and on the review card
+
+The cards use the LeClap evidence look shared with the [evidence-video skill](#evidence-video-agent-skill): the ink canvas, the brand gradient on the headline, Oswald, Rubik and Roboto Mono. The recording plays ungraded, with one ink label in its bottom-left corner.
 
 ## Validate
 
@@ -30,6 +33,7 @@ Run this command from this directory after placing the recording at `./evidence/
 npx @leclap/cli render template.json \
   --video walkthrough=./evidence/walkthrough.mp4 \
   --field project="Example project" \
+  --field ticket="PR #123" \
   --field change="Keyboard navigation" \
   --field reviewFocus="Focus order and visible focus states" \
   --output ./build/pr-evidence.mp4
@@ -41,16 +45,16 @@ Then attach `./build/pr-evidence.mp4` to the PR/MR description or a review comme
 
 For a UI change, a single walkthrough still leaves the reviewer comparing against memory. [`before-after.json`](./before-after.json) shows both behaviors in one short clip:
 
-1. a title card with the project and the change
-2. the `before` recording, badged **BEFORE**
-3. a wipe to the `after` recording, badged **AFTER**
+1. a LeClap card with the change, the ticket and the two outcomes, **BEFORE** in rose and **AFTER** in lavender
+2. the `before` recording, labelled **BEFORE**
+3. a wipe to the `after` recording, labelled **AFTER**
 4. a card that says what to review
 
 ### Inputs
 
 - `before`: the walkthrough on the base branch (the first 3.8 s are used)
-- `after`: the same walkthrough on the branch under review (the first 4.2 s are used)
-- `project`, `change`, `beforeCaption`, `afterCaption`, `reviewFocus`: the card and badge texts, set in the template's `global.variables`
+- `after`: the same walkthrough on the branch under review (the first 4.8 s are used)
+- `project`, `ticket`, `change`, `beforeCaption`, `afterCaption`, `reviewFocus`: the card and badge texts, set in the template's `global.variables`
 
 Copy the template next to your evidence and edit those variables to describe your change.
 
@@ -63,7 +67,7 @@ npm i -D @playwright/test && npx playwright install chromium
 node demo-shop/record.mjs
 ```
 
-This writes `./evidence/before.mp4` and `./evidence/after.mp4`. The demo shop's texts, if you want to reproduce the example exactly: project `Kiln & Co. — shop`, change `Make Add to cart obvious`, beforeCaption `A faint link, and no feedback`, afterCaption `One button, instant cart drawer`, reviewFocus `Button contrast and drawer focus`.
+This writes `./evidence/before.mp4` and `./evidence/after.mp4`. The demo shop's texts, if you want to reproduce the example exactly: project `Kiln & Co. shop`, ticket `SHOP-123`, change `Make add to cart obvious`, beforeCaption `A faint link, no feedback`, afterCaption `One button, then the cart`, reviewFocus `Button contrast, then the drawer`. The showcase preview uses exactly these.
 
 ### Validate and render
 
@@ -104,18 +108,22 @@ For another branch, keep the partial and the label pattern, and swap in that bra
 
 ## Evidence-video agent skill
 
-[`evidence-skill/`](./evidence-skill) turns the before/after idea into an agent skill a team can copy into `.agents/skills/evidence-video/` of the app under review. `before-after.json` lets LeClap draw its own badges and lower thirds; the skill's `build.py` composes every card and panel with ffmpeg first, then hands them to LeClap for the crossfades, the watermark and the render. That buys three things:
+[`evidence-skill/`](./evidence-skill) turns the before/after idea into an agent skill a team can copy into `.agents/skills/evidence-video/` of the app under review. Where `before-after.json` plays the two recordings one after the other, the skill plays them side by side and in step, inside a LeClap slate:
 
-- a label panel beside each clip, with the BEFORE/AFTER badge, a title and a wrapped description, while the capture plays next to it, letterboxed rather than cropped;
-- copy wrapped on the font's measured glyph widths, with a hard stop (`Overflow: desc: 8 lines > 6 allowed`) instead of text running off the frame;
-- one house style: colours, fonts and geometry pinned in `template.json`, applied by the script, and the traps plus the capture and publish checklists in [`SKILL.md`](./evidence-skill/SKILL.md), so every change's video looks like the last one.
+- a clapperboard intro on the ink canvas: the mark, the ticket, a brand-gradient headline that tracks in, the change in one line and the BEFORE/AFTER fields, then one clap on the cut into the comparison;
+- BEFORE and AFTER at the same time in two exact 4:3 panes, each trimmed so the change lands on the same second, letterboxed rather than cropped when the capture is not 4:3;
+- an optional freeze on that second, with a `frame` highlight around the changed area of each pane and a one-line callout per side;
+- copy measured on the fonts' real glyph advances, with a hard stop (`Overflow: before desc: 3 lines > 2 allowed`) instead of text running off the frame, and `leclap validate` on the resolved template;
+- a byte-identical re-render: the template pins `fps`, `seed` and the engine defaults, and the render runs with `--manifest --qc`.
 
-It needs Python 3 (standard library only) and an ffmpeg with `drawtext`. On the demo shop:
+`template.json` draws the slate, the closing card, the highlights and the clap; the skill's `build.py` composes the comparison clip with ffmpeg and fills the template's typed fields from one content file. The traps and the capture and publish checklists are in [`SKILL.md`](./evidence-skill/SKILL.md).
+
+It needs Python 3 (standard library only), an ffmpeg with `drawtext`, and `rsvg-convert` to rasterise the mark. On the demo shop:
 
 ```bash
 node demo-shop/record.mjs --out build/evidence/raw
 python3 evidence-skill/build.py --content evidence-skill/content.example.json --work build/evidence \
-  --logo ../../apps/leclap-web/public/favicon.svg --leclap "npx @leclap/cli"
+  --leclap "npx @leclap/cli"
 ```
 
-The video lands in `build/evidence/shop-123-evidence.mp4`, which git ignores.
+The video lands in `build/evidence/leclap-shop-123-evidence.mp4`, which git ignores.

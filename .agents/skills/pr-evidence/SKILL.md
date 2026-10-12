@@ -36,7 +36,7 @@ Work from two worktrees, one on the merge base and one on the branch, so both si
 - Drive the pages with a standalone Playwright script, not the Playwright MCP, which throttles to about 2 fps and can return stale frames. Models to copy: `.github/pr-media/{typed-fields,open-in-builder,webmcp}/record.mjs` and `camera-warmup/capture.mjs`. Their `make-media.sh` siblings also write an animated WebP (`-loop 0`): don't copy that step, the video replaces it.
 - Viewports: **1440×900** and **390×844**, at device scale factor 2.
 - Themes: light **and** dark where the surface supports both. The studio is dark-only (`StudioSurface.tsx`), so shoot it once.
-- Record the flow with `recordVideo: { dir, size: { width: 1024, height: 768 } }` on the browser context. That gives the capture the video is built from; Playwright's default 800×800 is smaller than the video's 960×720 stage and gets upscaled.
+- Record the flow with `recordVideo: { dir, size: { width: 1024, height: 768 } }` on the browser context. That gives the capture the video is built from: a 1024×768 capture fills each 4:3 pane exactly, any other shape is letterboxed, and Playwright's default 800×800 gets upscaled.
 
 ### Expo (`apps/leclap-expo`)
 
@@ -55,21 +55,22 @@ Work from two worktrees, one on the merge base and one on the branch, so both si
 
 ## 4. The video, made by LeClap
 
-Render it with the house before/after workflow in `examples/agentic-pr-video/evidence-skill/`. Read that skill's `SKILL.md` before the first render.
+Render it with the house before/after workflow in `examples/agentic-pr-video/evidence-skill/`. Read that skill's `SKILL.md` before the first render. The video is a LeClap slate, the two runs side by side and in step (with an optional freeze and highlights), and a closing card.
 
 ```bash
 pnpm --filter ffmpeg-video-composer build && pnpm --filter @leclap/cli build   # render with the working copy
 python3 examples/agentic-pr-video/evidence-skill/build.py \
   --content <work>/content.json --work <work> \
-  --logo apps/leclap-web/public/favicon.svg \
   --leclap "node packages/leclap-cli/dist/index.js"
 ```
 
-- **Run `build.py`**: don't hand-compose cards around `template.json`. `--content` is the only file you write; copy `content.example.json`.
-  - `trim` is a **start offset** into the capture, not a duration.
-  - An `Overflow` error means the copy is too long: shorten it, never widen the box.
+`build.py` finds the LeClap mark (`apps/leclap-web/public/favicon.svg`) and the fonts in the repo, and renders with `--manifest --qc`.
+
+- **Run `build.py`**: don't hand-compose a comparison around `template.json`. `--content` is the only file you write; copy `content.example.json`. It holds `ticket`, `summary` (the change in one line), `intro.headline`, `outro{headline, subtitle}`, an optional `clipSeconds` and `freeze{at, hold}`, and `sides[]` (`before`, then `after`), each with `badge`, `capture`, `trim`, `chip`, `pane{title, desc}`, and with a freeze its `highlight{x, y, w, h}` (capture pixels) and an optional `callout`.
+  - `trim` is a **start offset** into the capture, not a duration. Set each side's trim so both runs reach the change at the same second, and `freeze.at` to that second.
+  - An `Overflow` error, or `leclap validate` refusing the resolved template, means the copy is too long: shorten it, never widen the box.
 - **FFmpeg**: the cards need an FFmpeg with `drawtext`. Use mise's or `ffmpeg-static` on PATH; Homebrew's has none.
-- **Output**: one `.mp4`, H.264 `yuv420p`, tagged bt709 (a bt470bg/yuvj420p tag freezes the video in Chrome), with faststart. Aim for 20–40 s and a few MB.
+- **Output**: one `.mp4`, H.264 `yuv420p`, tagged bt709 (a bt470bg/yuvj420p tag freezes the video in Chrome), with faststart. Aim for 15–40 s and **under 10 MB**, GitHub's attachment cap on free plans.
 - **Watch it** at full speed and on a frame sheet: `ffmpeg -i evidence.mp4 -vf fps=1,scale=480:-2,tile=6x4 sheet.png`.
   - Check both sides read clearly and the labels are right.
   - Check the after side really is the branch.
@@ -77,24 +78,38 @@ python3 examples/agentic-pr-video/evidence-skill/build.py \
 
 ## 5. Store and embed
 
-- **Storage**: put everything under `.github/pr-media/<pr-slug>/`. That means the curated WebP snapshots, the `.mp4`, and the script that produced them (`record.mjs`, `make-media.sh`, `content.json`), so the evidence can be regenerated. Commit them with the PR. This overrides the example skill's "evidence is not committed": that rule is for its scratch renders, while this repo keeps the PR's curated evidence in git. Keep raw captures and scratch renders out of git, in the session scratchpad or a git-ignored `build/`.
+- **Storage**: put everything under `.github/pr-media/<pr-slug>/`. That means the curated WebP snapshots, the `.mp4`, and the script that produced them (`record.mjs`, `make-media.sh`, `content.json`), so the evidence can be regenerated. Name the video `<project>-<ticket>-evidence.mp4` (e.g. `leclap-pr-112-evidence.mp4`; `build.py` does it, with the project from the `origin` remote and the ticket from `content.json`), so a downloaded file still says what it proves. Commit them with the PR. This overrides the example skill's "evidence is not committed": that rule is for its scratch renders, while this repo keeps the PR's curated evidence in git. Keep raw captures and scratch renders out of git, in the session scratchpad or a git-ignored `build/`.
 - **Images**: use `raw.githubusercontent.com` URLs **pinned to the full commit SHA** that contains them. Pushing new media, or rewriting the branch with a force-push, means updating the pins: a rewritten SHA stops resolving once it's garbage-collected.
 
   ```markdown
   ![Builder, 390 px: before and after](https://raw.githubusercontent.com/heristop/leclap/<full-sha>/.github/pr-media/<pr-slug>/builder-390.webp)
   ```
 
-- **Video**: embed it inline, not as a link. GitHub only plays an uploaded attachment inline.
-  - Upload the `.mp4` through GitHub's attachment flow: drag it into the PR description in the web editor. If the user has connected a browser and authorised editing the PR, browser automation can do the same.
-  - Paste the returned `https://github.com/user-attachments/assets/…` URL on its own line; it renders as a player.
-  - **If the upload isn't possible in this session**, link the poster still to the committed file (`https://github.com/heristop/leclap/raw/<full-sha>/.github/pr-media/<pr-slug>/evidence.mp4`), say in the description that the inline upload is pending, and tell the user.
+- **Video: the inline player is mandatory.** The PR is not done until the video plays in the description. A poster image linking to the `.mp4`, or any link to the file, is **not** an acceptable fallback: GitHub downloads it instead of playing it. Only a GitHub attachment URL, `https://github.com/user-attachments/assets/<id>` pasted on its own line, renders as an inline player; `<video>` tags and `raw.githubusercontent.com` or `github.com/<repo>/raw/…` links don't play.
+  - There is no REST or `gh` API for these uploads: only a logged-in GitHub session can make one, and that session is the user's own browser. Drive it with the agent's browser tool (Claude in Chrome, or the equivalent in Codex). Never sign in for the user, and never use a headless or separate browser profile: it isn't logged in.
+  - **Attach, automated** ([`attach-video.js`](./attach-video.js)):
+    1. Commit and push the `.mp4` first, then build its raw URL pinned to the full SHA: `https://raw.githubusercontent.com/heristop/leclap/<full-sha>/.github/pr-media/<pr-slug>/evidence.mp4`.
+    2. Open the PR's conversation page in the user's browser.
+    3. With the browser tool's JavaScript execution, paste `attach-video.js` and run `await attachVideo('<raw-url>')`. The page fetches the file itself (no local file access needed), drops it into the comment box the way a drag-and-drop does, waits for GitHub's `https://github.com/user-attachments/assets/<id>` link, and restores the box: no comment is posted.
+    4. Write that URL into the description with `gh pr edit <n> --body-file …`, on its own line right after the opening reason.
+    5. Verify: `gh pr view <n> --json body` contains the URL, and the PR page shows a `<video>` element in the description.
+  - **Fallback, when the script can't run** (no browser tool connected, or the user isn't logged in): embed the capture `build.py` writes beside the video (`<project>-<ticket>-evidence.webp`, the frozen comparison with a play button and "Download the evidence video"), linked to the committed `.mp4`, so one click downloads it:
+
+    ```markdown
+    [![Evidence video, made with LeClap: click to download](https://raw.githubusercontent.com/heristop/leclap/<full-sha>/.github/pr-media/<pr-slug>/leclap-pr-<n>-evidence.webp)](https://raw.githubusercontent.com/heristop/leclap/<full-sha>/.github/pr-media/<pr-slug>/leclap-pr-<n>-evidence.mp4)
+    ```
+
+    Tell the user in chat that the inline player is waiting for their browser, and swap the capture for the `user-attachments` line as soon as it's connected. No "pending" note in the description: the capture is the fallback.
+
+  - Never say the evidence is complete while only the fallback is in place.
+  - The committed `.mp4` under `.github/pr-media/<pr-slug>/` stays the source of truth for regenerating the video; the attachment is what plays.
   - **No GIF anywhere**, not even as a preview.
-- **Publishing needs consent**: uploading, committing, pushing and editing the PR are outward-facing. Do them only once the user has asked for the PR or approved it.
+- **Publishing needs consent**: uploading the video, committing, pushing and editing the PR are outward-facing. Do them only once the user has asked for the PR or approved it.
 
 ## 6. Description shape
 
 - **Open with the reason**: the defect, or what was missing, in plain words. Never open with the change list.
-- **Show the evidence right after**: the video first, then the snapshot pairs with one-line captions (viewport, theme, state).
+- **Show the evidence right after**: the video first, as its `user-attachments` URL on its own line so it plays inline (or, until the browser is connected, the click-to-download capture), then the snapshot pairs with one-line captions (viewport, theme, state).
 - **Then** the change, the tests, and anything a reviewer must know: what wasn't captured and why, follow-ups.
 - No AI attribution in the description or the commits.
 
@@ -104,7 +119,8 @@ python3 examples/agentic-pr-video/evidence-skill/build.py \
 - [ ] Before from `git merge-base origin/main HEAD`, after from the branch, same state and data.
 - [ ] Web: 1440 and 390 px, light and dark where both exist. Expo: iOS simulator and Android emulator, Release builds.
 - [ ] Every snapshot is a still WebP, looked at, about 15 at most, and pinned to the full commit SHA.
-- [ ] The video is rendered by LeClap (`build.py` + the CLI or MCP), H.264 bt709 with faststart, and watched end to end.
-- [ ] The video is embedded inline (`user-attachments`), or the fallback link is in place and the pending upload is stated. No GIF.
+- [ ] The video is rendered by LeClap (`build.py` + the CLI or MCP), H.264 bt709 with faststart, under 10 MB, and watched end to end.
+- [ ] The video plays inline in the saved description: a `user-attachments` URL on its own line, checked on the page or in `gh pr view --json body`. Without a connected browser, the click-to-download capture is in place and the user knows the player is waiting. No GIF.
+- [ ] The video is named `<project>-<ticket>-evidence.mp4`.
 - [ ] The media and the scripts that made them are in `.github/pr-media/<pr-slug>/`.
 - [ ] The description opens with the reason.

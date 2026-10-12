@@ -134,14 +134,8 @@ describe('packaged sample catalog', () => {
     expect(app.requirements.assets).toContainEqual(
       expect.objectContaining({ reference: 'lofi-study.mp3', kind: 'music' })
     );
-    expect(getSample('house-evidence').requirements.projectVideos.map(({ name }) => name)).toEqual([
-      'intro',
-      'beforecard',
-      'beforeclip',
-      'aftercard',
-      'afterclip',
-      'outro',
-    ]);
+    // The house evidence video records one clip: build.py composes BEFORE and AFTER side by side into it.
+    expect(getSample('house-evidence').requirements.projectVideos.map(({ name }) => name)).toEqual(['sidebyside']);
     expect(getSample('before-after').requirements.variables).toContainEqual(
       expect.objectContaining({ name: 'change', default: 'Describe the change', placeholders: ['{{ change }}'] })
     );
@@ -174,8 +168,8 @@ describe('packaged sample catalog', () => {
     expect(custom.requirements.setup.join(' ')).toMatch(/--allow-remotion/);
   });
 
-  it.each(['pr-evidence', 'before-after'])('discloses effective title card and lower third fonts for %s', (id) => {
-    const presetFonts = getSample(id).requirements.assets.filter((asset) => asset.source === 'preset');
+  it('discloses effective title card and lower third fonts', () => {
+    const presetFonts = getSample('present-yourself').requirements.assets.filter((asset) => asset.source === 'preset');
     expect([...new Set(presetFonts.map(({ reference }) => reference))].sort()).toEqual(['Anton.ttf', 'Oswald.ttf']);
     expect(presetFonts.some(({ path }) => path.includes('.titleCard.'))).toBe(true);
     expect(presetFonts.some(({ path }) => path.includes('.lowerThird.'))).toBe(true);

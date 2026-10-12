@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { bundledVideoFor, fieldsFor, videoFor } from './fixtures.ts';
+import { bundledVideoFor, evidenceCopyFor, fieldsFor, videoFor } from './fixtures.ts';
 import { encodePreview } from './preview-export.ts';
 import { loadDescriptor } from './load-descriptor.ts';
 import { prepareSynthetic, prerenderedFor, previewMedia, withVariables } from './synthetic-media.ts';
@@ -62,6 +62,8 @@ const POSTER_AT = {
   'html-speaker': 2.4,
   'html-stats': 2.4,
   'effects-tour': 2.2,
+  'pr-evidence': 2.6,
+  'before-after': 2.6,
 };
 const fields = {
   form_1_name: 'KILN',
@@ -217,7 +219,9 @@ async function evidenceInputs(sample, template) {
     clips[section.name] = path.join(directory, 'raw', `${section.name === 'before' ? 'before' : 'after'}.mp4`);
   }
 
-  return { template, assetRoot: library, clips, sampleFields: fields };
+  const copy = withVariables(template, evidenceCopyFor(sample.id));
+
+  return { template: copy, assetRoot: library, clips, sampleFields: fields };
 }
 async function nativeInputs(sample, template) {
   const clips = {};

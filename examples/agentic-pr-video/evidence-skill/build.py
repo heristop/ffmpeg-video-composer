@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-"""Compose a before/after evidence video's cards and panels with ffmpeg, then hand them to LeClap.
+"""Build the LeClap before/after evidence video: compose the comparison clip, then hand it to LeClap.
 
-  python3 build.py --content content.json --work build/evidence --logo mark.svg --leclap "npx @leclap/cli"
+  python3 build.py --content content.json --work build/evidence --leclap "npx @leclap/cli"
 
---content is the only file you write; content.example.json is its shape. Every colour, font, size,
-position and easing comes from global.variables in template.json, so a render is reproducible from
-those two files. LeClap then does the join: the crossfades, the watermark and the final encode.
+--content is the only file you write; content.example.json is its shape. The video is the LeClap
+slate (intro), the two runs side by side and in step, and the closing card (outro).
 
-ffmpeg draws the cards because the house layout needs what LeClap's titleCard/lowerThird text sugar
-does not do: a label column beside the playing clip, BEFORE/AFTER chips lined up with their copy, and
-every string wrapped on measured glyph widths (drawtext itself never wraps).
+LeClap draws the slate and the outro from template.json: HTML layers for the board and its fields,
+kinetic type for the headline and the ticket, the card's sheen and clap, and the `frame` highlights. This
+script composes what the engine cannot: two exact 4:3 panes playing at once, each trimmed so the
+change lands on the same second, the freeze baked into both, and the pane labels and callouts, all
+measured on real glyph advances so nothing runs off its box. Every colour, size and position comes
+from global.variables in template.json, so a render is reproducible from those two files.
 """
 
 import argparse
@@ -23,23 +25,34 @@ import shutil
 import subprocess
 import sys
 
-from wrap import CopyError, cap_height, fits, line_height, wrap_checked
+from wrap import CopyError, cap_height, fits, width, wrap_checked
 
 SKILL_DIR = pathlib.Path(__file__).resolve().parent
-# Where the LeClap repo keeps its OFL fonts. A copy of the skill elsewhere finds them in ./fonts.
+# Where the LeClap repo keeps its OFL fonts and its mark. A copy of the skill elsewhere finds the
+# fonts in ./fonts and takes the mark from --logo.
 LIBRARY_FONTS = pathlib.Path("packages/leclap-creative-kit/src/library/fonts")
+LECLAP_MARK = pathlib.Path("apps/leclap-web/public/favicon.svg")
+MARK_ASSET = "images/leclap-mark.png"
+# The mark is drawn at 40 px on the slate; rasterise it at 4x so the engine's downscale stays crisp.
+MARK_RASTER = 160
 
 # Compose in RGB and convert once, with the matrix the engine tags its output with. drawbox and
 # drawtext convert their colours with BT.601 on a YUV frame, and the engine stamps BT.709 on every
-# segment, so composing in YUV decodes the BEFORE red a few points off the colour it was given.
+# segment, so composing in YUV decodes the BEFORE rose a few points off the colour it was given.
 TO_BT709 = "scale=out_color_matrix=bt709:out_range=tv,format=yuv420p"
 BT709_TAGS = ["-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv"]
 
-# The label panel's vertical rhythm, in px: chip to rule, rule to title, title to description, and
-# the accent rule's full width.
-RULE_GAP, TITLE_GAP, DESC_GAP, RULE_W = 12, 14, 16, 88
-# Space between a chip and its neighbour in the intro rows.
-ROW_GAP = 28
+# The template's copy inputs, filled from the content file.
+FIELD_NAMES = ("ticket", "headline", "summary", "beforeBadge", "afterBadge", "beforeChip", "afterChip",
+               "outroHeadline", "outroSubtitle")
+# HTML layers are drawn by Satori at the weight their CSS asks for (Rubik 400, Oswald 400), while
+# wrap.py measures the font file's default instance (Rubik Light). Heavier weights run a little
+# wider, so slate copy must fit 96 % of its box here; `leclap validate` then measures the real
+# layout and reports html_overflow, which this script treats as a hard stop too.
+HTML_SLACK = 0.96
+# The engine findings that mean the slate would not draw as authored.
+BLOCKING_FINDINGS = {"html_overflow", "html_missing_field", "html_font_unknown", "html_unavailable",
+                     "field_type_mismatch", "field_missing_required"}
 
 
 class V:
@@ -77,15 +90,9 @@ class V:
         return str(path)
 
 
-def ease(v, kind, start, duration):
-    progress = f"clip((t-{start})/{duration},0,1)"
-    power = v.i("motion.easeOutPow") if kind == "out" else v.i("motion.springPow")
-    return f"(1-pow(1-{progress},{power}))"
-
-
-# Every path this script hands ffmpeg is spliced raw into the `-vf` filtergraph, where these
-# characters are syntax: a colon in --work truncates the option and ffmpeg reports "No option name
-# near …", which reads like a filter bug rather than the path problem it actually is.
+# Every path this script hands ffmpeg is spliced raw into the filtergraph, where these characters
+# are syntax: a colon in --work truncates the option and ffmpeg reports "No option name near …",
+# which reads like a filter bug rather than the path problem it actually is.
 _FILTER_HOSTILE = frozenset(":,;'\\[]")
 
 
@@ -98,8 +105,8 @@ def check_filter_path(label, path):
 _seq = itertools.count()
 
 
-def txt(text, font, size, colour, x, top, alpha, extra="", *, tmp):
-    """One animated `drawtext`, with its copy passed by FILE rather than inline, its capitals at `top`.
+def txt(text, font, size, colour, x, baseline, alpha="1", extra="", *, tmp):
+    """One `drawtext` line with its BASELINE at `baseline`, its copy passed by FILE rather than inline.
 
     `text='…'` cannot carry an apostrophe. Not "needs escaping": cannot. `\\'`, `'\\''` and `\\\\'`
     all exit 0 and all render "it's" as "its", dropping the character silently, and one of them also
@@ -110,15 +117,13 @@ def txt(text, font, size, colour, x, top, alpha, extra="", *, tmp):
     `expansion=none` closes the other half of the same hole: drawtext expands `%{…}` out of a
     textfile exactly as it does inline, so a bare `%` in copy is ffmpeg syntax until switched off.
 
-    drawtext's own `y` is the top of the tallest glyph the line happens to contain, so an accented
-    capital (É, À) pushes the whole line down and a chip reading APRÈS sits lower than its row.
-    Anchoring on the baseline (`max_glyph_a` is the line's tallest ascent) puts every line where the
-    geometry says, on FFmpeg 6.0 and 8.1 alike.
+    drawtext's `y` is the top of the line box, which moves with the font and its size, so two sizes
+    given one `y` do not share a baseline. `ascent` is the font's own, the same for every line, so
+    `baseline-ascent` puts every face on the grid, accented capitals (É, À) included.
     """
-    baseline = f"({top})+{cap_height(font, size)}"
     return (
         f"drawtext=textfile={_tmp_line(text, tmp)}:fontfile={font}:fontsize={size}"
-        f":fontcolor={colour}:expansion=none:x={x}:y='{baseline}-max_glyph_a':alpha='{alpha}'{extra}"
+        f":fontcolor={colour}:expansion=none:x={x}:y='{baseline}-ascent':alpha='{alpha}'{extra}"
     )
 
 
@@ -131,83 +136,15 @@ def _tmp_line(text, tmp):
     return path
 
 
-def source_args(v, src, ss, dur):
-    if src is None:
-        w, h = v.i("geom.canvas", 0), v.i("geom.canvas", 1)
-        return ["-f", "lavfi", "-i", f"color=c={v.s('colour.surface')}:s={w}x{h}:d={dur}:r={v.fps}"]
-    return ["-ss", f"{ss:.3f}", "-t", f"{dur:.3f}", "-i", str(src)]
-
-
-def encode(v, vf, out, dur, src=None, ss=0.0):
-    cmd = [v.ffmpeg, "-y", "-hide_banner", "-loglevel", "error", *source_args(v, src, ss, dur)]
-    cmd += ["-vf", f"{vf},{TO_BT709}", "-r", str(v.fps), "-an", "-c:v", "libx264", "-crf", "16"]
-    subprocess.run([*cmd, "-pix_fmt", "yuv420p", *BT709_TAGS, str(out)], check=True)
-
-
-def centred(v, where, lines):
-    """Budget each centred line against the card's measure: nothing on a card wraps."""
-    measure = v.i("geom.canvas", 0) - 2 * v.i("geom.cardMargin")
-    for part, text, font, size in lines:
-        fits(f"{where} {part}", text, font, size, measure)
-
-
-def card(v, out, kicker, head, sub, accent, dur, tmp):
-    ky, hy, ry, sy = (v.i("geom.card", i) for i in range(4))
-    rw, rh = v.i("geom.rule", 0), v.i("geom.rule", 1)
-    gentle, slow = v.s("motion.gentle"), v.s("motion.slow")
-    label, display, body = v.font("font.label"), v.font("font.display"), v.font("font.body")
-    kicker_size, head_size, sub_size = v.i("size.kicker"), v.i("size.headline"), v.i("size.subtitle")
-    centred(v, out.stem, [("kicker", kicker, label, kicker_size), ("headline", head, display, head_size),
-                          ("subtitle", sub, body, sub_size)])
-    f = [
-        "format=rgb24",
-        txt(kicker, label, kicker_size, accent, "(w-text_w)/2", f"({ky})+(1-{ease(v, 'out', 0.00, gentle)})*16",
-            ease(v, "out", 0.00, gentle), tmp=tmp),
-        txt(head, display, head_size, v.s("colour.ink"), "(w-text_w)/2",
-            f"({hy})+(1-{ease(v, 'spring', 0.06, slow)})*28", ease(v, "out", 0.06, 0.20), tmp=tmp),
-        (f"drawbox=x='(iw-{rw}*{ease(v, 'out', 0.20, gentle)})/2':y={ry}"
-         f":w='max(2,{rw}*{ease(v, 'out', 0.20, gentle)})':h={rh}:c={accent}@1:t=fill"),
-        txt(sub, body, sub_size, v.s("colour.inkSubtle"), "(w-text_w)/2",
-            f"({sy})+(1-{ease(v, 'out', 0.30, gentle)})*16", ease(v, "out", 0.30, gentle), tmp=tmp),
-    ]
-    encode(v, ",".join(f), out, dur)
-
-
-def intro(v, out, kicker, head, rows, dur, tmp):
-    ky, hy = v.i("geom.card", 0) - 80, v.i("geom.card", 1) - 80  # the rows need the room; keep the gap
-    rw, rh = v.i("geom.rule", 0), v.i("geom.rule", 1)
-    gentle, slow = v.s("motion.gentle"), v.s("motion.slow")
-    badge_size, desc_size, pad = v.i("size.introBadge"), v.i("size.introDesc"), v.i("geom.badgePad") - 1
-    display, body, label = v.font("font.display"), v.font("font.body"), v.font("font.label")
-    kicker_size, head_size, canvas_w = v.i("size.kicker"), v.i("size.headline"), v.i("geom.canvas", 0)
-    centred(v, "intro", [("kicker", kicker, label, kicker_size), ("headline", head, display, head_size)])
-    chip_w = int(max(fits(f"intro badge {badge}", badge, display, badge_size, 400) for badge, _, _ in rows)) + 2 * pad
-    widest = max(fits("intro chip copy", chip, body, desc_size, 700) for _, _, chip in rows)
-    chip_x = int((canvas_w - (chip_w + ROW_GAP + widest)) / 2)
-    desc_x = chip_x + chip_w + ROW_GAP
-    f = [
-        "format=rgb24",
-        txt(kicker, label, kicker_size, v.s("colour.neutral"), "(w-text_w)/2",
-            f"({ky})+(1-{ease(v, 'out', 0.00, gentle)})*16", ease(v, "out", 0.00, gentle), tmp=tmp),
-        txt(head, display, head_size, v.s("colour.ink"), "(w-text_w)/2",
-            f"({hy})+(1-{ease(v, 'spring', 0.06, slow)})*28", ease(v, "out", 0.06, 0.20), tmp=tmp),
-        (f"drawbox=x='(iw-{rw}*{ease(v, 'out', 0.20, gentle)})/2':y={v.i('geom.introRule')}"
-         f":w='max(2,{rw}*{ease(v, 'out', 0.20, gentle)})':h={rh}:c={v.s('colour.neutral')}@1:t=fill"),
-    ]
-    for index, (badge, accent, chip) in enumerate(rows):
-        y = v.i("geom.introRowY") + index * v.i("geom.introRowGap")
-        start = 0.34 + index * v.f("motion.stagger")
-        # A box sized by drawtext itself (box=1) auto-fits its text, so a longer badge cannot overflow.
-        # The box grows `pad` around the text, so the text is inset by it to put the box at chip_x/y.
-        f.append(txt(badge, display, badge_size, v.s("colour.onAccent"), chip_x + pad, f"({y + pad})",
-                     ease(v, "out", start, v.s("motion.quick")),
-                     f":box=1:boxcolor={accent}@1:boxborderw={pad}", tmp=tmp))
-        # The copy shares the chip's baseline, whatever the two fonts' cap heights.
-        copy_top = y + pad + cap_height(display, badge_size) - cap_height(body, desc_size)
-        f.append(txt(chip, body, desc_size, v.s("colour.inkSubtle"), desc_x,
-                     f"({copy_top})+(1-{ease(v, 'out', round(start + 0.06, 2), gentle)})*12",
-                     ease(v, "out", round(start + 0.06, 2), gentle), tmp=tmp))
-    encode(v, ",".join(f), out, dur)
+def stepped_box(x, y, w, h, colour, thickness, t0, t1, fade, fps):
+    """A box that fades in at `t0` and out by `t1`. drawbox evaluates its colour once, so the fade is
+    a run of boxes, one per frame of each ramp, each behind its own `enable` window."""
+    count = max(1, round(fade * fps))
+    steps = [(t0 + k / fps, t0 + (k + 1) / fps, (k + 1) / (count + 1)) for k in range(count)]
+    steps.append((t0 + count / fps, t1 - count / fps, 1.0))
+    steps += [(t1 - (count - k) / fps, t1 - (count - k - 1) / fps, (count - k) / (count + 1)) for k in range(count)]
+    return [f"drawbox=x={x}:y={y}:w={w}:h={h}:c={colour}@{alpha:.3f}:t={thickness}"
+            f":enable='between(t,{start:.4f},{end:.4f})'" for start, end, alpha in steps]
 
 
 def probe(ffmpeg, path):
@@ -219,90 +156,177 @@ def probe(ffmpeg, path):
     if not size:
         raise SystemExit(f"no video stream in {path}")
     duration = re.search(r"Duration: (\d+):(\d+):(\d+(?:\.\d+)?)", banner)
-    seconds = None
-    if duration:
-        hours, minutes, secs = duration.groups()
-        seconds = int(hours) * 3600 + int(minutes) * 60 + float(secs)
-    return seconds, int(size.group(1)), int(size.group(2))
+    if not duration:
+        raise SystemExit(f"{path} has no duration header: remux it (ffmpeg -i in -c copy out.mp4) so the "
+                         "trim can be checked against its length")
+    hours, minutes, secs = duration.groups()
+    return int(hours) * 3600 + int(minutes) * 60 + float(secs), int(size.group(1)), int(size.group(2))
 
 
-def capture_hold(out, capture_seconds, ss, dur):
-    """Seconds of last-frame hold needed so the clip fills its section, or a hard stop."""
-    if capture_seconds is None:
-        print(f"  {out.stem}: capture has no duration header; cannot check it covers {dur}s from {ss}s")
-        return 0.0
-    if ss >= capture_seconds:
-        raise SystemExit(f"{out.stem}: trim {ss}s is past the end of the {capture_seconds:.2f}s capture "
-                         "(trim is a START offset, not a length)")
-    missing = round(ss + dur - capture_seconds, 3)
-    if missing <= 0:
-        return 0.0
-    # The engine would pad or truncate silently; holding the final state is the honest version.
-    print(f"  {out.stem}: capture ends {missing:.2f}s early; holding its last frame")
-    return missing
-
-
-def panel(v, out, src, ss, dur, accent, badge, title, desc, tmp):
-    vocabulary = v.get("limit.badgeVocabulary")
-    if badge not in vocabulary:
-        raise SystemExit(f"badge {badge!r} not in {vocabulary}: the chip has no room to wrap")
-    canvas_w, canvas_h = v.i("geom.canvas", 0), v.i("geom.canvas", 1)
-    col, pad, pad_badge = v.i("geom.panelWidth"), v.i("geom.panelPad"), v.i("geom.badgePad")
-    measure = col - 2 * pad
-    display, body = v.font("font.display"), v.font("font.body")
-    title_size, desc_size = v.i("size.panelTitle"), v.i("size.panelDesc")
-    fits(f"{badge} chip", badge, display, v.i("size.panelBadge"), measure - 2 * pad_badge)
-    title_lines = wrap_checked("title", title, display, title_size, measure, max_lines=v.i("limit.titleLines"))
-    desc_lines = wrap_checked("desc", desc, body, desc_size, measure, max_lines=v.i("limit.descLines"))
-    # Heights measured from the fonts like the widths, so the block centres on its real height. Each
-    # wrapped line is its own drawtext on that pitch: drawtext's multi-line layout differs between
-    # FFmpeg builds (6.0 spaces lines by the tallest glyph, 6.1+ by the font), and ours does not.
-    line_spacing, rule_h = v.i("geom.lineSpacing"), v.i("geom.rule", 1)
-    chip_h = cap_height(display, v.i("size.panelBadge")) + 2 * pad_badge  # badges are capitals
-    title_pitch = line_height(display, title_size) + line_spacing
-    desc_pitch = line_height(body, desc_size) + line_spacing
-    title_h = len(title_lines) * title_pitch - line_spacing
-    desc_h = len(desc_lines) * desc_pitch - line_spacing
-    block = chip_h + RULE_GAP + rule_h + TITLE_GAP + title_h + DESC_GAP + desc_h
-    y0 = int((canvas_h - block) / 2)
-    rule_y = y0 + chip_h + RULE_GAP
-    title_y = rule_y + rule_h + TITLE_GAP
-    desc_y = title_y + title_h + DESC_GAP
-
-    # Fit the capture inside the stage beside the panel: never crop it (the header and footer are
-    # usually where the change shows) and never stretch it. A 4:3 capture fills the stage exactly.
-    capture_seconds, src_w, src_h = probe(v.ffmpeg, src)
-    stage_w, stage_h = canvas_w - col, canvas_h
-    scale = min(stage_w / src_w, stage_h / src_h)
+def pane_fit(v, src_w, src_h):
+    """Where a capture lands in its 4:3 pane: a pure scale, never cropped, never stretched. A 4:3
+    capture fills the pane exactly; any other shape is letterboxed (or pillarboxed) inside it."""
+    pane_w, pane_h = v.i("geom.pane", 0), v.i("geom.pane", 1)
+    scale = min(pane_w / src_w, pane_h / src_h)
     fit_w, fit_h = int(src_w * scale) // 2 * 2, int(src_h * scale) // 2 * 2
-    fit_x, fit_y = col + (stage_w - fit_w) // 2, (stage_h - fit_h) // 2
-    hairline, gentle = v.s("colour.hairline"), v.s("motion.gentle")
-    f = [
-        f"scale={fit_w}:{fit_h}:flags=lanczos,setsar=1,format=rgb24",
-        f"pad={canvas_w}:{canvas_h}:{fit_x}:{fit_y}:{v.s('colour.stage')}",
-        f"drawbox=x=0:y=0:w={col}:h={canvas_h}:c={v.s('colour.surface')}@1:t=fill",
-        f"drawbox=x={col - 1}:y=0:w=1:h={canvas_h}:c={hairline}@1:t=fill",
-    ]
-    if (fit_w, fit_h) != (stage_w, stage_h):
-        f.append(f"drawbox=x={fit_x - 1}:y={fit_y - 1}:w={fit_w + 2}:h={fit_h + 2}:c={hairline}@1:t=1")
-    f += [
-        txt(badge, display, v.i("size.panelBadge"), v.s("colour.onAccent"), pad + pad_badge, y0 + pad_badge,
-            ease(v, "out", 0.05, v.s("motion.quick")),
-            f":box=1:boxcolor={accent}@1:boxborderw={pad_badge}", tmp=tmp),
-        (f"drawbox=x={pad}:y={rule_y}:w='max(2,{RULE_W}*{ease(v, 'out', 0.20, gentle)})':h={rule_h}"
-         f":c={accent}@1:t=fill"),
-        *(txt(line, display, title_size, v.s("colour.ink"), pad,
-              f"({title_y + index * title_pitch})+(1-{ease(v, 'out', 0.26, gentle)})*14",
-              ease(v, "out", 0.26, gentle), tmp=tmp) for index, line in enumerate(title_lines)),
-        *(txt(line, body, desc_size, v.s("colour.inkSubtle"), pad, desc_y + index * desc_pitch,
-              ease(v, "out", 0.40, gentle), tmp=tmp) for index, line in enumerate(desc_lines)),
-    ]
-    hold = capture_hold(out, capture_seconds, ss, dur)
-    if hold:
-        f.append(f"tpad=stop_mode=clone:stop_duration={hold}")
-    print(f"  {out.stem}: badge {badge} · title {len(title_lines)}L · desc {len(desc_lines)}L · block {block}px"
-          f" · capture {src_w}x{src_h} → {fit_w}x{fit_h}")
-    encode(v, ",".join(f), out, dur, src=src, ss=ss)
+    return scale, fit_w, fit_h, (pane_w - fit_w) // 2, (pane_h - fit_h) // 2
+
+
+def check_capture(side, seconds, clip, freeze):
+    """Refuse a capture that runs out before its pane does. ffmpeg would not end the pane early: the
+    canvas fixes the length and `eof_action=repeat` holds the last frame, so one run would silently
+    stand still, which reads as "nothing happens on this side". A freeze past the end is the same gap."""
+    trim = float(side["trim"])
+    if trim >= seconds:
+        raise SystemExit(f"{side['side']}: trim {trim}s is past the end of the {seconds:.2f}s capture "
+                         "(trim is a START offset, not a length)")
+    need = trim + clip
+    if need <= seconds + 1e-3:
+        return
+    raise SystemExit(f"{side['side']}: the capture holds {seconds:.2f}s but trim {trim}s + clipSeconds {clip}s "
+                     f"needs {need:.2f}s ({need - seconds:.2f}s short), so the pane would freeze on its last "
+                     f"frame{' before the hold' if freeze else ''}. Lower clipSeconds or the trim.")
+
+
+def balanced(lines, font, size):
+    """Re-break a two-line description where its lines come closest in width, so the second line is
+    never one stranded word. Each candidate line is narrower than the greedy first line, so it fits."""
+    if len(lines) != 2:
+        return lines
+    words = " ".join(lines).split()
+    splits = [(" ".join(words[:cut]), " ".join(words[cut:])) for cut in range(1, len(words))]
+    widest = width(lines[0], font, size)
+    candidates = [pair for pair in splits if width(pair[0], font, size) <= widest]
+    return list(min(candidates, key=lambda pair: max(width(pair[0], font, size), width(pair[1], font, size))))
+
+
+def chip(v, x, top, label, colour, *, tmp):
+    """A fixed-width badge: BEFORE and AFTER share one width, so what follows them starts on one x."""
+    display, size = v.font("font.display"), v.i("size.badge")
+    w, h = v.i("geom.chipWidth"), v.i("geom.chipHeight")
+    fits(f"{label} chip", label, display, size, w - 2 * v.i("geom.chipGap"))
+    baseline = top + round((h + cap_height(display, size)) / 2)
+    label_x = f"{x}+({w}-text_w)/2"
+    return [f"drawbox=x={x}:y={top}:w={w}:h={h}:c={colour}@1:t=fill",
+            txt(label, display, size, v.s("colour.ink"), label_x, baseline, tmp=tmp)], baseline
+
+
+def comparison(v, out, sides, work, clip, freeze, ticket, tmp):
+    """The two runs in two 4:3 panes with their labels, the hold baked in, written as one clip.
+
+    The hold is baked HERE (both panes loop the frame at `at` for `hold` seconds) rather than left to
+    the engine's `options.freeze`: that would freeze the whole frame, labels included, so a callout
+    drawn into this clip could never appear during the hold."""
+    canvas_w, canvas_h, fps = v.i("geom.canvas", 0), v.i("geom.canvas", 1), v.fps
+    pane_w, pane_h, pane_y, gap = v.i("geom.pane", 0), v.i("geom.pane", 1), v.i("geom.paneY"), v.i("geom.labelGap")
+    display, body, mono = v.font("font.display"), v.font("font.body"), v.font("font.mono")
+    vocabulary = v.get("limit.badgeVocabulary")
+    hold = float(freeze["hold"]) if freeze else 0.0
+    total = clip + hold
+    loop = (f",loop=loop={round(hold * fps)}:size=1:start={round(float(freeze['at']) * fps)},setpts=N/({fps}*TB)"
+            if freeze else "")
+
+    cmd = [v.ffmpeg, "-y", "-hide_banner", "-loglevel", "error"]
+    graph, last, fits_by_side = [], f"[{len(sides)}:v]", {}
+    for index, side in enumerate(sides):
+        seconds, src_w, src_h = probe(v.ffmpeg, work / side["capture"])
+        check_capture(side, seconds, clip, freeze)
+        scale, fit_w, fit_h, off_x, off_y = pane_fit(v, src_w, src_h)
+        fits_by_side[side["side"]] = (scale, off_x, off_y, src_w, src_h)
+        cmd += ["-ss", f"{float(side['trim']):.3f}", "-t", f"{clip:.3f}", "-i", str(work / side["capture"])]
+        graph.append(f"[{index}:v]fps={fps},scale={fit_w}:{fit_h}:flags=lanczos,setsar=1,format=rgb24,"
+                     f"pad={pane_w}:{pane_h}:{off_x}:{off_y}:{v.s('colour.letterbox')}{loop}[p{index}]")
+        graph.append(f"{last}[p{index}]overlay={v.i('geom.paneX', index)}:{pane_y}:eof_action=repeat[o{index}]")
+        last = f"[o{index}]"
+        print(f"  {side['side']} pane: capture {src_w}x{src_h} → {fit_w}x{fit_h}"
+              + (f" (letterboxed {off_x},{off_y})" if (off_x, off_y) != (0, 0) else ""))
+    cmd += ["-f", "lavfi", "-i", f"color=c={v.s('colour.canvas')}:s={canvas_w}x{canvas_h}:r={fps}:d={total}"]
+
+    margin, header = v.i("geom.margin"), v.i("geom.headerBaseline")
+    signature = "Made with LeClap"
+    sig_w = fits("signature", signature, mono, v.i("size.signature"), canvas_w / 2)
+    ticket_x = margin + v.i("geom.markSize") + 12
+    fits("ticket", ticket, mono, v.i("size.ticket"), canvas_w - ticket_x - sig_w - 2 * margin)
+    # The mark itself is an engine image input at margin:margin, so it is the same file as the slate's.
+    draw = ["format=rgb24",
+            txt(ticket, mono, v.i("size.ticket"), v.s("colour.brand"), ticket_x, header, tmp=tmp),
+            txt(signature, mono, v.i("size.signature"), v.s("colour.muted"), round(canvas_w - margin - sig_w),
+                header, tmp=tmp)]
+    chip_top = pane_y - gap - v.i("geom.chipHeight")
+    for index, side in enumerate(sides):
+        if side["badge"] not in vocabulary:
+            raise SystemExit(f"badge {side['badge']!r} not in {vocabulary}: the chip has no room to wrap")
+        pane_x, accent = v.i("geom.paneX", index), v.s(f"colour.{side['side']}")
+        boxes, baseline = chip(v, pane_x, chip_top, side["badge"], accent, tmp=tmp)
+        title_x = pane_x + v.i("geom.chipWidth") + v.i("geom.chipGap")
+        title_room = pane_w - (title_x - pane_x)
+        title_w = fits(f"{side['side']} title", side["title"], display, v.i("size.title"), title_room)
+        desc = balanced(wrap_checked(f"{side['side']} desc", side["desc"], body, v.i("size.desc"), pane_w,
+                                     max_lines=v.i("limit.descLines")), body, v.i("size.desc"))
+        draw += [f"drawbox=x={pane_x - 1}:y={pane_y - 1}:w={pane_w + 2}:h={pane_h + 2}"
+                 f":c={v.s('colour.divider')}@1:t=1",
+                 *boxes,
+                 txt(side["title"], display, v.i("size.title"), v.s("colour.fg"), title_x, baseline, tmp=tmp),
+                 *(txt(line, body, v.i("size.desc"), v.s("colour.muted"), pane_x,
+                       v.i("geom.descBaselines", number), tmp=tmp) for number, line in enumerate(desc))]
+        callout = side.get("callout") if freeze else None
+        note = ""
+        if callout:
+            mark, stroke, mark_gap = (v.i("geom.calloutMark", k) for k in range(3))
+            size = v.i("size.callout")
+            room = title_room - title_w - v.i("geom.calloutGap") - mark - mark_gap
+            callout_w = fits(f"{side['side']} callout", callout, mono, size, room)
+            # Right-aligned on the title row, never over the capture. It fades in just after the hold
+            # starts and is gone when the runs move again; the square is the highlight's shape and colour.
+            t0 = round(float(freeze["at"]) + v.f("motion.calloutDelay"), 3)
+            t1 = round(float(freeze["at"]) + hold, 3)
+            fade = v.f("motion.calloutFade")
+            callout_x = pane_x + pane_w - round(callout_w)
+            mark_x = callout_x - mark_gap - mark
+            mark_y = round(baseline - cap_height(mono, size) / 2 - mark / 2)
+            alpha = f"min(clip((t-{t0})/{fade},0,1),clip(({t1}-t)/{fade},0,1))"
+            draw += stepped_box(mark_x, mark_y, mark, mark, accent, stroke, t0, t1, fade, fps)
+            draw.append(txt(callout, mono, size, accent, callout_x, baseline, alpha,
+                            f":enable='between(t,{t0},{t1})'", tmp=tmp))
+            note = f" · callout {round(callout_w)}px of {round(room)}px"
+        print(f"  {side['side']} labels: badge {side['badge']} · title {round(title_w)}px of {title_room}px"
+              f" · desc {len(desc)}L{note}")
+
+    graph.append(f"{last}{','.join(draw)},{TO_BT709}[v]")
+    cmd += ["-filter_complex", ";".join(graph), "-map", "[v]", "-t", f"{total:.3f}", "-r", str(fps), "-an",
+            "-c:v", "libx264", "-crf", "16", "-pix_fmt", "yuv420p", *BT709_TAGS, str(out)]
+    subprocess.run(cmd, check=True)
+    return fits_by_side
+
+
+def highlight(v, index, side, fitted, freeze):
+    """An engine `frame` stroke around the changed area of pane `index`, shown only while the runs are
+    held. It fades rather than traces: the point is where it is, not how it arrives."""
+    area = side["highlight"]
+    scale, off_x, off_y, src_w, src_h = fitted
+    if area["x"] < 0 or area["y"] < 0 or area["x"] + area["w"] > src_w or area["y"] + area["h"] > src_h:
+        raise SystemExit(f"sides[{side['side']}].highlight {area} is outside the {src_w}x{src_h} capture "
+                         "(it is in capture pixels)")
+    clearance, radius, thickness = (v.i("geom.highlight", k) for k in range(3))
+    at, hold = float(freeze["at"]), float(freeze["hold"])
+    return {
+        "type": "frame",
+        "at": round(at + v.f("motion.calloutDelay"), 3),
+        "until": round(at + hold, 3),
+        "target": {
+            "x": round(v.i("geom.paneX", index) + off_x + area["x"] * scale),
+            "y": round(v.i("geom.paneY") + off_y + area["y"] * scale),
+            "w": round(area["w"] * scale),
+            "h": round(area["h"] * scale),
+        },
+        "clearance": clearance,
+        "radius": radius,
+        "thickness": thickness,
+        "trace": "fade",
+        "exit": "fade",
+        "contrast": "shadow",
+        "color": v.s(f"colour.{side['side']}"),
+    }
 
 
 def keys(obj, where, required, optional=()):
@@ -329,46 +353,150 @@ def pick(value, where, locale):
     return " ".join(text.split())
 
 
-def load_content(path, prefixes):
+def number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def load_content(path, locale):
+    """The content file, checked key by key and with every string picked for `locale`."""
     raw = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
-    keys(raw, "the file", required=("ticket", "intro", "outro", "sides"), optional=("clipSeconds",))
+    keys(raw, "the file", required=("ticket", "summary", "intro", "outro", "sides"),
+         optional=("clipSeconds", "freeze"))
     keys(raw["intro"], "intro", required=("headline",))
     keys(raw["outro"], "outro", required=("headline", "subtitle"))
+    freeze = raw.get("freeze")
+    if freeze is not None:
+        keys(freeze, "freeze", required=("at", "hold"))
     sides = raw["sides"] if isinstance(raw["sides"], list) else []
     names = [side.get("side") for side in sides if isinstance(side, dict)]
-    if names != prefixes:
-        raise SystemExit(f"content: sides must be {prefixes} in that order (the template's partial prefixes), "
-                         f"got {names}")
+    if names != ["before", "after"]:
+        raise SystemExit(f"content: sides must be before then after, got {names}")
+
+    def copy(value, where):
+        return pick(value, where, locale)
+
+    picked = []
     for side in sides:
         where = f"sides[{side['side']}]"
-        keys(side, where, required=("side", "badge", "capture", "trim", "chip", "card", "panel"))
-        keys(side["card"], f"{where}.card", required=("headline", "subtitle"))
-        keys(side["panel"], f"{where}.panel", required=("title", "desc"))
-        if not isinstance(side["trim"], (int, float)) or side["trim"] < 0:
+        needs_highlight = ("highlight",) if freeze else ()
+        keys(side, where, required=("side", "badge", "capture", "trim", "chip", "pane", *needs_highlight),
+             optional=("highlight", "callout"))
+        keys(side["pane"], f"{where}.pane", required=("title", "desc"))
+        if not number(side["trim"]) or side["trim"] < 0:
             raise SystemExit(f"content: {where}.trim is the START offset into the capture, in seconds (>= 0)")
-    clip = raw.get("clipSeconds", 1)
-    if not isinstance(clip, (int, float)) or clip <= 0:
-        raise SystemExit("content: clipSeconds must be a positive number of seconds")
-    return raw
+        if "highlight" in side:
+            keys(side["highlight"], f"{where}.highlight", required=("x", "y", "w", "h"))
+            if not all(number(side["highlight"][k]) for k in "xywh") or min(side["highlight"][k] for k in "wh") <= 0:
+                raise SystemExit(f"content: {where}.highlight is x, y, w, h in capture pixels")
+        entry = {"side": side["side"], "capture": side["capture"], "trim": side["trim"],
+                 "badge": copy(side["badge"], f"{where}.badge"), "chip": copy(side["chip"], f"{where}.chip"),
+                 "title": copy(side["pane"]["title"], f"{where}.pane.title"),
+                 "desc": copy(side["pane"]["desc"], f"{where}.pane.desc")}
+        if "highlight" in side:
+            entry["highlight"] = side["highlight"]
+        if "callout" in side:
+            entry["callout"] = copy(side["callout"], f"{where}.callout")
+        picked.append(entry)
+    return {
+        "ticket": copy(raw["ticket"], "ticket"),
+        "summary": copy(raw["summary"], "summary"),
+        "headline": copy(raw["intro"]["headline"], "intro.headline"),
+        "outroHeadline": copy(raw["outro"]["headline"], "outro.headline"),
+        "outroSubtitle": copy(raw["outro"]["subtitle"], "outro.subtitle"),
+        "clipSeconds": raw.get("clipSeconds"),
+        "freeze": freeze,
+        "sides": picked,
+    }
+
+
+def check_freeze(freeze, clip):
+    if freeze is None:
+        return
+    at, hold = freeze["at"], freeze["hold"]
+    if not number(at) or not 0 < at < clip:
+        raise SystemExit(f"content: freeze.at={at!r} is outside the {clip}s runs (it is section time, after trim)")
+    if not number(hold) or not 2 <= hold <= 10:
+        raise SystemExit(f"content: freeze.hold={hold!r} must be 2 to 10 s: the callout has to be found AND read")
+
+
+def check_slate(v, content):
+    """Budget the slate's copy on the same fonts its layers draw with: nothing on the slate wraps."""
+    measure = v.i("geom.slateMeasure")
+    display, body, mono = v.font("font.display"), v.font("font.body"), v.font("font.mono")
+    for name in ("headline", "outroHeadline"):
+        fits(name, content[name], display, v.i("size.headline"), measure)
+    fits("summary", content["summary"], body, v.i("size.summary"), measure * HTML_SLACK)
+    # The slate's field column: a badge, a gap, then the chip copy, in half the measure.
+    column = (measure - v.i("geom.margin")) / 2
+    room = column - v.i("geom.chipWidth") - v.i("geom.chipGap")
+    for side in content["sides"]:
+        fits(f"{side['side']} chip copy", side["chip"], body, v.i("size.chip"), room * HTML_SLACK)
+    made = spaced("Made with LeClap", mono, v.i("size.signature"), 2)
+    fits("outro subtitle", content["outroSubtitle"], body, v.i("size.chip"),
+         (measure - made - v.i("geom.margin")) * HTML_SLACK)
+    # The slate's ROLL field shares the header row with the mark, LeClap and EVIDENCE (272 px of it).
+    roll = spaced(content["ticket"], mono, v.i("size.roll"), 2)
+    if roll > measure - v.i("geom.slateHeader"):
+        raise SystemExit(f"Overflow: ticket: {roll:.0f}px > {measure - v.i('geom.slateHeader')}px on the slate, "
+                         f"{content['ticket']!r}")
+
+
+def spaced(text, font, size, spacing):
+    """Width of a line drawn with CSS letter-spacing, as the slate's mono fields are."""
+    return width(text, font, size) + spacing * len(text)
 
 
 def template_shape(tpl):
-    """The sections build.py composes: intro, a card + clip pair per side, outro. Anything else is a
-    different video, and this script would silently leave its sections without a clip."""
-    sections = tpl.get("sections", [])
-    refs = [section for section in sections if section.get("type") == "partial"]
-    named = {section.get("name"): section for section in sections if section.get("type") != "partial"}
-    partials = {partial["id"]: partial for partial in tpl.get("partials", [])}
-    ref_ids = {ref.get("ref") for ref in refs}
-    pair = partials.get(next(iter(ref_ids))) if len(ref_ids) == 1 else None
-    pair_named = {section.get("name"): section for section in (pair or {}).get("sections", [])}
-    all_clips = [*named.values(), *pair_named.values()]
-    if set(named) != {"intro", "outro"} or len(refs) != 2 or set(pair_named) != {"card", "clip"} or any(
-        section.get("type") != "project_video" for section in all_clips
-    ):
-        raise SystemExit("template.json: build.py composes project_video sections intro, outro and one "
-                         "card + clip partial per side; this template has a different shape")
-    return named, pair_named, [ref.get("prefix", "") for ref in refs]
+    """The sections this script fills: an intro, the side-by-side runs, an outro. Anything else is a
+    different video, and the comparison clip would land in no section."""
+    named = {section.get("name"): section for section in tpl.get("sections", [])}
+    if list(named) != ["intro", "sidebyside", "outro"] or named["sidebyside"].get("type") != "project_video":
+        raise SystemExit("template.json: build.py fills sections intro, sidebyside (project_video) and outro; "
+                         "this template has a different shape")
+    missing = [name for name in (*FIELD_NAMES, "clipSeconds") if name not in tpl["global"].get("fields", {})]
+    if missing:
+        raise SystemExit(f"template.json: global.fields lacks {', '.join(missing)}")
+    return named
+
+
+_FIELD = re.compile(r"\{\{\s*clipSeconds\s*\}\}")
+
+
+def resolve(node, clip, locale):
+    """Fill `{{ clipSeconds }}` as a number, and give every single-locale `en` text the render locale too."""
+    if isinstance(node, list):
+        return [resolve(item, clip, locale) for item in node]
+    if isinstance(node, str) and _FIELD.fullmatch(node.strip()):
+        return clip
+    if not isinstance(node, dict):
+        return node
+    out = {key: resolve(value, clip, locale) for key, value in node.items()}
+    if locale != "en" and list(out) == ["en"] and isinstance(out["en"], str):
+        out[locale] = out["en"]
+    return out
+
+
+def resolved_template(tpl, content, clip, hold, graphics, locale):
+    """The template with this change's copy as field defaults and every timing filled in.
+
+    The copy goes in as `global.fields` defaults, so the engine still type-checks it (maxLength) and
+    HTML-escapes it where an HTML layer draws it. `clipSeconds` is filled as a number and dropped:
+    `leclap timeline` and `snapshot` assume a 3 s clip for a section whose length is a field."""
+    out = resolve(json.loads(json.dumps(tpl)), clip, locale)
+    fields = out["global"]["fields"]
+    del fields["clipSeconds"]
+    values = {**{name: content[name] for name in FIELD_NAMES if name in content},
+              **{f"{side['side']}{suffix}": side[key] for side in content["sides"]
+                 for suffix, key in (("Badge", "badge"), ("Chip", "chip"))}}
+    for name in FIELD_NAMES:
+        fields[name]["default"] = values[name]
+    runs = next(section for section in out["sections"] if section["name"] == "sidebyside")
+    # The hold lengthens the section: a project_video is capped at its declared duration, so without
+    # this the freeze would push the end of both runs off the cut instead of extending it.
+    runs["options"]["duration"] = round(clip + hold, 3)
+    if graphics:
+        runs["graphics"] = graphics
+    return out
 
 
 def find_fonts(explicit, names):
@@ -390,32 +518,125 @@ def require_drawtext(ffmpeg):
     if re.search(r"\sdrawtext\s", filters):
         return
     raise SystemExit(f"{ffmpeg} has no drawtext filter (built without libfreetype), so it cannot draw a "
-                     "single card. Point --ffmpeg at one that has it: see SKILL.md, 'The traps'.")
+                     "single label. Point --ffmpeg at one that has it: see SKILL.md, 'The traps'.")
 
 
-def stage_logo(logo, tpl, work):
-    """Put the watermark image where the template's global.watermark.url points, under assets/."""
-    mark = tpl["global"].get("watermark")
-    if not mark or re.match(r"^(https?:|/|\{\{)", mark["url"]):
-        return
-    dest = work / "assets" / mark["url"]
-    if logo is None and dest.is_file():
-        return
-    if logo is None:
-        raise SystemExit(f"template.json declares global.watermark but {dest} does not exist: pass --logo "
-                         "<png|svg> (your product's mark), or delete global.watermark")
+def stage_mark(logo, work):
+    """The LeClap mark, unrecoloured, where the slate's HTML layers and the comparison read it."""
+    dest = work / "assets" / MARK_ASSET
     dest.parent.mkdir(parents=True, exist_ok=True)
-    source = pathlib.Path(logo)
+    source = pathlib.Path(logo) if logo else next(
+        (parent / LECLAP_MARK for parent in SKILL_DIR.parents if (parent / LECLAP_MARK).is_file()), None)
+    if source is None and dest.is_file():
+        return
+    if source is None:
+        raise SystemExit("the LeClap mark was not found: pass --logo apps/leclap-web/public/favicon.svg "
+                         "(or pwa-512x512.png) from the LeClap repo")
     if source.suffix.lower() == ".png":
         shutil.copyfile(source, dest)
         return
     if source.suffix.lower() != ".svg":
-        raise SystemExit(f"--logo must be a .png or an .svg: {source}")
+        raise SystemExit(f"--logo must be the LeClap mark as .svg or .png: {source}")
     if not shutil.which("rsvg-convert"):
-        raise SystemExit("--logo is an SVG and rsvg-convert (librsvg) is not installed: pass a PNG instead")
-    # 4x the on-screen width, so the engine's downscale keeps the mark's edges crisp.
-    width = round(int(tpl["global"]["variables"]["geom.canvas"][0]) * mark.get("scale", 0.12) * 4)
-    subprocess.run(["rsvg-convert", "-w", str(width), str(source), "-o", str(dest)], check=True)
+        raise SystemExit("--logo is an SVG and rsvg-convert (librsvg) is not installed: pass "
+                         "apps/leclap-web/public/pwa-512x512.png instead")
+    subprocess.run(["rsvg-convert", "-w", str(MARK_RASTER), str(source), "-o", str(dest)], check=True)
+
+
+def engine_check(leclap, resolved):
+    """`leclap validate` on the resolved template: the engine lays out every HTML layer, so this is
+    where a slate line too long for its box (html_overflow) is caught before anything renders."""
+    result = subprocess.run([*leclap, "validate", str(resolved), "--json"], capture_output=True, text=True)
+    try:
+        report = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        raise SystemExit(f"leclap validate failed:\n{result.stdout}{result.stderr}") from None
+    findings = [item for value in report.values() if isinstance(value, list) for item in value
+                if isinstance(item, dict)]
+    blocking = [item for item in findings if item.get("code") in BLOCKING_FINDINGS]
+    for item in findings:
+        print(f"  validate: {item.get('code')} at {item.get('path')}: {item.get('message')}")
+    if not report.get("success") or blocking:
+        raise SystemExit("leclap validate refused the resolved template: shorten the copy, never widen the box")
+
+
+def slugify(text):
+    return re.sub(r"[^A-Za-z0-9._-]+", "-", text).strip("-").lower()
+
+
+def repo_name():
+    # The origin remote's name, not the checkout's folder: a worktree is often named after its branch.
+    git = ["git", "-C", str(SKILL_DIR)]
+    remote = subprocess.run([*git, "remote", "get-url", "origin"], capture_output=True, text=True).stdout.strip()
+    top = subprocess.run([*git, "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    name = remote.rstrip("/").rsplit("/", 1)[-1].rsplit(":", 1)[-1] if remote else pathlib.Path(top).name
+    return name.removesuffix(".git")
+
+
+def probe_seconds(ffmpeg, video):
+    ffprobe = str(pathlib.Path(ffmpeg).with_name("ffprobe")) if "/" in ffmpeg else "ffprobe"
+    out = subprocess.run([ffprobe, "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(video)],
+                         capture_output=True, text=True).stdout.strip()
+    return float(out or 0)
+
+
+def hex_rgb(colour):
+    value = colour.lstrip("#")
+    return tuple(int(value[index:index + 2], 16) for index in (0, 2, 4))
+
+
+def poster(ffmpeg, video, at, v):
+    """<video>.webp beside the render: the frozen comparison above a LeClap player bar.
+
+    The description's fallback when the video can't be attached as an inline player: this capture, linked to
+    the committed .mp4, so one click downloads it. The bar sits BELOW the frame, so nothing hides the evidence:
+    the brand-gradient play button, what the file is (name, length, size), the web player's film-strip timeline
+    filled to the frame shown, and a download chip. Drawn at 2x with ffmpeg alone, then scaled down."""
+    out = video.with_suffix(".webp")
+    seconds = probe_seconds(ffmpeg, video)
+    size_mb = video.stat().st_size / 1_000_000
+    clock = f"{int(seconds // 60)}:{int(round(seconds % 60)):02d}"
+    meta = f"{video.name}  ·  {clock}  ·  {size_mb:.1f} MB".replace(":", "\\:")
+    display, mono = v.font_dir / v.s("font.display"), v.font_dir / v.s("font.mono")
+    ink, line, fg, muted = (v.s(key).replace("#", "0x") for key in
+                            ("colour.letterbox", "colour.divider", "colour.fg", "colour.muted"))
+    accent = v.s("colour.after").replace("#", "0x")
+    (r0, g0, b0), (r1, g1, b1) = hex_rgb(v.s("colour.after")), hex_rgb("#ffa8bf")
+    width, height, disc = 2560, 176, 112
+    cx = 104
+    track_x0, track_x1, track_y = 1120, 2100, 86
+    filled = track_x0 + int((track_x1 - track_x0) * min(1.0, at / seconds if seconds else 0))
+    sprockets = "".join(f",drawbox=x={x}:y={y}:w=10:h=8:color={line}:t=fill"
+                        for x in range(track_x0, track_x1, 30) for y in (60, 108))
+    chip_x, chip_w = 2190, 320
+    lerp = f"(X/{disc})"
+    graph = (
+        f"[1:v]drawbox=x=0:y=0:w={width}:h=2:color={line}:t=fill"
+        f",drawtext=fontfile='{display}':text='Play the evidence video':fontsize=46:fontcolor={fg}:x=196:y=30"
+        f",drawtext=fontfile='{mono}':text='{meta}':fontsize=26:fontcolor={muted}:x=198:y=104"
+        f",drawbox=x={track_x0}:y={track_y}:w={track_x1 - track_x0}:h=6:color={line}:t=fill"
+        f",drawbox=x={track_x0}:y={track_y}:w={filled - track_x0}:h=6:color={accent}:t=fill"
+        f",drawbox=x={filled - 3}:y={track_y - 14}:w=6:h=34:color={fg}:t=fill{sprockets}"
+        f",drawbox=x={chip_x}:y=44:w={chip_w}:h=88:color={accent}:t=3"
+        f",drawtext=fontfile='{display}':text='DOWNLOAD MP4':fontsize=34:fontcolor={accent}:x={chip_x + 78}:y=67"
+        f",drawbox=x={chip_x + 40}:y=62:w=4:h=30:color={accent}:t=fill[bar];"
+        f"[2:v]format=rgba,geq=r='{r0}+({r1}-{r0})*{lerp}':g='{g0}+({g1}-{g0})*{lerp}':b='{b0}+({b1}-{b0})*{lerp}':"
+        f"a='255*lt(hypot(X-{disc / 2},Y-{disc / 2}),{disc / 2 - 1})'[disc];"
+        f"[3:v]format=rgba,geq=r=20:g=20:b=22:a='255*gte(X,{disc / 2 - 16})*lte(abs(Y-{disc / 2}),({disc / 2 + 24}-X)*0.58)'[play];"
+        f"[4:v]format=rgba,geq=r={r0}:g={g0}:b={b0}:a='255*lte(abs(X-14),(22-Y)*0.62)'[arrow];"
+        f"[disc][play]overlay=0:0[button];"
+        f"[bar][button]overlay={cx - disc // 2}:{(height - disc) // 2}[bar2];"
+        f"[bar2][arrow]overlay={chip_x + 28}:88,scale=1280:-2:flags=lanczos[barsmall];"
+        f"[0:v][barsmall]vstack=inputs=2"
+    )
+    subprocess.run([ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-ss", f"{at:.3f}", "-i", str(video),
+                    "-f", "lavfi", "-i", f"color=c={ink}:s={width}x{height}",
+                    "-f", "lavfi", "-i", f"color=c=black:s={disc}x{disc}",
+                    "-f", "lavfi", "-i", f"color=c=black:s={disc}x{disc}",
+                    "-f", "lavfi", "-i", "color=c=black:s=28x24",
+                    "-filter_complex", graph, "-frames:v", "1", "-c:v", "libwebp", "-quality", "88", str(out)],
+                   check=True)
+    print(f"Poster: {out}")
 
 
 def parse_args():
@@ -425,12 +646,14 @@ def parse_args():
     parser.add_argument("--work", required=True, help="scratch render root: gets assets/, build/ and "
                                                       "evidence.template.json; capture paths are relative to it")
     parser.add_argument("--fonts", help="TTF/OTF directory (default: ./fonts, then LeClap's creative kit)")
-    parser.add_argument("--logo", help="PNG or SVG for global.watermark (your product's mark)")
+    parser.add_argument("--logo", help="the LeClap mark, .svg or .png (default: the repo's favicon.svg)")
     parser.add_argument("--ffmpeg", default="ffmpeg", help="an ffmpeg WITH drawtext (see SKILL.md)")
     parser.add_argument("--locale", default="en", help="picks {locale: copy} entries; forwarded to the render")
     parser.add_argument("--leclap", help='render with this CLI command, e.g. "npx @leclap/cli"; omit to only '
-                                         "build the clips (then use the MCP's compose_video)")
-    parser.add_argument("--out", help="rendered file (default: <work>/<ticket>-evidence.mp4)")
+                                         "build the assets (then use the MCP's compose_video)")
+    parser.add_argument("--project", help="the project the evidence belongs to, prefixed to the file name "
+                                          "(default: the git repository's name)")
+    parser.add_argument("--out", help="rendered file (default: <work>/<project>-<ticket>-evidence.mp4)")
     return parser.parse_args()
 
 
@@ -439,74 +662,63 @@ def main():
     sys.stdout.reconfigure(line_buffering=True)
     args = parse_args()
     tpl = json.loads(pathlib.Path(args.template).read_text(encoding="utf-8"))
-    named, pair, prefixes = template_shape(tpl)
-    content = load_content(args.content, prefixes)
+    template_shape(tpl)
+    content = load_content(args.content, args.locale)
     variables = tpl["global"]["variables"]
-    fonts = find_fonts(args.fonts, [variables[key] for key in ("font.display", "font.body", "font.label")])
+    fonts = find_fonts(args.fonts, [variables[key] for key in ("font.display", "font.body", "font.mono")])
     v = V(variables, fonts, args.ffmpeg, tpl["global"].get("fps", 30))
     require_drawtext(args.ffmpeg)
 
     work = pathlib.Path(args.work).resolve()
     videos, lines = work / "assets/videos", work / "build/lines"
-    # Scratch copy for `textfile=` lives OUTSIDE assets/videos: it is never an asset, and a dozen
-    # stray _line*.txt next to the shipped .mp4 only confuses whoever debugs a render.
+    # Scratch copy for `textfile=` lives OUTSIDE assets/: it is never an asset.
     for directory in (videos, lines):
         directory.mkdir(parents=True, exist_ok=True)
     check_filter_path("--fonts", v.font_dir)
     check_filter_path("--work", lines)
-    stage_logo(args.logo, tpl, work)
+    stage_mark(args.logo, work)
 
-    # A capture is only as long as the flow it records, and the house 8.0 s clip does not fit every
-    # change. clipSeconds overrides it, and the resolved template is written to the work dir so the
-    # render (CLI or MCP) uses the SAME number the clips were cut to: a mismatch there is silent.
-    if "clipSeconds" in content:
-        pair["clip"]["options"]["duration"] = content["clipSeconds"]
-    resolved = work / "evidence.template.json"
-    resolved.write_text(json.dumps(tpl, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    # The clip length is the template's typed clipSeconds field; the content file overrides its default.
+    spec = tpl["global"]["fields"]["clipSeconds"]
+    clip = content["clipSeconds"] if content["clipSeconds"] is not None else spec["default"]
+    if not number(clip) or not spec.get("min", clip) <= clip <= spec.get("max", clip):
+        raise SystemExit(f"content: clipSeconds={clip!r} is outside [{spec.get('min')}, {spec.get('max')}]")
+    freeze = content["freeze"]
+    check_freeze(freeze, clip)
 
-    def copy(value, where):
-        return pick(value, where, args.locale)
-
-    ticket = copy(content["ticket"], "ticket")
-    sides = content["sides"]
-    accents = {side["side"]: v.s(f"colour.{side['side']}") for side in sides}
+    leclap = shlex.split(args.leclap) if args.leclap else None
     try:
-        # `chip` is its own copy, deliberately: deriving it from the panel description produces a line
-        # several times the intro's measure, and the whole point of the intro row is to be scannable.
-        intro(v, videos / "intro.mp4", ticket, copy(content["intro"]["headline"], "intro.headline"),
-              [(copy(side["badge"], f"sides[{side['side']}].badge"), accents[side["side"]],
-                copy(side["chip"], f"sides[{side['side']}].chip")) for side in sides],
-              named["intro"]["options"]["duration"], lines)
-        card(v, videos / "outro.mp4", ticket, copy(content["outro"]["headline"], "outro.headline"),
-             copy(content["outro"]["subtitle"], "outro.subtitle"), v.s("colour.neutral"),
-             named["outro"]["options"]["duration"], lines)
-        for side in sides:
-            name, where = side["side"], f"sides[{side['side']}]"
-            card(v, videos / f"{name}card.mp4", ticket, copy(side["card"]["headline"], f"{where}.card.headline"),
-                 copy(side["card"]["subtitle"], f"{where}.card.subtitle"), accents[name],
-                 pair["card"]["options"]["duration"], lines)
-            panel(v, videos / f"{name}clip.mp4", work / side["capture"], side["trim"],
-                  pair["clip"]["options"]["duration"], accents[name], copy(side["badge"], f"{where}.badge"),
-                  copy(side["panel"]["title"], f"{where}.panel.title"),
-                  copy(side["panel"]["desc"], f"{where}.panel.desc"), lines)
+        check_slate(v, content)
+        fitted = comparison(v, videos / "sidebyside.mp4", content["sides"], work, clip, freeze,
+                            content["ticket"], lines)
     except CopyError as error:
         # The guard working, not an obstacle: shorten the copy. Never widen the box.
         raise SystemExit(f"{type(error).__name__}: {error}") from None
+    graphics = [highlight(v, index, side, fitted[side["side"]], freeze)
+                for index, side in enumerate(content["sides"]) if freeze and "highlight" in side]
+    hold = float(freeze["hold"]) if freeze else 0.0
+    resolved = work / "evidence.template.json"
+    resolved.write_text(json.dumps(resolved_template(tpl, content, clip, hold, graphics, args.locale), indent=2,
+                                   ensure_ascii=False) + "\n", encoding="utf-8")
 
-    clips = ["intro", *(f"{p}{s}" for p in prefixes for s in ("card", "clip")), "outro"]
-    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", ticket).strip("-").lower() or "evidence"
-    out = pathlib.Path(args.out).resolve() if args.out else work / f"{slug}-evidence.mp4"
-    print(f"Built {', '.join(clips)} in {videos}")
-    if not args.leclap:
-        paths = json.dumps({clip: str(videos / f"{clip}.mp4") for clip in clips})
-        print(f"Render: leclap render {resolved} --assets {work / 'assets'} --build {work / 'build'} "
-              f"--locale {args.locale} -o {out}")
+    # <project>-<ticket>-evidence.mp4: a downloaded file still says which project and ticket it proves.
+    stem = "-".join(part for part in (slugify(args.project or repo_name()), slugify(content["ticket"])) if part)
+    out = pathlib.Path(args.out).resolve() if args.out else work / f"{stem or 'evidence'}-evidence.mp4"
+    print(f"Built {videos / 'sidebyside.mp4'} and {resolved}")
+    render = ["render", str(resolved), "--assets", str(work / "assets"), "--build", str(work / "build"),
+              "--locale", args.locale, "-o", str(out), "--manifest", "--qc"]
+    if not leclap:
+        paths = json.dumps({"sidebyside": str(videos / "sidebyside.mp4")})
+        print(f"Render: leclap {shlex.join(render)}")
         print(f"   or MCP compose_video with template = {resolved.name}, locale {args.locale!r}, userVideoPaths = "
               f"{paths}, the server started with LECLAP_MCP_MEDIA_DIR={work / 'assets'}")
         return
-    command = [*shlex.split(args.leclap), "render", str(resolved), "--assets", str(work / "assets"),
-               "--build", str(work / "build"), "--locale", args.locale, "-o", str(out)]
-    subprocess.run(command, check=True)
+    engine_check(leclap, resolved)
+    subprocess.run([*leclap, *render], check=True)
+    intro = next(section for section in tpl["sections"] if section["name"] == "intro")["options"]["duration"]
+    fade = float((tpl["global"].get("transition") or {}).get("duration", 0))
+    held = float(freeze["at"]) + hold / 2 if freeze else clip / 2
+    poster(args.ffmpeg, out, float(intro) - fade + held, v)
 
 
 if __name__ == "__main__":

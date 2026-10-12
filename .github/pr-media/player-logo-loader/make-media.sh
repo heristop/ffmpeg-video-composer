@@ -16,4 +16,4 @@ for side in before after; do
     -c:v libx264 -crf 18 -pix_fmt yuv420p "$work/raw/$side-crop.mp4"
 done
 python3 examples/agentic-pr-video/evidence-skill/build.py --content "$here/content.json" --work "$work" \
-  --logo apps/leclap-web/public/favicon.svg --leclap "node packages/leclap-cli/dist/index.js"
+  --leclap "node packages/leclap-cli/dist/index.js"
