@@ -1,0 +1,44 @@
+{
+  "_note": "Captures are record.mjs's recordings cropped to the player (make-media.sh); the click lands about 2.8 s in.",
+  "ticket": "PLAYER-CLAP",
+  "clipSeconds": 2.6,
+  "intro": {
+    "headline": "THE LOGO CLAPS THE FILM IN"
+  },
+  "outro": {
+    "headline": "ONE MARK, ONE CLAP",
+    "subtitle": "The header's logo starts the film, Clappy still runs the loader"
+  },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before-crop.mp4",
+      "trim": 2.2,
+      "chip": "A drawn clapperboard pops",
+      "card": {
+        "headline": "A ROUGH CLAPPERBOARD",
+        "subtitle": "A gradient box and a striped stick, drawn in CSS"
+      },
+      "panel": {
+        "title": "A rough clapperboard",
+        "desc": "Pressing play pops a gradient box with a striped stick drawn in CSS: a stand-in for the logo, not the logo."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after-crop.mp4",
+      "trim": 2.2,
+      "chip": "The LeClap logo claps",
+      "card": {
+        "headline": "THE LECLAP LOGO",
+        "subtitle": "The header's mark pops in and claps its stick"
+      },
+      "panel": {
+        "title": "The LeClap logo",
+        "desc": "Pressing play pops the header's LeClap mark, which slams its clapper stick shut as it lands, then fades."
+      }
+    }
+  ]
+}

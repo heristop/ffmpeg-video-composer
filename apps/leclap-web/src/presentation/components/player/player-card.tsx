@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import { LogoMark, type LogoMarkHandle } from '@/presentation/components/LogoMark';
 import { cn } from '@/lib/utils';
 import { formatClock } from './player.logic';
 import { aspectLabel } from './timeline.logic';
@@ -88,17 +90,28 @@ export function PlayerTitleCard({
 }
 
 /**
- * The clap: a small clapperboard in the brand gradient pops at the centre as the visitor starts the film, its stick
- * slamming shut, then fades. Keyed by each start, so it replays every time; reduced motion never shows it.
+ * The clap: the LeClap mark (the header's logo) pops at the centre as the visitor starts the film and claps its
+ * stick shut as it lands, then fades. Keyed by each start, so it replays every time; reduced motion never shows it.
  */
 export function PlayerClap() {
+  const mark = useRef<LogoMarkHandle>(null);
+
+  useEffect(() => {
+    // Clap as the pop reaches full size, not while the mark is still growing in.
+    const timer = setTimeout(() => mark.current?.clap(), 180);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+
   return (
     <span
       aria-hidden="true"
+      data-player-clap="logo"
       className="player-clap pointer-events-none absolute left-1/2 top-1/2 z-[15] motion-reduce:hidden"
     >
-      <span className="player-clap-stick absolute -top-3 left-0 h-3 w-16 origin-bottom-left rounded-sm bg-[repeating-linear-gradient(135deg,var(--color-player-fg)_0_7px,var(--color-player-ink)_7px_14px)] ring-1 ring-player-ink/60" />
-      <span className="brand-gradient block h-10 w-16 rounded-md shadow-[var(--shadow-glow)] ring-1 ring-player-fg/30" />
+      <LogoMark ref={mark} className="size-20 [filter:drop-shadow(0_10px_24px_rgba(28,21,64,0.55))]" />
     </span>
   );
 }
