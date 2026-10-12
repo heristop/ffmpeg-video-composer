@@ -313,12 +313,14 @@ outward-facing, so do them only once the user has approved publishing:
 - **GitHub:** only an attachment URL (`https://github.com/user-attachments/assets/<id>`, pasted on its
   own line) renders as a player. `<video>` tags and `raw.githubusercontent.com` or `github.com/…/raw`
   links do not play. There is no REST or `gh` API for these uploads: it takes the web editor of a
-  logged-in browser. Keep the file under 10 MB (the attachment cap on free plans). With browser
-  automation in the user's own browser: open the PR, click Edit on the description, attach the `.mp4`
-  to the editor's hidden `input[type=file]` with the file-upload tool (clicking the button opens a
-  native picker instead), wait for the `user-attachments` line, move it where the video belongs, save,
-  and check the saved page shows a `<video>` player. With no browser available, ask the user to drag
-  the file into the description, with its exact path and where it goes.
+  logged-in browser: the user's own, driven by the agent's browser tool (Claude in Chrome, or the
+  equivalent in Codex). Keep the file under 10 MB (the attachment cap on free plans). Automate it
+  with LeClap's [`attach-video.js`](../../../.agents/skills/pr-evidence/attach-video.js): run in the
+  PR page, it fetches the pushed `.mp4` from its raw URL, drops it into the comment box like a
+  drag-and-drop, returns the `user-attachments` link and posts nothing. Then write the link into the
+  description with `gh pr edit` and check the page shows a `<video>` player. With no browser tool
+  connected, ask the user to connect one and stay logged in; meanwhile keep the video out of the
+  description rather than adding a pending note.
 - **GitLab:** use the [Markdown uploads API](https://docs.gitlab.com/api/project_markdown_uploads/)
   and embed the `markdown` it returns.
 

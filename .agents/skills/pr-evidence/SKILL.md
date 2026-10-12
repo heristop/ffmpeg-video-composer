@@ -86,15 +86,15 @@ python3 examples/agentic-pr-video/evidence-skill/build.py \
   ```
 
 - **Video: the inline player is mandatory.** The PR is not done until the video plays in the description. A poster image linking to the `.mp4`, or any link to the file, is **not** an acceptable fallback: GitHub downloads it instead of playing it. Only a GitHub attachment URL, `https://github.com/user-attachments/assets/<id>` pasted on its own line, renders as an inline player; `<video>` tags and `raw.githubusercontent.com` or `github.com/<repo>/raw/…` links don't play.
-  - There is no REST or `gh` API for these uploads: it needs a logged-in browser session, the user's own, through the Claude in Chrome extension.
-  - **Upload procedure:**
-    1. Open the PR, then click Edit on the description.
-    2. Find the markdown editor's hidden `input[type=file]` and attach the `.mp4` to it with the file-upload tool. Don't click the attach button: that opens a native file picker the automation can't drive.
-    3. Wait until the editor inserts the `https://github.com/user-attachments/assets/…` line.
-    4. Move that line to where the video belongs, right after the opening reason, then save.
-    5. Verify the saved description shows a `<video>` player: read the page, or check that `gh pr view <n> --json body` contains the `user-attachments` URL.
-  - **If no browser is connected**, stop and ask the user to connect the Claude in Chrome extension. Otherwise ask them to drag the `.mp4` into the description themselves: give the exact file path and say where it goes (right after the opening reason).
-  - Never leave a download link presented as the video, and never say the evidence is complete while the upload is pending.
+  - There is no REST or `gh` API for these uploads: only a logged-in GitHub session can make one, and that session is the user's own browser. Drive it with the agent's browser tool (Claude in Chrome, or the equivalent in Codex). Never sign in for the user, and never use a headless or separate browser profile: it isn't logged in.
+  - **Attach, automated** ([`attach-video.js`](./attach-video.js)):
+    1. Commit and push the `.mp4` first, then build its raw URL pinned to the full SHA: `https://raw.githubusercontent.com/heristop/leclap/<full-sha>/.github/pr-media/<pr-slug>/evidence.mp4`.
+    2. Open the PR's conversation page in the user's browser.
+    3. With the browser tool's JavaScript execution, paste `attach-video.js` and run `await attachVideo('<raw-url>')`. The page fetches the file itself (no local file access needed), drops it into the comment box the way a drag-and-drop does, waits for GitHub's `https://github.com/user-attachments/assets/<id>` link, and restores the box: no comment is posted.
+    4. Write that URL into the description with `gh pr edit <n> --body-file …`, on its own line right after the opening reason.
+    5. Verify: `gh pr view <n> --json body` contains the URL, and the PR page shows a `<video>` element in the description.
+  - **If the script can't run** (no browser tool connected, or the user isn't logged in), ask the user to connect their browser (the Claude in Chrome extension) and log in to GitHub there, then run the steps above. Until then, leave the video out of the description entirely and say in chat that it's waiting: never a "pending" note or a download link in the description.
+  - Never present a download link as the video, and never say the evidence is complete before the video plays.
   - The committed `.mp4` under `.github/pr-media/<pr-slug>/` stays the source of truth for regenerating the video; the attachment is what plays.
   - **No GIF anywhere**, not even as a preview.
 - **Publishing needs consent**: uploading the video, committing, pushing and editing the PR are outward-facing. Do them only once the user has asked for the PR or approved it.
