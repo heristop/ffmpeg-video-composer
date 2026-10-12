@@ -281,7 +281,7 @@
         "duration": 2.6,
         "clip": {
           "from": 1,
-          "to": 3
+          "to": 2.5
         },
         "speedRamp": "hero",
         "rampAudio": "mute"
@@ -375,7 +375,7 @@
         "duration": 2.6,
         "clip": {
           "from": 1,
-          "to": 4
+          "to": 2.7
         },
         "speedRamp": "bullet",
         "rampAudio": "mute"

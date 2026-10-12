@@ -32,14 +32,19 @@ clock="drawtext=fontfile=$FONT:text='%{eif\:t\:d}.%{eif\:mod(t*100\,100)\:d\:2}'
 pad="aevalsrc=0.08*sin(2*PI*220*t)+0.05*sin(2*PI*330*t):s=44100:d=8"
 voice="aevalsrc=0.32*sin(2*PI*(150+40*sin(2*PI*1.3*t))*t)*(0.55+0.45*sin(2*PI*3.2*t))*gt(sin(2*PI*0.45*t)+0.6\,0)+0.06*sin(2*PI*48*t):s=44100:d=8"
 push="zoompan=z='1+0.0012*on':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=640x360:fps=30"
-clip() { # name photo filter [audio]
+clip() { # name photo filter [audio] [fps]
   [ -f "$W/clips/$1.mp4" ] && return
-  ffmpeg -hide_banner -loglevel error -y -loop 1 -framerate 30 -i "$LIB/backgrounds/$2" -f lavfi -i "${4:-$pad}" \
-    -vf "$3" "${H264[@]}" -c:a aac -b:a 96k -t 8 "$W/clips/$1.mp4"
+  ffmpeg -hide_banner -loglevel error -y -loop 1 -framerate "${5:-30}" -i "$LIB/backgrounds/$2" -f lavfi -i "${4:-$pad}" \
+    -vf "$3" "${H264[@]}" -r "${5:-30}" -c:a aac -b:a 96k -t 8 "$W/clips/$1.mp4"
 }
 clip portrait neon-alley.jpg "scale=-2:1280,crop=360:640:x='(iw-360)/2':y='(ih-640)*t/8'"
 clip panorama desert-dunes.jpg "scale=1920:-2,crop=1920:540:0:'200+8*t'"
-clip timer turquoise-sea.jpg "scale=800:-2,crop=640:360:x='20*t':y=40,$clock"
+# The speed-ramp source is shot like real slow-motion footage, at 300 fps and already 1280x720: every preset speed
+# (0.2x, 0.3x, 1x, 2.5x, 3x, 4x) then takes a whole number of source frames per output frame, so slow motion never
+# holds a frame (a 30 fps source slowed to 0.2x holds each one five times). The pan moves exactly one pixel per
+# frame, cropped in RGB with exact=1: on 4:2:0 input crop rounds x to even pixels, which halves the cadence.
+clock720="drawtext=fontfile=$FONT:text='%{eif\:t\:d}.%{eif\:mod(t*100\,100)\:d\:2}':fontsize=128:fontcolor=white:shadowcolor=black@0.5:shadowx=4:shadowy=6:x=w-tw-72:y=h-th-56"
+clip timer turquoise-sea.jpg "scale=3840:-2,format=rgb24,crop=1280:720:x='300*t':y=540:exact=1,$clock720" "$pad" 300
 clip zoom autumn-leaves.jpg "scale=1280:-2,$push,$clock"
 clip main cafe-table.jpg "scale=1280:-2,$push"
 clip broll monstera-leaves.jpg "scale=800:-2,crop=640:360:x='160-20*t':y=40"
