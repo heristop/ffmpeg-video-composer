@@ -1,13 +1,15 @@
 {
-  "_note": "Captures are record.mjs's 1024x768 recordings cropped to the header and the player (make-media.sh). trim is a start offset: the loader is up from about 3 s.",
+  "_note": "Captures are record.mjs's 1024x768 recordings cropped to the header and the player (make-media.sh). trim is a start offset: the loader is up from about 3 s. highlight is the loader card, in capture pixels.",
   "ticket": "PLAYER-LOADER",
+  "summary": "The player's loader now wears the header's mark",
   "clipSeconds": 4.4,
+  "freeze": { "at": 0.8, "hold": 2.4 },
   "intro": {
     "headline": "ONE MARK WHILE IT LOADS"
   },
   "outro": {
     "headline": "THE LOGO, NOT THE MASCOT",
-    "subtitle": "The player's loader now wears the header's mark"
+    "subtitle": "Watch the clap beat over the buffer meter"
   },
   "sides": [
     {
@@ -15,14 +17,12 @@
       "badge": "BEFORE",
       "capture": "raw/before-crop.mp4",
       "trim": 3.2,
+      "highlight": { "x": 245, "y": 390, "w": 255, "h": 100 },
+      "callout": "Clappy runs his lane",
       "chip": "Clappy runs over the meter",
-      "card": {
-        "headline": "A MASCOT ON THE METER",
-        "subtitle": "A stall showed Clappy running his lane"
-      },
-      "panel": {
+      "pane": {
         "title": "A mascot on the meter",
-        "desc": "When the film stalls, Clappy runs his lane over the buffer meter: a second character next to the logo in the header."
+        "desc": "When the film stalls, Clappy runs his lane over the buffer meter: a second character beside the header's logo."
       }
     },
     {
@@ -30,14 +30,12 @@
       "badge": "AFTER",
       "capture": "raw/after-crop.mp4",
       "trim": 3.2,
+      "highlight": { "x": 245, "y": 390, "w": 255, "h": 100 },
+      "callout": "The mark claps",
       "chip": "The header's mark claps",
-      "card": {
-        "headline": "THE HEADER'S MARK",
-        "subtitle": "It claps once a beat until the film plays"
-      },
-      "panel": {
+      "pane": {
         "title": "The header's mark",
-        "desc": "The same LeClap mark as the header claps once a beat over the meter. The meter still fills with what has buffered."
+        "desc": "The header's LeClap mark claps once a beat over the meter, which still fills with what has buffered."
       }
     }
   ]

@@ -104,18 +104,22 @@ For another branch, keep the partial and the label pattern, and swap in that bra
 
 ## Evidence-video agent skill
 
-[`evidence-skill/`](./evidence-skill) turns the before/after idea into an agent skill a team can copy into `.agents/skills/evidence-video/` of the app under review. `before-after.json` lets LeClap draw its own badges and lower thirds; the skill's `build.py` composes every card and panel with ffmpeg first, then hands them to LeClap for the crossfades, the watermark and the render. That buys three things:
+[`evidence-skill/`](./evidence-skill) turns the before/after idea into an agent skill a team can copy into `.agents/skills/evidence-video/` of the app under review. Where `before-after.json` plays the two recordings one after the other, the skill plays them side by side and in step, inside a LeClap slate:
 
-- a label panel beside each clip, with the BEFORE/AFTER badge, a title and a wrapped description, while the capture plays next to it, letterboxed rather than cropped;
-- copy wrapped on the font's measured glyph widths, with a hard stop (`Overflow: desc: 8 lines > 6 allowed`) instead of text running off the frame;
-- one house style: colours, fonts and geometry pinned in `template.json`, applied by the script, and the traps plus the capture and publish checklists in [`SKILL.md`](./evidence-skill/SKILL.md), so every change's video looks like the last one.
+- a clapperboard intro on the ink canvas: the mark, the ticket, a brand-gradient headline that tracks in, the change in one line and the BEFORE/AFTER fields, then one clap on the cut into the comparison;
+- BEFORE and AFTER at the same time in two exact 4:3 panes, each trimmed so the change lands on the same second, letterboxed rather than cropped when the capture is not 4:3;
+- an optional freeze on that second, with a `frame` highlight around the changed area of each pane and a one-line callout per side;
+- copy measured on the fonts' real glyph advances, with a hard stop (`Overflow: before desc: 3 lines > 2 allowed`) instead of text running off the frame, and `leclap validate` on the resolved template;
+- a byte-identical re-render: the template pins `fps`, `seed` and the engine defaults, and the render runs with `--manifest --qc`.
 
-It needs Python 3 (standard library only) and an ffmpeg with `drawtext`. On the demo shop:
+`template.json` draws the slate, the closing card, the highlights and the clap; the skill's `build.py` composes the comparison clip with ffmpeg and fills the template's typed fields from one content file. The traps and the capture and publish checklists are in [`SKILL.md`](./evidence-skill/SKILL.md).
+
+It needs Python 3 (standard library only), an ffmpeg with `drawtext`, and `rsvg-convert` to rasterise the mark. On the demo shop:
 
 ```bash
 node demo-shop/record.mjs --out build/evidence/raw
 python3 evidence-skill/build.py --content evidence-skill/content.example.json --work build/evidence \
-  --logo ../../apps/leclap-web/public/favicon.svg --leclap "npx @leclap/cli"
+  --leclap "npx @leclap/cli"
 ```
 
 The video lands in `build/evidence/shop-123-evidence.mp4`, which git ignores.

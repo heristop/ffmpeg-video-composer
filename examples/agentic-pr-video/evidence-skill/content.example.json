@@ -1,43 +1,41 @@
 {
-  "_note": "The only file you write. trim is a START offset into the capture, in seconds, not a length: the length is the template's clip duration, or clipSeconds. Capture paths are relative to --work.",
+  "_note": "The only file you write. trim is a START offset into each capture, in seconds, not a length: pick it so both runs reach the change at the same second. The length is clipSeconds. freeze.at is section time (after trim); highlight is the changed area in capture pixels. Capture paths are relative to --work.",
   "ticket": "SHOP-123",
-  "clipSeconds": 4.4,
+  "summary": "Add to cart becomes a primary button that opens the cart",
+  "clipSeconds": 3.1,
+  "freeze": { "at": 1.7, "hold": 2.4 },
   "intro": {
     "headline": "MAKE ADD TO CART OBVIOUS"
   },
   "outro": {
     "headline": "REVIEW THE CART DRAWER",
-    "subtitle": "Button contrast first, then focus inside the drawer"
+    "subtitle": "Button contrast first, then focus in the drawer"
   },
   "sides": [
     {
       "side": "before",
       "badge": "BEFORE",
       "capture": "raw/before.mp4",
-      "trim": 0,
-      "chip": "A faint link, and no feedback",
-      "card": {
-        "headline": "A LINK NOBODY SEES",
-        "subtitle": "Add to cart is small grey text below the product copy"
-      },
-      "panel": {
+      "trim": 1.2,
+      "highlight": { "x": 1140, "y": 18, "w": 84, "h": 32 },
+      "callout": "Only the count moves",
+      "chip": "A faint link, no feedback",
+      "pane": {
         "title": "A link nobody sees",
-        "desc": "Add to cart is small grey text below the product copy. A click only bumps a quiet Cart (1) in the header: no confirmation, no drawer."
+        "desc": "Add to cart is small grey text under the product copy. A click only bumps a quiet Cart (1) in the header."
       }
     },
     {
       "side": "after",
       "badge": "AFTER",
       "capture": "raw/after.mp4",
-      "trim": 0,
-      "chip": "One button, instant cart drawer",
-      "card": {
-        "headline": "ONE OBVIOUS BUTTON",
-        "subtitle": "Where the eye already is, with feedback on click"
-      },
-      "panel": {
+      "trim": 0.1,
+      "highlight": { "x": 906, "y": 24, "w": 348, "h": 292 },
+      "callout": "The cart opens",
+      "chip": "One button, then the cart",
+      "pane": {
         "title": "One obvious button",
-        "desc": "A primary button where the eye already is. It confirms in place, and a drawer opens on what was just added, checkout one click away."
+        "desc": "A primary button where the eye already is. It confirms in place and opens the cart, checkout one click away."
       }
     }
   ]
