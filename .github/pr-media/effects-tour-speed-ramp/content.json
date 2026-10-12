@@ -1,0 +1,44 @@
+{
+  "_note": "Captures are the showcase effects tour (apps/leclap-web/public/videos/showcase/effects-tour.mp4) from 318 s for 15 s, base branch then this branch (make-media.sh). trim 2.4 starts on the hero ramp; the clip runs through montage and bullet.",
+  "ticket": "SPEED-RAMP",
+  "clipSeconds": 7.2,
+  "intro": {
+    "headline": "SPEED RAMPS THAT GLIDE"
+  },
+  "outro": {
+    "headline": "SMOOTH AT EVERY SPEED",
+    "subtitle": "A 300 fps source and ramps rounded to whole ticks"
+  },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.mp4",
+      "trim": 2.4,
+      "chip": "Slow motion holds frames",
+      "card": {
+        "headline": "SLOW MOTION THAT STEPS",
+        "subtitle": "Each frame held up to five times at 0.2x"
+      },
+      "panel": {
+        "title": "Slow motion that steps",
+        "desc": "The demo clip had 60 real positions a second: slowed to 0.2x, the pan stops and starts. Hero and bullet end mid slow motion."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.mp4",
+      "trim": 2.4,
+      "chip": "A fresh frame every frame",
+      "card": {
+        "headline": "SLOW MOTION THAT GLIDES",
+        "subtitle": "A new frame on every tick, at every speed"
+      },
+      "panel": {
+        "title": "Slow motion that glides",
+        "desc": "A 300 fps source and rounded timestamps: the pan moves on every frame. Hero and bullet now show their way back out."
+      }
+    }
+  ]
+}
