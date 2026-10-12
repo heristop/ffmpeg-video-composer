@@ -122,4 +122,4 @@ python3 evidence-skill/build.py --content evidence-skill/content.example.json --
   --leclap "npx @leclap/cli"
 ```
 
-The video lands in `build/evidence/shop-123-evidence.mp4`, which git ignores.
+The video lands in `build/evidence/leclap-shop-123-evidence.mp4`, which git ignores.

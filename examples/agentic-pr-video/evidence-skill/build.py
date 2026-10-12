@@ -560,6 +560,45 @@ def engine_check(leclap, resolved):
         raise SystemExit("leclap validate refused the resolved template: shorten the copy, never widen the box")
 
 
+def slugify(text):
+    return re.sub(r"[^A-Za-z0-9._-]+", "-", text).strip("-").lower()
+
+
+def repo_name():
+    # The origin remote's name, not the checkout's folder: a worktree is often named after its branch.
+    git = ["git", "-C", str(SKILL_DIR)]
+    remote = subprocess.run([*git, "remote", "get-url", "origin"], capture_output=True, text=True).stdout.strip()
+    top = subprocess.run([*git, "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    name = remote.rstrip("/").rsplit("/", 1)[-1].rsplit(":", 1)[-1] if remote else pathlib.Path(top).name
+    return name.removesuffix(".git")
+
+
+def poster(ffmpeg, video, at, v):
+    """<video>.webp beside the render: the frozen comparison with a play button and a download label.
+
+    It is the description's fallback when the video can't be attached as an inline player: the capture,
+    linked to the committed .mp4, so one click downloads it. Drawn with ffmpeg alone (lavfi + geq)."""
+    out = video.with_suffix(".webp")
+    label = "Download the evidence video"
+    font = v.font_dir / v.s("font.mono")
+    badge = 176
+    half = badge // 2
+    graph = (
+        f"[1:v]format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='235*lt(hypot(X-{half},Y-{half}),{half - 2})'[disc];"
+        f"[2:v]format=rgba,geq=r=255:g=255:b=255:"
+        f"a='255*gte(X,{half - 22})*lte(abs(Y-{half}),({half + 30}-X)*0.56)'[play];"
+        f"[disc][play]overlay=0:0[badge];"
+        f"[0:v][badge]overlay=(W-w)/2:(H-h)/2-24,"
+        f"drawtext=fontfile='{font}':text='{label}':fontsize=26:fontcolor=white:"
+        f"box=1:boxcolor=0x141416@0.82:boxborderw=14:x=(w-tw)/2:y=(h/2)+{half - 4}"
+    )
+    subprocess.run([ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-ss", f"{at:.3f}", "-i", str(video),
+                    "-f", "lavfi", "-i", f"color=c={v.s('colour.after').replace('#', '0x')}:s={badge}x{badge}",
+                    "-f", "lavfi", "-i", f"color=c=white:s={badge}x{badge}", "-filter_complex", graph,
+                    "-frames:v", "1", "-c:v", "libwebp", "-quality", "85", str(out)], check=True)
+    print(f"Poster: {out}")
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     parser.add_argument("--content", required=True, help="the copy and the two captures (content.example.json)")
@@ -572,7 +611,9 @@ def parse_args():
     parser.add_argument("--locale", default="en", help="picks {locale: copy} entries; forwarded to the render")
     parser.add_argument("--leclap", help='render with this CLI command, e.g. "npx @leclap/cli"; omit to only '
                                          "build the assets (then use the MCP's compose_video)")
-    parser.add_argument("--out", help="rendered file (default: <work>/<ticket>-evidence.mp4)")
+    parser.add_argument("--project", help="the project the evidence belongs to, prefixed to the file name "
+                                          "(default: the git repository's name)")
+    parser.add_argument("--out", help="rendered file (default: <work>/<project>-<ticket>-evidence.mp4)")
     return parser.parse_args()
 
 
@@ -620,8 +661,9 @@ def main():
     resolved.write_text(json.dumps(resolved_template(tpl, content, clip, hold, graphics, args.locale), indent=2,
                                    ensure_ascii=False) + "\n", encoding="utf-8")
 
-    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", content["ticket"]).strip("-").lower() or "evidence"
-    out = pathlib.Path(args.out).resolve() if args.out else work / f"{slug}-evidence.mp4"
+    # <project>-<ticket>-evidence.mp4: a downloaded file still says which project and ticket it proves.
+    stem = "-".join(part for part in (slugify(args.project or repo_name()), slugify(content["ticket"])) if part)
+    out = pathlib.Path(args.out).resolve() if args.out else work / f"{stem or 'evidence'}-evidence.mp4"
     print(f"Built {videos / 'sidebyside.mp4'} and {resolved}")
     render = ["render", str(resolved), "--assets", str(work / "assets"), "--build", str(work / "build"),
               "--locale", args.locale, "-o", str(out), "--manifest", "--qc"]
@@ -633,6 +675,10 @@ def main():
         return
     engine_check(leclap, resolved)
     subprocess.run([*leclap, *render], check=True)
+    intro = next(section for section in tpl["sections"] if section["name"] == "intro")["options"]["duration"]
+    fade = float((tpl["global"].get("transition") or {}).get("duration", 0))
+    held = float(freeze["at"]) + hold / 2 if freeze else clip / 2
+    poster(args.ffmpeg, out, float(intro) - fade + held, v)
 
 
 if __name__ == "__main__":

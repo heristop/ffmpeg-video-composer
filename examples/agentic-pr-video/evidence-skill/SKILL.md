@@ -91,7 +91,7 @@ python3 evidence-skill/build.py --content evidence-skill/content.example.json --
   --leclap "npx @leclap/cli"
 ```
 
-The video lands in `build/evidence/shop-123-evidence.mp4`; `build/` is git-ignored there. The demo
+The video lands in `build/evidence/leclap-shop-123-evidence.mp4`; `build/` is git-ignored there. The demo
 shop records 1280×720, so its panes are letterboxed: that is the 16:9 case working as intended.
 
 ---
@@ -296,7 +296,7 @@ change locally, **say so in the description**.
 **Watch it.** End to end at full speed, and on a frame sheet:
 
 ```bash
-ffmpeg -i <work>/<ticket>-evidence.mp4 -vf "fps=1,scale=426:-2,tile=4x4" -frames:v 1 sheet.png
+ffmpeg -i <work>/<project>-<ticket>-evidence.mp4 -vf "fps=1,scale=426:-2,tile=4x4" -frames:v 1 sheet.png
 ```
 
 Then check full-resolution frames of the slate, the comparison, the freeze with its highlights and
@@ -319,8 +319,9 @@ outward-facing, so do them only once the user has approved publishing:
   PR page, it fetches the pushed `.mp4` from its raw URL, drops it into the comment box like a
   drag-and-drop, returns the `user-attachments` link and posts nothing. Then write the link into the
   description with `gh pr edit` and check the page shows a `<video>` player. With no browser tool
-  connected, ask the user to connect one and stay logged in; meanwhile keep the video out of the
-  description rather than adding a pending note.
+  connected, embed the capture `build.py` writes beside the video (`<project>-<ticket>-evidence.webp`:
+  the frozen comparison with a play button), linked to the `.mp4` so one click downloads it, and ask
+  the user to connect their browser so the capture can be swapped for the player.
 - **GitLab:** use the [Markdown uploads API](https://docs.gitlab.com/api/project_markdown_uploads/)
   and embed the `markdown` it returns.
 
