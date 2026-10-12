@@ -2,6 +2,7 @@
 // adding a template is just adding a descriptor file with optional human-facing `meta` fields.
 import type { AppTemplateCategory, TemplateComplexity, TemplateDescriptor, TemplateOrientation } from './types';
 import { TEMPLATE_DESCRIPTORS } from './templates.generated';
+import { descriptorInFormat, formatsOf, resolveTemplateRef } from './template-formats';
 
 export interface AppTemplate {
   /** Stable catalog id (hyphenated), shared by web + expo. */
@@ -11,6 +12,8 @@ export interface AppTemplate {
   category: AppTemplateCategory;
   complexity: TemplateComplexity;
   orientation: TemplateOrientation;
+  /** Every format the template renders: its own orientation and each one its `formats` composes. */
+  formats: TemplateOrientation[];
   /** True when the descriptor has a `form` section (the app collects fields before compiling). */
   hasForm: boolean;
   descriptor: TemplateDescriptor;
@@ -62,6 +65,7 @@ function define(id: string, raw: unknown): AppTemplate {
     category: categoryOf(descriptor),
     complexity: complexityOf(descriptor),
     orientation: orientationOf(descriptor),
+    formats: formatsOf(descriptor),
     hasForm: hasFormOf(descriptor),
     descriptor,
   };
@@ -74,6 +78,31 @@ export const APP_TEMPLATES: AppTemplate[] = Object.entries(TEMPLATE_DESCRIPTORS)
 export const APP_TEMPLATES_BY_ID: Record<string, AppTemplate | undefined> = Object.fromEntries(
   APP_TEMPLATES.map((t) => [t.id, t])
 );
+
+/** The template composed for `format` (see template-formats.ts); itself for its own or an undeclared format. */
+export function appTemplateInFormat(template: AppTemplate, format: TemplateOrientation): AppTemplate {
+  const descriptor = descriptorInFormat(template.descriptor, format);
+
+  if (descriptor === template.descriptor) return template;
+
+  return { ...template, descriptor, orientation: format, category: categoryOf(descriptor) };
+}
+
+/**
+ * The catalog template a stored id refers to, in `format` when given, else in the format a retired id
+ * implies (`present-yourself-portrait` opens Present Yourself in portrait).
+ */
+export function findAppTemplate(ref: string, format?: TemplateOrientation): AppTemplate | undefined {
+  const resolved = resolveTemplateRef(ref);
+  const template = APP_TEMPLATES_BY_ID[resolved.id];
+  const wanted = format ?? resolved.format;
+
+  if (!template || !wanted) return template;
+
+  return appTemplateInFormat(template, wanted);
+}
+
+export { descriptorInFormat, formatsOf, resolveTemplateRef, type TemplateRef } from './template-formats';
 
 export type {
   AppTemplateCategory,

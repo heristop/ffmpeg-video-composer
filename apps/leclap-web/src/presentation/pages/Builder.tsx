@@ -14,6 +14,7 @@ import { type VideoEdit } from '@/domain/valueObjects/videoEdits';
 import type { MediaChoice } from '@/presentation/components/admin/templateEditorModel';
 import { type WizardModel, EMPTY_MODEL } from '@/lib/wizardModel';
 import { addRush, selectRush, removeRush } from '@/lib/rushActions';
+import { templateFormatParam } from '@/lib/template-format-param';
 import { loadProject, loadOutput, saveDraft, saveCompleted } from '@/services/projectService';
 import { Loader2 } from '@/presentation/components/icons';
 
@@ -688,13 +689,15 @@ interface PreselectArgs {
   presetId: string | null;
 }
 
-// `/studio/new?template=<id>` (no project) opens the editor straight on a template: fetch it and seed
-// the empty model with its default soundtrack — the same effect as picking it in the gallery. The
+// `/studio/new?template=<id>` (no project) opens the editor straight on a template, in `&format=` when
+// given: fetch it and seed the empty model with its default soundtrack — the same effect as picking it in
+// the gallery. The
 // `appliedRef` guards against re-running the apply for an id we've already handled, so the effect
 // can't loop on its own setState (which leaves the param untouched).
 const useTemplatePreselect = ({ setSelectedTemplate, setModel, presetId }: PreselectArgs) => {
   const [searchParams] = useSearchParams();
   const templateParam = searchParams.get('template');
+  const formatParam = templateFormatParam(searchParams.get('format'));
   const projectIdParam = searchParams.get('projectId');
   // A nav-state template for the current param is already applied, so seed appliedRef and never resolve.
   const appliedRef = useRef<string | null>(presetId && presetId === templateParam ? templateParam : null);
@@ -713,7 +716,7 @@ const useTemplatePreselect = ({ setSelectedTemplate, setModel, presetId }: Prese
     if (!skip && templateParam) {
       setResolving(true);
       templateService
-        .getTemplate(templateParam)
+        .getTemplate(templateParam, formatParam)
         .then((template) => {
           if (pending.cancelled) return;
           appliedRef.current = templateParam;
@@ -733,7 +736,7 @@ const useTemplatePreselect = ({ setSelectedTemplate, setModel, presetId }: Prese
     return () => {
       pending.cancelled = true;
     };
-  }, [templateParam, projectIdParam, setSelectedTemplate, setModel]);
+  }, [templateParam, formatParam, projectIdParam, setSelectedTemplate, setModel]);
 
   return { templateParam, projectIdParam, resolving };
 };

@@ -174,8 +174,8 @@ export async function loadProject(id: string): Promise<LoadResult> {
 
   if (!project) return { ok: false, reason: 'not-found' };
 
-  const templates = await templateService.getAllTemplates();
-  const template = templates.find((candidate) => candidate.id === project.templateId);
+  // In the format it was saved in; a retired variant's id resolves to the template that absorbed it.
+  const template = await templateService.getTemplate(project.templateId, project.orientation);
 
   if (!template) return { ok: false, reason: 'template-removed' };
 

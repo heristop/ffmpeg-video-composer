@@ -2,7 +2,7 @@
 import { templateLogger } from '@/lib/logger';
 // The catalog is authored once in @leclap/creative-kit and consumed by web + expo + the MCP catalog.
 // Legacy web-only demo templates were removed.
-import { APP_TEMPLATES, type TemplateOrientation } from '@leclap/creative-kit';
+import { APP_TEMPLATES, findAppTemplate, type AppTemplate, type TemplateOrientation } from '@leclap/creative-kit';
 
 type Translation = Record<string, string | undefined>;
 type Variables = Record<string, string | string[]>;
@@ -61,22 +61,28 @@ export interface CoreTemplate {
   category: 'sample' | 'video' | 'portrait' | 'advanced' | 'demo';
   complexity: 'simple' | 'intermediate' | 'advanced';
   orientation: TemplateOrientation;
+  // Every format the template composes (its own orientation included).
+  formats: TemplateOrientation[];
   hasForm: boolean;
   templateDescriptor: TemplateDescriptor;
   previewImage?: string;
 }
 
-// The catalog is the shared app-template list, mapped into the web CoreTemplate shape.
-const TEMPLATE_SOURCES: CoreTemplate[] = APP_TEMPLATES.map((t) => ({
+// A shared app template, mapped into the web CoreTemplate shape.
+const toCoreTemplate = (t: AppTemplate): CoreTemplate => ({
   id: t.id,
   name: t.name,
   description: t.description,
   category: t.category,
   complexity: t.complexity,
   orientation: t.orientation,
+  formats: t.formats,
   hasForm: t.hasForm,
   templateDescriptor: t.descriptor as unknown as TemplateDescriptor,
-}));
+});
+
+// The catalog is the shared app-template list, each template in its own format.
+const TEMPLATE_SOURCES: CoreTemplate[] = APP_TEMPLATES.map(toCoreTemplate);
 
 const CORE_TEMPLATES: Record<string, CoreTemplate | undefined> = Object.fromEntries(
   TEMPLATE_SOURCES.map((template) => [template.id, template])
@@ -95,18 +101,20 @@ class CoreTemplateService {
     }
   }
 
-  async getTemplate(id: string): Promise<CoreTemplate | null> {
-    const template = CORE_TEMPLATES[id];
+  // `format` picks one of the formats the template composes; without it a retired variant's id (e.g.
+  // `present-yourself-portrait`, saved projects and links) opens the merged template in that variant's format.
+  async getTemplate(id: string, format?: TemplateOrientation): Promise<CoreTemplate | null> {
+    const found = findAppTemplate(id, format);
 
-    if (!template) {
+    if (!found) {
       templateLogger.warn(`Template not found: ${id}`);
 
       return null;
     }
 
-    templateLogger.log(`Loading template: ${template.name}`);
+    templateLogger.log(`Loading template: ${found.name} (${found.orientation})`);
 
-    return template;
+    return toCoreTemplate(found);
   }
 
   async getTemplatesByCategory(category: CoreTemplate['category']): Promise<CoreTemplate[]> {

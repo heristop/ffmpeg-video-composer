@@ -5,22 +5,26 @@ import AppTutorial from './templates/app-tutorial.json';
 import FastCurious from './templates/fast-curious.json';
 import Interview from './templates/interview.json';
 import PhotoBackdrop from './templates/photo-backdrop.json';
-import PresentYourselfPortrait from './templates/present-yourself-portrait.json';
 import PresentYourself from './templates/present-yourself.json';
 import ProductLaunch from './templates/product-launch.json';
 import SquarePromo from './templates/square-promo.json';
 import StoryReel from './templates/story-reel.json';
 import WebAppPromo from './templates/web-app-promo.json';
 
+// A JSON import is typed by its literal shape, which TemplateDescriptor accepts for some templates and not
+// others; going through `unknown` types every entry the same way, with no per-entry assertion to keep in step.
+function descriptor(json: unknown): TemplateDescriptor {
+  return json as TemplateDescriptor;
+}
+
 export const TEMPLATE_DESCRIPTORS: Record<string, TemplateDescriptor> = {
-  'app-tutorial': AppTutorial,
-  'fast-curious': FastCurious as TemplateDescriptor,
-  interview: Interview as TemplateDescriptor,
-  'photo-backdrop': PhotoBackdrop as TemplateDescriptor,
-  'present-yourself-portrait': PresentYourselfPortrait as TemplateDescriptor,
-  'present-yourself': PresentYourself as TemplateDescriptor,
-  'product-launch': ProductLaunch,
-  'square-promo': SquarePromo,
-  'story-reel': StoryReel,
-  'web-app-promo': WebAppPromo,
+  'app-tutorial': descriptor(AppTutorial),
+  'fast-curious': descriptor(FastCurious),
+  interview: descriptor(Interview),
+  'photo-backdrop': descriptor(PhotoBackdrop),
+  'present-yourself': descriptor(PresentYourself),
+  'product-launch': descriptor(ProductLaunch),
+  'square-promo': descriptor(SquarePromo),
+  'story-reel': descriptor(StoryReel),
+  'web-app-promo': descriptor(WebAppPromo),
 };

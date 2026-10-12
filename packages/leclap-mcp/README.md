@@ -5,7 +5,7 @@ An [MCP](https://modelcontextprotocol.io) server that exposes the
 
 An AI agent (Claude Desktop, Cursor, …) is the LLM; this server helps it **author a customized
 template with nice effects** from the schema, then validates and renders it **deterministically** to
-an mp4. The server includes the 51 showcase samples through the shared packaged catalog, with
+an mp4. The server includes the 50 showcase samples through the shared packaged catalog, with
 creative direction, descriptors and required inputs. It works without the app or private creative-kit
 at runtime. Remotion-assisted authoring is an optional path.
 The result is _agent-composable, deterministic, reproducible_ video — the opposite of generative

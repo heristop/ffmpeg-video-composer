@@ -79,13 +79,6 @@
       "source": "packages/leclap-creative-kit/src/templates/photo-backdrop.json"
     },
     {
-      "id": "present-yourself-portrait",
-      "title": "Present Yourself (Portrait)",
-      "description": "Introduce yourself — a cinematic title card wipes into your graded clip with your name on a lower third, all rendered on this device.",
-      "category": "templates",
-      "source": "packages/leclap-creative-kit/src/templates/present-yourself-portrait.json"
-    },
-    {
       "id": "present-yourself",
       "title": "Present Yourself",
       "description": "Introduce yourself — a cinematic title card wipes into your graded clip with your name on a lower third, all rendered on this device.",

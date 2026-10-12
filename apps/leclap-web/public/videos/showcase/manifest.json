@@ -139,19 +139,6 @@
       "bytes": 1425905
     },
     {
-      "id": "present-yourself-portrait",
-      "source": "packages/leclap-creative-kit/src/templates/present-yourself-portrait.json",
-      "duration": 10.208333,
-      "hasAudio": true,
-      "orientation": "portrait",
-      "backend": "native",
-      "sha256": "f93c25bccd2203de46e8b7f3a1479441189cc2f0956ecaa5c30f874212b2f1db",
-      "templateSha256": "10d597c262a7b11f4db9e50f351fac1471a50d01aa9237b85d0ab9b0e2b9801f",
-      "mediaSource": "packages/leclap-creative-kit/src/library/videos/video_portrait.mp4",
-      "media": "Bundled catalog / demo app fixtures",
-      "bytes": 409011
-    },
-    {
       "id": "present-yourself",
       "source": "packages/leclap-creative-kit/src/templates/present-yourself.json",
       "duration": 10.208333,
@@ -159,7 +146,7 @@
       "orientation": "landscape",
       "backend": "native",
       "sha256": "ddcd71510bdf308dfd7fd1118939753709d4a362e45b4332d0cbc04c89cfc5d3",
-      "templateSha256": "e9c8a8bcd8336da764fc84c9cb2c3442dde9e485d995e4b2af5040ad3ea6e047",
+      "templateSha256": "8832f4affd290c262296123ac2a6f835d1da640fa0fb32c98d5b6c04b34b874d",
       "media": "Bundled catalog / demo app fixtures",
       "bytes": 629931
     },
