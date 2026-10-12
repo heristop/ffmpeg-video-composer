@@ -13,8 +13,11 @@ LeClap creates the artifact. Uploading it remains an explicit step in your GitHu
 
 - `walkthrough`: a screen recording of the implementation under review
 - `project`: the project name shown on the opening card
+- `ticket`: the pull or merge request, decoded in the card's corner (`PR #123`)
 - `change`: a concise name for the change
-- `reviewFocus`: the behavior the reviewer should watch
+- `reviewFocus`: the behavior the reviewer should watch, on the opening card, over the recording and on the review card
+
+The cards use the LeClap evidence look shared with the [evidence-video skill](#evidence-video-agent-skill): the ink canvas, the brand gradient on the headline, Oswald, Rubik and Roboto Mono. The recording plays ungraded, with one ink label in its bottom-left corner.
 
 ## Validate
 
@@ -30,6 +33,7 @@ Run this command from this directory after placing the recording at `./evidence/
 npx @leclap/cli render template.json \
   --video walkthrough=./evidence/walkthrough.mp4 \
   --field project="Example project" \
+  --field ticket="PR #123" \
   --field change="Keyboard navigation" \
   --field reviewFocus="Focus order and visible focus states" \
   --output ./build/pr-evidence.mp4
@@ -41,16 +45,16 @@ Then attach `./build/pr-evidence.mp4` to the PR/MR description or a review comme
 
 For a UI change, a single walkthrough still leaves the reviewer comparing against memory. [`before-after.json`](./before-after.json) shows both behaviors in one short clip:
 
-1. a title card with the project and the change
-2. the `before` recording, badged **BEFORE**
-3. a wipe to the `after` recording, badged **AFTER**
+1. a LeClap card with the change, the ticket and the two outcomes, **BEFORE** in rose and **AFTER** in lavender
+2. the `before` recording, labelled **BEFORE**
+3. a wipe to the `after` recording, labelled **AFTER**
 4. a card that says what to review
 
 ### Inputs
 
 - `before`: the walkthrough on the base branch (the first 3.8 s are used)
-- `after`: the same walkthrough on the branch under review (the first 4.2 s are used)
-- `project`, `change`, `beforeCaption`, `afterCaption`, `reviewFocus`: the card and badge texts, set in the template's `global.variables`
+- `after`: the same walkthrough on the branch under review (the first 4.8 s are used)
+- `project`, `ticket`, `change`, `beforeCaption`, `afterCaption`, `reviewFocus`: the card and badge texts, set in the template's `global.variables`
 
 Copy the template next to your evidence and edit those variables to describe your change.
 
@@ -63,7 +67,7 @@ npm i -D @playwright/test && npx playwright install chromium
 node demo-shop/record.mjs
 ```
 
-This writes `./evidence/before.mp4` and `./evidence/after.mp4`. The demo shop's texts, if you want to reproduce the example exactly: project `Kiln & Co. — shop`, change `Make Add to cart obvious`, beforeCaption `A faint link, and no feedback`, afterCaption `One button, instant cart drawer`, reviewFocus `Button contrast and drawer focus`.
+This writes `./evidence/before.mp4` and `./evidence/after.mp4`. The demo shop's texts, if you want to reproduce the example exactly: project `Kiln & Co. shop`, ticket `SHOP-123`, change `Make add to cart obvious`, beforeCaption `A faint link, no feedback`, afterCaption `One button, then the cart`, reviewFocus `Button contrast, then the drawer`. The showcase preview uses exactly these.
 
 ### Validate and render
 

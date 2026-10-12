@@ -31,3 +31,26 @@ const SAMPLE_VIDEOS: Record<string, string> = {
 export function bundledVideoFor(sampleId: string): string | undefined {
   return SAMPLE_VIDEOS[sampleId];
 }
+
+// The evidence templates' defaults are placeholders; their previews fill them with copy that matches the
+// demo shop's before/after walk (examples/agentic-pr-video/demo-shop).
+const EVIDENCE_COPY: Record<string, Record<string, string>> = {
+  'pr-evidence': {
+    project: 'Kiln & Co. shop',
+    ticket: 'SHOP-123',
+    change: 'Add to cart opens the cart',
+    reviewFocus: 'The button, then the cart drawer',
+  },
+  'before-after': {
+    project: 'Kiln & Co. shop',
+    ticket: 'SHOP-123',
+    change: 'Make add to cart obvious',
+    beforeCaption: 'A faint link, no feedback',
+    afterCaption: 'One button, then the cart',
+    reviewFocus: 'Button contrast, then the drawer',
+  },
+};
+
+export function evidenceCopyFor(sampleId: string): Record<string, string> {
+  return EVIDENCE_COPY[sampleId] ?? {};
+}

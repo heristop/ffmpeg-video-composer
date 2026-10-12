@@ -7,7 +7,7 @@ const templatePath = resolve(import.meta.dirname, '../../examples/agentic-pr-vid
 
 const load = (): {
   global: { variables: Record<string, string> };
-  sections: { name: string; type: string; transition?: { type: string }; lowerThird?: { badge?: { en?: string } } }[];
+  sections: { name: string; type: string; transition?: { type: string }; inputs?: { name: string; html?: string }[] }[];
 } => JSON.parse(readFileSync(templatePath, 'utf8'));
 
 describe('agentic PR before/after example', () => {
@@ -33,8 +33,13 @@ describe('agentic PR before/after example', () => {
 
     expect(names.indexOf('before')).toBeLessThan(names.indexOf('after'));
     expect(names.indexOf('after')).toBeLessThan(names.indexOf('review'));
-    expect(before).toMatchObject({ type: 'project_video', lowerThird: { badge: { en: 'BEFORE' } } });
-    expect(after).toMatchObject({ type: 'project_video', lowerThird: { badge: { en: 'AFTER' } } });
+    const badge = (section: typeof before): string | undefined =>
+      section?.inputs?.find((input) => input.name === 'label')?.html;
+
+    expect(before).toMatchObject({ type: 'project_video' });
+    expect(after).toMatchObject({ type: 'project_video' });
+    expect(badge(before)).toContain('>BEFORE<');
+    expect(badge(after)).toContain('>AFTER<');
     expect(before?.transition?.type).toMatch(/^wipe/);
   });
 });

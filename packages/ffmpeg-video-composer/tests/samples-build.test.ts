@@ -18,8 +18,8 @@ describe('isolated installed samples entry', () => {
       for (const format of ['module', 'commonjs']) {
         const script =
           format === 'module'
-            ? "import { listSamples, getSample } from 'ffmpeg-video-composer/samples'; console.log(JSON.stringify([listSamples().length,getSample('product-reveal').requirements.effects[0].id,[...new Set(getSample('pr-evidence').requirements.assets.filter(a=>a.source==='preset').map(a=>a.reference))].sort()]));"
-            : "const { listSamples, getSample } = require('ffmpeg-video-composer/samples'); console.log(JSON.stringify([listSamples().length,getSample('product-reveal').requirements.effects[0].id,[...new Set(getSample('pr-evidence').requirements.assets.filter(a=>a.source==='preset').map(a=>a.reference))].sort()]));";
+            ? "import { listSamples, getSample } from 'ffmpeg-video-composer/samples'; console.log(JSON.stringify([listSamples().length,getSample('product-reveal').requirements.effects[0].id,[...new Set(getSample('present-yourself').requirements.assets.filter(a=>a.source==='preset').map(a=>a.reference))].sort()]));"
+            : "const { listSamples, getSample } = require('ffmpeg-video-composer/samples'); console.log(JSON.stringify([listSamples().length,getSample('product-reveal').requirements.effects[0].id,[...new Set(getSample('present-yourself').requirements.assets.filter(a=>a.source==='preset').map(a=>a.reference))].sort()]));";
         const result = spawnSync(process.execPath, ['--input-type', format, '-e', script], {
           cwd: directory,
           encoding: 'utf8',

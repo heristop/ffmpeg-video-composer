@@ -168,8 +168,8 @@ describe('packaged sample catalog', () => {
     expect(custom.requirements.setup.join(' ')).toMatch(/--allow-remotion/);
   });
 
-  it.each(['pr-evidence', 'before-after'])('discloses effective title card and lower third fonts for %s', (id) => {
-    const presetFonts = getSample(id).requirements.assets.filter((asset) => asset.source === 'preset');
+  it('discloses effective title card and lower third fonts', () => {
+    const presetFonts = getSample('present-yourself').requirements.assets.filter((asset) => asset.source === 'preset');
     expect([...new Set(presetFonts.map(({ reference }) => reference))].sort()).toEqual(['Anton.ttf', 'Oswald.ttf']);
     expect(presetFonts.some(({ path }) => path.includes('.titleCard.'))).toBe(true);
     expect(presetFonts.some(({ path }) => path.includes('.lowerThird.'))).toBe(true);

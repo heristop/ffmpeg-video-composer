@@ -399,26 +399,26 @@
     {
       "id": "pr-evidence",
       "source": "examples/agentic-pr-video/template.json",
-      "duration": 10.471995,
+      "duration": 12.723991,
+      "hasAudio": true,
       "orientation": "landscape",
       "backend": "native",
-      "sha256": "5bf192bf37f3a668ab7ba57e4b48c5f2fbb952a898468c5969ff69d8436b8deb",
-      "templateSha256": "9b577510449effb711f490ee2f84be6b0740e56dbdce4708943e6a08e25acee5",
+      "sha256": "9d0314628c10b3e42411a2cfbaf7c811b6762daf8cf08e4f3f38d9eb8b14705d",
+      "templateSha256": "54f166577906cee8fb32458c20c2bc51501c0520c0bc3e7a650e52d786094b58",
       "media": "Synthetic demo-shop captures and house cards",
-      "bytes": 205766,
-      "hasAudio": true
+      "bytes": 220502
     },
     {
       "id": "before-after",
       "source": "examples/agentic-pr-video/before-after.json",
-      "duration": 10.842993,
+      "duration": 13.791995,
+      "hasAudio": true,
       "orientation": "landscape",
       "backend": "native",
-      "sha256": "e84286d001e448c0a43ffede01032199a4c5ea3152e39c99195900f4e94200d0",
-      "templateSha256": "0752962575729f63927beb79e6ed9d86ccbc832f1c7975d1030a958f5eab053f",
+      "sha256": "43774d0048c8e390c9d5a430a9ccd6a343efe32b22296b30e03e9ab1ebc72184",
+      "templateSha256": "07ea922a0570d21f072f2aaf504dcd4847644fd0b83fe5c0c84211eee2ad2403",
       "media": "Synthetic demo-shop captures and house cards",
-      "bytes": 179535,
-      "hasAudio": true
+      "bytes": 230852
     },
     {
       "id": "house-evidence",
