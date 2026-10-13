@@ -127,9 +127,9 @@ function litRadii(frame: Buffer, plain: Buffer, angle: number): number[] {
   );
 }
 
-/** The ray's predicted extent at section time t (linear trim path, see fx-burst.ts). */
+/** The ray's predicted extent at section time t (linear trim path over 70 % of the duration, see fx-burst.ts). */
 function predicted(t: number): [number, number] {
-  const p = (t - AT) / DURATION;
+  const p = (t - AT) / (DURATION * 0.7);
   const head = INNER + (OUTER - INNER) * Math.min(1, Math.max(0, p / 0.6));
   const tail = INNER + (OUTER - INNER) * Math.min(1, Math.max(0, (p - 0.3) / 0.7));
   const length = LENGTH * Math.min(1, Math.max(0.3, (head - tail) / LENGTH));
@@ -142,6 +142,7 @@ const ready = hasFfmpeg();
 let plain: Buffer[] = [];
 let burst: Buffer[] = [];
 let turned: Buffer[] = [];
+let dotted: Buffer[] = [];
 
 beforeAll(() => {
   if (!ready) return;
@@ -150,6 +151,7 @@ beforeAll(() => {
   plain = render(null, 'plain');
   burst = render(GRAPHIC, 'burst');
   turned = render({ ...GRAPHIC, rotation: 45 } as FxGraphic, 'turned');
+  dotted = render({ ...GRAPHIC, dots: true, jitter: 0.2, duration: 0.4 } as FxGraphic, 'dotted');
 
   if (!dump) return;
 
@@ -167,7 +169,7 @@ beforeAll(() => {
 
 describe.skipIf(!ready)('burst on real frames', () => {
   it('stands every ray on its angle, between the radii the trim path predicts', () => {
-    for (const n of [9, 14, 17, 22]) {
+    for (const n of [9, 12, 14, 16]) {
       const [near, far] = predicted(n / FPS);
 
       for (const angle of [-90, 0, 90, 180]) {
@@ -187,7 +189,7 @@ describe.skipIf(!ready)('burst on real frames', () => {
   });
 
   it('turns the whole fan by `rotation`: diagonal rays are pre-rotated sprites on the diagonals', () => {
-    const n = 17;
+    const n = 14;
     const [, far] = predicted(n / FPS);
 
     for (const angle of [-45, 45, 135, -135]) {
@@ -207,6 +209,18 @@ describe.skipIf(!ready)('burst on real frames', () => {
 
     expect(lit[0]).toBeGreaterThanOrEqual(Math.round(AT * FPS));
     expect(lit.at(-1)).toBeLessThanOrEqual(Math.round((AT + DURATION) * FPS));
+  });
+
+  it('leaves nothing behind after 70 % of its life: no ray, no faint dot', () => {
+    // At 0.2 s for the default 0.4 s: everything is gone by 0.2 + 0.28 = 0.48 s, between frames 14 and 15
+    // (off the frame grid: trim rounds its end to the nearest frame, so a branch must keep a clear frame).
+    const last = Math.ceil((AT + 0.4 * 0.7) * FPS);
+    const peak = (frame: Buffer, plainFrame: Buffer) =>
+      frame.reduce((most, v, i) => Math.max(most, Math.abs(v - plainFrame[i])), 0);
+
+    expect(peak(dotted[Math.round((AT + 0.1) * FPS)], plain[0])).toBeGreaterThan(120);
+
+    for (let n = last; n < dotted.length; n++) expect(peak(dotted[n], plain[n]), `frame ${n}`).toBeLessThanOrEqual(2);
   });
 
   it('renders the same bytes twice', () => {

@@ -3,15 +3,18 @@
 //
 // Each ray is a compile-time `ray` sprite (a solid capsule) ALREADY TURNED to its angle, at its longest
 // length, so nothing rotates per frame; a capsule turned half a turn is itself, so opposite rays share one
-// sprite. A ray is a trim path: its head runs from the inner to the outer radius over the first 60 % of its
-// life, its tail follows over the last 70 % (both on the pass ease), so it grows from a stub, shoots out at
-// full length, then shrinks into the outer radius. The overlay centres the sprite between head and tail
+// sprite. Everything is gone by 70 % of the duration (END): a ray's life runs from its start to there, and
+// nothing lingers faint over the rest of the window: each branch runs CLEAR frames past its fade, so its last
+// frame, the one its overlay repeats until the window ends, is clear. A ray is a trim path: its head runs from the inner to
+// the outer radius over the first 60 % of its life, its tail follows over the last 70 % (both on the pass
+// ease), so it grows from a stub, shoots out at full length, then shrinks into the outer radius. The overlay centres the sprite between head and tail
 // (x/y expressions in t) and scales it down per frame to the head-tail distance (scale eval=frame, never
 // up, floored at 30 %: the stroke thins with it). Alpha: a 4-frame ramp in, then a fade over the last
-// 55 %. Dots (one shared disc sprite) ride between the rays a beat later and shrink as they go. The region is
+// 55 %. Dots (one shared disc sprite, few and large) ride in the gaps between the rays a beat later and shrink
+// as they go. The region is
 // a square around the origin that holds the outer radius plus half a ray, unmasked (fx-marks drawIn): the
 // rays leave the button they burst from. Jitter (seeded, drawn in a fixed order) offsets each ray's angle,
-// reach, length and start. At most 48 overlays per graphic (later passes drop first).
+// reach, length (±20 % at the default) and start (0–30 ms late at the default), so no burst looks stamped. At most 48 overlays per graphic (later passes drop first).
 // Reduced motion: the rays at rest at mid travel, 70 % long, faded in and out; no dots.
 // Filters: fps, trim, split, colorchannelmixer, fade, scale (eval=frame), overlay: all on-device.
 
@@ -46,13 +49,23 @@ const DEFAULT_THICKNESS = 6;
 const DEFAULT_GAP = 0.1;
 const DEFAULT_TRAVEL = 0.55;
 /** A dot's diameter, in ray strokes. */
-export const DOT_SIZE = 2.4;
+export const DOT_SIZE = 3.4;
 const DEFAULT_LENGTH = 0.5;
 const DEFAULT_JITTER = 0.2;
-const MAX_DOTS = 12;
+/** `dots: true` puts one dot in every other gap, at most this many. */
+const MAX_DOTS = 6;
+/** The latest a ray starts after the pass, s, at the default jitter and above. */
+const RAY_DELAY = 0.03;
+/** The share of the duration by which every ray and dot is gone. */
+export const END = 0.7;
+/**
+ * Frames a branch runs past its fade. A layer overlay repeats a branch's last frame until the window ends,
+ * so that frame must be the fully faded one; trim rounds its end to the nearest frame, so one is not enough.
+ */
+const CLEAR = 2;
 /** The smallest share of its sprite a ray is drawn at (a stub at birth and at death). */
 export const FLOOR = 0.3;
-/** Shares of a ray's life: the head travels over [0, HEAD], the tail over [TAIL, 1], the fade from FADE. */
+/** Shares of a ray's life (its start to END): the head travels over [0, HEAD], the tail over [TAIL, 1], the fade from FADE. */
 export const HEAD = 0.6;
 export const TAIL = 0.3;
 export const FADE = 0.45;
@@ -107,10 +120,21 @@ function fan(count: number, spread: number, rotation: number, between: boolean):
   return Array.from({ length: count }, (_, i) => first + offset + i * step);
 }
 
+/** `count` dot angles spread evenly over the gaps between the ray angles (a dot never sits on a ray). */
+function gapsOf(rays: number[], spread: number, rotation: number, count: number): number[] {
+  const step = rays[1] - rays[0];
+  const gaps = rays.slice(0, spread >= 360 ? rays.length : rays.length - 1).map((angle) => angle + step / 2);
+
+  // More dots than gaps: evenly over the spread, as many as asked.
+  if (count > gaps.length) return fan(count, spread, rotation, true);
+
+  return Array.from({ length: count }, (_, i) => gaps[Math.floor(((i + 0.5) * gaps.length) / count)]);
+}
+
 function dotCount(fx: Ctx, rays: number): number {
   const dots = fx.graphic.dots;
 
-  if (dots === true) return Math.min(rays, MAX_DOTS);
+  if (dots === true) return Math.min(Math.ceil(rays / 2), MAX_DOTS);
 
   return typeof dots === 'number' ? dots : 0;
 }
@@ -163,11 +187,12 @@ function partsOf(fx: Ctx, geo: Geometry, thickness: number): Pick<BurstPlan, 'ra
   const spread = g.spread ?? 360;
   const jitter = g.jitter ?? DEFAULT_JITTER;
   const step = spread / (spread >= 360 ? count : Math.max(1, count - 1));
-  const shape = fan(count, spread, g.rotation ?? 0, false).map((angle) => {
+  const angles = fan(count, spread, g.rotation ?? 0, false);
+  const shape = angles.map((angle) => {
     const turn = (fx.random() - 0.5) * jitter * step * 0.5;
     const reach = 1 + (fx.random() - 0.5) * jitter * 0.5;
-    const stretch = 1 + (fx.random() - 0.5) * jitter * 0.8;
-    const delay = fx.random() * jitter * 0.15 * fx.duration;
+    const stretch = 1 + (fx.random() - 0.5) * Math.min(1, jitter * 2);
+    const delay = fx.random() * RAY_DELAY * Math.min(1, jitter / DEFAULT_JITTER);
     const [inner, outer] = travelAlong(fx, geo, angle + turn);
     const far = inner + Math.max(1, outer - inner) * reach;
 
@@ -179,20 +204,20 @@ function partsOf(fx: Ctx, geo: Geometry, thickness: number): Pick<BurstPlan, 'ra
       delay,
     };
   });
-  const dotAngles = fan(dotCount(fx, count), spread, g.rotation ?? 0, true);
+  const dotAngles = gapsOf(angles, spread, g.rotation ?? 0, dotCount(fx, count));
   const dotReach = dotAngles.map(() => 1 + (fx.random() - 0.5) * jitter * 0.6);
   const starts = passStarts(fx, shape.length + dotAngles.length);
 
   return {
     rays: starts.flatMap((t0) =>
-      shape.map(({ delay, ...ray }) => ({ ...ray, start: t0 + delay, life: fx.duration - delay }))
+      shape.map(({ delay, ...ray }) => ({ ...ray, start: t0 + delay, life: fx.duration * END - delay }))
     ),
     dots: starts.flatMap((t0) =>
       dotAngles.map((angle, i) => ({
         angle,
         ...dotPath(travelAlong(fx, geo, angle), dotReach[i]),
         start: t0 + DOT_DELAY * fx.duration,
-        life: fx.duration * (1 - DOT_DELAY),
+        life: fx.duration * (END - DOT_DELAY),
       }))
     ),
   };
@@ -270,7 +295,7 @@ function rayFilters(fx: Ctx, ray: Ray, spec: SpriteSpec, path: Path): Filter[] {
   const ramp = Math.min(rampOf(fx), ray.life / 4);
 
   return [
-    { type: 'trim', value: `start=${fmt(ray.start)}:end=${fmt(ray.start + ray.life)}` },
+    { type: 'trim', value: `start=${fmt(ray.start)}:end=${fmt(ray.start + ray.life + CLEAR / fx.frame.fps)}` },
     fadeIn(fx, ray.start, ramp),
     ...fadeOut(fx, ray.start + ray.life * FADE, ray.life * (1 - FADE)),
     scaleTo(sizeExpr(spec.w, factor), sizeExpr(spec.h, factor)),
@@ -305,7 +330,7 @@ function dotLayer(fx: Ctx, plan: BurstPlan, dot: Dot, input: string, label: stri
   const [c, s] = [Math.cos((dot.angle * Math.PI) / 180), Math.sin((dot.angle * Math.PI) / 180)];
   const side = dotSpec(plan).w;
   const filters: Filter[] = [
-    { type: 'trim', value: `start=${fmt(dot.start)}:end=${fmt(dot.start + dot.life)}` },
+    { type: 'trim', value: `start=${fmt(dot.start)}:end=${fmt(dot.start + dot.life + CLEAR / fx.frame.fps)}` },
     fadeIn(fx, dot.start, Math.min(rampOf(fx), dot.life / 4)),
     ...fadeOut(fx, dot.start + dot.life * 0.5, dot.life * 0.5),
     scaleTo(sizeExpr(side, `1-${DOT_SHRINK}*(${travel})`)),

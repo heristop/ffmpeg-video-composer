@@ -127,7 +127,7 @@ export const ENGINE_THUMBS: EngineThumb[] = [
     fx('confetti', { at: 0.05, duration: 1.9, origin: { x: 0.5, y: 0.8 }, count: 32, size: 56, speed: 1.4 }),
   ]),
   // Impact lines around the accent button, twice so the 2 s clip loops on a beat.
-  thumb('burst', 'Burst', 0.32, [
+  thumb('burst', 'Burst', 0.26, [
     {
       type: 'fx',
       effect: 'burst',

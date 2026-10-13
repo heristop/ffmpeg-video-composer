@@ -30,7 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   "BAM!". Thin rays shoot out from `origin`, grow then shrink between an inner and an outer radius as they
   fade, with optional `dots` between them. `rays` (4–24), `radius` ([inner, outer]; by default each ray starts
   just outside the target's edge along its own direction, so a burst around a pill or a badge clears it),
-  `thickness`, `length`, `spread` (180 = a half burst), `rotation` and a seeded `jitter`. Each ray is a
+  `thickness`, `length`, `spread` (180 = a half burst), `rotation` and a seeded `jitter` (each ray starts
+  0–30 ms late and is ±20 % long at the default, so no burst looks stamped). It snaps: 0.4 s by default on
+  an expo-out, every ray and dot gone by 70 % of the duration so nothing faint lingers, and `dots: true`
+  puts few, larger dots in every other gap. Each ray is a
   compile-time sprite already turned to its angle (opposite rays share one), moved and scaled by per-frame
   expressions: no `rotate`, only on-device filters (`scale`, `fade`, `colorchannelmixer`, `overlay`). Reduced
   motion: the rays rest at mid travel and fade in and out. It is in the motion catalog, the JSON schema, the

@@ -85,17 +85,17 @@ export const burstDoc = {
     thickness: 'Ray stroke in px at 1080p (default 6; scaled to the output frame). Thins as the ray shrinks.',
     length:
       "A ray's longest length as a share of its travel (outer - inner; default 0.5). Each ray grows from a stub, shoots out at that length, then shrinks into the outer radius.",
-    dots: 'Small dots riding between the rays: true = one per gap (at most 12), or a count 1–12 (default none).',
+    dots: 'Dots riding in the gaps between the rays, larger than the stroke: true = one in every other gap (at most 6), or a count 1–12 (default none).',
     spread:
       'Degrees the rays fan over, centred on up (default 360 = all around; 180 = a half burst over the origin, 90 = a narrow fan).',
     rotation:
       'Degrees the whole fan turns clockwise (default 0: a full burst has a ray straight up; 180 points a half burst down).',
     jitter:
-      'Seeded irregularity 0..1 (default 0.2): each ray gets its own angle offset, reach, length and a slight delay. 0 = perfectly regular.',
+      'Seeded irregularity 0..1 (default 0.2): each ray gets its own angle offset, reach, length (±20 % at 0.2) and start (0–30 ms late at 0.2 and above), so no burst looks stamped. 0 = perfectly regular.',
   },
   intent: {
     summary:
-      'A one-shot radial burst from a point: thin strokes shoot out, grow then shrink as they fade, with optional dots between them; the impact lines of a like-button pop or a "BAM!".',
+      'A one-shot radial burst from a point: thin strokes shoot out on an expo-out, grow then shrink as they fade, with optional dots between them, all gone by 70 % of the duration; the impact lines of a like-button pop or a "BAM!".',
     useWhen: 'a heart or a button pops; a badge or a price slams in; a stamp lands; the beat a counter hits its goal',
     avoidWhen: 'calm or editorial tones; on every element of a section; together with confetti or a glint in one beat',
     vary: 'origin and radius put it on the exact element; rays, thickness and length set its weight (few and thick = a pop, many and thin = a flash); spread + rotation fan it (180 = a half burst over a title); dots add sparkle; jitter breaks the symmetry; duration and ease set the snap; colour defaults to the theme accent.',

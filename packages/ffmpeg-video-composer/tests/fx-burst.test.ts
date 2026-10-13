@@ -7,7 +7,7 @@ import { parseSpriteUrl, spriteImage } from '@/editor/presets/fx-sprites';
 import type { SugarContext } from '@/editor/presets/sugar-context';
 import { FX_PRIMITIVES, type FxGraphic } from '@/schemas/fx.schemas';
 import { GraphicSchema } from '@/schemas/graphics.schemas';
-import { planOf } from '@/editor/presets/fx-burst';
+import { DOT_SIZE, END, planOf } from '@/editor/presets/fx-burst';
 import type { FxContext } from '@/editor/presets/fx-kit';
 
 function burstContext(target: { x: number; y: number; w: number; h: number }): FxContext<'burst'> {
@@ -95,6 +95,11 @@ describe('fx burst schema', () => {
     expect(FX_PRIMITIVES.burst.defaults.ceiling * FX_PRIMITIVES.burst.defaults.intensity).toBeGreaterThanOrEqual(0.85);
   });
 
+  it('defaults to a 0.4 s snap on an expo-out travel', () => {
+    expect(FX_PRIMITIVES.burst.defaults.duration).toBe(0.4);
+    expect(FX_PRIMITIVES.burst.defaults.ease).toBe('cubic-bezier(0.16, 1, 0.3, 1)');
+  });
+
   it('accepts its own parameters and rejects the rest', () => {
     const ok = [
       { effect: 'burst' },
@@ -152,22 +157,83 @@ describe('fx burst lowering', () => {
     const up = parseSpriteUrl(inputs.find((url) => url.includes('tilt=90')) ?? '');
     const [ray] = chains.filter((chain) => chain.outputs?.[0] === 'fx1_ry0');
     const overlay = chains.find((chain) => chain.inputs?.includes('fx1_ry0'))?.filters[0];
-    const head = easedProgressExpr(parseEasing('linear'), { delay: 0.4, duration: 0.36 });
-    const tail = easedProgressExpr(parseEasing('linear'), { delay: 0.58, duration: 0.42 });
+    // Visible life: 0.7 of the 0.6 s duration = 0.42 s; head over its first 60 %, tail over its last 70 %.
+    const head = easedProgressExpr(parseEasing('linear'), { delay: 0.4, duration: 0.252 });
+    const tail = easedProgressExpr(parseEasing('linear'), { delay: 0.526, duration: 0.294 });
     const factor = `clip(((${head})-(${tail}))*2,0.3,1)`;
 
     // Thickness 6 px at 1080p → 4 px at 720p; length 0.5 of the 100 px travel → 50 px.
     expect(up).toMatchObject({ kind: 'ray', tilt: 90, width: 50, stroke: 4, w: 6, h: 52 });
     expect(ray.filters.map((f) => `${f.type}=${String(f.value)}`)).toEqual([
-      'trim=start=0.4:end=1',
-      'fade=t=in:st=0.4:d=0.133333:alpha=1',
-      'fade=t=out:st=0.67:d=0.33:alpha=1',
+      'trim=start=0.4:end=0.886667',
+      'fade=t=in:st=0.4:d=0.105:alpha=1',
+      'fade=t=out:st=0.589:d=0.231:alpha=1',
       `scale=w='max(2,2*trunc(3*(${factor})+0.5))':h='max(2,2*trunc(26*(${factor})+0.5))':eval=frame`,
     ]);
     // Region: a square around the origin (640, 360) of half side 200 + 25 + 4 + 4, snapped outward to even px: x 406, y 126.
     expect(overlay?.value).toBe(
       `x='234+0*((${head})+(${tail}))-overlay_w/2':y='134+-50*((${head})+(${tail}))-overlay_h/2'`
     );
+  });
+
+  it('is gone by 70 % of its life: every ray and dot trims and fades out by then', () => {
+    // Default duration 0.4 s from at 0.4: nothing draws after 0.4 + 0.7 · 0.4 = 0.68 s.
+    // Each branch keeps a fully faded frame past its fade: a layer overlay repeats a branch's last frame
+    // until the window ends, so that frame must be clear (2 frames of margin: trim rounds its end to a frame).
+    const { chains } = lower({ target: HEART, dots: true });
+    const parts = chains.filter((chain) => /fx1_(ry|dt)\d+$/.test(chain.outputs?.[0] ?? ''));
+    const done = 0.4 + END * 0.4;
+
+    expect(END).toBe(0.7);
+    expect(parts).toHaveLength(12);
+
+    for (const chain of parts) {
+      const end = Number(/end=([\d.]+)/.exec(String(chain.filters[0].value))?.[1]);
+      const fade = chain.filters.find((f) => String(f.value).startsWith('t=out'));
+      const [, st, d] = /st=([\d.]+):d=([\d.]+)/.exec(String(fade?.value)) ?? [];
+
+      expect(Number(st) + Number(d)).toBeLessThanOrEqual(done + 1e-6);
+      expect(end).toBeCloseTo(Number(st) + Number(d) + 2 / 30, 5);
+    }
+  });
+
+  it('breaks the stamp: each ray starts 0–30 ms late and is ±20 % long, from the seed', () => {
+    let state = 12345;
+    const random = () => {
+      state = (state * 1103515245 + 12345) % 2147483648;
+
+      return state / 2147483648;
+    };
+    const fx = {
+      ...burstContext(HEART),
+      graphic: { type: 'fx', effect: 'burst', rays: 24 },
+      random,
+    } as FxContext<'burst'>;
+    const rays = planOf(fx)?.rays ?? [];
+    const offsets = rays.map((ray) => ray.start - fx.at);
+    const lengths = rays.map((ray) => ray.length / (0.5 * (ray.outer - ray.inner)));
+
+    expect(Math.min(...offsets)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...offsets)).toBeLessThanOrEqual(0.03);
+    expect(Math.max(...offsets) - Math.min(...offsets)).toBeGreaterThan(0.015);
+    expect(Math.min(...lengths)).toBeGreaterThanOrEqual(0.8 - 1e-9);
+    expect(Math.max(...lengths)).toBeLessThanOrEqual(1.2 + 1e-9);
+    expect(Math.max(...lengths) - Math.min(...lengths)).toBeGreaterThan(0.2);
+    // Every ray still ends with the others, at 70 % of the duration.
+    expect(rays.every((ray) => Math.abs(ray.start + ray.life - (fx.at + END * fx.duration)) < 1e-9)).toBe(true);
+  });
+
+  it('draws fewer, larger dots, each in a gap between two rays', () => {
+    const fx = { ...burstContext(HEART), graphic: { type: 'fx', effect: 'burst', dots: true, jitter: 0 } };
+    const plan = planOf(fx as FxContext<'burst'>);
+    const rays = plan?.rays.map((ray) => ray.angle) ?? [];
+    const dots = plan?.dots.map((dot) => dot.angle) ?? [];
+    const apart = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
+
+    expect(DOT_SIZE).toBeGreaterThanOrEqual(3.4);
+    expect(dots).toHaveLength(4);
+
+    for (const dot of dots) expect(Math.min(...rays.map((ray) => apart(dot, ray)))).toBeCloseTo(22.5, 6);
   });
 
   it('starts each ray just outside the target edge by default, whatever its shape', () => {
@@ -202,8 +268,8 @@ describe('fx burst lowering', () => {
 
     expect(discs).toHaveLength(1);
     expect(discs[0]?.shape).toBe('disc');
-    expect(count(text, /overlay=x=/g)).toBe(12);
-    expect(count(lower({ target: HEART, rays: 6, dots: 3 }).text, /overlay=x=/g)).toBe(9);
+    expect(count(text, /overlay=x=/g)).toBe(9);
+    expect(count(lower({ target: HEART, rays: 6, dots: 2 }).text, /overlay=x=/g)).toBe(8);
   });
 
   it('defaults to the theme accent and honours an authored colour', () => {

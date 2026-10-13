@@ -89,5 +89,5 @@ export const burst = {
     jitter: z.number().min(0).max(1).optional(),
   },
   // Solid strokes like the other marks: a burst must read at phone scale, and each ray is a few px wide.
-  defaults: { duration: 0.6, ease: 'cubic-bezier(0.16, 1, 0.3, 1)', ceiling: 1, intensity: 0.9 },
+  defaults: { duration: 0.4, ease: 'cubic-bezier(0.16, 1, 0.3, 1)', ceiling: 1, intensity: 0.9 },
 };
