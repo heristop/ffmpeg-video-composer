@@ -59,6 +59,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `examples/motion-design/fx-glitch-iris-sheen.json`: a torn title, an iris from a sun icon that grows into
   it, and a glossed premium pill with a glint.
 
+- A `path` graphic: a line that draws itself along any path, for a chart line with a dot riding its end, a
+  circle drawn around a detail, a hand-drawn swash or a progress ring. The path is `points` (optionally
+  `smooth` through them and `closed`), a `shape` (`circle`, `ellipse`, `arc`, `wave`) or an SVG `d` limited to
+  M/L/H/V/C/Q/Z, in px or fractions of a `target`. It takes `thickness`, round or butt `caps`, `dash`,
+  `from`/`to` (stop a ring at 75 %, or undraw), a `head` dot, and an `exit` that fades or retracts in drawing
+  order. The drawing end moves by arc length, so a linear ease runs at constant speed on any shape. The stroke
+  and a map of each pixel's position along the path are rasterised once at compile time (`trace:` images,
+  same bytes on every platform); one `lutyuv` per output frame thresholds the map, so the reveal is
+  anti-aliased and smooth on every frame with the on-device filters (`lutyuv`, `alphamerge`, `overlay`,
+  `crop`, `trim`, `split`, `fps`, `fade`). Once drawn, a still of the stroke replaces the reveal.
+
 ### Changed
 
 - fx `glint`: each star is now a 12–14 frame twinkle (scale up from 0, turn 15°, gone) instead of filling

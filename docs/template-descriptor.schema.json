@@ -3263,7 +3263,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -6126,7 +6126,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -9032,7 +9032,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -11662,7 +11662,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -14272,7 +14272,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -17353,7 +17353,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -19963,7 +19963,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -22573,7 +22573,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -25701,6 +25701,304 @@
           "required": ["type"],
           "additionalProperties": false,
           "description": "Four corner brackets that extend from the corners (viewfinder / focus framing): brackets around a subject that close in on a spring, extend clockwise from the top-left, exit by expanding and fading, and stay readable on light backgrounds."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "path"
+            },
+            "id": {
+              "type": "string",
+              "maxLength": 40,
+              "pattern": "^[A-Za-z]\\w*(?:-[A-Za-z]\\w*)*$",
+              "description": "Id other time fields in this section reference as \"<id>.start\" / \"<id>.end\". Unique within the section."
+            },
+            "at": {
+              "description": "When it animates in: seconds from the section start (default 0) or a time reference (\"beat:8\").",
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "$ref": "#/$defs/TimeRef"
+                }
+              ]
+            },
+            "duration": {
+              "description": "Seconds the draw takes (default 1.2).",
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 10
+            },
+            "ease": {
+              "description": "Curve of the animation (default per type, e.g. $expo).",
+              "$ref": "#/$defs/EasingSpec"
+            },
+            "role": {
+              "type": "string",
+              "enum": ["micro", "panel", "camera", "headline", "accent", "mascot"],
+              "description": "Motion role of this element (global.motion.roles): micro (small UI bits, quick, no overshoot), panel (plates/cards, controlled settle), camera (smooth, near-invisible), headline (strong entrance, stable hold), accent (snappy emphasis), mascot (playful overshoot). Supplies ease (and duration when the ease comes from the role) to an element that sets none; an explicit ease/duration always wins."
+            },
+            "until": {
+              "description": "When it disappears: seconds or a time reference (\"end - 0.3\"); default: holds to the cut.",
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "$ref": "#/$defs/TimeRef"
+                }
+              ]
+            },
+            "color": {
+              "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
+              "type": "string"
+            },
+            "above": {
+              "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
+              "type": "boolean"
+            },
+            "target": {
+              "description": "Coordinates are 0..1 fractions of this box (default: px).",
+              "$ref": "#/$defs/FxTarget"
+            },
+            "points": {
+              "description": "[x, y] pairs.",
+              "minItems": 2,
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              }
+            },
+            "smooth": {
+              "description": "A smooth curve through the points.",
+              "type": "boolean"
+            },
+            "closed": {
+              "type": "boolean"
+            },
+            "shape": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "circle"
+                    },
+                    "cx": {
+                      "type": "number"
+                    },
+                    "cy": {
+                      "type": "number"
+                    },
+                    "r": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "start": {
+                      "description": "Start angle, degrees clockwise from 3 o’clock (default -90: 12 o’clock).",
+                      "type": "number"
+                    },
+                    "direction": {
+                      "type": "string",
+                      "enum": ["cw", "ccw"]
+                    }
+                  },
+                  "required": ["type", "cx", "cy", "r"],
+                  "additionalProperties": false,
+                  "description": "With a target, r is a fraction of its shorter side."
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "ellipse"
+                    },
+                    "cx": {
+                      "type": "number"
+                    },
+                    "cy": {
+                      "type": "number"
+                    },
+                    "rx": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "ry": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "start": {
+                      "description": "Start angle, degrees clockwise from 3 o’clock (default -90: 12 o’clock).",
+                      "type": "number"
+                    },
+                    "direction": {
+                      "type": "string",
+                      "enum": ["cw", "ccw"]
+                    }
+                  },
+                  "required": ["type", "cx", "cy", "rx", "ry"],
+                  "additionalProperties": false,
+                  "description": "An ellipse."
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "arc"
+                    },
+                    "cx": {
+                      "type": "number"
+                    },
+                    "cy": {
+                      "type": "number"
+                    },
+                    "r": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "start": {
+                      "description": "Start angle, degrees clockwise from 3 o’clock (default -90: 12 o’clock).",
+                      "type": "number"
+                    },
+                    "sweep": {
+                      "type": "number",
+                      "description": "Degrees (< 0: ccw)."
+                    }
+                  },
+                  "required": ["type", "cx", "cy", "r", "sweep"],
+                  "additionalProperties": false,
+                  "description": "A circular arc."
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "wave"
+                    },
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    },
+                    "width": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "amplitude": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "wavelength": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "phase": {
+                      "description": "Degrees (default 0: rising).",
+                      "type": "number"
+                    }
+                  },
+                  "required": ["type", "x", "y", "width", "amplitude", "wavelength"],
+                  "additionalProperties": false,
+                  "description": "A sine wave, left to right."
+                }
+              ]
+            },
+            "d": {
+              "description": "SVG path of M, L, H, V, C, Q, Z.",
+              "type": "string"
+            },
+            "thickness": {
+              "description": "Line thickness in px (default 6).",
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 80
+            },
+            "caps": {
+              "description": "round (default) or butt.",
+              "type": "string",
+              "enum": ["round", "butt"]
+            },
+            "dash": {
+              "description": "[on, off] px.",
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              ]
+            },
+            "from": {
+              "description": "Start position, 0..1 (default 0).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "to": {
+              "description": "End position (default 1).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "head": {
+              "description": "A dot riding the drawing end.",
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "size": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 200
+                    },
+                    "color": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "exit": {
+              "description": "fade (default), retract (erases in drawing order) or none.",
+              "type": "string",
+              "enum": ["none", "fade", "retract"]
+            },
+            "exitDuration": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 3
+            }
+          },
+          "required": ["type"],
+          "additionalProperties": false,
+          "description": "A line drawing itself along points, a shape or an SVG path, with an optional head dot."
         },
         {
           "type": "object",

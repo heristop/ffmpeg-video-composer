@@ -139,6 +139,10 @@ export const GRAPHIC_GUIDES: Record<string, MotionGuide> = {
   ]),
   frame: guide('TRACES', 'framing a stat or a quote', 'busy frames', ['counter', 'typewriter']),
   corners: guide('BRACKETS', 'focus on a product, a stat or a face', 'full-bleed type', ['counter', 'orbit']),
+  path: guide('DRAWS ON', 'a chart line, a circled detail, a swash or a ring', 'more than two drawing at once', [
+    'counter',
+    'bars-chart',
+  ]),
   wipe: guide('WIPES', 'an in-scene page turn between two ideas', 'a beat that already ends on a transition', [
     'slide',
     'swipe',

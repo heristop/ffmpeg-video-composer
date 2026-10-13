@@ -4,6 +4,7 @@ import { ElementIdSchema, timeValue } from './time.schemas';
 import { TranslationSchema } from './global.schemas';
 import { FxGraphicSchema } from './fx.schemas';
 import { cornerStrokeFields, frameStrokeFields, underlineStrokeFields } from './graphics-stroke.schemas';
+import { pathGeometryError, pathStrokeFields } from './graphics-path.schemas';
 
 // ── animated graphics (docs/plans/motion-system.md §4.4) ──────────────────────
 //
@@ -108,6 +109,20 @@ export const GraphicSchema = z
           'in on a spring, extend clockwise from the top-left, exit by expanding and fading, and stay readable on ' +
           'light backgrounds.'
       ),
+    z
+      .object({
+        type: z.literal('path'),
+        ...timing,
+        duration: z.number().positive().max(10).optional().describe('Seconds the draw takes (default 1.2).'),
+        ...pathStrokeFields,
+      })
+      .strict()
+      .superRefine((g, ctx) => {
+        const message = pathGeometryError(g);
+
+        if (message) ctx.addIssue({ code: 'custom', message, path: g.d === undefined ? [] : ['d'] });
+      })
+      .describe('A line drawing itself along points, a shape or an SVG path, with an optional head dot.'),
     z
       .object({
         type: z.literal('wipe'),
@@ -240,8 +255,8 @@ export const GraphicsSchema = z
   .array(GraphicSchema)
   .max(24)
   .describe(
-    'Animated graphics: flash, bars, underline, frame, corners, wipe, panel, glitch, focus, progress, ticker, ' +
-      'bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters).'
+    'Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ' +
+      'ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters).'
   );
 
 export type Graphic = z.infer<typeof GraphicSchema>;

@@ -97,6 +97,10 @@ Each phrase is fitted to at most two balanced lines, held for at least a second,
 
 [`fx-burst.json`](./fx-burst.json) shows the `burst` fx primitive in three beats on an ink ground: a heart springs in (`options.animate` scale on a near-critical `spring(300, 24)`, 5 % overshoot) and fires a rose burst with a few dots one frame before the top of the pop, squashing 0.92 × 1.06 for 2 frames on the hit; a SALE badge drops on a keyframed `y`, stretching as it falls, squashes on the floor (`scaleX` / `scaleY`), rebounds into a short stretch and rests on a `spring(170, 18)`, throwing ten short impact lines on the frame it lands; a title settles over a lavender half burst (`spread: 180`, origin at its bottom edge). Each ray is a sprite turned at compile time; its length and fade are per-frame expressions, so nothing rotates per frame, and every burst is gone by 70 % of its duration. Asset-free.
 
+## Line draw
+
+[`line-draw.json`](./line-draw.json) shows the `path` graphic in three beats: a smoothed chart line draws on with a lavender dot locked to its end, a rose ring closes around the point the line passed, then everything retracts in drawing order; a hand-drawn swash (an SVG `d`) lands under a title; a progress ring fills to 75 % while its value counts up. Asset-free; see [Paths](../../docs/template-configuration.md#paths-path).
+
 ## One story, three formats
 
 [`formats.json`](./formats.json) is one launch story composed for 16:9, 9:16 and 1:1. `$format` markers set per-format sizes, positions and holds; `formats.portrait` / `formats.square` patch sections by element id (the square cut drops the proof beat). Render every format with `leclap render formats.json --formats all` (one file per format); the showcase previews the landscape cut.
