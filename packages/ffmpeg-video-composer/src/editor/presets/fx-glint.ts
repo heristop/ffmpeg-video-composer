@@ -102,9 +102,15 @@ function twinkle(fx: Ctx, star: Star): string {
 function starFilters(fx: Ctx, plan: GlintPlan, star: Star): Filter[] {
   const spin = ((fx.graphic.spin ?? 15) * Math.PI) / 180;
   const ramp = Math.min(rampOf(fx), star.life / 4);
+  // Filled with the star colour at alpha 0, never `c=none` (stale pixels around a moving angle: fx-confetti).
   const turn: Filter[] =
     spin !== 0 && fx.has('rotate')
-      ? [{ type: 'rotate', value: `a='${fmt(spin)}*clip((t-${fmt(star.start)})/${fmt(star.life)},0,1)':c=none` }]
+      ? [
+          {
+            type: 'rotate',
+            value: `a='${fmt(spin)}*clip((t-${fmt(star.start)})/${fmt(star.life)},0,1)':c=0x${plan.spec.color ?? 'ffffff'}@0`,
+          },
+        ]
       : [];
 
   return [

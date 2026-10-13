@@ -44,6 +44,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `global` in the code to `globalThis`, locals and object keys included, so resolving a theme walked
   `globalThis`; only the free identifier is rewritten now. Error messages no longer read `globalThis.beats`.
 
+- fx `confetti` and `glint`: a turning piece no longer leaves trails. Their `rotate` filled the corners of the
+  turned sprite with `c=none`, which leaves whatever FFmpeg's frame pool last held there, so each piece
+  smeared its earlier angles and a paper strip read as a filled square. The corners are now cleared with the
+  piece's own colour at alpha 0, which also keeps the scale after the turn from pulling in a dark fringe.
+
 ## [3.1.0] - 2026-10-11
 
 ### Added

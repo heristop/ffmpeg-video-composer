@@ -225,7 +225,7 @@ describe('fx confetti', () => {
   it('tumbles and flutters every piece and follows a ballistic path', () => {
     const { text } = lower({ effect: 'confetti', count: 6, colors: ['#FF0000'] });
 
-    expect(count(text, /rotate=a='[\d.-]+\+-?[\d.]+\*\(t-0\.4\)':c=none/g)).toBe(6);
+    expect(count(text, /rotate=a='[\d.-]+\+-?[\d.]+\*\(t-0\.4\)':c=0xff0000@0:/g)).toBe(6);
     expect(count(text, /abs\(cos\(/g)).toBe(6);
     expect(text).toMatch(/exp\(-[\d.]+\*\(t-0\.4\)\)/);
     expect(text).toContain('fade=t=in:st=0.4:d=0.133333:alpha=1');
