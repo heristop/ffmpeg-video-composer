@@ -13,6 +13,7 @@ import { bokehDoc, dustDoc } from './fx-particles.docs';
 import { glassDoc, resolveDoc } from './fx-surface.docs';
 import { edgeGlowDoc, leakDoc } from './fx-light.docs';
 import { bloomDoc, grainDoc, vignetteBreatheDoc } from './fx-ambient.docs';
+import { gooDoc } from './fx-liquid.docs';
 
 const sheenDoc = {
   params: {
@@ -60,6 +61,7 @@ export const FX_DOCS: { [N in FxEffectName]: FxDoc<(typeof FX_PRIMITIVES)[N]['pa
   bloom: bloomDoc,
   'vignette-breathe': vignetteBreatheDoc,
   grain: grainDoc,
+  goo: gooDoc,
 };
 
 // What `.describe(text)` records, on the schema itself (keeping any metadata it has, e.g. an id).

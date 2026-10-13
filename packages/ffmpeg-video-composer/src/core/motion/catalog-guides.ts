@@ -122,6 +122,12 @@ export const TRANSITION_GUIDES: Record<string, MotionGuide> = {
   ]),
   'whip-up': guide('WHIPS UP', 'energetic list or feed-style stacking', 'cinematic tone', ['rise', 'pop']),
   'whip-down': guide('WHIPS DOWN', 'a drop into the next beat', 'the opening hook', ['drop', 'flash']),
+  drip: guide(
+    'DRIPS',
+    'a playful chapter change, a brand colour moment, a reveal from under paint',
+    'premium, calm or corporate tone, or more than once per video',
+    ['goo', 'drop']
+  ),
 };
 
 export const GRAPHIC_GUIDES: Record<string, MotionGuide> = {

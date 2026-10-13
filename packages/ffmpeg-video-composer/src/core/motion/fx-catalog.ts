@@ -44,6 +44,8 @@ const RULES = [
     'in reduced motion: at most one per section, never on UI or text-heavy cards.',
   'Surfaces (glass, resolve) rework the pixels inside the target: a frosted plate under text, a logo that lands ' +
     'in focus. Keep the text on them legible and give a kinetic entrance or a resolve, not both.',
+  'Liquid (goo) is a solid shape in one colour, not light: blobs that stretch, split and merge inside the target. ' +
+    'Give it the beat to itself and keep text off it; tune droplets, spread, angle and goo, or keyframe blobs.',
   'One hero effect per beat, at most two layered (ambient textures count); land it on the beat its target ' +
     'resolves (`at: "card.end"`).',
   'Tie colour to the palette ("$color.accent", "$color.fg") and speed to the motion energy and tokens ($smooth, ' +

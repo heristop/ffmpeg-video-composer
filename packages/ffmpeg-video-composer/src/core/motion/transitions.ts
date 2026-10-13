@@ -9,8 +9,9 @@
 //   [next] → in ‖ rest ────┘                           ├─ concat(head, mix, rest)
 //
 // Same timeline as xfade (offset + duration), so the audio crossfade and music windows are unchanged.
-// Only standard filters (split, trim, setpts, pad, overlay, crop, scale, format, zoompan, xfade, concat, gblur,
-// and color/alphamerge for an iris with an origin, an ease or a rim), all in the on-device build.
+// Only standard filters (split, trim, setpts, pad, overlay, crop, scale, format, zoompan, xfade, concat, gblur;
+// the drip adds gradients, color, lutyuv, drawbox, alphamerge and loop: transition-drip.ts), all in the
+// on-device build.
 
 import { parseEasing, type EasingSpec } from './easing';
 import { easedProgressExpr, fmt } from './hermite';
@@ -24,6 +25,8 @@ export {
   isDesignedTransition,
   type DesignedTransition,
 } from './transition-names';
+import { dripGraph, DRIP_FALLBACK_COLOR } from './transition-drip';
+import { fnv1a32 } from '../determinism/hash';
 
 export const DESIGNED_TRANSITION_DESCRIPTIONS: Record<DesignedTransition, string> = {
   'push-left': 'The next scene pushes the current one out to the left, both moving together.',
@@ -38,6 +41,9 @@ export const DESIGNED_TRANSITION_DESCRIPTIONS: Record<DesignedTransition, string
   'whip-right': 'A whip pan to the right: the next scene pushes in from the left, motion-blurred at peak speed.',
   'whip-up': 'A vertical whip: the next scene pushes in from below, motion-blurred along the travel.',
   'whip-down': 'A vertical whip: the next scene pushes in from above, motion-blurred along the travel.',
+  drip:
+    'Paint runs down in drips of different lengths and covers the frame, then the next scene drips down over it ' +
+    '(color: the paint, default the theme accent).',
 };
 
 /** A point of the frame in fractions: 0 = left / top edge, 1 = right / bottom edge. */
@@ -53,6 +59,8 @@ export interface DesignedBoundary {
   origin?: FramePoint;
   /** Iris only: a #RRGGBB outline on the circle's edge (default none). */
   rim?: string;
+  /** Drip only: the paint colour (hex; default the brand lavender, the director passes the theme accent). */
+  color?: string;
   /** Graph labels, without brackets. */
   left: string;
   right: string;
@@ -209,7 +217,16 @@ function whip(b: DesignedBoundary, p: Pads): string {
   return `${push(b, { ...p, mix: moved }, e, travel)};[${moved}]${blur}[${p.mix}]`;
 }
 
+function drip(b: DesignedBoundary, p: Pads): string {
+  const { id, duration, fps, width, height, ease } = b;
+  const color = b.color ?? DRIP_FALLBACK_COLOR;
+
+  return dripGraph({ id, duration, fps, width, height, ease, color, seed: fnv1a32(id), ...p });
+}
+
 function compose(b: DesignedBoundary, p: Pads): string {
+  if (b.type === 'drip') return drip(b, p);
+
   if (b.type === 'zoom-through') return zoomThrough(b, p);
 
   if (b.type === 'iris') return iris(b, p);

@@ -1635,6 +1635,14 @@ describe('templateEditorModel — transitions/look/grade/motion/layers fields', 
     expect(toEditorState(asTemplate(state)).defaultTransition).toEqual({ type: 'fade', duration: 0.8 });
   });
 
+  it("keeps a drip default transition's paint colour through global.transition and back", () => {
+    const drip = { type: 'drip', duration: 1, color: '#F96F99' };
+    const state = baseState({ defaultTransition: drip });
+
+    expect(buildDescriptor(state).global?.transition).toEqual(drip);
+    expect(toEditorState(asTemplate(state)).defaultTransition).toEqual(drip);
+  });
+
   it('passes section transitionAfter through as section.transition and back', () => {
     const state = baseState([
       {

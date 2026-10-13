@@ -168,6 +168,7 @@ export type ProjectBuildInfos = TakeBuildInfos & {
     ease?: RevealEasing;
     origin?: { x: number; y: number };
     rim?: string;
+    color?: string;
   }>;
 };
 
@@ -230,6 +231,8 @@ interface SectionTransition {
   origin?: { x: number; y: number };
   /** Iris only: a #RRGGBB outline on the opening circle's edge. */
   rim?: string;
+  /** Drip only: the paint colour. */
+  color?: string;
 }
 
 interface DuckingConfig {

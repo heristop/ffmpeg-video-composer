@@ -296,6 +296,7 @@ export function buildDescriptor(state: EditorState): TemplateDescriptor {
       type: state.defaultTransition.type,
       duration: state.defaultTransition.duration,
       ...(state.defaultTransition.ease === undefined ? {} : { ease: state.defaultTransition.ease }),
+      ...(state.defaultTransition.color === undefined ? {} : { color: state.defaultTransition.color }),
     },
     // Motion template settings, carried through from the loaded descriptor.
     ...motionGlobalFrom(state.motion),

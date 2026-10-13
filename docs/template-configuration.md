@@ -257,13 +257,21 @@ The validator rejects:
 
 ### Designed transitions
 
-`transition.type` also accepts the designed transitions `push-left`, `push-right`, `push-up`, `push-down`, `swipe-left`, `swipe-right`, `zoom-through` and `iris`, plus an `ease` (default `cubic-bezier(0.65, 0, 0.35, 1)`; springs overshoot a push). A designed boundary cuts the outgoing tail and the incoming head, and composes them with filters whose geometry is evaluated once per frame (pad/overlay/crop, zoompan, a built-in crossfade). It then concatenates the result back on the same timeline as `xfade`. It costs about the same as a built-in transition and runs on device. A plain `iris` uses the built-in circle reveal: from the centre, linearly. Give it an `origin` (`{ "x": 0.12, "y": 0.18 }`, frame fractions, 0 = left / top) to open the circle from a point of the frame, such as the icon the next scene grows out of, and an `ease` to shape the opening (default `linear` for an iris). The circle then reaches the frame corner farthest from the origin at the end. A `rim` (`"#F6C445"`, a #RRGGBB colour, off by default) outlines the circle's edge, about 8 px wide at 720p: give it the colour of the element the iris opens from, so the circle visibly grows out of it instead of a hole appearing inside it. The shaped iris draws its mask per pixel (an `xfade` custom expression) at a quarter of the frame size, scales it up as the incoming scene's alpha (`alphamerge`) and overlays it on the outgoing scene. That costs about 1/16 of a full-size per-pixel transition and stays on the on-device allowlist; a `rim` adds a second quarter-size ring mask over a plain colour.
+`transition.type` also accepts the designed transitions `push-left`, `push-right`, `push-up`, `push-down`, `swipe-left`, `swipe-right`, `zoom-through`, `iris` and `drip`, plus an `ease` (default `cubic-bezier(0.65, 0, 0.35, 1)`; springs overshoot a push). A designed boundary cuts the outgoing tail and the incoming head, and composes them with filters whose geometry is evaluated once per frame (pad/overlay/crop, zoompan, a built-in crossfade). It then concatenates the result back on the same timeline as `xfade`. It costs about the same as a built-in transition and runs on device. A plain `iris` uses the built-in circle reveal: from the centre, linearly. Give it an `origin` (`{ "x": 0.12, "y": 0.18 }`, frame fractions, 0 = left / top) to open the circle from a point of the frame, such as the icon the next scene grows out of, and an `ease` to shape the opening (default `linear` for an iris). The circle then reaches the frame corner farthest from the origin at the end. A `rim` (`"#F6C445"`, a #RRGGBB colour, off by default) outlines the circle's edge, about 8 px wide at 720p: give it the colour of the element the iris opens from, so the circle visibly grows out of it instead of a hole appearing inside it. The shaped iris draws its mask per pixel (an `xfade` custom expression) at a quarter of the frame size, scales it up as the incoming scene's alpha (`alphamerge`) and overlays it on the outgoing scene. That costs about 1/16 of a full-size per-pixel transition and stays on the on-device allowlist; a `rim` adds a second quarter-size ring mask over a plain colour.
 
 ![Every designed transition, mid-way](./media/gallery/transitions.webp)
 
 More in the [gallery](./gallery.md#transitions).
 
 `whip-left`, `whip-right`, `whip-up` and `whip-down` are pushes with motion blur modelled on a 144° camera shutter. The push curve (default `cubic-bezier(0.7, 0, 0.2, 1)`) is differentiated around each frame, and the distance the picture travels while the shutter is open sets a gaussian blur stretched along the travel axis (capped at 4.5% of that axis). The blur ramps in and out with the speed, so a longer whip or a higher frame rate blurs less; a 0.4 s whip at 30 fps peaks at about 39 px on a 1280 px frame. Keep whips at 0.3–0.5 s, on the beat.
+
+`drip` runs a wall of paint down over the outgoing scene in drips of different, seeded lengths with rounded ends. The paint covers the whole frame at the midpoint, then the incoming scene runs down over the paint the same way, with a different set of drips, so the cut hides under the paint. `color` sets the paint (`"#f96f99"` or a theme token such as `"$color.accent2"`; default the theme accent). `ease` shapes each half (default `cubic-bezier(0.55, 0, 0.35, 1)`): the paint covers by 46 % of the duration, holds a beat, and the incoming scene starts at 54 %. The transition `duration` is shared with the other types (default 0.3 s), so set it: 0.8–1.2 s reads as paint. Each boundary gets its own drips.
+
+```jsonc
+"transition": { "type": "drip", "duration": 1, "color": "$color.accent2" }
+```
+
+The drip shape is drawn once per half, as a still silhouette: the wall, each drip's body and rounded end, and a shallow shoulder where each drip leaves the wall. The rounded ends are cut from one anti-aliased disc (a radial `gradients` source thresholded with `lutyuv`). Each frame scales the silhouette vertically by the eased progress, so every drip grows with the wall and the longer ones fall faster. The scaled silhouette becomes the alpha of the paint (then of the incoming scene) through `alphamerge`. It runs on device and costs two scales, two `alphamerge` and two full-frame overlays per frame: about 13 ms per transition frame at 1280×720 on one laptop thread, against about 2 ms for `iris` and 1 ms for a push.
 
 ### xfade transition names
 
@@ -1686,7 +1694,7 @@ More in the [gallery](./gallery.md#light-and-effects).
 ]
 ```
 
-There are 14 primitives in four families:
+There are 15 primitives in five families:
 
 | Family   | Primitives                                   | Character                                                                                                  |
 | -------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
@@ -1694,6 +1702,7 @@ There are 14 primitives in four families:
 | Marks    | `ripple`, `glint`, `confetti`, `burst`       | Start from a point of the target and may leave it: a tap, a sparkle, a confetti pop, impact lines.         |
 | Ambient  | `bokeh`, `dust`, `vignette-breathe`, `grain` | Faint textures (≤ 0.12) that last the section. They are absent at `global.motion.energy: 0`.               |
 | Surfaces | `glass`, `resolve`                           | Rework the pixels inside the target: a frosted plate under text, a title that lands in focus.              |
+| Liquid   | `goo`                                        | A solid shape: blobs that stretch, split into droplets and merge back with gooey necks.                    |
 
 ### Targets
 
@@ -1740,6 +1749,7 @@ Every primitive takes these fields, on top of its own parameters:
 | 0.3–0.35 | `sheen`, `edge-glow`, `resolve` (0.35), `glass` (0.3)                                   |
 | 0.7      | `sheen` with `profile: "gloss"` on a flat target (`layer:<i>`, `text:<i>`, a rectangle) |
 | 0.85–1   | `ripple` (0.85), `glint` (0.9), `confetti` and `burst` (1): small marks that must read  |
+| 1        | `goo`: a solid shape, not light                                                      |
 
 The gloss ceiling is for flat graphics only, such as a badge, a pill or a button: no footage sits under the light, so it cannot grey skin. Aimed at the frame or a pane, a gloss sheen keeps the 0.35 ceiling, and the lint warns with `fx_gloss_target`.
 
@@ -1990,6 +2000,32 @@ A logo or title resolves into place: the target region starts defocused, slightl
 | `fade`  | 0.1–1 | Share of the duration the element takes to become opaque (default 0.55).                                                                    |
 
 Use when: an intro logo, a brand lock-up or a one-word title lands on a calm card. Avoid: text that already has a kinetic entrance (pick one); over moving footage (the region is processed as a rectangle with a feathered edge).
+
+#### `goo` (liquid)
+
+Liquid blobs that move, stretch, split into droplets and merge back. Each blob is a soft disc (a gaussian sprite scaled to its radius and placed by its tracks). The blobs are united on a canvas the size of their bounding box, then cut at a threshold with a one-pixel ramp. Two blobs closer than about 2.7 radii (centre to centre) fuse with a smooth neck before they touch, and pinch off as they part. The result is the alpha of a solid fill. Without `blobs`, a seeded choreography plays: the blob pops in (one overshoot of about 6 %), stretches as 1–4 droplets leave it along an axis and bounce apart (about 5 % overshoot), drifts, runs back so every droplet merges on the same frame, holds, then shrinks away. Defaults: 2.6 s on `cubic-bezier(0.45, 0, 0.2, 1.3)` (the split), ceiling 1, intensity 1, colour the theme accent. Reduced motion: one still blob that fades in and out.
+
+| Field      | Range        | What it does                                                                                                                                                                                                                                                          |
+| ---------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `blobs`    | 1–8          | Hand-placed blobs `{ x, y, r, animate: { x, y, r } }`: `x`/`y` in target fractions, `r` a share of the target's short side; the tracks are [keyframe tracks](#keyframe-tracks-animate) in section seconds. Overrides the choreography. Key `r` to 0 to absorb a blob. |
+| `droplets` | 1–4          | Choreography: droplets that split off (default 2–3 from the seed).                                                                                                                                                                                                    |
+| `spread`   | 0.05–0.5     | Choreography: how far the farthest droplet travels, a share of the target's width (default 0.3), kept inside the target.                                                                                                                                              |
+| `angle`    | −180–180     | Choreography: direction of the split in degrees, 0 = right, 90 = down (default ±15° around left or right).                                                                                                                                                            |
+| `size`     | 0.04–0.4     | Choreography: the main blob's radius, a share of the target's short side (default 0.14).                                                                                                                                                                              |
+| `goo`      | 0–1          | Stickiness (default 0.5): how far apart blobs still fuse and how thick their necks are.                                                                                                                                                                               |
+| `pop`      | true / false | Choreography: grow from nothing and shrink away at the ends (default true).                                                                                                                                                                                           |
+
+```jsonc
+"graphics": [
+  { "type": "fx", "effect": "goo", "at": 0.4, "duration": 2.4, "droplets": 3, "spread": 0.34, "angle": 0, "color": "$color.accent" },
+  { "type": "fx", "effect": "goo", "target": "frame", "duration": 3, "blobs": [
+    { "x": 0.3, "y": 0.5, "r": 0.12, "animate": { "x": [{ "t": 0.5, "v": 0.3 }, { "t": 1.5, "v": 0.7, "ease": "$smooth" }] } },
+    { "x": 0.7, "y": 0.5, "r": 0.08 }
+  ] }
+]
+```
+
+The canvas covers only the blobs' bounding box, so the cost follows their size. Each frame scales and lays one sprite per blob (drawn at a quarter of its size, a gaussian upscales cleanly), then runs one `lutyuv`, one `alphamerge` and one overlay of that box. The default choreography with three droplets at 1280×720 (a 794×254 box) costs about 3.4 ms per frame on one laptop thread. Use when: a playful brand beat, a loading or "thinking" moment, an object that breaks apart and regroups. Avoid: behind body copy; next to another fx in the same beat; a corporate tone.
 
 ### Examples
 

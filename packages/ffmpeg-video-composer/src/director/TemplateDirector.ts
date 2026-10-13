@@ -221,9 +221,9 @@ class TemplateDirector {
    * consumed by MusicComposer (xfade-aware windows) and the final-assembly path selection.
    */
   private readonly buildTransitions = (segments: Section[]): void => {
-    const declared = this.template.descriptor.global?.transition;
-    const crossfade = this.project.engineFeatures?.missingFilters?.has('xfade') !== true;
-    this.project.buildInfos.transitions.splice(0, Infinity, ...boundaryTransitions(segments, declared, crossfade));
+    const { transition, theme } = this.template.descriptor.global ?? {};
+    const fade = this.project.engineFeatures?.missingFilters?.has('xfade') !== true;
+    this.project.buildInfos.transitions.splice(0, Infinity, ...boundaryTransitions(segments, transition, fade, theme));
   };
 
   calculateTotalLength = async (segments: Section[]): Promise<void> => {

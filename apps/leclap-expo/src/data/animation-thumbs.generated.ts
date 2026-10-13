@@ -13,6 +13,7 @@ export const ANIMATION_THUMB_POSTERS: Record<string, number> = {
   'fx:glass': require('../../assets/animation-thumbs/glass.png'),
   'fx:vignette-breathe': require('../../assets/animation-thumbs/vignette-breathe.png'),
   'fx:burst': require('../../assets/animation-thumbs/burst.png'),
+  'fx:goo': require('../../assets/animation-thumbs/goo.png'),
   'fx:glint': require('../../assets/animation-thumbs/glint.png'),
   'graphic:frame': require('../../assets/animation-thumbs/frame.png'),
   'graphic:corners': require('../../assets/animation-thumbs/corners.png'),

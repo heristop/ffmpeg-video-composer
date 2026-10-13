@@ -143,6 +143,10 @@ export const ENGINE_THUMBS: EngineThumb[] = [
       intensity: 1,
     },
   ]),
+  // One blob splitting into three droplets and merging back inside the 2 s clip.
+  thumb('goo', 'Goo', 0.8, [
+    fx('goo', { at: 0, duration: 2, droplets: 3, size: 0.15, spread: 0.42, angle: 0, color: ACCENT, pop: false }),
+  ]),
   thumb('glint', 'Glints', 0.5, [fx('glint', { path: 'corners', at: 0.1, count: 4, size: 90, stagger: 0.2 })]),
   thumb(
     'frame',

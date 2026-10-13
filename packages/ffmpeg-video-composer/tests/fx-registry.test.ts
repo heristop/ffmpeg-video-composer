@@ -80,7 +80,7 @@ describe('fx schema', () => {
     expect(GraphicSchema.safeParse({ ...sheen, intensity: 2 }).success).toBe(false);
   });
 
-  const MARKS = new Set(['ripple', 'glint', 'confetti', 'burst']);
+  const MARKS = new Set(['ripple', 'glint', 'confetti', 'burst', 'goo']);
 
   it('documents every parameter of every primitive', () => {
     describeFxPrimitives();
@@ -94,7 +94,7 @@ describe('fx schema', () => {
         expect((schema as { description?: string }).description?.length ?? 0, `${name}.${key}`).toBeGreaterThan(20);
       }
 
-      // Light washes stay under the doctrine's 0.35; marks (a ring, a star point, paper confetti) are solid.
+      // Light washes stay under the doctrine's 0.35; marks (a ring, a star point, paper confetti, a goo blob) are solid.
       expect(row.defaults.ceiling).toBeLessThanOrEqual(MARKS.has(name) ? 1 : 0.35);
       expect(row.defaults.ceiling * row.defaults.intensity).toBeLessThanOrEqual(row.defaults.ceiling);
     }

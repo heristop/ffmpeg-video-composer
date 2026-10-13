@@ -172,6 +172,13 @@ const FX_TUNES: Record<string, Tune> = {
     thickness: even(clamp(short(geo) * 0.03, 4, 10)),
     dots: true,
   }),
+  // A blob that splits along the subject's long side, sized to it, in the accent.
+  goo: (geo) => ({
+    at: landing(geo),
+    color: '$color.accent',
+    angle: geo.rect.w >= geo.rect.h ? 0 : 90,
+    size: round2(clamp(90 / short(geo), 0.08, 0.2)),
+  }),
   bokeh: (geo) => ({ ...spanning(geo), count: geo.frame.width >= geo.frame.height ? 8 : 6 }),
   dust: (geo) => ({ ...spanning(geo), count: 18 }),
   grain: (geo) => ({ ...spanning(geo), size: 1.5 }),

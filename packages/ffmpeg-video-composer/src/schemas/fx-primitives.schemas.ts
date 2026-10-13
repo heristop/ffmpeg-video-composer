@@ -4,6 +4,7 @@ import { bokeh, dust } from './fx-particles.schemas';
 import { glass, resolve } from './fx-surface.schemas';
 import { BLOOM, GRAIN, VIGNETTE_BREATHE } from './fx-ambient.schemas';
 import { EDGE_GLOW, LEAK } from './fx-light.schemas';
+import { goo } from './fx-liquid.schemas';
 
 // ── fx primitives: the parameter surface of every procedural effect ─────────────
 //
@@ -99,6 +100,7 @@ export const FX_PRIMITIVES = {
   bloom: BLOOM,
   'vignette-breathe': VIGNETTE_BREATHE,
   grain: GRAIN,
+  goo,
 } as const satisfies Record<string, FxPrimitive>;
 
 export type FxEffectName = keyof typeof FX_PRIMITIVES;

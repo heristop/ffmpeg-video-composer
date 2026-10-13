@@ -147,7 +147,8 @@ export const TransitionSchema = z
       .describe(
         'xfade transition name between this section and the next, "cut" for a hard cut, or ' +
           'a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, ' +
-          'whip-left/right/up/down (a push motion-blurred at peak speed).'
+          'whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the ' +
+          'frame, then the next scene drips down over the paint).'
       ),
     ease: EasingSpecSchema.optional().describe(
       'Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.'
@@ -164,6 +165,10 @@ export const TransitionSchema = z
       .describe(
         "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from."
       ),
+    color: z
+      .string()
+      .optional()
+      .describe('drip: the paint colour ("#rrggbb" or "$color.accent"; default the theme accent).'),
     duration: z
       .number()
       .positive()
