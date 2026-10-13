@@ -10,6 +10,7 @@ import { frameOf, previewFxContext, seconds, type PreviewEnv } from './fx-contex
 import { loopSpan } from './fx-time';
 import { paintEdgeGlow, paintLeak, paintSheen, paintVignette } from './paint-light';
 import { paintConfetti, paintGlint, paintRipple } from './paint-marks';
+import { paintBurst } from './paint-burst';
 import { bloomSurface, glassSurface, paintBokeh, paintDust, paintGrain, resolveSurface } from './paint-texture';
 import { strokePainter, type StrokeGraphic } from './paint-stroke';
 import type { Box, FxPainter } from './painter';
@@ -25,6 +26,7 @@ const FX_PARTS: Record<FxEffectName, (fx: never) => Parts | null> = {
   ripple: (fx) => nullable(paintRipple(fx)),
   glint: (fx) => nullable(paintGlint(fx)),
   confetti: (fx) => ({ paint: paintConfetti(fx) }),
+  burst: (fx) => nullable(paintBurst(fx)),
   bokeh: (fx) => ({ paint: paintBokeh(fx) }),
   dust: (fx) => ({ paint: paintDust(fx) }),
   grain: (fx) => ({ paint: paintGrain(fx) }),

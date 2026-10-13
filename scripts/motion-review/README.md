@@ -118,7 +118,7 @@ an object), otherwise the value is spliced into the text. Pixel values are even 
 ### Fixtures for `graphics[].type: "fx"` effects
 
 The procedural effects of the motion polish plan (`sheen`, `leak`, `edge-glow`, `ripple`, `glint`,
-`confetti`, `bokeh`, `dust`, `bloom`, `glass`) are `graphics` entries with `type: "fx"`, an `effect`, and a
+`confetti`, `burst`, `bokeh`, `dust`, `bloom`, `glass`) are `graphics` entries with `type: "fx"`, an `effect`, and a
 `target`. Each effect task adds **one fixture**, `fixtures/fx-<effect>.json`, whose sheet keys
 (`fx-sheen__dark__portrait`, …) are the ones the plan's acceptance criteria name:
 

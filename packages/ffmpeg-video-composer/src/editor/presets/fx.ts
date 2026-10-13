@@ -26,7 +26,7 @@
 
 import type { Filter } from '@/core/types';
 import { fnv1a32, seededRandom } from '@/core/determinism/hash';
-import { FX_PRIMITIVES, type FxEffectName } from '../../schemas/fx.schemas';
+import { FX_PRIMITIVES, fxGraphicOf, type FxEffectName } from '../../schemas/fx.schemas';
 import { FX_PASS_REST } from './fx-spec';
 import { defaultLightColor, WARM_WHITE } from './fx-color';
 import { resolveFxTarget, type FxTargetRect } from './fx-target';
@@ -87,7 +87,7 @@ function context(request: FxRequest, target: FxTargetRect, time: Timing): AnyFxC
   const masks = ctx.masks;
 
   return {
-    graphic: g,
+    graphic: fxGraphicOf(g),
     target,
     frame: { width, height, fps: ctx.fps },
     ...time,

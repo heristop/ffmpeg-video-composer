@@ -1,8 +1,9 @@
 import { z } from 'zod';
 
-// ── fx primitives that mark a moment: ripple (a tap or a pulse), glint (star twinkles, orbiting specs)
-// and confetti (a ballistic burst). Rows of FX_PRIMITIVES (fx-primitives.schemas.ts); lowered by
-// editor/presets/fx-ripple.ts, fx-glint.ts and fx-confetti.ts. Every field is optional: an omitted one is
+// ── fx primitives that mark a moment: ripple (a tap or a pulse), glint (star twinkles, orbiting specs),
+// confetti (a ballistic burst) and burst (impact lines shooting out of a point). Rows of FX_PRIMITIVES
+// (fx-primitives.schemas.ts); lowered by editor/presets/fx-ripple.ts, fx-glint.ts, fx-confetti.ts and
+// fx-burst.ts. Every field is optional: an omitted one is
 // derived from the target, the theme, global.motion.energy and the element's seed. Each row is checked
 // against FxPrimitive where FX_PRIMITIVES lists it (no import back: that would be a cycle); its prose
 // lives in fx-docs.ts.
@@ -68,4 +69,25 @@ export const confetti = {
     fade: z.number().min(0.1).max(2).optional(),
   },
   defaults: { duration: 2.2, ease: 'linear', ceiling: 1, intensity: 1 },
+};
+
+const RadiusShare = z.number().min(0).max(4);
+
+export const burst = {
+  params: {
+    origin: origin(),
+    rays: z.number().int().min(4).max(24).optional(),
+    radius: z
+      .tuple([RadiusShare, RadiusShare])
+      .refine(([inner, outer]) => outer > inner, 'radius is [inner, outer] with outer > inner')
+      .optional(),
+    thickness: z.number().min(1).max(32).optional(),
+    length: z.number().min(0.1).max(1).optional(),
+    dots: z.union([z.boolean(), z.number().int().min(1).max(12)]).optional(),
+    spread: z.number().min(10).max(360).optional(),
+    rotation: z.number().min(-180).max(180).optional(),
+    jitter: z.number().min(0).max(1).optional(),
+  },
+  // Solid strokes like the other marks: a burst must read at phone scale, and each ray is a few px wide.
+  defaults: { duration: 0.6, ease: 'cubic-bezier(0.16, 1, 0.3, 1)', ceiling: 1, intensity: 0.9 },
 };

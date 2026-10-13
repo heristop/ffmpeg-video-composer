@@ -155,3 +155,13 @@ type FxParamsOf<N extends FxEffectName> = N extends FxEffectName
 export type FxGraphicOf<N extends FxEffectName> = N extends FxEffectName
   ? { type: 'fx'; effect: N } & z.infer<z.ZodObject<typeof FX_COMMON>> & FxParamsOf<N>
   : never;
+
+/**
+ * A validated fx graphic as its own primitive's shape. FxGraphic (inferred from variants built off one
+ * generic row type) merges every primitive's fields into one object, so a field two primitives type
+ * differently (ripple's `radius` is a number, burst's an [inner, outer] pair) cannot be narrowed by `effect`;
+ * the schema already checked `g` against the variant its `effect` names.
+ */
+export function fxGraphicOf(g: FxGraphic): FxGraphicOf<FxEffectName> {
+  return g as FxGraphicOf<FxEffectName>;
+}

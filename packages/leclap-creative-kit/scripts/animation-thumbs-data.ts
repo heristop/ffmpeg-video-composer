@@ -126,6 +126,23 @@ export const ENGINE_THUMBS: EngineThumb[] = [
   thumb('confetti', 'Confetti', 0.7, [
     fx('confetti', { at: 0.05, duration: 1.9, origin: { x: 0.5, y: 0.8 }, count: 32, size: 56, speed: 1.4 }),
   ]),
+  // Impact lines around the accent button, twice so the 2 s clip loops on a beat.
+  thumb('burst', 'Burst', 0.32, [
+    {
+      type: 'fx',
+      effect: 'burst',
+      target: { x: 264, y: 486, w: 240, h: 64 },
+      at: 0.15,
+      repeat: 2,
+      every: 1,
+      rays: 10,
+      thickness: 12,
+      length: 0.6,
+      dots: true,
+      color: '#FFFFFF',
+      intensity: 1,
+    },
+  ]),
   thumb('glint', 'Glints', 0.5, [
     fx('glint', { path: 'corners', at: 0.1, repeat: 2, every: 0.95, count: 4, size: 90 }),
   ]),

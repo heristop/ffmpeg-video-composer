@@ -1649,12 +1649,12 @@ More in the [gallery](./gallery.md#light-and-effects).
 ]
 ```
 
-There are 13 primitives in four families:
+There are 14 primitives in four families:
 
 | Family   | Primitives                                   | Character                                                                                                  |
 | -------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Light    | `sheen`, `leak`, `edge-glow`, `bloom`        | Adds luminance and never greys: a highlight stays inside its target (an edge-glow blooms just outside it). |
-| Marks    | `ripple`, `glint`, `confetti`                | Start from a point of the target and may leave it: a tap, a sparkle, a burst.                              |
+| Marks    | `ripple`, `glint`, `confetti`, `burst`       | Start from a point of the target and may leave it: a tap, a sparkle, a confetti pop, impact lines.         |
 | Ambient  | `bokeh`, `dust`, `vignette-breathe`, `grain` | Faint textures (≤ 0.12) that last the section. They are absent at `global.motion.energy: 0`.               |
 | Surfaces | `glass`, `resolve`                           | Rework the pixels inside the target: a frosted plate under text, a title that lands in focus.              |
 
@@ -1696,18 +1696,18 @@ Every primitive takes these fields, on top of its own parameters:
 
 `intensity` 1 maps to the primitive's ceiling, the highest peak alpha it may reach:
 
-| Ceiling  | Primitives                                                                           |
-| -------- | ------------------------------------------------------------------------------------ |
-| 0.12     | `bloom`, `bokeh`, `dust`, `vignette-breathe`, `grain` (`grain` is noise strength 12) |
-| 0.25     | `leak`                                                                               |
-| 0.3–0.35 | `sheen`, `edge-glow`, `resolve` (0.35), `glass` (0.3)                                |
-| 0.85–1   | `ripple` (0.85), `glint` (0.9), `confetti` (1): small marks that must read           |
+| Ceiling  | Primitives                                                                             |
+| -------- | -------------------------------------------------------------------------------------- |
+| 0.12     | `bloom`, `bokeh`, `dust`, `vignette-breathe`, `grain` (`grain` is noise strength 12)   |
+| 0.25     | `leak`                                                                                 |
+| 0.3–0.35 | `sheen`, `edge-glow`, `resolve` (0.35), `glass` (0.3)                                  |
+| 0.85–1   | `ripple` (0.85), `glint` (0.9), `confetti` and `burst` (1): small marks that must read |
 
 Keep one hero effect per beat and at most two layered (ambient textures count). Land it on the beat its target resolves. Effects never cover text you need read or faces. Tie colour to the palette (`$color.accent`, `$color.fg`) and timing to the motion tokens. The [sameness lint](#compose-motion-dont-pick-stock-animations) flags an untuned fx (`fx_untuned`), a repeated effect, an off-theme colour and more than two decorative effects in one section.
 
 ### Reduced motion, devices and warnings
 
-At `global.motion.energy: 0`, every primitive switches to its reduced form (each table below names it): light holds still or becomes a faint static highlight, marks rest in place and fade in and out, and the ambient textures and `bloom` are dropped. Every primitive lowers to filters on the [on-device allowlist](./on-device-compilation.md). Where a build lacks an optional filter, it falls back: `sheen` and `leak` use compile-time sprites without `gradients`, `vignette-breathe` uses a gradient mask without `vignette`, and `confetti` and `glint` drop their spin without `rotate`. When an fx cannot render, it is skipped with a warning: `fx_target` (the target names nothing in the section), `mask_unavailable` (a shaped target without `alphamerge`) or `fx_skipped` (a missing filter or input). Effects are drawn in "Preview render" in the builder, not on its editing canvas.
+At `global.motion.energy: 0`, every primitive switches to its reduced form (each table below names it): light holds still or becomes a faint static highlight, marks rest in place and fade in and out, and the ambient textures and `bloom` are dropped. Every primitive lowers to filters on the [on-device allowlist](./on-device-compilation.md). Where a build lacks an optional filter, it falls back: `sheen` and `leak` use compile-time sprites without `gradients`, `vignette-breathe` uses a gradient mask without `vignette`, and `confetti` and `glint` drop their spin without `rotate` (`burst` never needs it: its rays are turned at compile time). When an fx cannot render, it is skipped with a warning: `fx_target` (the target names nothing in the section), `mask_unavailable` (a shaped target without `alphamerge`) or `fx_skipped` (a missing filter or input). Effects are drawn in "Preview render" in the builder, not on its editing canvas.
 
 Wide, soft lights (`leak`, `bloom`, `vignette-breathe`) carry a fine static grain, about ±1 code value and seeded like every fx, so their slow falloff still reads as a gradient after H.264 encoding instead of flat contour bands. The grain covers only the light itself; the picture outside it is untouched.
 
@@ -1836,6 +1836,38 @@ A ballistic burst of tumbling paper pieces in the theme colours: launched from a
 | `fade`    | 0.1–2               | Seconds faded out at the end of the burst (default 0.5).                                                                    |
 
 Use when: a real celebration: a launch, a milestone, a win, a sign-up count; once per video. Avoid: serious, corporate or editorial tones; behind text that must be read; more than one burst per video.
+
+#### `burst` (marks)
+
+A one-shot radial burst from a point: thin strokes shoot out, grow then shrink as they fade, with optional dots between them; the impact lines of a like-button pop or a "BAM!". Defaults: 0.6 s on `cubic-bezier(0.16, 1, 0.3, 1)`, ceiling 1, intensity 0.9. Reduced motion: the rays appear at rest at mid travel and fade in and out (no travel, no growth).
+
+| Field       | Range                  | What it does                                                                                                                                                                                                                                                                                                                                                               |
+| ----------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `origin`    | `{x, y}` (−0.5–1.5)    | Where the rays shoot from, as fractions of the target ({x, y}; default the target centre).                                                                                                                                                                                                                                                                                 |
+| `rays`      | int 4–24               | Number of rays (default 8; 4–24). Fewer and thicker reads as a pop, many and thin as a flash.                                                                                                                                                                                                                                                                              |
+| `radius`    | `[inner, outer]` (0–4) | [inner, outer]: where the rays start and where they vanish, from the origin, as shares of the target's size (its short side, or half its long side when larger). Default: each ray starts just outside the target's edge along its own direction (0.1 of the size past it) and travels 0.55 of it, so a burst around a pill or a badge clears it; [0.6, 1.15] on a square. |
+| `thickness` | 1–32                   | Ray stroke in px at 1080p (default 6; scaled to the output frame). Thins as the ray shrinks.                                                                                                                                                                                                                                                                               |
+| `length`    | 0.1–1                  | A ray's longest length as a share of its travel (outer - inner; default 0.5). Each ray grows from a stub, shoots out at that length, then shrinks into the outer radius.                                                                                                                                                                                                   |
+| `dots`      | boolean \| int 1–12    | Small dots riding between the rays: true = one per gap (at most 12), or a count 1–12 (default none).                                                                                                                                                                                                                                                                       |
+| `spread`    | 10–360                 | Degrees the rays fan over, centred on up (default 360 = all around; 180 = a half burst over the origin, 90 = a narrow fan).                                                                                                                                                                                                                                                |
+| `rotation`  | -180–180               | Degrees the whole fan turns clockwise (default 0: a full burst has a ray straight up; 180 points a half burst down).                                                                                                                                                                                                                                                       |
+| `jitter`    | 0–1                    | Seeded irregularity 0..1 (default 0.2): each ray gets its own angle offset, reach, length and a slight delay. 0 = perfectly regular.                                                                                                                                                                                                                                       |
+
+Use when: a heart or a button pops; a badge or a price slams in; a stamp lands; the beat a counter hits its goal. Avoid: calm or editorial tones; on every element of a section; together with confetti or a glint in one beat.
+
+```jsonc
+{
+  "type": "fx",
+  "effect": "burst",
+  "target": "layer:1",
+  "at": "heart.end",
+  "rays": 10,
+  "radius": [0.62, 1.25],
+  "thickness": 7,
+  "dots": true,
+  "color": "#f96f99",
+}
+```
 
 #### `bokeh` (ambient)
 

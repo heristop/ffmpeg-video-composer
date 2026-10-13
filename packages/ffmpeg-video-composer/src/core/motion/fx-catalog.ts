@@ -36,8 +36,9 @@ const RULES = [
     'and derive it from what it decorates, never a floating box.',
   'Light (sheen, leak, edge-glow) adds luminance, never greys: it stays inside its target (an edge-glow blooms ' +
     'just outside the card), peaks ≤ 0.35 alpha (leak ≤ 0.25) and ≤ 0.6 intensity over skin.',
-  'Marks (ripple, glint, confetti) start from a point of the target and may leave it: a ripple on the exact ' +
-    'control, glints on a product, confetti once per video on a real payoff.',
+  'Marks (ripple, glint, confetti, burst) start from a point of the target and may leave it: a ripple on the exact ' +
+    'control, glints on a product, a burst on the beat something pops or lands, confetti once per video on a real ' +
+    'payoff.',
   'Ambient textures (bokeh, dust, grain, bloom, vignette-breathe) stay ≤ 0.12, last the section and are dropped ' +
     'in reduced motion: at most one per section, never on UI or text-heavy cards.',
   'Surfaces (glass, resolve) rework the pixels inside the target: a frosted plate under text, a logo that lands ' +

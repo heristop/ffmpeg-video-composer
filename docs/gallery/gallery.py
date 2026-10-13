@@ -237,7 +237,7 @@ def graphics():
 # Each fx primitive near its peak: (section, seconds into it, family).
 FX = [
     ('sheen', 0.85, 'light'), ('edge-glow', 1.2, 'light'), ('leak', 1.2, 'light'), ('bloom', 1.2, 'light'),
-    ('ripple', 0.75, 'marks'), ('glint', 0.75, 'marks'), ('confetti', 0.75, 'marks'),
+    ('ripple', 0.75, 'marks'), ('glint', 0.75, 'marks'), ('confetti', 0.75, 'marks'), ('burst', 0.55, 'marks'),
     ('bokeh', 1.2, 'ambient'), ('dust', 1.2, 'ambient'), ('vignette-breathe', 1.2, 'ambient'),
     ('grain', 1.2, 'ambient'), ('glass', 1.2, 'surfaces'), ('resolve', 0.75, 'surfaces'),
 ]

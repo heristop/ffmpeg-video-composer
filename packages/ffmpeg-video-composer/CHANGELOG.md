@@ -26,6 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tracks on an input that is not a layer; an unknown track name is an `unknown_key` with the nearest name.
 - Layer tracks appear on the motion timeline as `animate` events, so the pacing lint no longer reports dead
   air over a section whose layers are moving.
+- fx `burst` (marks): a one-shot radial burst from a point, the impact lines of a like-button pop or a
+  "BAM!". Thin rays shoot out from `origin`, grow then shrink between an inner and an outer radius as they
+  fade, with optional `dots` between them. `rays` (4–24), `radius` ([inner, outer]; by default each ray starts
+  just outside the target's edge along its own direction, so a burst around a pill or a badge clears it),
+  `thickness`, `length`, `spread` (180 = a half burst), `rotation` and a seeded `jitter`. Each ray is a
+  compile-time sprite already turned to its angle (opposite rays share one), moved and scaled by per-frame
+  expressions: no `rotate`, only on-device filters (`scale`, `fade`, `colorchannelmixer`, `overlay`). Reduced
+  motion: the rays rest at mid travel and fade in and out. It is in the motion catalog, the JSON schema, the
+  builder's animation library (with a live canvas preview) and `examples/motion-design/fx-burst.json`.
 
 ### Changed
 

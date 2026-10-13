@@ -3,7 +3,7 @@
 // the engine's own plan functions (band, rings, pieces, lobes…) and draws what the render will draw, with
 // the same seeded context defaults. Only the drawing differs (Canvas2D instead of a filtergraph). Pure.
 import type { Graphic } from 'ffmpeg-video-composer/src/schemas/graphics.schemas.ts';
-import type { FxGraphic, FxTarget } from 'ffmpeg-video-composer/src/schemas/fx.schemas.ts';
+import { fxGraphicOf, type FxGraphic, type FxTarget } from 'ffmpeg-video-composer/src/schemas/fx.schemas.ts';
 import { FX_PRIMITIVES } from 'ffmpeg-video-composer/src/schemas/fx-primitives.schemas.ts';
 import type { MotionTokens } from 'ffmpeg-video-composer/src/schemas/motion.schemas.ts';
 import type { AnyFxContext } from 'ffmpeg-video-composer/src/editor/presets/fx-kit.ts';
@@ -181,7 +181,7 @@ export function previewFxContext(graphic: Graphic, index: number, env: PreviewEn
   const seed = fxSeed(g, index, env);
 
   return {
-    graphic: g,
+    graphic: fxGraphicOf(g),
     target,
     frame: { ...frame, fps: PREVIEW_FPS },
     ...time,

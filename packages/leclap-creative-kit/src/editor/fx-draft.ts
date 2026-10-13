@@ -164,6 +164,14 @@ const FX_TUNES: Record<string, Tune> = {
     origin: { x: 0.5, y: isFrame(geo) ? 0.9 : 0.6 },
     count: geo.frame.width * geo.frame.height > 1_000_000 ? 30 : 24,
   }),
+  // Impact lines around the card: more and finer rays on a big target, a few heavy ones on a small one.
+  burst: (geo) => ({
+    at: landing(geo),
+    color: '$color.accent',
+    rays: short(geo) > 320 ? 12 : 8,
+    thickness: even(clamp(short(geo) * 0.03, 4, 10)),
+    dots: true,
+  }),
   bokeh: (geo) => ({ ...spanning(geo), count: geo.frame.width >= geo.frame.height ? 8 : 6 }),
   dust: (geo) => ({ ...spanning(geo), count: 18 }),
   grain: (geo) => ({ ...spanning(geo), size: 1.5 }),

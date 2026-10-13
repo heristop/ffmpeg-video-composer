@@ -36,6 +36,7 @@ const KINDS: readonly SpriteKind[] = [
   'rim',
   'feather',
   'glow',
+  'ray',
 ];
 const NUMERIC = [
   'w',

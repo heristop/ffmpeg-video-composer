@@ -7,6 +7,7 @@ import { SHEEN } from './fx-sheen';
 import { RIPPLE } from './fx-ripple';
 import { GLINT } from './fx-glint';
 import { CONFETTI } from './fx-confetti';
+import { BURST } from './fx-burst';
 import { BOKEH, DUST } from './fx-particles';
 import { GLASS } from './fx-glass';
 import { RESOLVE } from './fx-resolve';
@@ -22,6 +23,7 @@ export const FX_EFFECTS: { readonly [N in FxEffectName]?: FxEffect<N> } = {
   ripple: RIPPLE,
   glint: GLINT,
   confetti: CONFETTI,
+  burst: BURST,
   bokeh: BOKEH,
   dust: DUST,
   glass: GLASS,

@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import { FX_PRIMITIVES, type FxDoc, type FxEffectName } from './fx-primitives.schemas';
 import { FxGraphicSchema } from './fx.schemas';
-import { confettiDoc, glintDoc, rippleDoc } from './fx-celebrate.docs';
+import { burstDoc, confettiDoc, glintDoc, rippleDoc } from './fx-celebrate.docs';
 import { bokehDoc, dustDoc } from './fx-particles.docs';
 import { glassDoc, resolveDoc } from './fx-surface.docs';
 import { edgeGlowDoc, leakDoc } from './fx-light.docs';
@@ -47,6 +47,7 @@ export const FX_DOCS: { [N in FxEffectName]: FxDoc<(typeof FX_PRIMITIVES)[N]['pa
   ripple: rippleDoc,
   glint: glintDoc,
   confetti: confettiDoc,
+  burst: burstDoc,
   bokeh: bokehDoc,
   dust: dustDoc,
   glass: glassDoc,
