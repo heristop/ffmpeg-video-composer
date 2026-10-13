@@ -611,6 +611,18 @@
       "templateSha256": "00f4b566ed60d57ab7cfa63909d0e2f009528dc89dd3bed593cdf397722e47a1",
       "media": "Bundled catalog / demo app fixtures",
       "bytes": 61960
+    },
+    {
+      "id": "layer-keyframes",
+      "source": "examples/motion-design/layer-keyframes.json",
+      "duration": 13.728005,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "3b979905ee0dcb6a278040d3af7612afda9d5602f767dc4e98bbe32e7643d7ab",
+      "templateSha256": "15f4e355e82edaed3beb0cd9d995da24505fecb64a86080ce9fe54104016ce90",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 91790
     }
   ]
 }

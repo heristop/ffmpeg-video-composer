@@ -356,6 +356,13 @@
       "description": "A square stat board and spec sheet: a header on an accent bar, four stat tiles landing in reading order, and a two-column spec list with values aligned right. A landscape cut is composed with $format.",
       "category": "effects",
       "source": "examples/motion-design/html-stats.json"
+    },
+    {
+      "id": "layer-keyframes",
+      "title": "Layer keyframes",
+      "description": "Cards and shapes animated over time with keyframe tracks: a pop-in with overshoot, squash and stretch, a two-face flip, a needle that swings past its mark and settles, and three-depth parallax.",
+      "category": "effects",
+      "source": "examples/motion-design/layer-keyframes.json"
     }
   ]
 }

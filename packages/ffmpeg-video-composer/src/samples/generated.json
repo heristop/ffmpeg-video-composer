@@ -16458,5 +16458,465 @@
         }
       }
     }
+  },
+  {
+    "id": "layer-keyframes",
+    "title": "Layer keyframes",
+    "description": "Cards and shapes animated over time with keyframe tracks: a pop-in with overshoot, squash and stretch, a two-face flip, a needle that swings past its mark and settles, and three-depth parallax.",
+    "category": "effects",
+    "source": "examples/motion-design/layer-keyframes.json",
+    "orientation": "landscape",
+    "backend": "native",
+    "creativeDirection": "Audience: motion designers checking what layer keyframes can do. Direction: one move per beat on a dark ink ground, lavender and rose shapes, a small uppercase label naming the move. Every move is a keyframe track on the layer itself: scale on a spring for the pop-in, opposing scaleX/scaleY about the bottom edge for the squash, scaleX to zero and back across two faces for the flip, rotate about the base with a loose spring for the needle, x tracks at three speeds for the parallax. Review: centres stay put while cards scale, the ball lands on the floor line, the flip never shows both faces, the needle pivots on the hub.",
+    "showcasePath": "/showcase?sample=layer-keyframes",
+    "preview": {
+      "video": "/videos/showcase/layer-keyframes.mp4",
+      "poster": "/videos/showcase/layer-keyframes.webp",
+      "template": "/videos/showcase/layer-keyframes.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [],
+      "assets": [],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Layer keyframes",
+        "description": "Keyframe tracks on HTML layers: a card pop-in with overshoot, squash and stretch, a card flip, a needle swinging past its target and a three-depth parallax.",
+        "creativeDirection": "Audience: motion designers checking what layer keyframes can do. Direction: one move per beat on a dark ink ground, lavender and rose shapes, a small uppercase label naming the move. Every move is a keyframe track on the layer itself: scale on a spring for the pop-in, opposing scaleX/scaleY about the bottom edge for the squash, scaleX to zero and back across two faces for the flip, rotate about the base with a loose spring for the needle, x tracks at three speeds for the parallax. Review: centres stay put while cards scale, the ball lands on the floor line, the flip never shows both faces, the needle pivots on the hub."
+      },
+      "global": {
+        "orientation": "landscape",
+        "fps": 30,
+        "musicEnabled": false,
+        "transition": {
+          "type": "cut"
+        }
+      },
+      "sections": [
+        {
+          "name": "pop_in",
+          "type": "color_background",
+          "purpose": "A card pops in on a spring: scale 0 to an overshoot and back to 1, about its centre.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 1.6
+          },
+          "inputs": [
+            {
+              "name": "label_1",
+              "type": "html",
+              "html": "<div class=\"label\"><span>01 · Pop-in</span></div>",
+              "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+              "width": 520,
+              "height": 48,
+              "options": {
+                "position": "64:48",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "pop_card",
+              "type": "html",
+              "html": "<div class=\"card\"><strong>Pop-in</strong></div>",
+              "css": ".card { display: flex; align-items: center; justify-content: center; width: 420px; height: 220px; border-radius: 32px; background: #9298fb } strong { color: #141416; font: 700 44px Rubik }",
+              "width": 420,
+              "height": 220,
+              "options": {
+                "position": "430:250",
+                "animate": {
+                  "scale": [
+                    {
+                      "t": 0.25,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.6,
+                      "v": 1.15,
+                      "ease": "ease-out-cubic"
+                    },
+                    {
+                      "t": 0.9,
+                      "v": 1,
+                      "ease": "ease-in-out-sine"
+                    }
+                  ],
+                  "opacity": [
+                    {
+                      "t": 0.25,
+                      "v": 0
+                    },
+                    {
+                      "t": "+0.1",
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "squash",
+          "type": "color_background",
+          "purpose": "A badge drops, stretches as it falls, squashes on the floor and springs back.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2.6
+          },
+          "inputs": [
+            {
+              "name": "label_2",
+              "type": "html",
+              "html": "<div class=\"label\"><span>02 · Squash & stretch</span></div>",
+              "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+              "width": 520,
+              "height": 48,
+              "options": {
+                "position": "64:48",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "floor",
+              "type": "html",
+              "html": "<div class=\"floor\"></div>",
+              "css": ".floor { width: 520px; height: 6px; border-radius: 3px; background: #9298fb }",
+              "width": 520,
+              "height": 6,
+              "options": {
+                "position": "380:556"
+              }
+            },
+            {
+              "name": "ball",
+              "type": "html",
+              "html": "<div class=\"disc\"></div>",
+              "css": ".disc { display: flex; align-items: center; justify-content: center; width: 180px; height: 180px; border-radius: 90px; background: #f96f99 } strong { color: #141416; font: 700 40px Rubik }",
+              "width": 180,
+              "height": 180,
+              "options": {
+                "position": "550:376",
+                "origin": "bottom",
+                "animate": {
+                  "y": [
+                    {
+                      "t": 0.2,
+                      "v": "-460"
+                    },
+                    {
+                      "t": 0.75,
+                      "v": "+0",
+                      "ease": "ease-in"
+                    }
+                  ],
+                  "scaleX": [
+                    {
+                      "t": 0.2,
+                      "v": 0.86
+                    },
+                    {
+                      "t": 0.75,
+                      "v": 0.86
+                    },
+                    {
+                      "t": 0.85,
+                      "v": 1.32,
+                      "ease": "ease-out"
+                    },
+                    {
+                      "t": 1.6,
+                      "v": 1,
+                      "ease": "spring(320, 9)"
+                    }
+                  ],
+                  "scaleY": [
+                    {
+                      "t": 0.2,
+                      "v": 1.18
+                    },
+                    {
+                      "t": 0.75,
+                      "v": 1.18
+                    },
+                    {
+                      "t": 0.85,
+                      "v": 0.66,
+                      "ease": "ease-out"
+                    },
+                    {
+                      "t": 1.6,
+                      "v": 1,
+                      "ease": "spring(320, 9)"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "flip",
+          "type": "color_background",
+          "purpose": "A card flips: the front narrows to its edge, the back opens out of it.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2.4
+          },
+          "inputs": [
+            {
+              "name": "label_3",
+              "type": "html",
+              "html": "<div class=\"label\"><span>03 · Flip</span></div>",
+              "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+              "width": 520,
+              "height": 48,
+              "options": {
+                "position": "64:48",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "front",
+              "type": "html",
+              "html": "<div class=\"card\"><strong>Front</strong></div>",
+              "css": ".card { display: flex; align-items: center; justify-content: center; width: 420px; height: 240px; border-radius: 32px; background: #9298fb } strong { color: #141416; font: 700 44px Rubik }",
+              "width": 420,
+              "height": 240,
+              "options": {
+                "position": "430:240",
+                "duration": 0.95,
+                "animate": {
+                  "scaleX": [
+                    {
+                      "t": 0.5,
+                      "v": 1
+                    },
+                    {
+                      "t": 0.95,
+                      "v": 0,
+                      "ease": "ease-in"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "back",
+              "type": "html",
+              "html": "<div class=\"card\"><strong>Back</strong></div>",
+              "css": ".card { display: flex; align-items: center; justify-content: center; width: 420px; height: 240px; border-radius: 32px; background: #f96f99 } strong { color: #141416; font: 700 44px Rubik }",
+              "width": 420,
+              "height": 240,
+              "options": {
+                "position": "430:240",
+                "start": 0.95,
+                "animate": {
+                  "scaleX": [
+                    {
+                      "t": 0.95,
+                      "v": 0
+                    },
+                    {
+                      "t": 1.4,
+                      "v": 1,
+                      "ease": "ease-out"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "needle",
+          "type": "color_background",
+          "purpose": "A gauge needle swings past its target and settles, pivoting on its base.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2.6
+          },
+          "inputs": [
+            {
+              "name": "label_4",
+              "type": "html",
+              "html": "<div class=\"label\"><span>04 · Needle overshoot</span></div>",
+              "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+              "width": 520,
+              "height": 48,
+              "options": {
+                "position": "64:48",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "dial",
+              "type": "html",
+              "html": "<div class=\"dial\"></div>",
+              "css": ".dial { width: 440px; height: 440px; border-radius: 220px; border: 14px solid #9298fb }",
+              "width": 440,
+              "height": 440,
+              "options": {
+                "position": "420:200"
+              }
+            },
+            {
+              "name": "needle",
+              "type": "html",
+              "html": "<div class=\"needle\"></div>",
+              "css": ".needle { width: 16px; height: 200px; border-radius: 8px; background: #f96f99 }",
+              "width": 16,
+              "height": 200,
+              "options": {
+                "position": "632:220",
+                "origin": "bottom",
+                "animate": {
+                  "rotate": [
+                    {
+                      "t": 0.3,
+                      "v": -100
+                    },
+                    {
+                      "t": "+1.8",
+                      "v": 40,
+                      "ease": "spring(150, 7)"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "hub",
+              "type": "html",
+              "html": "<div class=\"disc\"></div>",
+              "css": ".disc { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #9298fb } strong { color: #141416; font: 700 40px Rubik }",
+              "width": 44,
+              "height": 44,
+              "options": {
+                "position": "618:398"
+              }
+            }
+          ]
+        },
+        {
+          "name": "parallax",
+          "type": "color_background",
+          "purpose": "Three depths drift left at three speeds: the far discs slowly, the cards faster, the front card fastest.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 4.5
+          },
+          "inputs": [
+            {
+              "name": "label_5",
+              "type": "html",
+              "html": "<div class=\"label\"><span>05 · Parallax</span></div>",
+              "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+              "width": 520,
+              "height": 48,
+              "options": {
+                "position": "64:48",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "far",
+              "type": "html",
+              "html": "<div class=\"row\"><div class=\"a\"></div><div class=\"b\"></div><div class=\"c\"></div></div>",
+              "css": ".row { display: flex; align-items: center; justify-content: space-between; width: 1200px; height: 160px } .a { width: 120px; height: 120px; border-radius: 60px; background: #2a2a3a } .b { width: 90px; height: 90px; border-radius: 45px; background: #2a2a3a } .c { width: 150px; height: 150px; border-radius: 75px; background: #2a2a3a }",
+              "width": 1200,
+              "height": 160,
+              "options": {
+                "position": "120:120",
+                "animate": {
+                  "x": [
+                    {
+                      "v": "+0"
+                    },
+                    {
+                      "t": 4.5,
+                      "v": "-60",
+                      "ease": "ease-in-out-sine"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "mid",
+              "type": "html",
+              "html": "<div class=\"row\"><div class=\"card\"></div><div class=\"card\"></div><div class=\"card\"></div></div>",
+              "css": ".row { display: flex; align-items: center; gap: 160px; width: 1400px; height: 150px } .card { width: 260px; height: 150px; border-radius: 24px; background: #4a4f8f }",
+              "width": 1400,
+              "height": 150,
+              "options": {
+                "position": "200:300",
+                "animate": {
+                  "x": [
+                    {
+                      "v": "+0"
+                    },
+                    {
+                      "t": 4.5,
+                      "v": "-220",
+                      "ease": "ease-in-out-cubic"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "front_card",
+              "type": "html",
+              "html": "<div class=\"card\"><strong>Depth</strong></div>",
+              "css": ".card { display: flex; align-items: center; justify-content: center; width: 360px; height: 200px; border-radius: 32px; background: #f96f99 } strong { color: #141416; font: 700 44px Rubik }",
+              "width": 360,
+              "height": 200,
+              "options": {
+                "position": "760:440",
+                "animate": {
+                  "x": [
+                    {
+                      "v": "+0"
+                    },
+                    {
+                      "t": 4.5,
+                      "v": "-560",
+                      "ease": "ease-in-out"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
   }
 ]
