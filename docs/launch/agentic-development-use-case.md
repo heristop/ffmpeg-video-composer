@@ -83,7 +83,7 @@ LeClap renders the local artifact. It does not upload to GitHub or GitLab; keep 
 
 ## Campaign angle — the feature ships its own proof
 
-Status: review draft. Hold publication until the supporting feature branch and its PR media are public.
+Status: review draft. The supporting feature and its PR media are now on `main`; publication still requires human approval.
 
 Verified proof on `feat/motion-effects`:
 
@@ -134,3 +134,62 @@ The branch keeps the review inputs and outputs together:
 - validation, render QC, and review-snapshot steps.
 
 This makes the video evidence inspectable and repeatable alongside the implementation. LeClap creates the local artifact; uploading or attaching it remains an explicit action in the GitHub or GitLab workflow.
+
+## Campaign angle — make visible proof part of done
+
+Status: review draft. Verified against `main` at the 3.1.0 release; do not publish automatically.
+
+Verified proof:
+
+- app pull requests are expected to include matched before/after snapshots and a before/after video rendered with LeClap, unless the change has no visible effect;
+- the captures come from the merge base and the branch under review, using the same screen, state, data, and viewport;
+- the current workflow can align both runs side by side, freeze the comparison point, and highlight the changed areas;
+- the resolved template is validated and the render includes a manifest and output quality checks;
+- the repository includes a runnable example, a rendered MP4, a poster, stills, and the files needed to reproduce the artifact;
+- attaching or publishing the artifact remains an explicit action in the user's code-host workflow.
+
+### LinkedIn
+
+What if visible proof were part of the definition of done for an agent-written change?
+
+That is now the rule for LeClap's own app pull requests.
+
+When a change affects the interface, the agent captures the same state on the merge base and on the branch. LeClap turns those recordings into a short side-by-side review video, with an optional freeze and highlights on the exact moment that changed.
+
+The artifact is not a generated approximation. It is composed from the implementation evidence itself, using a validated template and the repository's own video engine.
+
+The PR keeps the video, selected snapshots, and the files needed to reproduce them beside the code. The reviewer can see the behavior first, then inspect the diff with the right context.
+
+Structured proof collection makes the evidence consistent. LeClap makes it reviewable. Publication remains explicit and under the user's control.
+
+Agentic development should not stop at “the tests pass.” It should show what changed.
+
+### X thread
+
+**1/5** What if visible proof were part of “done” for an agent-written UI change? In LeClap's own app PRs, it now is.
+
+**2/5** The agent captures the same screen, state, data, and viewport on the merge base and on the branch. No comparing the fix against memory.
+
+**3/5** LeClap composes both real recordings side by side. The workflow can freeze the key moment and highlight exactly where the behavior changed.
+
+**4/5** The video is validated and quality-checked, then kept with selected snapshots and its reproducible inputs beside the code.
+
+**5/5** LeClap creates the review artifact. Attaching or publishing it stays explicit in the user's GitHub or GitLab workflow. Ship the change; show the proof.
+
+### GitHub / GitLab announcement
+
+#### Visible app changes now carry reproducible LeClap evidence
+
+The repository's app-PR workflow now treats visual evidence as part of completion. A pull or merge request that changes the web or mobile interface should include matched before/after snapshots and a before/after video rendered with LeClap, unless the change has no visible effect.
+
+The comparison is grounded in the code under review:
+
+- BEFORE comes from the branch's merge base;
+- AFTER comes from the branch;
+- both captures use the same screen, state, data, and viewport;
+- LeClap aligns the runs side by side and can freeze and highlight the comparison point;
+- the resolved template is validated, and the render produces a manifest plus output quality checks.
+
+The repository includes the runnable workflow, a rendered sample, its poster and stills, and the files needed to reproduce the artifact. Structured proof collection keeps the input consistent; LeClap turns it into a review-ready video.
+
+The render remains local. Uploading or attaching the result is a separate, explicit action in the GitHub or GitLab workflow.
