@@ -114,6 +114,10 @@ export default defineConfig([
     target: 'es2024',
     platform: 'browser',
     globalName: 'FFmpegVideoComposer',
+    // Node's `global` reads as `globalThis` in the page. A define, not a text replace: it rewrites only the free
+    // identifier, never a local variable, a parameter or an object key named `global` (a replace turned the
+    // theme resolver's `{ global: resolveGlobal(global, theme) }` into a walk over `globalThis`).
+    inputOptions: { transform: { define: { global: 'globalThis' } } },
     // The JSDoc of the sources ships in the .d.ts (and the sourcemaps point at the sources); repeated in the
     // JS it only adds to what a page downloads before its first compile (tests/build-output.test.ts budget).
     // Legal and annotation (`@__PURE__`) comments stay.
@@ -163,19 +167,9 @@ export default defineConfig([
       harfbuzzShaper,
       replace({
         preventAssignment: true,
-        // Leading boundary excludes a preceding word char, `$`, `.` or `/` so the bare `global`
-        // identifier is rewritten but module specifiers / properties (e.g. `./global.schemas`,
-        // `foo.global`) are left intact. A plain `\b` treats `.`/`/` as boundaries and would mangle
-        // the path `./global.schemas` into `./globalThis.schemas`.
-        delimiters: [String.raw`(?<![\w$./])`, String.raw`\b`],
-        // Only rewrite `global` in the JS bundle. Without this exclude the same
-        // substitution mangles reflect-metadata's inlined `declare global {` into the
-        // invalid `declare globalThis {` in the generated .d.ts, breaking tsc consumers.
-        exclude: ['**/*.d.ts'],
         values: {
           'process.env.NODE_ENV': JSON.stringify('production'),
           'process.env.PLATFORM': JSON.stringify('browser'),
-          global: 'globalThis',
         },
       }),
     ],

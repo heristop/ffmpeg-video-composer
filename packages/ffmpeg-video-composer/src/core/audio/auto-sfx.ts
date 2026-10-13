@@ -5,7 +5,7 @@
 // seconds. Deterministic: document order, then time; capped; a cue landing (same edge) near an authored
 // sound or an earlier auto cue is skipped so effects never stack. Pure.
 
-import { isDesignedTransition } from '../motion/transitions';
+import { isDesignedTransition } from '../motion/transition-names';
 import type { ElementEntry } from '../timing/fields';
 import { entranceSpan, defaultStart, type SpanContext } from '../timing/spans';
 import { knownDuration, RENDERED, type TimelineSection } from '../timing/timeline';

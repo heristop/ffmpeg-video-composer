@@ -10,7 +10,7 @@ import { DEFAULT_TRANSITION_DURATION } from '../../schemas/effects.schemas';
 import { resolveMotionDescriptor } from './tokens';
 import { resolveTimeRefs } from '../timing/resolve';
 import { resolveKeyTimes } from './tracks';
-import { DEFAULT_TRANSITION_EASE, isDesignedTransition } from './transitions';
+import { DEFAULT_TRANSITION_EASE, isDesignedTransition } from './transition-names';
 import { graphicEvent, kineticEvents } from './timeline-elements';
 import { drawtextEvents, sugarEvents } from './timeline-text';
 import { subtitleEvents } from './timeline-subtitles';

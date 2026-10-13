@@ -1,0 +1,40 @@
+// The bundled sound effects' ids: the schema's enum, kept apart from the library's entries (sfx-library.ts) so
+// the schemas a page loads up front never carry the descriptions and mix settings.
+
+export const SFX_IDS = [
+  'whoosh',
+  'swoosh-short',
+  'hit',
+  'boom',
+  'riser',
+  'click',
+  'tick',
+  'pop',
+  'shutter',
+  'ding',
+  'glitch',
+  'sparkle',
+  'thud',
+  'zap',
+  'notification',
+  'keystroke',
+  'blip',
+  'rise-short',
+  'coin',
+  'drum-roll',
+  'heartbeat',
+  'clap',
+  'snap',
+  'success',
+  'error',
+  'swoosh-long',
+  'sub-drop',
+  'reverse-cymbal',
+  'water-drop',
+  'whistle-up',
+  'camera-focus',
+  'paper',
+  'tada',
+] as const;
+
+export type SfxId = (typeof SFX_IDS)[number];
