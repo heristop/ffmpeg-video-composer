@@ -42,6 +42,27 @@ describe('iris origin: schema', () => {
     expect(TransitionSchema.safeParse({ type: 'iris', origin: { x: 0.2, y: 0.2, z: 1 } }).success).toBe(false);
   });
 
+  it('accepts a #RRGGBB rim colour and rejects the rest', () => {
+    expect(TransitionSchema.safeParse({ type: 'iris', rim: '#F6C445' }).success).toBe(true);
+    expect(TransitionSchema.safeParse({ type: 'iris', rim: 'yellow' }).success).toBe(false);
+    expect(TransitionSchema.safeParse({ type: 'iris', rim: '#FC4' }).success).toBe(false);
+  });
+
+  it('carries the rim from the declared transition to the boundary', () => {
+    const sections = [{ name: 'a' }, { name: 'b' }] as unknown as Section[];
+    const declared = { type: 'iris', duration: 0.6, origin: { x: 0.1, y: 0.2 }, rim: '#F6C445' } as const;
+
+    expect(boundaryTransitions(sections, declared)).toEqual([
+      { type: 'iris', duration: 0.6, ease: undefined, origin: { x: 0.1, y: 0.2 }, rim: '#F6C445' },
+    ]);
+    expect(
+      buildVideoGraph([{ type: 'iris', duration: 0.6, rim: '#F6C445' }], [2], [0.6], '[vout]', {
+        scale: '1280:720',
+        fps: 30,
+      })
+    ).toContain('color=c=0xF6C445');
+  });
+
   it('carries origin from the declared transition to the boundary', () => {
     const sections = [{ name: 'a' }, { name: 'b' }] as unknown as Section[];
     const declared = { type: 'iris', duration: 0.6, ease: 'ease-out-cubic', origin: { x: 0.1, y: 0.2 } } as const;
@@ -73,10 +94,38 @@ describe('iris origin: lowering', () => {
         'if(lt((0.6*(1-P)),0.3),0+((0.6*(1-P))-0)*(1.666667+((0.6*(1-P))-0)*(0+((0.6*(1-P))-0)*0)),' +
         'if(lt((0.6*(1-P)),0.6),0.5+((0.6*(1-P))-0.3)*(1.666667+((0.6*(1-P))-0.3)*(0+((0.6*(1-P))-0.3)*0)),1))))' +
         "-hypot(X-32,Y-36))/1.5+0.5,0,1)'" +
-        ':duration=0.6:offset=0,scale=1280:720:flags=bilinear,format=gray,settb=AVTB[dt0mask];' +
-        '[dt0in][dt0mask]alphamerge[dt0ia];[dt0tail][dt0ia]overlay=0:0[dt0mix]'
+        ':duration=0.6:offset=0,scale=1280:720:flags=bilinear,format=gray,settb=AVTB,setpts=N/(30*TB)[dt0mask];' +
+        '[dt0in]setpts=N/(30*TB)[dt0ig];[dt0ig][dt0mask]alphamerge[dt0ia];[dt0tail]setpts=N/(30*TB)[dt0tg];' +
+        '[dt0tg][dt0ia]overlay=0:0[dt0mix]'
     );
     expect(graph).not.toContain('circleopen');
+  });
+
+  it('outlines the opening circle with a rim: a ring mask over a colour, laid on the mix', () => {
+    const plain = designedTransitionGraph({ ...BOUNDARY, origin: { x: 0.1, y: 0.2 }, ease: 'linear' });
+    const rim = designedTransitionGraph({ ...BOUNDARY, origin: { x: 0.1, y: 0.2 }, ease: 'linear', rim: '#F6C445' });
+    const e =
+      'if(lt((0.6*(1-P)),0),0,' +
+      'if(lt((0.6*(1-P)),0.3),0+((0.6*(1-P))-0)*(1.666667+((0.6*(1-P))-0)*(0+((0.6*(1-P))-0)*0)),' +
+      'if(lt((0.6*(1-P)),0.6),0.5+((0.6*(1-P))-0.3)*(1.666667+((0.6*(1-P))-0.3)*(0+((0.6*(1-P))-0.3)*0)),1)))';
+
+    // The disc is unchanged; its overlay now feeds the rim instead of the mix.
+    expect(rim).toContain(plain.slice(0, plain.indexOf('[dt0tg][dt0ia]overlay=0:0[dt0mix]')));
+    expect(rim).toContain(
+      'color=c=black:s=320x180:r=30:d=0.6,format=gray[dt0ring0];color=c=black:s=320x180:r=30:d=0.6,format=gray[dt0ring1];' +
+        `[dt0ring0][dt0ring1]xfade=transition=custom:expr='255*clip((1-abs(hypot(X-32,Y-36)-323.493789*(${e})))/1.5+0.5,0,1)'` +
+        ':duration=0.6:offset=0,scale=1280:720:flags=bilinear,format=gray,settb=AVTB,setpts=N/(30*TB)[dt0ringmask];' +
+        'color=c=0xF6C445:s=1280x720:r=30:d=0.6,settb=AVTB,setpts=N/(30*TB)[dt0rc];' +
+        '[dt0rc][dt0ringmask]alphamerge[dt0rim];[dt0tg][dt0ia]overlay=0:0[dt0ov];[dt0ov][dt0rim]overlay=0:0[dt0mix]'
+    );
+    // Every label is produced once and consumed once (the boundary's own split uses r1 / r2).
+    const produced = [...rim.matchAll(/((?:\[[a-z0-9]+\])+)(?=;|$)/g)].flatMap((m) => m[1].slice(1, -1).split(']['));
+
+    expect(produced).toContain('dt0r1');
+
+    expect(new Set(produced).size).toBe(produced.length);
+    // A rim alone (centred, linear) also takes the mask path.
+    expect(designedTransitionGraph({ ...BOUNDARY, rim: '#F6C445' })).not.toContain('circleopen');
   });
 
   it('eases the opening: the same origin with an ease-in curve differs from linear', () => {
@@ -108,6 +157,11 @@ describe('iris origin: lowering', () => {
     );
     for (const filter of filters) expect(DEVICE_FILTERS.has(filter), filter).toBe(true);
     expect(graph).toBe(designedTransitionGraph({ ...BOUNDARY, origin: { x: 0.9, y: 0.9 }, ease: 'ease-out-cubic' }));
+    const rimmed = designedTransitionGraph({ ...BOUNDARY, origin: { x: 0.9, y: 0.9 }, rim: '#FF0000' });
+
+    for (const [, filter] of rimmed.matchAll(/(?:^|[\];,])([a-z]+)(?=[=[,;]|$)/g)) {
+      expect(DEVICE_FILTERS.has(filter), filter).toBe(true);
+    }
   });
 });
 
@@ -148,6 +202,70 @@ describe.skipIf(!hasFfmpeg())('iris origin on real frames', () => {
 
     return { right: walk(1, 0), down: walk(0, 1), left: walk(-1, 0), up: walk(0, -1) };
   }
+
+  it('draws the rim along the circle edge at mid-transition, in its colour', () => {
+    const boundary = { ...BOUNDARY, width: W, height: H, offset: 0.5, duration: 0.6, origin: ORIGIN, rim: '#FF0000' };
+    const graph =
+      `color=c=black:s=${W}x${H}:r=${FPS}:d=1.5,format=yuv420p,settb=AVTB[vs0];` +
+      `color=c=white:s=${W}x${H}:r=${FPS}:d=1.5,format=yuv420p,settb=AVTB[vs1];` +
+      designedTransitionGraph(boundary);
+    const raw = execFileSync(
+      'ffmpeg',
+      ['-v', 'error', '-filter_complex', graph, '-map', '[v0]', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'],
+      { maxBuffer: 1 << 28 }
+    );
+    const size = W * H * 3;
+    const frame = raw.subarray((Math.round(0.5 * FPS) + 9) * size, (Math.round(0.5 * FPS) + 10) * size);
+    const rgb = (x: number, y: number) => [0, 1, 2].map((c) => frame[(y * W + x) * 3 + c]);
+    const [ox, oy] = [Math.round(ORIGIN.x * W), Math.round(ORIGIN.y * H)];
+    // Linear, 9 frames into 18: the edge sits at half the reach from the origin.
+    const radius = Math.hypot(W * (1 - ORIGIN.x), H * (1 - ORIGIN.y)) / 2;
+
+    let checked = 0;
+
+    for (const angle of [0, 15, 30, 45, 60, 90, 180]) {
+      const [c, s] = [Math.cos((angle * Math.PI) / 180), Math.sin((angle * Math.PI) / 180)];
+      const along = (r: number) => rgb(Math.round(ox + c * r), Math.round(oy + s * r));
+      const red = Array.from({ length: 25 }, (_, k) => along(radius - 12 + k)).filter(
+        ([r, g, b]) => r > 180 && g < 90 && b < 90
+      );
+
+      const [fx, fy] = [ox + c * (radius + 24), oy + s * (radius + 24)];
+
+      if (fx < 0 || fx >= W || fy < 0 || fy >= H) continue;
+      expect(red.length, `rim at ${angle}°`).toBeGreaterThanOrEqual(3);
+      // Inside the circle the incoming white, outside the outgoing black, both untinted.
+      expect(
+        along(radius * 0.5).every((v) => v > 235),
+        `inside at ${angle}°`
+      ).toBe(true);
+      expect(
+        along(radius + 24).every((v) => v < 30),
+        `outside at ${angle}°`
+      ).toBe(true);
+      checked++;
+    }
+    expect(checked).toBeGreaterThanOrEqual(3);
+  }, 60000);
+
+  it('opens a little on every frame when the clips come from a 1/15360 timebase (no stalled frames)', () => {
+    // Segments decode on the mp4 timebase; after the trims the incoming and outgoing frames can sit 1 µs
+    // apart, and an overlay pairing them by timestamp then reuses the previous mask every third frame.
+    const boundary = { ...BOUNDARY, width: W, height: H, offset: 3.15, duration: 0.75, origin: ORIGIN, rim: '#FF0000' };
+    const graph =
+      `color=c=black:s=${W}x${H}:r=${FPS}:d=4,format=yuv420p,settb=1/15360,settb=AVTB[vs0];` +
+      `color=c=white:s=${W}x${H}:r=${FPS}:d=2,format=yuv420p,settb=1/15360,settb=AVTB[vs1];` +
+      designedTransitionGraph({ ...boundary, ease: 'linear' });
+    const raw = execFileSync(
+      'ffmpeg',
+      ['-v', 'error', '-filter_complex', graph, '-map', '[v0]', '-f', 'rawvideo', '-pix_fmt', 'gray', '-'],
+      { maxBuffer: 1 << 28 }
+    );
+    const all = Array.from({ length: raw.length / (W * H) }, (_, i) => raw.subarray(i * W * H, (i + 1) * W * H));
+    const radii = all.slice(Math.round(3.15 * FPS) + 2, Math.round(3.15 * FPS) + 16).map((frame) => reach(frame).right);
+
+    for (let i = 1; i < radii.length; i++) expect(radii[i], JSON.stringify(radii)).toBeGreaterThan(radii[i - 1]);
+  }, 60000);
 
   it('centres the circle on the origin at mid-transition, sized by the curve', () => {
     const linear = frames('linear');

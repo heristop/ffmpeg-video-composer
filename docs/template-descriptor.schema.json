@@ -728,6 +728,11 @@
               "required": ["x", "y"],
               "additionalProperties": false
             },
+            "rim": {
+              "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
             "duration": {
               "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
               "type": "number",
@@ -2853,6 +2858,11 @@
                     },
                     "required": ["x", "y"],
                     "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -5711,6 +5721,11 @@
                     },
                     "required": ["x", "y"],
                     "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -8613,6 +8628,11 @@
                     "required": ["x", "y"],
                     "additionalProperties": false
                   },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
                     "type": "number",
@@ -11238,6 +11258,11 @@
                     "required": ["x", "y"],
                     "additionalProperties": false
                   },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
                     "type": "number",
@@ -13842,6 +13867,11 @@
                     },
                     "required": ["x", "y"],
                     "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -16919,6 +16949,11 @@
                     "required": ["x", "y"],
                     "additionalProperties": false
                   },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
                     "type": "number",
@@ -19524,6 +19559,11 @@
                     "required": ["x", "y"],
                     "additionalProperties": false
                   },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
                     "type": "number",
@@ -22128,6 +22168,11 @@
                     },
                     "required": ["x", "y"],
                     "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -25882,10 +25927,16 @@
               "maximum": 1
             },
             "tear": {
-              "description": "Row tearing (default off): N horizontal bands shifted sideways per frame.",
+              "description": "Row tearing (default off): N horizontal bands shifted sideways in 2–3 seeded bursts, nearly still between them.",
               "type": "integer",
               "minimum": 2,
               "maximum": 24
+            },
+            "hold": {
+              "description": "Frames each torn band holds its offset before it jumps (default 2; tear only).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6
             }
           },
           "required": ["type"],
@@ -26743,7 +26794,7 @@
                   "maximum": 96
                 },
                 "stagger": {
-                  "description": "Seconds between star twinkles (default 0.12). The pass duration covers every star.",
+                  "description": "Seconds between star twinkles (default 0.12). Each star twinkles for 12–14 frames whatever the duration, which only has to cover the stagger.",
                   "type": "number",
                   "minimum": 0,
                   "maximum": 0.4
@@ -26769,7 +26820,7 @@
               },
               "required": ["type", "effect"],
               "additionalProperties": false,
-              "description": "Four-point star glints that twinkle once on a target (scale up, turn, vanish), or small lights orbiting it: the sparkle of something new or polished. Tune: path sets the character (scatter = sparkle, corners = a framed gem, orbit = a spec orbit); count, size and points set the density; stagger and duration set the rhythm; spin and the twinkle ease set the snap; colour tints the light."
+              "description": "Four-point star glints that twinkle once on a target (each a 12–14 frame twinkle: scale up from 0, turn, vanish), or small lights orbiting it: the sparkle of something new or polished. Repeats start at least 1.5 s apart. Tune: path sets the character (scatter = sparkle, corners = a framed gem, orbit = a spec orbit); count, size and points set the density; stagger and duration set the rhythm; spin and the twinkle ease set the snap; colour tints the light."
             },
             {
               "type": "object",

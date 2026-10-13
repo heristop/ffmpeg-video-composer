@@ -3,7 +3,15 @@ import { describe, expect, it } from 'vitest';
 import type { Filter, FilterGraphChain } from '@/core/types';
 import { graphicToFilters } from '@/editor/presets/graphics';
 import { sampleSteps } from '@/editor/presets/graphics-spec';
-import { MAX_TEAR_BANDS, tearBands, tearFilters, type TearBand } from '@/editor/presets/glitch-tear';
+import {
+  MAX_TEAR_BANDS,
+  tearBands,
+  tearEnvelope,
+  tearFilters,
+  tearPlan,
+  type TearBand,
+} from '@/editor/presets/glitch-tear';
+import { seededRandom } from '@/core/determinism/hash';
 import { renderFilterGraph } from '@/editor/utils/filter-graph';
 import { DEVICE_FILTERS } from '@/editor/utils/device-filters.generated';
 import { GraphicSchema } from '@/schemas/graphics.schemas';
@@ -46,6 +54,14 @@ describe('glitch tear: schema', () => {
     expect(GraphicSchema.safeParse({ type: 'glitch', tear: 4.5 }).success).toBe(false);
     expect(GraphicSchema.safeParse({ type: 'glitch', tear: true }).success).toBe(false);
   });
+
+  it('accepts a hold of 1–6 frames', () => {
+    expect(GraphicSchema.safeParse({ type: 'glitch', tear: 8, hold: 3 }).success).toBe(true);
+    expect(GraphicSchema.safeParse({ type: 'glitch', tear: 8, hold: 1 }).success).toBe(true);
+    expect(GraphicSchema.safeParse({ type: 'glitch', tear: 8, hold: 0 }).success).toBe(false);
+    expect(GraphicSchema.safeParse({ type: 'glitch', tear: 8, hold: 7 }).success).toBe(false);
+    expect(GraphicSchema.safeParse({ type: 'glitch', tear: 8, hold: 2.5 }).success).toBe(false);
+  });
 });
 
 describe('glitch tear: lowering', () => {
@@ -71,25 +87,26 @@ describe('glitch tear: lowering', () => {
 
   it('emits the exact chain for a fixed seed', () => {
     const steps = [
-      { from: 1, to: 1.5, strength: 1 },
-      { from: 1.5, to: 2, strength: 1 },
+      { from: 1, to: 1.5 },
+      { from: 1.5, to: 2 },
     ];
-    const text = graphText(tearFilters({ bands: 2, intensity: 1, frame: FRAME, seed: 11, steps }, 'g0_'));
+    const text = graphText(tearFilters({ bands: 2, hold: 2, intensity: 1, frame: FRAME, seed: 11, steps }, 'g0_'));
 
-    // Window bounds sit half a frame early so a frame exactly on a step boundary joins that step.
+    // Window bounds sit half a frame early so a frame exactly on a step boundary joins that step. Two steps
+    // are one hold: each band keeps one offset over both.
     expect(text).toBe(
       'split=3[g0_base][g0_c0][g0_c1];' +
         '[g0_c0]crop=640:234:0:0[g0_b0];[g0_c1]crop=640:126:0:234[g0_b1];' +
-        "[g0_base][g0_b0]overlay=x='50*gte(t,1.483333)*lt(t,1.983333)':y=0:" +
+        "[g0_base][g0_b0]overlay=x='50*gte(t,0.983333)*lt(t,1.983333)':y=0:" +
         "enable='gte(t,0.983333)*lt(t,1.983333)'[g0_o0];" +
-        "[g0_o0][g0_b1]overlay=x='52*gte(t,0.983333)*lt(t,1.483333)+-74*gte(t,1.483333)*lt(t,1.983333)':y=234:" +
+        "[g0_o0][g0_b1]overlay=x='-72*gte(t,0.983333)*lt(t,1.983333)':y=234:" +
         "enable='gte(t,0.983333)*lt(t,1.983333)'"
     );
   });
 
   it('cuts the whole frame into at most `tear` even-row bands, shifted by up to 12 % of the width', () => {
-    const steps = sampleSteps(0, 0.9, 30).map((s) => ({ ...s, strength: 1 }));
-    const bands = tearBands({ bands: 8, intensity: 1, frame: FRAME, seed: 4, steps });
+    const steps = sampleSteps(0, 0.9, 30);
+    const bands = tearBands({ bands: 8, hold: 2, intensity: 1, frame: FRAME, seed: 4, steps });
 
     expect(bands.length).toBeLessThanOrEqual(8);
     expect(bands[0].y).toBe(0);
@@ -102,7 +119,7 @@ describe('glitch tear: lowering', () => {
       for (const offset of band.offsets) expect(Math.abs(offset)).toBeLessThanOrEqual(Math.round(640 * 0.12));
     }
     const moving = bands.flatMap((band) => band.offsets).filter((o) => o !== 0);
-    expect(moving.length).toBeGreaterThan(bands.length * steps.length * 0.4);
+    expect(moving.length).toBeGreaterThan(bands.length * steps.length * 0.15);
   });
 
   it('is deterministic per seed and reshuffles with a new seed', () => {
@@ -112,11 +129,54 @@ describe('glitch tear: lowering', () => {
     expect(graphText(graphic(spec, 5))).not.toEqual(graphText(graphic(spec, 6)));
   });
 
-  it('settles as the hit decays: the last step never moves more than the first', () => {
-    const steps = sampleSteps(0, 0.9, 30).map((s, i, all) => ({ ...s, strength: i === all.length - 1 ? 0 : 1 }));
-    const bands = tearBands({ bands: 6, intensity: 1, frame: FRAME, seed: 9, steps });
+  it('holds each band still for `hold` frames (2 by default) before it jumps', () => {
+    const steps = sampleSteps(0, 0.9, 30);
 
-    for (const band of bands) expect(band.offsets.at(-1)).toBe(0);
+    for (const hold of [2, 3]) {
+      for (const seed of [1, 4, 9, 21]) {
+        for (const band of tearBands({ bands: 12, hold, intensity: 1, frame: FRAME, seed, steps })) {
+          const jumps = band.offsets.flatMap((offset, i) => (i > 0 && offset !== band.offsets[i - 1] ? [i] : []));
+          const edges = [0, ...jumps, band.offsets.length];
+
+          for (let k = 1; k < edges.length; k++) {
+            expect(edges[k] - edges[k - 1], `hold ${hold} seed ${seed} band y=${band.y}`).toBeGreaterThanOrEqual(hold);
+          }
+        }
+      }
+    }
+  });
+
+  it('tears in 2–3 seeded bursts, near still between them', () => {
+    const counts = new Set<number>();
+
+    for (const seed of [1, 2, 3, 4, 5, 6, 7, 8]) {
+      const envelope = tearEnvelope(16, 2, seededRandom(seed));
+      const strong = envelope.map((a) => a >= 0.7);
+      const bursts = strong.filter((on, i) => on && !strong[i - 1]).length;
+
+      expect(envelope).toHaveLength(16);
+      expect(bursts, `seed ${seed}`).toBeGreaterThanOrEqual(2);
+      expect(bursts, `seed ${seed}`).toBeLessThanOrEqual(3);
+      for (const amp of envelope.filter((a) => a < 0.7)) expect(amp).toBeLessThanOrEqual(0.1);
+      counts.add(bursts);
+    }
+    expect(counts).toEqual(new Set([2, 3]));
+    expect(tearEnvelope(11, 2, seededRandom(1))).not.toEqual(tearEnvelope(11, 2, seededRandom(2)));
+  });
+
+  it('keeps the bands nearly in place between the bursts', () => {
+    const steps = sampleSteps(0, 0.35, 30);
+    const input = { bands: 16, hold: 2, intensity: 1, frame: FRAME, seed: 7, steps };
+    const { bands, envelope } = tearPlan(input);
+    const quiet = envelope.flatMap((a, i) => (a < 0.7 ? [i] : []));
+    const loud = envelope.flatMap((a, i) => (a >= 0.7 ? [i] : []));
+    const most = (frames: number[]) =>
+      Math.max(...bands.flatMap((band) => frames.map((i) => Math.abs(band.offsets[i]))));
+
+    expect(quiet.length).toBeGreaterThan(0);
+    // Between the bursts at most 0.1 of the 77 px peak; in them, real tears.
+    expect(most(quiet)).toBeLessThanOrEqual(8);
+    expect(most(loud)).toBeGreaterThan(30);
   });
 });
 
@@ -163,14 +223,15 @@ describe.skipIf(!hasFfmpeg())('glitch tear on real frames', () => {
   }
 
   it('shifts each band by its planned offset during the window and not at all outside it', () => {
-    const steps = sampleSteps(AT, DURATION, 30).map((s) => ({ ...s, strength: 1 }));
-    const input = { bands: 5, intensity: 0.6, frame: FRAME, seed: 21, steps };
+    const steps = sampleSteps(AT, DURATION, 30);
+    const input = { bands: 5, hold: 2, intensity: 0.6, frame: FRAME, seed: 21, steps };
     const bands = tearBands(input);
     const torn = render(tearFilters(input, 't_'));
     const plain = render([]);
 
     expect(torn.length).toBe(plain.length);
     let moved = 0;
+    const measured = bands.map(() => [] as number[]);
 
     for (const [i, frame] of torn.entries()) {
       const step = i >= AT * 30 && i < (AT + DURATION) * 30 ? i - AT * 30 : -1;
@@ -179,12 +240,23 @@ describe.skipIf(!hasFfmpeg())('glitch tear on real frames', () => {
         const row = band.y + Math.floor(band.h / 2);
         const expected = step < 0 ? 0 : band.offsets[step];
 
+        if (Math.abs(expected) > 80 && step >= 0) measured[bands.indexOf(band)].push(expected);
         if (Math.abs(expected) > 80) continue;
-        expect(shiftOf(frame, plain[i], row), `frame ${i} band y=${band.y}`).toBe(expected);
+        const shift = shiftOf(frame, plain[i], row);
+
+        expect(shift, `frame ${i} band y=${band.y}`).toBe(expected);
+        if (step >= 0) measured[bands.indexOf(band)].push(shift);
         if (expected !== 0) moved++;
       }
       if (step < 0) expect(frame.equals(plain[i]), `frame ${i} untouched`).toBe(true);
     }
-    expect(moved).toBeGreaterThan(20);
-  }, 60000);
+    expect(moved).toBeGreaterThan(10);
+
+    // On screen, each band's shift holds for at least 2 frames before it jumps.
+    for (const shifts of measured) {
+      const edges = [0, ...shifts.flatMap((v, i) => (i > 0 && v !== shifts[i - 1] ? [i] : [])), shifts.length];
+
+      for (let k = 1; k < edges.length; k++) expect(edges[k] - edges[k - 1]).toBeGreaterThanOrEqual(2);
+    }
+  }, 120000);
 });

@@ -43,6 +43,8 @@ export interface FxDefaults {
    * the target is flat (a layer, a text block or a rectangle: fx-flat-target.ts); elsewhere `ceiling` holds.
    */
   flat?: { profile: string; ceiling: number };
+  /** The shortest time between two passes' starts, s: a repeated mark needs room to read as a new event. */
+  period?: number;
 }
 
 export interface FxPrimitive {

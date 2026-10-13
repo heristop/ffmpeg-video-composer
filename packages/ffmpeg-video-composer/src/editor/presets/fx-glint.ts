@@ -4,8 +4,10 @@
 // Every star is the same compile-time `star` sprite (gaussian core plus 6:1 cross flares), rendered once
 // at the largest on-screen size and only scaled DOWN per frame: it turns by `spin` (rotate, on the fixed
 // sprite size), then scales 0 → 1 → 0 (up on the pass ease, a juicy overshoot kept under the sprite size;
-// down on an ease-in), with 4-frame alpha ramps at both ends. Stars are staggered so the whole pass stays
-// inside `duration`. Orbit: `count` lights travel around the target's edge (an ellipse through the
+// down on an ease-in), with 4-frame alpha ramps at both ends. A star is a twinkle: it lives 12–14 frames
+// (seeded, in 30 fps frames) and is gone, never parked on its spot; each branch runs CLEAR frames past its
+// fade, so the frame its overlay repeats until the window ends is clear. Stars are staggered so the whole
+// pass stays inside `duration`; repeated passes start at least 1.5 s apart (FX_PRIMITIVES glint period). Orbit: `count` lights travel around the target's edge (an ellipse through the
 // middle of its sides) with a trail of fading gaussian ghosts. The region is the target grown by half a
 // star, so a corner glint is never cut. Reduced motion: the stars at rest, half size, faded in and out.
 
@@ -35,6 +37,11 @@ type Ctx = FxContext<'glint'>;
 
 /** Share of a star's life spent growing (the rest shrinks). */
 export const GROW = 0.45;
+/** A star's life: 12 to 14 frames at 30 fps (seeded per spot), in seconds. */
+export const TWINKLE = 12 / 30;
+const TWINKLE_SPREAD = 2 / 30;
+/** Frames a star's branch runs past its fade (trim rounds its end to a frame, so one is not enough). */
+const CLEAR = 2;
 export const SHRINK_EASE = 'cubic-bezier(0.4, 0, 1, 1)';
 
 export interface Star {
@@ -55,7 +62,7 @@ export interface GlintPlan {
   stars: Star[];
 }
 
-// Sizes, positions and timing; context defaults drawn in a fixed order: count, sizes, spots, order.
+// Sizes, positions and timing; context defaults drawn in a fixed order: count, sizes, spots, order, lives.
 export function planOf(fx: Ctx): GlintPlan | null {
   const g = fx.graphic;
   const k = frameScale(fx);
@@ -75,14 +82,15 @@ export function planOf(fx: Ctx): GlintPlan | null {
 
   const spots = glintSpots(g.path ?? 'scatter', count, fx.random, g.points);
   const stagger = count > 1 ? Math.min(g.stagger ?? 0.12, (fx.duration * 0.6) / (count - 1)) : 0;
-  const life = fx.duration - (count - 1) * stagger;
+  const room = fx.duration - (count - 1) * stagger;
+  const lives = spots.map(() => Math.min(room, TWINKLE + fx.random() * TWINKLE_SPREAD));
   const stars = glintPasses(fx, count).flatMap((t0) =>
     spots.map((spot, i) => ({
       cx: Math.round(x + spot.x * w - region.x),
       cy: Math.round(y + spot.y * h - region.y),
       scale: sizes[i] / Math.max(...sizes),
       start: t0 + spot.order * stagger,
-      life,
+      life: lives[i],
     }))
   );
 
@@ -114,7 +122,7 @@ function starFilters(fx: Ctx, plan: GlintPlan, star: Star): Filter[] {
       : [];
 
   return [
-    { type: 'trim', value: `start=${fmt(star.start)}:end=${fmt(star.start + star.life)}` },
+    { type: 'trim', value: `start=${fmt(star.start)}:end=${fmt(star.start + star.life + CLEAR / fx.frame.fps)}` },
     fadeIn(fx, star.start, ramp),
     ...fadeOut(fx, star.start + star.life - ramp, ramp),
     ...turn,

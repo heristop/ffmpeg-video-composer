@@ -157,6 +157,13 @@ export const TransitionSchema = z
       .strict()
       .optional()
       .describe('iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).'),
+    rim: z
+      .string()
+      .regex(/^#[0-9a-fA-F]{6}$/, 'rim is a #RRGGBB colour')
+      .optional()
+      .describe(
+        "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from."
+      ),
     duration: z
       .number()
       .positive()

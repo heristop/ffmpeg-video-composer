@@ -26,7 +26,7 @@
 
 import type { Filter } from '@/core/types';
 import { fnv1a32, seededRandom } from '@/core/determinism/hash';
-import { FX_PRIMITIVES, fxGraphicOf, type FxEffectName } from '../../schemas/fx.schemas';
+import { FX_PRIMITIVES, fxGraphicOf, type FxDefaults, type FxEffectName } from '../../schemas/fx.schemas';
 import { fxCeiling } from '../../schemas/fx-flat-target';
 import { FX_PASS_REST } from './fx-spec';
 import { defaultLightColor, WARM_WHITE } from './fx-color';
@@ -67,12 +67,12 @@ interface Timing {
 
 function timing(request: FxRequest, energy: number): Timing | null {
   const { graphic: g, ctx } = request;
-  const defaults = FX_PRIMITIVES[g.effect].defaults;
+  const defaults: FxDefaults = FX_PRIMITIVES[g.effect].defaults;
   const scaled = defaults.duration / Math.sqrt(Math.min(2, Math.max(0.5, energy || 1)));
   const duration = Math.max(2, Math.round((g.duration ?? scaled) * ctx.fps)) / ctx.fps;
   const at = onGrid(request.at, ctx.fps);
   const passes = g.repeat ?? 1;
-  const every = Math.max(duration, onGrid(g.every ?? duration + FX_PASS_REST, ctx.fps));
+  const every = Math.max(duration, defaults.period ?? 0, onGrid(g.every ?? duration + FX_PASS_REST, ctx.fps));
   const last = at + (passes - 1) * every + duration;
   const end = request.until === undefined ? last : Math.min(last, onGrid(request.until, ctx.fps));
 

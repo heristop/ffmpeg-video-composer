@@ -143,9 +143,7 @@ export const ENGINE_THUMBS: EngineThumb[] = [
       intensity: 1,
     },
   ]),
-  thumb('glint', 'Glints', 0.5, [
-    fx('glint', { path: 'corners', at: 0.1, repeat: 2, every: 0.95, count: 4, size: 90 }),
-  ]),
+  thumb('glint', 'Glints', 0.5, [fx('glint', { path: 'corners', at: 0.1, count: 4, size: 90, stagger: 0.2 })]),
   thumb(
     'frame',
     'Frame',

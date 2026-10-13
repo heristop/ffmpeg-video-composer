@@ -172,6 +172,40 @@ describe('fx glint', () => {
     }
   });
 
+  it('twinkles each star for 12–14 frames: it scales up from 0, turns 15° and is gone', () => {
+    for (const seed of [1, 2, 3, 4, 5]) {
+      const { chains } = lower({ effect: 'glint', target: CARD }, { seed });
+      const stars = chains.filter((chain) => /fx1_st\d+$/.test(chain.outputs?.[0] ?? ''));
+
+      expect(stars.length).toBeGreaterThanOrEqual(3);
+
+      for (const chain of stars) {
+        const values = chain.filters.map((f) => `${f.type}=${String(f.value)}`);
+        const [, start, end] = /trim=start=([\d.]+):end=([\d.]+)/.exec(values[0]) ?? [];
+        const [, st, d] = /fade=t=out:st=([\d.]+):d=([\d.]+)/.exec(values.join(',')) ?? [];
+        const life = (Number(st) + Number(d) - Number(start)) * 30;
+
+        expect(life, `seed ${seed}`).toBeGreaterThanOrEqual(12 - 1e-6);
+        expect(life, `seed ${seed}`).toBeLessThanOrEqual(14 + 1e-6);
+        // Two clear frames past the fade: the overlay repeats a branch's last frame until the window ends.
+        expect(Number(end)).toBeCloseTo(Number(st) + Number(d) + 2 / 30, 5);
+        expect(values.join(',')).toContain("rotate=a='0.261799*clip(");
+        expect(values.at(-1)).toMatch(/^scale=w='max\(2,2\*trunc\(/);
+      }
+    }
+  });
+
+  it('spaces repeated twinkles at least 1.5 s apart, whatever `every` asks', () => {
+    const one = { effect: 'glint', target: CARD, points: [{ x: 0.9, y: 0.1 }] } as Partial<FxGraphic>;
+    const starts = (graphic: Partial<FxGraphic>) =>
+      [...lower(graphic).text.matchAll(/\[fx1_star_\d+\]trim=start=([\d.]+)/g)].map((m) => Number(m[1]));
+
+    expect(starts({ ...one, repeat: 3, every: 0.6 })).toEqual([0.4, 1.9, 3.4]);
+    expect(starts({ ...one, repeat: 2, every: 2 })).toEqual([0.4, 2.4]);
+    // Default: duration + 1.2 s of rest.
+    expect(starts({ ...one, repeat: 2 })).toEqual([0.4, 2.5]);
+  });
+
   it('derives different layouts per seed, and honours points, count, size and spin', () => {
     const layouts = new Set([1, 2, 3, 4].map((seed) => lower({ effect: 'glint', target: CARD }, { seed }).text));
 

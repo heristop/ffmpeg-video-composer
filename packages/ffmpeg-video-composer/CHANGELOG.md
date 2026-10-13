@@ -39,22 +39,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   motion: the rays rest at mid travel and fade in and out. It is in the motion catalog, the JSON schema, the
   builder's animation library (with a live canvas preview) and `examples/motion-design/fx-burst.json`.
 - Glitch row tearing: `graphics[].tear` (2–24, off by default) on a `glitch` cuts the frame into that many
-  horizontal bands of seeded heights and shifts each one sideways by a seeded offset on every frame of the
-  hit, up to 12 % of the width at intensity 1, on top of the RGB split and colour slices. 16–24 bands slice a
-  title into thin displaced rows. It lowers to one `split`/`crop`/`overlay` sub-graph that is off outside
+  horizontal bands of seeded heights and shifts each one sideways, up to 12 % of the width at intensity 1, on
+  top of the RGB split and colour slices. The tear comes in 2–3 seeded bursts, nearly still between them, and
+  each band holds its offset for `hold` frames (default 2, sometimes one more) before it jumps, so it reads
+  as a torn signal rather than per-frame noise. 16–24 bands slice a title into thin displaced rows. It lowers to one `split`/`crop`/`overlay` sub-graph that is off outside
   the hit, and an untorn glitch compiles to the same filters as before.
 - Iris origin and ease: a designed `iris` transition takes `origin` (`{ x, y }` in frame fractions) to open
   the circle from a point of the frame, such as the icon the next scene grows out of, and now honours `ease`
   (default `linear`). The circle grows to the frame corner farthest from the origin. The mask is drawn per
   pixel at a quarter of the frame size (an `xfade` custom expression), scaled up and applied with
   `alphamerge`, which costs about 1/16 of a full-size per-pixel transition and stays on the on-device build.
-  An iris without `origin` or `ease` is still the built-in centred `circleopen`, byte for byte.
+  A `rim` (`"#RRGGBB"`, off by default) outlines the opening circle in the colour of the element it opens
+  from, so the circle grows out of it. An iris without `origin`, `ease` or `rim` is still the built-in
+  centred `circleopen`, byte for byte.
 - Sheen `profile: "gloss"`: a broad, flat-topped band, twice as wide as the specular one by default, for flat
   graphics such as a badge, a pill or a button. On a flat target (`layer:<i>`, `text:<i>` or a rectangle) its
   ceiling is 0.7 instead of 0.35. Over the frame or a pane it keeps 0.35, and the new `fx_gloss_target` lint
   warns about it. The other profiles render as before.
-- `examples/motion-design/fx-glitch-iris-sheen.json`: a torn title, an iris from a sun icon and a glossed
-  premium pill with a glint.
+- `examples/motion-design/fx-glitch-iris-sheen.json`: a torn title, an iris from a sun icon that grows into
+  it, and a glossed premium pill with a glint.
+
+### Changed
+
+- fx `glint`: each star is now a 12–14 frame twinkle (scale up from 0, turn 15°, gone) instead of filling
+  the pass duration, so a star no longer sits almost still on its spot for half a second; `duration` only
+  has to cover the stagger. Repeated passes start at least 1.5 s apart, whatever `every` asks. The glint
+  picker thumbnail and the fx gallery sheet are regenerated.
 
 ### Changed
 

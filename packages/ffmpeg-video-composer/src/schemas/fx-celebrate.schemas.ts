@@ -48,7 +48,8 @@ export const glint = {
     speed: z.number().min(0.2).max(3).optional(),
   },
   // Point sources: the peak is high (a star must read at 1080p) but each covers < 0.1 % of the frame.
-  defaults: { duration: 0.9, ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)', ceiling: 0.9, intensity: 0.85 },
+  // Each star is a 12–14 frame twinkle; repeats at least 1.5 s apart, so each reads as a new catch of light.
+  defaults: { duration: 0.9, ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)', ceiling: 0.9, intensity: 0.85, period: 1.5 },
 };
 
 export const confetti = {

@@ -10,7 +10,7 @@
 //
 // Same timeline as xfade (offset + duration), so the audio crossfade and music windows are unchanged.
 // Only standard filters (split, trim, setpts, pad, overlay, crop, scale, format, zoompan, xfade, concat, gblur,
-// and color/alphamerge for an iris with an origin or an ease), all in the on-device build.
+// and color/alphamerge for an iris with an origin, an ease or a rim), all in the on-device build.
 
 import { parseEasing, type EasingSpec } from './easing';
 import { easedProgressExpr, fmt } from './hermite';
@@ -51,6 +51,8 @@ export interface DesignedBoundary {
   ease?: EasingSpec;
   /** Iris only: where the circle opens from (default the centre). */
   origin?: FramePoint;
+  /** Iris only: a #RRGGBB outline on the circle's edge (default none). */
+  rim?: string;
   /** Graph labels, without brackets. */
   left: string;
   right: string;
@@ -125,16 +127,41 @@ function zoomThrough(b: DesignedBoundary, p: Pads): string {
 const IRIS_MASK_DIVISOR = 4;
 /** Width of the mask's edge ramp, in mask px (~6 px at full size). */
 const IRIS_SOFT = 1.5;
+/** Half the rim's width, in mask px (the ring is ~8 px wide at full size before its soft edges). */
+const IRIS_RIM = 1;
 
 function even(value: number): number {
   return 2 * Math.round(value / 2);
+}
+
+interface MaskFrame {
+  b: DesignedBoundary;
+  /** The mask's size, px. */
+  size: [number, number];
+  /** The setpts that puts a branch on the frame grid. */
+  grid: string;
+}
+
+// One per-pixel mask at mask size: `expr` is its signed distance to the edge (mask px), softened, scaled up.
+function maskChain(m: MaskFrame, name: string, expr: string): string {
+  const { b } = m;
+  const d = fmt(b.duration);
+  const source = `color=c=black:s=${m.size[0]}x${m.size[1]}:r=${b.fps}:d=${d},format=gray`;
+  const id = `${b.id}${name}`;
+
+  return (
+    `${source}[${id}0];${source}[${id}1];` +
+    `[${id}0][${id}1]xfade=transition=custom:expr='255*clip(${expr}/${fmt(IRIS_SOFT)}+0.5,0,1)'` +
+    `:duration=${d}:offset=0,scale=${b.width}:${b.height}:flags=bilinear,format=gray,settb=AVTB,${m.grid}`
+  );
 }
 
 // An iris from `origin` on the eased curve. A full-size per-pixel xfade expression costs ~0.8 s per 720p
 // frame, so only the mask is per-pixel, at a quarter of the frame size (1/16 of the pixels): a disc of
 // radius reach × e(t) around the origin, where reach is the origin's farthest frame corner. It is scaled
 // up and becomes the incoming scene's alpha over the outgoing one. xfade's P runs 1 → 0, so the elapsed
-// time is duration × (1 − P).
+// time is duration × (1 − P). A `rim` adds a second mask, a ring on the disc's edge, as the alpha of a
+// plain colour laid over the mix: the circle visibly grows out of the element it opens from.
 function irisMask(b: DesignedBoundary, p: Pads): string {
   const origin = b.origin ?? { x: 0.5, y: 0.5 };
   const [mw, mh] = [even(b.width / IRIS_MASK_DIVISOR), even(b.height / IRIS_MASK_DIVISOR)];
@@ -142,21 +169,31 @@ function irisMask(b: DesignedBoundary, p: Pads): string {
   const reach = Math.hypot(Math.max(ox, mw - ox), Math.max(oy, mh - oy)) + IRIS_SOFT;
   const d = fmt(b.duration);
   const e = easedProgressExpr(parseEasing(b.ease ?? 'linear'), { delay: 0, duration: b.duration }, `(${d}*(1-P))`);
-  const expr = `255*clip((${fmt(reach)}*(${e})-hypot(X-${fmt(ox)},Y-${fmt(oy)}))/${fmt(IRIS_SOFT)}+0.5,0,1)`;
-  const source = `color=c=black:s=${mw}x${mh}:r=${b.fps}:d=${d},format=gray`;
+  const distance = `hypot(X-${fmt(ox)},Y-${fmt(oy)})`;
+  const radius = `${fmt(reach)}*(${e})`;
   const id = b.id;
+  // Every branch on one frame grid: after the trims, frames decoded on the mp4 timebase can sit 1 µs off the
+  // mask's, and the overlay and alphamerge pair frames by timestamp, so every third frame reused a stale one.
+  const grid = `setpts=N/(${b.fps}*TB)`;
+  const mask = { b, size: [mw, mh] as [number, number], grid };
+  const disc =
+    `${maskChain(mask, 'm', `(${radius}-${distance})`)}[${id}mask];[${p.in}]${grid}[${id}ig];` +
+    `[${id}ig][${id}mask]alphamerge[${id}ia];[${p.tail}]${grid}[${id}tg];`;
+
+  if (!b.rim) return `${disc}[${id}tg][${id}ia]overlay=0:0[${p.mix}]`;
+
+  const color = `color=c=0x${b.rim.slice(1)}:s=${b.width}x${b.height}:r=${b.fps}:d=${d},settb=AVTB,${grid}`;
 
   return (
-    `${source}[${id}m0];${source}[${id}m1];` +
-    `[${id}m0][${id}m1]xfade=transition=custom:expr='${expr}':duration=${d}:offset=0,` +
-    `scale=${b.width}:${b.height}:flags=bilinear,format=gray,settb=AVTB[${id}mask];` +
-    `[${p.in}][${id}mask]alphamerge[${id}ia];[${p.tail}][${id}ia]overlay=0:0[${p.mix}]`
+    `${disc}${maskChain(mask, 'ring', `(${IRIS_RIM}-abs(${distance}-${radius}))`)}[${id}ringmask];` +
+    `${color}[${id}rc];[${id}rc][${id}ringmask]alphamerge[${id}rim];` +
+    `[${id}tg][${id}ia]overlay=0:0[${id}ov];[${id}ov][${id}rim]overlay=0:0[${p.mix}]`
   );
 }
 
-// The built-in circle reveal (centred, linear) unless an origin or an ease asks for the mask.
+// The built-in circle reveal (centred, linear) unless an origin, an ease or a rim asks for the mask.
 function iris(b: DesignedBoundary, p: Pads): string {
-  if (b.origin || b.ease) return irisMask(b, p);
+  if (b.origin || b.ease || b.rim) return irisMask(b, p);
 
   return `[${p.tail}][${p.in}]xfade=transition=circleopen:duration=${fmt(b.duration)}:offset=0[${p.mix}]`;
 }

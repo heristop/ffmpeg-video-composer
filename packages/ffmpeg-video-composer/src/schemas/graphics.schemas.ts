@@ -147,7 +147,16 @@ export const GraphicSchema = z
           .min(2)
           .max(24)
           .optional()
-          .describe('Row tearing (default off): N horizontal bands shifted sideways per frame.'),
+          .describe(
+            'Row tearing (default off): N horizontal bands shifted sideways in 2–3 seeded bursts, nearly still between them.'
+          ),
+        hold: z
+          .number()
+          .int()
+          .min(1)
+          .max(6)
+          .optional()
+          .describe('Frames each torn band holds its offset before it jumps (default 2; tear only).'),
       })
       .strict()
       .describe(

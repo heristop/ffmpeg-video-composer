@@ -176,6 +176,7 @@ export function boundaryTransitions(
       duration,
       ease: declared.ease,
       ...(declared.origin ? { origin: declared.origin } : {}),
+      ...(declared.rim ? { rim: declared.rim } : {}),
     };
   });
 }
