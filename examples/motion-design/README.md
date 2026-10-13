@@ -91,7 +91,7 @@ Each phrase is fitted to at most two balanced lines, held for at least a second,
 
 [`fx-pack.json`](./fx-pack.json) strings five beats together with whip transitions: a glitch hook whose punch word smears in on a kinetic `trail`, a rack-focus title framed by corners, a bar chart that grows and counts up under a progress bar, a looping ticker, and a close that shows the lower-third styles (`side-rule`, `clean-bar`, `kicker`, `stack-bars`, `pill`). Asset-free. Watch it at `/showcase?sample=fx-pack`.
 
-[`fx-glitch-iris-sheen.json`](./fx-glitch-iris-sheen.json) shows three cheat-sheet moves: a title torn into displaced rows (`glitch` with `tear`), an iris that opens out of a sun icon (`transition.origin` and `ease`), and a premium pill swept by a bright gloss (`sheen` with `profile: "gloss"`) before a star glints on its corner. Asset-free.
+[`fx-glitch-iris-sheen.json`](./fx-glitch-iris-sheen.json) shows three cheat-sheet moves: a title torn into displaced rows in three held bursts (`glitch` with `tear`, each band holding `hold` frames), an iris that opens out of a sun icon as the sun swells to 1.3× (`transition.origin`, `ease` and a `rim` in the sun's rose, the sun scaled by `options.animate`), and a premium pill swept by a bright gloss (`sheen` with `profile: "gloss"`) before a star twinkles once on its corner. Asset-free.
 
 ## Burst
 
