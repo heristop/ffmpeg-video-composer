@@ -2,7 +2,7 @@
   "meta": {
     "name": "fx burst",
     "description": "The burst fx primitive: a heart pop with a rose burst and dots, a SALE badge slam with impact lines, and a lavender half burst under a title.",
-    "creativeDirection": "Audience: motion designers checking the burst primitive. Direction: one accent per beat on a dark ink ground (#141416), lavender (#9298fb) and rose (#f96f99) shapes, a small uppercase label naming the beat. Each burst fires on the frame its element lands: at the top of the heart's overshoot, on the badge's floor contact (its keyframed y meets the floor as scaleY squashes), and as the title settles. Review: rays clear the element they burst from, the half burst fans only upward, nothing lingers after 0.8 s."
+    "creativeDirection": "Audience: motion designers checking the burst primitive. Direction: one accent per beat on a dark ink ground (#141416), lavender (#9298fb) and rose (#f96f99) shapes, a small uppercase label naming the beat. Each burst fires on the frame its element hits: one frame before the top of the heart's spring pop (the heart squashes 0.92 x 1.06 for 2 frames on the hit), on the badge's floor contact (it stretches as it falls, squashes, rebounds into a short stretch, then rests), and as the title settles. Springs are near-critical, overshooting 5 % at most. Review: rays clear the element they burst from, the half burst fans only upward, and every burst is gone by 70 % of its duration: nothing faint lingers."
   },
   "global": {
     "orientation": "landscape",
@@ -26,7 +26,7 @@
     {
       "name": "heart_pop",
       "type": "color_background",
-      "purpose": "A heart pops in on an overshoot and a rose burst fires from it at the top of the pop, with dots between the rays.",
+      "purpose": "A heart springs in and a rose burst fires from it one frame before the top of the pop, with a few dots between the rays; the heart squashes on the hit.",
       "options": {
         "backgroundColor": "#141416",
         "duration": 2.0
@@ -64,14 +64,48 @@
                   "v": 0
                 },
                 {
-                  "t": 0.55,
-                  "v": 1.22,
-                  "ease": "ease-out-cubic"
+                  "v": 1,
+                  "ease": "spring(300, 24)"
+                }
+              ],
+              "scaleX": [
+                {
+                  "t": 0.4667,
+                  "v": 1
                 },
                 {
-                  "t": 0.95,
+                  "t": 0.5,
+                  "v": 0.92,
+                  "ease": "ease-out"
+                },
+                {
+                  "t": 0.5333,
+                  "v": 0.92
+                },
+                {
+                  "t": 0.6333,
                   "v": 1,
-                  "ease": "spring(300, 10)"
+                  "ease": "ease-in-out"
+                }
+              ],
+              "scaleY": [
+                {
+                  "t": 0.4667,
+                  "v": 1
+                },
+                {
+                  "t": 0.5,
+                  "v": 1.06,
+                  "ease": "ease-out"
+                },
+                {
+                  "t": 0.5333,
+                  "v": 1.06
+                },
+                {
+                  "t": 0.6333,
+                  "v": 1,
+                  "ease": "ease-in-out"
                 }
               ],
               "opacity": [
@@ -99,7 +133,7 @@
             "w": 160,
             "h": 160
           },
-          "at": 0.5,
+          "at": 0.4333,
           "rays": 8,
           "thickness": 8,
           "length": 0.55,
@@ -113,7 +147,7 @@
     {
       "name": "sale_drop",
       "type": "color_background",
-      "purpose": "A SALE badge drops, stretched, slams on the floor with a squash and springs back; impact lines fire from it on the frame it lands.",
+      "purpose": "A SALE badge drops, stretching as it speeds up, slams on the floor with a squash, rebounds into a short stretch and rests; impact lines fire from it on the frame it lands.",
       "options": {
         "backgroundColor": "#141416",
         "duration": 2.4
@@ -171,41 +205,51 @@
               "scaleX": [
                 {
                   "t": 0.15,
-                  "v": 0.9
+                  "v": 1
                 },
                 {
                   "t": 0.6,
-                  "v": 0.9
+                  "v": 0.95,
+                  "ease": "ease-in"
                 },
                 {
-                  "t": 0.68,
-                  "v": 1.18,
+                  "t": 0.6667,
+                  "v": 1.16,
                   "ease": "ease-out"
                 },
                 {
-                  "t": 1.3,
+                  "t": 0.7667,
+                  "v": 0.96,
+                  "ease": "ease-in-out"
+                },
+                {
                   "v": 1,
-                  "ease": "spring(320, 10)"
+                  "ease": "spring(170, 18)"
                 }
               ],
               "scaleY": [
                 {
                   "t": 0.15,
-                  "v": 1.12
+                  "v": 1
                 },
                 {
                   "t": 0.6,
-                  "v": 1.12
+                  "v": 1.07,
+                  "ease": "ease-in"
                 },
                 {
-                  "t": 0.68,
-                  "v": 0.74,
+                  "t": 0.6667,
+                  "v": 0.78,
                   "ease": "ease-out"
                 },
                 {
-                  "t": 1.3,
+                  "t": 0.7667,
+                  "v": 1.04,
+                  "ease": "ease-in-out"
+                },
+                {
                   "v": 1,
-                  "ease": "spring(320, 10)"
+                  "ease": "spring(170, 18)"
                 }
               ]
             }
@@ -223,12 +267,12 @@
             "h": 132
           },
           "at": 0.6,
-          "rays": 12,
+          "rays": 10,
           "spread": 200,
           "thickness": 6,
-          "length": 0.6,
+          "length": 0.4,
           "jitter": 0.35,
-          "duration": 0.5,
+          "duration": 0.3,
           "color": "$color.fg",
           "seed": 8
         }
@@ -315,7 +359,7 @@
           "length": 0.5,
           "dots": 4,
           "jitter": 0.1,
-          "duration": 0.75,
+          "duration": 0.6,
           "color": "$color.accent2",
           "seed": 5
         }
