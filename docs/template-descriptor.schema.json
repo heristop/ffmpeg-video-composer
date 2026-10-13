@@ -1673,6 +1673,24 @@
                               "description": "Animated entrance for sugar text, with optional timing overrides."
                             }
                           ]
+                        },
+                        "animate": {
+                          "$ref": "#/$defs/LayerAnimate"
+                        },
+                        "origin": {
+                          "type": "string",
+                          "enum": [
+                            "center",
+                            "top-left",
+                            "top",
+                            "top-right",
+                            "left",
+                            "right",
+                            "bottom-left",
+                            "bottom",
+                            "bottom-right"
+                          ],
+                          "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         }
                       },
                       "additionalProperties": false
@@ -4495,6 +4513,24 @@
                               "description": "Animated entrance for sugar text, with optional timing overrides."
                             }
                           ]
+                        },
+                        "animate": {
+                          "$ref": "#/$defs/LayerAnimate"
+                        },
+                        "origin": {
+                          "type": "string",
+                          "enum": [
+                            "center",
+                            "top-left",
+                            "top",
+                            "top-right",
+                            "left",
+                            "right",
+                            "bottom-left",
+                            "bottom",
+                            "bottom-right"
+                          ],
+                          "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         }
                       },
                       "additionalProperties": false
@@ -7360,6 +7396,24 @@
                               "description": "Animated entrance for sugar text, with optional timing overrides."
                             }
                           ]
+                        },
+                        "animate": {
+                          "$ref": "#/$defs/LayerAnimate"
+                        },
+                        "origin": {
+                          "type": "string",
+                          "enum": [
+                            "center",
+                            "top-left",
+                            "top",
+                            "top-right",
+                            "left",
+                            "right",
+                            "bottom-left",
+                            "bottom",
+                            "bottom-right"
+                          ],
+                          "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         }
                       },
                       "additionalProperties": false
@@ -9949,6 +10003,24 @@
                               "description": "Animated entrance for sugar text, with optional timing overrides."
                             }
                           ]
+                        },
+                        "animate": {
+                          "$ref": "#/$defs/LayerAnimate"
+                        },
+                        "origin": {
+                          "type": "string",
+                          "enum": [
+                            "center",
+                            "top-left",
+                            "top",
+                            "top-right",
+                            "left",
+                            "right",
+                            "bottom-left",
+                            "bottom",
+                            "bottom-right"
+                          ],
+                          "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         }
                       },
                       "additionalProperties": false
@@ -12518,6 +12590,24 @@
                               "description": "Animated entrance for sugar text, with optional timing overrides."
                             }
                           ]
+                        },
+                        "animate": {
+                          "$ref": "#/$defs/LayerAnimate"
+                        },
+                        "origin": {
+                          "type": "string",
+                          "enum": [
+                            "center",
+                            "top-left",
+                            "top",
+                            "top-right",
+                            "left",
+                            "right",
+                            "bottom-left",
+                            "bottom",
+                            "bottom-right"
+                          ],
+                          "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         }
                       },
                       "additionalProperties": false
@@ -15558,6 +15648,24 @@
                               "description": "Animated entrance for sugar text, with optional timing overrides."
                             }
                           ]
+                        },
+                        "animate": {
+                          "$ref": "#/$defs/LayerAnimate"
+                        },
+                        "origin": {
+                          "type": "string",
+                          "enum": [
+                            "center",
+                            "top-left",
+                            "top",
+                            "top-right",
+                            "left",
+                            "right",
+                            "bottom-left",
+                            "bottom",
+                            "bottom-right"
+                          ],
+                          "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         }
                       },
                       "additionalProperties": false
@@ -18127,6 +18235,24 @@
                               "description": "Animated entrance for sugar text, with optional timing overrides."
                             }
                           ]
+                        },
+                        "animate": {
+                          "$ref": "#/$defs/LayerAnimate"
+                        },
+                        "origin": {
+                          "type": "string",
+                          "enum": [
+                            "center",
+                            "top-left",
+                            "top",
+                            "top-right",
+                            "left",
+                            "right",
+                            "bottom-left",
+                            "bottom",
+                            "bottom-right"
+                          ],
+                          "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         }
                       },
                       "additionalProperties": false
@@ -20696,6 +20822,24 @@
                               "description": "Animated entrance for sugar text, with optional timing overrides."
                             }
                           ]
+                        },
+                        "animate": {
+                          "$ref": "#/$defs/LayerAnimate"
+                        },
+                        "origin": {
+                          "type": "string",
+                          "enum": [
+                            "center",
+                            "top-left",
+                            "top",
+                            "top-right",
+                            "left",
+                            "right",
+                            "bottom-left",
+                            "bottom",
+                            "bottom-right"
+                          ],
+                          "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         }
                       },
                       "additionalProperties": false
@@ -23955,28 +24099,40 @@
       "additionalProperties": false,
       "description": "Hz: cutoff, or from→to over each note. resonance = Q (default 0.707)."
     },
-    "Animate": {
+    "LayerAnimate": {
       "type": "object",
       "properties": {
         "x": {
-          "description": "Horizontal position track (drawtext x).",
+          "description": "Horizontal position track (overlay x): pixels, or \"+80\"/\"-40\" relative to options.position.",
           "$ref": "#/$defs/KeyframeTrack"
         },
         "y": {
-          "description": "Vertical position track (drawtext y).",
-          "$ref": "#/$defs/KeyframeTrack"
-        },
-        "opacity": {
-          "description": "Opacity track (drawtext alpha), clamped to 0..1.",
+          "description": "Vertical position track (overlay y): pixels, or \"+80\"/\"-40\" relative to options.position.",
           "$ref": "#/$defs/KeyframeTrack"
         },
         "scale": {
-          "description": "Scale track: multiplies a numeric fontsize, re-rasterized every frame.",
+          "description": "Uniform scale track: a multiplier of the layer box (0..10).",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "scaleX": {
+          "description": "Horizontal scale track (0..10), multiplied with scale: squash and stretch, or a card flip (1 → 0 → 1).",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "scaleY": {
+          "description": "Vertical scale track (0..10), multiplied with scale.",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "rotate": {
+          "description": "Rotation track in degrees, clockwise: absolute, or \"+15\"/\"-15\" relative to options.rotation.",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "opacity": {
+          "description": "Opacity track 0..1, multiplied with options.opacity.",
           "$ref": "#/$defs/KeyframeTrack"
         }
       },
       "additionalProperties": false,
-      "description": "Keyframe tracks for a positioned drawtext. Each key eases into the next; a track overrides the same property from reveal/exit."
+      "description": "Keyframe tracks for the layer, times in section seconds. Each key eases into the next. A track overrides the same property of options.motion (x/y over a rise or slide, opacity over a fade). scale/scaleX/scaleY/rotate need the layer box: an html layer, or options.scale as \"W:H\" pixels."
     },
     "KeyframeTrack": {
       "minItems": 1,
@@ -24019,6 +24175,29 @@
         "required": ["v"],
         "additionalProperties": false
       }
+    },
+    "Animate": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "description": "Horizontal position track (drawtext x).",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "y": {
+          "description": "Vertical position track (drawtext y).",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "opacity": {
+          "description": "Opacity track (drawtext alpha), clamped to 0..1.",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "scale": {
+          "description": "Scale track: multiplies a numeric fontsize, re-rasterized every frame.",
+          "$ref": "#/$defs/KeyframeTrack"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Keyframe tracks for a positioned drawtext. Each key eases into the next; a track overrides the same property from reveal/exit."
     },
     "KineticBlock": {
       "type": "object",

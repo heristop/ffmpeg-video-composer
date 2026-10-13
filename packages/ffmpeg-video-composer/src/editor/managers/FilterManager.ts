@@ -88,6 +88,9 @@ class FilterManager {
     return filter.type;
   };
 
+  /** The output frame rate, on which per-frame lowerings (layer keyframes) step. */
+  frameRate = (): number => this.project.config.videoConfig?.fps ?? DefaultConfig.FPS;
+
   // The section's frame rate and length, over which an animated drawtext size is sampled.
   private readonly fontSizeTiming = (): FontSizeTiming => {
     const section = this.segment.currentSection;

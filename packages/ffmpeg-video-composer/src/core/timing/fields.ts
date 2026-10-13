@@ -1,6 +1,8 @@
 // Where time references may appear inside a section, and the elements they can name. Both walk a plain
 // section object; the slots write back in place, so callers walk a clone.
 
+import { LAYER_TRACKS } from '../../schemas/layer-animate.schemas';
+
 type Bag = Record<string, unknown>;
 
 /** A time field holding a string that may be a reference. */
@@ -131,6 +133,9 @@ function collectSlots(section: Bag, accept: Accept): RawSlot[] {
     ]),
     ...cameraSlots(accept, bag(section.camera)),
     ...list(section.filters).flatMap((filter, i) => filterSlots(accept, filter, `filters[${i}]`)),
+    ...list(section.inputs).flatMap((input, i) =>
+      trackSlots(accept, bag(bag(input.options)?.animate), LAYER_TRACKS, `inputs[${i}].options.animate`)
+    ),
     ...cueSlots(accept, section),
   ];
 }

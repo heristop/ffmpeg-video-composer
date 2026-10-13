@@ -12,6 +12,7 @@ import type FormattersManager from './FormatterManager';
 import type FilterManager from './FilterManager';
 import { escapeRegExp } from './VariableManager';
 import { isBackgroundInput } from '../utils/background-input';
+import { layerKeyframes } from '../presets/layer-keyframes';
 import { resolveFit } from '../utils/reframe';
 
 // Section.inputs is typed as Input[] for schema purposes, but at runtime it holds
@@ -122,13 +123,8 @@ class MapManager {
 
   // Prepares the animation leg before the overlay: scale it to its declared size and fade it when
   // opacity < 1 (shared with the whole-video AnimationComposer so both composite identically). A
-  // `motion` fade appends its alpha fade-in on an rgba frame. When leg filters exist the chain is
-  // prepended to the graph and its named pad returned; otherwise the raw `${inputIndex}:v` leg.
-  private readonly buildAnimationLeg = (
-    input: MapAnimationInput,
-    inputIndex: number,
-    motion: OverlayMotion
-  ): string => {
+  // `motion` fade appends its alpha fade-in on an rgba frame.
+  private readonly animationLegFilters = (input: MapAnimationInput, motion: OverlayMotion): string[] => {
     const legFilters = buildAnimationLegFilters(input.options);
 
     if (motion.legFilter) {
@@ -139,6 +135,12 @@ class MapManager {
       legFilters.push(motion.legFilter);
     }
 
+    return legFilters;
+  };
+
+  // When leg filters exist the chain is prepended to the graph and its named pad returned; otherwise the
+  // raw `${inputIndex}:v` leg.
+  private readonly registerLeg = (input: MapAnimationInput, inputIndex: number, legFilters: string[]): string => {
     if (legFilters.length === 0) {
       return `${inputIndex}:v`;
     }
@@ -147,6 +149,22 @@ class MapManager {
     this.segment.filtersMapList.unshift(`[${inputIndex}:v]${legFilters.join(',')}[${animationPad}]`);
 
     return animationPad;
+  };
+
+  // The leg and the overlay position. `options.animate` keyframe tracks own both (presets/layer-keyframes);
+  // otherwise an optional `motion` animates the entrance: slide/rise emit overlay x/y time-expressions,
+  // fade adds an alpha fade-in to the overlay leg.
+  private readonly overlayPlan = (
+    input: MapAnimationInput,
+    position: string
+  ): { legFilters: string[]; x?: string; y?: string } => {
+    if (input.options.animate) {
+      return layerKeyframes(input.options, this.filterManager.frameRate());
+    }
+
+    const motion = overlayMotionExpr(input.options.motion, position);
+
+    return { legFilters: this.animationLegFilters(input, motion), x: motion.x, y: motion.y };
   };
 
   addAnimationOverlay = (input: MapAnimationInput, inputIndex: number, videoScale = ''): void => {
@@ -161,11 +179,8 @@ class MapManager {
       ? this.buildAnimationBackground(input.name, videoStream, videoScale)
       : (this.segment.mapsList.at(-1) ?? videoStream);
 
-    // An optional `motion` animates the entrance: slide/rise emit overlay x/y time-expressions; fade
-    // adds an alpha fade-in to the overlay leg (needs an rgba frame first).
-    const motion = overlayMotionExpr(input.options.motion, position);
-
-    const animationLeg = this.buildAnimationLeg(input, inputIndex, motion);
+    const plan = this.overlayPlan(input, position);
+    const animationLeg = this.registerLeg(input, inputIndex, plan.legFilters);
 
     this.segment.inputsMapCount++;
 
@@ -177,8 +192,8 @@ class MapManager {
     // Moving entrances use the named, single-quoted overlay form so the comma-bearing time expressions
     // are not mis-parsed as extra filter options; otherwise the static positional "x:y" form.
     const overlayValue =
-      motion.x || motion.y
-        ? `x='${motion.x}':y='${motion.y}':eof_action=${eofAction}${timeline}`
+      plan.x || plan.y
+        ? `x='${plan.x}':y='${plan.y}':eof_action=${eofAction}${timeline}`
         : `${position}:eof_action=${eofAction}${timeline}`;
 
     // The animation overlays on top of the already-filtered background; no section filters here.

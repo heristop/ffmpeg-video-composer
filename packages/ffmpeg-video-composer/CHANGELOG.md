@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Keyframe tracks on image, animation and html layer inputs: `inputs[].options.animate` takes `x`, `y`,
+  `scale`, `scaleX`, `scaleY`, `rotate` and `opacity` tracks, with the same `{ t, v, ease? }` keys, easings,
+  springs, tokens and time references as the drawtext tracks. Cards, badges and icons can now pop in with an
+  overshoot, squash and stretch, flip (`scaleX` 1 → 0 → 1 across two layers), swing like a needle or drift in
+  parallax, instead of only entering with `options.motion`. `options.origin` (`center` by default, or an edge
+  or corner) is the point that stays put while the layer scales or turns. `x`/`y` take pixels or offsets from
+  `options.position`; `rotate` takes degrees, absolute or relative to `options.rotation`; `opacity` multiplies
+  `options.opacity`. A track overrides the same property of `options.motion`. Scale and rotate tracks need the
+  layer box: an html layer has it, an image or animation needs `options.scale` as `"W:H"` pixels. Every filter
+  runs on the layer's own frame and is in the on-device build (`fps`, `scale`, `rotate`, `colorchannelmixer`,
+  `overlay`); a property without a track adds nothing, and templates without `animate` compile to the same
+  commands as before.
+- Validation: `invalid_keyframes` for layer tracks out of order, an opacity outside 0..1 or a scale outside
+  0..10, relative values on scale or opacity, a scale or rotate track on a layer whose size is unknown, and
+  tracks on an input that is not a layer; an unknown track name is an `unknown_key` with the nearest name.
+- Layer tracks appear on the motion timeline as `animate` events, so the pacing lint no longer reports dead
+  air over a section whose layers are moving.
+
 ## [3.1.0] - 2026-10-11
 
 ### Added

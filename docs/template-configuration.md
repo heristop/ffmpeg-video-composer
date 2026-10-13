@@ -810,8 +810,9 @@ A positioned `drawtext` filter takes `animate` tracks for `x`, `y`, `opacity` an
 - `t`: seconds from the section start, `"+0.3"` relative to the previous key, or a duration token. If omitted, the first key is at 0 and later keys wait for the previous key plus the ease's natural duration (a spring's settle time, else 0.6 s).
 - `v`: for `x`/`y`, pixels, or `"+80"`/`"-40"` relative to the resting position from `values.x`/`values.y`. For `opacity`, 0..1. For `scale`, a multiplier of a **numeric** `values.fontsize`; the text is re-rasterized every frame, so it stays crisp.
 - A track overrides the same property from `reveal`/`exit`. Other properties keep their entrance and exit.
+- Image, animation and html layer inputs take their own tracks (with `scaleX`, `scaleY` and `rotate`): see [Layer keyframes](#layer-keyframes-optionsanimate).
 
-Validation codes: `unknown_motion_token`, `invalid_motion_token`, `invalid_easing`, and `invalid_keyframes` (keys out of order, relative opacity/scale, scale without a numeric fontsize, tracks on anything but `drawtext`). Grammar errors in an easing string fail at the schema with the reason, e.g. `unknown easing "ease-outt"`.
+Validation codes: `unknown_motion_token`, `invalid_motion_token`, `invalid_easing`, and `invalid_keyframes` (keys out of order, relative opacity/scale, scale without a numeric fontsize, tracks on anything but `drawtext` or a layer input). Grammar errors in an easing string fail at the schema with the reason, e.g. `unknown easing "ease-outt"`.
 
 ## Title cards
 
@@ -924,7 +925,7 @@ An animation is **one** single-file animated input. **APNG** and **WebM** (VP9 w
 
 **Playback extent** — set exactly one of `loop` (forever), `loops` (a finite play count), or `duration` (seconds); precedence is `duration` > `loops` > `loop`. `start` delays the overlay (`-itsoffset`, default 0). `persistent` maps to `eof_action=repeat` (freeze the last frame once the overlay ends, instead of letting the video show through). `opacity` < 1 fades the leg via `colorchannelmixer=aa`. Reference an input by `@name` from a `maps[]` entry.
 
-**Motion** — `options.motion` gives the overlay an animated entrance, reusing the [Reveal](#reveal) vocabulary (`fade`/`rise`/`slide-left`/`slide-right`, or an object with `delay`/`duration`/`distance`). It compiles to time-expressions on the `overlay` `x`/`y` (and the leg's fade for `fade`), so a logo or animation can slide / rise / fade into place. Available on both `animation` and `image` inputs.
+**Motion** — `options.motion` gives the overlay an animated entrance, reusing the [Reveal](#reveal) vocabulary (`fade`/`rise`/`slide-left`/`slide-right`, or an object with `delay`/`duration`/`distance`). It compiles to time-expressions on the `overlay` `x`/`y` (and the leg's fade for `fade`), so a logo or animation can slide / rise / fade into place. Available on both `animation` and `image` inputs. To move, scale, turn or fade a layer over time, use [layer keyframes](#layer-keyframes-optionsanimate).
 
 ### `type: "image"`
 
@@ -1000,7 +1001,7 @@ A template can bring its own font files, for a brand typeface the registry does 
 
 Validation reports a `src` that is WOFF2 (`font_woff2_unsupported`) or names no font format (`font_format`), and warns about a declared family no HTML layer selects (`font_unused`). `leclap validate` and the MCP `validate_template` also open each file the way a render would, and fail on one that is missing or outside the font dirs (`font_not_found`), damaged (`font_unreadable`), not a font (`font_format`) or over the limit (`font_too_large`). See [`html-brand-font.json`](../examples/motion-design/html-brand-font.json) (render it with `--fonts packages/leclap-creative-kit/src/library/fonts`).
 
-A layer is a still: animate it with `options.motion`. `rise` and `slide-*` only move the layer, so set `start` to the same time as the motion `delay` when the layer should not be visible before it moves in. Inline text and inline elements in one paragraph are laid out word by word on flexbox, so the browser's exact line breaks are not guaranteed.
+A layer is a still: give it an entrance with `options.motion`, or animate it over time with [`options.animate`](#layer-keyframes-optionsanimate). `rise` and `slide-*` only move the layer, so set `start` to the same time as the motion `delay` when the layer should not be visible before it moves in. Inline text and inline elements in one paragraph are laid out word by word on flexbox, so the browser's exact line breaks are not guaranteed.
 
 The PNG is named by a hash of everything that changes the drawing (resolved HTML and CSS, images, fonts, box, density and renderer versions), so an unchanged layer is rendered once per process. See [`html-card.json`](../examples/motion-design/html-card.json) (cards, a stat row, chips), [`html-testimonial.json`](../examples/motion-design/html-testimonial.json) (mixed weights in a sentence, a round portrait, `clip-path` stars), [`html-speaker.json`](../examples/motion-design/html-speaker.json) (a lower third with wrapped title and badges) and [`html-stats.json`](../examples/motion-design/html-stats.json) (stat tiles and an aligned spec list). Five bundled app templates use them for their cards: the lower third in [`interview.json`](../packages/leclap-creative-kit/src/templates/interview.json), the offer tag and spec card in [`product-launch.json`](../packages/leclap-creative-kit/src/templates/product-launch.json), the feature chips in [`web-app-promo.json`](../packages/leclap-creative-kit/src/templates/web-app-promo.json), the step badges in [`app-tutorial.json`](../packages/leclap-creative-kit/src/templates/app-tutorial.json) and the chapter cards in [`story-reel.json`](../packages/leclap-creative-kit/src/templates/story-reel.json).
 
@@ -1017,6 +1018,108 @@ A host with no rasteriser registered refuses the template with `html_unavailable
 ![The four HTML layout recipes](./media/gallery/html-layers.webp)
 
 More in the [gallery](./gallery.md#html-layers).
+
+### Layer keyframes (`options.animate`)
+
+`options.motion` only gives a layer an entrance. To animate a card, a badge or an icon over time, give any `image`, `animation` or `html` input keyframe tracks in `options.animate`. The keys have the same shape as the [drawtext tracks](#keyframe-tracks-animate): `{ "t", "v", "ease"? }`, where `t` is seconds from the **section** start (not from `options.start`), `"+0.3"`, a duration token or a time reference, and each key eases into itself from the previous one.
+
+| Track              | Value                                                                             | Lowers to                                                                     |
+| ------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `x`, `y`           | Pixels, or `"+80"`/`"-40"` relative to `options.position`.                        | The overlay's `x`/`y` expressions.                                            |
+| `scale`            | Multiplier of the layer box, 0..10.                                               | One `scale` (`eval=frame`) on the layer's own frame.                          |
+| `scaleX`, `scaleY` | Per-axis multipliers, 0..10, multiplied with `scale`: squash and stretch, a flip. | The same `scale`.                                                             |
+| `rotate`           | Degrees, clockwise; absolute, or `"+15"` relative to `options.rotation`.          | One `rotate` with an angle in `t`, in a transparent square holding the layer. |
+| `opacity`          | 0..1, multiplied with `options.opacity`.                                          | `colorchannelmixer` alpha steps, one per level, each gated to its frames.     |
+
+`options.origin` is the point of the box that stays put while the layer scales or turns: `center` (default), `top-left`, `top`, `top-right`, `left`, `right`, `bottom-left`, `bottom` or `bottom-right`. A needle turns about its `bottom`, a ball squashes on its `bottom`, a flag waves from its `left`.
+
+- **The box.** `scale`, `scaleX`, `scaleY` and `rotate` need the layer size: an `html` layer has it (`width`/`height`); an image or an animation needs `options.scale` as `"W:H"` pixels. A `w`/`h` in `options.position` (e.g. `"(W-w)/2:(H-h)/2"`) means the resting box.
+- **With an entrance.** A track overrides the same property of `options.motion`: an `x` or `y` track replaces a `rise`/`slide-*` travel on its axis, an `opacity` track replaces a `fade`. The other properties keep the entrance.
+- **Order.** The layer is turned, then scaled on screen axes. With a constant `rotate` and a `scaleX`, the squash runs along the screen, not along the turned layer.
+- **Cost.** Every filter runs on the layer's own frame, never on the full canvas, and a property without a track adds nothing. With `scale`, `rotate` or `opacity` the layer is conformed to the section frame rate first, so it steps on every output frame. Opacity is quantised to steps of 1/50.
+- **On device.** Only `fps`, `scale`, `rotate`, `format`, `colorchannelmixer` and `overlay` are used, all in the on-device LGPL build.
+
+Validation reports `invalid_keyframes` for keys out of order or at the same time, an `opacity` outside 0..1, a scale outside 0..10, a relative value on `scale*`/`opacity`, a scale or rotate track on a layer whose box is unknown, and tracks on an input that is not a layer. An unknown track name is an `unknown_key` with the nearest name.
+
+**Pop-in with overshoot.** The card grows past its size and settles, about its centre:
+
+```jsonc
+{
+  "name": "card",
+  "type": "html",
+  "html": "<div class=\"card\"><strong>New</strong></div>",
+  "css": ".card { display: flex; align-items: center; justify-content: center; width: 420px; height: 220px; border-radius: 32px; background: #9298fb }",
+  "width": 420,
+  "height": 220,
+  "options": {
+    "position": "430:250",
+    "animate": {
+      "scale": [
+        { "t": 0.25, "v": 0 },
+        { "t": 0.6, "v": 1.15, "ease": "ease-out-cubic" },
+        { "t": 0.9, "v": 1, "ease": "ease-in-out-sine" },
+      ],
+      "opacity": [
+        { "t": 0.25, "v": 0 },
+        { "t": "+0.1", "v": 1 },
+      ],
+    },
+  },
+}
+```
+
+A spring does the same with one key: `{ "t": "+0.7", "v": 1, "ease": "$bouncy" }`.
+
+**Squash and stretch.** A ball falls stretched, squashes on the floor and springs back, pinned at its bottom edge:
+
+```jsonc
+"options": {
+  "position": "550:376",
+  "origin": "bottom",
+  "animate": {
+    "y": [{ "t": 0.2, "v": "-460" }, { "t": 0.75, "v": "+0", "ease": "ease-in" }],
+    "scaleX": [{ "t": 0.2, "v": 0.86 }, { "t": 0.75, "v": 0.86 }, { "t": 0.85, "v": 1.32, "ease": "ease-out" }, { "t": 1.6, "v": 1, "ease": "spring(320, 9)" }],
+    "scaleY": [{ "t": 0.2, "v": 1.18 }, { "t": 0.75, "v": 1.18 }, { "t": 0.85, "v": 0.66, "ease": "ease-out" }, { "t": 1.6, "v": 1, "ease": "spring(320, 9)" }]
+  }
+}
+```
+
+**Flip.** Two layers at the same place: the front narrows to its edge and hides (`duration`), the back starts there (`start`) and opens out:
+
+```jsonc
+{ "name": "front", "type": "html", /* … */ "options": {
+  "position": "430:240", "duration": 0.95,
+  "animate": { "scaleX": [{ "t": 0.5, "v": 1 }, { "t": 0.95, "v": 0, "ease": "ease-in" }] }
+} },
+{ "name": "back", "type": "html", /* … */ "options": {
+  "position": "430:240", "start": 0.95,
+  "animate": { "scaleX": [{ "t": 0.95, "v": 0 }, { "t": 1.4, "v": 1, "ease": "ease-out" }] }
+} }
+```
+
+At `scaleX` 0 the layer is drawn 2 px wide: the card's edge.
+
+**Needle overshoot.** A 16×200 needle turns about its base and swings past its target on a loose spring:
+
+```jsonc
+"options": {
+  "position": "632:220",
+  "origin": "bottom",
+  "animate": { "rotate": [{ "t": 0.3, "v": -100 }, { "t": "+1.8", "v": 40, "ease": "spring(150, 7)" }] }
+}
+```
+
+**Parallax.** Layers at different depths travel different distances over the same time:
+
+```jsonc
+{ "name": "far",   /* … */ "options": { "position": "120:120", "animate": { "x": [{ "v": "+0" }, { "t": 4.5, "v": "-60",  "ease": "ease-in-out-sine" }] } } },
+{ "name": "mid",   /* … */ "options": { "position": "200:300", "animate": { "x": [{ "v": "+0" }, { "t": 4.5, "v": "-220", "ease": "ease-in-out-cubic" }] } } },
+{ "name": "front", /* … */ "options": { "position": "760:440", "animate": { "x": [{ "v": "+0" }, { "t": 4.5, "v": "-560", "ease": "ease-in-out" }] } } }
+```
+
+All five are in [`layer-keyframes.json`](../examples/motion-design/layer-keyframes.json).
+
+Limits: a layer is a raster. An `html` layer is drawn once at 2× and scaled per frame, so it stays sharp up to `scale` 2 (with a `rotate` track it is first scaled to its box, so it softens above 1); an image is only as sharp as its file. The turned square is the box diagonal, so the frame scaled on top of a turn grows with it.
 
 ## Whole-video animations
 

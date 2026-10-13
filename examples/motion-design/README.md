@@ -136,7 +136,7 @@ leclap render examples/motion-design/formats.json --formats all \
 
 ## HTML layers
 
-HTML and CSS (`inputs[].type: "html"`) lay out what positioned `drawtext` can't: cards, badges, chips, tables and text with mixed weights. Each layer is drawn once into a transparent PNG, then moves like any image overlay (`rise`, `slide-*`, `fade`, under a camera move). The copy comes from typed `global.fields`, the colours and faces from `$color.*` / `$font.*` tokens. HTML layers render on Node, in the browser and in the LeClap app, byte for byte alike; see [HTML layers](../../docs/template-configuration.md#html-layers).
+HTML and CSS (`inputs[].type: "html"`) lay out what positioned `drawtext` can't: cards, badges, chips, tables and text with mixed weights. Each layer is drawn once into a transparent PNG, then moves like any image overlay (`rise`, `slide-*`, `fade`, under a camera move), or scales, turns, moves and fades on [keyframe tracks](../../docs/template-configuration.md#layer-keyframes-optionsanimate). The copy comes from typed `global.fields`, the colours and faces from `$color.*` / `$font.*` tokens. HTML layers render on Node, in the browser and in the LeClap app, byte for byte alike; see [HTML layers](../../docs/template-configuration.md#html-layers).
 
 | Sample                                             | Format    | What it shows                                                                                                                                                                            |
 | -------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -145,6 +145,7 @@ HTML and CSS (`inputs[].type: "html"`) lay out what positioned `drawtext` can't:
 | [`html-testimonial.json`](./html-testimonial.json) | portrait  | A Reels quote with bold accent words inside one sentence, a round portrait, star chips cut with `clip-path`                                                                              |
 | [`html-speaker.json`](./html-speaker.json)         | landscape | A conference opener and lower third: a text wordmark, a talk title that wraps in its box, time and room badges                                                                           |
 | [`html-stats.json`](./html-stats.json)             | square    | Stat tiles that land in reading order and a spec list with values aligned right; a landscape cut via `$format`                                                                           |
+| [`layer-keyframes.json`](./layer-keyframes.json)   | landscape | Keyframe tracks on layers (`options.animate`): a pop-in with overshoot, squash and stretch, a card flip, a needle swinging past its target, a three-depth parallax                       |
 
 Images inside a layer (`<img src>`, CSS `url()`) name bundled backgrounds by their `/assets/backgrounds/…` path, like the sections' `pictureUrl`, so the CLI, the web app and the phone all stage them.
 
