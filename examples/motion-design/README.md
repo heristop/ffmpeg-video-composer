@@ -93,7 +93,7 @@ Each phrase is fitted to at most two balanced lines, held for at least a second,
 
 ## Burst
 
-[`fx-burst.json`](./fx-burst.json) shows the `burst` fx primitive in three beats on an ink ground: a heart that pops in on a keyframed overshoot (`options.animate` scale) fires a rose burst with dots between the rays; a SALE badge drops on a keyframed `y`, squashes on the floor (`scaleX` / `scaleY`) and throws impact lines on the frame it lands; a title settles over a lavender half burst (`spread: 180`, origin at its bottom edge). Each ray is a sprite turned at compile time; its length and fade are per-frame expressions, so nothing rotates per frame. Asset-free.
+[`fx-burst.json`](./fx-burst.json) shows the `burst` fx primitive in three beats on an ink ground: a heart springs in (`options.animate` scale on a near-critical `spring(300, 24)`, 5 % overshoot) and fires a rose burst with a few dots one frame before the top of the pop, squashing 0.92 × 1.06 for 2 frames on the hit; a SALE badge drops on a keyframed `y`, stretching as it falls, squashes on the floor (`scaleX` / `scaleY`), rebounds into a short stretch and rests on a `spring(170, 18)`, throwing ten short impact lines on the frame it lands; a title settles over a lavender half burst (`spread: 180`, origin at its bottom edge). Each ray is a sprite turned at compile time; its length and fade are per-frame expressions, so nothing rotates per frame, and every burst is gone by 70 % of its duration. Asset-free.
 
 ## One story, three formats
 
