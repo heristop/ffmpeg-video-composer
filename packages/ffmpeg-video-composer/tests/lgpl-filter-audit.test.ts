@@ -21,6 +21,7 @@ import { sfxGraph } from '@/editor/utils/sfx-mix';
 import { REGISTERED_FX, lowerFx } from '@/editor/presets/fx';
 import { lowerStroke } from '@/editor/presets/stroke-graphics';
 import { FX_DOCS } from '@/schemas/fx-docs';
+import { layerKeyframes } from '@/editor/presets/layer-keyframes';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const commonSh = fs.readFileSync(path.resolve(here, '../../../scripts/ffmpeg/common.sh'), 'utf8');
@@ -180,6 +181,35 @@ describe('LGPL device filter audit', () => {
     for (const type of types([...fill, ...layouts])) {
       expect(enabled.has(type), `mask/layout emits "${type}"`).toBe(true);
       expect(ENGINE_EMITTED_FILTERS as readonly string[], type).toContain(type);
+    }
+  });
+
+  // LAYER_KEYFRAMES_AUDIT: a layer input with every keyframe track (and every static leg option and a fade
+  // entrance next to them) lowers to device filters only, in both the turned and the unturned legs.
+  it('layer keyframe tracks lower to device-safe filters', () => {
+    const tracks = {
+      x: [{ v: '-40' }, { t: 0.5, v: '+0', ease: 'spring(300, 14)' }],
+      y: [{ v: 0 }, { t: 1, v: 20 }],
+      scale: [{ v: 0 }, { t: 0.4, v: 1.2, ease: 'ease-out-back' }, { t: 0.6, v: 1 }],
+      scaleX: [{ v: 1 }, { t: 1, v: 0 }, { t: 1.2, v: 1 }],
+      scaleY: [{ v: 1 }, { t: 0.2, v: 0.8 }],
+      opacity: [{ v: 0 }, { t: 0.3, v: 1 }],
+    };
+    const base = { position: '10:20', scale: '200:100', flip: 'horizontal', opacity: 0.8, motion: 'fade' } as const;
+    const legs = [
+      layerKeyframes({ ...base, fit: 'contain', animate: tracks }, 25),
+      layerKeyframes({ ...base, origin: 'bottom', animate: { ...tracks, rotate: [{ v: -60 }, { t: 1, v: 20 }] } }, 25),
+      layerKeyframes({ ...base, rotation: 15, animate: { scale: tracks.scale } }, 25),
+    ].flatMap((plan) => plan.legFilters);
+    const names = legs.map((filter) => filter.split('=')[0]);
+
+    expect(new Set(names)).toEqual(
+      new Set(['fps', 'scale', 'setsar', 'format', 'pad', 'hflip', 'rotate', 'colorchannelmixer', 'fade'])
+    );
+
+    for (const name of names) {
+      expect(enabled.has(name), `layer keyframes emit "${name}"`).toBe(true);
+      expect(ENGINE_EMITTED_FILTERS as readonly string[], name).toContain(name);
     }
   });
 

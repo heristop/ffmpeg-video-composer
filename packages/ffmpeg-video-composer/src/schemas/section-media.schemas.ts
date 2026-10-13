@@ -3,6 +3,7 @@ import { OverlayFitSchema, OverlayFlipSchema, RevealSchema } from './effects.sch
 import { FilterSchema } from './filter.schemas';
 import { TranslationSchema } from './global.schemas';
 import { HtmlInputShape, htmlInputIssues } from './html-input.schemas';
+import { LayerAnimateSchema, LayerOriginSchema } from './layer-animate.schemas';
 
 // Input/shape/field media primitives — the animation input options, the editor-only shape recipe, the
 // input schema and the form-field schema — live here to keep `section.schemas` under the max-lines
@@ -41,6 +42,8 @@ export const InputOptionsSchema = z
     motion: RevealSchema.optional().describe(
       'Animated entrance for the overlay: rise/slide in via overlay x/y expressions, or fade in.'
     ),
+    animate: LayerAnimateSchema.optional(),
+    origin: LayerOriginSchema.optional(),
   })
   .strict()
   .describe('Playback and compositing options for an animation input.');

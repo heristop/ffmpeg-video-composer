@@ -14,6 +14,7 @@ import { DEFAULT_TRANSITION_EASE, isDesignedTransition } from './transitions';
 import { graphicEvent, kineticEvents } from './timeline-elements';
 import { drawtextEvents, sugarEvents } from './timeline-text';
 import { subtitleEvents } from './timeline-subtitles';
+import { layerEvents } from './timeline-layers';
 import type { Subtitles } from '../../schemas/subtitles.schemas';
 import {
   easeKey,
@@ -54,6 +55,7 @@ interface LooseSection {
   graphics?: Graphic[];
   subtitles?: Subtitles;
   filters?: unknown[];
+  inputs?: unknown[];
   motion?: Array<{ type?: string }>;
 }
 
@@ -201,6 +203,7 @@ function sectionTimeline(input: SectionInput, base: Omit<ElementFrame, 'duration
     ...(incoming ? [transitionEvent(incoming, 0, Math.min(incoming.duration, duration), 'transition-in')] : []),
     ...sugarEvents(section as Parameters<typeof sugarEvents>[0], frame),
     ...drawtextEvents(section.filters, frame),
+    ...layerEvents(section.inputs, frame),
     ...(section.kinetic ?? []).flatMap((block, k) => kineticEvents(block, k, frame)),
     ...(section.graphics ?? []).map((graphic, k) => graphicEvent(graphic, k, frame)),
     ...subtitleEvents(section.subtitles, frame),

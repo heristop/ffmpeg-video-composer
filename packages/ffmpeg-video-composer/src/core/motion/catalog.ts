@@ -67,6 +67,11 @@ const ART_DIRECTION = [
   'Graphics: corners or frame for focus, underline under a headline, panel as a backing plate, bars for cinema, ' +
     'wipe as an in-scene page turn, flash for impact (at most 3 per second), glitch for a hook hit, focus to rack ' +
     'into a beat, progress / ticker / bars-chart for data and broadcast.',
+  'Layers: cards, badges and icons (image, animation and html inputs) take options.animate keyframe tracks ' +
+    '(x, y, scale, scaleX, scaleY, rotate, opacity; options.origin is the pivot). Pop-in with overshoot: scale ' +
+    '0 → 1.15 → 1. Squash and stretch: scaleX and scaleY in opposition on the landing. Flip: scaleX 1 → 0 → 1 ' +
+    'with two faces swapped at the midpoint (start/duration). Needle: rotate about origin bottom with ' +
+    'ease-out-back. Parallax: x tracks at different speeds per depth.',
   'Transitions: push for sequence, swipe for layering, zoom-through for energy, iris for reveals, whip for a fast ' +
     'jump on the beat (0.3–0.5 s); keep the others 0.5–0.8 s and prefer cut between beats of the same idea. ' +
     'Designed transitions ease like any other motion (ease: $snappy…).',

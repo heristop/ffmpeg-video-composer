@@ -2,7 +2,8 @@
 //
 // - invalid_motion_token / unknown_motion_token / invalid_easing: token definitions and references.
 // - invalid_keyframes: key times out of order, a relative value on a non-positional track, a scale track
-//   without a numeric fontsize, or tracks on something other than a drawtext.
+//   without a numeric fontsize, or tracks on something other than a drawtext or a layer input (whose own
+//   rules live in layer-animate-validation.ts).
 
 import type { TemplateDescriptor } from '../schemas/template.schemas';
 import { EasingError, easingError, validSpring, type EasingSpec } from '@/core/motion/easing';
@@ -17,6 +18,7 @@ import { parseTimeRef } from '@/core/timing/grammar';
 import { resolveTimeRefs } from '@/core/timing/resolve';
 
 import { motionRoleErrors } from './motion-roles-validation';
+import { LAYER_ANIMATE_PATH, layerAnimateErrors } from './layer-animate-validation';
 import { withEasingHint } from './validation/easing-hint';
 import { nearest } from './validation/suggest';
 import type { ValidationError } from './validation/types';
@@ -122,21 +124,26 @@ function easingUseError(use: Use, tokens: ResolvedTokens): ValidationError | nul
   return message ? withEasingHint({ path: use.path, message, code: 'invalid_easing' }, resolved) : null;
 }
 
-function trackError(
-  axis: string,
-  keys: TrackKey[],
-  owner: Record<string, unknown>,
-  tokens: ResolvedTokens
-): string | null {
+// Key times as they will lower: seconds, "+seconds" or tokens, strictly increasing. A time reference
+// left unresolved is reported by the time-reference rules.
+function keyTimingError(keys: TrackKey[], tokens: ResolvedTokens): string | null {
   const resolved = keys.map((key) => ({ ...key, t: resolveTimeRef(key.t, tokens) }));
 
-  // A time reference left unresolved is reported by the time-reference rules.
   if (resolved.some((key) => typeof key.t === 'string' && parseTimeRef(key.t))) return null;
 
   const badTime = resolved.find((key) => typeof key.t === 'string' && !/^\+?\d+(?:\.\d+)?$/.test(key.t));
 
   if (badTime) return `time "${String(badTime.t)}" is not seconds, "+seconds", a duration token or a time reference`;
 
+  return keyTimesError(resolved.map((key) => ({ ...key, ease: resolveEasingRef(key.ease ?? 'linear', tokens) })));
+}
+
+function trackError(
+  axis: string,
+  keys: TrackKey[],
+  owner: Record<string, unknown>,
+  tokens: ResolvedTokens
+): string | null {
   if ((axis === 'opacity' || axis === 'scale') && keys.some((key) => typeof key.v === 'string')) {
     return `${axis} keys take plain numbers, not relative offsets`;
   }
@@ -145,15 +152,31 @@ function trackError(
     return 'a scale track needs a numeric values.fontsize to scale';
   }
 
-  return keyTimesError(resolved.map((key) => ({ ...key, ease: resolveEasingRef(key.ease ?? 'linear', tokens) })));
+  return keyTimingError(keys, tokens);
 }
 
-function animateUseErrors(use: Use, tokens: ResolvedTokens): ValidationError[] {
+// The input whose options carry a layer `animate`, or null when the tracks sit anywhere else.
+function layerInput(path: string, template: TemplateDescriptor): Record<string, unknown> | null {
+  const match = LAYER_ANIMATE_PATH.exec(path);
+
+  if (!match) return null;
+
+  const section = template.sections?.[Number(match[1])] as { inputs?: unknown[] } | undefined;
+
+  return (section?.inputs?.[Number(match[2])] as Record<string, unknown> | undefined) ?? null;
+}
+
+function animateUseErrors(use: Use, tokens: ResolvedTokens, template: TemplateDescriptor): ValidationError[] {
+  const tracks = use.value as Record<string, TrackKey[]>;
+  const input = layerInput(use.path, template);
+
+  if (input) return layerAnimateErrors(use.path, tracks, input, (keys) => keyTimingError(keys, tokens));
+
   if (use.owner.type !== 'drawtext') {
     return [{ path: use.path, message: 'animate tracks apply to drawtext filters', code: 'invalid_keyframes' }];
   }
 
-  return Object.entries(use.value as Record<string, TrackKey[]>).flatMap(([axis, keys]) => {
+  return Object.entries(tracks).flatMap(([axis, keys]) => {
     const message = trackError(axis, keys, use.owner, tokens);
 
     return message ? [{ path: `${use.path}.${axis}`, message, code: 'invalid_keyframes' }] : [];
@@ -238,7 +261,8 @@ function kineticErrors(template: TemplateDescriptor): ValidationError[] {
 
 export function validateMotionSystem(template: TemplateDescriptor): ValidationError[] {
   // Keyframe times may be time references: check the tracks as they will lower, in seconds.
-  const uses = motionUses(resolveTimeRefs(template, { deferBeatsAnalysis: true }).descriptor);
+  const resolved = resolveTimeRefs(template, { deferBeatsAnalysis: true }).descriptor;
+  const uses = motionUses(resolved);
 
   const tokens = resolveTokens(template.global?.motion);
   const easingErrors = uses.filter((use) => use.kind === 'easing').map((use) => easingUseError(use, tokens));
@@ -250,7 +274,7 @@ export function validateMotionSystem(template: TemplateDescriptor): ValidationEr
     ...curveTokenErrors(template.global?.motion),
     ...motionRoleErrors(template.global?.motion),
     ...easingErrors.filter((error): error is ValidationError => error !== null),
-    ...tracks.flatMap((use) => animateUseErrors(use, tokens)),
+    ...tracks.flatMap((use) => animateUseErrors(use, tokens, resolved)),
     ...kineticErrors(template),
   ];
 }

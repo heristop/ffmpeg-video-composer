@@ -28,7 +28,8 @@ const GUIDE = [
   'Motion system: section `kinetic` blocks animate copy natively per word or ' +
     'glyph (cascade, rise, drop, slide, pop, impact, tracking-in, typewriter, scramble, wave, highlight, counter, ' +
     'split, fade) with accents and exits; easings add springs (spring(k,c)), cubic-bezier, named curves and ' +
-    '$tokens ($snappy, $bouncy, $expo…); `animate` keyframe tracks drive x/y/opacity/scale on drawtext filters; ' +
+    '$tokens ($snappy, $bouncy, $expo…); `animate` keyframe tracks drive x/y/opacity/scale on drawtext filters ' +
+    'and x/y/scale/scaleX/scaleY/rotate/opacity on image, animation and html inputs (options.animate, options.origin); ' +
     'global.motion holds tokens and the energy dial; global.seed makes every random-looking choice repeatable. ' +
     'Kinetic `trail` adds echo smears; section `graphics` add hits (flash, glitch, focus), shapes and data / ' +
     'broadcast graphics (progress, ticker, bars-chart); `type: "fx"` graphics are procedural light primitives ' +

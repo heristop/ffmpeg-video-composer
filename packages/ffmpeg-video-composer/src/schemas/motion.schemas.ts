@@ -174,7 +174,7 @@ export const KeyframeSchema = z
   })
   .strict();
 
-const TrackSchema = z.array(KeyframeSchema).min(1).max(32).meta({ id: 'KeyframeTrack' });
+export const TrackSchema = z.array(KeyframeSchema).min(1).max(32).meta({ id: 'KeyframeTrack' });
 
 export const AnimateSchema = z
   .object({

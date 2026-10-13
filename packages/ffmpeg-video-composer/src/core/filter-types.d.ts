@@ -4,6 +4,7 @@
 import type { Reveal, TimedReveal, TimedExit } from './descriptor-text';
 import type { FontRef } from './fonts';
 import type { Animate, MotionRole } from '../schemas/motion.schemas';
+import type { LayerAnimate, LayerOrigin } from '../schemas/layer-animate.schemas';
 
 /** How an overlay maps into its "w:h" scale box: free stretch, letterbox inside, or fill + centre-crop. */
 export type OverlayFit = 'stretch' | 'contain' | 'cover';
@@ -73,6 +74,10 @@ interface InputOptions {
   flip?: OverlayFlip;
   /** Animated entrance for the overlay (rise/slide/fade), reusing the reveal vocabulary. */
   motion?: Reveal;
+  /** Keyframe tracks (x, y, scale, scaleX, scaleY, rotate, opacity); override the same property of `motion`. */
+  animate?: LayerAnimate;
+  /** Pivot of the animate scale/rotate tracks within the layer box (default center). */
+  origin?: LayerOrigin;
 }
 
 export interface Map {
@@ -159,7 +164,11 @@ type MapAnimationOptions = {
   duration?: number;
   start?: number;
   opacity?: number;
+  rotation?: number;
+  flip?: OverlayFlip;
   motion?: Reveal;
+  animate?: LayerAnimate;
+  origin?: LayerOrigin;
 };
 
 export type MapAnimationInput = {

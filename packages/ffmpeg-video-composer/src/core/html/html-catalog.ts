@@ -127,7 +127,9 @@ export function htmlCatalog(): HtmlCatalog {
     images:
       'img src and url() must be template assets (relative or /assets/ paths, PNG/JPEG); remote images are refused.',
     motion:
-      'The layer is a still: animate it with options.motion (rise, slide-*, fade), start/duration, camera and fx.',
+      'The layer is a still: give it an entrance with options.motion (rise, slide-*, fade), keyframe it with ' +
+      'options.animate (x, y, scale, scaleX, scaleY, rotate, opacity about options.origin), and time it with ' +
+      'start/duration; camera and fx work on it too.',
     limits: `width and height in output pixels, ${HTML_LAYER_MAX_SIZE} max; drawn at 2× and scaled into the box. Content taller than the box is cut (html_overflow).`,
     platforms:
       'Node (CLI, MCP), the browser (web app) and the phone (a hidden WebView) render HTML layers, byte for ' +

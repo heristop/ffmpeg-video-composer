@@ -146,7 +146,8 @@ export const ENGINE_EMITTED_FILTERS = [
   // stylized looks (Phase 4 LOOK_TABLE rows: duotone/sketch/glitch)
   'rgbashift',
   'edgedetect',
-  // motion (MOTION_HANDLERS in looks.ts) + gradient/animation overlay opacity fade
+  // motion (MOTION_HANDLERS in looks.ts) + gradient/animation overlay opacity fade, and layer keyframe
+  // tracks (presets/layer-keyframes.ts: fps conform, per-frame scale/rotate, gated colorchannelmixer steps)
   'zoompan',
   'rotate',
   'hflip',
