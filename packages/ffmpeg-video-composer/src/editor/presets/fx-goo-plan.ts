@@ -8,22 +8,13 @@ import { parseEasing } from '@/core/motion/easing';
 import type { FxGraphicOf } from '../../schemas/fx.schemas';
 import type { Region } from './fx-marks';
 import { choreography, type Choreo } from './fx-goo-choreo';
+import type { GooBlob, Track } from './fx-goo-types';
+
+export type { GooBlob, Track } from './fx-goo-types';
 
 export { GOO_POP_EASE } from './fx-goo-choreo';
 
 type Graphic = FxGraphicOf<'goo'>;
-
-/** One value track: its keys (px, absolute times) over a resting `base` (px). */
-export interface Track {
-  base: number;
-  keys?: TrackKey[];
-}
-
-export interface GooBlob {
-  x: Track;
-  y: Track;
-  r: Track;
-}
 
 export interface GooPlan {
   blobs: GooBlob[];

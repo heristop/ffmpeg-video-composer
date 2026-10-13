@@ -6,7 +6,7 @@
 import type { EasingSpec } from '@/core/motion/easing';
 import type { TrackKey } from '@/core/motion/tracks';
 import type { FxGraphicOf } from '../../schemas/fx.schemas';
-import type { GooBlob } from './fx-goo-plan';
+import type { GooBlob } from './fx-goo-types';
 
 type Graphic = FxGraphicOf<'goo'>;
 
