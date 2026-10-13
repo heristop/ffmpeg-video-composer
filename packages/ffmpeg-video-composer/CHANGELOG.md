@@ -38,6 +38,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   expressions: no `rotate`, only on-device filters (`scale`, `fade`, `colorchannelmixer`, `overlay`). Reduced
   motion: the rays rest at mid travel and fade in and out. It is in the motion catalog, the JSON schema, the
   builder's animation library (with a live canvas preview) and `examples/motion-design/fx-burst.json`.
+- Glitch row tearing: `graphics[].tear` (2–24, off by default) on a `glitch` cuts the frame into that many
+  horizontal bands of seeded heights and shifts each one sideways by a seeded offset on every frame of the
+  hit, up to 12 % of the width at intensity 1, on top of the RGB split and colour slices. 16–24 bands slice a
+  title into thin displaced rows. It lowers to one `split`/`crop`/`overlay` sub-graph that is off outside
+  the hit, and an untorn glitch compiles to the same filters as before.
+- Iris origin and ease: a designed `iris` transition takes `origin` (`{ x, y }` in frame fractions) to open
+  the circle from a point of the frame, such as the icon the next scene grows out of, and now honours `ease`
+  (default `linear`). The circle grows to the frame corner farthest from the origin. The mask is drawn per
+  pixel at a quarter of the frame size (an `xfade` custom expression), scaled up and applied with
+  `alphamerge`, which costs about 1/16 of a full-size per-pixel transition and stays on the on-device build.
+  An iris without `origin` or `ease` is still the built-in centred `circleopen`, byte for byte.
+- Sheen `profile: "gloss"`: a broad, flat-topped band, twice as wide as the specular one by default, for flat
+  graphics such as a badge, a pill or a button. On a flat target (`layer:<i>`, `text:<i>` or a rectangle) its
+  ceiling is 0.7 instead of 0.35. Over the frame or a pane it keeps 0.35, and the new `fx_gloss_target` lint
+  warns about it. The other profiles render as before.
+- `examples/motion-design/fx-glitch-iris-sheen.json`: a torn title, an iris from a sun icon and a glossed
+  premium pill with a glint.
 
 ### Changed
 

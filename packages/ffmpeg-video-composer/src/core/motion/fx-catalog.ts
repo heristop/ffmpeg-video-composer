@@ -35,7 +35,8 @@ const RULES = [
   'Anchor every effect with `target` (a card rect with its radius, a pane, a layer, a kinetic block, or the frame) ' +
     'and derive it from what it decorates, never a floating box.',
   'Light (sheen, leak, edge-glow) adds luminance, never greys: it stays inside its target (an edge-glow blooms ' +
-    'just outside the card), peaks ≤ 0.35 alpha (leak ≤ 0.25) and ≤ 0.6 intensity over skin.',
+    'just outside the card), peaks ≤ 0.35 alpha (leak ≤ 0.25) and ≤ 0.6 intensity over skin; only a sheen with ' +
+    'profile "gloss" on a flat graphic (a layer, a text block or a rectangle: a badge, a pill) may reach 0.7.',
   'Marks (ripple, glint, confetti, burst) start from a point of the target and may leave it: a ripple on the exact ' +
     'control, glints on a product, a burst on the beat something pops or lands, confetti once per video on a real ' +
     'payoff.',

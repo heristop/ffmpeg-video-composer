@@ -1,7 +1,8 @@
 // fx "sheen": a specular light band crossing its target (schemas/fx-primitives.schemas.ts for the fields).
 //
 // The band is a `gradients` source sized to the band only (never the frame): 7 colour stops sample the
-// light profile (bandProfile: a gaussian core plus a bloom twice as wide, a soft wash, or twin glints)
+// light profile (bandProfile: a gaussian core plus a bloom twice as wide, a soft wash, twin glints, or the
+// flat-topped gloss sheet, which may peak at 0.7 on a flat graphic: schemas/fx-flat-target.ts)
 // along a tilted normal, so the stripes come out tilted without `rotate`; a light gblur turns the
 // piecewise-linear stops into a smooth gaussian and a seeded dither on its alpha keeps 8-bit output free of
 // banding. Its position along the travel axis follows the eased pass progress, from fully before the
@@ -58,7 +59,8 @@ export function bandOf(fx: FxContext<'sheen'>): Band {
   const g = fx.graphic;
   const { w, h } = fx.target;
   const tiltDefault = 14 + Math.round(fx.random() * 24) / 2;
-  const widthDefault = 0.15 * (0.85 + fx.random() * 0.3);
+  // gloss: a broad sheet of light, twice the specular band (the badge sweeps it is meant for).
+  const widthDefault = (g.profile === 'gloss' ? 0.3 : 0.15) * (0.85 + fx.random() * 0.3);
   const direction = g.direction ?? (h > w * 1.25 ? 'down' : 'right');
   const horizontal = direction === 'right' || direction === 'left';
   const width = Math.max(2, (g.width ?? widthDefault) * Math.min(w, h));

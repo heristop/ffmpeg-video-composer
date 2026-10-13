@@ -9,8 +9,8 @@
 //   [next] → in ‖ rest ────┘                           ├─ concat(head, mix, rest)
 //
 // Same timeline as xfade (offset + duration), so the audio crossfade and music windows are unchanged.
-// Only standard filters (split, trim, setpts, pad, overlay, crop, scale, format, zoompan, xfade, concat, gblur),
-// all in the on-device build.
+// Only standard filters (split, trim, setpts, pad, overlay, crop, scale, format, zoompan, xfade, concat, gblur,
+// and color/alphamerge for an iris with an origin or an ease), all in the on-device build.
 
 import { parseEasing, type EasingSpec } from './easing';
 import { easedProgressExpr, fmt } from './hermite';
@@ -33,16 +33,24 @@ export const DESIGNED_TRANSITION_DESCRIPTIONS: Record<DesignedTransition, string
   'swipe-left': 'The next scene slides over from the right while the current one drifts left beneath it.',
   'swipe-right': 'The next scene slides over from the left while the current one drifts right beneath it.',
   'zoom-through': 'The camera flies through the current scene into the next: scale up, cross, settle.',
-  iris: 'A circle opens from the centre to reveal the next scene (linear; ease is ignored).',
+  iris: 'A circle opens to reveal the next scene: from the centre, linearly, unless origin or ease is set.',
   'whip-left': 'A whip pan: the next scene pushes in from the right, motion-blurred along the travel at peak speed.',
   'whip-right': 'A whip pan to the right: the next scene pushes in from the left, motion-blurred at peak speed.',
   'whip-up': 'A vertical whip: the next scene pushes in from below, motion-blurred along the travel.',
   'whip-down': 'A vertical whip: the next scene pushes in from above, motion-blurred along the travel.',
 };
 
+/** A point of the frame in fractions: 0 = left / top edge, 1 = right / bottom edge. */
+export interface FramePoint {
+  x: number;
+  y: number;
+}
+
 export interface DesignedBoundary {
   type: DesignedTransition;
   ease?: EasingSpec;
+  /** Iris only: where the circle opens from (default the centre). */
+  origin?: FramePoint;
   /** Graph labels, without brackets. */
   left: string;
   right: string;
@@ -113,8 +121,43 @@ function zoomThrough(b: DesignedBoundary, p: Pads): string {
   );
 }
 
-// The built-in circle reveal: a per-pixel soft edge cost ~0.8 s per 720p frame, too slow for a phone.
+/** The iris mask is drawn at this fraction of the frame size, then scaled up (its edge softens with it). */
+const IRIS_MASK_DIVISOR = 4;
+/** Width of the mask's edge ramp, in mask px (~6 px at full size). */
+const IRIS_SOFT = 1.5;
+
+function even(value: number): number {
+  return 2 * Math.round(value / 2);
+}
+
+// An iris from `origin` on the eased curve. A full-size per-pixel xfade expression costs ~0.8 s per 720p
+// frame, so only the mask is per-pixel, at a quarter of the frame size (1/16 of the pixels): a disc of
+// radius reach × e(t) around the origin, where reach is the origin's farthest frame corner. It is scaled
+// up and becomes the incoming scene's alpha over the outgoing one. xfade's P runs 1 → 0, so the elapsed
+// time is duration × (1 − P).
+function irisMask(b: DesignedBoundary, p: Pads): string {
+  const origin = b.origin ?? { x: 0.5, y: 0.5 };
+  const [mw, mh] = [even(b.width / IRIS_MASK_DIVISOR), even(b.height / IRIS_MASK_DIVISOR)];
+  const [ox, oy] = [origin.x * mw, origin.y * mh];
+  const reach = Math.hypot(Math.max(ox, mw - ox), Math.max(oy, mh - oy)) + IRIS_SOFT;
+  const d = fmt(b.duration);
+  const e = easedProgressExpr(parseEasing(b.ease ?? 'linear'), { delay: 0, duration: b.duration }, `(${d}*(1-P))`);
+  const expr = `255*clip((${fmt(reach)}*(${e})-hypot(X-${fmt(ox)},Y-${fmt(oy)}))/${fmt(IRIS_SOFT)}+0.5,0,1)`;
+  const source = `color=c=black:s=${mw}x${mh}:r=${b.fps}:d=${d},format=gray`;
+  const id = b.id;
+
+  return (
+    `${source}[${id}m0];${source}[${id}m1];` +
+    `[${id}m0][${id}m1]xfade=transition=custom:expr='${expr}':duration=${d}:offset=0,` +
+    `scale=${b.width}:${b.height}:flags=bilinear,format=gray,settb=AVTB[${id}mask];` +
+    `[${p.in}][${id}mask]alphamerge[${id}ia];[${p.tail}][${id}ia]overlay=0:0[${p.mix}]`
+  );
+}
+
+// The built-in circle reveal (centred, linear) unless an origin or an ease asks for the mask.
 function iris(b: DesignedBoundary, p: Pads): string {
+  if (b.origin || b.ease) return irisMask(b, p);
+
   return `[${p.tail}][${p.in}]xfade=transition=circleopen:duration=${fmt(b.duration)}:offset=0[${p.mix}]`;
 }
 

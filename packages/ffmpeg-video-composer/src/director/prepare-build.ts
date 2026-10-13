@@ -171,6 +171,11 @@ export function boundaryTransitions(
 
     const duration = declared.duration ?? globalTransition?.duration ?? DEFAULT_TRANSITION_DURATION;
 
-    return { type: declared.type, duration, ease: declared.ease };
+    return {
+      type: declared.type,
+      duration,
+      ease: declared.ease,
+      ...(declared.origin ? { origin: declared.origin } : {}),
+    };
   });
 }

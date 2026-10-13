@@ -11,8 +11,11 @@
 //   literal instead of a $color token once global.theme is set, else a hex used nowhere else.
 // - decor_overload: more than DECOR_MAX_PER_SECTION decorative effects (fx, light hits, frames, animation
 //   overlays) layered in one section.
+// - fx_gloss_target (restraint, not sameness; it rides along with the fx rules): a flat-graphic profile
+//   (the sheen's "gloss") aimed at the frame or a pane, where it keeps the light doctrine's lower ceiling.
 
 import { FX_PRIMITIVES } from '../schemas/fx-primitives.schemas';
+import { deniedFlatProfile } from '../schemas/fx-flat-target';
 import { librarySampleOf, type LibrarySample } from '@/core/motion/library-samples';
 import { RENDERING_SECTION_TYPES } from '@/core/motion/timeline';
 import { parseHexColor } from '@/core/theme/palette';
@@ -80,6 +83,29 @@ function fxUntuned(section: Section): SamenessWarning[] {
         'fx_untuned',
         `Section "${section.name}": fx "${String(graphic.effect)}" sets none of its look parameters`,
         `Tune it for this template: ${look.slice(0, 6).join(', ')}, colour ("$color.accent"), duration/ease (get_motion_catalog → fx).`
+      ),
+    ];
+  });
+}
+
+function targetName(target: unknown): string {
+  if (target === undefined) return 'the frame';
+
+  return typeof target === 'string' ? target : 'a rectangle';
+}
+
+function glossTarget(section: Section): SamenessWarning[] {
+  return graphicsOf(section).flatMap(({ graphic, path }) => {
+    const profile = graphic.type === 'fx' ? deniedFlatProfile(graphic) : null;
+
+    if (!profile) return [];
+
+    return [
+      warn(
+        path,
+        'fx_gloss_target',
+        `Section "${section.name}": fx "${String(graphic.effect)}" profile "${profile}" targets ${targetName(graphic.target)}, so it keeps the 0.35 light ceiling`,
+        'Aim it at the flat graphic it glosses ("layer:<i>", "text:<i>" or a {x, y, w, h, radius} rectangle), or use profile "specular" over footage.'
       ),
     ];
   });
@@ -269,7 +295,7 @@ export function samenessWarnings(data: unknown): SamenessWarning[] {
   const sections = renderingSections(template);
 
   return [
-    ...sections.flatMap((section) => [...fxUntuned(section), ...decorOverload(section)]),
+    ...sections.flatMap((section) => [...fxUntuned(section), ...decorOverload(section), ...glossTarget(section)]),
     ...effectRepeated(sections),
     ...librarySamples(template, sections),
     ...offTheme(template, sections),

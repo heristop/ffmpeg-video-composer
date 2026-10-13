@@ -27,6 +27,7 @@
 import type { Filter } from '@/core/types';
 import { fnv1a32, seededRandom } from '@/core/determinism/hash';
 import { FX_PRIMITIVES, fxGraphicOf, type FxEffectName } from '../../schemas/fx.schemas';
+import { fxCeiling } from '../../schemas/fx-flat-target';
 import { FX_PASS_REST } from './fx-spec';
 import { defaultLightColor, WARM_WHITE } from './fx-color';
 import { resolveFxTarget, type FxTargetRect } from './fx-target';
@@ -94,7 +95,7 @@ function context(request: FxRequest, target: FxTargetRect, time: Timing): AnyFxC
     ease: g.ease ?? defaults.ease,
     color: lightColor(request),
     theme: ctx.theme,
-    peak: defaults.ceiling * (g.intensity ?? defaults.intensity),
+    peak: fxCeiling(g) * (g.intensity ?? defaults.intensity),
     energy,
     reduced: energy === 0,
     seed,

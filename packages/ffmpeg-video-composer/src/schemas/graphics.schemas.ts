@@ -141,10 +141,17 @@ export const GraphicSchema = z
           .max(1)
           .optional()
           .describe('How hard the frame tears: channel split, jitter and grain (default 0.6).'),
+        tear: z
+          .number()
+          .int()
+          .min(2)
+          .max(24)
+          .optional()
+          .describe('Row tearing (default off): N horizontal bands shifted sideways per frame.'),
       })
       .strict()
       .describe(
-        'A digital glitch hit: seeded RGB channel split, horizontal jitter, grain and colour slices for `duration` (default 0.35 s). Changes with global.seed.'
+        'A digital glitch hit: seeded RGB channel split, horizontal jitter, grain and colour slices for `duration` (default 0.35 s); `tear` adds row tearing. Changes with global.seed.'
       ),
     z
       .object({

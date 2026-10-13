@@ -152,6 +152,11 @@ export const TransitionSchema = z
     ease: EasingSpecSchema.optional().describe(
       'Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.'
     ),
+    origin: z
+      .object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1) })
+      .strict()
+      .optional()
+      .describe('iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).'),
     duration: z
       .number()
       .positive()

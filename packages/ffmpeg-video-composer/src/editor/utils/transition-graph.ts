@@ -2,11 +2,11 @@
 // so the (stateless) timeline math — offsets, capped durations, the xfade/acrossfade chains — is
 // testable on its own and VideoEditor stays focused on orchestration. No FFmpeg or IO here.
 
-import { designedTransitionGraph, isDesignedTransition } from '@/core/motion/transitions';
+import { designedTransitionGraph, isDesignedTransition, type FramePoint } from '@/core/motion/transitions';
 import type { EasingSpec } from '@/core/motion/easing';
 
 /** A boundary transition between two adjacent segments — `type` is an xfade name, `cut` or a designed one. */
-export type Transition = { type: string; duration: number; ease?: EasingSpec };
+export type Transition = { type: string; duration: number; ease?: EasingSpec; origin?: FramePoint };
 
 /** Per-segment probe result the assembly graph is built from. */
 export type SegmentProbe = { duration: number; hasAudio: boolean };
@@ -92,6 +92,7 @@ function boundaryLink(
     return designedTransitionGraph({
       type: transition.type,
       ease: transition.ease,
+      ...(transition.origin ? { origin: transition.origin } : {}),
       left: strip(labels.left),
       right: strip(labels.right),
       out: strip(labels.out),
