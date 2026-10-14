@@ -11,8 +11,8 @@ type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 const DROPPED_KEYS = new Set(['$schema', 'examples', 'title']);
 /** Said once next to the digest instead of `"additionalProperties":false` on ~150 objects. */
 export const CLOSED_OBJECTS = 'objects accept only their listed properties unless additionalProperties says otherwise';
-// Subtrees shorter than this are cheaper inline than as a `$ref`.
-const MIN_HOIST = 90;
+// Below the size of a reference, a subtree cannot save space even when repeated often.
+const MIN_HOIST = 32;
 // Description clip lengths tried in order until the digest fits; 0 drops descriptions.
 const DESCRIPTION_STEPS = [160, 90, 40, 0];
 // Union factoring: a union needs this many object variants sharing this many identical fields.
@@ -136,7 +136,13 @@ function hoist(node: Json, hoister: Hoister, isRoot: boolean): Json {
 
   const text = JSON.stringify(node);
 
-  if (!isRoot && (hoister.counts.get(text) ?? 0) > 1) {
+  const count = hoister.counts.get(text) ?? 0;
+  const nextId = `S${String(hoister.ids.size)}`;
+  const referenceLength = JSON.stringify({ $ref: `#/$defs/${nextId}` }).length;
+  const definitionLength = text.length + nextId.length + 4;
+  const savesSpace = count * (text.length - referenceLength) > definitionLength;
+
+  if (!isRoot && count > 1 && (hoister.ids.has(text) || savesSpace)) {
     let id = hoister.ids.get(text);
 
     if (!id) {
