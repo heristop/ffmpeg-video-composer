@@ -27,6 +27,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Layer tracks appear on the motion timeline as `animate` events, so the pacing lint no longer reports dead
   air over a section whose layers are moving.
 
+### Changed
+
+- Browser entry: the template validator loads on demand, like the compile pipeline. It lowers every overlay
+  (text, lower thirds, kinetic type, subtitles, graphics) to find where text lands, so it made up most of what a
+  page loaded before its first compile, and every new graphic or effect added to it. The eager load drops from
+  636 KB to 299 KB (the schemas, models, adapters and catalogs). **Breaking** for code that validates with the
+  browser entry's `Template` before compiling: `await loadTemplateValidation()` (new export) first, then
+  `setDescriptor`, `loadFromJSON` and `validateDescriptor` stay synchronous; before it they throw. A compile and
+  `resolveTemplateEffects` (still async, same signature) load the validator themselves. The Node and React
+  Native entries are unchanged.
+
+### Fixed
+
+- Browser entry: validating a template with a `global` block overflowed the stack. The build rewrote every
+  `global` in the code to `globalThis`, locals and object keys included, so resolving a theme walked
+  `globalThis`; only the free identifier is rewritten now. Error messages no longer read `globalThis.beats`.
+
 ## [3.1.0] - 2026-10-11
 
 ### Added

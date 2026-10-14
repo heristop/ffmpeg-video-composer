@@ -16,23 +16,14 @@ import { parseEasing, type EasingSpec } from './easing';
 import { easedProgressExpr, fmt } from './hermite';
 import { whipBlur, WHIP_EASE } from './whip';
 import { exactZoomFilters, ZOOM_TIME } from './zoom-exact';
+import { DEFAULT_TRANSITION_EASE, type DesignedTransition } from './transition-names';
 
-export const DESIGNED_TRANSITIONS = [
-  'push-left',
-  'push-right',
-  'push-up',
-  'push-down',
-  'swipe-left',
-  'swipe-right',
-  'zoom-through',
-  'iris',
-  'whip-left',
-  'whip-right',
-  'whip-up',
-  'whip-down',
-] as const;
-
-export type DesignedTransition = (typeof DESIGNED_TRANSITIONS)[number];
+export {
+  DEFAULT_TRANSITION_EASE,
+  DESIGNED_TRANSITIONS,
+  isDesignedTransition,
+  type DesignedTransition,
+} from './transition-names';
 
 export const DESIGNED_TRANSITION_DESCRIPTIONS: Record<DesignedTransition, string> = {
   'push-left': 'The next scene pushes the current one out to the left, both moving together.',
@@ -48,13 +39,6 @@ export const DESIGNED_TRANSITION_DESCRIPTIONS: Record<DesignedTransition, string
   'whip-up': 'A vertical whip: the next scene pushes in from below, motion-blurred along the travel.',
   'whip-down': 'A vertical whip: the next scene pushes in from above, motion-blurred along the travel.',
 };
-
-/** Default transition curve: a symmetric, Apple-like ease-in-out. */
-export const DEFAULT_TRANSITION_EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
-
-export function isDesignedTransition(type: string): type is DesignedTransition {
-  return (DESIGNED_TRANSITIONS as readonly string[]).includes(type);
-}
 
 export interface DesignedBoundary {
   type: DesignedTransition;

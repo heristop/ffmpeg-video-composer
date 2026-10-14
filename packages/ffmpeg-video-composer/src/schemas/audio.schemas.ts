@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { EasingSpecSchema } from './motion.schemas';
 import { timeValue } from './time.schemas';
-import { SFX_IDS } from '../core/audio/sfx-library';
+import { SFX_IDS } from '../core/audio/sfx-ids';
 import { VOICE_PRESETS } from '../core/audio/voice-presets';
 import { SoundSchema } from './sound.schemas';
 

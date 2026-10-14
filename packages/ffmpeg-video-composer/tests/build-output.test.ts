@@ -328,21 +328,45 @@ describe('Build Output', () => {
     });
 
     // The size a page actually loads before its first compile: browser.js plus every chunk it imports
-    // statically (lazy `import()` chunks are fetched later). Guards the shared chunk from regrowing.
-    // Typed fields (~18 KB) are eager: the browser validator resolves and coerces them synchronously.
-    // So are template fonts (~7 KB: the global.fonts schema, its rules and advisories, font-family resolution);
-    // loading the font files (WOFF inflate, hashing) stays in a lazy chunk. Layer keyframes add ~4 KB (the
-    // options.animate schema, its validation rules and timeline events); their lowering stays in the lazy
-    // MapManager chunk.
-    it('browser entry eager load (browser.js + static chunks) should be under 640KB', async () => {
+    // statically (lazy `import()` chunks are fetched later). What stays eager is what the entry's exports need
+    // at import time: the zod schemas (the EffectSectionSchema export), the models, the WASM and filesystem
+    // adapter classes, tsyringe and reflect-metadata, the theme and platform catalogs, template font specs.
+    // The template validator is lazy: its rules lower every overlay sugar (text, lower thirds, kinetic,
+    // subtitles, graphics) to find where text lands, so each new graphic or effect grew the eager load with it.
+    // It loads with loadTemplateValidation(), resolveTemplateEffects() or the first compile.
+    it('browser entry eager load (browser.js + static chunks) should be under 340KB', async () => {
       const files = await browserEagerFiles();
       const sizes = await Promise.all(
         [...files.keys()].map(async (file) => (await stat(path.join(DIST_DIR, file))).size)
       );
       const total = sizes.reduce((a, b) => a + b, 0);
 
-      expect(total).toBeLessThan(640 * 1024);
+      expect(total).toBeLessThan(340 * 1024);
       console.log(`  browser eager load: ${(total / 1024).toFixed(2)} KB across ${files.size} files`);
+    });
+
+    // The validator and the overlay lowering it runs (draw layers, the motion timeline) are fetched on demand,
+    // in their own chunk, and so is the compile pipeline (director, editor, managers).
+    it('browser entry eager load carries neither the template validator nor the render pipeline', async () => {
+      const code = [...(await browserEagerFiles()).values()].join('\n');
+
+      expect(code).not.toMatch(/\bBaseTemplateValidator = class\b/);
+      expect(code).not.toMatch(
+        /function (sectionDrawLayers|motionTimeline|graphicsToFilters|kineticBlocksToFilters)\(/
+      );
+      expect(code).not.toMatch(/\b(TemplateDirector|VideoEditor|SegmentBuilder) = class\b/);
+    });
+
+    it('browser entry loads the template validator on demand', async () => {
+      const entry = await readFile(path.join(DIST_DIR, 'browser.js'), 'utf-8');
+      const chunk = /import\(["']\.\/(register-template-validator-[^"']+\.js)["']\)/.exec(entry)?.[1];
+
+      expect(chunk).toBeDefined();
+      expect((await browserEagerFiles()).has(chunk as string)).toBe(false);
+
+      const code = [...(await chunkGraph(chunk as string)).values()].join('\n');
+
+      expect(code).toMatch(/\bBaseTemplateValidator = class\b/);
     });
 
     // Validation needs the schemas, not their authoring prose: the fx rows' descriptions and intent
@@ -422,6 +446,24 @@ describe('Build Output', () => {
       expect(templateDescriptor).toBeDefined();
       expect(templateDescriptor.global).toBeDefined();
       expect(templateDescriptor.sections).toBeInstanceOf(Array);
+    });
+
+    it('dist/browser.js validates a template once loadTemplateValidation() resolves', async () => {
+      const mod = await import(path.join(DIST_DIR, 'browser.js'));
+      const json = await readFile(path.join(__dirname, 'fixtures/picture.json'), 'utf-8');
+
+      await mod.loadTemplateValidation();
+
+      expect(new mod.Template().loadFromJSON(json).success).toBe(true);
+    });
+
+    // Node's `global` becomes `globalThis` in the browser build, but only the free identifier: a local, a parameter
+    // or an object key named `global` (the descriptor's own `global`) keeps its name.
+    it('dist/browser.js keeps bindings and keys named global', async () => {
+      const code = [...(await chunkGraph('browser.js')).values()].join('\n');
+
+      expect(code).toMatch(/global: resolveGlobal\(global, theme\)/);
+      expect(code).not.toMatch(/globalThis: |resolveGlobal\(globalThis/);
     });
 
     it('should import and use exports from dist/browser.js', async () => {

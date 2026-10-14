@@ -13,7 +13,7 @@ import {
   MIN_RESONANCE,
   MIN_SOUND_LENGTH,
 } from '../core/audio/synth/bounds';
-import { SFX_IDS } from '../core/audio/sfx-library';
+import { SFX_IDS } from '../core/audio/sfx-ids';
 import { noteSeconds } from '../core/audio/synth/timing';
 import type { Layer, SoundFx } from '../core/audio/synth/types';
 

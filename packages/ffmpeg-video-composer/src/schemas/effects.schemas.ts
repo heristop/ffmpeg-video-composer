@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DESIGNED_TRANSITIONS } from '../core/motion/transitions';
+import { DESIGNED_TRANSITIONS } from '../core/motion/transition-names';
 import { EasingSpecSchema } from './motion.schemas';
 import { GLOBAL_AUDIO_POLISH_FIELDS } from './audio.schemas';
 

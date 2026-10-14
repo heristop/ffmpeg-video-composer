@@ -3,43 +3,9 @@
 // synthesized by packages/leclap-creative-kit/scripts/gen-sfx.ts into its src/library/sfx/ folder (original,
 // license-free audio); a test checks every entry against the file on disk. Pure data.
 
-export const SFX_IDS = [
-  'whoosh',
-  'swoosh-short',
-  'hit',
-  'boom',
-  'riser',
-  'click',
-  'tick',
-  'pop',
-  'shutter',
-  'ding',
-  'glitch',
-  'sparkle',
-  'thud',
-  'zap',
-  'notification',
-  'keystroke',
-  'blip',
-  'rise-short',
-  'coin',
-  'drum-roll',
-  'heartbeat',
-  'clap',
-  'snap',
-  'success',
-  'error',
-  'swoosh-long',
-  'sub-drop',
-  'reverse-cymbal',
-  'water-drop',
-  'whistle-up',
-  'camera-focus',
-  'paper',
-  'tada',
-] as const;
+import type { SfxId } from './sfx-ids';
 
-export type SfxId = (typeof SFX_IDS)[number];
+export { SFX_IDS, type SfxId } from './sfx-ids';
 
 export interface SfxEntry {
   id: SfxId;
