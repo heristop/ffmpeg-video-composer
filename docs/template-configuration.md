@@ -1749,7 +1749,7 @@ Every primitive takes these fields, on top of its own parameters:
 | 0.3–0.35 | `sheen`, `edge-glow`, `resolve` (0.35), `glass` (0.3)                                   |
 | 0.7      | `sheen` with `profile: "gloss"` on a flat target (`layer:<i>`, `text:<i>`, a rectangle) |
 | 0.85–1   | `ripple` (0.85), `glint` (0.9), `confetti` and `burst` (1): small marks that must read  |
-| 1        | `goo`: a solid shape, not light                                                      |
+| 1        | `goo`: a solid shape, not light                                                         |
 
 The gloss ceiling is for flat graphics only, such as a badge, a pill or a button: no footage sits under the light, so it cannot grey skin. Aimed at the frame or a pane, a gloss sheen keeps the 0.35 ceiling, and the lint warns with `fx_gloss_target`.
 
