@@ -71,6 +71,7 @@ export const ENGINE_LIBRARY: readonly EngineLibraryEntry[] = [
   fx('glass', 'focus', 'subject', { effect: 'glass' }),
   fx('vignette-breathe', 'focus', 'frame', { effect: 'vignette-breathe' }),
   fx('confetti', 'celebrate', 'subject', { effect: 'confetti' }),
+  fx('burst', 'celebrate', 'subject', { effect: 'burst' }),
   fx('glint', 'celebrate', 'subject', { effect: 'glint' }),
   stroke('frame'),
   stroke('corners'),

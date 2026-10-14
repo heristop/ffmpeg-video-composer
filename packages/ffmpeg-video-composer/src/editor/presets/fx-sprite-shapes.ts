@@ -15,7 +15,8 @@ export type SpriteKind =
   | 'bokeh'
   | 'rim'
   | 'feather'
-  | 'glow';
+  | 'glow'
+  | 'ray';
 
 /** Light profiles across a band: a specular core with bloom, one soft wash, or two thin parallel glints. */
 export const BAND_PROFILES = ['specular', 'soft', 'twin'] as const;
@@ -38,6 +39,9 @@ export type BandProfile = (typeof BAND_PROFILES)[number];
  *   fades in over `halo` px.
  * - glow: gaussian bloom of σ `sigma` px, peak alpha `peak`, OUTSIDE a centred rounded rectangle inset
  *   `inset` px from every image edge (corner `radius` px); exactly transparent inside it.
+ * - ray: a solid capsule (a stroke with round caps) through the centre, `width` px long caps included,
+ *   `stroke` px thick, along `tilt` degrees (screen convention: 0 = right, 90 = down). A burst ray turned
+ *   at compile time, so it needs no per-frame rotate.
  */
 export interface SpriteSpec {
   kind: SpriteKind;
@@ -168,6 +172,19 @@ function glow(spec: SpriteSpec): Coverage {
   };
 }
 
+function ray(spec: SpriteSpec): Coverage {
+  const theta = ((spec.tilt ?? 0) * Math.PI) / 180;
+  const [c, s] = [Math.cos(theta), Math.sin(theta)];
+  const half = (spec.stroke ?? 4) / 2;
+  const reach = Math.max(0, (spec.width ?? spec.w) / 2 - half);
+
+  return (x, y) => {
+    const u = Math.min(reach, Math.max(-reach, x * c + y * s));
+
+    return clamp01(half - Math.hypot(x - u * c, y - u * s) + 0.5);
+  };
+}
+
 const SHAPES: Record<SpriteKind, (spec: SpriteSpec) => Coverage> = {
   disc,
   ring,
@@ -180,6 +197,7 @@ const SHAPES: Record<SpriteKind, (spec: SpriteSpec) => Coverage> = {
   rim: (spec) => rimCoverage(spec, roundedRectDistance),
   feather: (spec) => featherCoverage(spec, roundedRectDistance),
   glow,
+  ray,
 };
 
 /** The coverage function of a sprite, in pixel-centre coordinates relative to the image centre. */

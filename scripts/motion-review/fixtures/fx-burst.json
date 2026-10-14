@@ -1,0 +1,19 @@
+{
+  "label": "Burst",
+  "kind": "fx",
+  "window": { "at": 0.3, "duration": 0.6 },
+  "moments": [0.28, 0.36, 0.42, 0.5, 0.6, 0.75, 0.92],
+  "subject": { "x": 0.43, "y": 0.4, "w": 0.14, "h": 0.2, "radius": 0.5 },
+  "section": {
+    "graphics": [
+      {
+        "type": "fx",
+        "effect": "burst",
+        "target": "{{target}}",
+        "at": "{{at}}",
+        "duration": "{{duration}}",
+        "dots": true
+      }
+    ]
+  }
+}

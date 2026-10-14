@@ -154,13 +154,25 @@ function turnSide(spec: SpriteSpec): number {
   return even(Math.hypot(spec.w, spec.h) + 2);
 }
 
+// The fill of a turn: the piece's own colour, fully transparent. `c=none` leaves whatever the frame pool's
+// buffer held outside the turned piece (its earlier angles: trails); a colour at alpha 0 clears it, and
+// keeping the RGB of the piece keeps the scale after it from pulling a dark fringe into the edge.
+function clear(piece: Piece): string {
+  return `0x${piece.sprite.slice(1)}@0`;
+}
+
 function motionFilters(fx: Ctx, piece: Piece, side: number): Filter[] {
   const T = `(t-${fmt(piece.t0)})`;
   const fade = Math.min(fx.graphic.fade ?? 0.5, fx.duration / 2);
   const end = piece.t0 + fx.duration;
   const squash = `${fmt(piece.scale)}*max(0.18,abs(cos(${fmt(piece.flutter)}*${T}+${fmt(piece.flip)})))`;
   const turn: Filter[] = fx.has('rotate')
-    ? [{ type: 'rotate', value: `a='${fmt(piece.angle)}+${fmt(piece.spin)}*${T}':c=none:ow=${side}:oh=${side}` }]
+    ? [
+        {
+          type: 'rotate',
+          value: `a='${fmt(piece.angle)}+${fmt(piece.spin)}*${T}':c=${clear(piece)}:ow=${side}:oh=${side}`,
+        },
+      ]
     : [];
 
   return [
@@ -178,7 +190,7 @@ function stillFilters(fx: Ctx, piece: Piece, side: number): Filter[] {
   const half = (fx.end - fx.at) / 2;
   const size = even(side * piece.scale);
   const turn: Filter[] = fx.has('rotate')
-    ? [{ type: 'rotate', value: `a=${fmt(piece.angle)}:c=none:ow=${side}:oh=${side}` }]
+    ? [{ type: 'rotate', value: `a=${fmt(piece.angle)}:c=${clear(piece)}:ow=${side}:oh=${side}` }]
     : [];
 
   return [

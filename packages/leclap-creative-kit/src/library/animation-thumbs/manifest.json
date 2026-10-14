@@ -70,6 +70,13 @@
     "kind": "fx"
   },
   {
+    "id": "burst",
+    "label": "Burst",
+    "thumb": "burst.webp",
+    "poster": "burst.png",
+    "kind": "fx"
+  },
+  {
     "id": "glint",
     "label": "Glints",
     "thumb": "glint.webp",

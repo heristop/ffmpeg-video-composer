@@ -100,6 +100,13 @@ export const ANIMATION_THUMBS: AnimationThumb[] = [
     poster: '/assets/animation-thumbs/vignette-breathe.png',
   },
   {
+    id: 'burst',
+    label: 'Burst',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/burst.webp',
+    poster: '/assets/animation-thumbs/burst.png',
+  },
+  {
     id: 'glint',
     label: 'Glints',
     kind: 'fx',

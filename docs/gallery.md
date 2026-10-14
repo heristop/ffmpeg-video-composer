@@ -58,7 +58,7 @@ Every `graphics[].type`: `flash` (at its peak), `bars`, `underline`, `frame`, `c
 
 ![Every fx primitive near its peak](./media/gallery/fx.webp)
 
-Every `graphics[].type: "fx"` primitive, each anchored to what it decorates and tuned for it. Light: `sheen` (crossing the card), `edge-glow`, `leak` (from the left edge), `bloom`. Marks: `ripple` (a tap on the button), `glint`, `confetti`. Ambient textures, which stay faint by design (≤ 0.12): `bokeh`, `dust`, `vignette-breathe`, `grain`. Surfaces: `glass` (a frosted plate under the line), `resolve` (the title still out of focus). Template: [`fx.json`](./gallery/templates/fx.json). Sheet: `bash docs/gallery/make-gallery.sh fx`.
+Every `graphics[].type: "fx"` primitive, each anchored to what it decorates and tuned for it. Light: `sheen` (crossing the card), `edge-glow`, `leak` (from the left edge), `bloom`. Marks: `ripple` (a tap on the button), `glint`, `confetti`, `burst` (impact lines around a badge). Ambient textures, which stay faint by design (≤ 0.12): `bokeh`, `dust`, `vignette-breathe`, `grain`. Surfaces: `glass` (a frosted plate under the line), `resolve` (the title still out of focus). Template: [`fx.json`](./gallery/templates/fx.json). Sheet: `bash docs/gallery/make-gallery.sh fx`.
 
 ## Strokes
 

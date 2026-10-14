@@ -26809,6 +26809,187 @@
                 },
                 "effect": {
                   "type": "string",
+                  "const": "burst"
+                },
+                "id": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "pattern": "^[A-Za-z]\\w*(?:-[A-Za-z]\\w*)*$",
+                  "description": "Id other time fields in this section reference as \"<id>.start\" / \"<id>.end\". Unique within the section."
+                },
+                "target": {
+                  "$ref": "#/$defs/FxTarget"
+                },
+                "at": {
+                  "description": "When the effect starts: seconds from the section start (default 0) or a time reference.",
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "$ref": "#/$defs/TimeRef"
+                    }
+                  ]
+                },
+                "duration": {
+                  "description": "Seconds one pass takes (default per primitive, quicker at higher global.motion.energy). A surface or an ambient texture lasts its duration: set it to the section length to hold it (up to 30).",
+                  "type": "number",
+                  "minimum": 0.1,
+                  "maximum": 30
+                },
+                "ease": {
+                  "description": "Curve of one pass: a token ($smooth, $expo…), a named curve, cubic-bezier(…) or spring(…). Default per primitive.",
+                  "$ref": "#/$defs/EasingSpec"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": ["micro", "panel", "camera", "headline", "accent", "mascot"],
+                  "description": "Motion role of this element (global.motion.roles): micro (small UI bits, quick, no overshoot), panel (plates/cards, controlled settle), camera (smooth, near-invisible), headline (strong entrance, stable hold), accent (snappy emphasis), mascot (playful overshoot). Supplies ease (and duration when the ease comes from the role) to an element that sets none; an explicit ease/duration always wins."
+                },
+                "until": {
+                  "description": "Hard stop: nothing of the effect draws after this.",
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "$ref": "#/$defs/TimeRef"
+                    }
+                  ]
+                },
+                "repeat": {
+                  "description": "Number of passes (default 1).",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8
+                },
+                "every": {
+                  "description": "Seconds from one pass start to the next when repeat > 1 (default: duration + 1.2).",
+                  "type": "number",
+                  "minimum": 0.2,
+                  "maximum": 30
+                },
+                "color": {
+                  "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
+                  "type": "string"
+                },
+                "intensity": {
+                  "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "seed": {
+                  "description": "Variation seed mixed with global.seed: picks the context defaults (tilt, width jitter) and the dither. Change it to re-roll an untuned effect; same seed, same pixels.",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "above": {
+                  "description": "Draw above the section text (default: true on a text target, else false).",
+                  "type": "boolean"
+                },
+                "origin": {
+                  "description": "Where the rays shoot from, as fractions of the target ({x, y}; default the target centre).",
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "minimum": -0.5,
+                      "maximum": 1.5,
+                      "description": "Across the target: 0 = left edge, 1 = right edge."
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": -0.5,
+                      "maximum": 1.5,
+                      "description": "Down the target: 0 = top edge, 1 = bottom edge."
+                    }
+                  },
+                  "required": ["x", "y"],
+                  "additionalProperties": false
+                },
+                "rays": {
+                  "description": "Number of rays (default 8; 4–24). Fewer and thicker reads as a pop, many and thin as a flash.",
+                  "type": "integer",
+                  "minimum": 4,
+                  "maximum": 24
+                },
+                "radius": {
+                  "description": "[inner, outer]: where the rays start and where they vanish, from the origin, as shares of the target's size (its short side, or half its long side when larger). Default: each ray starts just outside the target's edge along its own direction (0.1 of the size past it) and travels 0.55 of it, so a burst around a pill or a badge clears it; [0.6, 1.15] on a square.",
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 4
+                    },
+                    {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 4
+                    }
+                  ]
+                },
+                "thickness": {
+                  "description": "Ray stroke in px at 1080p (default 6; scaled to the output frame). Thins as the ray shrinks.",
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 32
+                },
+                "length": {
+                  "description": "A ray's longest length as a share of its travel (outer - inner; default 0.5). Each ray grows from a stub, shoots out at that length, then shrinks into the outer radius.",
+                  "type": "number",
+                  "minimum": 0.1,
+                  "maximum": 1
+                },
+                "dots": {
+                  "description": "Dots riding in the gaps between the rays, larger than the stroke: true = one in every other gap (at most 6), or a count 1–12 (default none).",
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 12
+                    }
+                  ]
+                },
+                "spread": {
+                  "description": "Degrees the rays fan over, centred on up (default 360 = all around; 180 = a half burst over the origin, 90 = a narrow fan).",
+                  "type": "number",
+                  "minimum": 10,
+                  "maximum": 360
+                },
+                "rotation": {
+                  "description": "Degrees the whole fan turns clockwise (default 0: a full burst has a ray straight up; 180 points a half burst down).",
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "jitter": {
+                  "description": "Seeded irregularity 0..1 (default 0.2): each ray gets its own angle offset, reach, length (±20 % at 0.2) and start (0–30 ms late at 0.2 and above), so no burst looks stamped. 0 = perfectly regular.",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": ["type", "effect"],
+              "additionalProperties": false,
+              "description": "A one-shot radial burst from a point: thin strokes shoot out on an expo-out, grow then shrink as they fade, with optional dots between them, all gone by 70 % of the duration; the impact lines of a like-button pop or a \"BAM!\". Tune: origin and radius put it on the exact element; rays, thickness and length set its weight (few and thick = a pop, many and thin = a flash); spread + rotation fan it (180 = a half burst over a title); dots add sparkle; jitter breaks the symmetry; duration and ease set the snap; colour defaults to the theme accent."
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "fx"
+                },
+                "effect": {
+                  "type": "string",
                   "const": "bokeh"
                 },
                 "id": {

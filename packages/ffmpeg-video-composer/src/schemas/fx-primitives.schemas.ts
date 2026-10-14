@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { confetti, glint, ripple } from './fx-celebrate.schemas';
+import { burst, confetti, glint, ripple } from './fx-celebrate.schemas';
 import { bokeh, dust } from './fx-particles.schemas';
 import { glass, resolve } from './fx-surface.schemas';
 import { BLOOM, GRAIN, VIGNETTE_BREATHE } from './fx-ambient.schemas';
@@ -75,6 +75,7 @@ export const FX_PRIMITIVES = {
   ripple,
   glint,
   confetti,
+  burst,
   bokeh,
   dust,
   glass,

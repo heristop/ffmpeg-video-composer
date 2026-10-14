@@ -26,6 +26,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tracks on an input that is not a layer; an unknown track name is an `unknown_key` with the nearest name.
 - Layer tracks appear on the motion timeline as `animate` events, so the pacing lint no longer reports dead
   air over a section whose layers are moving.
+- fx `burst` (marks): a one-shot radial burst from a point, the impact lines of a like-button pop or a
+  "BAM!". Thin rays shoot out from `origin`, grow then shrink between an inner and an outer radius as they
+  fade, with optional `dots` between them. `rays` (4–24), `radius` ([inner, outer]; by default each ray starts
+  just outside the target's edge along its own direction, so a burst around a pill or a badge clears it),
+  `thickness`, `length`, `spread` (180 = a half burst), `rotation` and a seeded `jitter` (each ray starts
+  0–30 ms late and is ±20 % long at the default, so no burst looks stamped). It snaps: 0.4 s by default on
+  an expo-out, every ray and dot gone by 70 % of the duration so nothing faint lingers, and `dots: true`
+  puts few, larger dots in every other gap. Each ray is a
+  compile-time sprite already turned to its angle (opposite rays share one), moved and scaled by per-frame
+  expressions: no `rotate`, only on-device filters (`scale`, `fade`, `colorchannelmixer`, `overlay`). Reduced
+  motion: the rays rest at mid travel and fade in and out. It is in the motion catalog, the JSON schema, the
+  builder's animation library (with a live canvas preview) and `examples/motion-design/fx-burst.json`.
 
 ### Changed
 
@@ -43,6 +55,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Browser entry: validating a template with a `global` block overflowed the stack. The build rewrote every
   `global` in the code to `globalThis`, locals and object keys included, so resolving a theme walked
   `globalThis`; only the free identifier is rewritten now. Error messages no longer read `globalThis.beats`.
+
+- fx `confetti` and `glint`: a turning piece no longer leaves trails. Their `rotate` filled the corners of the
+  turned sprite with `c=none`, which leaves whatever FFmpeg's frame pool last held there, so each piece
+  smeared its earlier angles and a paper strip read as a filled square. The corners are now cleared with the
+  piece's own colour at alpha 0, which also keeps the scale after the turn from pulling in a dark fringe.
 
 ## [3.1.0] - 2026-10-11
 

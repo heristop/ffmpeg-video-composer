@@ -80,7 +80,7 @@ describe('fx schema', () => {
     expect(GraphicSchema.safeParse({ ...sheen, intensity: 2 }).success).toBe(false);
   });
 
-  const MARKS = new Set(['ripple', 'glint', 'confetti']);
+  const MARKS = new Set(['ripple', 'glint', 'confetti', 'burst']);
 
   it('documents every parameter of every primitive', () => {
     describeFxPrimitives();
