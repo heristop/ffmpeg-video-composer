@@ -166,11 +166,25 @@ function layerInput(path: string, template: TemplateDescriptor): Record<string, 
   return (section?.inputs?.[Number(match[2])] as Record<string, unknown> | undefined) ?? null;
 }
 
+/** `animate` on a goo blob: sections[i].graphics[j].blobs[k].animate. */
+const GOO_BLOB_ANIMATE_PATH = /^sections\[\d+\]\.graphics\[\d+\]\.blobs\[\d+\]\.animate$/;
+
+function blobTrackErrors(path: string, tracks: Record<string, TrackKey[]>, tokens: ResolvedTokens): ValidationError[] {
+  return Object.entries(tracks).flatMap(([axis, keys]) => {
+    const message = keyTimingError(keys, tokens);
+
+    return message ? [{ path: `${path}.${axis}`, message, code: 'invalid_keyframes' }] : [];
+  });
+}
+
 function animateUseErrors(use: Use, tokens: ResolvedTokens, template: TemplateDescriptor): ValidationError[] {
   const tracks = use.value as Record<string, TrackKey[]>;
   const input = layerInput(use.path, template);
 
   if (input) return layerAnimateErrors(use.path, tracks, input, (keys) => keyTimingError(keys, tokens));
+
+  // A goo blob's x / y / r tracks (fx-goo.ts): key timing only, the schema bounds the rest.
+  if (GOO_BLOB_ANIMATE_PATH.test(use.path)) return blobTrackErrors(use.path, tracks, tokens);
 
   if (use.owner.type !== 'drawtext') {
     return [{ path: use.path, message: 'animate tracks apply to drawtext filters', code: 'invalid_keyframes' }];

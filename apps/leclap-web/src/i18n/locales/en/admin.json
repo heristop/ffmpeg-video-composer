@@ -739,6 +739,7 @@
       "confetti": "Confetti",
       "burst": "Burst",
       "glint": "Glints",
+      "goo": "Goo",
       "frame": "Frame",
       "corners": "Corner brackets",
       "underline": "Underline",
@@ -871,7 +872,10 @@
       "y": "Y",
       "origin": "Origin",
       "caps": "Caps",
-      "settle": "Settle"
+      "settle": "Settle",
+      "droplets": "Droplets",
+      "goo": "Stickiness",
+      "pop": "Pop in and out"
     },
     "kind": {
       "switch": "Effects or animation files",

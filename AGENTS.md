@@ -94,7 +94,7 @@ when only a library build is needed. The dev `compile`/`diagnose` scripts also i
 
 ### Motion effects (engine `fx` primitives)
 
-- The 14 `graphics[].type: "fx"` primitives are documented in [`docs/template-configuration.md`](./docs/template-configuration.md#light-and-effects-graphicstype-fx). Adding one follows the extension contract at the top of `packages/ffmpeg-video-composer/src/editor/presets/fx.ts`: a row in `FX_PRIMITIVES` (`schemas/fx-primitives.schemas.ts`), its prose in `FX_DOCS` (`schemas/fx-docs.ts`), a lowering module `editor/presets/fx-<name>.ts` (on-device filters only, with a fallback), one line in `fx-registry.ts`, and an entry in `tests/lgpl-filter-audit.test.ts`.
+- The 15 `graphics[].type: "fx"` primitives are documented in [`docs/template-configuration.md`](./docs/template-configuration.md#light-and-effects-graphicstype-fx). Adding one follows the extension contract at the top of `packages/ffmpeg-video-composer/src/editor/presets/fx.ts`: a row in `FX_PRIMITIVES` (`schemas/fx-primitives.schemas.ts`), its prose in `FX_DOCS` (`schemas/fx-docs.ts`), a lowering module `editor/presets/fx-<name>.ts` (on-device filters only, with a fallback), one line in `fx-registry.ts`, and an entry in `tests/lgpl-filter-audit.test.ts`.
 - Review motion visually, not only through goldens: `pnpm motion:review` renders every effect fixture (`scripts/motion-review/fixtures/`) and bundled template as contact sheets with a before/after `index.html` (see [`scripts/motion-review/README.md`](./scripts/motion-review/README.md)).
 - After changing an effect's defaults or the builder's animation library, regenerate the picker thumbnails with `pnpm gen:animation-thumbs` (plain blobs under `packages/leclap-creative-kit/src/library/animation-thumbs/`).
 

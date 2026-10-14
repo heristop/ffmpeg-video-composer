@@ -77,6 +77,13 @@
     "kind": "fx"
   },
   {
+    "id": "goo",
+    "label": "Goo",
+    "thumb": "goo.webp",
+    "poster": "goo.png",
+    "kind": "fx"
+  },
+  {
     "id": "glint",
     "label": "Glints",
     "thumb": "glint.webp",

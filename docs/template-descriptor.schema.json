@@ -696,7 +696,8 @@
                     "whip-left",
                     "whip-right",
                     "whip-up",
-                    "whip-down"
+                    "whip-down",
+                    "drip"
                   ]
                 },
                 {
@@ -704,7 +705,7 @@
                   "const": "cut"
                 }
               ],
-              "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed)."
+              "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
             },
             "ease": {
               "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -732,6 +733,10 @@
               "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
               "type": "string",
               "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "color": {
+              "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
+              "type": "string"
             },
             "duration": {
               "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -2827,7 +2832,8 @@
                           "whip-left",
                           "whip-right",
                           "whip-up",
-                          "whip-down"
+                          "whip-down",
+                          "drip"
                         ]
                       },
                       {
@@ -2835,7 +2841,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -2863,6 +2869,10 @@
                     "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
                     "type": "string",
                     "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "color": {
+                    "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
+                    "type": "string"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -5690,7 +5700,8 @@
                           "whip-left",
                           "whip-right",
                           "whip-up",
-                          "whip-down"
+                          "whip-down",
+                          "drip"
                         ]
                       },
                       {
@@ -5698,7 +5709,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -5726,6 +5737,10 @@
                     "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
                     "type": "string",
                     "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "color": {
+                    "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
+                    "type": "string"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -8596,7 +8611,8 @@
                           "whip-left",
                           "whip-right",
                           "whip-up",
-                          "whip-down"
+                          "whip-down",
+                          "drip"
                         ]
                       },
                       {
@@ -8604,7 +8620,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -8632,6 +8648,10 @@
                     "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
                     "type": "string",
                     "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "color": {
+                    "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
+                    "type": "string"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -11226,7 +11246,8 @@
                           "whip-left",
                           "whip-right",
                           "whip-up",
-                          "whip-down"
+                          "whip-down",
+                          "drip"
                         ]
                       },
                       {
@@ -11234,7 +11255,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -11262,6 +11283,10 @@
                     "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
                     "type": "string",
                     "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "color": {
+                    "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
+                    "type": "string"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -13836,7 +13861,8 @@
                           "whip-left",
                           "whip-right",
                           "whip-up",
-                          "whip-down"
+                          "whip-down",
+                          "drip"
                         ]
                       },
                       {
@@ -13844,7 +13870,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -13872,6 +13898,10 @@
                     "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
                     "type": "string",
                     "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "color": {
+                    "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
+                    "type": "string"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -16917,7 +16947,8 @@
                           "whip-left",
                           "whip-right",
                           "whip-up",
-                          "whip-down"
+                          "whip-down",
+                          "drip"
                         ]
                       },
                       {
@@ -16925,7 +16956,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -16953,6 +16984,10 @@
                     "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
                     "type": "string",
                     "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "color": {
+                    "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
+                    "type": "string"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -19527,7 +19562,8 @@
                           "whip-left",
                           "whip-right",
                           "whip-up",
-                          "whip-down"
+                          "whip-down",
+                          "drip"
                         ]
                       },
                       {
@@ -19535,7 +19571,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -19563,6 +19599,10 @@
                     "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
                     "type": "string",
                     "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "color": {
+                    "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
+                    "type": "string"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -22137,7 +22177,8 @@
                           "whip-left",
                           "whip-right",
                           "whip-up",
-                          "whip-down"
+                          "whip-down",
+                          "drip"
                         ]
                       },
                       {
@@ -22145,7 +22186,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -22173,6 +22214,10 @@
                     "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
                     "type": "string",
                     "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "color": {
+                    "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
+                    "type": "string"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -28657,6 +28702,186 @@
               "required": ["type", "effect"],
               "additionalProperties": false,
               "description": "Fine, seeded, luma-only film grain under a low ceiling (noise strength 12 at intensity 1): binds mixed footage and flat cards into one texture. Tune: size sets fine vs. coarse; intensity ≤ 1 sets the amount (below ~0.7 a standard encode smooths it away on flat areas); animated false gives a paper-like still texture; seed re-rolls the pattern."
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "fx"
+                },
+                "effect": {
+                  "type": "string",
+                  "const": "goo"
+                },
+                "id": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "pattern": "^[A-Za-z]\\w*(?:-[A-Za-z]\\w*)*$",
+                  "description": "Id other time fields in this section reference as \"<id>.start\" / \"<id>.end\". Unique within the section."
+                },
+                "target": {
+                  "$ref": "#/$defs/FxTarget"
+                },
+                "at": {
+                  "description": "When the effect starts: seconds from the section start (default 0) or a time reference.",
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "$ref": "#/$defs/TimeRef"
+                    }
+                  ]
+                },
+                "duration": {
+                  "description": "Seconds one pass takes (default per primitive, quicker at higher global.motion.energy). A surface or an ambient texture lasts its duration: set it to the section length to hold it (up to 30).",
+                  "type": "number",
+                  "minimum": 0.1,
+                  "maximum": 30
+                },
+                "ease": {
+                  "description": "Curve of one pass: a token ($smooth, $expo…), a named curve, cubic-bezier(…) or spring(…). Default per primitive.",
+                  "$ref": "#/$defs/EasingSpec"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": ["micro", "panel", "camera", "headline", "accent", "mascot"],
+                  "description": "Motion role of this element (global.motion.roles): micro (small UI bits, quick, no overshoot), panel (plates/cards, controlled settle), camera (smooth, near-invisible), headline (strong entrance, stable hold), accent (snappy emphasis), mascot (playful overshoot). Supplies ease (and duration when the ease comes from the role) to an element that sets none; an explicit ease/duration always wins."
+                },
+                "until": {
+                  "description": "Hard stop: nothing of the effect draws after this.",
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "$ref": "#/$defs/TimeRef"
+                    }
+                  ]
+                },
+                "repeat": {
+                  "description": "Number of passes (default 1).",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8
+                },
+                "every": {
+                  "description": "Seconds from one pass start to the next when repeat > 1 (default: duration + 1.2).",
+                  "type": "number",
+                  "minimum": 0.2,
+                  "maximum": 30
+                },
+                "color": {
+                  "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
+                  "type": "string"
+                },
+                "intensity": {
+                  "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "seed": {
+                  "description": "Variation seed mixed with global.seed: picks the context defaults (tilt, width jitter) and the dither. Change it to re-roll an untuned effect; same seed, same pixels.",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "above": {
+                  "description": "Draw above the section text (default: true on a text target, else false).",
+                  "type": "boolean"
+                },
+                "blobs": {
+                  "description": "The blobs, placed and keyframed by hand (up to 8): {x, y, r, animate: {x, y, r}} in target fractions, times in section seconds; overrides the choreography (droplets, spread, angle, size, pop). Blobs closer than about 2.7 radii fuse with a neck; key r to 0 to absorb one.",
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": -0.5,
+                        "maximum": 1.5,
+                        "description": "Centre across the target: 0 = left edge, 1 = right edge."
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": -0.5,
+                        "maximum": 1.5,
+                        "description": "Centre down the target: 0 = top edge, 1 = bottom edge."
+                      },
+                      "r": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 0.6,
+                        "description": "Radius as a share of the target's short side."
+                      },
+                      "animate": {
+                        "description": "Keyframe tracks (times in section seconds); each key eases into the next.",
+                        "type": "object",
+                        "properties": {
+                          "x": {
+                            "description": "Centre x track, in target fractions (or \"+0.1\" relative to x).",
+                            "$ref": "#/$defs/KeyframeTrack"
+                          },
+                          "y": {
+                            "description": "Centre y track, in target fractions (or \"-0.1\" relative to y).",
+                            "$ref": "#/$defs/KeyframeTrack"
+                          },
+                          "r": {
+                            "description": "Radius track, a share of the target's short side (0 = gone).",
+                            "$ref": "#/$defs/KeyframeTrack"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": ["x", "y", "r"],
+                    "additionalProperties": false
+                  }
+                },
+                "droplets": {
+                  "description": "Choreography: droplets that split off the main blob (default 2–3 from the seed).",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "spread": {
+                  "description": "Choreography: how far the farthest droplet travels, as a share of the target's width (default 0.3), kept inside the target.",
+                  "type": "number",
+                  "minimum": 0.05,
+                  "maximum": 0.5
+                },
+                "angle": {
+                  "description": "Choreography: direction of the split in degrees, 0 = right, 90 = down (default ±15° around left or right).",
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "size": {
+                  "description": "Choreography: the main blob's radius as a share of the target's short side (default 0.14).",
+                  "type": "number",
+                  "minimum": 0.04,
+                  "maximum": 0.4
+                },
+                "goo": {
+                  "description": "Stickiness 0..1 (default 0.5): how far apart blobs still fuse and how thick their necks are (0 = nearly separate discs, 1 = long, syrupy necks).",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "pop": {
+                  "description": "Choreography: grow from nothing at the start and shrink away at the end (default true).",
+                  "type": "boolean"
+                }
+              },
+              "required": ["type", "effect"],
+              "additionalProperties": false,
+              "description": "Liquid blobs that stretch, split into droplets and merge back, with smooth gooey necks between them: a solid shape in one colour, inside its target. Tune: colour (default the theme accent); size, droplets, spread and angle shape the split; goo sets how syrupy it is; duration and ease its pace (2–3 s reads as liquid, faster as a splash); blobs for a choreography of your own."
             }
           ],
           "description": "A procedural light/texture primitive lowered at output resolution and clipped to its `target`. Every look parameter is open: tune profile, size, angle, path, colour, intensity, timing and seed so the effect fits this template instead of a stock look. Omitted fields derive from the target, theme and energy."

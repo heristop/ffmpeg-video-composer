@@ -60,9 +60,19 @@ function duckingFrom(ducking: unknown): AudioMix['ducking'] {
 }
 
 export function defaultTransitionFrom(global: TemplateDescriptor['global']): DefaultTransition {
+  const transition = global?.transition;
+
   return {
-    type: global?.transition?.type ?? DEFAULT_TRANSITION.type,
-    duration: global?.transition?.duration ?? DEFAULT_TRANSITION.duration,
-    ...(global?.transition?.ease === undefined ? {} : { ease: global.transition.ease }),
+    type: transition?.type ?? DEFAULT_TRANSITION.type,
+    duration: transition?.duration ?? DEFAULT_TRANSITION.duration,
+    ...designedFields(transition),
+  };
+}
+
+// A designed transition's curve and (drip) paint colour, passed through when set.
+function designedFields(transition: { ease?: DefaultTransition['ease']; color?: string } | undefined) {
+  return {
+    ...(transition?.ease === undefined ? {} : { ease: transition.ease }),
+    ...(transition?.color === undefined ? {} : { color: transition.color }),
   };
 }

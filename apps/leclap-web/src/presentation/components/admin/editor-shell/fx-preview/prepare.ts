@@ -11,6 +11,7 @@ import { loopSpan } from './fx-time';
 import { paintEdgeGlow, paintLeak, paintSheen, paintVignette } from './paint-light';
 import { paintConfetti, paintGlint, paintRipple } from './paint-marks';
 import { paintBurst } from './paint-burst';
+import { paintGoo } from './paint-goo';
 import { bloomSurface, glassSurface, paintBokeh, paintDust, paintGrain, resolveSurface } from './paint-texture';
 import { strokePainter, type StrokeGraphic } from './paint-stroke';
 import type { Box, FxPainter } from './painter';
@@ -33,6 +34,7 @@ const FX_PARTS: Record<FxEffectName, (fx: never) => Parts | null> = {
   glass: (fx) => ({ surface: glassSurface(fx) }),
   resolve: (fx) => ({ surface: resolveSurface(fx) }),
   bloom: (fx) => ({ surface: bloomSurface(fx) }),
+  goo: (fx) => ({ paint: paintGoo(fx) }),
 };
 
 /** Primitives the engine leaves out under reduced motion (their reduced form is "absent"). */

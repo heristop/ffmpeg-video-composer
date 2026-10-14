@@ -1,5 +1,6 @@
 import type { ProjectBuildInfos, ProjectConfig, Section, TemplateDescriptor, VideoConfig } from '@/core/types';
 import { DEFAULT_TRANSITION_DURATION } from '../schemas/effects.schemas';
+import { DRIP_FALLBACK_COLOR } from '@/core/motion/transition-drip';
 import { resolveTimeRefs, type TimingOptions } from '@/core/timing/resolve';
 import type AbstractFFmpeg from '../platform/ffmpeg/AbstractFFmpeg';
 import type Project from '../core/models/Project';
@@ -9,7 +10,8 @@ import { resolveDeterministic } from '@/core/determinism/contract';
 import { resolveFps, resolveOrientationScale } from './resolve-video-config';
 import { resolveMotionDescriptor } from '@/core/motion/tokens';
 import { effectiveOrientation } from '@/core/platforms';
-import { resolveThemeDescriptor } from '@/core/theme/resolve';
+import { resolveTheme, resolveThemeDescriptor } from '@/core/theme/resolve';
+import type { ThemeSpec } from '@/core/theme/themes';
 import { expandAutoSfx } from '@/core/audio/auto-sfx';
 import { assertEffectsResolved, expandPartialsSafe } from '@/core/partials';
 import type AbstractLogger from '../platform/logging/AbstractLogger';
@@ -153,6 +155,23 @@ type BoundaryTransition = ProjectBuildInfos['transitions'][number];
 /** The `transition` a section or the descriptor's `global` declares. */
 type DeclaredTransition = Section['transition'];
 
+function transitionOptions(
+  declared: NonNullable<DeclaredTransition>,
+  theme: unknown
+): Pick<BoundaryTransition, 'origin' | 'rim' | 'color'> {
+  const options = {
+    ...(declared.origin ? { origin: declared.origin } : {}),
+    ...(declared.rim ? { rim: declared.rim } : {}),
+  };
+
+  if (declared.type !== 'drip') return options;
+
+  // The drip's paint: the authored colour (theme tokens already resolved), else the theme accent.
+  const accent = resolveTheme(theme as ThemeSpec | undefined)?.colors.accent;
+
+  return { ...options, color: declared.color ?? accent ?? DRIP_FALLBACK_COLOR };
+}
+
 /**
  * The per-boundary transitions of the N rendering sections (N-1 boundaries, in order). Each boundary
  * takes the transition of the EARLIER section or the global default; it is only a non-cut transition
@@ -161,7 +180,8 @@ type DeclaredTransition = Section['transition'];
 export function boundaryTransitions(
   segments: readonly Section[],
   globalTransition: DeclaredTransition,
-  canCrossfade = true
+  canCrossfade = true,
+  theme?: unknown
 ): BoundaryTransition[] {
   return segments.slice(0, -1).map((segment) => {
     const declared = segment.transition ?? globalTransition;
@@ -175,8 +195,7 @@ export function boundaryTransitions(
       type: declared.type,
       duration,
       ease: declared.ease,
-      ...(declared.origin ? { origin: declared.origin } : {}),
-      ...(declared.rim ? { rim: declared.rim } : {}),
+      ...transitionOptions(declared, theme),
     };
   });
 }

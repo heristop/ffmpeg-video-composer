@@ -70,6 +70,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   anti-aliased and smooth on every frame with the on-device filters (`lutyuv`, `alphamerge`, `overlay`,
   `crop`, `trim`, `split`, `fps`, `fade`). Once drawn, a still of the stroke replaces the reveal.
 
+- `goo` fx primitive (a fifth family, liquid): blobs that stretch, split into droplets and merge back with
+  smooth gooey necks, as a solid shape in one colour (default the theme accent). Without `blobs`, a seeded
+  choreography plays: the blob pops in, 1–4 droplets (`droplets`) stretch out along `angle` over `spread`,
+  bounce apart, drift, run back to merge on the same frame, then the blob shrinks away (`pop: false` keeps
+  it whole at both ends). `blobs` places up to eight blobs and keyframes their `x`, `y` and `r` with the layer
+  tracks' `{ t, v, ease }` keys; `goo` (0–1) sets how far apart blobs still fuse. Each blob is a gaussian
+  sprite placed per frame; they are united on a canvas the size of their bounding box and cut by one
+  `lutyuv` threshold with a one-pixel ramp, then used as the alpha of the fill. On device; about 3.4 ms per
+  frame for three droplets at 720p on one laptop thread. Reduced motion: one still blob that fades in and
+  out. The builder lists it under Celebrate, with a thumbnail and a live canvas preview.
+- `drip` designed transition: a wall of paint runs down over the outgoing scene in drips of seeded lengths
+  with rounded ends, covers the frame at the midpoint, then the incoming scene runs down over the paint.
+  `color` sets the paint (default the theme accent) and `ease` each half. The drip shape is drawn once as a
+  still silhouette and scaled per frame, so it runs on device (about 13 ms per transition frame at 720p on
+  one laptop thread). Every other transition lowers to the same commands as before.
+
 ### Changed
 
 - fx `glint`: each star is now a 12–14 frame twinkle (scale up from 0, turn 15°, gone) instead of filling

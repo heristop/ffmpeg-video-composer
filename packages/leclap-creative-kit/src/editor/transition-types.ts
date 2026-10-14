@@ -9,6 +9,8 @@ export interface SectionTransition {
   duration?: number;
   // Curve of a designed transition, passed through in descriptor shape.
   ease?: MotionEase;
+  // drip: the paint colour.
+  color?: string;
 }
 
 // Default cross-section transition (maps to global.transition).
@@ -16,6 +18,8 @@ export interface DefaultTransition {
   type: string;
   duration: number;
   ease?: MotionEase;
+  // drip: the paint colour.
+  color?: string;
 }
 
 // The duration mirrors the ENGINE fallback (DEFAULT_TRANSITION_DURATION) so a descriptor that

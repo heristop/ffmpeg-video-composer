@@ -6,7 +6,14 @@ import { designedTransitionGraph, isDesignedTransition, type FramePoint } from '
 import type { EasingSpec } from '@/core/motion/easing';
 
 /** A boundary transition between two adjacent segments — `type` is an xfade name, `cut` or a designed one. */
-export type Transition = { type: string; duration: number; ease?: EasingSpec; origin?: FramePoint; rim?: string };
+export type Transition = {
+  type: string;
+  duration: number;
+  ease?: EasingSpec;
+  origin?: FramePoint;
+  rim?: string;
+  color?: string;
+};
 
 /** Per-segment probe result the assembly graph is built from. */
 export type SegmentProbe = { duration: number; hasAudio: boolean };
@@ -94,6 +101,7 @@ function boundaryLink(
       ease: transition.ease,
       ...(transition.origin ? { origin: transition.origin } : {}),
       ...(transition.rim ? { rim: transition.rim } : {}),
+      ...(transition.color ? { color: transition.color } : {}),
       left: strip(labels.left),
       right: strip(labels.right),
       out: strip(labels.out),

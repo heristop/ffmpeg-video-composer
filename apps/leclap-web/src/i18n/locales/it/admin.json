@@ -739,6 +739,7 @@
       "confetti": "Coriandoli",
       "burst": "Esplosione",
       "glint": "Scintille",
+      "goo": "Gocce liquide",
       "frame": "Cornice",
       "corners": "Angoli",
       "underline": "Sottolineatura",
@@ -871,7 +872,10 @@
       "y": "Y",
       "origin": "Origine",
       "caps": "Estremità",
-      "settle": "Assestamento"
+      "settle": "Assestamento",
+      "droplets": "Goccioline",
+      "goo": "Viscosità",
+      "pop": "Comparsa e scomparsa"
     },
     "kind": {
       "switch": "Effetti o file di animazione",

@@ -107,6 +107,13 @@ export const ANIMATION_THUMBS: AnimationThumb[] = [
     poster: '/assets/animation-thumbs/burst.png',
   },
   {
+    id: 'goo',
+    label: 'Goo',
+    kind: 'fx',
+    thumb: '/assets/animation-thumbs/goo.webp',
+    poster: '/assets/animation-thumbs/goo.png',
+  },
+  {
     id: 'glint',
     label: 'Glints',
     kind: 'fx',

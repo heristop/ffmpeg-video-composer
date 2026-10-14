@@ -101,6 +101,8 @@ Each phrase is fitted to at most two balanced lines, held for at least a second,
 
 [`line-draw.json`](./line-draw.json) shows the `path` graphic in three beats: a smoothed chart line draws on with a lavender dot locked to its end, a rose ring closes around the point the line passed, then everything retracts in drawing order; a hand-drawn swash (an SVG `d`) lands under a title; a progress ring fills to 75 % while its value counts up. Asset-free; see [Paths](../../docs/template-configuration.md#paths-path).
 
+[`fx-liquid.json`](./fx-liquid.json) shows two liquid cheat-sheet moves: a lavender blob that stretches, splits into three droplets that bounce apart and merges back on one frame (`goo` with keyframed `blobs`), then a rose paint `drip` transition into a title. Asset-free.
+
 ## One story, three formats
 
 [`formats.json`](./formats.json) is one launch story composed for 16:9, 9:16 and 1:1. `$format` markers set per-format sizes, positions and holds; `formats.portrait` / `formats.square` patch sections by element id (the square cut drops the proof beat). Render every format with `leclap render formats.json --formats all` (one file per format); the showcase previews the landscape cut.

@@ -739,6 +739,7 @@
       "confetti": "Confettis",
       "burst": "Éclat",
       "glint": "Scintillements",
+      "goo": "Gouttes liquides",
       "frame": "Cadre",
       "corners": "Coins de visée",
       "underline": "Soulignement",
@@ -871,7 +872,10 @@
       "y": "Y",
       "origin": "Origine",
       "caps": "Extrémités",
-      "settle": "Rebond"
+      "settle": "Rebond",
+      "droplets": "Gouttelettes",
+      "goo": "Viscosité",
+      "pop": "Apparition et disparition"
     },
     "kind": {
       "switch": "Effets ou fichiers d’animation",

@@ -74,7 +74,7 @@ const ART_DIRECTION = [
     'with two faces swapped at the midpoint (start/duration). Needle: rotate about origin bottom with ' +
     'ease-out-back. Parallax: x tracks at different speeds per depth.',
   'Transitions: push for sequence, swipe for layering, zoom-through for energy, iris for reveals (origin on the ' +
-    'icon it opens from, rim in its colour, the icon scaling up as it opens), whip for a fast jump on the beat (0.3–0.5 s); keep the others 0.5–0.8 s and prefer cut ' +
+    'icon it opens from, rim in its colour, the icon scaling up as it opens), whip for a fast jump on the beat (0.3–0.5 s); drip for a playful brand-colour change (0.8–1.2 s, color: the paint); keep the others 0.5–0.8 s and prefer cut ' +
     'between beats of the same idea. ' +
     'Designed transitions ease like any other motion (ease: $snappy…).',
   'Kinetic trail ({ echoes, delta, fade }) smears fast travel (impact, drop, slide, whip-paced edits); skip it on ' +

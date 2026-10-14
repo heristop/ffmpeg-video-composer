@@ -181,6 +181,8 @@ export const ENGINE_EMITTED_FILTERS = [
   'acrossfade',
   'format',
   'color',
+  // designed transitions (core/motion/transitions.ts): one timebase across concat, zoompan and xfade
+  'settb',
   'atrim',
   'asetpts',
   'atempo',

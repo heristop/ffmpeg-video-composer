@@ -22,6 +22,7 @@ import { REGISTERED_FX, lowerFx } from '@/editor/presets/fx';
 import { lowerStroke } from '@/editor/presets/stroke-graphics';
 import { FX_DOCS } from '@/schemas/fx-docs';
 import { layerKeyframes } from '@/editor/presets/layer-keyframes';
+import { DESIGNED_TRANSITIONS, designedTransitionGraph } from '@/core/motion/transitions';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const commonSh = fs.readFileSync(path.resolve(here, '../../../scripts/ffmpeg/common.sh'), 'utf8');
@@ -255,6 +256,40 @@ describe('LGPL device filter audit', () => {
     for (const type of types(lowered)) {
       expect(enabled.has(type), `fx emits "${type}"`).toBe(true);
       expect(ENGINE_EMITTED_FILTERS as readonly string[], type).toContain(type);
+    }
+  });
+
+  // TRANSITION_AUDIT: every designed transition (the drip's silhouettes and masks included) lowers to device
+  // filters only, on its default curve and on a spring.
+  it('every designed transition lowers to device-safe filters', () => {
+    const graphs = DESIGNED_TRANSITIONS.flatMap((type) =>
+      [undefined, 'spring(300, 26, 1, 0)'].map((ease) =>
+        designedTransitionGraph({
+          type,
+          ease,
+          color: '#F96F99',
+          left: 'vs0',
+          right: 'vs1',
+          out: 'v0',
+          id: 'dt0',
+          offset: 2,
+          duration: 0.8,
+          width: 640,
+          height: 360,
+          fps: 25,
+        })
+      )
+    );
+    const names = new Set(
+      graphs.flatMap((graph) => [...graph.matchAll(/(?:^|[\];,])([a-z]+)(?=[=[,;]|$)/g)].map((m) => m[1]))
+    );
+
+    expect(names).toContain('gradients');
+    expect(names).toContain('alphamerge');
+
+    for (const name of names) {
+      expect(enabled.has(name), `designed transitions emit "${name}"`).toBe(true);
+      expect(ENGINE_EMITTED_FILTERS as readonly string[], name).toContain(name);
     }
   });
 

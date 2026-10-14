@@ -16,6 +16,7 @@ import { EDGE_GLOW } from './fx-edge-glow';
 import { BLOOM } from './fx-bloom';
 import { VIGNETTE_BREATHE } from './fx-vignette';
 import { GRAIN } from './fx-grain';
+import { GOO } from './fx-goo';
 
 /** The registry: one line per primitive. */
 export const FX_EFFECTS: { readonly [N in FxEffectName]?: FxEffect<N> } = {
@@ -33,4 +34,5 @@ export const FX_EFFECTS: { readonly [N in FxEffectName]?: FxEffect<N> } = {
   bloom: BLOOM,
   'vignette-breathe': VIGNETTE_BREATHE,
   grain: GRAIN,
+  goo: GOO,
 };

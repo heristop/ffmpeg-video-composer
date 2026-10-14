@@ -73,6 +73,7 @@ export const ENGINE_LIBRARY: readonly EngineLibraryEntry[] = [
   fx('confetti', 'celebrate', 'subject', { effect: 'confetti' }),
   fx('burst', 'celebrate', 'subject', { effect: 'burst' }),
   fx('glint', 'celebrate', 'subject', { effect: 'glint' }),
+  fx('goo', 'celebrate', 'subject', { effect: 'goo' }),
   stroke('frame'),
   stroke('corners'),
   stroke('underline'),
