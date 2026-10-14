@@ -155,6 +155,23 @@ type BoundaryTransition = ProjectBuildInfos['transitions'][number];
 /** The `transition` a section or the descriptor's `global` declares. */
 type DeclaredTransition = Section['transition'];
 
+function transitionOptions(
+  declared: NonNullable<DeclaredTransition>,
+  theme: unknown
+): Pick<BoundaryTransition, 'origin' | 'rim' | 'color'> {
+  const options = {
+    ...(declared.origin ? { origin: declared.origin } : {}),
+    ...(declared.rim ? { rim: declared.rim } : {}),
+  };
+
+  if (declared.type !== 'drip') return options;
+
+  // The drip's paint: the authored colour (theme tokens already resolved), else the theme accent.
+  const accent = resolveTheme(theme as ThemeSpec | undefined)?.colors.accent;
+
+  return { ...options, color: declared.color ?? accent ?? DRIP_FALLBACK_COLOR };
+}
+
 /**
  * The per-boundary transitions of the N rendering sections (N-1 boundaries, in order). Each boundary
  * takes the transition of the EARLIER section or the global default; it is only a non-cut transition
@@ -174,16 +191,11 @@ export function boundaryTransitions(
 
     const duration = declared.duration ?? globalTransition?.duration ?? DEFAULT_TRANSITION_DURATION;
 
-    // The drip's paint: the authored colour (theme tokens already resolved), else the theme accent.
-    const accent = resolveTheme(theme as ThemeSpec | undefined)?.colors.accent;
-
     return {
       type: declared.type,
       duration,
       ease: declared.ease,
-      ...(declared.origin ? { origin: declared.origin } : {}),
-      ...(declared.rim ? { rim: declared.rim } : {}),
-      ...(declared.type === 'drip' ? { color: declared.color ?? accent ?? DRIP_FALLBACK_COLOR } : {}),
+      ...transitionOptions(declared, theme),
     };
   });
 }
