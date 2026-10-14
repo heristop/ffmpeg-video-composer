@@ -118,6 +118,16 @@ describe('schema digest', () => {
     expect(new Set(parsed.oneOf.map((entry) => JSON.stringify(entry.allOf))).size).toBe(1);
   });
 
+  it('shares short schemas when many path coordinates repeat them', () => {
+    const coordinate = { type: 'number', minimum: 0, maximum: 1 };
+    const schema = { properties: Object.fromEntries(Array.from({ length: 12 }, (_, i) => [`point${i}`, coordinate])) };
+    const digest = compactSchema(schema, 120);
+    const parsed = JSON.parse(digest) as { properties: Record<string, { $ref?: string }> };
+
+    expect(parsed.properties.point0.$ref).toBeDefined();
+    expect(digest.length).toBeLessThan(JSON.stringify(schema).length);
+  });
+
   it('keeps field names that collide with schema keywords (a section has a title and a description)', () => {
     const schema = {
       type: 'object',

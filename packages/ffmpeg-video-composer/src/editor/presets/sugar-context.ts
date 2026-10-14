@@ -16,9 +16,9 @@ export type FxRequest = {
   ctx: SugarContext;
 };
 
-/** One stroke graphic (frame, corners, underline) to lower (editor/presets/stroke-graphics.ts). */
+/** One stroke graphic (frame, corners, underline, path) to lower (editor/presets/stroke-graphics.ts). */
 export type StrokeRequest = Omit<FxRequest, 'graphic'> & {
-  graphic: Extract<Graphic, { type: 'frame' | 'corners' | 'underline' }>;
+  graphic: Extract<Graphic, { type: 'frame' | 'corners' | 'underline' | 'path' }>;
 };
 
 // Context a sugar compiler needs to lower time/space-dependent effects (motion calibrates its

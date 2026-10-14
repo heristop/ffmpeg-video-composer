@@ -259,7 +259,7 @@ describe('LGPL device filter audit', () => {
   });
 
   // STROKE_AUDIT: the v2 frame / corners / underline (rounded arc and cap sprites, shadows, every trace and
-  // exit) lower to device filters only.
+  // exit) and the path graphic lower to device filters only.
   it('every v2 stroke graphic lowers to device-safe filters', () => {
     const graphics = [
       ...['path', 'split', 'sides', 'fade'].flatMap((trace) =>
@@ -269,6 +269,20 @@ describe('LGPL device filter audit', () => {
         ['fade', 'retract', 'expand'].map((exit) => ({ type: 'corners', trace, exit, radius: 8, target: 'layer:0' }))
       ),
       ...['fade', 'retract'].map((exit) => ({ type: 'underline', caps: 'round', exit, color: '#FF8AAE@0.8' })),
+      // PATH_AUDIT: the path graphic (reveal lut steps, held trim, cap and head riders, every exit).
+      ...['fade', 'retract', 'none'].map((exit) => ({
+        type: 'path',
+        points: [
+          [40, 300],
+          [200, 120],
+          [400, 260],
+        ],
+        smooth: true,
+        head: { size: 14, color: '#FFF685' },
+        exit,
+      })),
+      { type: 'path', shape: { type: 'arc', cx: 0.5, cy: 0.5, r: 0.3, sweep: 300 }, target: 'layer:0', to: 0.75 },
+      { type: 'path', d: 'M10 10 C100 0 200 100 300 40', dash: [12, 8], caps: 'butt', color: '#FF8AAE@0.6' },
     ];
     const types = (filters: Filter[]): string[] =>
       filters.flatMap((f) => (f.graph ? f.graph.flatMap((chain) => types(chain.filters)) : [f.type]));
@@ -293,6 +307,8 @@ describe('LGPL device filter audit', () => {
 
     expect(emitted).toContain('overlay');
     expect(emitted).toContain('fade');
+    expect(emitted).toContain('lutyuv');
+    expect(emitted).toContain('alphamerge');
 
     for (const type of emitted) {
       expect(enabled.has(type), `stroke graphics emit "${type}"`).toBe(true);

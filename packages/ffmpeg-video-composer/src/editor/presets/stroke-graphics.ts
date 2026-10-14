@@ -1,8 +1,8 @@
-// Stroke graphics (frame, corners, underline) → filters. Reached only from the compile path
+// Stroke graphics (frame, corners, underline, path) → filters. Reached only from the compile path
 // (compositing.ts → SugarContext.masks.strokes), never eagerly. This module resolves what frame and
 // corners share (the box they run along, even-pixel thickness and radius, contrast-aware ink, the entrance
 // and exit windows) and hands the per-type plan (stroke-outline.ts) to the drawing (stroke-lower.ts).
-// The underline has its own, simpler lowering (stroke-underline.ts).
+// The underline has its own, simpler lowering (stroke-underline.ts), the path its own (path-draw.ts).
 
 import type { Filter } from '@/core/types';
 import { parseEasing } from '@/core/motion/easing';
@@ -15,6 +15,7 @@ import { cornersPlan, framePlan } from './stroke-outline';
 import { inflate } from './stroke-shapes';
 import { entrancePhase, exitPhase, strokeSamples } from './stroke-timeline';
 import { lowerUnderline } from './stroke-underline';
+import { lowerPath, type PathRequest } from './path-draw';
 import type { StrokeRequest } from './sugar-context';
 import {
   DEFAULT_CLEARANCE,
@@ -155,6 +156,8 @@ function lowerOutline(request: OutlineRequest): Filter[] {
 
 /** One stroke graphic as filters (the masks.strokes entry). */
 export function lowerStroke(request: StrokeRequest): Filter[] | null {
+  if (request.graphic.type === 'path') return lowerPath(request as PathRequest);
+
   if (request.graphic.type === 'underline') {
     return lowerUnderline(request as StrokeRequest & { graphic: { type: 'underline' } });
   }

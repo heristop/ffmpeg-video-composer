@@ -1,0 +1,214 @@
+{
+  "meta": {
+    "name": "Line draw",
+    "description": "The path graphic: a chart line drawing on with a dot riding its end, a ring drawn around one point, a hand-drawn swash under a title and a progress ring filling to 75 %.",
+    "creativeDirection": "Audience: motion designers checking what the path graphic can do. Direction: one draw per beat on a dark ink ground, light and lavender strokes, rose for the accent, a small uppercase label naming the move. The chart line runs at constant speed along its curve with the dot locked to its end, the ring closes on the point the line passed, then everything retracts in drawing order. Review: no stepping on the stroke, the dot never leaves the line's end, the ring closes exactly, the swash lands under the title, the ring stops at three quarters."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "chart_line",
+      "type": "color_background",
+      "purpose": "A smoothed chart line draws on with a lavender dot on its end, a rose ring circles one point, then it all retracts.",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 4.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "01 · CHART LINE"
+          },
+          "preset": "fade",
+          "size": 28,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#9298fb"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "path",
+          "at": 0.1,
+          "duration": 0.6,
+          "points": [
+            [180, 150],
+            [180, 600],
+            [1120, 600]
+          ],
+          "thickness": 4,
+          "color": "#9298fb@0.45",
+          "caps": "round",
+          "exit": "retract",
+          "exitDuration": 0.5
+        },
+        {
+          "type": "path",
+          "at": 0.4,
+          "duration": 1.6,
+          "ease": "cubic-bezier(0.45, 0, 0.25, 1)",
+          "points": [
+            [220, 540],
+            [330, 460],
+            [450, 520],
+            [580, 390],
+            [700, 450],
+            [830, 300],
+            [950, 350],
+            [1080, 190]
+          ],
+          "smooth": true,
+          "thickness": 9,
+          "color": "#f5f3f7",
+          "head": {
+            "size": 26,
+            "color": "#9298fb"
+          },
+          "exit": "retract",
+          "exitDuration": 0.8
+        },
+        {
+          "type": "path",
+          "at": 2.2,
+          "duration": 0.7,
+          "ease": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "shape": {
+            "type": "circle",
+            "cx": 580,
+            "cy": 390,
+            "r": 48
+          },
+          "thickness": 6,
+          "color": "#f96f99",
+          "exit": "retract",
+          "exitDuration": 0.5
+        }
+      ]
+    },
+    {
+      "name": "swash",
+      "type": "color_background",
+      "purpose": "A title lands, then a hand-drawn swash draws itself under it.",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.8
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "02 · SWASH"
+          },
+          "preset": "fade",
+          "size": 28,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#9298fb"
+        },
+        {
+          "text": {
+            "en": "Draw the eye"
+          },
+          "preset": "rise",
+          "size": 120,
+          "y": 260,
+          "delay": 0.1,
+          "color": "#f5f3f7"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "path",
+          "at": 0.7,
+          "duration": 0.6,
+          "ease": "cubic-bezier(0.33, 0, 0.2, 1)",
+          "d": "M390 438 C540 400 720 460 900 404",
+          "thickness": 9,
+          "color": "#f96f99",
+          "above": true,
+          "exit": "fade"
+        }
+      ]
+    },
+    {
+      "name": "progress_ring",
+      "type": "color_background",
+      "purpose": "A progress ring fills to three quarters while its value counts up.",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "03 · PROGRESS RING"
+          },
+          "preset": "fade",
+          "size": 28,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#9298fb"
+        },
+        {
+          "text": {
+            "en": ""
+          },
+          "preset": "counter",
+          "size": 96,
+          "y": "center",
+          "delay": 0.3,
+          "duration": 1.4,
+          "ease": "cubic-bezier(0.33, 0, 0.15, 1)",
+          "counter": {
+            "from": 0,
+            "to": 75,
+            "suffix": "%"
+          },
+          "color": "#f5f3f7"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "path",
+          "at": 0,
+          "duration": 0.4,
+          "shape": {
+            "type": "circle",
+            "cx": 640,
+            "cy": 360,
+            "r": 170
+          },
+          "thickness": 18,
+          "color": "#9298fb@0.18",
+          "from": 1,
+          "exit": "fade"
+        },
+        {
+          "type": "path",
+          "at": 0.3,
+          "duration": 1.4,
+          "ease": "cubic-bezier(0.33, 0, 0.15, 1)",
+          "shape": {
+            "type": "circle",
+            "cx": 640,
+            "cy": 360,
+            "r": 170
+          },
+          "to": 0.75,
+          "thickness": 18,
+          "color": "#9298fb",
+          "exit": "fade"
+        }
+      ]
+    }
+  ]
+}

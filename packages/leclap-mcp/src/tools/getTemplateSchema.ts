@@ -32,7 +32,8 @@ const GUIDE = [
     'and x/y/scale/scaleX/scaleY/rotate/opacity on image, animation and html inputs (options.animate, options.origin); ' +
     'global.motion holds tokens and the energy dial; global.seed makes every random-looking choice repeatable. ' +
     'Kinetic `trail` adds echo smears; section `graphics` add hits (flash, glitch, focus), shapes and data / ' +
-    'broadcast graphics (progress, ticker, bars-chart); `type: "fx"` graphics are procedural light primitives ' +
+    'broadcast graphics (progress, ticker, bars-chart), `path` lines that draw themselves (points, circle, arc, ' +
+    'wave or SVG d, with a head dot); `type: "fx"` graphics are procedural light primitives ' +
     `and marks on a \`target\` (a card rect, pane, layer or kinetic block), effect one of: ${FX_EFFECTS}. ` +
     'Compose them by ' +
     "tuning each one's parameters (shape, colour, intensity, timing, repeat, seed) for the template instead " +

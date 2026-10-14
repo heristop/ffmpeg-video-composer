@@ -1585,6 +1585,7 @@ More in the [gallery](./gallery.md#graphics).
 
 | Type         | Extra fields                                                                                                                                             | Effect                                                                                                                                                                                                                                                    |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `path`       | `points` + `smooth`/`closed`, `shape`, `d`, `target`, `thickness`, `caps`, `dash`, `from`, `to`, `head`, `exit`, `exitDuration`                          | A line that draws itself along any path, a dot riding its end: see [Paths](#paths-path).                                                                                                                                                                  |
 | `flash`      | `intensity`                                                                                                                                              | A full-frame light hit that decays (white, 0.3 s).                                                                                                                                                                                                        |
 | `bars`       | `aspect` (2.39)                                                                                                                                          | Letterbox bars slide in from the top and bottom.                                                                                                                                                                                                          |
 | `underline`  | `x`, `y`, `width`, `thickness`, `origin`, `caps`, `settle`, `exit`, `exitDuration`                                                                       | A rule that draws itself across.                                                                                                                                                                                                                          |
@@ -1599,7 +1600,7 @@ More in the [gallery](./gallery.md#graphics).
 | `bars-chart` | `values`, `labels`, `max`, `x`, `y`, `width`, `height`, `stagger` (0.08), `gap` (0.3), `showValues`, `decimals`, `prefix`, `suffix`, `font`, `textColor` | Bars grow one after another (`duration` is per bar, 0.7 s) while their values count up.                                                                                                                                                                   |
 | `fx`         | `effect`, `target`, `intensity`, `repeat`, `every`, `seed` and the primitive's own parameters                                                            | A procedural light or texture primitive clipped to its target: see [Light and effects](#light-and-effects-graphicstype-fx).                                                                                                                               |
 
-See [`examples/motion-design/fx-pack.json`](../examples/motion-design/fx-pack.json) for trails, whips, these graphics and the lower-third styles. A graphic's `duration` is at most 3 s, except `progress` (600 s) and `fx` (30 s).
+See [`examples/motion-design/fx-pack.json`](../examples/motion-design/fx-pack.json) for trails, whips, these graphics and the lower-third styles. A graphic's `duration` is at most 3 s, except `path` (10 s), `progress` (600 s) and `fx` (30 s).
 
 ### Strokes (`frame`, `corners`, `underline`)
 
@@ -1628,6 +1629,41 @@ An `underline` is drawn above text by default, so a CTA card or a text plate nev
   { "type": "frame", "at": 0.2, "target": "layer:0", "clearance": 16, "radius": 24, "trace": "path", "exit": "fade", "color": "$color.fg" },
   { "type": "corners", "at": 0.2, "target": "text:0", "clearance": 32, "spread": 1.08, "exit": "expand", "color": "$color.accent" },
   { "type": "underline", "at": 0.6, "x": 440, "y": 520, "width": 400, "thickness": 8, "caps": "round", "settle": 0.03, "exit": "fade" }
+]
+```
+
+### Paths (`path`)
+
+A `path` strokes any line and draws it on progressively (a "trim path"): a chart line with a dot riding its end, a circle drawn around a detail, a hand-drawn swash under a title, a progress ring. The geometry is exactly one of:
+
+- `points`: `[x, y]` pairs (2–64) drawn in order; `smooth: true` runs a smooth curve through every point (centripetal Catmull-Rom, no overshoot loops), `closed: true` joins the last point back to the first.
+- `shape`: `{ "type": "circle", cx, cy, r }`, `{ "type": "ellipse", cx, cy, rx, ry }` (both start at 12 o'clock, `start` in degrees clockwise from 3 o'clock, `direction` `cw` or `ccw`), `{ "type": "arc", cx, cy, r, start, sweep }` (`sweep` in degrees, negative = counter-clockwise) or `{ "type": "wave", x, y, width, amplitude, wavelength, phase }` (a sine from its left end, rising first).
+- `d`: an SVG path of `M`, `L`, `H`, `V`, `C`, `Q` and `Z` commands (lower case = relative). Arcs (`A`) and smooth shorthands (`S`, `T`) are rejected: use `shape` or `C`.
+
+Coordinates are px, or fractions (0–1) of `target` when it is set: `"frame"`, `"layer:<i>"`, `"pane:<i>"`, `"text:<i>"` or a `{ x, y, w, h }` rectangle (see [fx targets](#targets)). With a target, a circle's or an arc's `r` is a fraction of its shorter side, an ellipse's `rx`/`ry`, a wave's `width`/`wavelength` and `amplitude` fractions of its width and height.
+
+| Field          | Default             | Notes                                                                                                                                                                         |
+| -------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `thickness`    | 6                   | Stroke width in px (up to 80). Joins are round.                                                                                                                               |
+| `caps`         | `round`             | `round` or `butt`. With round caps, a cap disc rides the drawing end of an opaque stroke, so the line grows with a round tip.                                                 |
+| `dash`         | solid               | `[on, off]` px along the path.                                                                                                                                                |
+| `from`, `to`   | 0, 1                | Where the drawing end starts and stops, as fractions of the length: `to: 0.75` fills a ring to 75 %; `from: 1, to: 0` undraws it.                                             |
+| `head`         | none                | `true`, or `{ size, color }`: a dot riding the drawing end (default 2.4 × the thickness, in the stroke colour).                                                               |
+| `duration`     | 1.2 s (up to 10)    | On `cubic-bezier(0.65, 0, 0.35, 1)` unless `ease` is set. The drawing end moves at constant speed along the path for a linear ease, whatever the shape.                       |
+| `exit`         | `fade`              | Before `until` (or the end of the section): `fade`, `retract` (the tail runs after the head and erases the line in drawing order, on `$smooth`) or `none` (holds to the cut). |
+| `exitDuration` | 0.3 s (retract 0.6) | 0.1–3 s.                                                                                                                                                                      |
+
+The stroke is rasterised once at compile time, anti-aliased, at its exact on-screen size, together with a map of each pixel's position along the path; one `lutyuv` per output frame thresholds that map, so the reveal is smooth on every frame and runs on device (the same filters as the other strokes, no `geq`). A pixel where the path crosses itself belongs to the pass nearest to it.
+
+```jsonc
+"graphics": [
+  // A chart line drawing on with a dot on its end, then a ring drawn around one point.
+  { "type": "path", "at": 0.2, "duration": 1.4, "points": [[120, 520], [300, 420], [460, 470], [640, 300], [800, 360], [1000, 180]], "smooth": true, "thickness": 8, "color": "#9298fb", "head": { "size": 22, "color": "#f5f3f7" }, "exit": "retract" },
+  { "type": "path", "at": 1.5, "duration": 0.7, "shape": { "type": "circle", "cx": 640, "cy": 300, "r": 46 }, "thickness": 6, "color": "#f96f99" },
+  // A progress ring filling to 75 %, in fractions of the frame.
+  { "type": "path", "at": 0.3, "target": "frame", "shape": { "type": "arc", "cx": 0.5, "cy": 0.5, "r": 0.3, "start": -90, "sweep": 360 }, "to": 0.75, "thickness": 18 },
+  // A hand-drawn swash under a title, from an SVG path.
+  { "type": "path", "at": 0.8, "d": "M380 470 C520 440 760 500 900 455", "thickness": 7, "exit": "none" }
 ]
 ```
 
