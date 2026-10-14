@@ -55,11 +55,11 @@ describe('get_motion_catalog search', () => {
 
 describe('catalog gap log', () => {
   it('appends one JSON line per query that matched nothing, under the output dir', async () => {
-    await catalogResult({ query: 'liquid morph' }, config);
+    await catalogResult({ query: 'xyzzy hologram' }, config);
     await catalogResult({ query: 'one punch word on the beat' }, config);
     await catalogResult({ query: 'neon xyzzy', kind: 'kinetic' }, config);
 
-    expect(await logLines()).toMatchObject([{ query: 'liquid morph' }, { query: 'neon xyzzy', kind: 'kinetic' }]);
+    expect(await logLines()).toMatchObject([{ query: 'xyzzy hologram' }, { query: 'neon xyzzy', kind: 'kinetic' }]);
   });
 
   it('does not log the whole-catalog call', async () => {

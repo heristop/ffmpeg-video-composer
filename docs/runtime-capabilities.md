@@ -61,6 +61,7 @@
 | `setparams`         | yes               | yes                       | yes                        |
 | `setpts`            | yes               | yes                       | yes                        |
 | `setsar`            | yes               | yes                       | yes                        |
+| `settb`             | yes               | yes                       | yes                        |
 | `sidechaincompress` | yes               | yes                       | yes                        |
 | `split`             | yes               | yes                       | yes                        |
 | `trim`              | yes               | yes                       | yes                        |
