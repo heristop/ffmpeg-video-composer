@@ -33,14 +33,15 @@ export const glintDoc = {
     points: 'Exact star positions as target fractions; overrides path and count (scatter/corners only).',
     count: 'Stars (default 3–5 from the seed, fewer on small targets) or orbiting lights (default 2).',
     size: 'Star span in px at 1080p (default 36–52 per star from the seed, 34 for orbit lights; scaled to the output frame).',
-    stagger: 'Seconds between star twinkles (default 0.12). The pass duration covers every star.',
+    stagger:
+      'Seconds between star twinkles (default 0.12). Each star twinkles for 12–14 frames whatever the duration, which only has to cover the stagger.',
     spin: 'Degrees each star turns while it twinkles (default 15; 0 = no turn).',
     trail: 'orbit: strength of the trail behind each light (default 0.4; 0 = none).',
     speed: 'orbit: revolutions per second (default 0.9).',
   },
   intent: {
     summary:
-      'Four-point star glints that twinkle once on a target (scale up, turn, vanish), or small lights orbiting it: the sparkle of something new or polished.',
+      'Four-point star glints that twinkle once on a target (each a 12–14 frame twinkle: scale up from 0, turn, vanish), or small lights orbiting it: the sparkle of something new or polished. Repeats start at least 1.5 s apart.',
     useWhen: 'a product, a logo or a price lands; a "new" badge; jewellery, glass, chrome',
     avoidWhen: 'over text you need read; on footage with busy highlights; together with confetti in one beat',
     vary: 'path sets the character (scatter = sparkle, corners = a framed gem, orbit = a spec orbit); count, size and points set the density; stagger and duration set the rhythm; spin and the twinkle ease set the snap; colour tints the light.',

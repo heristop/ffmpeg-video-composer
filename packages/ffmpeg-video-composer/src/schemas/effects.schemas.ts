@@ -152,6 +152,18 @@ export const TransitionSchema = z
     ease: EasingSpecSchema.optional().describe(
       'Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.'
     ),
+    origin: z
+      .object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1) })
+      .strict()
+      .optional()
+      .describe('iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).'),
+    rim: z
+      .string()
+      .regex(/^#[0-9a-fA-F]{6}$/, 'rim is a #RRGGBB colour')
+      .optional()
+      .describe(
+        "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from."
+      ),
     duration: z
       .number()
       .positive()

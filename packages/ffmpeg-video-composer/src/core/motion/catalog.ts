@@ -72,8 +72,9 @@ const ART_DIRECTION = [
     '0 → 1.15 → 1. Squash and stretch: scaleX and scaleY in opposition on the landing. Flip: scaleX 1 → 0 → 1 ' +
     'with two faces swapped at the midpoint (start/duration). Needle: rotate about origin bottom with ' +
     'ease-out-back. Parallax: x tracks at different speeds per depth.',
-  'Transitions: push for sequence, swipe for layering, zoom-through for energy, iris for reveals, whip for a fast ' +
-    'jump on the beat (0.3–0.5 s); keep the others 0.5–0.8 s and prefer cut between beats of the same idea. ' +
+  'Transitions: push for sequence, swipe for layering, zoom-through for energy, iris for reveals (origin on the ' +
+    'icon it opens from, rim in its colour, the icon scaling up as it opens), whip for a fast jump on the beat (0.3–0.5 s); keep the others 0.5–0.8 s and prefer cut ' +
+    'between beats of the same idea. ' +
     'Designed transitions ease like any other motion (ease: $snappy…).',
   'Kinetic trail ({ echoes, delta, fade }) smears fast travel (impact, drop, slide, whip-paced edits); skip it on ' +
     'calm presets and on long copy, where the echoes multiply the draw cost.',
@@ -197,7 +198,9 @@ const GRAPHICS: Record<string, string> = {
     '(default 24 px), spread (close-in), trace clockwise|together|fade, radius, exit, contrast auto|shadow.',
   wipe: 'A colour panel sweeping across the frame: covers then uncovers (direction).',
   panel: 'A solid block growing from one edge: a backing plate for text (x, y, width, height, from).',
-  glitch: 'A seeded digital tear: RGB split, jitter, grain and colour slices for a short hit (intensity).',
+  glitch:
+    'A seeded digital tear: RGB split, jitter, grain and colour slices for a short hit (intensity); tear: N ' +
+    'shifts N horizontal bands sideways in 2–3 seeded bursts, each held hold (2) frames (torn lines of text).',
   focus:
     'Rack focus: the frame blurs in or out of focus (direction in|out, amount). above: false keeps later text sharp.',
   progress: 'A bar that fills over a window, then holds (position, thickness, track, x, y, width; linear by default).',

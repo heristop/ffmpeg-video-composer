@@ -162,7 +162,13 @@ export type ProjectBuildInfos = TakeBuildInfos & {
   musicFilters: string[];
   fileConcatPath: string;
   musicPath: string;
-  transitions: Array<{ type: string; duration: number; ease?: RevealEasing }>;
+  transitions: Array<{
+    type: string;
+    duration: number;
+    ease?: RevealEasing;
+    origin?: { x: number; y: number };
+    rim?: string;
+  }>;
 };
 
 export interface TemplateDescriptor {
@@ -220,6 +226,10 @@ interface SectionTransition {
   duration?: number;
   /** Curve of a designed transition. */
   ease?: RevealEasing;
+  /** Iris only: where the circle opens from, in frame fractions. */
+  origin?: { x: number; y: number };
+  /** Iris only: a #RRGGBB outline on the opening circle's edge. */
+  rim?: string;
 }
 
 interface DuckingConfig {

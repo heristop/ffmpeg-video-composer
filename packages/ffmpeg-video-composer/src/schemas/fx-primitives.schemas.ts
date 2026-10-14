@@ -38,6 +38,13 @@ export interface FxDefaults {
   ceiling: number;
   /** Default intensity (0..1 of the ceiling). */
   intensity: number;
+  /**
+   * A raised ceiling for one profile meant for flat graphics (a badge, a button, a card), applied only when
+   * the target is flat (a layer, a text block or a rectangle: fx-flat-target.ts); elsewhere `ceiling` holds.
+   */
+  flat?: { profile: string; ceiling: number };
+  /** The shortest time between two passes' starts, s: a repeated mark needs room to read as a new event. */
+  period?: number;
 }
 
 export interface FxPrimitive {
@@ -55,14 +62,21 @@ export interface FxDoc<P extends z.ZodRawShape = z.ZodRawShape> {
 
 const sheen = {
   params: {
-    profile: z.enum(['specular', 'soft', 'twin']).optional(),
+    profile: z.enum(['specular', 'soft', 'twin', 'gloss']).optional(),
     width: z.number().min(0.02).max(0.6).optional(),
     tilt: z.number().min(-60).max(60).optional(),
     direction: z.enum(['right', 'left', 'down', 'up']).optional(),
     bloom: z.number().min(0).max(0.6).optional(),
   },
-  // Peak alpha 0.32 by default: a glint, never a wash (doctrine: light ≤ 0.35).
-  defaults: { duration: 0.75, ease: 'cubic-bezier(0.45, 0, 0.2, 1)', ceiling: 0.35, intensity: 0.32 / 0.35 },
+  // Peak alpha 0.32 by default: a glint, never a wash (doctrine: light ≤ 0.35). The gloss profile on a flat
+  // graphic (a badge, a pill) may reach 0.7: no footage under it, so no skin to grey.
+  defaults: {
+    duration: 0.75,
+    ease: 'cubic-bezier(0.45, 0, 0.2, 1)',
+    ceiling: 0.35,
+    intensity: 0.32 / 0.35,
+    flat: { profile: 'gloss', ceiling: 0.7 },
+  },
 } satisfies FxPrimitive;
 
 /**

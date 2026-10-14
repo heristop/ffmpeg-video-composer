@@ -115,6 +115,7 @@ const SCENARIOS: Record<string, Partial<FxGraphic>> = {
   ring: { effect: 'ripple' },
   tap: { effect: 'ripple', variant: 'tap', radius: 0.9 },
   glint: { effect: 'glint', count: 4 },
+  twinkle: { effect: 'glint', points: [{ x: 0.85, y: 0.15 }] },
   orbit: { effect: 'glint', path: 'orbit' },
   confetti: { effect: 'confetti', origin: { x: 0.5, y: 0.6 } },
 };
@@ -178,6 +179,16 @@ describe.skipIf(!ready)('celebrate fx on real frames', () => {
 
       for (const [i, frame] of fx.entries()) expect(maxLumaDelta(frame, plain[i], near), `${name} ${i}`).toBe(0);
     }
+  });
+
+  it('twinkles one glint for 12–14 frames, then leaves the frame untouched', () => {
+    const lit = litFrames('twinkle');
+    const span = (lit.at(-1) ?? 0) - lit[0] + 1;
+
+    // The first frame of a life is its fade's zero: 12–14 frames of life light 11–14 frames, in one run.
+    expect(span).toBeGreaterThanOrEqual(11);
+    expect(span).toBeLessThanOrEqual(14);
+    expect(lit).toHaveLength(span);
   });
 
   it('moves confetti: consecutive frames differ and pieces fall back down after the apex', () => {

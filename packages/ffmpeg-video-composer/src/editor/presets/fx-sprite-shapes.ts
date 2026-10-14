@@ -19,7 +19,7 @@ export type SpriteKind =
   | 'ray';
 
 /** Light profiles across a band: a specular core with bloom, one soft wash, or two thin parallel glints. */
-export const BAND_PROFILES = ['specular', 'soft', 'twin'] as const;
+export const BAND_PROFILES = ['specular', 'soft', 'twin', 'gloss'] as const;
 export type BandProfile = (typeof BAND_PROFILES)[number];
 
 /**
@@ -140,6 +140,8 @@ const PROFILES: Record<BandProfile, (offset: number, width: number, bloom: numbe
   specular: (offset, width, bloom) => (1 - bloom) * gauss(offset, width / 4) + bloom * gauss(offset, width / 2),
   soft: (offset, width) => gauss(offset, width / 3),
   twin: (offset, width) => Math.max(gauss(offset - width * 0.35, width / 9), gauss(offset + width * 0.35, width / 9)),
+  // A flat-topped band (super-gaussian, order 4): an even sheet of light across a glossy badge or button.
+  gloss: (offset, width) => Math.exp(-0.5 * (offset / (width * 0.45)) ** 4),
 };
 
 /**

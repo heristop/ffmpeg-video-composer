@@ -1,7 +1,8 @@
 // Pixel-effect and broadcast graphics: glitch, focus, progress and ticker. Like the box graphics they
 // are sampled once per frame on the compile side and gated by `enable` windows, so the result is
 // frame-exact and deterministic; glitch draws its randomness from the element's derived seed.
-// Filters used: rgbashift, noise, gblur, drawbox, drawtext (all in the on-device allowlist).
+// Filters used: rgbashift, noise, gblur, drawbox, drawtext, and split/crop/overlay for the glitch's row
+// tearing (glitch-tear.ts), all in the on-device allowlist.
 
 import type { Filter } from '@/core/types';
 import { parseEasing } from '@/core/motion/easing';
@@ -24,6 +25,7 @@ import {
   type Rect,
   type Spec,
 } from './graphics-spec';
+import { TEAR_HOLD, tearFilters } from './glitch-tear';
 
 const SMOOTH = 'cubic-bezier(0.65, 0, 0.35, 1)';
 const GLITCH_SHIFT = 26;
@@ -33,7 +35,7 @@ function fullFrame(frame: Frame): Rect[] {
   return [{ x: 0, y: 0, w: frame.width, h: frame.height }];
 }
 
-// Full strength through most of the hit, then a quick decay so the tear does not end on a hard edge.
+// Full strength through most of the hit, then a quick decay so the hit does not end on a hard edge.
 function glitchEnvelope(p: number): number {
   return p < 0.75 ? 1 : Math.max(0, (1 - p) / 0.25);
 }
@@ -96,7 +98,21 @@ function glitchSpec(g: Of<'glitch'>, frame: Frame, base: Base): Spec {
         values: { alls: grain, allf: 't+u', all_seed: env.seed % 2147483647, enable: windowExpr(at, end) },
       } as unknown as Filter;
 
-      return [noise, ...steps.flatMap((step) => glitchFrame(step, random, { intensity, color, frame }))];
+      const tear = g.tear
+        ? tearFilters(
+            {
+              bands: g.tear,
+              hold: g.hold ?? TEAR_HOLD,
+              intensity,
+              frame,
+              seed: env.seed,
+              steps,
+            },
+            `gt${env.site?.index ?? 0}_`
+          )
+        : [];
+
+      return [...tear, noise, ...steps.flatMap((step) => glitchFrame(step, random, { intensity, color, frame }))];
     },
   };
 }

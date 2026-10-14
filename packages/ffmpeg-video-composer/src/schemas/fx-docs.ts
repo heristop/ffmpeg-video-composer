@@ -19,7 +19,8 @@ const sheenDoc = {
     profile:
       'Light profile across the band: specular (tight gaussian core + a bloom twice as wide, default: glass, ' +
       'metal, screens), soft (one wide gaussian wash: paper, fabric, matte cards), twin (two thin parallel ' +
-      'glints: chrome, lenses, techy UI).',
+      'glints: chrome, lenses, techy UI), gloss (a broad flat sheet for badges, pills, buttons: ceiling 0.7 on a ' +
+      'layer, text or rectangle target).',
     width:
       "Band width as a fraction of the target's short side (default ~0.15, varied by target shape and seed). " +
       '0.05–0.1 = a crisp glint, 0.2–0.4 = a broad wash.',
@@ -34,7 +35,9 @@ const sheenDoc = {
   intent: {
     summary:
       'A specular light band that crosses its target once (or `repeat` times), clipped to the target shape: light on the glass of a card, a screen, a product shot or the letters of a title.',
-    useWhen: 'a hero object lands or resolves; a CTA card or price settles; a title locks up',
+    useWhen:
+      'a hero object lands or resolves; a CTA card or price settles; a title locks up; a badge or pill is ' +
+      'polished (profile gloss)',
     avoidWhen: 'over faces or footage with skin (keep intensity ≤ 0.6 there); more than one sheen per beat',
     vary: 'profile and width set the material (crisp glint vs. broad wash); tilt and direction set the light source; colour (e.g. "$color.accent") tints it; duration and ease set the speed (0.6–0.9 s reads as a glint, 1.2 s+ as a slow reflection); repeat + every turn it into a periodic glint.',
     reduced: 'a static 8% highlight that fades in and out on the target',

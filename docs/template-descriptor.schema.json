@@ -710,6 +710,29 @@
               "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
               "$ref": "#/$defs/EasingSpec"
             },
+            "origin": {
+              "description": "iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).",
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": ["x", "y"],
+              "additionalProperties": false
+            },
+            "rim": {
+              "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
             "duration": {
               "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
               "type": "number",
@@ -2817,6 +2840,29 @@
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
                     "$ref": "#/$defs/EasingSpec"
+                  },
+                  "origin": {
+                    "description": "iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).",
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": ["x", "y"],
+                    "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -5657,6 +5703,29 @@
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
                     "$ref": "#/$defs/EasingSpec"
+                  },
+                  "origin": {
+                    "description": "iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).",
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": ["x", "y"],
+                    "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -8541,6 +8610,29 @@
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
                     "$ref": "#/$defs/EasingSpec"
                   },
+                  "origin": {
+                    "description": "iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).",
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": ["x", "y"],
+                    "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
                     "type": "number",
@@ -11148,6 +11240,29 @@
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
                     "$ref": "#/$defs/EasingSpec"
                   },
+                  "origin": {
+                    "description": "iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).",
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": ["x", "y"],
+                    "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
                     "type": "number",
@@ -13734,6 +13849,29 @@
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
                     "$ref": "#/$defs/EasingSpec"
+                  },
+                  "origin": {
+                    "description": "iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).",
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": ["x", "y"],
+                    "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -16793,6 +16931,29 @@
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
                     "$ref": "#/$defs/EasingSpec"
                   },
+                  "origin": {
+                    "description": "iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).",
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": ["x", "y"],
+                    "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
                     "type": "number",
@@ -19380,6 +19541,29 @@
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
                     "$ref": "#/$defs/EasingSpec"
                   },
+                  "origin": {
+                    "description": "iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).",
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": ["x", "y"],
+                    "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
                     "type": "number",
@@ -21966,6 +22150,29 @@
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
                     "$ref": "#/$defs/EasingSpec"
+                  },
+                  "origin": {
+                    "description": "iris: circle origin in frame fractions (default 0.5, 0.5; ease default linear).",
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": ["x", "y"],
+                    "additionalProperties": false
+                  },
+                  "rim": {
+                    "description": "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -25718,11 +25925,23 @@
               "type": "number",
               "minimum": 0,
               "maximum": 1
+            },
+            "tear": {
+              "description": "Row tearing (default off): N horizontal bands shifted sideways in 2–3 seeded bursts, nearly still between them.",
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 24
+            },
+            "hold": {
+              "description": "Frames each torn band holds its offset before it jumps (default 2; tear only).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6
             }
           },
           "required": ["type"],
           "additionalProperties": false,
-          "description": "A digital glitch hit: seeded RGB channel split, horizontal jitter, grain and colour slices for `duration` (default 0.35 s). Changes with global.seed."
+          "description": "A digital glitch hit: seeded RGB channel split, horizontal jitter, grain and colour slices for `duration` (default 0.35 s); `tear` adds row tearing. Changes with global.seed."
         },
         {
           "type": "object",
@@ -26240,9 +26459,9 @@
                   "type": "boolean"
                 },
                 "profile": {
-                  "description": "Light profile across the band: specular (tight gaussian core + a bloom twice as wide, default: glass, metal, screens), soft (one wide gaussian wash: paper, fabric, matte cards), twin (two thin parallel glints: chrome, lenses, techy UI).",
+                  "description": "Light profile across the band: specular (tight gaussian core + a bloom twice as wide, default: glass, metal, screens), soft (one wide gaussian wash: paper, fabric, matte cards), twin (two thin parallel glints: chrome, lenses, techy UI), gloss (a broad flat sheet for badges, pills, buttons: ceiling 0.7 on a layer, text or rectangle target).",
                   "type": "string",
-                  "enum": ["specular", "soft", "twin"]
+                  "enum": ["specular", "soft", "twin", "gloss"]
                 },
                 "width": {
                   "description": "Band width as a fraction of the target's short side (default ~0.15, varied by target shape and seed). 0.05–0.1 = a crisp glint, 0.2–0.4 = a broad wash.",
@@ -26575,7 +26794,7 @@
                   "maximum": 96
                 },
                 "stagger": {
-                  "description": "Seconds between star twinkles (default 0.12). The pass duration covers every star.",
+                  "description": "Seconds between star twinkles (default 0.12). Each star twinkles for 12–14 frames whatever the duration, which only has to cover the stagger.",
                   "type": "number",
                   "minimum": 0,
                   "maximum": 0.4
@@ -26601,7 +26820,7 @@
               },
               "required": ["type", "effect"],
               "additionalProperties": false,
-              "description": "Four-point star glints that twinkle once on a target (scale up, turn, vanish), or small lights orbiting it: the sparkle of something new or polished. Tune: path sets the character (scatter = sparkle, corners = a framed gem, orbit = a spec orbit); count, size and points set the density; stagger and duration set the rhythm; spin and the twinkle ease set the snap; colour tints the light."
+              "description": "Four-point star glints that twinkle once on a target (each a 12–14 frame twinkle: scale up from 0, turn, vanish), or small lights orbiting it: the sparkle of something new or polished. Repeats start at least 1.5 s apart. Tune: path sets the character (scatter = sparkle, corners = a framed gem, orbit = a spec orbit); count, size and points set the density; stagger and duration set the rhythm; spin and the twinkle ease set the snap; colour tints the light."
             },
             {
               "type": "object",
