@@ -69,3 +69,57 @@ describe('cssFonts', () => {
     });
   });
 });
+
+describe('brand css hardening', () => {
+  it('reads 4 and 8 digit hex with alpha', () => {
+    expect(normalizeColor('#3ce6acff')).toBe('#3ce6ac');
+    expect(normalizeColor('#3ce6ac40')).toBeNull();
+    expect(normalizeColor('#abcd')).toBe('#aabbcc');
+    expect(normalizeColor('#abc0')).toBeNull();
+  });
+
+  it('reads rgb() percentages and hsl() hue units', () => {
+    expect(normalizeColor('rgb(10% 20% 30%)')).toBe('#1a334d');
+    expect(normalizeColor('hsl(0.5turn 50% 40%)')).toBe(normalizeColor('hsl(180 50% 40%)'));
+    expect(normalizeColor('hsl(180deg 50% 40%)')).toBe(normalizeColor('hsl(180 50% 40%)'));
+    expect(normalizeColor('hsl(200grad 50% 40%)')).toBe(normalizeColor('hsl(180 50% 40%)'));
+    expect(normalizeColor('hsl(3.14159265rad 50% 40%)')).toBe(normalizeColor('hsl(180 50% 40%)'));
+  });
+
+  it('strips !important from families and still counts important colours', () => {
+    expect(cssFonts('h1{font-family:"A B"!important}').display).toBe('A B');
+    expect(cssFonts('h1{font-family:Inter ! IMPORTANT}').display).toBe('Inter');
+    expect(cssColors('a{color:#3ce6ac !important}')).toEqual([{ hex: '#3ce6ac', weight: 1, source: 'declaration' }]);
+  });
+
+  it('ignores comments', () => {
+    expect(cssColors('/* color: #ff0000; */ a{color:#00ff00}').map((c) => c.hex)).toEqual(['#00ff00']);
+    expect(cssFonts('/* note */ h1{font-family:Inter} /* x').display).toBe('Inter');
+  });
+
+  it('parses hostile 2 MB input in linear time', () => {
+    const inputs = [
+      'a'.repeat(2_000_000),
+      '{'.repeat(2_000_000),
+      ':'.repeat(2_000_000),
+      'rgb('.repeat(400_000),
+      'color:' + ' '.repeat(2_000_000),
+      'x{font-family' + ' '.repeat(2_000_000),
+      '/*'.repeat(1_000_000),
+    ];
+
+    // Best of three and a 3 s ceiling: quadratic parsing takes minutes here, a loaded host only adds noise.
+    for (const input of inputs) {
+      const runs = [0, 1, 2].map(() => {
+        const start = performance.now();
+
+        cssColors(input);
+        cssFonts(input);
+
+        return performance.now() - start;
+      });
+
+      expect(Math.min(...runs)).toBeLessThan(3000);
+    }
+  }, 60_000);
+});
