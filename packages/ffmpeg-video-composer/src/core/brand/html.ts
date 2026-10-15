@@ -27,6 +27,22 @@ function asciiLower(text: string): string {
   return text.replace(/[A-Z]/g, (c) => c.toLowerCase());
 }
 
+const NAMED_ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+
+/** Decode the common entities in one bounded pass; anything unknown or out of range is left as written. */
+function decodeEntities(text: string): string {
+  if (!text.includes('&')) return text;
+
+  return text.replace(/&(#x[0-9a-f]{1,6}|#\d{1,7}|[a-z]{2,4});/gi, (whole, body: string) => {
+    if (body[0] !== '#') return NAMED_ENTITIES[body.toLowerCase()] ?? whole;
+
+    const code =
+      body[1] === 'x' || body[1] === 'X' ? Number.parseInt(body.slice(2), 16) : Number.parseInt(body.slice(1), 10);
+
+    return code > 0 && code <= 0x10ffff && (code < 0xd800 || code > 0xdfff) ? String.fromCodePoint(code) : whole;
+  });
+}
+
 function attr(attrs: Attributes, key: string): string {
   return attrs[key] ?? '';
 }
@@ -71,12 +87,12 @@ function attributeValue(html: string, from: number, to: number): { value: string
     const close = html.indexOf(first, from + 1);
     const end = close === -1 || close > to ? to : close;
 
-    return { value: html.slice(from + 1, end), next: end + 1 };
+    return { value: decodeEntities(html.slice(from + 1, end)), next: end + 1 };
   }
 
   const end = skipWhile(html, from, to, (ch) => !isSpace(ch));
 
-  return { value: html.slice(from, end), next: end };
+  return { value: decodeEntities(html.slice(from, end)), next: end };
 }
 
 /** Attributes of the tag text between a tag name's end and its closing `>`. One pass, no backtracking. */
@@ -113,13 +129,6 @@ interface Head {
   inlineCss: string;
 }
 
-/** Where the head ends: `</head` or `<body`, whichever comes first. */
-function headLimit(lower: string): number {
-  const ends = [lower.indexOf('</head'), lower.indexOf('<body')].filter((index) => index !== -1);
-
-  return ends.length > 0 ? Math.min(...ends) : lower.length;
-}
-
 function tagName(lower: string, lt: number, limit: number): { name: string; end: number } {
   let end = lt + 1;
 
@@ -139,12 +148,12 @@ interface Walk {
 }
 
 /** Take the raw text of a <title> or <style> that opens at `walk.pos`, up to its closing tag. */
-function takeRawText(walk: Walk, name: 'title' | 'style'): void {
+function takeRawText(walk: Walk, name: 'title' | 'style' | 'script'): void {
   const close = walk.lower.indexOf(`</${name}`, walk.pos);
   const stop = close === -1 ? walk.html.length : close;
 
   if (name === 'title' && walk.head.title === null && close !== -1) {
-    walk.head.title = walk.html.slice(walk.pos, Math.min(stop, walk.pos + MAX_TITLE));
+    walk.head.title = decodeEntities(walk.html.slice(walk.pos, Math.min(stop, walk.pos + MAX_TITLE)));
   }
 
   if (name === 'style') {
@@ -168,11 +177,13 @@ function step(walk: Walk, lt: number): boolean {
     return close !== -1;
   }
 
+  if (walk.lower.startsWith('</head', lt) || walk.lower.startsWith('<body', lt)) return false;
+
   const { name, end: nameEnd } = tagName(walk.lower, lt, walk.limit);
 
   walk.pos = lt + 1;
 
-  if (name !== 'meta' && name !== 'link' && name !== 'title' && name !== 'style') return true;
+  if (!['meta', 'link', 'title', 'style', 'script'].includes(name)) return true;
 
   const end = tagEnd(walk.html, nameEnd);
 
@@ -184,7 +195,7 @@ function step(walk: Walk, lt: number): boolean {
 
   if (name === 'link') walk.head.links.push(attributes(walk.html, nameEnd, end));
 
-  if (name === 'title' || name === 'style') takeRawText(walk, name);
+  if (name === 'title' || name === 'style' || name === 'script') takeRawText(walk, name);
 
   return true;
 }
@@ -192,7 +203,7 @@ function step(walk: Walk, lt: number): boolean {
 function walkHead(html: string): Head {
   const lower = asciiLower(html);
   const head: Head = { metas: [], links: [], title: null, inlineCss: '' };
-  const walk: Walk = { html, lower, limit: headLimit(lower), pos: 0, head, css: [], cssLength: 0 };
+  const walk: Walk = { html, lower, limit: lower.length, pos: 0, head, css: [], cssLength: 0 };
 
   while (walk.pos < walk.limit) {
     const lt = lower.indexOf('<', walk.pos);
@@ -207,7 +218,9 @@ function walkHead(html: string): Head {
 
 function resolve(href: string, base: string): string | null {
   try {
-    return new URL(href, base).href;
+    const url = new URL(href, base);
+
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null;
   } catch {
     return null;
   }
@@ -228,7 +241,7 @@ function rels(link: Attributes): string[] {
 function logoFrom(links: Attributes[], metas: Attributes[], base: string): BrandLogo | null {
   const candidates: { href: string; source: BrandLogo['source'] }[] = [
     {
-      href: attr(links.find((l) => rels(l).includes('apple-touch-icon')) ?? {}, 'href'),
+      href: attr(links.find((l) => rels(l).some((rel) => rel.startsWith('apple-touch-icon'))) ?? {}, 'href'),
       source: 'apple-touch-icon',
     },
     {
@@ -270,7 +283,9 @@ function metaContent(metas: Attributes[], keys: [string, string]): string {
 
 export function parseBrandPage(html: string, pageUrl: string): BrandPage {
   const { metas, links, title: rawTitle, inlineCss } = walkHead(html);
-  const sheets = links.filter((l) => rels(l).includes('stylesheet') && attr(l, 'href'));
+  const sheets = links.filter(
+    (l) => rels(l).includes('stylesheet') && !rels(l).includes('alternate') && attr(l, 'href')
+  );
   const google = sheets.filter((l) => /fonts\.googleapis\.com/i.test(attr(l, 'href')));
   const siteName = [metaContent(metas, ['property', 'og:site_name']), metaContent(metas, ['name', 'application-name'])]
     .map((value) => value.trim())

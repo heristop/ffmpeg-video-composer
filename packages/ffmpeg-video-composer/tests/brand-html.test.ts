@@ -61,6 +61,43 @@ describe('parseBrandPage', () => {
     expect(parseBrandPage(tag, 'https://acme.test/').themeColor).toBe('#3ce6ac');
   });
 
+  it('decodes html entities in attribute values and the title', () => {
+    const html = `<title>Ben &amp; Jerry&#39;s &#x41;&bogus; &#99999999;</title>
+      <link rel="stylesheet" href="/a.css?a=1&amp;b=2">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400&amp;family=Space+Grotesk&amp;display=swap">`;
+    const parsed = parseBrandPage(html, 'https://acme.test/');
+
+    expect(parsed.name).toBe("Ben & Jerry's A&bogus; &#99999999;");
+    expect(parsed.stylesheets).toEqual(['https://acme.test/a.css?a=1&b=2']);
+    expect(parsed.googleFamilies).toEqual(['Inter', 'Space Grotesk']);
+  });
+
+  it('only keeps http and https urls', () => {
+    for (const bad of [['java', 'script:alert(1)'].join(''), 'data:image/png;base64,AAAA', 'file:///etc/x.png']) {
+      const html = `<link rel="stylesheet" href="${bad}"><link rel="icon" href="${bad}"><meta property="og:image" content="${bad}">`;
+      const parsed = parseBrandPage(html, 'https://acme.test/');
+
+      expect(parsed.stylesheets).toEqual([]);
+      expect(parsed.logo).toBeNull();
+    }
+  });
+
+  it('treats script bodies as raw text', () => {
+    const html = `<script>var s = '</head><body><link rel="icon" href="/evil.png">';</script><meta name="theme-color" content="#3ce6ac"></head>`;
+    const parsed = parseBrandPage(html, 'https://acme.test/');
+
+    expect(parsed.themeColor).toBe('#3ce6ac');
+    expect(parsed.logo).toBeNull();
+  });
+
+  it('ignores alternate stylesheets and accepts precomposed apple icons', () => {
+    const html = `<link rel="alternate stylesheet" href="/alt.css"><link rel="apple-touch-icon-precomposed" href="/p.png">`;
+    const parsed = parseBrandPage(html, 'https://acme.test/');
+
+    expect(parsed.stylesheets).toEqual([]);
+    expect(parsed.logo).toEqual({ url: 'https://acme.test/p.png', type: 'png', source: 'apple-touch-icon' });
+  });
+
   describe('hostile input stays linear', () => {
     const size = 2_000_000;
     const cases: Record<string, string> = {
