@@ -15,7 +15,7 @@ export interface BrandPage {
   logo: BrandLogo | null;
 }
 
-type Attributes = Record<string, string>;
+type Attributes = Partial<Record<string, string>>;
 
 /** Inline CSS kept from a page: enough for any real stylesheet in a <style>, bounded for hostile ones. */
 const MAX_INLINE_CSS = 512 * 1024;
@@ -24,7 +24,15 @@ const MAX_TITLE = 1000;
 const WHITESPACE = new Set([' ', '\t', '\n', '\r', '\f']);
 
 function asciiLower(text: string): string {
-  return text.replace(/[A-Z]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 32));
+  return text.replace(/[A-Z]/g, (c) => c.toLowerCase());
+}
+
+function attr(attrs: Attributes, key: string): string {
+  return attrs[key] ?? '';
+}
+
+function isSpace(ch: string | undefined): boolean {
+  return ch !== undefined && WHITESPACE.has(ch);
 }
 
 /** Index of the `>` closing the tag opened at `from`, skipping quoted attribute values; -1 if unterminated. */
@@ -39,11 +47,36 @@ function tagEnd(html: string, from: number): number {
       continue;
     }
 
-    if (ch === '"' || ch === "'") quote = ch;
     if (ch === '>') return i;
+
+    if (ch === '"' || ch === "'") quote = ch;
   }
 
   return -1;
+}
+
+function skipWhile(html: string, from: number, to: number, skip: (ch: string) => boolean): number {
+  let i = from;
+
+  while (i < to && skip(html[i])) i++;
+
+  return i;
+}
+
+/** The attribute value starting at `from` (after `=`), and where the next attribute begins. */
+function attributeValue(html: string, from: number, to: number): { value: string; next: number } {
+  const first = html[from];
+
+  if (first === '"' || first === "'") {
+    const close = html.indexOf(first, from + 1);
+    const end = close === -1 || close > to ? to : close;
+
+    return { value: html.slice(from + 1, end), next: end + 1 };
+  }
+
+  const end = skipWhile(html, from, to, (ch) => !isSpace(ch));
+
+  return { value: html.slice(from, end), next: end };
 }
 
 /** Attributes of the tag text between a tag name's end and its closing `>`. One pass, no backtracking. */
@@ -52,45 +85,22 @@ function attributes(html: string, from: number, to: number): Attributes {
   let i = from;
 
   while (i < to) {
-    while (i < to && (WHITESPACE.has(html[i]) || html[i] === '/')) i++;
+    i = skipWhile(html, i, to, (ch) => isSpace(ch) || ch === '/');
 
-    const nameStart = i;
+    const nameEnd = skipWhile(html, i, to, (ch) => !isSpace(ch) && ch !== '=' && ch !== '/');
+    const name = asciiLower(html.slice(i, nameEnd));
 
-    while (i < to && !WHITESPACE.has(html[i]) && html[i] !== '=' && html[i] !== '/') i++;
-
-    const name = asciiLower(html.slice(nameStart, i));
-
-    while (i < to && WHITESPACE.has(html[i])) i++;
+    i = skipWhile(html, nameEnd, to, isSpace);
 
     if (html[i] !== '=') {
-      if (name && i === nameStart) i++;
       if (name) out[name] ??= '';
       continue;
     }
 
-    i++;
+    const parsed = attributeValue(html, skipWhile(html, i + 1, to, isSpace), to);
 
-    while (i < to && WHITESPACE.has(html[i])) i++;
-
-    const quote = html[i] === '"' || html[i] === "'" ? html[i] : '';
-    let value = '';
-
-    if (quote) {
-      const close = html.indexOf(quote, i + 1);
-      const end = close === -1 || close > to ? to : close;
-
-      value = html.slice(i + 1, end);
-      i = end + 1;
-    }
-
-    if (!quote) {
-      const start = i;
-
-      while (i < to && !WHITESPACE.has(html[i])) i++;
-      value = html.slice(start, i);
-    }
-
-    if (name) out[name] ??= value;
+    if (name) out[name] ??= parsed.value;
+    i = parsed.next;
   }
 
   return out;
@@ -103,67 +113,94 @@ interface Head {
   inlineCss: string;
 }
 
-function walkHead(html: string): Head {
-  const lower = asciiLower(html);
-  const headEnds = [lower.indexOf('</head'), lower.indexOf('<body')].filter((index) => index !== -1);
-  const limit = headEnds.length > 0 ? Math.min(...headEnds) : html.length;
-  const head: Head = { metas: [], links: [], title: null, inlineCss: '' };
-  const css: string[] = [];
-  let cssLength = 0;
-  let pos = 0;
+/** Where the head ends: `</head` or `<body`, whichever comes first. */
+function headLimit(lower: string): number {
+  const ends = [lower.indexOf('</head'), lower.indexOf('<body')].filter((index) => index !== -1);
 
-  while (pos < limit) {
-    const lt = lower.indexOf('<', pos);
+  return ends.length > 0 ? Math.min(...ends) : lower.length;
+}
 
-    if (lt === -1 || lt >= limit) break;
+function tagName(lower: string, lt: number, limit: number): { name: string; end: number } {
+  let end = lt + 1;
 
-    if (lower.startsWith('<!--', lt)) {
-      const close = lower.indexOf('-->', lt + 4);
+  while (end < limit && lower[end] >= 'a' && lower[end] <= 'z') end++;
 
-      if (close === -1) break;
-      pos = close + 3;
-      continue;
-    }
+  return { name: lower.slice(lt + 1, end), end };
+}
 
-    let nameEnd = lt + 1;
+interface Walk {
+  html: string;
+  lower: string;
+  limit: number;
+  pos: number;
+  head: Head;
+  css: string[];
+  cssLength: number;
+}
 
-    while (nameEnd < limit && lower[nameEnd] >= 'a' && lower[nameEnd] <= 'z') nameEnd++;
+/** Take the raw text of a <title> or <style> that opens at `walk.pos`, up to its closing tag. */
+function takeRawText(walk: Walk, name: 'title' | 'style'): void {
+  const close = walk.lower.indexOf(`</${name}`, walk.pos);
+  const stop = close === -1 ? walk.html.length : close;
 
-    const name = lower.slice(lt + 1, nameEnd);
-
-    if (name !== 'meta' && name !== 'link' && name !== 'title' && name !== 'style') {
-      pos = lt + 1;
-      continue;
-    }
-
-    const end = tagEnd(html, nameEnd);
-
-    if (end === -1) break;
-
-    pos = end + 1;
-
-    if (name === 'meta') head.metas.push(attributes(html, nameEnd, end));
-    if (name === 'link') head.links.push(attributes(html, nameEnd, end));
-
-    if (name === 'title' || name === 'style') {
-      const close = lower.indexOf(`</${name}`, pos);
-      const stop = close === -1 ? html.length : close;
-
-      if (name === 'title' && head.title === null && close !== -1)
-        head.title = html.slice(pos, Math.min(stop, pos + MAX_TITLE));
-
-      if (name === 'style' && cssLength < MAX_INLINE_CSS) {
-        const text = html.slice(pos, Math.min(stop, pos + MAX_INLINE_CSS - cssLength));
-
-        css.push(text);
-        cssLength += text.length + 1;
-      }
-
-      pos = stop;
-    }
+  if (name === 'title' && walk.head.title === null && close !== -1) {
+    walk.head.title = walk.html.slice(walk.pos, Math.min(stop, walk.pos + MAX_TITLE));
   }
 
-  head.inlineCss = css.join('\n');
+  if (name === 'style') {
+    const room = Math.max(0, MAX_INLINE_CSS - walk.cssLength);
+    const text = walk.html.slice(walk.pos, Math.min(stop, walk.pos + room));
+
+    walk.css.push(text);
+    walk.cssLength += text.length + 1;
+  }
+
+  walk.pos = stop;
+}
+
+/** Handle the tag opening at `lt`. Returns false when the rest of the head cannot be read. */
+function step(walk: Walk, lt: number): boolean {
+  if (walk.lower.startsWith('<!--', lt)) {
+    const close = walk.lower.indexOf('-->', lt + 4);
+
+    walk.pos = close + 3;
+
+    return close !== -1;
+  }
+
+  const { name, end: nameEnd } = tagName(walk.lower, lt, walk.limit);
+
+  walk.pos = lt + 1;
+
+  if (name !== 'meta' && name !== 'link' && name !== 'title' && name !== 'style') return true;
+
+  const end = tagEnd(walk.html, nameEnd);
+
+  if (end === -1) return false;
+
+  walk.pos = end + 1;
+
+  if (name === 'meta') walk.head.metas.push(attributes(walk.html, nameEnd, end));
+
+  if (name === 'link') walk.head.links.push(attributes(walk.html, nameEnd, end));
+
+  if (name === 'title' || name === 'style') takeRawText(walk, name);
+
+  return true;
+}
+
+function walkHead(html: string): Head {
+  const lower = asciiLower(html);
+  const head: Head = { metas: [], links: [], title: null, inlineCss: '' };
+  const walk: Walk = { html, lower, limit: headLimit(lower), pos: 0, head, css: [], cssLength: 0 };
+
+  while (walk.pos < walk.limit) {
+    const lt = lower.indexOf('<', walk.pos);
+
+    if (lt === -1 || lt >= walk.limit || !step(walk, lt)) break;
+  }
+
+  head.inlineCss = walk.css.join('\n');
 
   return head;
 }
@@ -185,17 +222,26 @@ function typeOf(url: string): BrandLogo['type'] | null {
 }
 
 function rels(link: Attributes): string[] {
-  return (link.rel ?? '').toLowerCase().split(/\s+/);
+  return attr(link, 'rel').toLowerCase().split(/\s+/);
 }
 
 function logoFrom(links: Attributes[], metas: Attributes[], base: string): BrandLogo | null {
-  const candidates: { href: string | undefined; source: BrandLogo['source'] }[] = [
-    { href: links.find((l) => rels(l).includes('apple-touch-icon'))?.href, source: 'apple-touch-icon' },
+  const candidates: { href: string; source: BrandLogo['source'] }[] = [
     {
-      href: links.find((l) => rels(l).includes('icon') && !/\.ico(?:[?#]|$)/i.test(l.href ?? ''))?.href,
+      href: attr(links.find((l) => rels(l).includes('apple-touch-icon')) ?? {}, 'href'),
+      source: 'apple-touch-icon',
+    },
+    {
+      href: attr(
+        links.find((l) => rels(l).includes('icon') && !/\.ico(?:[?#]|$)/i.test(attr(l, 'href'))) ?? {},
+        'href'
+      ),
       source: 'icon',
     },
-    { href: metas.find((m) => m.property?.toLowerCase() === 'og:image')?.content, source: 'og:image' },
+    {
+      href: attr(metas.find((m) => attr(m, 'property').toLowerCase() === 'og:image') ?? {}, 'content'),
+      source: 'og:image',
+    },
   ];
 
   for (const { href, source } of candidates) {
@@ -216,27 +262,31 @@ function googleFamilies(href: string): string[] {
   return new URL(url).searchParams.getAll('family').map((f) => f.split(':')[0].replace(/\+/g, ' ').trim());
 }
 
+function metaContent(metas: Attributes[], keys: [string, string]): string {
+  const meta = metas.find((m) => attr(m, keys[0]).toLowerCase() === keys[1]);
+
+  return meta ? attr(meta, 'content') : '';
+}
+
 export function parseBrandPage(html: string, pageUrl: string): BrandPage {
   const { metas, links, title: rawTitle, inlineCss } = walkHead(html);
-  const sheets = links.filter((l) => rels(l).includes('stylesheet') && l.href);
-  const google = sheets.filter((l) => /fonts\.googleapis\.com/i.test(l.href));
-  const siteName = metas.find((m) => {
-    const key = m.property?.toLowerCase();
-
-    return key === 'og:site_name' || m.name?.toLowerCase() === 'application-name';
-  })?.content;
-  const title = rawTitle?.split(/\s[|–—-]\s/)[0]?.trim();
-  const themeColor = metas.find((m) => m.name?.toLowerCase() === 'theme-color')?.content;
+  const sheets = links.filter((l) => rels(l).includes('stylesheet') && attr(l, 'href'));
+  const google = sheets.filter((l) => /fonts\.googleapis\.com/i.test(attr(l, 'href')));
+  const siteName = [metaContent(metas, ['property', 'og:site_name']), metaContent(metas, ['name', 'application-name'])]
+    .map((value) => value.trim())
+    .find((value) => value !== '');
+  const title = rawTitle?.split(/\s[|–—-]\s/)[0].trim();
+  const themeColor = metaContent(metas, ['name', 'theme-color']);
 
   return {
-    name: siteName?.trim() || title || null,
+    name: siteName ?? (title === undefined || title === '' ? null : title),
     themeColor: themeColor ? normalizeColor(themeColor) : null,
     stylesheets: sheets
       .filter((l) => !google.includes(l))
-      .map((l) => resolve(l.href, pageUrl))
+      .map((l) => resolve(attr(l, 'href'), pageUrl))
       .filter((url): url is string => url !== null),
     inlineCss,
-    googleFamilies: google.flatMap((l) => googleFamilies(l.href)),
+    googleFamilies: google.flatMap((l) => googleFamilies(attr(l, 'href'))),
     logo: logoFrom(links, metas, pageUrl),
   };
 }
