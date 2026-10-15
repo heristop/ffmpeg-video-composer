@@ -44,7 +44,7 @@ export function groundOf(frames: readonly StyleFrame[]): Ground {
 
 function cellEnergy(frame: StyleFrame): number[] {
   const luma = lumaOf(frame);
-  const cells = new Array<number>(9).fill(0);
+  const cells = Array.from({ length: 9 }, () => 0);
   const { width, height } = frame;
 
   for (let y = 0; y < height - 1; y++) {
@@ -60,9 +60,11 @@ function cellEnergy(frame: StyleFrame): number[] {
 }
 
 export function anchorOf(frames: readonly StyleFrame[]): Anchor {
-  const totals = new Array<number>(9).fill(0);
+  const totals = Array.from({ length: 9 }, () => 0);
 
-  for (const frame of frames) cellEnergy(frame).forEach((energy, cell) => (totals[cell] += energy));
+  for (const frame of frames) {
+    for (const [cell, energy] of cellEnergy(frame).entries()) totals[cell] += energy;
+  }
 
   const sum = totals.reduce((a, b) => a + b, 0);
 
