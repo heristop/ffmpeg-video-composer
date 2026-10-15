@@ -14,7 +14,9 @@ const DIP_LUMA = 12;
 // A neighbour difference at least this share of the peak means the change is spread over frames.
 const RAMP_SHARE = 0.35;
 
-const round2 = (value: number): number => Math.round(value * 100) / 100;
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
 
 export function frameTime(frames: readonly StyleFrame[], k: number): number {
   return frames[k]?.time ?? k * DEFAULT_FRAME_INTERVAL;
