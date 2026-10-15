@@ -368,6 +368,9 @@ export * from './core/theme';
 export * from './core/style';
 // Reference-structure analysis (pure): a clip's shots, rhythm and layout as binding prompt rules.
 export * from './core/structure';
+
+// Brand kits (pure): a site's colours, fonts and logo as a theme.
+export * from './core/brand';
 export {
   analyzeStyleFile,
   extractStyleFrames,
