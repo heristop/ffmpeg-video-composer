@@ -39,6 +39,13 @@ const DANGEROUS_FILTERS = new Set([
   'openclsrc',
   'coreimage',
   'coreimagesrc',
+  // Command/network/model loaders: sendcmd reads a command file, zmq/azmq open a listening socket,
+  // arnndn loads a model file.
+  'sendcmd',
+  'asendcmd',
+  'zmq',
+  'azmq',
+  'arnndn',
 ]);
 
 // A URL/pseudo-protocol scheme anywhere in a value → SSRF or protocol-based file access.
@@ -56,10 +63,16 @@ const ABSOLUTE_OR_TRAVERSAL = /^\s*(\/|[a-zA-Z]:[\\/])|(^|[\\/])\.\.([\\/]|$)/;
 // start of the string, e.g. `red;movie=/etc/passwd` in a colour that lands in a `color=c=…` source.
 // Every string leaf is scanned with these, because a template field the filter scan never reads (a
 // transition colour, a theme value) can still reach a filtergraph. They need the filter-name-then-`=`
-// shape after a separator, so free copy ("Hello; world", "watch the movie, then…", a URL) passes; the
-// generic option words of FILE_OPTION (file, model, commands) are left out for the same reason.
+// shape after a separator, so free copy ("Hello; world", "watch the movie, then…", a URL) passes.
+// zmq/azmq run with no options, so they also match bare before a separator or the end. The short
+// generic option names (`f`, `file`) only match in option position, glued to the `=` or `:` before
+// them (`sendcmd=f=…`, `drawtext=…:file=…`); FFmpeg reads no whitespace around an option key.
+// Quotes and backslashes are stripped first: FFmpeg's tokenizer unescapes `mo\vie` to `movie`.
 const CHAINED_FILTER = new RegExp(`(^|[;,\\]])\\s*(${[...DANGEROUS_FILTERS].join('|')})(@\\w*)?\\s*=`, 'i');
+const CHAINED_BARE_FILTER = /(^|[;,\]])\s*a?zmq(@\w*)?\s*($|[;,[])/i;
 const CHAINED_FILE_OPTION = /(^|[;,\]:=])\s*(psfile|filename|textfile|pfile|fontfile|model_filename|stats_file)\s*=/i;
+const OPTION_FILE = /[=:](f|file)=/i;
+const CHAINED_PATTERNS = [CHAINED_FILTER, CHAINED_BARE_FILTER, CHAINED_FILE_OPTION, OPTION_FILE];
 
 export type GuardResult = { ok: true } | { ok: false; message: string };
 
@@ -160,7 +173,7 @@ function findFilterEscape(descriptor: TemplateDescriptor): string | undefined {
       continue;
     }
 
-    if (DANGEROUS_FILTERS.has(type.trim().toLowerCase())) {
+    if (DANGEROUS_FILTERS.has(type.replace(/\\/g, '').trim().toLowerCase())) {
       return `Filter "${type.trim()}" is not allowed: it can read arbitrary files or URLs. Supply media via userVideoPaths (checked against the media dir) instead.`;
     }
 
@@ -204,9 +217,9 @@ function* stringLeaves(value: unknown, at: string): Generator<[string, string]> 
 // A source/plugin filter or a file option chained into ANY string field (see CHAINED_FILTER).
 function findChainedEscape(descriptor: TemplateDescriptor): string | undefined {
   for (const [at, value] of stringLeaves(descriptor, '')) {
-    const unquoted = value.replace(/["'`]/g, '');
+    const unescaped = value.replace(/["'`\\]/g, '');
 
-    if (CHAINED_FILTER.test(unquoted) || CHAINED_FILE_OPTION.test(unquoted)) {
+    if (CHAINED_PATTERNS.some((pattern) => pattern.test(unescaped))) {
       return `Field "${at}" contains FFmpeg filter syntax that reads a file or URL: refusing to forward it to ffmpeg.`;
     }
   }

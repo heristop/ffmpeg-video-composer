@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `validate_template`, `compose_video` and `render_preview` refuse a template whose string fields (a
   transition colour, for instance) carry FFmpeg filter syntax that opens files or URLs, not only the filter
   `value` and `values`. Ordinary copy with semicolons or commas is unaffected.
+- The template guard also sees through backslash-escaped filter names and refuses the command, socket and
+  model-loading filters, and file options chained into a filter.
 
 ## [0.6.0] - 2026-10-11
 

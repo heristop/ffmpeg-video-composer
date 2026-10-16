@@ -231,6 +231,15 @@ describe('assertDescriptorSafe: filtergraph syntax in any string field', () => {
     'red, movie = /etc/passwd',
     'red;[x]drawtext=textfile=/etc/passwd',
     'red,curves=psfile=/tmp/x.acv',
+    // FFmpeg's tokenizer drops backslashes, so an escaped name still runs.
+    String.raw`red,nullsink;mo\vie=/etc/passwd`,
+    String.raw`red;a\movie=/etc/passwd`,
+    'red;sendcmd=f=/tmp/cmds.txt',
+    'red,zmq',
+    String.raw`red;[x]azmq=bind_address=tcp\://0.0.0.0\:5555`,
+    'red,arnndn=m=/tmp/model.rnnn',
+    'red;[x]drawtext=file=/etc/passwd',
+    'red;sendcmd@a=f=/tmp/cmds.txt',
   ])('rejects a drip colour carrying %s', async (color) => {
     const result = await assertDescriptorSafe(dripDescriptor(color), mediaDir);
 
@@ -253,6 +262,10 @@ describe('assertDescriptorSafe: filtergraph syntax in any string field', () => {
     'Watch the movie, then the sequel',
     'Profile: file = notes.txt',
     'See https://leclap.dev; it renders',
+    'Send cmd; zmq fans welcome',
+    'f = ma, the law',
+    String.raw`C:\Users\me, a path in a caption`,
+    'Fill the form, file = done',
   ])('keeps ordinary copy such as %s', async (title) => {
     const result = await assertDescriptorSafe(dripDescriptor('$color.accent', title), mediaDir);
 
