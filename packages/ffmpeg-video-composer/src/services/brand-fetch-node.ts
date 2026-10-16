@@ -31,13 +31,14 @@ const THEME_COLOR_WEIGHT = 6;
 
 const HEADERS = { 'user-agent': 'LeClap brand reader', accept: 'text/html,text/css,image/*;q=0.9,*/*;q=0.5' };
 
-/** The content types a logo may have, by the kit's logo type (which alone names the saved file). */
-const LOGO_TYPES: Record<BrandLogo['type'], { file: string; mime: string[] }> = {
-  png: { file: 'logo.png', mime: ['image/png'] },
-  svg: { file: 'logo.svg', mime: ['image/svg+xml'] },
-  jpeg: { file: 'logo.jpg', mime: ['image/jpeg'] },
-  webp: { file: 'logo.webp', mime: ['image/webp'] },
-  ico: { file: 'logo.ico', mime: ['image/x-icon', 'image/vnd.microsoft.icon'] },
+/** The image content types a logo may come back as, with the file each is saved to (never named by a URL). */
+const LOGO_FILES: Record<string, string> = {
+  'image/png': 'logo.png',
+  'image/svg+xml': 'logo.svg',
+  'image/jpeg': 'logo.jpg',
+  'image/webp': 'logo.webp',
+  'image/x-icon': 'logo.ico',
+  'image/vnd.microsoft.icon': 'logo.ico',
 };
 
 async function defaultLookup(host: string): Promise<string[]> {
@@ -151,7 +152,9 @@ async function drain(
     throw tooLarge(cap.maxBytes, cap.url);
   }
 
-  return drain(reader, cap, [...chunks, value], size + value.byteLength);
+  chunks.push(value);
+
+  return drain(reader, cap, chunks, size + value.byteLength);
 }
 
 /** The body, refused (and the stream cancelled) as soon as it goes over maxBytes. */
@@ -224,7 +227,11 @@ async function get({ url, hop, maxBytes }: Hop, options: BrandFetchOptions): Pro
 }
 
 function safeGet(href: string, options: BrandFetchOptions, maxBytes = options.maxBytes ?? MAX_BYTES) {
-  return get({ url: new URL(href), hop: 0, maxBytes }, options);
+  const url = new URL(href);
+
+  if (url.username || url.password) throw new Error('URLs that embed credentials are not fetched');
+
+  return get({ url, hop: 0, maxBytes }, options);
 }
 
 function text(body: Uint8Array): string {
@@ -242,6 +249,8 @@ export async function fetchBrandKit(url: string, options: BrandFetchOptions = {}
         .catch(() => '')
     )
   );
+  options.signal?.throwIfAborted();
+
   const css = [parsed.inlineCss, ...sheets].join('\n');
   const colors = cssColors(css);
   const fonts = cssFonts(css);
@@ -265,35 +274,56 @@ export async function fetchBrandKit(url: string, options: BrandFetchOptions = {}
   };
 }
 
-/** Download a logo as an image of its declared type, at most 2 MB; the file name comes from that type. */
+/** Download a logo, at most 2 MB, as whichever allowed image type it comes back as; that type names the file. */
 async function downloadLogo(logo: BrandLogo, options: BrandFetchOptions): Promise<{ file: string; body: Uint8Array }> {
-  if (!Object.hasOwn(LOGO_TYPES, logo.type)) throw new Error(`Unknown logo type: ${JSON.stringify(logo.type)}`);
-
-  const { file, mime } = LOGO_TYPES[logo.type];
   const download = await safeGet(logo.url, options, Math.min(options.maxBytes ?? MAX_LOGO_BYTES, MAX_LOGO_BYTES));
+  const file = Object.hasOwn(LOGO_FILES, download.type) ? LOGO_FILES[download.type] : null;
 
-  if (!mime.includes(download.type)) {
-    throw new Error(`The logo isn't a ${mime.join(' or ')} image (got "${download.type}"): ${download.url}`);
-  }
+  if (!file) throw new Error(`The logo isn't an image (got "${download.type}"): ${download.url}`);
 
   return { file, body: download.body };
 }
 
+/** The logo, or why it could not be had; a caller's abort is never swallowed into a reason. */
+async function tryLogo(
+  logo: BrandLogo,
+  options: BrandFetchOptions
+): Promise<{ file: string; body: Uint8Array } | { error: string }> {
+  try {
+    return await downloadLogo(logo, options);
+  } catch (error) {
+    options.signal?.throwIfAborted();
+
+    return { error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+/** The logo as recorded in brand-kit.json: its URL and type, plus the saved `file` when there is one. */
+function savedLogo(logo: BrandLogo | null, file?: string): BrandLogo | null {
+  if (!logo) return null;
+
+  return { url: logo.url, type: logo.type, source: logo.source, ...(file ? { file } : {}) };
+}
+
 /**
  * Download the kit's logo and write it and brand-kit.json into `dir`. File names are fixed
- * (`logo.<type>`, `brand-kit.json`), never taken from a URL, so nothing is written outside `dir`.
+ * (`logo.<ext>` from the returned image type, `brand-kit.json`), never taken from a URL, so nothing is
+ * written outside `dir`. The logo is optional: if it can't be had (not an image, too large, unreachable)
+ * the kit is saved with the logo's URL but no `file`, `logo` is null and `logoError` says why.
  */
 export async function saveBrandKit(
   kit: BrandKit,
   dir: string,
   options: BrandFetchOptions = {}
-): Promise<{ kit: BrandKit; json: string; logo: string | null }> {
-  const download = kit.logo ? await downloadLogo(kit.logo, options) : null;
+): Promise<{ kit: BrandKit; json: string; logo: string | null; logoError?: string }> {
+  const result = kit.logo ? await tryLogo(kit.logo, options) : null;
+  const download = result && 'file' in result ? result : null;
+  const logoError = result && 'error' in result ? result.error : undefined;
   const logo = download ? path.join(dir, download.file) : null;
   const saved: BrandKit = {
     ...kit,
     name: sanitizeBrandName(kit.name),
-    logo: kit.logo && download ? { ...kit.logo, file: download.file } : kit.logo,
+    logo: savedLogo(kit.logo, download?.file),
   };
 
   await mkdir(dir, { recursive: true });
@@ -303,5 +333,5 @@ export async function saveBrandKit(
   const json = path.join(dir, 'brand-kit.json');
   await writeFile(json, `${JSON.stringify(saved, null, 2)}\n`);
 
-  return { kit: saved, json, logo };
+  return { kit: saved, json, logo, ...(logoError ? { logoError } : {}) };
 }

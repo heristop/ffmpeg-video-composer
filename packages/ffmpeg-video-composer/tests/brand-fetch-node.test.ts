@@ -44,6 +44,11 @@ const pages: Partial<
     body: '<title>Big</title><link rel="apple-touch-icon" href="/logo.png">',
   },
   'https://big-logo.test/logo.png': { type: 'image/png', body: new Uint8Array(2_000_001) },
+  'https://cdn-logo.test/': {
+    type: 'text/html',
+    body: '<title>Cdn</title><link rel="apple-touch-icon" href="/logo.png">',
+  },
+  'https://cdn-logo.test/logo.png': { type: 'image/webp; charset=binary', body: new Uint8Array([1, 2]) },
   'https://evil-logo.test/': {
     type: 'text/html',
     body: '<title>Evil</title><link rel="apple-touch-icon" href="/..%2F..%2Fescape.png">',
@@ -226,6 +231,39 @@ describe('fetchBrandKit', () => {
     await expect(pending).rejects.toThrow(/stopped by caller/);
   });
 
+  it('rejects when the caller aborts, even if only stylesheets were in flight', async () => {
+    const controller = new AbortController();
+    const aborting = (async (input: string | URL) => {
+      if (String(input).endsWith('.css')) controller.abort(new Error('stopped by caller'));
+
+      return fakeFetch(input);
+    }) as typeof fetch;
+
+    await expect(
+      fetchBrandKit('https://brand.test/', { fetch: aborting, lookup, signal: controller.signal })
+    ).rejects.toThrow(/stopped by caller/);
+  });
+
+  it('refuses a URL with credentials without echoing them', async () => {
+    const error = await fetchBrandKit('https://user:s3cret@brand.test/', options).catch((e: Error) => e);
+
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).message).toMatch(/credentials/i);
+    expect((error as Error).message).not.toMatch(/s3cret|user/);
+  });
+
+  it('reads a body of many tiny segments', async () => {
+    const tiny = new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (let i = 0; i < 5000; i++) controller.enqueue(new TextEncoder().encode('<'));
+        controller.close();
+      },
+    });
+    const streaming = (async () => new Response(tiny, { headers: { 'content-type': 'text/html' } })) as typeof fetch;
+
+    await expect(fetchBrandKit('https://brand.test/', { fetch: streaming, lookup })).resolves.toBeTruthy();
+  });
+
   it('keeps a hostile site name on one short line', async () => {
     const kit = await fetchBrandKit('https://forged.test/', options);
 
@@ -255,24 +293,37 @@ describe('saveBrandKit', () => {
     expect(readdirSync(target).sort()).toEqual(['brand-kit.json', 'logo.png']);
   });
 
-  it('refuses a logo type outside the known ones', async () => {
-    const target = mkdtempSync(path.join(dir, 'unknown-'));
-    const kit = await fetchBrandKit('https://brand.test/', options);
-    const forged = { ...kit, logo: { ...kit.logo, type: 'constructor' } } as unknown as typeof kit;
+  it('picks the logo extension from the content type that came back, not the URL', async () => {
+    const target = mkdtempSync(path.join(dir, 'cdn-'));
+    const saved = await saveBrandKit(await fetchBrandKit('https://cdn-logo.test/', options), target, options);
 
-    await expect(saveBrandKit(forged, target, options)).rejects.toThrow(/unknown logo type/i);
-    expect(readdirSync(target)).toEqual([]);
+    expect(saved.logo).toBe(path.join(target, 'logo.webp'));
+    expect(saved.kit.logo?.file).toBe('logo.webp');
+    expect(readdirSync(target).sort()).toEqual(['brand-kit.json', 'logo.webp']);
   });
 
-  it('refuses a logo that is not an image or is over 2 MB', async () => {
-    const target = mkdtempSync(path.join(dir, 'refused-'));
+  it('saves the kit without a logo when the logo is not an image or is over 2 MB', async () => {
+    for (const [site, reason] of [
+      ['https://fake-logo.test/', /image/i],
+      ['https://big-logo.test/', /too large/i],
+    ] as const) {
+      const target = mkdtempSync(path.join(dir, 'refused-'));
+      const saved = await saveBrandKit(await fetchBrandKit(site, options), target, options);
 
+      expect(saved.logo).toBeNull();
+      expect(saved.logoError).toMatch(reason);
+      expect(saved.kit.logo?.file).toBeUndefined();
+      expect(readdirSync(target)).toEqual(['brand-kit.json']);
+    }
+  });
+
+  it('still rejects when the caller aborts during the logo download', async () => {
+    const controller = new AbortController();
+    const kit = await fetchBrandKit('https://brand.test/', options);
+
+    controller.abort(new Error('stopped by caller'));
     await expect(
-      saveBrandKit(await fetchBrandKit('https://fake-logo.test/', options), target, options)
-    ).rejects.toThrow(/image/i);
-    await expect(saveBrandKit(await fetchBrandKit('https://big-logo.test/', options), target, options)).rejects.toThrow(
-      /too large/i
-    );
-    expect(readdirSync(target)).toEqual([]);
+      saveBrandKit(kit, mkdtempSync(path.join(dir, 'abort-')), { ...options, signal: controller.signal })
+    ).rejects.toThrow(/stopped by caller/);
   });
 });
