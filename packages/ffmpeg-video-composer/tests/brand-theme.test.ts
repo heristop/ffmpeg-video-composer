@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { contrastRatio } from '@/core/color-contrast';
 import { hexToRgb, hue, hueDistance, rgbToOklab } from '@/core/style/oklab';
-import { brandPromptRules, brandTheme, nearestBundledFont, sanitizeBrandName, type BrandKit } from '@/core/brand';
+import {
+  brandPromptRules,
+  brandTheme,
+  nearestBundledFont,
+  sanitizeBrandName,
+  withThemeColor,
+  type BrandKit,
+} from '@/core/brand';
 import { ThemeObjectSchema } from '@/schemas/theme.schemas';
 
 const kit: BrandKit = {
@@ -101,6 +108,38 @@ describe('brandTheme on a design system with hundreds of colours', () => {
     expect(
       hueDistance(hue(rgbToOklab(brand.r, brand.g, brand.b)), hue(rgbToOklab(blue.r, blue.g, blue.b)))
     ).toBeLessThanOrEqual(20);
+  });
+});
+
+describe('brandTheme with a declared theme-color', () => {
+  // A site shipping a light and a dark scheme in its CSS, whose page declares the dark one as its theme-color.
+  const schemes: BrandKit['colors'] = [
+    { hex: '#ffffff', weight: 42, source: 'custom-property' },
+    { hex: '#000000', weight: 18, source: 'declaration' },
+    { hex: '#f7f8f8', weight: 15, source: 'custom-property' },
+    { hex: '#828fff', weight: 15, source: 'custom-property' },
+    { hex: '#5e6ad2', weight: 12, source: 'custom-property' },
+    ...Array.from({ length: 20 }, (_, i) => ({
+      hex: `#${(40 + i * 8).toString(16).padStart(2, '0').repeat(3)}`,
+      weight: 18,
+      source: 'declaration' as const,
+    })),
+  ];
+
+  it('paints on the scheme the page declares', () => {
+    expect(brandTheme({ ...kit, colors: withThemeColor(schemes, '#08090a') }).theme.colors?.bg).toBe('#08090a');
+  });
+
+  it('still lets a dominant canvas colour win over a light theme-color on a dark site', () => {
+    const dark = withThemeColor(
+      [
+        { hex: '#000000', weight: 198, source: 'declaration' },
+        { hex: '#972121', weight: 5, source: 'declaration' },
+      ],
+      '#ffffff'
+    );
+
+    expect(brandTheme({ ...kit, colors: dark }).theme.colors?.bg).toBe('#000000');
   });
 });
 

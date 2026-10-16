@@ -141,9 +141,12 @@ export function cssColors(input: string): BrandColor[] {
   return [...found.values()].sort((a, b) => b.weight - a.weight);
 }
 
-/** The declared theme-color's least weight, and its share of the CSS palette on a large one. */
+/**
+ * The declared theme-color's least weight, and its share of the CSS palette on a large one: as much as one
+ * of the palette's main colours, since it names the scheme (or the brand colour) the page actually shows.
+ */
 const THEME_COLOR_WEIGHT = 6;
-const THEME_COLOR_SHARE = 0.05;
+const THEME_COLOR_SHARE = 0.15;
 
 /**
  * The CSS palette with the page's declared theme-color folded in: added to the weight the CSS already gives
