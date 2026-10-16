@@ -223,7 +223,9 @@ the summary says `logo: not saved (<reason>)`. Only `https://` URLs on public ho
 `brand-rules.txt` points the logo at `/assets/brand/<file>`, a served path. Copy the logo to `assets/brand/` so
 it resolves: `leclap render` reads relative asset paths from `<cwd>/assets`, so keep `assets/` next to your
 template (the web builder serves its own `/assets/`, where you upload the logo instead). If your template lives
-elsewhere, change that path in the rules to wherever your assets resolve.
+elsewhere, change that path in the rules to wherever your assets resolve. A raster icon is preferred over an SVG
+one; an SVG or ICO logo is kept, but an image layer reads SVG only where FFmpeg has librsvg (not in the browser
+or on the phone) and never reads ICO, so the rules ask for a PNG conversion first.
 
 ## `style` — match a reference look
 

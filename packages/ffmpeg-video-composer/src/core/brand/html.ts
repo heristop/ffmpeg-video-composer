@@ -272,13 +272,22 @@ function iconLink(link: Attributes): IconLink | null {
   return { href, source: 'icon', size, explicit: size > 0 };
 }
 
-/** The largest usable icon (a stated size beats an implied one, a touch icon beats a favicon), else og:image. */
+/** SVG and ICO need a conversion before they can be an image layer: FFmpeg reads SVG only with librsvg. */
+function isRaster(href: string): boolean {
+  return !/\.(svg|ico)(?:[?#]|$)/i.test(href);
+}
+
+/**
+ * The largest usable icon (a raster beats a vector, a stated size beats an implied one, a touch icon beats a
+ * favicon), else og:image.
+ */
 function logoFrom(links: Attributes[], metas: Attributes[], base: string): BrandLogo | null {
   const icons = links
     .map(iconLink)
     .filter((icon): icon is IconLink => icon !== null)
     .sort(
       (a, b) =>
+        Number(isRaster(b.href)) - Number(isRaster(a.href)) ||
         b.size - a.size ||
         Number(b.explicit) - Number(a.explicit) ||
         Number(b.source === 'apple-touch-icon') - Number(a.source === 'apple-touch-icon')

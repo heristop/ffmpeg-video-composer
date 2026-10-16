@@ -116,10 +116,19 @@ export function brandPromptRules(kit: BrandKit, brand: BrandTheme, logoPath?: st
     ...(refs.length > 0
       ? [`- Exact brand fonts, for text fields that take a font object (Node and phone renders): ${refs.join('; ')}.`]
       : []),
-    ...(logoPath
-      ? [
-          `- Logo: "${logoPath}". Show it on the opening and the closing as an image layer, never recoloured or cropped.`,
-        ]
-      : []),
+    ...(logoPath ? [logoRule(logoPath)] : []),
   ].join('\n');
+}
+
+/** An image layer reads PNG, JPEG and WebP everywhere; SVG needs FFmpeg with librsvg and ICO never loops. */
+function logoRule(logoPath: string): string {
+  if (/\.(svg|ico)$/i.test(logoPath)) {
+    return (
+      `- Logo: "${logoPath}". It is ${/\.svg$/i.test(logoPath) ? 'an SVG' : 'an ICO'}, which an image layer cannot ` +
+      'read on every renderer: convert it to PNG first (same name, .png), then show the PNG on the opening and the ' +
+      'closing, never recoloured or cropped.'
+    );
+  }
+
+  return `- Logo: "${logoPath}". Show it on the opening and the closing as an image layer, never recoloured or cropped.`;
 }

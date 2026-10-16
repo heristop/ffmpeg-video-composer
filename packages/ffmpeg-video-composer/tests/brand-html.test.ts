@@ -160,6 +160,28 @@ describe('parseBrandPage', () => {
     });
   });
 
+  it('prefers a raster icon over a larger svg one, and takes the svg when it is the only icon', () => {
+    const svg = '<link rel="icon" sizes="512x512" href="/logo.svg" type="image/svg+xml">';
+    const png = '<link rel="icon" sizes="32x32" href="/favicon32.png">';
+
+    expect(parseBrandPage(svg + png, 'https://acme.test/').logo).toEqual({
+      url: 'https://acme.test/favicon32.png',
+      type: 'png',
+      source: 'icon',
+    });
+    expect(parseBrandPage(svg, 'https://acme.test/').logo).toEqual({
+      url: 'https://acme.test/logo.svg',
+      type: 'svg',
+      source: 'icon',
+    });
+  });
+
+  it('prefers an svg icon over a raster og:image, which is a share card rather than a logo', () => {
+    const html = '<link rel="icon" href="/logo.svg"><meta property="og:image" content="/card.png">';
+
+    expect(parseBrandPage(html, 'https://acme.test/').logo?.url).toBe('https://acme.test/logo.svg');
+  });
+
   it('reads og: tags written with name= as well as property=', () => {
     const html =
       '<title>Acme: cloud rockets, and more</title><meta content="Acme" name="og:site_name" />' +
