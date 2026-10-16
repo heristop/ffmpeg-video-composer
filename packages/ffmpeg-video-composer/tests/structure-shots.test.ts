@@ -109,6 +109,26 @@ describe('findBoundaries', () => {
     expect(findBoundaries(values.map((v, k) => flat(v, t(k))))).toEqual([]);
   });
 
+  it('reads a brightness ramp inside one shot as no boundary', () => {
+    const values = [100, 100, 100, 100, 110, 120, 130, 140, 150, 160, 170, 180, 180, 180, 180, 180];
+
+    expect(findBoundaries(values.map((v, k) => flat(v, t(k))))).toEqual([]);
+  });
+
+  it('reads an exposure ramp on a detailed shot as no boundary', () => {
+    const lift = [0, 0, 0, 0, 10, 20, 30, 40, 50, 60, 70, 80, 80, 80, 80, 80];
+    const frames = lift.map((offset, k) => painted((x, y) => Math.min(255, shotA(x, y) * 0.8 + offset), t(k)));
+
+    expect(findBoundaries(frames)).toEqual([]);
+  });
+
+  it('reads a fade through near-uniform dark grey as one dip', () => {
+    const values = [180, 180, 180, 180, 120, 60, 30, 30, 60, 120, 180, 180, 180, 180];
+    const boundaries = findBoundaries(values.map((v, k) => flat(v, t(k))));
+
+    expect(boundaries.map((b) => b.transition)).toEqual(['dip']);
+  });
+
   it('ignores a fade in from black at the start and a fade out at the end', () => {
     const values = [0, 60, 120, 180, 180, 180, 180, 180, 180, 120, 60, 0];
 
