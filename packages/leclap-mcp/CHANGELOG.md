@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `value` and `values`. Ordinary copy with semicolons or commas is unaffected.
 - The template guard also sees through backslash-escaped filter names and refuses the command, socket and
   model-loading filters, and file options chained into a filter.
+- The template guard also refuses the LUT, SOFA, mask, OCR, speech and neural-network filters that load files,
+  and more file-capable filter options.
 
 ## [0.6.0] - 2026-10-11
 

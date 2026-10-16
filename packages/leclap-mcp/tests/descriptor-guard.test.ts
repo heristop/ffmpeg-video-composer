@@ -272,3 +272,47 @@ describe('assertDescriptorSafe: filtergraph syntax in any string field', () => {
     expect(result.ok).toBe(true);
   });
 });
+
+// The raw filter surface: a filter's `type` and scalar `value` reach FFmpeg as `type=value`.
+function rawFilterDescriptor(filter: Record<string, unknown>): TemplateDescriptor {
+  return {
+    sections: [
+      {
+        name: 's',
+        type: 'color_background',
+        options: { backgroundColor: '#000000', duration: 2 },
+        filters: [filter],
+      },
+    ],
+  } as unknown as TemplateDescriptor;
+}
+
+describe('assertDescriptorSafe: raw filter type and value', () => {
+  it.each([
+    { type: 'drawtext', value: 'textfile=/etc/passwd:x=0' },
+    { type: 'drawtext=textfile=/etc/passwd:x', values: { x: '0' } },
+    { type: 'movie', value: '/etc/passwd' },
+    { type: 'subtitles', value: 'subs.srt' },
+    { type: 'sofalizer', value: 'sofa=/tmp/a.sofa' },
+    { type: 'whisper', value: 'model=/tmp/m.bin' },
+    { type: 'dnn_processing', value: 'model=/tmp/m.pb' },
+    { type: 'haldclut' },
+    { type: 'ocr', value: 'datapath=/tmp' },
+    { type: 'drawbox', values: { x: '0', dumpfile: '/tmp/x' } },
+    { type: 'removelogo', value: 'm=/tmp/mask.png' },
+  ])('refuses %o', async (filter) => {
+    const result = await assertDescriptorSafe(rawFilterDescriptor(filter), mediaDir);
+
+    expect(result.ok, JSON.stringify(filter)).toBe(false);
+  });
+
+  it.each([
+    { type: 'pad', value: '1120:558:(ow-iw)/2:(oh-ih)/2:color=0x10141e' },
+    { type: 'perspective', value: "x0='W*0.025':sense=destination:eval=frame" },
+    { type: 'lut3d', value: 'teal-orange' },
+  ])('keeps %o', async (filter) => {
+    const result = await assertDescriptorSafe(rawFilterDescriptor(filter), mediaDir);
+
+    expect(result.ok, JSON.stringify(filter)).toBe(true);
+  });
+});

@@ -46,7 +46,23 @@ const DANGEROUS_FILTERS = new Set([
   'zmq',
   'azmq',
   'arnndn',
+  // Filters that read a file or a model given as an option (LUT, SOFA, mask, OCR data, whisper model).
+  'lut1d',
+  'haldclut',
+  'sofalizer',
+  'whisper',
+  'cover_rect',
+  'find_rect',
+  'removelogo',
+  'ocr',
 ]);
+
+// Every dnn_* filter loads a model file.
+function dangerousFilter(type: string): boolean {
+  const name = type.replace(/\\/g, '').trim().toLowerCase();
+
+  return DANGEROUS_FILTERS.has(name) || name.startsWith('dnn_');
+}
 
 // A URL/pseudo-protocol scheme anywhere in a value → SSRF or protocol-based file access.
 const PSEUDO_PROTOCOL =
@@ -54,7 +70,7 @@ const PSEUDO_PROTOCOL =
 // A file-bearing filter OPTION token (curves=psfile=…, drawtext=textfile=…, movie=filename=…, …).
 // Quotes are stripped before matching, so 'psfile'=… and "textfile"=… are caught too.
 const FILE_OPTION =
-  /(^|[\s,:;=])(psfile|filename|textfile|pfile|fontfile|model|model_filename|commands|file|stats_file)\s*=/i;
+  /(^|[\s,:;=])(psfile|filename|textfile|pfile|fontfile|model|model_filename|commands|file|stats_file|m|sofa|cover|object|datapath|dumpfile|log_path|destination)\s*=/i;
 // A value that is itself an absolute path or a traversal.
 const ABSOLUTE_OR_TRAVERSAL = /^\s*(\/|[a-zA-Z]:[\\/])|(^|[\\/])\.\.([\\/]|$)/;
 
@@ -173,7 +189,7 @@ function findFilterEscape(descriptor: TemplateDescriptor): string | undefined {
       continue;
     }
 
-    if (DANGEROUS_FILTERS.has(type.replace(/\\/g, '').trim().toLowerCase())) {
+    if (dangerousFilter(type)) {
       return `Filter "${type.trim()}" is not allowed: it can read arbitrary files or URLs. Supply media via userVideoPaths (checked against the media dir) instead.`;
     }
 
