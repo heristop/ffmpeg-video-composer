@@ -21,6 +21,27 @@ export const BRAND_HEADING =
   'Brand kit (BINDING: the user’s own brand. Use its theme, name and logo as given; never recolour or ' +
   'redraw the logo):';
 
+/** A site name is untrusted text bound into prompt rules: one line, at most this many characters. */
+export const MAX_BRAND_NAME = 80;
+
+// Whitespace (line and paragraph separators included) and C0/C1 control characters.
+const NAME_BREAKS = /[\s\u0000-\u001f\u007f-\u009f]+/g;
+
+/** The name on one line (whitespace and control characters collapsed), capped with an ellipsis; null if empty. */
+export function sanitizeBrandName(name: string | null): string | null {
+  const flat = (name ?? '').replace(NAME_BREAKS, ' ').trim();
+  const chars = Array.from(flat);
+
+  if (chars.length === 0) return null;
+
+  if (chars.length <= MAX_BRAND_NAME) return flat;
+
+  return `${chars
+    .slice(0, MAX_BRAND_NAME - 1)
+    .join('')
+    .trimEnd()}…`;
+}
+
 const DEFAULT_FONT: Record<FontRole, string> = { display: 'archivo-black', body: 'rubik', mono: 'mono' };
 
 function cluster(hex: string, share: number): PaletteCluster {
@@ -83,7 +104,7 @@ export function brandPromptRules(kit: BrandKit, brand: BrandTheme, logoPath?: st
 
   return [
     BRAND_HEADING,
-    `- Brand: ${kit.name ?? new URL(kit.url).hostname}. Write its name exactly so.`,
+    `- Brand: ${sanitizeBrandName(kit.name) ?? new URL(kit.url).hostname}. Write its name exactly so.`,
     `- Set global.theme to exactly: ${JSON.stringify(brand.theme)}`,
     ...(refs.length > 0
       ? [`- Exact brand fonts, for text fields that take a font object (Node and phone renders): ${refs.join('; ')}.`]
