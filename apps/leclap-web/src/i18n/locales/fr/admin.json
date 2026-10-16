@@ -1338,6 +1338,7 @@
     "analyse": "Analyser la référence",
     "analysing": "Lecture de la palette, de la texture et du rythme…",
     "error": "Impossible d’analyser cette référence : {{message}}",
+    "structure": "Format : {{shots}} plans, {{avgShot}} s en moyenne — l’IA le suit",
     "roles": {
       "bg": "Fond",
       "fg": "Texte",

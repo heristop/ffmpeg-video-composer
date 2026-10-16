@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Film, Image, Loader2, Sparkles, Trash2 } from '@/presentation/components/icons';
 import { Button } from '@/presentation/components/ui';
 import type { ReferenceStyle } from '@/infrastructure/style/analyze-reference';
-import { isReferenceClip, isReferenceImage } from './reference-style.logic';
+import { isReferenceClip, isReferenceImage, structureSummary } from './reference-style.logic';
 import { StyleSwatches } from './StyleSwatches';
 import { useReferenceStyle } from './use-reference-style';
 
@@ -146,7 +146,7 @@ export const ReferenceStylePanel = ({ applyLabel, onApply, disabled = false, foo
   );
 };
 
-const ReadyPreview = ({
+export const ReadyPreview = ({
   style,
   applyLabel,
   onApply,
@@ -156,21 +156,30 @@ const ReadyPreview = ({
   applyLabel: string;
   onApply: (style: ReferenceStyle) => void;
   disabled: boolean;
-}) => (
-  <div className="grid gap-3 rounded-xl border border-divider bg-foreground/[0.03] p-3">
-    <StyleSwatches analysis={style.analysis} />
-    <div>
-      <Button
-        type="button"
-        size="sm"
-        className="min-h-10"
-        disabled={disabled}
-        onClick={() => {
-          onApply(style);
-        }}
-      >
-        {applyLabel}
-      </Button>
+}) => {
+  const { t } = useTranslation('admin');
+
+  return (
+    <div className="grid gap-3 rounded-xl border border-divider bg-foreground/[0.03] p-3">
+      <StyleSwatches analysis={style.analysis} />
+      {style.structure ? (
+        <p className="text-sm text-muted-foreground">
+          {t('styleReference.structure', structureSummary(style.structure))}
+        </p>
+      ) : null}
+      <div>
+        <Button
+          type="button"
+          size="sm"
+          className="min-h-10"
+          disabled={disabled}
+          onClick={() => {
+            onApply(style);
+          }}
+        >
+          {applyLabel}
+        </Button>
+      </div>
     </div>
-  </div>
-);
+  );
+};

@@ -251,6 +251,26 @@ describe('reference style guide', () => {
     expect(built.system.length).toBeLessThanOrEqual(DEFAULT_PROMPT_BUDGET);
   });
 
+  it('fits a 24-shot reference format under the budget', () => {
+    const format = [
+      'Keep: ink ground',
+      'Reference format (BINDING structure…',
+      ...Array.from(
+        { length: 25 },
+        (_, i) => `- Shot ${i + 1}: 1.25 s, dark ground, main element top-left, lively, enters with "fade".`
+      ),
+    ].join('\n');
+    const built = promptFor(
+      '30s product launch for a note-taking app, bold, punchy kinetic type',
+      { orientation: 'portrait', genre: 'product-launch' },
+      [],
+      format
+    );
+
+    expect(built.system.length).toBeLessThanOrEqual(DEFAULT_PROMPT_BUDGET);
+    expect(built.schemaTruncated).toBe(false);
+  });
+
   it('carries the reference rules into the planning prompt', () => {
     const { catalog } = generationContext();
 

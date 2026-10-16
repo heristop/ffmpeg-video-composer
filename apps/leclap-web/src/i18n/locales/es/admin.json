@@ -1338,6 +1338,7 @@
     "analyse": "Analizar referencia",
     "analysing": "Leyendo paleta, textura y ritmo…",
     "error": "No se pudo analizar esta referencia: {{message}}",
+    "structure": "Formato: {{shots}} planos, {{avgShot}} s de media — la IA lo sigue",
     "roles": {
       "bg": "Fondo",
       "fg": "Texto",
