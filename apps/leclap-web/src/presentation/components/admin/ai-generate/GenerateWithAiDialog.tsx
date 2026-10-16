@@ -17,13 +17,15 @@ import { PlanOptions } from './PlanOptions';
 import { PlanReview } from './PlanReview';
 import { planIsComplete } from './plan-review.logic';
 import { ProviderSettings } from './ProviderSettings';
-import { ReferenceStyleSection } from './ReferenceStyleSection';
+import { BindingSections } from './BindingSections';
 import { ResultCard } from './ResultCard';
 import { generatedToEditorState, needsReplaceConfirmation } from './load-generated';
 import {
+  bindingArgs,
   effectiveHints,
   preferredSamples,
   routeChips,
+  themeOwner,
   withoutThemeHint,
   type Orientation,
   type RouteChip,
@@ -176,6 +178,8 @@ const GenerateWithAiDialog = ({ open, onOpenChange, hasUnsavedWork, onLoad }: Ge
   const [pending, setPending] = useState<EditorState | null>(null);
   // Binding style rules from "Match a reference", or null when no reference is attached.
   const [referenceStyle, setReferenceStyle] = useState<string | null>(null);
+  // Binding brand rules from an imported brand-kit.json, or null when none is imported.
+  const [brand, setBrand] = useState<{ name: string; rules: string } | null>(null);
   // The provider group starts open while the chosen provider has no key; "Add key" reopens it.
   const [providerOpen, setProviderOpen] = useState(key === '');
   const chips = run.route.kind === 'ready' ? routeChips(run.route.route, form.overrides) : [];
@@ -213,11 +217,11 @@ const GenerateWithAiDialog = ({ open, onOpenChange, hasUnsavedWork, onLoad }: Ge
       model: form.model.trim() || form.provider.defaultModel,
       apiKey: key,
       brief: form.brief,
-      hints: withoutThemeHint(effectiveHints(routed, userHints), referenceStyle),
+      hints: withoutThemeHint(effectiveHints(routed, userHints), themeOwner(referenceStyle, brand)),
       preferSampleIds: preferredSamples(routed),
       planFirst: form.planFirst,
       reviewPlan: form.reviewPlan,
-      ...(referenceStyle ? { referenceStyle } : {}),
+      ...bindingArgs(referenceStyle, brand),
     });
   };
 
@@ -287,13 +291,18 @@ const GenerateWithAiDialog = ({ open, onOpenChange, hasUnsavedWork, onLoad }: Ge
           disabled={locked}
         />
         <div className="grid gap-3">
-          <ReferenceStyleSection
-            attached={referenceStyle !== null}
-            onAttach={(style) => {
+          <BindingSections
+            referenceAttached={referenceStyle !== null}
+            onAttachReference={(style) => {
               setReferenceStyle(style.promptRules);
             }}
-            onDetach={() => {
+            onDetachReference={() => {
               setReferenceStyle(null);
+            }}
+            brand={brand}
+            onAttachBrand={setBrand}
+            onDetachBrand={() => {
+              setBrand(null);
             }}
             disabled={running}
           />

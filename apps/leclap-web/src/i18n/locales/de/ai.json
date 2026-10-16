@@ -192,5 +192,14 @@
     "detach": "Styleguide entfernen",
     "summaryNone": "Optional",
     "summaryAttached": "Angehängt"
+  },
+  "brand": {
+    "label": "Ihre Marke",
+    "hint": "Importieren Sie eine brand-kit.json aus `leclap brand <Ihre Website>`: Das Video übernimmt Ihre Farben, Schriften und Ihren Namen. Ihr Logo fügen Sie über den Wasserzeichen-Upload hinzu.",
+    "attached": "Marke: {{name}}",
+    "detach": "Marke entfernen",
+    "summaryNone": "Optional",
+    "summaryAttached": "Angehängt",
+    "tooLarge": "Diese Datei ist zu groß für eine brand-kit.json."
   }
 }

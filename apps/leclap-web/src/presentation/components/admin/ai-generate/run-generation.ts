@@ -22,6 +22,8 @@ export interface GenerateArgs {
   reviewPlan?: boolean;
   // Binding keep / avoid rules from an analysed reference ("Match a reference").
   referenceStyle?: string;
+  // Binding brand rules (theme, name, fonts) from an imported brand kit.
+  brand?: string;
 }
 
 type Dispatch = (action: RunAction) => void;
@@ -42,7 +44,7 @@ export function requestPlan(args: GenerateArgs, signal: AbortSignal, dispatch: D
     provider: args.provider,
     model: args.model,
     apiKey: args.apiKey,
-    system: buildPlanPrompt(catalog, args.hints, args.referenceStyle),
+    system: buildPlanPrompt(catalog, args.hints, args.referenceStyle, args.brand),
     prompt: args.brief,
     hints: args.hints,
     vocabulary: planVocabulary(catalog),
@@ -54,17 +56,18 @@ export function requestPlan(args: GenerateArgs, signal: AbortSignal, dispatch: D
 }
 
 // The plan's theme and platform become hints, so the system prompt's art direction matches them. An
-// attached reference style owns the theme, so the plan's built-in theme pick is ignored then.
+// attached reference style or brand kit owns the theme, so the plan's built-in theme pick is ignored then.
 export function hintsWithPlan(
   hints: GenerationHints,
   plan: TemplatePlan | null,
-  referenceStyle?: string
+  referenceStyle?: string,
+  brand?: string
 ): GenerationHints {
   if (!plan) return hints;
 
   return {
     ...hints,
-    ...(plan.theme && !referenceStyle ? { theme: plan.theme } : {}),
+    ...(plan.theme && !referenceStyle && !brand ? { theme: plan.theme } : {}),
     ...(plan.platform ? { platform: plan.platform } : {}),
   };
 }
@@ -76,8 +79,8 @@ export async function writeTemplate(
   dispatch: Dispatch
 ): Promise<void> {
   const send = live(signal, dispatch);
-  const hints = hintsWithPlan(args.hints, plan, args.referenceStyle);
-  const prompt = promptFor(args.brief, hints, args.preferSampleIds, args.referenceStyle);
+  const hints = hintsWithPlan(args.hints, plan, args.referenceStyle, args.brand);
+  const prompt = promptFor(args.brief, hints, args.preferSampleIds, args.referenceStyle, args.brand);
   const result = await generateTemplate({
     provider: args.provider,
     model: args.model,

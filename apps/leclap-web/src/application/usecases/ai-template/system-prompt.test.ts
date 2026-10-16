@@ -334,3 +334,40 @@ describe('reference style guide', () => {
     expect(promptFor('a launch video', {}).system).not.toContain(REFERENCE_STYLE_HEADING);
   });
 });
+
+describe('brand kit', () => {
+  it('adds the brand as its own binding block, apart from the reference', () => {
+    const brand = 'Brand kit (BINDING: …):\n- Brand: Acme.\n- Set global.theme to exactly: {"extends":"leclap"}';
+    const built = promptFor('a launch video', {}, [], undefined, brand);
+
+    expect(built.system).toContain('- Brand: Acme.');
+    expect(built.system).not.toContain(REFERENCE_STYLE_HEADING);
+    expect(built.system.length).toBeLessThanOrEqual(DEFAULT_PROMPT_BUDGET);
+  });
+
+  it('reaches the plan prompt too, and an empty brand adds nothing', () => {
+    const { catalog } = generationContext();
+
+    expect(buildPlanPrompt(catalog, {}, undefined, '- Brand: Acme.')).toContain('- Brand: Acme.');
+    expect(promptFor('a launch video', {}, [], undefined, '  ').system).toBe(promptFor('a launch video', {}).system);
+  });
+
+  it('keeps the whole schema for the tightest brief with a realistic brand block', () => {
+    const brand = [
+      'Brand kit (BINDING: …):',
+      '- Brand: Acme. Write its name exactly so.',
+      `- Set global.theme to exactly: ${JSON.stringify({ extends: 'leclap', colors: { primary: '#3ce6ac', ink: '#101010', surface: '#f4f1ea' } })}`,
+      '- Exact brand fonts, for text fields that take a font object (Node and phone renders): display {"family":"Inter","weight":700}; body {"family":"Inter"}.',
+    ].join('\n');
+    const built = promptFor(
+      '30s product launch for a note-taking app',
+      { genre: 'product-launch' },
+      [],
+      undefined,
+      brand
+    );
+
+    expect(built.schemaTruncated).toBe(false);
+    expect(built.system.length).toBeLessThanOrEqual(DEFAULT_PROMPT_BUDGET);
+  });
+});

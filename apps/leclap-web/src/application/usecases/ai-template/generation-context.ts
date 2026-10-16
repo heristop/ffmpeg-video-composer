@@ -34,12 +34,13 @@ export function generationContext(): GenerationContext {
 }
 
 // The system prompt for one brief: the two most relevant samples (router picks first) as examples,
-// plus the binding rules of an attached reference style guide.
+// plus the binding rules of an attached reference style guide and brand kit.
 export function promptFor(
   prompt: string,
   hints: GenerationHints,
   preferSampleIds: string[] = [],
-  referenceStyle?: string
+  referenceStyle?: string,
+  brand?: string
 ): BuiltPrompt {
   const context = generationContext();
   const samples = pickSamples(prompt, context.samples, {
@@ -48,5 +49,5 @@ export function promptFor(
     orientation: hints.orientation,
   });
 
-  return buildSystemPrompt({ schema: context.schema, catalog: context.catalog, samples, hints, referenceStyle });
+  return buildSystemPrompt({ schema: context.schema, catalog: context.catalog, samples, hints, referenceStyle, brand });
 }
