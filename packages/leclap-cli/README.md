@@ -208,6 +208,23 @@ caption block or the action buttons is obvious. `--cache <dir>` names the sectio
 shared temp directory); `--json` prints every frame's path, time, section and size. Frames land in
 `./frames` unless `--out` says otherwise.
 
+## `brand` — read a website's brand
+
+```bash
+leclap brand https://example.com                 # summary; writes ./brand-kit/
+leclap brand https://example.com -o acme --json  # the kit, theme, font refs and any logoError as JSON
+```
+
+Writes `brand-kit.json`, `brand.theme.json` (`{ global: { theme } }`), `brand-rules.txt` (binding rules for an
+agent) and, when it can be downloaded, `logo.<png|svg|jpg|webp|ico>` (the extension follows the image type the
+site returns). A logo that is missing, not an image or over 2 MB is not an error: the kit is still written and
+the summary says `logo: not saved (<reason>)`. Only `https://` URLs on public hosts are fetched.
+
+`brand-rules.txt` points the logo at `/assets/brand/<file>`, a served path. Copy the logo to `assets/brand/` so
+it resolves: `leclap render` reads relative asset paths from `<cwd>/assets`, so keep `assets/` next to your
+template (the web builder serves its own `/assets/`, where you upload the logo instead). If your template lives
+elsewhere, change that path in the rules to wherever your assets resolve.
+
 ## `style` — match a reference look
 
 ```bash
