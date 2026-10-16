@@ -264,6 +264,18 @@ describe('brand-named custom properties', () => {
   });
 });
 
+describe('brand-named custom properties in any case', () => {
+  it('weighs whole brand words written in capitals as brand tokens', () => {
+    const colors = cssColors(':root { --Brand-500: #5e6ad2; --PRIMARY: #533afd; --THEMED-BG: #f59e0b; }');
+
+    expect(Object.fromEntries(colors.map((c) => [c.hex, c.weight]))).toEqual({
+      '#5e6ad2': 5,
+      '#533afd': 5,
+      '#f59e0b': 2,
+    });
+  });
+});
+
 describe('cssFonts and emoji faces', () => {
   it('never takes an emoji or symbol face for a family', () => {
     expect(

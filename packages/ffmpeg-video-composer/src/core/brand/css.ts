@@ -9,9 +9,15 @@ import type { BrandColor } from './types';
 export { cssFonts } from './fonts';
 
 const WEIGHT = { brandProperty: 5, property: 2, background: 2, declaration: 1 } as const;
-// A whole word of the property's name (`--color-brand-500`, `--colorPrimary`), not a fragment (`--themed-bg`).
-const BRAND_NAME =
-  /(?:^|[-_])(?:brand|primary|accent|main|theme)(?![a-z])|[a-z](?:Brand|Primary|Accent|Main|Theme)(?![a-z])/;
+// A whole word of the property's name in any case (`--color-brand-500`, `--PRIMARY`, `--colorPrimary`), not a
+// fragment (`--themed-bg`).
+const BRAND_WORD = /(?:^|[-_])(?:brand|primary|accent|main|theme)(?![a-z])/i;
+const BRAND_CAMEL_WORD = /[a-z](?:Brand|Primary|Accent|Main|Theme)(?![a-z])/;
+
+function isBrandName(property: string): boolean {
+  return BRAND_WORD.test(property) || BRAND_CAMEL_WORD.test(property);
+}
+
 const KEYWORDS: Record<string, string> = { black: '#000000', white: '#ffffff' };
 
 function hex2(value: number): string {
@@ -125,7 +131,7 @@ export function cssColors(input: string): BrandColor[] {
 
   for (const [property, value] of declarations(css)) {
     if (property.startsWith('--')) {
-      const weight = BRAND_NAME.test(property) ? WEIGHT.brandProperty : WEIGHT.property;
+      const weight = isBrandName(property) ? WEIGHT.brandProperty : WEIGHT.property;
 
       for (const hex of colorsIn(value)) add(hex, weight, 'custom-property');
       continue;
