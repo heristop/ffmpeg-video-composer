@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { contrastRatio } from '@/core/color-contrast';
-import { hexToRgb } from '@/core/style/oklab';
+import { hexToRgb, hue, hueDistance, rgbToOklab } from '@/core/style/oklab';
 import { brandPromptRules, brandTheme, nearestBundledFont, type BrandKit } from '@/core/brand';
 import { ThemeObjectSchema } from '@/schemas/theme.schemas';
 
@@ -25,11 +25,32 @@ describe('brandTheme', () => {
     expect(brand.theme.extends).toBe('leclap');
   });
 
-  it('keeps the brand colour and readable text', () => {
-    expect(brand.theme.colors?.brand ?? brand.theme.colors?.accent).toBe('#3ce6ac');
+  it('keeps the brand colour hue and readable text', () => {
+    const mint = hexToRgb('#3ce6ac');
+    const mintHue = hue(rgbToOklab(mint.r, mint.g, mint.b));
+    const role = brand.roles.brand;
+    const roleRgb = hexToRgb(role.hex);
+
+    expect(hueDistance(hue(rgbToOklab(roleRgb.r, roleRgb.g, roleRgb.b)), mintHue)).toBeLessThanOrEqual(20);
+    expect(['extracted', 'adjusted']).toContain(role.source);
+    expect(contrastRatio(roleRgb, hexToRgb(brand.theme.colors?.bg ?? ''))).toBeGreaterThanOrEqual(3);
     expect(
       contrastRatio(hexToRgb(brand.theme.colors?.fg ?? ''), hexToRgb(brand.theme.colors?.bg ?? ''))
     ).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('keeps the brand colour exactly on a dark background', () => {
+    const dark = brandTheme({
+      ...kit,
+      colors: [
+        { hex: '#0b0a14', weight: 12, source: 'declaration' },
+        { hex: '#3ce6ac', weight: 9, source: 'custom-property' },
+        { hex: '#f4f1ea', weight: 3, source: 'declaration' },
+      ],
+    });
+
+    expect(dark.theme.colors?.bg).toBe('#0b0a14');
+    expect(dark.theme.colors?.brand ?? dark.theme.colors?.accent).toBe('#3ce6ac');
   });
 
   it('maps fonts to bundled ids and keeps the exact families as suggestions', () => {
