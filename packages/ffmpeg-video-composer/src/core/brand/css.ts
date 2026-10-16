@@ -9,13 +9,13 @@ import type { BrandColor } from './types';
 export { cssFonts } from './fonts';
 
 const WEIGHT = { brandProperty: 5, property: 2, background: 2, declaration: 1 } as const;
-// A whole word of the property's name in any case (`--color-brand-500`, `--PRIMARY`, `--colorPrimary`), not a
-// fragment (`--themed-bg`).
-const BRAND_WORD = /(?:^|[-_])(?:brand|primary|accent|main|theme)(?![a-z])/i;
-const BRAND_CAMEL_WORD = /[a-z](?:Brand|Primary|Accent|Main|Theme)(?![a-z])/;
+// A whole word of the property's name, in any case and in camel case (`--color-brand-500`, `--PRIMARY`,
+// `--brandBlue`, `--colorPrimary`), not a fragment (`--themed-bg`, `--brandingless`). Camel-case humps become
+// `-` separated lowercase words first, so one boundary test covers every spelling.
+const BRAND_WORD = /(?:^|[-_])(?:brand|primary|accent|main|theme)(?![a-z])/;
 
 function isBrandName(property: string): boolean {
-  return BRAND_WORD.test(property) || BRAND_CAMEL_WORD.test(property);
+  return BRAND_WORD.test(property.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase());
 }
 
 const KEYWORDS: Record<string, string> = { black: '#000000', white: '#ffffff' };

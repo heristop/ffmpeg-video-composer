@@ -302,6 +302,31 @@ describe('cssFonts token depth', () => {
   });
 });
 
+describe('brand-named custom properties in camel case', () => {
+  it('weighs camel-case, capitalised and kebab brand tokens, not words that only start with one', () => {
+    const brand = [
+      '--Brand-500',
+      '--PRIMARY',
+      '--brandBlue',
+      '--themeColor',
+      '--primaryColor',
+      '--colorPrimary',
+      '--brand',
+      '--color-brand-500',
+    ];
+    const plain = ['--THEMED-BG', '--brandingless', '--themed-bg', '--domain-tint'];
+    const hex = (i: number) => `#${(16 + i).toString(16).padStart(2, '0')}6ad2`;
+    const names = [...brand, ...plain];
+    const colors = cssColors(`:root { ${names.map((name, i) => `${name}: ${hex(i)};`).join(' ')} }`);
+    const weights = Object.fromEntries(colors.map((c) => [c.hex, c.weight]));
+
+    expect(Object.fromEntries(names.map((name, i) => [name, weights[hex(i)]]))).toEqual({
+      ...Object.fromEntries(brand.map((name) => [name, 5])),
+      ...Object.fromEntries(plain.map((name) => [name, 2])),
+    });
+  });
+});
+
 describe('cssFonts and emoji faces', () => {
   it('never takes an emoji or symbol face for a family', () => {
     expect(
