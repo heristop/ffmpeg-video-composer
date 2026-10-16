@@ -201,6 +201,9 @@ async function get({ url, hop, maxBytes }: Hop, options: BrandFetchOptions): Pro
   if (hop > MAX_REDIRECTS) throw new Error(`Too many redirects (more than ${MAX_REDIRECTS})`);
 
   options.signal?.throwIfAborted();
+
+  if (url.username || url.password) throw new Error('URLs that embed credentials are not fetched');
+
   await assertPublic(url, options.lookup ?? defaultLookup);
 
   const fetcher = options.fetch ?? fetch;
@@ -226,12 +229,9 @@ async function get({ url, hop, maxBytes }: Hop, options: BrandFetchOptions): Pro
   return { url: url.href, type, body: await readCapped(response, maxBytes, url.href) };
 }
 
-function safeGet(href: string, options: BrandFetchOptions, maxBytes = options.maxBytes ?? MAX_BYTES) {
-  const url = new URL(href);
-
-  if (url.username || url.password) throw new Error('URLs that embed credentials are not fetched');
-
-  return get({ url, hop: 0, maxBytes }, options);
+/** Always a promise: a bad or credentialed URL rejects instead of throwing before a caller's .catch attaches. */
+async function safeGet(href: string, options: BrandFetchOptions, maxBytes = options.maxBytes ?? MAX_BYTES) {
+  return get({ url: new URL(href), hop: 0, maxBytes }, options);
 }
 
 function text(body: Uint8Array): string {

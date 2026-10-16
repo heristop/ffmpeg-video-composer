@@ -49,6 +49,12 @@ const pages: Partial<
     body: '<title>Cdn</title><link rel="apple-touch-icon" href="/logo.png">',
   },
   'https://cdn-logo.test/logo.png': { type: 'image/webp; charset=binary', body: new Uint8Array([1, 2]) },
+  'https://cred-css.test/': {
+    type: 'text/html',
+    body: '<title>Cred</title><link rel="stylesheet" href="https://u:p@cred-css.test/x.css"><link rel="stylesheet" href="/a.css">',
+  },
+  'https://cred-css.test/a.css': { type: 'text/css', body: 'body{background:#f4f1ea;color:#111}' },
+  'https://cred-hop.test/': { status: 302, type: 'text/html', body: '', location: 'https://u:s3cret@brand.test/' },
   'https://evil-logo.test/': {
     type: 'text/html',
     body: '<title>Evil</title><link rel="apple-touch-icon" href="/..%2F..%2Fescape.png">',
@@ -250,6 +256,20 @@ describe('fetchBrandKit', () => {
     expect(error).toBeInstanceOf(Error);
     expect((error as Error).message).toMatch(/credentials/i);
     expect((error as Error).message).not.toMatch(/s3cret|user/);
+  });
+
+  it('skips a credentialed stylesheet link and still reads the others', async () => {
+    const kit = await fetchBrandKit('https://cred-css.test/', options);
+
+    expect(kit.name).toBe('Cred');
+    expect(kit.colors.map((c) => c.hex)).toContain('#f4f1ea');
+  });
+
+  it('refuses a redirect whose Location carries credentials', async () => {
+    const error = await fetchBrandKit('https://cred-hop.test/', options).catch((e: Error) => e);
+
+    expect((error as Error).message).toMatch(/credentials/i);
+    expect((error as Error).message).not.toMatch(/s3cret/);
   });
 
   it('reads a body of many tiny segments', async () => {
