@@ -190,6 +190,7 @@ leclap snapshot template.json --at-transitions --sheet 3x2 --safe tiktok --out f
 leclap snapshot template.json --at 4 --zoom 0.5,0,0.5,0.5   # crop x,y,w,h (fractions, or pixels)
 leclap snapshot template.json --at 2 --looks          # the section at 2 s, once per LOOK preset, in one grid
 leclap compare a.json b.json --at 3                   # the same moment of each template, labelled
+leclap compare remix.json draft.json --at 3 --reference clip.mp4  # the reference clip's frame at that moment is the first tile
 leclap timeline template.json --json                  # where everything sits, without rendering
 leclap snapshot template.json --format portrait       # one format of a template with `formats` (default: its own)
 ```
