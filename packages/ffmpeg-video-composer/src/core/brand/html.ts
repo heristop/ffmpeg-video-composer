@@ -84,8 +84,8 @@ function attributeValue(html: string, from: number, to: number): { value: string
   const first = html[from];
 
   if (first === '"' || first === "'") {
-    const close = html.indexOf(first, from + 1);
-    const end = close === -1 || close > to ? to : close;
+    // The closing quote is searched for within the tag only: an unmatched quote ends the value at the tag's end.
+    const end = skipWhile(html, from + 1, to, (ch) => ch !== first);
 
     return { value: decodeEntities(html.slice(from + 1, end)), next: end + 1 };
   }

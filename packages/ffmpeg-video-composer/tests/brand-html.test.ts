@@ -176,6 +176,16 @@ describe('parseBrandPage', () => {
     expect(parseBrandPage('<title>Re:Acme</title>', 'https://acme.test/').name).toBe('Re:Acme');
   });
 
+  it('ends a value whose quote never closes at the end of its tag', () => {
+    const parsed = parseBrandPage(
+      `<link a=x" rel='icon"><link rel="apple-touch-icon" href="/touch.png"><meta name='theme-color" content="#ff0000">'`,
+      'https://acme.test/'
+    );
+
+    expect(parsed.logo?.url).toBe('https://acme.test/touch.png');
+    expect(parsed.themeColor).toBeNull();
+  });
+
   describe('hostile input stays linear', () => {
     const size = 2_000_000;
     const cases: Record<string, string> = {
@@ -186,6 +196,7 @@ describe('parseBrandPage', () => {
       'repeated <link rel=': '<link rel="stylesheet" href="'.repeat(size / 28),
       'one huge attribute name': '<meta ' + 'a'.repeat(size) + '>',
       'repeated <title>': '<title>'.repeat(size / 7),
+      'unmatched quotes in every <link>': '<link a=x" href=\'y">'.repeat(size / 21) + '<link a=x" href=\'y">',
     };
 
     for (const [label, html] of Object.entries(cases)) {
