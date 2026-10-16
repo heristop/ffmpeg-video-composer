@@ -100,6 +100,29 @@ describe('brandTheme on a design system with hundreds of colours', () => {
     ],
   };
 
+  it('gives a theme-color about 15% of the palette brandTheme builds, not of the whole token list', () => {
+    const colors = withThemeColor(system.colors, '#161cbb');
+    const palette = colors.toSorted((a, b) => b.weight - a.weight).slice(0, 16);
+    const total = palette.reduce((sum, c) => sum + c.weight, 0);
+    const declared = palette.find((c) => c.hex === '#161cbb');
+
+    expect(declared?.source).toBe('theme-color');
+    expect((declared?.weight ?? 0) / total).toBeGreaterThanOrEqual(0.12);
+    expect((declared?.weight ?? 0) / total).toBeLessThanOrEqual(0.2);
+  });
+
+  it('still makes a theme-color the brand on a small palette', () => {
+    const small = withThemeColor(
+      [
+        { hex: '#ffffff', weight: 30, source: 'declaration' },
+        { hex: '#000000', weight: 20, source: 'declaration' },
+      ],
+      '#5e6ad2'
+    );
+
+    expect(brandTheme({ ...kit, colors: small }).roles.brand.hex).toBe('#5e6ad2');
+  });
+
   it('still finds the brand colour among the palette the site uses most', () => {
     const blue = hexToRgb('#0969da');
     const brand = hexToRgb(brandTheme(system).roles.brand.hex);

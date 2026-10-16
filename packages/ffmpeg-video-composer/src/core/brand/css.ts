@@ -142,24 +142,31 @@ export function cssColors(input: string): BrandColor[] {
 }
 
 /**
- * The declared theme-color's least weight, and its share of the CSS palette on a large one: as much as one
- * of the palette's main colours, since it names the scheme (or the brand colour) the page actually shows.
+ * How many of a site's colours make its palette: the most used, like an image's main clusters. A design
+ * system's long tail of token shades would otherwise dilute every colour, the brand's included.
+ */
+export const BRAND_PALETTE_SIZE = 16;
+
+/**
+ * The declared theme-color's least weight, and its share of the palette brandTheme builds: as much as one of
+ * the palette's main colours, since it names the scheme (or the brand colour) the page actually shows.
  */
 const THEME_COLOR_WEIGHT = 6;
 const THEME_COLOR_SHARE = 0.15;
 
 /**
  * The CSS palette with the page's declared theme-color folded in: added to the weight the CSS already gives
- * that colour (never replacing it), and worth a share of the palette, so it still counts on a site whose CSS
- * names hundreds of colours.
+ * that colour (never replacing it), and worth THEME_COLOR_SHARE of the BRAND_PALETTE_SIZE colours used most,
+ * so it counts the same on a site whose CSS names hundreds of colours as on one naming a few.
  */
 export function withThemeColor(colors: BrandColor[], themeHex: string | null): BrandColor[] {
   if (themeHex === null) return colors;
 
-  const total = colors.reduce((sum, color) => sum + color.weight, 0);
-  const weight = Math.max(THEME_COLOR_WEIGHT, Math.round(total * THEME_COLOR_SHARE));
   const current = colors.find((color) => color.hex === themeHex);
-  const merged: BrandColor = { hex: themeHex, weight: weight + (current?.weight ?? 0), source: 'theme-color' };
+  const others = colors.filter((color) => color !== current).sort((a, b) => b.weight - a.weight);
+  const palette = others.slice(0, BRAND_PALETTE_SIZE - 1).reduce((sum, color) => sum + color.weight, 0);
+  const bonus = Math.max(THEME_COLOR_WEIGHT, Math.round((palette * THEME_COLOR_SHARE) / (1 - THEME_COLOR_SHARE)));
+  const merged: BrandColor = { hex: themeHex, weight: bonus + (current?.weight ?? 0), source: 'theme-color' };
 
-  return [merged, ...colors.filter((color) => color !== current)].sort((a, b) => b.weight - a.weight);
+  return [merged, ...others].sort((a, b) => b.weight - a.weight);
 }

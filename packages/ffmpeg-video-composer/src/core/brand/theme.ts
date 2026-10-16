@@ -7,6 +7,7 @@ import { assignRoles } from '../style/roles';
 import { chroma, hexToRgb, hue, rgbToOklab } from '../style/oklab';
 import type { PaletteCluster, ThemeRoles } from '../style/types';
 import { THEME_COLOR_NAMES, type ThemeColors, type ThemeInput } from '../theme/themes';
+import { BRAND_PALETTE_SIZE } from './css';
 import type { BrandKit } from './types';
 
 type FontRole = 'display' | 'body' | 'mono';
@@ -74,14 +75,8 @@ export function nearestBundledFont(family: string | null, role: FontRole): strin
   return DEFAULT_FONT[role];
 }
 
-/**
- * The colours a palette is built from: the site's most used, like an image's main clusters. A design system's
- * long tail of token shades would otherwise dilute its brand colour below the accent's minimum share.
- */
-const PALETTE_SIZE = 16;
-
 export function brandTheme(kit: BrandKit): BrandTheme {
-  const used = kit.colors.toSorted((a, b) => b.weight - a.weight).slice(0, PALETTE_SIZE);
+  const used = kit.colors.toSorted((a, b) => b.weight - a.weight).slice(0, BRAND_PALETTE_SIZE);
   const total = used.reduce((sum, color) => sum + color.weight, 0) || 1;
   const palette = used.map((color) => cluster(color.hex, color.weight / total));
   const { roles } = assignRoles(palette.length > 0 ? palette : [cluster('#ffffff', 1)]);
