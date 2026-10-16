@@ -72,6 +72,38 @@ describe('brandTheme', () => {
   });
 });
 
+describe('brandTheme on a design system with hundreds of colours', () => {
+  // Every shade of a token scale is its own colour: the brand blue is under 1% of the whole list.
+  const greys = Array.from({ length: 400 }, (_, i) => {
+    const v = (20 + Math.floor((i * 215) / 400)).toString(16).padStart(2, '0');
+
+    return {
+      hex: `#${v}${v}${(Number.parseInt(v, 16) + (i % 3)).toString(16).padStart(2, '0')}`,
+      weight: 15,
+      source: 'declaration' as const,
+    };
+  });
+  const system: BrandKit = {
+    ...kit,
+    colors: [
+      { hex: '#ffffff', weight: 318, source: 'custom-property' },
+      { hex: '#010409', weight: 92, source: 'custom-property' },
+      { hex: '#0969da', weight: 46, source: 'custom-property' },
+      ...greys,
+    ],
+  };
+
+  it('still finds the brand colour among the palette the site uses most', () => {
+    const blue = hexToRgb('#0969da');
+    const brand = hexToRgb(brandTheme(system).roles.brand.hex);
+
+    expect(brandTheme(system).roles.brand.source).not.toBe('derived');
+    expect(
+      hueDistance(hue(rgbToOklab(brand.r, brand.g, brand.b)), hue(rgbToOklab(blue.r, blue.g, blue.b)))
+    ).toBeLessThanOrEqual(20);
+  });
+});
+
 describe('nearestBundledFont', () => {
   it('uses a bundled font when the brand already uses it', () => {
     expect(nearestBundledFont('Playfair Display', 'display')).toBe('playfair');
