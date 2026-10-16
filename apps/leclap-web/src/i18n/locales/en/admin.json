@@ -1337,6 +1337,7 @@
     "analyse": "Analyse reference",
     "analysing": "Reading palette, texture and pacing…",
     "error": "This reference could not be analysed: {{message}}",
+    "structure": "Format: {{shots}} shots, {{avgShot}} s on average — the AI follows it",
     "roles": {
       "bg": "Background",
       "fg": "Text",

@@ -10,12 +10,13 @@ import type { StyleFrame } from 'ffmpeg-video-composer/src/core/style/types.ts';
 import { ThemeObjectSchema } from 'ffmpeg-video-composer/src/schemas/theme.schemas.ts';
 import admin from '@/i18n/locales/en/admin.json';
 import ai from '@/i18n/locales/en/ai.json';
-import { analyzerInput } from '@/infrastructure/style/analyze-reference';
+import type { ReferenceStructure } from 'ffmpeg-video-composer/src/core/structure/types.ts';
+import { analyzerInput, referencePromptRules } from '@/infrastructure/style/analyze-reference';
 import { analysisSize, MAX_REFERENCE_FRAMES, referenceSampleTimes } from '@/infrastructure/style/reference-frames';
 import { ReferenceStyleSection } from '../ai-generate/ReferenceStyleSection';
-import { ReferenceStylePanel } from './ReferenceStylePanel';
+import { ReadyPreview, ReferenceStylePanel } from './ReferenceStylePanel';
 import { StyleSwatches } from './StyleSwatches';
-import { contrastLevel, swatchesOf, withReferenceTheme } from './reference-style.logic';
+import { contrastLevel, structureSummary, swatchesOf, withReferenceTheme } from './reference-style.logic';
 
 beforeAll(async () => {
   await i18n.init({
@@ -28,6 +29,15 @@ beforeAll(async () => {
 });
 
 const noop = () => {};
+
+const structure: ReferenceStructure = {
+  duration: 2,
+  shots: [
+    { index: 0, start: 0, end: 1, duration: 1, transitionIn: null, ground: 'dark', anchor: 'left', motion: 0 },
+    { index: 1, start: 1, end: 2, duration: 1, transitionIn: 'cut', ground: 'light', anchor: 'center', motion: 0.5 },
+  ],
+  rhythm: { shots: 2, avgShot: 1, shortest: 1, longest: 1, cutsPerMinute: 30 },
+};
 
 function render(node: React.ReactNode): string {
   return renderToStaticMarkup(<I18nextProvider i18n={i18n}>{node}</I18nextProvider>);
@@ -137,5 +147,40 @@ describe('reference markup', () => {
 
     expect(html).toContain(ai.reference.attached);
     expect(html).toContain(ai.reference.detach);
+  });
+});
+
+describe('reference structure', () => {
+  it('keeps the style rules alone for a still', async () => {
+    expect(await referencePromptRules('Keep: ink ground')).toBe('Keep: ink ground');
+  });
+
+  it('adds the binding format after the style rules for a clip', async () => {
+    const rules = await referencePromptRules('Keep: ink ground', structure);
+
+    expect(rules.startsWith('Keep: ink ground\n\nReference format')).toBe(true);
+    expect(rules).toContain('Shot 2: 1 s, light ground');
+  });
+
+  it('summarises a structure for the panel', () => {
+    expect(structureSummary(structure)).toEqual({ shots: 2, avgShot: 1 });
+  });
+
+  it('shows the format line under the swatches for a clip, not for a still', () => {
+    const analysis = analyzeStyle({ frames: [canvasFrame()] });
+    const clip = render(
+      <ReadyPreview
+        style={{ analysis, structure, promptRules: '' }}
+        applyLabel="Apply"
+        onApply={noop}
+        disabled={false}
+      />
+    );
+    const still = render(
+      <ReadyPreview style={{ analysis, promptRules: '' }} applyLabel="Apply" onApply={noop} disabled={false} />
+    );
+
+    expect(clip).toContain('Format: 2 shots, 1 s on average');
+    expect(still).not.toContain('Format:');
   });
 });
