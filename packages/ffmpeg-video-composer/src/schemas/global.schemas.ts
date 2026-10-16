@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { MAX_SEED } from '../core/determinism/contract';
 import { EMOJI_MODES } from '../core/emoji-assets';
 import { MotionTokensSchema } from './motion.schemas';
@@ -68,7 +69,7 @@ export const GlobalTextOverlaySchema = z
       'Font id, .ttf filename, or { family, weight, style } for any Google Fonts family (default Oswald).'
     ),
     size: z.number().positive().optional().describe('Font size in px; default derived from the output height.'),
-    color: z.string().optional().describe('Text colour as a CSS hex string (default white).'),
+    color: ColorToken.optional().describe('Text colour as a CSS hex string (default white).'),
     opacity: z.number().min(0).max(1).optional().describe('Static text alpha 0..1 when no reveal is set (default 1).'),
     reveal: RevealSchema.optional().describe('Animated entrance for the text (default none).'),
     effect: TextEffectSchema.optional().describe('Drop shadow / outline for legibility over every section.'),

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 
 // Text-legibility and media-keying sugar, split out of effects.schemas to keep that file under the
 // max-lines budget. Re-exported from effects.schemas so importers keep a single entry point.
@@ -14,7 +15,7 @@ export const TextEffectSchema = z
         z.boolean(),
         z
           .object({
-            color: z.string().optional().describe('Shadow colour token, e.g. "#000000@0.6" (default #000000@0.6).'),
+            color: ColorToken.optional().describe('Shadow colour token, e.g. "#000000@0.6" (default #000000@0.6).'),
             dx: z.number().optional().describe('Horizontal shadow offset in pixels (default 2).'),
             dy: z.number().optional().describe('Vertical shadow offset in pixels (default 2).'),
           })
@@ -27,7 +28,7 @@ export const TextEffectSchema = z
         z.boolean(),
         z
           .object({
-            color: z.string().optional().describe('Outline colour token (default #000000).'),
+            color: ColorToken.optional().describe('Outline colour token (default #000000).'),
             width: z.number().min(0).optional().describe('Outline width in pixels (default 2).'),
           })
           .strict(),
@@ -45,7 +46,7 @@ export const TextEffectSchema = z
 // that needs no extra input (the bg is painted from the clip itself), so stream indices never shift.
 export const ChromaKeySchema = z
   .object({
-    color: z.string().describe('Screen colour to remove as a CSS hex string, e.g. "#00FF00" for a green screen.'),
+    color: ColorToken.describe('Screen colour to remove as a CSS hex string, e.g. "#00FF00" for a green screen.'),
     similarity: z
       .number()
       .min(0.01)
@@ -53,10 +54,9 @@ export const ChromaKeySchema = z
       .optional()
       .describe('How close a pixel must be to the key colour to be removed, 0.01..1 (default 0.3).'),
     blend: z.number().min(0).max(1).optional().describe('Softness of the keyed edge, 0..1 (default 0.1).'),
-    background: z
-      .string()
-      .optional()
-      .describe('Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).'),
+    background: ColorToken.optional().describe(
+      'Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).'
+    ),
   })
   .strict()
   .describe('Background removal: keys out a solid screen colour and composites the clip over a solid colour.');

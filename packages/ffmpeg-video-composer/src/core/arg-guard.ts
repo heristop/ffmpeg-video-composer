@@ -25,9 +25,9 @@ export function assertSafeArgToken(value: string, field: string): string {
 
 // A colour interpolated unquoted into a `color=c=<colour>` lavfi source sits INSIDE an input filtergraph,
 // so whitespace is not the only escape: `,` `;` `[` `]` `=` `:` `/` and quotes chain further filters or
-// options. A colour of the engine grammar (#RRGGBB, #RGB, 0x…, a name, an @alpha suffix) only ever needs
-// these characters.
-const COLOR_TOKEN = /^[#A-Za-z0-9@._]+$/;
+// options, and a quote closes a quoted `fontcolor='…'`. A colour of the engine grammar (#RRGGBB, #RGB,
+// 0x…, a name, an @alpha suffix, a theme token) only ever needs these characters.
+const COLOR_TOKEN = /^[#$A-Za-z0-9@._]+$/;
 
 export function assertSafeColorToken(value: string, field: string): string {
   if (!COLOR_TOKEN.test(value)) {

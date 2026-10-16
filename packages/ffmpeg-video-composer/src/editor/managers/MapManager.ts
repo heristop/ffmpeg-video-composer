@@ -11,6 +11,7 @@ import {
 import type FormattersManager from './FormatterManager';
 import type FilterManager from './FilterManager';
 import { escapeRegExp } from './VariableManager';
+import { assertSafeColorToken } from '@/core/arg-guard';
 import { isBackgroundInput } from '../utils/background-input';
 import { layerKeyframes } from '../presets/layer-keyframes';
 import { resolveFit } from '../utils/reframe';
@@ -363,11 +364,15 @@ class MapManager {
     head: string[] = []
   ): void => {
     const videoStream = `${videoInputIndex}:v`;
-    const color = this.formattersManager.formatColor(chromaKey.color);
+    // Both colours land unquoted in the graph (`colorkey=<c>`, `drawbox=…color=<c>`): one colour token each.
+    const color = assertSafeColorToken(this.formattersManager.formatColor(chromaKey.color), 'chromaKey.color');
     const similarity = chromaKey.similarity ?? 0.3;
     const blend = chromaKey.blend ?? 0.1;
-    const background = this.formattersManager.formatColor(
-      chromaKey.background ?? this.currentSection.options?.backgroundColor ?? 'black'
+    const background = assertSafeColorToken(
+      this.formattersManager.formatColor(
+        chromaKey.background ?? this.currentSection.options?.backgroundColor ?? 'black'
+      ),
+      'chromaKey.background'
     );
 
     const scaleChain = videoScale

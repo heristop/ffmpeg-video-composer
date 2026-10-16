@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { OverlayFitSchema, OverlayFlipSchema, RevealSchema } from './effects.schemas';
 import { FilterSchema } from './filter.schemas';
 import { TranslationSchema } from './global.schemas';
@@ -9,17 +10,6 @@ import { ClipBoxSchema } from './clip.schemas';
 // Input/shape/field media primitives — the animation input options, the editor-only shape recipe, the
 // input schema and the form-field schema — live here to keep `section.schemas` under the max-lines
 // budget; re-exported from `./section.schemas` so importers keep a single entry point.
-
-// ── section colour ─────────────────────────────────────────────────────────────
-
-// A section colour reaches an unquoted `color=c=…` lavfi source: one colour token of the engine grammar
-// (#RRGGBB, #RGB, 0x…, a name, an @alpha suffix, a $color.<name> theme token) or one {{ VARIABLE }}.
-export const SectionColorSchema = z
-  .string()
-  .regex(
-    /^(?:[#$A-Za-z0-9@._]+|\{\{ ?[A-Za-z_][A-Za-z0-9_]* ?\}\})$/,
-    'a colour: #RRGGBB, a name, an @alpha suffix, $color.<token> or {{ VARIABLE }}'
-  );
 
 // ── input ──────────────────────────────────────────────────────────────────────
 
@@ -71,7 +61,7 @@ export const InputOptionsSchema = z
 export const ShapeSpecSchema = z
   .object({
     kind: z.enum(['rect', 'ellipse']).describe('Shape geometry: an axis-aligned rectangle or an ellipse/circle.'),
-    color: z.string().describe('Fill colour as a hex string (e.g. "#ff4d4d").'),
+    color: ColorToken.describe('Fill colour as a hex string (e.g. "#ff4d4d").'),
     cornerRadius: z
       .number()
       .min(0)
@@ -82,7 +72,7 @@ export const ShapeSpecSchema = z
       .min(0)
       .optional()
       .describe('Outline width in output pixels drawn inside the shape bounds (0/omitted = no outline).'),
-    strokeColor: z.string().optional().describe('Outline colour as a hex string; used when strokeWidth > 0.'),
+    strokeColor: ColorToken.optional().describe('Outline colour as a hex string; used when strokeWidth > 0.'),
   })
   .strict()
   .describe('Editor-only recipe of a pre-rasterized shape overlay; ignored by the engine at compile.');

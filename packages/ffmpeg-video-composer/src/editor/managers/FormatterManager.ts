@@ -9,6 +9,7 @@ import type { Filter, FilterValues } from '@/core/types';
 import type VariableManager from './VariableManager';
 import { isFontRef, fontRefSlug, type FontInput } from '@/core/fonts';
 import { escapeDrawtextText } from '@/core/drawtext-text';
+import { assertSafeColorToken } from '@/core/arg-guard';
 import { lutFileStem } from '../presets/lut-spec';
 
 // The whole filtergraph is emitted as one double-quoted `-vf "…"` argv token, and parseCommand
@@ -174,8 +175,14 @@ class FormatterManager {
     return typeof colorValue === 'string' ? colorValue : '';
   }
 
+  // The resolved colour sits in a quoted filter option, so it must be one colour token: a quote, a
+  // separator or whitespace would close the option and chain filters. fontcolor_expr is an expression,
+  // not a token; only quotes are removed from it.
   private formatColorValue(key: string, values: ExtendedFilterValues): string {
-    return `${stripFilterUnsafe(key)}='${stripFilterUnsafe(this.formatColor(this.resolveColorFromValues(key, values)))}'`;
+    const color = this.formatColor(this.resolveColorFromValues(key, values));
+    const safe = key === 'fontcolor_expr' ? color.replace(/['"]/g, '') : assertSafeColorToken(color, key);
+
+    return `${stripFilterUnsafe(key)}='${stripFilterUnsafe(safe)}'`;
   }
 
   private formatFontValue(values: ExtendedFilterValues): string {

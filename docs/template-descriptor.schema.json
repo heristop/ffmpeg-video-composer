@@ -1234,7 +1234,8 @@
               },
               "color": {
                 "description": "Text colour as a CSS hex string (default white).",
-                "type": "string"
+                "type": "string",
+                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
               },
               "opacity": {
                 "description": "Static text alpha 0..1 when no reveal is set (default 1).",
@@ -1298,7 +1299,8 @@
                         "properties": {
                           "color": {
                             "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                            "type": "string"
+                            "type": "string",
+                            "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                           },
                           "dx": {
                             "description": "Horizontal shadow offset in pixels (default 2).",
@@ -1324,7 +1326,8 @@
                         "properties": {
                           "color": {
                             "description": "Outline colour token (default #000000).",
-                            "type": "string"
+                            "type": "string",
+                            "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                           },
                           "width": {
                             "description": "Outline width in pixels (default 2).",
@@ -1671,6 +1674,7 @@
                         },
                         "color": {
                           "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                           "description": "Fill colour as a hex string (e.g. \"#ff4d4d\")."
                         },
                         "cornerRadius": {
@@ -1685,7 +1689,8 @@
                         },
                         "strokeColor": {
                           "description": "Outline colour as a hex string; used when strokeWidth > 0.",
-                          "type": "string"
+                          "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                         }
                       },
                       "required": ["kind", "color"],
@@ -3210,7 +3215,8 @@
                   },
                   "color": {
                     "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "box": {
                     "description": "When true, draws a background box behind the text (preset default otherwise).",
@@ -3218,7 +3224,8 @@
                   },
                   "boxColor": {
                     "description": "Box colour as a CSS hex string when the box is on.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Box opacity 0..1 when the box is on.",
@@ -3282,7 +3289,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -3308,7 +3316,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -3377,11 +3386,13 @@
                   },
                   "accent": {
                     "description": "Accent colour: draws an accent bar and the badge background.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "bandColor": {
                     "description": "Legibility band colour as a CSS hex string (default near-black #0a0f14).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Legibility band opacity 0..1 (default 0.6; 0 = no band).",
@@ -3470,7 +3481,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -3496,7 +3508,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -3878,7 +3891,8 @@
                   },
                   "color": {
                     "description": "Bar colour (default black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["aspect"],
@@ -4059,6 +4073,7 @@
                 "properties": {
                   "color": {
                     "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                     "description": "Screen colour to remove as a CSS hex string, e.g. \"#00FF00\" for a green screen."
                   },
                   "similarity": {
@@ -4075,7 +4090,8 @@
                   },
                   "background": {
                     "description": "Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["color"],
@@ -4277,7 +4293,7 @@
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
                     "type": "string",
-                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -4685,6 +4701,7 @@
                         },
                         "color": {
                           "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                           "description": "Fill colour as a hex string (e.g. \"#ff4d4d\")."
                         },
                         "cornerRadius": {
@@ -4699,7 +4716,8 @@
                         },
                         "strokeColor": {
                           "description": "Outline colour as a hex string; used when strokeWidth > 0.",
-                          "type": "string"
+                          "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                         }
                       },
                       "required": ["kind", "color"],
@@ -6224,7 +6242,8 @@
                   },
                   "color": {
                     "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "box": {
                     "description": "When true, draws a background box behind the text (preset default otherwise).",
@@ -6232,7 +6251,8 @@
                   },
                   "boxColor": {
                     "description": "Box colour as a CSS hex string when the box is on.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Box opacity 0..1 when the box is on.",
@@ -6296,7 +6316,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -6322,7 +6343,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -6391,11 +6413,13 @@
                   },
                   "accent": {
                     "description": "Accent colour: draws an accent bar and the badge background.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "bandColor": {
                     "description": "Legibility band colour as a CSS hex string (default near-black #0a0f14).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Legibility band opacity 0..1 (default 0.6; 0 = no band).",
@@ -6484,7 +6508,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -6510,7 +6535,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -6892,7 +6918,8 @@
                   },
                   "color": {
                     "description": "Bar colour (default black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["aspect"],
@@ -7073,6 +7100,7 @@
                 "properties": {
                   "color": {
                     "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                     "description": "Screen colour to remove as a CSS hex string, e.g. \"#00FF00\" for a green screen."
                   },
                   "similarity": {
@@ -7089,7 +7117,8 @@
                   },
                   "background": {
                     "description": "Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["color"],
@@ -7291,7 +7320,7 @@
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
                     "type": "string",
-                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -7742,6 +7771,7 @@
                         },
                         "color": {
                           "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                           "description": "Fill colour as a hex string (e.g. \"#ff4d4d\")."
                         },
                         "cornerRadius": {
@@ -7756,7 +7786,8 @@
                         },
                         "strokeColor": {
                           "description": "Outline colour as a hex string; used when strokeWidth > 0.",
-                          "type": "string"
+                          "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                         }
                       },
                       "required": ["kind", "color"],
@@ -9281,7 +9312,8 @@
                   },
                   "color": {
                     "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "box": {
                     "description": "When true, draws a background box behind the text (preset default otherwise).",
@@ -9289,7 +9321,8 @@
                   },
                   "boxColor": {
                     "description": "Box colour as a CSS hex string when the box is on.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Box opacity 0..1 when the box is on.",
@@ -9353,7 +9386,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -9379,7 +9413,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -9448,11 +9483,13 @@
                   },
                   "accent": {
                     "description": "Accent colour: draws an accent bar and the badge background.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "bandColor": {
                     "description": "Legibility band colour as a CSS hex string (default near-black #0a0f14).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Legibility band opacity 0..1 (default 0.6; 0 = no band).",
@@ -9541,7 +9578,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -9567,7 +9605,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -9949,7 +9988,8 @@
                   },
                   "color": {
                     "description": "Bar colour (default black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["aspect"],
@@ -10130,6 +10170,7 @@
                 "properties": {
                   "color": {
                     "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                     "description": "Screen colour to remove as a CSS hex string, e.g. \"#00FF00\" for a green screen."
                   },
                   "similarity": {
@@ -10146,7 +10187,8 @@
                   },
                   "background": {
                     "description": "Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["color"],
@@ -10370,7 +10412,7 @@
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
                     "type": "string",
-                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "forceAspectRatio": {
                     "description": "Cover-crop the clip to fill the output frame, never stretching (on by default; false skips scaling).",
@@ -10523,6 +10565,7 @@
                         },
                         "color": {
                           "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                           "description": "Fill colour as a hex string (e.g. \"#ff4d4d\")."
                         },
                         "cornerRadius": {
@@ -10537,7 +10580,8 @@
                         },
                         "strokeColor": {
                           "description": "Outline colour as a hex string; used when strokeWidth > 0.",
-                          "type": "string"
+                          "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                         }
                       },
                       "required": ["kind", "color"],
@@ -12062,7 +12106,8 @@
                   },
                   "color": {
                     "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "box": {
                     "description": "When true, draws a background box behind the text (preset default otherwise).",
@@ -12070,7 +12115,8 @@
                   },
                   "boxColor": {
                     "description": "Box colour as a CSS hex string when the box is on.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Box opacity 0..1 when the box is on.",
@@ -12134,7 +12180,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -12160,7 +12207,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -12229,11 +12277,13 @@
                   },
                   "accent": {
                     "description": "Accent colour: draws an accent bar and the badge background.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "bandColor": {
                     "description": "Legibility band colour as a CSS hex string (default near-black #0a0f14).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Legibility band opacity 0..1 (default 0.6; 0 = no band).",
@@ -12322,7 +12372,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -12348,7 +12399,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -12730,7 +12782,8 @@
                   },
                   "color": {
                     "description": "Bar colour (default black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["aspect"],
@@ -12911,6 +12964,7 @@
                 "properties": {
                   "color": {
                     "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                     "description": "Screen colour to remove as a CSS hex string, e.g. \"#00FF00\" for a green screen."
                   },
                   "similarity": {
@@ -12927,7 +12981,8 @@
                   },
                   "background": {
                     "description": "Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["color"],
@@ -13129,7 +13184,7 @@
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
                     "type": "string",
-                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -13284,6 +13339,7 @@
                         },
                         "color": {
                           "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                           "description": "Fill colour as a hex string (e.g. \"#ff4d4d\")."
                         },
                         "cornerRadius": {
@@ -13298,7 +13354,8 @@
                         },
                         "strokeColor": {
                           "description": "Outline colour as a hex string; used when strokeWidth > 0.",
-                          "type": "string"
+                          "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                         }
                       },
                       "required": ["kind", "color"],
@@ -14823,7 +14880,8 @@
                   },
                   "color": {
                     "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "box": {
                     "description": "When true, draws a background box behind the text (preset default otherwise).",
@@ -14831,7 +14889,8 @@
                   },
                   "boxColor": {
                     "description": "Box colour as a CSS hex string when the box is on.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Box opacity 0..1 when the box is on.",
@@ -14895,7 +14954,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -14921,7 +14981,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -14990,11 +15051,13 @@
                   },
                   "accent": {
                     "description": "Accent colour: draws an accent bar and the badge background.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "bandColor": {
                     "description": "Legibility band colour as a CSS hex string (default near-black #0a0f14).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Legibility band opacity 0..1 (default 0.6; 0 = no band).",
@@ -15083,7 +15146,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -15109,7 +15173,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -15491,7 +15556,8 @@
                   },
                   "color": {
                     "description": "Bar colour (default black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["aspect"],
@@ -15672,6 +15738,7 @@
                 "properties": {
                   "color": {
                     "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                     "description": "Screen colour to remove as a CSS hex string, e.g. \"#00FF00\" for a green screen."
                   },
                   "similarity": {
@@ -15688,7 +15755,8 @@
                   },
                   "background": {
                     "description": "Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["color"],
@@ -15779,7 +15847,8 @@
                       },
                       "color": {
                         "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                       }
                     },
                     "additionalProperties": false
@@ -15827,7 +15896,8 @@
                       },
                       "color": {
                         "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                       }
                     },
                     "additionalProperties": false
@@ -15875,14 +15945,16 @@
                       },
                       "color": {
                         "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                       }
                     },
                     "additionalProperties": false
                   },
                   "accent": {
                     "description": "Accent colour: draws an underline bar and tints the kicker.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "align": {
                     "description": "Horizontal alignment of the card (default left).",
@@ -15891,7 +15963,8 @@
                   },
                   "background": {
                     "description": "Fade colour; defaults to the section background colour.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "reveal": {
                     "description": "Entrance for the lines, staggered top-to-bottom (default \"rise\").",
@@ -15960,7 +16033,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -15986,7 +16060,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -16207,7 +16282,7 @@
                   "backgroundColor": {
                     "description": "Primary background colour as a CSS hex string (e.g. \"#000000\").",
                     "type": "string",
-                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -16325,7 +16400,8 @@
                       "properties": {
                         "color": {
                           "description": "Solid fill colour as a CSS hex string or FFmpeg colour name (e.g. \"#FF0000\").",
-                          "type": "string"
+                          "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                         },
                         "opacity": {
                           "description": "Layer opacity, 0..1 (default 1).",
@@ -16413,6 +16489,7 @@
                           "properties": {
                             "color": {
                               "type": "string",
+                              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                               "description": "Outline colour as a CSS hex string or FFmpeg colour name (e.g. \"#FFFFFF\")."
                             },
                             "width": {
@@ -16516,6 +16593,7 @@
                         },
                         "color": {
                           "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                           "description": "Fill colour as a hex string (e.g. \"#ff4d4d\")."
                         },
                         "cornerRadius": {
@@ -16530,7 +16608,8 @@
                         },
                         "strokeColor": {
                           "description": "Outline colour as a hex string; used when strokeWidth > 0.",
-                          "type": "string"
+                          "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                         }
                       },
                       "required": ["kind", "color"],
@@ -18055,7 +18134,8 @@
                   },
                   "color": {
                     "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "box": {
                     "description": "When true, draws a background box behind the text (preset default otherwise).",
@@ -18063,7 +18143,8 @@
                   },
                   "boxColor": {
                     "description": "Box colour as a CSS hex string when the box is on.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Box opacity 0..1 when the box is on.",
@@ -18127,7 +18208,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -18153,7 +18235,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -18222,11 +18305,13 @@
                   },
                   "accent": {
                     "description": "Accent colour: draws an accent bar and the badge background.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "bandColor": {
                     "description": "Legibility band colour as a CSS hex string (default near-black #0a0f14).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Legibility band opacity 0..1 (default 0.6; 0 = no band).",
@@ -18315,7 +18400,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -18341,7 +18427,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -18723,7 +18810,8 @@
                   },
                   "color": {
                     "description": "Bar colour (default black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["aspect"],
@@ -18904,6 +18992,7 @@
                 "properties": {
                   "color": {
                     "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                     "description": "Screen colour to remove as a CSS hex string, e.g. \"#00FF00\" for a green screen."
                   },
                   "similarity": {
@@ -18920,7 +19009,8 @@
                   },
                   "background": {
                     "description": "Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["color"],
@@ -19122,7 +19212,7 @@
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
                     "type": "string",
-                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "pictureUrl": {
                     "description": "URL of the background image asset.",
@@ -19277,6 +19367,7 @@
                         },
                         "color": {
                           "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                           "description": "Fill colour as a hex string (e.g. \"#ff4d4d\")."
                         },
                         "cornerRadius": {
@@ -19291,7 +19382,8 @@
                         },
                         "strokeColor": {
                           "description": "Outline colour as a hex string; used when strokeWidth > 0.",
-                          "type": "string"
+                          "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                         }
                       },
                       "required": ["kind", "color"],
@@ -20816,7 +20908,8 @@
                   },
                   "color": {
                     "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "box": {
                     "description": "When true, draws a background box behind the text (preset default otherwise).",
@@ -20824,7 +20917,8 @@
                   },
                   "boxColor": {
                     "description": "Box colour as a CSS hex string when the box is on.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Box opacity 0..1 when the box is on.",
@@ -20888,7 +20982,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -20914,7 +21009,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -20983,11 +21079,13 @@
                   },
                   "accent": {
                     "description": "Accent colour: draws an accent bar and the badge background.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "bandColor": {
                     "description": "Legibility band colour as a CSS hex string (default near-black #0a0f14).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Legibility band opacity 0..1 (default 0.6; 0 = no band).",
@@ -21076,7 +21174,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -21102,7 +21201,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -21484,7 +21584,8 @@
                   },
                   "color": {
                     "description": "Bar colour (default black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["aspect"],
@@ -21665,6 +21766,7 @@
                 "properties": {
                   "color": {
                     "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                     "description": "Screen colour to remove as a CSS hex string, e.g. \"#00FF00\" for a green screen."
                   },
                   "similarity": {
@@ -21681,7 +21783,8 @@
                   },
                   "background": {
                     "description": "Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["color"],
@@ -21883,7 +21986,7 @@
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
                     "type": "string",
-                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -22038,6 +22141,7 @@
                         },
                         "color": {
                           "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                           "description": "Fill colour as a hex string (e.g. \"#ff4d4d\")."
                         },
                         "cornerRadius": {
@@ -22052,7 +22156,8 @@
                         },
                         "strokeColor": {
                           "description": "Outline colour as a hex string; used when strokeWidth > 0.",
-                          "type": "string"
+                          "type": "string",
+                          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                         }
                       },
                       "required": ["kind", "color"],
@@ -23577,7 +23682,8 @@
                   },
                   "color": {
                     "description": "Text colour as a CSS hex string; overrides the preset colour.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "box": {
                     "description": "When true, draws a background box behind the text (preset default otherwise).",
@@ -23585,7 +23691,8 @@
                   },
                   "boxColor": {
                     "description": "Box colour as a CSS hex string when the box is on.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Box opacity 0..1 when the box is on.",
@@ -23649,7 +23756,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -23675,7 +23783,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -23744,11 +23853,13 @@
                   },
                   "accent": {
                     "description": "Accent colour: draws an accent bar and the badge background.",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "bandColor": {
                     "description": "Legibility band colour as a CSS hex string (default near-black #0a0f14).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "boxOpacity": {
                     "description": "Legibility band opacity 0..1 (default 0.6; 0 = no band).",
@@ -23837,7 +23948,8 @@
                             "properties": {
                               "color": {
                                 "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "dx": {
                                 "description": "Horizontal shadow offset in pixels (default 2).",
@@ -23863,7 +23975,8 @@
                             "properties": {
                               "color": {
                                 "description": "Outline colour token (default #000000).",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                               },
                               "width": {
                                 "description": "Outline width in pixels (default 2).",
@@ -24245,7 +24358,8 @@
                   },
                   "color": {
                     "description": "Bar colour (default black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["aspect"],
@@ -24426,6 +24540,7 @@
                 "properties": {
                   "color": {
                     "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                     "description": "Screen colour to remove as a CSS hex string, e.g. \"#00FF00\" for a green screen."
                   },
                   "similarity": {
@@ -24442,7 +24557,8 @@
                   },
                   "background": {
                     "description": "Solid colour composited behind the keyed clip (default: the section backgroundColor, else black).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "required": ["color"],
@@ -24644,7 +24760,7 @@
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
                     "type": "string",
-                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -25838,7 +25954,8 @@
         },
         "color": {
           "description": "Text colour (default #F5F3F7); the fallback when `fill` cannot render.",
-          "type": "string"
+          "type": "string",
+          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
         },
         "fill": {
           "type": "object",
@@ -26008,7 +26125,8 @@
             },
             "color": {
               "description": "Accent text colour (default #FFF685).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "marker": {
               "description": "Highlight marker colour behind accent words (highlight preset; default #7C83FD@0.85).",
@@ -26070,7 +26188,8 @@
                   "properties": {
                     "color": {
                       "description": "Shadow colour token, e.g. \"#000000@0.6\" (default #000000@0.6).",
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                     },
                     "dx": {
                       "description": "Horizontal shadow offset in pixels (default 2).",
@@ -26096,7 +26215,8 @@
                   "properties": {
                     "color": {
                       "description": "Outline colour token (default #000000).",
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                     },
                     "width": {
                       "description": "Outline width in pixels (default 2).",
@@ -26633,7 +26753,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -26704,7 +26825,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -26775,7 +26897,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -26886,7 +27009,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -26999,7 +27123,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -27123,7 +27248,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -27345,7 +27471,8 @@
                       "maximum": 200
                     },
                     "color": {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                     }
                   },
                   "additionalProperties": false
@@ -27421,7 +27548,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -27491,7 +27619,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -27579,7 +27708,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -27662,7 +27792,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -27738,7 +27869,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -27831,7 +27963,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -27876,7 +28009,8 @@
             },
             "textColor": {
               "description": "Text colour (default #F5F3F7).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             }
           },
           "required": ["type", "text"],
@@ -27937,7 +28071,8 @@
             },
             "color": {
               "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "above": {
               "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
@@ -28023,7 +28158,8 @@
             },
             "textColor": {
               "description": "Label colour (default #F5F3F7).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             }
           },
           "required": ["type", "values"],
@@ -28105,7 +28241,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -28229,7 +28366,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -28398,7 +28536,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -28560,7 +28699,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -28757,7 +28897,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -28938,7 +29079,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -29076,7 +29218,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -29208,7 +29351,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -29333,7 +29477,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -29447,7 +29592,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -29601,7 +29747,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -29732,7 +29879,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -29852,7 +30000,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -29986,7 +30135,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -30098,7 +30248,8 @@
                 },
                 "color": {
                   "description": "Light colour: \"#rrggbb\", a colour name or a theme token (\"$color.accent\"). Default: a warm white tinted by the theme's accent. Its @alpha is ignored: use intensity.",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "intensity": {
                   "description": "Strength 0..1, mapped under the primitive's light ceiling (a sheen peaks at 0.35 alpha at 1; default ~0.9). Keep ≤ 0.6 over skin.",
@@ -30646,11 +30797,13 @@
         },
         "color": {
           "description": "Base text colour overriding the DNA (hex or $color.* token).",
-          "type": "string"
+          "type": "string",
+          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
         },
         "activeColor": {
           "description": "Active-word colour overriding the DNA (hex or $color.* token).",
-          "type": "string"
+          "type": "string",
+          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
         },
         "renderer": {
           "description": "drawbox (filters) or html (rasterised, same layout). Default: html for a DNA with a plate, else drawbox.",
@@ -30703,7 +30856,8 @@
               "properties": {
                 "color": {
                   "description": "Divider colour (default #FFFFFF).",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "width": {
                   "description": "Divider thickness in px (default 4).",
@@ -30771,7 +30925,8 @@
               "properties": {
                 "color": {
                   "description": "Divider colour (default #FFFFFF).",
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                 },
                 "width": {
                   "description": "Divider thickness in px (default 4).",

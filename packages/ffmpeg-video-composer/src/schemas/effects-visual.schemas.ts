@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { RevealSchema } from './reveal.schemas';
 
 // Section visual effects — the look/grade preset list, colour-grade, motion/geometry and background
@@ -171,10 +172,9 @@ export const MotionEffectSchema = z
 
 export const BackgroundLayerSchema = z
   .object({
-    color: z
-      .string()
-      .optional()
-      .describe('Solid fill colour as a CSS hex string or FFmpeg colour name (e.g. "#FF0000").'),
+    color: ColorToken.optional().describe(
+      'Solid fill colour as a CSS hex string or FFmpeg colour name (e.g. "#FF0000").'
+    ),
     opacity: z.number().min(0).max(1).optional().describe('Layer opacity, 0..1 (default 1).'),
     x: z
       .union([z.number(), z.string()])
@@ -217,7 +217,7 @@ export const BackgroundLayerSchema = z
       .describe('Gradient drawn across the layer; overrides the solid color field.'),
     border: z
       .object({
-        color: z.string().describe('Outline colour as a CSS hex string or FFmpeg colour name (e.g. "#FFFFFF").'),
+        color: ColorToken.describe('Outline colour as a CSS hex string or FFmpeg colour name (e.g. "#FFFFFF").'),
         width: z.number().int().min(1).describe('Outline thickness in output pixels.'),
       })
       .optional()

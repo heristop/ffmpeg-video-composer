@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { EasingSpecSchema } from './motion.schemas';
 
 // Section layouts: several media in one frame. A split screen tiles panes side by side or stacked; a
@@ -18,7 +19,7 @@ const LayoutSourceSchema = z
 
 const DividerSchema = z
   .object({
-    color: z.string().optional().describe('Divider colour (default #FFFFFF).'),
+    color: ColorToken.optional().describe('Divider colour (default #FFFFFF).'),
     width: z.number().positive().max(100).optional().describe('Divider thickness in px (default 4).'),
   })
   .strict()
