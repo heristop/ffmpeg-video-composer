@@ -4276,7 +4276,8 @@
                   },
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -7289,7 +7290,8 @@
                   },
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -10367,7 +10369,8 @@
                   },
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
                   },
                   "forceAspectRatio": {
                     "description": "Cover-crop the clip to fill the output frame, never stretching (on by default; false skips scaling).",
@@ -13125,7 +13128,8 @@
                   },
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -16202,7 +16206,8 @@
                   },
                   "backgroundColor": {
                     "description": "Primary background colour as a CSS hex string (e.g. \"#000000\").",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -19116,7 +19121,8 @@
                   },
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
                   },
                   "pictureUrl": {
                     "description": "URL of the background image asset.",
@@ -21876,7 +21882,8 @@
                   },
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",
@@ -24636,7 +24643,8 @@
                   },
                   "backgroundColor": {
                     "description": "Solid background colour as a CSS hex string (e.g. \"#000000\").",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\})$"
                   },
                   "pictureUrl": {
                     "description": "URL of a picture asset used as the section background or overlay.",

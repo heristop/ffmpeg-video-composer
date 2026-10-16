@@ -10,6 +10,17 @@ import { ClipBoxSchema } from './clip.schemas';
 // input schema and the form-field schema — live here to keep `section.schemas` under the max-lines
 // budget; re-exported from `./section.schemas` so importers keep a single entry point.
 
+// ── section colour ─────────────────────────────────────────────────────────────
+
+// A section colour reaches an unquoted `color=c=…` lavfi source: one colour token of the engine grammar
+// (#RRGGBB, #RGB, 0x…, a name, an @alpha suffix, a $color.<name> theme token) or one {{ VARIABLE }}.
+export const SectionColorSchema = z
+  .string()
+  .regex(
+    /^(?:[#$A-Za-z0-9@._]+|\{\{ ?[A-Za-z_][A-Za-z0-9_]* ?\}\})$/,
+    'a colour: #RRGGBB, a name, an @alpha suffix, $color.<token> or {{ VARIABLE }}'
+  );
+
 // ── input ──────────────────────────────────────────────────────────────────────
 
 export const InputOptionsSchema = z

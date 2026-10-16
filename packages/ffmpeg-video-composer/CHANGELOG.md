@@ -151,6 +151,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   slip FFmpeg filter syntax into the render through these fields.
 - `drip` transition: a section drip without its own `color` now takes the colour of the global drip
   transition before falling back to the theme accent.
+- Section `backgroundColor`: only a single colour (hex, a name, an `@alpha` suffix, a `$color.<name>` token or
+  a `{{ VARIABLE }}`) is accepted, and the render refuses any other resolved value, so the colour can no
+  longer carry FFmpeg filter syntax into the section's input.
 
 ## [3.1.0] - 2026-10-11
 

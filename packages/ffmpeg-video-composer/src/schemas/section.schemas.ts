@@ -15,7 +15,7 @@ import {
 import { TranslationSchema, GlobalConfigSchema } from './global.schemas';
 import { FilterSchema, MapSchema } from './filter.schemas';
 import { CaptionSchema, TitleCardSchema, LowerThirdSchema } from './text.schemas';
-import { InputSchema, FieldSchema } from './section-media.schemas';
+import { InputSchema, FieldSchema, SectionColorSchema } from './section-media.schemas';
 import { MOTION_SECTION_FIELDS } from './motion-section.schemas';
 import { SectionLayoutSchema } from './layout.schemas';
 import { CLIP_AUDIO_OPTION_FIELDS } from './audio.schemas';
@@ -115,7 +115,9 @@ export const BaseSectionOptionsSchema = z
       .string()
       .optional()
       .describe('URL of a background image or video composited behind the section content.'),
-    backgroundColor: z.string().optional().describe('Solid background colour as a CSS hex string (e.g. "#000000").'),
+    backgroundColor: SectionColorSchema.optional().describe(
+      'Solid background colour as a CSS hex string (e.g. "#000000").'
+    ),
     pictureUrl: z.string().optional().describe('URL of a picture asset used as the section background or overlay.'),
     forceAspectRatio: z
       .boolean()
@@ -239,7 +241,9 @@ export const ColorBackgroundSectionSchema = BaseSectionSchema.extend({
   type: z.literal('color_background').describe('Section type: renders a solid or layered colour background.'),
   titleCard: TitleCardSchema.optional().describe('Structured title card (kicker/headline/subtitle) for this section.'),
   options: BaseSectionOptionsSchema.extend({
-    backgroundColor: z.string().optional().describe('Primary background colour as a CSS hex string (e.g. "#000000").'),
+    backgroundColor: SectionColorSchema.optional().describe(
+      'Primary background colour as a CSS hex string (e.g. "#000000").'
+    ),
     layers: z
       .array(BackgroundLayerSchema)
       .optional()

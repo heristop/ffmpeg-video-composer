@@ -23,6 +23,20 @@ export function assertSafeArgToken(value: string, field: string): string {
   return value;
 }
 
+// A colour interpolated unquoted into a `color=c=<colour>` lavfi source sits INSIDE an input filtergraph,
+// so whitespace is not the only escape: `,` `;` `[` `]` `=` `:` `/` and quotes chain further filters or
+// options. A colour of the engine grammar (#RRGGBB, #RGB, 0x…, a name, an @alpha suffix) only ever needs
+// these characters.
+const COLOR_TOKEN = /^[#A-Za-z0-9@._]+$/;
+
+export function assertSafeColorToken(value: string, field: string): string {
+  if (!COLOR_TOKEN.test(value)) {
+    throw new Error(`Unsafe ${field}: "${value}" is not a colour (#RRGGBB, a name, an @alpha suffix)`);
+  }
+
+  return value;
+}
+
 // A section name is interpolated into output/asset file paths (`<buildDir>/<name>_output.mp4`, the
 // concat list, staged segment files). Reject path separators, parent refs, and NUL so a malicious
 // template's section name can't traverse out of the build/assets directory — other characters are
