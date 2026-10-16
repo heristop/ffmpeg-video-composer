@@ -286,7 +286,7 @@ function logoFrom(links: Attributes[], metas: Attributes[], base: string): Brand
   const candidates: { href: string; source: BrandLogo['source'] }[] = [
     ...icons,
     ...metas
-      .filter((m) => attr(m, 'property').toLowerCase() === 'og:image')
+      .filter((m) => ogKey(m) === 'og:image')
       .map((m) => ({ href: attr(m, 'content'), source: 'og:image' as const })),
   ];
 
@@ -333,6 +333,11 @@ function ownStylesheets(sheets: Attributes[], pageUrl: string): string[] {
     .map((sheet) => sheet.url);
 }
 
+/** An Open Graph tag's key: pages write it as property= (the spec) or name= (common). */
+function ogKey(meta: Attributes): string {
+  return (attr(meta, 'property') || attr(meta, 'name')).toLowerCase();
+}
+
 function metaContent(metas: Attributes[], keys: [string, string]): string {
   const meta = metas.find((m) => attr(m, keys[0]).toLowerCase() === keys[1]);
 
@@ -345,7 +350,10 @@ export function parseBrandPage(html: string, pageUrl: string): BrandPage {
     (l) => rels(l).includes('stylesheet') && !rels(l).includes('alternate') && attr(l, 'href')
   );
   const google = sheets.filter((l) => /fonts\.googleapis\.com/i.test(attr(l, 'href')));
-  const siteName = [metaContent(metas, ['property', 'og:site_name']), metaContent(metas, ['name', 'application-name'])]
+  const siteName = [
+    attr(metas.find((m) => ogKey(m) === 'og:site_name') ?? {}, 'content'),
+    metaContent(metas, ['name', 'application-name']),
+  ]
     .map((value) => value.trim())
     .find((value) => value !== '');
   const title = rawTitle?.split(/\s[|–—-]\s/)[0].trim();

@@ -160,6 +160,16 @@ describe('parseBrandPage', () => {
     });
   });
 
+  it('reads og: tags written with name= as well as property=', () => {
+    const html =
+      '<title>Acme: cloud rockets, and more</title><meta content="Acme" name="og:site_name" />' +
+      '<meta content="/brand/acme-og.png" name="og:image" />';
+    const parsed = parseBrandPage(html, 'https://acme.test/');
+
+    expect(parsed.name).toBe('Acme');
+    expect(parsed.logo).toEqual({ url: 'https://acme.test/brand/acme-og.png', type: 'png', source: 'og:image' });
+  });
+
   describe('hostile input stays linear', () => {
     const size = 2_000_000;
     const cases: Record<string, string> = {
