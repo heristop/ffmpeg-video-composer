@@ -46,6 +46,7 @@ export function structurePromptRules(structure: ReferenceStructure): string {
     ...head,
     `- ${rhythm.shots} shots over ${structure.duration} s (average ${rhythm.avgShot} s, shortest ${rhythm.shortest} s, longest ${rhythm.longest} s, ${rhythm.cutsPerMinute} cuts/min).`,
     '- One section per shot, in this order, each within ±20% of its length; use the transition named for each boundary.',
+    '- The engine overlaps transitions: a section’s `duration` is its shot’s length plus its outgoing transition’s duration (a "cut" adds nothing).',
     '- "main element <zone>" is where the headline or subject sits on a 3×3 grid; a dark/light ground sets the section background.',
     ...listed,
     ...(rest > 0 ? [`- …and ${rest} more shots in the same rhythm (average ${rhythm.avgShot} s).`] : []),

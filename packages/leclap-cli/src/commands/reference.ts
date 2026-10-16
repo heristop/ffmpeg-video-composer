@@ -42,9 +42,13 @@ export function templateSections(templateJson: unknown): { name: string; duratio
 
   if (resolved.issues.length > 0) throw new Error(resolved.issues.map((issue) => issue.message).join('; '));
 
-  return videoTimeline(resolved.descriptor).sections.map((section) => ({
+  // On-screen length, as the reference's shots are measured: a transition pulls the next section back
+  // over this one, so a section is seen from its start to the next one's.
+  const { sections } = videoTimeline(resolved.descriptor);
+
+  return sections.map((section, i) => ({
     name: section.name,
-    duration: section.duration,
+    duration: Number(((sections[i + 1]?.start ?? section.end) - section.start).toFixed(6)),
     durationKnown: section.durationKnown,
   }));
 }
