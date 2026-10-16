@@ -158,6 +158,7 @@ type DeclaredTransition = Section['transition'];
 
 function transitionOptions(
   declared: NonNullable<DeclaredTransition>,
+  globalTransition: DeclaredTransition,
   theme: unknown
 ): Pick<BoundaryTransition, 'origin' | 'rim' | 'color'> {
   const options = {
@@ -167,10 +168,11 @@ function transitionOptions(
 
   if (declared.type !== 'drip') return options;
 
-  // The drip's paint: the authored colour (theme tokens already resolved), else the theme accent.
+  // The drip's paint: the authored colour (theme tokens already resolved), else the global drip colour,
+  // else the theme accent.
   const accent = resolveTheme(theme as ThemeSpec | undefined)?.colors.accent;
 
-  return { ...options, color: declared.color ?? accent ?? DRIP_FALLBACK_COLOR };
+  return { ...options, color: declared.color ?? globalTransition?.color ?? accent ?? DRIP_FALLBACK_COLOR };
 }
 
 /**
@@ -196,7 +198,7 @@ export function boundaryTransitions(
       type: declared.type,
       duration,
       ease: declared.ease,
-      ...transitionOptions(declared, theme),
+      ...transitionOptions(declared, globalTransition, theme),
       ...designFields(declared, theme),
     };
   });

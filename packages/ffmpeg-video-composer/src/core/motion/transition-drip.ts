@@ -22,6 +22,7 @@
 import { fnv1a32, seededRandom } from '../determinism/hash';
 import { parseEasing, type EasingSpec } from './easing';
 import { easedProgressExpr, fmt } from './hermite';
+import { parseHexColor } from '../theme/palette';
 
 /** Share of the transition the paint takes to cover the frame; the incoming scene starts at REVEAL. */
 export const DRIP_COVER = 0.46;
@@ -216,9 +217,22 @@ export interface DripBoundary extends DripStage {
   seed: number;
 }
 
-/** A colour as the `color` source accepts it: `#RRGGBB` → `0xRRGGBB`, anything else unchanged. */
+/** A hex colour (`#rgb`, `#rrggbb`, `0x…`, any `@alpha`) as a `color` source value `0xRRGGBB`; null otherwise. */
+export function hexSource(color: string | undefined): string | null {
+  const rgb = parseHexColor(color ?? '');
+
+  if (!rgb) return null;
+
+  return `0x${rgb.map((channel) => channel.toString(16).padStart(2, '0').toUpperCase()).join('')}`;
+}
+
+/**
+ * The paint as the `color` source accepts it. Anything but a hex colour (a name, a CSS function,
+ * filtergraph syntax from a template that skipped the schema) falls back to the default paint, so the
+ * value can never leave the `color` option.
+ */
 function sourceColor(color: string): string {
-  return color.startsWith('#') ? `0x${color.slice(1)}` : color;
+  return hexSource(color) ?? `0x${DRIP_FALLBACK_COLOR.slice(1)}`;
 }
 
 /** The drip's compose step: [tail] + [in] → [mix]. */

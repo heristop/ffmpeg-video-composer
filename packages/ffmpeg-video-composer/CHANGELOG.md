@@ -145,6 +145,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   smeared its earlier angles and a paper strip read as a filled square. The corners are now cleared with the
   piece's own colour at alpha 0, which also keeps the scale after the turn from pulling in a dark fringe.
 
+- `drip` transition: `color` now only accepts a `#RRGGBB` colour or a `$color.<name>` theme token, and the
+  render falls back to the default paint for any other value instead of passing it to FFmpeg as is. The
+  same applies to an iris `rim` that is not a hex colour, which is now dropped. A template could otherwise
+  slip FFmpeg filter syntax into the render through these fields.
+- `drip` transition: a section drip without its own `color` now takes the colour of the global drip
+  transition before falling back to the theme accent.
+
 ## [3.1.0] - 2026-10-11
 
 ### Added
