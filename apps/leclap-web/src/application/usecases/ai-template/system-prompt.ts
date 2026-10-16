@@ -73,18 +73,41 @@ export const REFERENCE_STYLE_HEADING =
   'conflict. They carry the reference\u2019s palette and pacing, plus its format for a clip: never reproduce its ' +
   'subjects, logos or text):';
 
-/** The binding reference-style block (empty without rules), shared by the plan and template prompts. */
-export function referenceBlock(rules: string | undefined): string[] {
+// With a brand kit attached too, the brand owns the colours and fonts and the reference keeps its pacing,
+// format and texture: the reference's own theme line gives way, so the prompt binds one theme only.
+const REFERENCE_THEME_LINE = /^Set global\.theme to exactly: .*$/gm;
+const REFERENCE_THEME_UNDER_BRAND =
+  'Set global.theme from the brand kit below, not from this reference; keep this reference\u2019s pacing, format ' +
+  'and texture.';
+const BRAND_OVER_REFERENCE =
+  '- This brand overrides the reference style guide\u2019s palette and fonts; the reference keeps only its pacing, ' +
+  'format and texture.';
+
+function attached(rules: string | undefined): boolean {
+  return (rules?.trim() ?? '') !== '';
+}
+
+/**
+ * The binding reference-style block (empty without rules), shared by the plan and template prompts. With a
+ * brand attached, its theme line defers to the brand's.
+ */
+export function referenceBlock(rules: string | undefined, brand?: string): string[] {
   const trimmed = rules?.trim();
 
-  return trimmed ? [`${REFERENCE_STYLE_HEADING}\n${trimmed}`] : [];
+  if (!trimmed) return [];
+
+  const body = attached(brand) ? trimmed.replace(REFERENCE_THEME_LINE, REFERENCE_THEME_UNDER_BRAND) : trimmed;
+
+  return [`${REFERENCE_STYLE_HEADING}\n${body}`];
 }
 
 /** The binding brand block (empty without a kit), shared by the plan and template prompts. */
-export function brandBlock(rules: string | undefined): string[] {
+export function brandBlock(rules: string | undefined, referenceStyle?: string): string[] {
   const trimmed = rules?.trim();
 
-  return trimmed ? [trimmed] : [];
+  if (!trimmed) return [];
+
+  return [attached(referenceStyle) ? `${trimmed}\n${BRAND_OVER_REFERENCE}` : trimmed];
 }
 
 function fixedBlocks(input: PromptInput): string[] {
@@ -96,8 +119,8 @@ function fixedBlocks(input: PromptInput): string[] {
     COMPOSE_MOTION,
     LAZY_DEFAULTS,
     `Engine catalog:\n${formatCatalog(input.catalog, input.hints.genre)}`,
-    ...referenceBlock(input.referenceStyle),
-    ...brandBlock(input.brand),
+    ...referenceBlock(input.referenceStyle, input.brand),
+    ...brandBlock(input.brand, input.referenceStyle),
   ];
 }
 

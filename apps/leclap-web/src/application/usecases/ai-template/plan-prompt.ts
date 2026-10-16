@@ -71,9 +71,9 @@ export function buildPlanPrompt(
     LAZY_DEFAULTS,
     `Vocabulary:\n${vocabularyBlock(catalog, hints.genre)}`,
     // An attached reference fixes the theme: the plan's "theme" stays "none" and its pacing follows it.
-    ...referenceBlock(referenceStyle),
-    // A brand kit fixes the theme the same way.
-    ...brandBlock(brand),
+    // A brand kit fixes the theme the same way, and wins on colours and fonts when both are attached.
+    ...referenceBlock(referenceStyle, brand),
+    ...brandBlock(brand, referenceStyle),
   ].join('\n\n');
 }
 

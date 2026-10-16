@@ -352,6 +352,38 @@ describe('brand kit', () => {
     expect(promptFor('a launch video', {}, [], undefined, '  ').system).toBe(promptFor('a launch video', {}).system);
   });
 
+  it('lets the brand own the theme when a reference is attached too, and the reference keep its pacing', () => {
+    const reference = [
+      'Set global.theme to exactly: {"extends":"leclap","colors":{"bg":"#101830"}}',
+      'Use $color.<role> tokens for every colour instead of literal hex values.',
+      'Direct it as the "product-launch" genre.',
+      'Keep:',
+      '- Quick cuts, about 1.2 s a shot',
+      'Avoid:',
+      '- Film grain',
+    ].join('\n');
+    const brand = 'Brand kit (BINDING: …):\n- Brand: Acme.\n- Set global.theme to exactly: {"extends":"leclap"}';
+    const { catalog } = generationContext();
+
+    for (const prompt of [
+      promptFor('a launch video', {}, [], reference, brand).system,
+      buildPlanPrompt(catalog, {}, reference, brand),
+    ]) {
+      expect(prompt.match(/Set global\.theme to exactly:/g)).toHaveLength(1);
+      expect(prompt).toContain('- Set global.theme to exactly: {"extends":"leclap"}');
+      expect(prompt).not.toContain('"bg":"#101830"');
+      expect(prompt).toContain('- Quick cuts, about 1.2 s a shot');
+      expect(prompt).toContain('Direct it as the "product-launch" genre.');
+      expect(prompt).toContain('overrides the reference style guide’s palette and fonts');
+    }
+  });
+
+  it('adds no override line without a reference', () => {
+    const brand = 'Brand kit (BINDING: …):\n- Brand: Acme.';
+
+    expect(promptFor('a launch video', {}, [], undefined, brand).system).not.toContain('overrides the reference');
+  });
+
   it('keeps the whole schema for the tightest brief with a realistic brand block', () => {
     const brand = [
       'Brand kit (BINDING: …):',
