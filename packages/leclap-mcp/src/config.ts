@@ -32,6 +32,11 @@ export interface McpConfig {
    * read or write files. Only for trusted local templates; the render-time deny-list stays on either way.
    */
   allowRawFilters?: boolean;
+  /**
+   * Enable extract_brand, which fetches a website (HTTPS, public hosts only, size and time caps) to read
+   * its brand. Off by default; opt in with --allow-network / LECLAP_MCP_ALLOW_NETWORK.
+   */
+  allowNetwork?: boolean;
   /** Default Remotion entry (the module that calls registerRoot) for render_remotion_clip; optional. */
   remotionEntry?: string;
   /** Optional host Chromium/Chrome executable for registered effect rendering. */
@@ -162,6 +167,8 @@ export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
   const allowRemotion = readBoolean(argv, '--allow-remotion', process.env.LECLAP_MCP_ALLOW_REMOTION);
   const allowRawFilters = readBoolean(argv, '--allow-raw-filters', process.env.LECLAP_MCP_ALLOW_RAW_FILTERS);
 
+  const allowNetwork = readBoolean(argv, '--allow-network', process.env.LECLAP_MCP_ALLOW_NETWORK);
+
   return {
     ...directoryConfig(argv),
     ...fontsDirConfig(argv),
@@ -171,6 +178,7 @@ export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
     ),
     allowRemotion,
     allowRawFilters,
+    allowNetwork,
     ...catalogPathConfig(argv),
     ...(browserExecutable ? { browserExecutable: path.resolve(browserExecutable) } : {}),
     ...(remotionEntry ? { remotionEntry: path.resolve(remotionEntry) } : {}),

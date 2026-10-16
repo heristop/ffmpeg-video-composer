@@ -26,8 +26,14 @@ const ALWAYS = [
 ];
 const REMOTION = ['get_effect_schema', 'render_preview', 'render_remotion_clip'];
 
-async function toolNames(allowRemotion: boolean): Promise<string[]> {
-  const server = createServer({ mediaDir: '/unused', outputDir: '/unused', renderTimeoutMs: 1000, allowRemotion });
+async function toolNames(allowRemotion: boolean, allowNetwork = false): Promise<string[]> {
+  const server = createServer({
+    mediaDir: '/unused',
+    outputDir: '/unused',
+    renderTimeoutMs: 1000,
+    allowRemotion,
+    allowNetwork,
+  });
   const client = new Client({ name: 'surface-client', version: '1.0.0' });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   await Promise.all([client.connect(clientTransport), server.connect(serverTransport)]);
@@ -46,5 +52,10 @@ describe('the MCP tool surface', () => {
 
   it('adds only the Remotion trio when Remotion is allowed', async () => {
     expect(await toolNames(true)).toEqual([...ALWAYS, ...REMOTION].sort());
+  });
+
+  it('adds extract_brand only when the network is allowed', async () => {
+    expect(await toolNames(false, true)).toEqual([...ALWAYS, 'extract_brand'].sort());
+    expect(await toolNames(true, true)).toEqual([...ALWAYS, ...REMOTION, 'extract_brand'].sort());
   });
 });

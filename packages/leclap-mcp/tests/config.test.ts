@@ -9,6 +9,7 @@ const ENV_KEYS = [
   'LECLAP_MCP_MEDIA_DIR',
   'LECLAP_MCP_RENDER_TIMEOUT_MS',
   'LECLAP_MCP_ALLOW_REMOTION',
+  'LECLAP_MCP_ALLOW_NETWORK',
   'LECLAP_MCP_EFFECT_CACHE_MAX_BYTES',
   'LECLAP_MCP_EFFECT_CATALOG',
 ] as const;
@@ -76,6 +77,15 @@ describe('loadConfig', () => {
 
     expect(warning).toMatch(/allow-raw-filters/);
     expect(warning).toMatch(/trusted/);
+  });
+
+  it('keeps the network off unless the operator opts in', () => {
+    expect(loadConfig([]).allowNetwork).toBe(false);
+    expect(loadConfig(['--allow-network']).allowNetwork).toBe(true);
+    expect(loadConfig(['--allow-network=false']).allowNetwork).toBe(false);
+
+    process.env.LECLAP_MCP_ALLOW_NETWORK = '1';
+    expect(loadConfig([]).allowNetwork).toBe(true);
   });
 
   it('enables Remotion only when explicitly opted in', () => {
