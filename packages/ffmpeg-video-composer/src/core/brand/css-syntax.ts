@@ -63,6 +63,13 @@ function stripImportant(value: string): string {
   return value.slice(0, bang);
 }
 
+/** A property's name: CSS properties are case-insensitive, custom properties (`--brandColor`) are not. */
+function propertyName(raw: string): string {
+  const name = raw.trim();
+
+  return name.startsWith('--') ? name : name.toLowerCase();
+}
+
 /** `prop: value` pairs from a block's text, split on `;`. */
 export function declarations(text: string): [string, string][] {
   const found: [string, string][] = [];
@@ -79,7 +86,7 @@ export function declarations(text: string): [string, string][] {
       const colon = piece.indexOf(':');
 
       if (colon !== -1) {
-        found.push([piece.slice(0, colon).trim().toLowerCase(), stripImportant(piece.slice(colon + 1).trim())]);
+        found.push([propertyName(piece.slice(0, colon)), stripImportant(piece.slice(colon + 1).trim())]);
       }
     }
 

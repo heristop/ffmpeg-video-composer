@@ -245,3 +245,21 @@ describe('brand css strings and hues', () => {
     expect(normalizeColor('hsl(480 100% 50%)')).toBe(normalizeColor('hsl(120 100% 50%)'));
   });
 });
+
+describe('brand-named custom properties', () => {
+  it('weighs brand, primary and theme tokens, not properties that merely contain the word', () => {
+    const colors = cssColors(`
+      :root { --color-brand-500: #5e6ad2; --colorPrimary: #533afd; --theme: #3ce6ac; }
+      .badge-amber { --themed-bg: #f59e0b; }
+      .footer { --domain-tint: #bd5200; }
+    `);
+
+    expect(Object.fromEntries(colors.map((c) => [c.hex, c.weight]))).toEqual({
+      '#5e6ad2': 5,
+      '#533afd': 5,
+      '#3ce6ac': 5,
+      '#f59e0b': 2,
+      '#bd5200': 2,
+    });
+  });
+});

@@ -9,7 +9,9 @@ import type { BrandColor } from './types';
 export { cssFonts } from './fonts';
 
 const WEIGHT = { brandProperty: 5, property: 2, background: 2, declaration: 1 } as const;
-const BRAND_NAME = /brand|primary|accent|main|theme/i;
+// A whole word of the property's name (`--color-brand-500`, `--colorPrimary`), not a fragment (`--themed-bg`).
+const BRAND_NAME =
+  /(?:^|[-_])(?:brand|primary|accent|main|theme)(?![a-z])|[a-z](?:Brand|Primary|Accent|Main|Theme)(?![a-z])/;
 const KEYWORDS: Record<string, string> = { black: '#000000', white: '#ffffff' };
 
 function hex2(value: number): string {
