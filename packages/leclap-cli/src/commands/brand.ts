@@ -34,6 +34,11 @@ export function formatBrandSummary(kit: BrandKit, brand: BrandTheme, logoError?:
   ];
 }
 
+/** The `--json` document: the kit, its theme and font refs, and why the logo wasn't saved (if it wasn't). */
+export function brandJson(kit: BrandKit, brand: BrandTheme, logoError?: string): string {
+  return `${JSON.stringify({ kit, theme: brand.theme, fontRefs: brand.fontRefs, ...(logoError ? { logoError } : {}) }, null, 2)}\n`;
+}
+
 export const brand = defineCommand({
   meta: { name: 'brand', description: "Read a website's brand (colours, fonts, logo) into a theme" },
   args: {
@@ -56,7 +61,7 @@ export const brand = defineCommand({
 
       process.stdout.write(
         args.json
-          ? `${JSON.stringify({ kit: saved.kit, theme: theme.theme, fontRefs: theme.fontRefs }, null, 2)}\n`
+          ? brandJson(saved.kit, theme, saved.logoError)
           : `${wordmark()}${formatBrandSummary(saved.kit, theme, saved.logoError).join('\n')}\n`
       );
       console.error(
@@ -65,7 +70,9 @@ export const brand = defineCommand({
         )
       );
       console.error(
-        hint('Import brand-kit.json in the builder’s Generate with AI, or give brand-rules.txt to your agent.')
+        hint(
+          'Import brand-kit.json in the builder’s Generate with AI, or give brand-rules.txt to your agent. Copy the logo to assets/brand/ so its /assets/brand/ path resolves.'
+        )
       );
     } catch (error) {
       console.error(fail(error instanceof Error ? error.message : String(error)));

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { brandTheme, type BrandKit } from 'ffmpeg-video-composer';
 import { KNOWN_COMMANDS, rewriteArgv } from '../src/args';
-import { formatBrandSummary } from '../src/commands/brand';
+import { brandJson, formatBrandSummary } from '../src/commands/brand';
 
 const kit: BrandKit = {
   url: 'https://brand.test/',
@@ -41,5 +41,13 @@ describe('leclap brand', () => {
 
   it('is a known command, not a template to render', () => {
     expect(rewriteArgv(['brand', 'https://brand.test'], KNOWN_COMMANDS)).toEqual(['brand', 'https://brand.test']);
+  });
+
+  it('puts logoError in the JSON, which stays one parseable document', () => {
+    const json = JSON.parse(brandJson(kit, brandTheme(kit), 'too large'));
+
+    expect(json.logoError).toBe('too large');
+    expect(json.kit.name).toBe('Brand');
+    expect(JSON.parse(brandJson(kit, brandTheme(kit))).logoError).toBeUndefined();
   });
 });
