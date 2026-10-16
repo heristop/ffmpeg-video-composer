@@ -8,6 +8,9 @@ import { extractStyleFrames, type StyleFramesOptions } from './style-frames-node
 /**
  * Frames decoded for a structure: five minutes at the 0.25 s grid. The style sampler's 240 would space
  * a long clip's samples out (0.6 s on a two-minute clip) and merge a short shot into its neighbours.
+ * Memory grows with it: a five-minute portrait clip (1200 frames of 160×348 rgb24, about 200 MB decoded,
+ * plus the stdout chunks and the luma planes) peaked at about 650 MB resident; a 15 s landscape clip at
+ * about 100 MB.
  */
 export const STRUCTURE_MAX_FRAMES = 1200;
 
