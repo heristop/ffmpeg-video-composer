@@ -2221,7 +2221,9 @@ Derive a `global.theme` object from a reference image or clip: `leclap style ref
 A reference **clip** gives more than a palette: its format. LeClap reads its shots (length, the
 transition into each, light or dark ground, where the main element sits on a 3×3 grid, motion) and its
 rhythm, and hands them to the generator as binding rules: one section per shot, in order, each within
-±20 % of its length. In the builder, add a clip under **Match a reference**; the panel shows a line such as
+±20 % of its length on screen. A transition overlaps the two sections it joins, so a section's `duration` is
+its shot's length plus its outgoing transition's duration, and `--check` times each section from its start to
+the next one's. In the builder, add a clip under **Match a reference**; the panel shows a line such as
 "Format: 8 shots, 2.4 s on average — the AI follows it". On the command line, `leclap reference clip.mp4`
 prints the rules and `leclap reference clip.mp4 --check template.json` holds a template to them (flags in
 the [CLI README](../packages/leclap-cli/README.md#reference--follow-a-reference-clips-format));

@@ -110,6 +110,12 @@ describe('structurePromptRules', () => {
     expect(rules).toMatch(/never .*subjects, logos or text/i);
   });
 
+  it('sizes a section as its shot plus the outgoing transition the engine overlaps', () => {
+    const rules = structurePromptRules(analyzeStructure({ frames: clip, duration: 2.5 }));
+
+    expect(rules).toMatch(/duration.*shot’s length plus its outgoing transition’s duration/);
+  });
+
   it('lists at most 24 shots and summarises the rest', () => {
     // 30 one-second shots (4 frames each), alternating dark and light: a cut every 4 frames.
     const frames = Array.from({ length: 120 }, (_, k) => flat(Math.floor(k / 4) % 2 === 0 ? 20 : 235, k * 0.25));
