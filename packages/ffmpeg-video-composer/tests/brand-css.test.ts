@@ -119,6 +119,7 @@ describe('brand css hardening', () => {
       'x{font-family:' + 'var(--a,'.repeat(250_000),
       ':root{' + '--a:var(--b);--b:var(--a);'.repeat(80_000) + '}body{font-family:var(--a)}',
       'x{font-family:var(--a)}'.repeat(80_000) + ':root{--a:' + 'var(--a, '.repeat(100) + '}',
+      Array.from({ length: 100_000 }, (_, n) => `a{font-family:f${n}}`).join(''),
     ];
 
     // Best of three and a 3 s ceiling: quadratic parsing takes minutes here, a loaded host only adds noise.
@@ -336,5 +337,21 @@ describe('cssFonts and emoji faces', () => {
         .icons { font-family: "Segoe UI Symbol"; }
       `)
     ).toEqual({ display: null, body: null, mono: null, families: [] });
+  });
+});
+
+describe('cssFonts family limits', () => {
+  it('keeps at most 64 distinct families, the first ones the site names', () => {
+    const fonts = cssFonts(Array.from({ length: 200 }, (_, n) => `.f${n}{font-family:Face${n}}`).join(''));
+
+    expect(fonts.families).toHaveLength(64);
+    expect(fonts.families[0]).toBe('Face0');
+    expect(fonts.families[63]).toBe('Face63');
+  });
+
+  it('still reads a role from a rule past the family cap', () => {
+    const many = Array.from({ length: 100 }, (_, n) => `.f${n}{font-family:Face${n}}`).join('');
+
+    expect(cssFonts(`${many} h1{font-family:Late Display}`).display).toBe('Late Display');
   });
 });

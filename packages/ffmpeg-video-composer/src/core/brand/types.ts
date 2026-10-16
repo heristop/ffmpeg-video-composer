@@ -15,7 +15,7 @@ export interface BrandFonts {
   body: string | null;
   /** Code's family (code, pre, kbd, .mono). */
   mono: string | null;
-  /** Every first-choice family the site names, in order of appearance, deduplicated. */
+  /** Every first-choice family the site names, in order of appearance, deduplicated, at most 64. */
   families: string[];
 }
 

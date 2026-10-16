@@ -24,6 +24,9 @@ const GENERIC_FAMILIES = new Set([
   'blinkmacsystemfont',
 ]);
 
+/** Distinct families kept in a kit; the roles still read every rule. */
+const MAX_FAMILIES = 64;
+
 /** A family that is the site's own face: not a generic, a keyword, a metric fallback, an emoji face or a size. */
 function firstFamily(value: string): string | null {
   const first =
@@ -177,19 +180,28 @@ function customProperties(css: string): Map<string, string[]> {
   return properties;
 }
 
-function addFamily(fonts: BrandFonts, family: string): void {
-  if (!fonts.families.includes(family)) fonts.families.push(family);
+/** Adds a family once, in order of appearance, up to MAX_FAMILIES; `seen` keeps the check constant-time. */
+function addFamily(fonts: BrandFonts, seen: Set<string>, family: string): void {
+  if (seen.has(family) || seen.size >= MAX_FAMILIES) return;
+
+  seen.add(family);
+  fonts.families.push(family);
 }
 
 /** Roles from the rules that set a family: headings, body, code and their utility classes. */
-function rolesFromRules(css: string, familyOf: (value: string) => string | null, fonts: BrandFonts): void {
+function rolesFromRules(
+  css: string,
+  familyOf: (value: string) => string | null,
+  fonts: BrandFonts,
+  seen: Set<string>
+): void {
   for (const { selector, body } of rules(css)) {
     const declared = declarations(body).find(([property]) => property === 'font-family');
     const family = declared ? familyOf(declared[1]) : null;
 
     if (family === null) continue;
 
-    addFamily(fonts, family);
+    addFamily(fonts, seen, family);
 
     for (const role of ['display', 'body', 'mono'] as const) {
       if (fonts[role] === null && ROLE_SELECTORS[role].test(selector)) fonts[role] = family;
@@ -198,7 +210,12 @@ function rolesFromRules(css: string, familyOf: (value: string) => string | null,
 }
 
 /** Roles no rule named: the site's font tokens, by name, once resolved to a family. */
-function rolesFromTokens(names: Iterable<string>, familyOf: (value: string) => string | null, fonts: BrandFonts) {
+function rolesFromTokens(
+  names: Iterable<string>,
+  familyOf: (value: string) => string | null,
+  fonts: BrandFonts,
+  seen: Set<string>
+) {
   for (const name of names) {
     const role = roleOfToken(name);
     const family = role === null || fonts[role] !== null ? null : familyOf(`var(${name})`);
@@ -206,7 +223,7 @@ function rolesFromTokens(names: Iterable<string>, familyOf: (value: string) => s
     if (role === null || family === null) continue;
 
     fonts[role] = family;
-    addFamily(fonts, family);
+    addFamily(fonts, seen, family);
   }
 }
 
@@ -216,8 +233,10 @@ export function cssFonts(input: string): BrandFonts {
   const properties = customProperties(css);
   const familyOf = familyResolver(properties);
 
-  rolesFromRules(css, familyOf, fonts);
-  rolesFromTokens(properties.keys(), familyOf, fonts);
+  const seen = new Set<string>();
+
+  rolesFromRules(css, familyOf, fonts, seen);
+  rolesFromTokens(properties.keys(), familyOf, fonts, seen);
 
   return fonts;
 }
