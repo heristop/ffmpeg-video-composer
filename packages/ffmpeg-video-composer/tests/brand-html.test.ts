@@ -170,6 +170,12 @@ describe('parseBrandPage', () => {
     expect(parsed.logo).toEqual({ url: 'https://acme.test/brand/acme-og.png', type: 'png', source: 'og:image' });
   });
 
+  it('cuts a tagline after a colon from the title', () => {
+    expect(parseBrandPage('<title>Acme: Build for the rocket era</title>', 'https://acme.test/').name).toBe('Acme');
+    expect(parseBrandPage('<title>Acme 2: the sequel</title>', 'https://acme.test/').name).toBe('Acme 2');
+    expect(parseBrandPage('<title>Re:Acme</title>', 'https://acme.test/').name).toBe('Re:Acme');
+  });
+
   describe('hostile input stays linear', () => {
     const size = 2_000_000;
     const cases: Record<string, string> = {

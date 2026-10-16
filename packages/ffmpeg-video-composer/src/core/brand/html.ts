@@ -356,7 +356,7 @@ export function parseBrandPage(html: string, pageUrl: string): BrandPage {
   ]
     .map((value) => value.trim())
     .find((value) => value !== '');
-  const title = rawTitle?.split(/\s[|–—-]\s/)[0].trim();
+  const title = rawTitle?.split(/\s[|–—-]\s|:\s/)[0].trim();
   const themeColor = metaContent(metas, ['name', 'theme-color']);
 
   return {
