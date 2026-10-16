@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `extract_structure`: a reference clip's format (shots, rhythm, transitions, grounds, layout) as binding
   rules, from at most 480 sampled frames.
 
+### Fixed
+
+- `validate_template`, `compose_video` and `render_preview` refuse a template whose string fields (a
+  transition colour, for instance) carry FFmpeg filter syntax that opens files or URLs, not only the filter
+  `value` and `values`. Ordinary copy with semicolons or commas is unaffected.
+
 ## [0.6.0] - 2026-10-11
 
 ### Added

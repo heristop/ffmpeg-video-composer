@@ -51,6 +51,16 @@ const FILE_OPTION =
 // A value that is itself an absolute path or a traversal.
 const ABSOLUTE_OR_TRAVERSAL = /^\s*(\/|[a-zA-Z]:[\\/])|(^|[\\/])\.\.([\\/]|$)/;
 
+// Filtergraph syntax that opens a resource, as it reads once chained into a graph: a source/plugin
+// filter or a file-bearing option right after a filter separator (`;`, `,`, `]`, `:`, `=`) or at the
+// start of the string, e.g. `red;movie=/etc/passwd` in a colour that lands in a `color=c=…` source.
+// Every string leaf is scanned with these, because a template field the filter scan never reads (a
+// transition colour, a theme value) can still reach a filtergraph. They need the filter-name-then-`=`
+// shape after a separator, so free copy ("Hello; world", "watch the movie, then…", a URL) passes; the
+// generic option words of FILE_OPTION (file, model, commands) are left out for the same reason.
+const CHAINED_FILTER = new RegExp(`(^|[;,\\]])\\s*(${[...DANGEROUS_FILTERS].join('|')})(@\\w*)?\\s*=`, 'i');
+const CHAINED_FILE_OPTION = /(^|[;,\]:=])\s*(psfile|filename|textfile|pfile|fontfile|model_filename|stats_file)\s*=/i;
+
 export type GuardResult = { ok: true } | { ok: false; message: string };
 
 // Recursively yield every plain object node in the descriptor (arrays and objects), so the walk
@@ -166,6 +176,44 @@ function findFilterEscape(descriptor: TemplateDescriptor): string | undefined {
   return undefined;
 }
 
+// Every string leaf of the descriptor with its path (`sections[0].transition.color`).
+function* stringLeaves(value: unknown, at: string): Generator<[string, string]> {
+  if (typeof value === 'string') {
+    yield [at, value];
+
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    for (const [index, item] of value.entries()) {
+      yield* stringLeaves(item, `${at}[${index}]`);
+    }
+
+    return;
+  }
+
+  if (value === null || typeof value !== 'object') {
+    return;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    yield* stringLeaves(child, at ? `${at}.${key}` : key);
+  }
+}
+
+// A source/plugin filter or a file option chained into ANY string field (see CHAINED_FILTER).
+function findChainedEscape(descriptor: TemplateDescriptor): string | undefined {
+  for (const [at, value] of stringLeaves(descriptor, '')) {
+    const unquoted = value.replace(/["'`]/g, '');
+
+    if (CHAINED_FILTER.test(unquoted) || CHAINED_FILE_OPTION.test(unquoted)) {
+      return `Field "${at}" contains FFmpeg filter syntax that reads a file or URL: refusing to forward it to ffmpeg.`;
+    }
+  }
+
+  return undefined;
+}
+
 function collectFontfiles(descriptor: TemplateDescriptor): string[] {
   const files: string[] = [];
 
@@ -189,11 +237,12 @@ async function containFontfile(fontfile: string, mediaDir: string): Promise<stri
   }
 }
 
-// Reject dangerous filter types + file/URL-bearing scalar values, confirm every path-like fontfile
+// Reject dangerous filter types, file/URL-bearing scalar values and source/file filter syntax in any
+// string field, confirm every path-like fontfile
 // stays under the media dir, and that every local media path is there (media-refs.ts). Async because
 // containment is realpath-checked (symlink-safe).
 export async function assertDescriptorSafe(descriptor: TemplateDescriptor, mediaDir: string): Promise<GuardResult> {
-  const escape = findFilterEscape(descriptor);
+  const escape = findFilterEscape(descriptor) ?? findChainedEscape(descriptor);
 
   if (escape) {
     return { ok: false, message: escape };

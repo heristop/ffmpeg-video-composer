@@ -205,3 +205,57 @@ describe('assertDescriptorSafe', () => {
     expect(result.ok).toBe(true);
   });
 });
+
+// Filtergraph syntax smuggled through a string field the filter scan above never reads (a transition
+// colour lands in a `color=c=…` source): every string leaf is scanned for source/file filter syntax.
+function dripDescriptor(color: string, title = 'Hello'): TemplateDescriptor {
+  return {
+    global: { transition: { type: 'drip', duration: 1, color: '#123456' } },
+    sections: [
+      {
+        name: 'a',
+        type: 'color_background',
+        options: { backgroundColor: '#000000', duration: 2 },
+        transition: { type: 'drip', duration: 1, color },
+        filters: [{ type: 'drawtext', values: { text: { en: title } } }],
+      },
+      { name: 'b', type: 'color_background', options: { backgroundColor: '#ffffff', duration: 2 } },
+    ],
+  } as unknown as TemplateDescriptor;
+}
+
+describe('assertDescriptorSafe: filtergraph syntax in any string field', () => {
+  it.each([
+    'red:s=2x2[x];[x]nullsink;movie=/etc/passwd',
+    'red;amovie@a=/etc/passwd',
+    'red, movie = /etc/passwd',
+    'red;[x]drawtext=textfile=/etc/passwd',
+    'red,curves=psfile=/tmp/x.acv',
+  ])('rejects a drip colour carrying %s', async (color) => {
+    const result = await assertDescriptorSafe(dripDescriptor(color), mediaDir);
+
+    expect(result).toMatchObject({ ok: false });
+    expect(!result.ok && result.message).toMatch(/transition\.color/);
+  });
+
+  it('rejects the same syntax in the global transition', async () => {
+    const descriptor = dripDescriptor('#F96F99') as unknown as { global: { transition: { color: string } } };
+    descriptor.global.transition.color = 'red;movie=/etc/passwd';
+
+    const result = await assertDescriptorSafe(descriptor as unknown as TemplateDescriptor, mediaDir);
+
+    expect(result.ok).toBe(false);
+  });
+
+  it.each([
+    'Hello; world',
+    'Movies; the best of 2026',
+    'Watch the movie, then the sequel',
+    'Profile: file = notes.txt',
+    'See https://leclap.dev; it renders',
+  ])('keeps ordinary copy such as %s', async (title) => {
+    const result = await assertDescriptorSafe(dripDescriptor('$color.accent', title), mediaDir);
+
+    expect(result.ok).toBe(true);
+  });
+});
