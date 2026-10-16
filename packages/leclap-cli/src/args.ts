@@ -9,6 +9,7 @@ export const KNOWN_COMMANDS = [
   'verify',
   'style',
   'reference',
+  'brand',
   'studio',
   'beats',
   'transcribe',

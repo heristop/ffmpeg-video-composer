@@ -29,6 +29,7 @@ leclap samples export <id> # raw descriptor JSON to stdout (or --output <new-fil
 leclap verify <manifest>  # check a video against its render manifest (--rerender to re-render and compare)
 leclap style <reference>  # derive a theme + style guide from an image or clip (--json, --out style-guide.md)
 leclap reference <clip>   # a reference clip's format (shots, rhythm, layout) as binding rules (--json, --out, --check)
+leclap brand <url>        # read a website's brand (name, colours, fonts, logo) into brand-kit.json, a global.theme and binding rules for an agent or the builder (-o brand-kit, --json); HTTPS and public hosts only
 leclap beats <audio>      # tempo, beat grid, confidence and drop/build cues for global.beats (--json)
 leclap transcribe <t|media> # speech → word-timed captions with whisper.cpp, pinned into the template (--srt, --json)
 leclap snapshot <template> # render and save still frames (PNG) of chosen moments, contact sheets

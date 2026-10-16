@@ -15,6 +15,7 @@ import { samples } from './commands/samples.js';
 import { verify } from './commands/verify.js';
 import { style } from './commands/style.js';
 import { reference } from './commands/reference.js';
+import { brand } from './commands/brand.js';
 import { studio } from './commands/studio.js';
 import { beats } from './commands/beats.js';
 import { snapshot } from './commands/snapshot.js';
@@ -38,6 +39,7 @@ const main = defineCommand({
     verify,
     style,
     reference,
+    brand,
     studio,
     beats,
     snapshot,
