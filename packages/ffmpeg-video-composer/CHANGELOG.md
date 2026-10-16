@@ -29,6 +29,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   window's centre, so the letter and its hole stay locked together, and the next scene shows through the
   hole until it covers the frame. A window that cannot be drawn falls back to the plain zoom-through with a
   warning. Shaped irises and windows add their matte image as an input of the transition assembly.
+- Reference structure: `analyzeStructure` reads a reference clip's format (shots with their length, the
+  transition into each (cut, dissolve → `fade`, dip → `fadeblack`), light or dark ground, where the main
+  element sits on a 3×3 grid and motion) plus its rhythm, from the frames the style analyzer already
+  samples. `structurePromptRules` turns it into binding generation rules (24 shots listed at most) and
+  `structureDrift` holds a template to it. `analyzeStructureFile` decodes a clip on Node. Format only: never
+  the reference's subjects, logos or text.
 - Keyframe tracks on image, animation and html layer inputs: `inputs[].options.animate` takes `x`, `y`,
   `scale`, `scaleX`, `scaleY`, `rotate` and `opacity` tracks, with the same `{ t, v, ease? }` keys, easings,
   springs, tokens and time references as the drawtext tracks. Cards, badges and icons can now pop in with an

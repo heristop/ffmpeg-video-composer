@@ -2216,6 +2216,34 @@ Fonts take a bundled id (`bebas`, `oswald`, `anton`, `archivo-black`, `bungee`, 
 
 Derive a `global.theme` object from a reference image or clip: `leclap style ref.mp4 --out style-guide.md`, the MCP `extract_style` tool, or **Match a reference** in the web builder's Advanced panel and in Generate with AI. The palette is clustered in OKLab and assigned to `bg`, `fg`, `muted`, `surface`, `brand`, `accent` and `accent2`; `fg` and `muted` are moved to WCAG AA (4.5:1) on `bg`, and accents to 3:1, when they fall short. Grain suggests a `global.grade.grain`. Clips also give the average shot length, cuts per minute and motion energy (→ `theme.motion`) and a suggested genre. Only the palette, texture and pacing carry over: the reference's subjects, logos and text are never copied. The same reference and seed always give the same theme. The library API is described in [engine configuration](./engine-configuration.md#reference-style-and-music-analysis).
 
+### Match a reference's format
+
+A reference **clip** gives more than a palette: its format. LeClap reads its shots (length, the
+transition into each, light or dark ground, where the main element sits on a 3×3 grid, motion) and its
+rhythm, and hands them to the generator as binding rules: one section per shot, in order, each within
+±20 % of its length. In the builder, add a clip under **Match a reference**; the panel shows a line such as
+"Format: 8 shots, 2.4 s on average — the AI follows it". On the command line, `leclap reference clip.mp4`
+prints the rules and `leclap reference clip.mp4 --check template.json` holds a template to them (flags in
+the [CLI README](../packages/leclap-cli/README.md#reference--follow-a-reference-clips-format));
+`leclap compare remix.json --at 2 --reference clip.mp4` puts both side by side. Agents call the MCP tool
+`extract_structure`, which samples at most 480 frames (2 minutes at full resolution, longer clips sampled
+evenly); the CLI samples up to 1200.
+
+What is read:
+
+- **Transitions.** A cut stays `cut`, a dissolve reads as `fade`, a dip to black as `fadeblack`. Black holds
+  and fades through dark grey count as one dip; brightness ramps inside a shot are not cuts and flashes are
+  ignored. Letterbox and pillarbox bars are cropped before reading.
+- **Layout.** The main element is anchored on a 3×3 grid; grainy or diffuse detail falls back to "spread".
+- **Rules.** Each shot is held to ±20 % of its length; at most 24 shots are listed in the rules.
+
+Limits: a faint cut on a dark ground can be missed, a push or swipe reads as a cut or a dissolve, and the
+anchor follows the busiest detail, not necessarily the subject.
+
+LeClap reads the format from pixels (luma changes and where the detail is) and never describes or copies
+the reference's subjects, logos or text. Use a clip you have the right to use: LeClap doesn't download
+videos from X, YouTube or other hosts.
+
 ## Delivery platforms
 
 Set `global.platform` when a video has a destination. It tunes the defaults and the validation for that app; the rendered frames stay the engine's own presets.
