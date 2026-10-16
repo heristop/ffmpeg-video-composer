@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with or without the `.mcp.json` option. It covers the validate/render loop (through the project's package
   manager, since `leclap` is a devDependency), the sugar tier before raw `filters[]`, the re-encode cost model and
   the traps that never surface as errors, and points at `llms.txt` instead of restating the schema.
+- `leclap reference <clip>` prints a reference clip's format as binding rules (`--json`, `--out`);
+  `--check template.json` exits 1 on drift. `leclap compare --reference <clip>` adds the reference's frame
+  as the first tile.
 
 ## [0.5.0] - 2026-10-11
 
