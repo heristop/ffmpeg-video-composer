@@ -122,6 +122,44 @@ describe('parseBrandPage', () => {
     ]);
   });
 
+  it('takes the largest icon, by its sizes, over a small first one', () => {
+    const html = [
+      '<link rel="icon" sizes="32x32" href="/favicon32.png">',
+      '<link rel="apple-touch-icon" href="/touch.png">',
+      '<link rel="apple-touch-icon" sizes="57x57" href="/touch-57.png">',
+      '<link rel="apple-touch-icon" sizes="180x180" href="/touch-180.png">',
+      '<link rel="icon" sizes="16x16 256x256" href="/icon-256.png">',
+    ].join('');
+
+    expect(parseBrandPage(html, 'https://acme.test/').logo?.url).toBe('https://acme.test/icon-256.png');
+    expect(parseBrandPage(html.replace(/<link rel="icon" sizes="16x16[^>]*>/, ''), 'https://acme.test/').logo).toEqual({
+      url: 'https://acme.test/touch-180.png',
+      type: 'png',
+      source: 'apple-touch-icon',
+    });
+  });
+
+  it('keeps a touch icon without sizes above small favicons', () => {
+    const html = '<link rel="icon" sizes="32x32" href="/f32.png"><link rel="apple-touch-icon" href="/apple.png">';
+
+    expect(parseBrandPage(html, 'https://acme.test/').logo?.url).toBe('https://acme.test/apple.png');
+  });
+
+  it('tries the next link of the same kind when one is unusable', () => {
+    const html = [
+      '<link rel="apple-touch-icon" href="javascript:alert(1)">',
+      '<link rel="apple-touch-icon" href="/touch">',
+      '<link rel="apple-touch-icon" href="/touch.png">',
+      '<meta property="og:image" content="/og.png">',
+    ].join('');
+
+    expect(parseBrandPage(html, 'https://acme.test/').logo).toEqual({
+      url: 'https://acme.test/touch.png',
+      type: 'png',
+      source: 'apple-touch-icon',
+    });
+  });
+
   describe('hostile input stays linear', () => {
     const size = 2_000_000;
     const cases: Record<string, string> = {

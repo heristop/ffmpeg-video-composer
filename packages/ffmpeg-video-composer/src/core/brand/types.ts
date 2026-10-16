@@ -22,7 +22,7 @@ export interface BrandFonts {
 export interface BrandLogo {
   url: string;
   type: 'png' | 'svg' | 'jpeg' | 'webp' | 'ico';
-  /** Where the logo was found. */
+  /** Where the logo was found: the largest touch icon or icon by its sizes, else og:image. */
   source: 'apple-touch-icon' | 'icon' | 'og:image';
   /** Set once downloaded: the file name beside brand-kit.json. */
   file?: string;

@@ -238,23 +238,56 @@ function rels(link: Attributes): string[] {
   return attr(link, 'rel').toLowerCase().split(/\s+/);
 }
 
+/** Apple's touch icon is 180 px when a link gives no size; any other icon without one counts as smallest. */
+const TOUCH_ICON_SIZE = 180;
+
+interface IconLink {
+  href: string;
+  source: 'apple-touch-icon' | 'icon';
+  size: number;
+  explicit: boolean;
+}
+
+function sizeOf(sizes: string): number {
+  let largest = 0;
+
+  for (const match of sizes.slice(0, 200).matchAll(/(\d{1,5})x(\d{1,5})/gi)) {
+    largest = Math.max(largest, Math.min(Number(match[1]), Number(match[2])));
+  }
+
+  return largest;
+}
+
+function iconLink(link: Attributes): IconLink | null {
+  const kinds = rels(link);
+  const href = attr(link, 'href');
+  const size = sizeOf(attr(link, 'sizes'));
+
+  if (kinds.some((rel) => rel.startsWith('apple-touch-icon'))) {
+    return { href, source: 'apple-touch-icon', size: size || TOUCH_ICON_SIZE, explicit: size > 0 };
+  }
+
+  if (!kinds.includes('icon') || /\.ico(?:[?#]|$)/i.test(href)) return null;
+
+  return { href, source: 'icon', size, explicit: size > 0 };
+}
+
+/** The largest usable icon (a stated size beats an implied one, a touch icon beats a favicon), else og:image. */
 function logoFrom(links: Attributes[], metas: Attributes[], base: string): BrandLogo | null {
+  const icons = links
+    .map(iconLink)
+    .filter((icon): icon is IconLink => icon !== null)
+    .sort(
+      (a, b) =>
+        b.size - a.size ||
+        Number(b.explicit) - Number(a.explicit) ||
+        Number(b.source === 'apple-touch-icon') - Number(a.source === 'apple-touch-icon')
+    );
   const candidates: { href: string; source: BrandLogo['source'] }[] = [
-    {
-      href: attr(links.find((l) => rels(l).some((rel) => rel.startsWith('apple-touch-icon'))) ?? {}, 'href'),
-      source: 'apple-touch-icon',
-    },
-    {
-      href: attr(
-        links.find((l) => rels(l).includes('icon') && !/\.ico(?:[?#]|$)/i.test(attr(l, 'href'))) ?? {},
-        'href'
-      ),
-      source: 'icon',
-    },
-    {
-      href: attr(metas.find((m) => attr(m, 'property').toLowerCase() === 'og:image') ?? {}, 'content'),
-      source: 'og:image',
-    },
+    ...icons,
+    ...metas
+      .filter((m) => attr(m, 'property').toLowerCase() === 'og:image')
+      .map((m) => ({ href: attr(m, 'content'), source: 'og:image' as const })),
   ];
 
   for (const { href, source } of candidates) {
@@ -265,6 +298,14 @@ function logoFrom(links: Attributes[], metas: Attributes[], base: string): Brand
   }
 
   return null;
+}
+
+function googleFamilies(href: string): string[] {
+  const url = resolve(href, 'https://fonts.googleapis.com/');
+
+  if (!url) return [];
+
+  return new URL(url).searchParams.getAll('family').map((f) => f.split(':')[0].replace(/\+/g, ' ').trim());
 }
 
 // A site-wide sheet (layout, global, main, app…) holds the tokens; a colour-scheme or print variant holds a
@@ -290,14 +331,6 @@ function ownStylesheets(sheets: Attributes[], pageUrl: string): string[] {
     .map((sheet) => ({ url: sheet.url, rank: sheetRank(sheet.link, sheet.url) }))
     .sort((a, b) => a.rank - b.rank)
     .map((sheet) => sheet.url);
-}
-
-function googleFamilies(href: string): string[] {
-  const url = resolve(href, 'https://fonts.googleapis.com/');
-
-  if (!url) return [];
-
-  return new URL(url).searchParams.getAll('family').map((f) => f.split(':')[0].replace(/\+/g, ' ').trim());
 }
 
 function metaContent(metas: Attributes[], keys: [string, string]): string {
