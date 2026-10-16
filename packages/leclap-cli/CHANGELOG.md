@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-15
+
 ### Added
 
 - `leclap init` writes agent guidance: an `AGENTS.md` pointer (imported by a one-line `CLAUDE.md`) and `.agents/skills/authoring-leclap-videos/SKILL.md`,
@@ -20,6 +22,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   raw filters (trusted local templates only). Without it, raw filters are allow-listed by the engine and a
   template that uses a filter outside the list fails with `filter_not_allowed`.
 - `leclap brand <url>` writes a brand kit, a theme and binding rules.
+- `leclap samples` lists 51 samples: the new `layer-keyframes` sample animates cards and shapes with layer
+  keyframe tracks (pop-in, squash and stretch, flip, needle, parallax).
+- `leclap render` and `leclap validate` take everything `ffmpeg-video-composer` 3.2.0 adds: layer keyframe
+  tracks (`options.animate`, `options.origin`), the `path` graphic, the `burst` and `goo` fx, the `drip`
+  transition, glitch `tear`, iris `origin`/`ease`/`rim` and sheen `profile: "gloss"`.
+
+### Changed
+
+- Requires `ffmpeg-video-composer` ^3.2.0.
 
 ### Fixed
 
