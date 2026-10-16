@@ -1,10 +1,12 @@
 // Shot boundaries, from three readings of the sampled luma:
-// - dips: runs of black frames inside the clip (a fade out, a black hold, a fade in) are one boundary each;
+// - dips: runs of blank dark frames inside the clip (a fade out through black or dark grey, a hold, a fade
+//   in) are one boundary each;
 // - cuts: the reference-style cut detector (neighbourhood ratio test, so a pan reads as motion), each
 //   classified as a cut, or a dissolve when the change is spread over neighbouring frames; a one-sample
 //   flash between matching frames is not a cut;
 // - slow dissolves: a cross-fade too even for the ratio test, found where a frame is the average of the
-//   frames half a second either side of it while those two differ (a pan or a cut never is).
+//   frames half a second either side of it while those two differ (a pan or a cut never is), and those
+//   two are different pictures — not one picture made brighter or darker (exposure, lights coming up).
 
 import { detectCuts, frameDifference, frameDifferences } from '../style/pacing';
 import { lumaOf } from '../style/texture';
@@ -13,10 +15,15 @@ import type { Boundary, TransitionGuess } from './types';
 
 /** Sampling interval when frames carry no time: the reference samplers' 0.25 s. */
 export const DEFAULT_FRAME_INTERVAL = 0.25;
-// A frame reads as black under this mean 8-bit luma and this standard deviation (a dark scene with any
-// detail — a night sky, a dark interface — is not black).
-const DIP_LUMA = 12;
-const DIP_SPREAD = 6;
+// A frame reads as black under this mean 8-bit luma and this standard deviation: a dark scene with any
+// detail — a night sky, a dark interface — is not black.
+const BLACK_LUMA = 12;
+const BLANK_SPREAD = 6;
+// A fade that bottoms out on a blank dark grey (under this mean luma) instead of black is a dip too, when
+// the grey is short (at most this many samples) and the luma ramps down into it and back up out of it. A
+// longer or cut-to grey is a plain dark shot.
+const GREY_LUMA = 40;
+const GREY_HOLD = 4;
 // A neighbour difference at least this share of the peak means the change is spread over frames.
 const RAMP_SHARE = 0.35;
 // Cuts at most this many differences apart, with the frames between them still changing, are one change
@@ -30,6 +37,9 @@ const FLASH_MATCH = 0.3;
 const DISSOLVE_SPAN = 2;
 const DISSOLVE_MIN_CHANGE = 0.1;
 const DISSOLVE_LINEARITY = 0.25;
+// The two ends of a dissolve are different pictures: a gain and offset of the first one (a brightness or
+// exposure ramp inside one shot) must leave at least this share of the change unexplained.
+const DISSOLVE_NEW_PICTURE = 0.5;
 
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
@@ -39,8 +49,13 @@ export function frameTime(frames: readonly StyleFrame[], k: number): number {
   return frames[k]?.time ?? k * DEFAULT_FRAME_INTERVAL;
 }
 
-function isBlack(luma: Uint8Array): boolean {
-  if (luma.length === 0) return true;
+interface LumaStats {
+  mean: number;
+  spread: number;
+}
+
+function statsOf(luma: Uint8Array): LumaStats {
+  if (luma.length === 0) return { mean: 0, spread: 0 };
 
   let sum = 0;
   let squares = 0;
@@ -52,10 +67,53 @@ function isBlack(luma: Uint8Array): boolean {
 
   const mean = sum / luma.length;
 
-  return mean < DIP_LUMA && Math.sqrt(Math.max(0, squares / luma.length - mean * mean)) < DIP_SPREAD;
+  return { mean, spread: Math.sqrt(Math.max(0, squares / luma.length - mean * mean)) };
 }
 
-/** Runs of black frames as [first, last] frame indices, edge runs (a fade in or out of the clip) included. */
+function isBlack(stats: LumaStats): boolean {
+  return stats.mean < BLACK_LUMA && stats.spread < BLANK_SPREAD;
+}
+
+function isBlankGrey(stats: LumaStats): boolean {
+  return stats.mean < GREY_LUMA && stats.spread < BLANK_SPREAD;
+}
+
+// The luma falls over the two frames before `first` into the run and rises over the two after `end`.
+function fadesThrough(means: readonly number[], first: number, end: number): boolean {
+  if (first < 2 || end + 2 >= means.length) return false;
+
+  const floor = Math.max(...means.slice(first, end + 1));
+
+  return (
+    means[first - 2] > means[first - 1] &&
+    means[first - 1] > floor &&
+    floor < means[end + 1] &&
+    means[end + 1] < means[end + 2]
+  );
+}
+
+/**
+ * Frames that belong to a dip: black frames, and blank dark-grey frames where a fade bottoms out short of
+ * black. Black runs at the clip's edges (a fade in or out of the clip) are included.
+ */
+function blankFrames(stats: readonly LumaStats[]): boolean[] {
+  const blank = stats.map(isBlankGrey);
+  const means = stats.map((s) => s.mean);
+  const out = stats.map(() => false);
+
+  for (const [first, end] of blackRuns(blank)) {
+    const black = stats.slice(first, end + 1).some(isBlack);
+    const greyDip = end - first < GREY_HOLD && fadesThrough(means, first, end);
+
+    if (!black && !greyDip) continue;
+
+    out.fill(true, first, end + 1);
+  }
+
+  return out;
+}
+
+/** Runs of flagged frames as [first, last] frame indices. */
 function blackRuns(black: readonly boolean[]): [number, number][] {
   const runs: [number, number][] = [];
 
@@ -111,13 +169,42 @@ function groupCuts(cuts: readonly number[], diffs: readonly number[]): number[][
   return groups;
 }
 
+/** RMS (0..1) of what a gain and offset of `before` leaves unexplained in `after`. */
+function affineResidual(before: Uint8Array, after: Uint8Array): number {
+  const n = before.length;
+  let sumB = 0;
+  let sumA = 0;
+
+  for (let p = 0; p < n; p++) {
+    sumB += before[p];
+    sumA += after[p];
+  }
+
+  const meanB = sumB / n;
+  const meanA = sumA / n;
+  let covariance = 0;
+  let variance = 0;
+
+  for (let p = 0; p < n; p++) {
+    covariance += (before[p] - meanB) * (after[p] - meanA);
+    variance += (before[p] - meanB) ** 2;
+  }
+
+  const gain = variance > 0 ? covariance / variance : 0;
+  let squares = 0;
+
+  for (let p = 0; p < n; p++) squares += (after[p] - meanA - gain * (before[p] - meanB)) ** 2;
+
+  return Math.sqrt(squares / n) / 255;
+}
+
 function isEvenBlend(lumas: readonly Uint8Array[], k: number): boolean {
   const before = lumas[k - DISSOLVE_SPAN];
   const after = lumas[k + DISSOLVE_SPAN];
   const middle = lumas[k];
   const change = frameDifference(before, after);
 
-  if (change < DISSOLVE_MIN_CHANGE) return false;
+  if (change < DISSOLVE_MIN_CHANGE || affineResidual(before, after) < DISSOLVE_NEW_PICTURE * change) return false;
 
   let residual = 0;
 
@@ -160,7 +247,7 @@ export function findBoundaries(frames: readonly StyleFrame[]): Boundary[] {
 
   const lumas = frames.map(lumaOf);
   const diffs = frameDifferences(frames);
-  const black = lumas.map(isBlack);
+  const black = blankFrames(lumas.map(statsOf));
   const last = frames.length - 1;
   const dips: Boundary[] = blackRuns(black)
     .filter(([first, end]) => first > 0 && end < last)
