@@ -29,6 +29,27 @@ export function referenceTilePath(outDir: string): string {
   return path.join(outDir, 'compare-reference.png');
 }
 
+// ffmpeg's last stderr line, without the input path it opens with: "Invalid data found when processing input".
+function shortReason(error: unknown, clip: string): string {
+  const stderr = (error as { stderr?: Buffer | string }).stderr?.toString() ?? '';
+  const last = stderr.trim().split('\n').at(-1)?.trim() ?? '';
+  const fallback = error instanceof Error ? error.message : String(error);
+  const line = last.length > 0 ? last : fallback;
+
+  return line.replaceAll(`${clip}: `, '').replaceAll(clip, path.basename(clip));
+}
+
+/** Decode one frame of the reference before any render, so a clip that is not a video fails fast. */
+export async function assertReadableReference(clip: string): Promise<void> {
+  try {
+    execFileSync(await resolveStyleFfmpeg(), ['-v', 'error', '-i', clip, '-frames:v', '1', '-f', 'null', '-'], {
+      stdio: 'pipe',
+    });
+  } catch (error) {
+    throw new Error(`Reference could not be read: ${shortReason(error, clip)}`, { cause: error });
+  }
+}
+
 /** The reference's frame at the compared second, saved in `outDir`; fails when the clip ends before it. */
 async function grabReference(clip: string, at: number, outDir: string, width: number) {
   const out = referenceTilePath(outDir);
@@ -75,6 +96,8 @@ export const compare = defineCommand({
       const reference = args.reference === undefined ? undefined : path.resolve(args.reference);
 
       if (reference && !existsSync(reference)) throw new Error(`Reference not found: ${args.reference}`);
+
+      if (reference) await assertReadableReference(reference);
 
       // `--at` may be a time reference ("intro.end"): the engine resolves it on the first template and hands
       // the numeric second to `lead`, so the reference frame is grabbed at the same moment.
