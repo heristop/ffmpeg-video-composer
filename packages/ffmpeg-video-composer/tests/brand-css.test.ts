@@ -106,6 +106,14 @@ describe('brand css hardening', () => {
       'color:' + ' '.repeat(2_000_000),
       'x{font-family' + ' '.repeat(2_000_000),
       '/*'.repeat(1_000_000),
+      ':root{' +
+        Array.from({ length: 10 }, (_, k) =>
+          Array.from({ length: 8 }, (_, j) =>
+            Array.from({ length: 8 }, (_, d) => `--n${k}_${j}:var(--n${k + 1}_${d});`).join('')
+          ).join('')
+        ).join('') +
+        '}' +
+        'x{font-family:var(--n0_0)}'.repeat(80_000),
       '"/*'.repeat(600_000),
       '"' + String.raw`\\`.repeat(1_000_000),
       'x{font-family:' + 'var(--a,'.repeat(250_000),
@@ -273,6 +281,18 @@ describe('brand-named custom properties in any case', () => {
       '#533afd': 5,
       '#f59e0b': 2,
     });
+  });
+});
+
+describe('cssFonts token depth', () => {
+  it('reads a token reached too deep once when a later rule reaches it directly', () => {
+    const chain = Array.from({ length: 8 }, (_, i) => `--f${i}: var(--f${i + 1});`).join(' ');
+    const fonts = cssFonts(`:root { ${chain} --f8: var(--acme); --acme: "Acme Display"; }
+      body { font-family: var(--f0); }
+      h1 { font-family: var(--f8); }`);
+
+    expect(fonts.body).toBeNull();
+    expect(fonts.display).toBe('Acme Display');
   });
 });
 

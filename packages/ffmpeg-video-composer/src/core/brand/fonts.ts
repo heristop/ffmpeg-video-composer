@@ -82,21 +82,40 @@ function varCall(value: string): VarCall {
  * fallbacks and what follows them). Each property resolves once, so a cycle or a long chain stays bounded.
  */
 function familyResolver(properties: Map<string, string[]>): (value: string) => string | null {
-  const resolved = new Map<string, string | null>();
+  // A result cut short by the depth limit holds only for starts at least that deep: a shallower start retries,
+  // so each property resolves at most once per depth.
+  const resolved = new Map<string, { family: string | null; depth: number; complete: boolean }>();
+  const resolving = new Set<string>();
+  let cuts = 0;
 
   function ofProperty(name: string, depth: number): string | null {
-    if (resolved.has(name)) return resolved.get(name) ?? null;
+    const known = resolved.get(name);
 
-    resolved.set(name, null);
+    if (resolving.has(name)) return null;
 
-    const values = depth >= MAX_VAR_DEPTH ? [] : (properties.get(name) ?? []);
+    if (known && (known.complete || depth >= known.depth)) {
+      if (!known.complete) cuts++;
+
+      return known.family;
+    }
+
+    if (depth >= MAX_VAR_DEPTH) {
+      cuts++;
+
+      return null;
+    }
+
+    const before = cuts;
     let family: string | null = null;
 
-    for (const value of values) {
+    resolving.add(name);
+
+    for (const value of properties.get(name) ?? []) {
       family ??= of(value, depth + 1);
     }
 
-    resolved.set(name, family);
+    resolving.delete(name);
+    resolved.set(name, { family, depth, complete: family !== null || cuts === before });
 
     return family;
   }
