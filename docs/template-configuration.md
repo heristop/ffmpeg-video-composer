@@ -2298,6 +2298,12 @@ LeClap reads the format from pixels (luma changes and where the detail is) and n
 the reference's subjects, logos or text. Use a clip you have the right to use: LeClap doesn't download
 videos from X, YouTube or other hosts.
 
+### Use your brand
+
+`leclap brand https://your.site` reads your website's brand: its name, the colours it declares and uses most (with readable text guaranteed), its fonts and its logo. It writes a `brand-kit/` folder: `brand-kit.json`, `brand.theme.json` (a `global.theme` to paste), `brand-rules.txt` (binding rules for an agent) and `logo.<ext>` when the logo downloads (the extension follows the image type the site returns). A logo that fails does not lose the kit: it is still saved and the failure is reported as `logoError`. Copy the logo to `assets/brand/` so the rules' `/assets/brand/` path resolves (see the [CLI](../packages/leclap-cli/README.md#brand--read-a-websites-brand)). Import `brand-kit.json` in the builder's **Generate with AI** under **Your brand**; agents call the MCP `extract_brand` (start the server with `--allow-network`; the kit is saved under `<media-dir>/brand-kits/<host>/`). The library API is `fetchBrandKit(url)`, `saveBrandKit`, `brandTheme(kit)` and `brandPromptRules`.
+
+Theme fonts are bundled fonts, so a branded template renders the same on every platform: LeClap picks the closest one and lists your exact families as `FontRef` suggestions (font objects you can use for Node and phone renders). The site name is cleaned (whitespace collapsed, 80 characters at most). LeClap only fetches over HTTPS, refuses URLs with credentials and addresses that are not public (checked again on every redirect, three at most), reads at most 2 MB per response within 10 seconds and follows at most three stylesheets. It never fetches from the builder.
+
 ## Delivery platforms
 
 Set `global.platform` when a video has a destination. It tunes the defaults and the validation for that app; the rendered frames stay the engine's own presets.
