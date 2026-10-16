@@ -138,7 +138,7 @@ export const mcpDoc: McpDoc = {
       args: 'path',
       purpose:
         "Reads a reference clip's format: its shots with lengths, the transition into each, light or dark ground, where the main element sits on a 3x3 grid and motion, plus the rhythm, as binding rules.",
-      when: 'Use to remake a reference video format: build one section per listed shot, in order, and take the palette from extract_style. Analyses at most 2 minutes at full resolution. The path must resolve inside the media dir.',
+      when: 'Use to remake a reference video format: build one section per listed shot, in order, and take the palette from extract_style. Samples every 0.25 s for up to 2 minutes. The path must resolve inside the media dir.',
     },
     {
       name: 'analyze_music',

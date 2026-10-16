@@ -74,7 +74,7 @@ export function registerExtractStructure(server: McpServer, config: McpConfig, a
         'Read a reference clip (absolute path under the media dir) as a format: its shots with lengths, the ' +
         'transition into each (cut, fade, fadeblack), light or dark ground, where the main element sits on a ' +
         '3x3 grid and motion, plus the rhythm. Returns binding rules: build one section per shot, in order. ' +
-        'Analyses at most 2 minutes at full resolution; a longer clip is sampled evenly, so its shots are coarser. ' +
+        'Samples every 0.25 s for up to 2 minutes; a longer clip is sampled evenly, so its shots are coarser. ' +
         'Pair with extract_style for the palette. The format only: never copies subjects, logos or text.',
       inputSchema,
       outputSchema,
