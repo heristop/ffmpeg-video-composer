@@ -39,6 +39,8 @@ export interface CompareOptions extends SnapshotRenderOptions {
   /** Grid columns (default: the square root of the variant count, rounded up). */
   cols?: number;
   tileWidth?: number;
+  /** A tile placed before the variants, made once the compared second is known (a reference frame). */
+  lead?: (time: number, tileWidth: number) => Promise<{ path: string; label: string }>;
 }
 
 export interface CompareResult {
@@ -89,12 +91,17 @@ async function compare(engine: SnapshotEngine, variants: CompareVariant[], optio
       variantFrame(engine, variant, index, root, options)
     );
 
-    const cols = Math.max(1, options.cols ?? Math.ceil(Math.sqrt(frames.length)));
     const tileWidth = options.tileWidth ?? 480;
+    const lead = await options.lead?.(frames[0].time, tileWidth);
+    const tileCount = frames.length + (lead ? 1 : 0);
+    const cols = Math.max(1, options.cols ?? Math.ceil(Math.sqrt(tileCount)));
     const first = frames[0];
     const tileHeight = Math.round((tileWidth * first.height) / Math.max(1, first.width) / 2) * 2;
-    const inputs = frames.map((frame) => ({ path: frame.path, label: `${frame.label} ${frame.time.toFixed(2)}s` }));
-    const layout = { cols, rows: Math.ceil(frames.length / cols), tileWidth, tileHeight };
+    const inputs = [
+      ...(lead ? [{ path: lead.path, label: `${lead.label} ${frames[0].time.toFixed(2)}s` }] : []),
+      ...frames.map((frame) => ({ path: frame.path, label: `${frame.label} ${frame.time.toFixed(2)}s` })),
+    ];
+    const layout = { cols, rows: Math.ceil(tileCount / cols), tileWidth, tileHeight };
     const sheet = await buildSheet(
       inputs,
       layout,
