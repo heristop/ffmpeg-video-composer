@@ -28,6 +28,7 @@ leclap samples show <id>  # inspect direction and requirements (also --json)
 leclap samples export <id> # raw descriptor JSON to stdout (or --output <new-file>)
 leclap verify <manifest>  # check a video against its render manifest (--rerender to re-render and compare)
 leclap style <reference>  # derive a theme + style guide from an image or clip (--json, --out style-guide.md)
+leclap reference <clip>   # a reference clip's format (shots, rhythm, layout) as binding rules (--json, --out, --check)
 leclap beats <audio>      # tempo, beat grid, confidence and drop/build cues for global.beats (--json)
 leclap transcribe <t|media> # speech → word-timed captions with whisper.cpp, pinned into the template (--srt, --json)
 leclap snapshot <template> # render and save still frames (PNG) of chosen moments, contact sheets
@@ -212,6 +213,10 @@ clustered in OKLab and assigned to theme roles, with `fg` and `muted` moved to W
 when they fall short; clips add the average shot length, cuts per minute, motion energy and a
 suggested genre. Only the palette, texture and pacing carry over — subjects, logos and text in the
 reference are never copied. The same reference (and `--seed`) always gives the same theme.
+
+## `reference` — follow a reference clip's format
+
+- `leclap reference <clip> [--json] [--out rules.txt] [--check template.json]` — read a reference clip's format (shots, rhythm, transitions, grounds, where the main element sits) as binding rules; `--check` exits 1 when a template drifts from it. The format only: never the reference's subjects, logos or text.
 
 ## `beats` — measure a music track
 

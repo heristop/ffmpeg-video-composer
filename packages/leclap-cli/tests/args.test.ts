@@ -16,6 +16,7 @@ describe('rewriteArgv', () => {
     expect(rewriteArgv(['diagnose'], KNOWN_COMMANDS)).toEqual(['diagnose']);
     expect(rewriteArgv(['validate', 'x.json'], KNOWN_COMMANDS)).toEqual(['validate', 'x.json']);
     expect(rewriteArgv(['samples', 'list'], KNOWN_COMMANDS)).toEqual(['samples', 'list']);
+    expect(rewriteArgv(['reference', 'clip.mp4'], KNOWN_COMMANDS)).toEqual(['reference', 'clip.mp4']);
   });
 
   it('leaves flags and empty argv untouched', () => {

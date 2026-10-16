@@ -8,6 +8,7 @@ export const KNOWN_COMMANDS = [
   'samples',
   'verify',
   'style',
+  'reference',
   'studio',
   'beats',
   'transcribe',
