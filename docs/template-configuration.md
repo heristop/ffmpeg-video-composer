@@ -2228,8 +2228,9 @@ the next one's. In the builder, add a clip under **Match a reference**; the pane
 prints the rules and `leclap reference clip.mp4 --check template.json` holds a template to them (flags in
 the [CLI README](../packages/leclap-cli/README.md#reference--follow-a-reference-clips-format));
 `leclap compare remix.json --at 2 --reference clip.mp4` puts both side by side. Agents call the MCP tool
-`extract_structure`, which samples at most 480 frames (2 minutes at full resolution, longer clips sampled
-evenly); the CLI samples up to 1200.
+`extract_structure`, which samples at most 480 frames (every 0.25 s for up to 2 minutes, longer clips sampled
+evenly); the CLI samples up to 1200. The builder samples at most 120 frames (30 s at 0.25 s); a longer clip is
+sampled more sparsely, so short shots can merge and its format can differ from `leclap reference`.
 
 What is read:
 
