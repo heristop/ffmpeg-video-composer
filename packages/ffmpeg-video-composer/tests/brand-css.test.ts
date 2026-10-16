@@ -106,6 +106,8 @@ describe('brand css hardening', () => {
       'color:' + ' '.repeat(2_000_000),
       'x{font-family' + ' '.repeat(2_000_000),
       '/*'.repeat(1_000_000),
+      '"/*'.repeat(600_000),
+      '"' + String.raw`\\`.repeat(1_000_000),
       'x{font-family:' + 'var(--a,'.repeat(250_000),
       ':root{' + '--a:var(--b);--b:var(--a);'.repeat(80_000) + '}body{font-family:var(--a)}',
       'x{font-family:var(--a)}'.repeat(80_000) + ':root{--a:' + 'var(--a, '.repeat(100) + '}',
@@ -226,5 +228,20 @@ describe('cssFonts through custom properties', () => {
     ).toMatchObject({
       body: null,
     });
+  });
+});
+
+describe('brand css strings and hues', () => {
+  it('keeps reading after a comment opener inside a quoted string', () => {
+    const css = `.a{background:url("/img/*.png")} .b{color:#3ce6ac} h1{font-family:"Acme */ Display"} /* c */ .c{color:#ff0000}`;
+
+    expect(cssColors(css).map((c) => c.hex)).toEqual(['#3ce6ac', '#ff0000']);
+    expect(cssFonts(css).display).toBe('Acme */ Display');
+  });
+
+  it('wraps negative and large hsl hues', () => {
+    expect(normalizeColor('hsl(-120 100% 50%)')).toBe(normalizeColor('hsl(240 100% 50%)'));
+    expect(normalizeColor('hsl(-30deg, 100%, 50%)')).toBe(normalizeColor('hsl(330, 100%, 50%)'));
+    expect(normalizeColor('hsl(480 100% 50%)')).toBe(normalizeColor('hsl(120 100% 50%)'));
   });
 });
