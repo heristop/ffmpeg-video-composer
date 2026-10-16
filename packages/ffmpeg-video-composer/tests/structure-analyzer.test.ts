@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { analyzeStructure, structureDrift, structurePromptRules } from '@/core/structure';
+import { analyzeStructure, cropBars, structureDrift, structurePromptRules } from '@/core/structure';
 import { XFADE_TRANSITIONS } from '@/schemas/effects.schemas';
 import { LECLAP_TRANSITION } from '@/core/structure/prompt';
 import type { StyleFrame } from '@/core/style';
@@ -53,6 +53,50 @@ describe('analyzeStructure', () => {
 
   it('refuses a single frame', () => {
     expect(() => analyzeStructure({ frames: [flat(1, 0)] })).toThrow(/clip/);
+  });
+});
+
+// A 60×30 frame painted by `paint(x, y)` (luma, written to every channel).
+function painted(paint: (x: number, y: number) => number, time: number): StyleFrame {
+  const width = 60;
+  const height = 30;
+  const data = new Uint8Array(width * height * 3);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) data.fill(paint(x, y), (y * width + x) * 3, (y * width + x) * 3 + 3);
+  }
+
+  return { data, width, height, time };
+}
+
+describe('analyzeStructure on letterboxed and pillarboxed clips', () => {
+  it('finds a cut inside pillarbox bars that dilute the frame difference', () => {
+    // A portrait clip pillarboxed in landscape: black bars on the outer thirds, the picture in the middle.
+    const frame = (value: number, time: number) => painted((x) => (x < 20 || x >= 40 ? 0 : value), time);
+    const frames = [...[0, 1, 2, 3].map((k) => frame(60, k * 0.25)), ...[4, 5, 6, 7].map((k) => frame(120, k * 0.25))];
+
+    expect(analyzeStructure({ frames }).shots.map((s) => s.transitionIn)).toEqual([null, 'cut']);
+  });
+
+  it('places the main element within the picture, not on the letterbox edges', () => {
+    // Black bars on the top and bottom 5 rows; a faint detail on the left of the picture.
+    const paint = (x: number, y: number) => {
+      if (y < 5 || y >= 25) return 0;
+
+      if (x < 20 && y >= 12 && y < 18) return x % 2 === 0 ? 136 : 120;
+
+      return 128;
+    };
+    const frames = [0, 1, 2, 3].map((k) => painted(paint, k * 0.25));
+
+    expect(analyzeStructure({ frames }).shots[0].anchor).toBe('left');
+  });
+
+  it('keeps the dark ground around an off-centre subject: uneven margins are not bars', () => {
+    // A bright subject on black, 10 columns from the left edge and 30 from the right.
+    const frames = [0, 1].map((k) => painted((x, y) => (x >= 10 && x < 30 && y >= 8 && y < 22 ? 200 : 0), k));
+
+    expect(cropBars(frames)[0].width).toBe(60);
   });
 });
 
