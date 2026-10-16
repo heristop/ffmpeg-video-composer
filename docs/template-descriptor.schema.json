@@ -16459,10 +16459,12 @@
                           "properties": {
                             "from": {
                               "type": "string",
+                              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                               "description": "Start colour of the gradient as a CSS hex string or FFmpeg colour name."
                             },
                             "to": {
                               "type": "string",
+                              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$",
                               "description": "End colour of the gradient as a CSS hex string or FFmpeg colour name."
                             },
                             "direction": {
@@ -26130,7 +26132,8 @@
             },
             "marker": {
               "description": "Highlight marker colour behind accent words (highlight preset; default #7C83FD@0.85).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             }
           },
           "required": ["words"],
@@ -27889,7 +27892,8 @@
             },
             "track": {
               "description": "Colour of the unfilled track (default none), e.g. \"#FFFFFF@0.2\".",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
             },
             "x": {
               "description": "Left edge in px.",
@@ -28804,7 +28808,8 @@
                   "maxItems": 5,
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
                   }
                 },
                 "depth": {

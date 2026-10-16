@@ -194,8 +194,8 @@ export const BackgroundLayerSchema = z
       .describe('Layer height in output pixels or FFmpeg expression (default: full output height).'),
     gradient: z
       .object({
-        from: z.string().describe('Start colour of the gradient as a CSS hex string or FFmpeg colour name.'),
-        to: z.string().describe('End colour of the gradient as a CSS hex string or FFmpeg colour name.'),
+        from: ColorToken.describe('Start colour of the gradient as a CSS hex string or FFmpeg colour name.'),
+        to: ColorToken.describe('End colour of the gradient as a CSS hex string or FFmpeg colour name.'),
         direction: z
           .enum(['horizontal', 'vertical', 'diagonal'])
           .optional()

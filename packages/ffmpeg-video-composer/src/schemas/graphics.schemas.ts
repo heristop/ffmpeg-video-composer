@@ -204,7 +204,7 @@ export const GraphicSchema = z
           .describe('Seconds the bar takes to fill (default 3; linear unless `ease` is set).'),
         position: z.enum(['top', 'bottom']).optional().describe('Frame edge the bar sits on (default bottom).'),
         thickness: z.number().positive().max(80).optional().describe('Bar thickness in px (default 8).'),
-        track: z.string().optional().describe('Colour of the unfilled track (default none), e.g. "#FFFFFF@0.2".'),
+        track: ColorToken.optional().describe('Colour of the unfilled track (default none), e.g. "#FFFFFF@0.2".'),
         ...placement,
         width: z.number().positive().optional().describe('Bar length in px (default full frame width).'),
       })

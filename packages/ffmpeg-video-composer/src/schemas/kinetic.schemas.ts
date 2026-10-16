@@ -195,10 +195,9 @@ export const KineticBlockSchema = z
           .union([z.array(z.number().int().min(0)).max(64), z.literal('last'), z.literal('first')])
           .describe('Zero-based word indices to accent, or "first" / "last".'),
         color: ColorToken.optional().describe('Accent text colour (default #FFF685).'),
-        marker: z
-          .string()
-          .optional()
-          .describe('Highlight marker colour behind accent words (highlight preset; default #7C83FD@0.85).'),
+        marker: ColorToken.optional().describe(
+          'Highlight marker colour behind accent words (highlight preset; default #7C83FD@0.85).'
+        ),
       })
       .strict()
       .optional()

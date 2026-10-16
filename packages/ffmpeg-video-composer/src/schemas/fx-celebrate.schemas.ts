@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 
 // ── fx primitives that mark a moment: ripple (a tap or a pulse), glint (star twinkles, orbiting specs),
 // confetti (a ballistic burst) and burst (impact lines shooting out of a point). Rows of FX_PRIMITIVES
@@ -65,7 +66,7 @@ export const confetti = {
     spin: z.number().min(0).max(4).optional(),
     size: z.number().min(4).max(64).optional(),
     discs: z.number().min(0).max(1).optional(),
-    colors: z.array(z.string()).min(1).max(5).optional(),
+    colors: z.array(ColorToken).min(1).max(5).optional(),
     depth: z.number().min(0).max(1).optional(),
     fade: z.number().min(0.1).max(2).optional(),
   },

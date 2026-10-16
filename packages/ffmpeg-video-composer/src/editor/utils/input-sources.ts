@@ -1,4 +1,4 @@
-import { assertSafeArgToken } from '@/core/arg-guard';
+import { assertSafeArgToken, assertSafeColorToken } from '@/core/arg-guard';
 import type { RevealEasing } from '../presets/text';
 import { easedRamp, phaseDuration } from '../presets/eased-ramp';
 import type { BackgroundLayer } from '../../schemas/template.schemas';
@@ -436,8 +436,9 @@ export function buildGradientSource(layer: BackgroundLayer, scale: string, durat
   const size = `${w}x${h}`;
   const coords = gradientCoords(gradient.shape, gradient.direction, gradient.angle, w, h);
 
-  const from = assertSafeArgToken(gradient.from, 'gradient from');
-  const to = assertSafeArgToken(gradient.to, 'gradient to');
+  // Both stops land unquoted in the lavfi input graph: one colour token each, not just whitespace-free.
+  const from = assertSafeColorToken(gradient.from, 'gradient from');
+  const to = assertSafeColorToken(gradient.to, 'gradient to');
   // Only emit `type=` when the descriptor sets a shape, so older descriptors keep byte-identical
   // commands; a frozen `speed` is ALWAYS explicit — the source's default 0.01 slowly rotates the
   // gradient over the section, an unexposed side effect a background layer must not have. The value

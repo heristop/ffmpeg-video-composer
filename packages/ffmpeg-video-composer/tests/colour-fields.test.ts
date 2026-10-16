@@ -5,6 +5,8 @@ import MapManager from '@/editor/managers/MapManager';
 import { templateDescriptorJsonSchema } from '@/schemas/template.schemas';
 import { ChromaKeySchema } from '@/schemas/text-media.schemas';
 import { TitleCardSchema } from '@/schemas/text.schemas';
+import { BackgroundLayerSchema } from '@/schemas/effects-visual.schemas';
+import { buildGradientSource } from '@/editor/utils/input-sources';
 
 // Colour fields reach filtergraphs (`colorkey=<c>`, `drawbox=…color=<c>`, `fontcolor='<c>'`): every one is a
 // single colour token in the schema, and the two lowering choke points refuse anything else, so a
@@ -17,6 +19,43 @@ const VALID = ['black', '#141416', '#000000@0.5', '$color.bg', '$color.accent@0.
 // formatColorValue) and the synth noise colour (white/pink/brown, never in a filtergraph).
 const OPEN = new Set(['fontcolor', 'boxcolor', 'shadowcolor', 'bordercolor']);
 const OPEN_DESCRIPTIONS = [/^Alternate colour parameter/, /^noise/i];
+
+// Fields whose description mentions colour without being one (enums, free text, CSS), plus the raw
+// filter colour values and colorsList (which takes rgb() the formatter converts).
+const NOT_COLOUR_TOKENS = new Set(['c', 'colorsList', 'contrast', 'crown', 'css', 'emoji', 'type']);
+
+// Every string (or string-list) property whose DESCRIPTION speaks of a colour, whatever its key: a
+// gradient's `from`/`to` or a progress `track` reach filtergraphs as much as a `color` does.
+function describedColourFields(): string[] {
+  const missing: string[] = [];
+
+  (function walk(node: unknown, at: string): void {
+    if (Array.isArray(node)) {
+      for (const [i, child] of node.entries()) walk(child, `${at}[${i}]`);
+
+      return;
+    }
+
+    if (!node || typeof node !== 'object') return;
+    const record = node as Record<string, unknown>;
+    const properties = record.properties as Record<string, Record<string, unknown>> | undefined;
+
+    for (const [key, schema] of Object.entries(properties ?? {})) {
+      const description = typeof schema.description === 'string' ? schema.description : '';
+      const items = (schema.items ?? {}) as Record<string, unknown>;
+      const bare =
+        (schema.type === 'string' && !schema.pattern) ||
+        (schema.type === 'array' && items.type === 'string' && !items.pattern);
+      const open = OPEN.has(key) || NOT_COLOUR_TOKENS.has(key) || OPEN_DESCRIPTIONS.some((re) => re.test(description));
+
+      if (/colou?r/i.test(description) && bare && !open) missing.push(`${at}.${key}`);
+    }
+
+    for (const [key, child] of Object.entries(record)) walk(child, `${at}.${key}`);
+  })(templateDescriptorJsonSchema, '');
+
+  return missing;
+}
 
 function colourStringFields(): string[] {
   const missing: string[] = [];
@@ -51,6 +90,10 @@ describe('colour fields: schema', () => {
     expect(colourStringFields()).toEqual([]);
   });
 
+  it('constrains colour fields named otherwise (gradient stops, tracks, markers, palettes)', () => {
+    expect(describedColourFields()).toEqual([]);
+  });
+
   it('rejects filtergraph syntax in the chroma key and title card colours', () => {
     for (const color of HOSTILE) {
       expect(ChromaKeySchema.safeParse({ color }).success, color).toBe(false);
@@ -76,6 +119,28 @@ function formatter(): FormatterManager {
 
   return new FormatterManager(project as never, template as never, vm as never, segment as never, logger as never);
 }
+
+describe('gradient background layers', () => {
+  it('rejects filtergraph syntax in the gradient stops', () => {
+    for (const color of HOSTILE) {
+      expect(BackgroundLayerSchema.safeParse({ gradient: { from: color, to: '#000000' } }).success, color).toBe(false);
+      expect(BackgroundLayerSchema.safeParse({ gradient: { from: '#000000', to: color } }).success, color).toBe(false);
+    }
+
+    expect(BackgroundLayerSchema.safeParse({ gradient: { from: '$color.bg', to: '#7C83FD@0.5' } }).success).toBe(true);
+  });
+
+  it('refuses a gradient stop that is not a colour token at lowering', () => {
+    for (const color of HOSTILE.filter((value) => !/\s/.test(value))) {
+      expect(() => buildGradientSource({ gradient: { from: color, to: '#000000' } }, '1280:720', 4), color).toThrow(
+        /gradient from/
+      );
+      expect(() => buildGradientSource({ gradient: { from: '#000000', to: color } }, '1280:720', 4), color).toThrow(
+        /gradient to/
+      );
+    }
+  });
+});
 
 describe('colour fields: lowering choke points', () => {
   it('refuses a drawtext/drawbox colour value that is not a colour token', () => {
