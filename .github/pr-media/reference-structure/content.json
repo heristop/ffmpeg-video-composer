@@ -1,0 +1,42 @@
+{
+  "_note": "Captures from record.mjs (Generate with AI, 1024x768, the same footage-edit.mp4 clip). trim is a start offset: both runs show the analysis landing at second 3.0; the freeze holds the result at 4.5.",
+  "ticket": "reference-structure",
+  "summary": "Match a reference reads a clip's format, not only its look",
+  "clipSeconds": 6,
+  "freeze": { "at": 4.5, "hold": 4 },
+  "intro": {
+    "headline": "MATCH A CLIP'S FORMAT"
+  },
+  "outro": {
+    "headline": "REVIEW THE FORMAT LINE",
+    "subtitle": "Same clip: shots and pace, then the prompt"
+  },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.webm",
+      "trim": 21.7,
+      "highlight": { "x": 566, "y": 532, "w": 420, "h": 104 },
+      "callout": "Palette and pace only",
+      "chip": "Palette and pace only",
+      "pane": {
+        "title": "The look, not the format",
+        "desc": "A seven-shot clip gives swatches and a pace. Its shots never reach the AI."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.webm",
+      "trim": 14.4,
+      "highlight": { "x": 566, "y": 544, "w": 340, "h": 36 },
+      "callout": "7 shots, read",
+      "chip": "The clip's format, read",
+      "pane": {
+        "title": "The format, read",
+        "desc": "The same clip now reports its shots and their length, and the AI follows them."
+      }
+    }
+  ]
+}
