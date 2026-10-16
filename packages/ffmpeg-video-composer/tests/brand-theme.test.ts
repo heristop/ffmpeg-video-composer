@@ -1,14 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { contrastRatio } from '@/core/color-contrast';
 import { hexToRgb, hue, hueDistance, rgbToOklab } from '@/core/style/oklab';
-import {
-  brandPromptRules,
-  brandTheme,
-  nearestBundledFont,
-  sanitizeBrandName,
-  withThemeColor,
-  type BrandKit,
-} from '@/core/brand';
+import { withThemeColor } from '@/core/brand/css';
+import { brandPromptRules, brandTheme, nearestBundledFont, sanitizeBrandName } from '@/core/brand/theme';
+import type { BrandKit } from '@/core/brand/types';
 import { ThemeObjectSchema } from '@/schemas/theme.schemas';
 
 const kit: BrandKit = {

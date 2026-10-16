@@ -17,12 +17,11 @@ import {
   MAX_BRAND_COLORS,
   MAX_BRAND_FAMILIES,
   MAX_FAMILY_NAME,
-  parseBrandPage,
-  sanitizeBrandName,
   withThemeColor,
-  type BrandKit,
-  type BrandLogo,
-} from '../core/brand';
+} from '../core/brand/css';
+import { parseBrandPage } from '../core/brand/html';
+import { sanitizeBrandName } from '../core/brand/theme';
+import type { BrandKit, BrandLogo } from '../core/brand/types';
 
 export interface BrandFetchOptions {
   fetch?: typeof fetch;
