@@ -299,6 +299,11 @@ describe('reference style guide', () => {
     expect(built.system.length).toBeLessThanOrEqual(DEFAULT_PROMPT_BUDGET);
   });
 
+  it('heads the block as carrying a clip’s format too, not the palette alone', () => {
+    expect(REFERENCE_STYLE_HEADING).toContain('format');
+    expect(REFERENCE_STYLE_HEADING).not.toContain('only');
+  });
+
   it('fits a real reference clip’s style and format (more than 24 shots) under the budget', () => {
     const { format, rules: clipRules } = clipReferenceRules();
     const built = promptFor(
