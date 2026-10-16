@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { analyzeStructure, cropBars, structureDrift, structurePromptRules } from '@/core/structure';
+import { analyzeStructure, structureDrift, structurePromptRules } from '@/core/structure';
+import { cropBars } from '@/core/structure/bars';
 import { XFADE_TRANSITIONS } from '@/schemas/effects.schemas';
 import { LECLAP_TRANSITION } from '@/core/structure/prompt';
 import type { StyleFrame } from '@/core/style';
