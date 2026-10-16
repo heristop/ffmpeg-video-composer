@@ -354,4 +354,15 @@ describe('cssFonts family limits', () => {
 
     expect(cssFonts(`${many} h1{font-family:Late Display}`).display).toBe('Late Display');
   });
+
+  it('never takes a family name longer than 80 characters', () => {
+    const long = 'A'.repeat(81);
+
+    expect(cssFonts(`body{font-family:"${long}", "Acme Sans"} h1{font-family:"${'B'.repeat(80)}"}`)).toEqual({
+      display: 'B'.repeat(80),
+      body: null,
+      mono: null,
+      families: ['B'.repeat(80)],
+    });
+  });
 });

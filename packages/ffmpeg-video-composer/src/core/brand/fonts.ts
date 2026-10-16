@@ -24,6 +24,8 @@ const GENERIC_FAMILIES = new Set([
   'blinkmacsystemfont',
 ]);
 
+/** Real family names are a few words; a longer one is not a face the site ships. */
+const MAX_FAMILY_NAME = 80;
 /** Distinct families kept in a kit; the roles still read every rule. */
 const MAX_FAMILIES = 64;
 
@@ -35,7 +37,9 @@ function firstFamily(value: string): string | null {
       ?.trim()
       .replace(/^["']|["']$/g, '') ?? '';
 
-  if (first === '' || first.startsWith('var(') || GENERIC_FAMILIES.has(first.toLowerCase())) return null;
+  if (first === '' || first.length > MAX_FAMILY_NAME) return null;
+
+  if (first.startsWith('var(') || GENERIC_FAMILIES.has(first.toLowerCase())) return null;
 
   if (/fallback|emoji|symbol/i.test(first) || /^[\d.+-]/.test(first)) return null;
 
