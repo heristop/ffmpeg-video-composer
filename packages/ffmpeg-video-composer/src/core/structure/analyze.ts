@@ -30,7 +30,7 @@ export function analyzeStructure(input: StructureInput): ReferenceStructure {
   if (frames.length < 2) throw new Error('A reference structure needs a clip (at least 2 frames), not a still.');
 
   const duration = clipDuration(frames, input.duration);
-  const boundaries = findBoundaries(frames);
+  const boundaries = findBoundaries(frames).filter((b) => b.time < duration);
   const starts = [0, ...boundaries.map((b) => b.time)];
   const shots: Shot[] = starts.map((start, index) => {
     const end = boundaries[index]?.time ?? duration;

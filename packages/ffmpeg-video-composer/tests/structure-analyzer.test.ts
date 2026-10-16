@@ -32,6 +32,17 @@ describe('analyzeStructure', () => {
     expect(structure.rhythm).toMatchObject({ shots: 3, shortest: 0.5, longest: 1.12 });
   });
 
+  it('clamps shots to a duration shorter than the sampled frames', () => {
+    const structure = analyzeStructure({ frames: clip, duration: 1.2 });
+
+    expect(structure.shots.length).toBeGreaterThan(0);
+    for (const shot of structure.shots) {
+      expect(shot.end).toBeLessThanOrEqual(1.2);
+      expect(shot.duration).toBeGreaterThan(0);
+    }
+    expect(structure.rhythm.shortest).toBeGreaterThan(0);
+  });
+
   it('reads one continuous shot when there is no cut', () => {
     const structure = analyzeStructure({ frames: [0, 1, 2, 3].map((k) => flat(90, k * 0.25)) });
 
