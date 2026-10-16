@@ -52,6 +52,29 @@ describe.skipIf(!hasFfmpeg())('analyzeStructureFile (ffmpeg)', () => {
     expect(structure.shots[1].duration).toBeLessThan(1.3);
   });
 
+  it('samples a long clip every 0.25 s, so a half-second shot past the first minute is kept', async () => {
+    const long = path.join(dir, 'long-flash.mp4');
+    const shots = [
+      'color=c=0x101820:s=160x90:r=10:d=60',
+      'color=c=0xf0f0f0:s=160x90:r=10:d=0.5',
+      'color=c=0x101820:s=160x90:r=10:d=59.5',
+    ];
+    execFileSync('ffmpeg', [
+      '-v',
+      'error',
+      ...shots.flatMap((s) => ['-f', 'lavfi', '-i', s]),
+      '-filter_complex',
+      '[0][1][2]concat=n=3:v=1:a=0',
+      '-pix_fmt',
+      'yuv420p',
+      long,
+    ]);
+
+    const structure = await analyzeStructureFile(long);
+
+    expect(structure.shots.map((shot) => shot.ground)).toEqual(['dark', 'light', 'dark']);
+  }, 60_000);
+
   it('refuses a still image', async () => {
     await expect(analyzeStructureFile(still)).rejects.toThrow(/clip/);
   });
