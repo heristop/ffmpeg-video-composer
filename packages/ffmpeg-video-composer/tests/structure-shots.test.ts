@@ -27,6 +27,20 @@ function panFrame(x: number, time: number): StyleFrame {
 
 const t = (k: number) => k * 0.25;
 
+// A frame painted by `paint(x, y)` (luma on every channel).
+function painted(paint: (x: number, y: number) => number, time: number): StyleFrame {
+  const data = new Uint8Array(W * H * 3);
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) data.fill(paint(x, y), (y * W + x) * 3, (y * W + x) * 3 + 3);
+  }
+
+  return { data, width: W, height: H, time };
+}
+
+const shotA = (x: number, y: number) => (Math.floor(x / 4) % 2 === 0 ? 40 : 200) + (y % 3) * 5;
+const shotB = (x: number, y: number) => (Math.floor(y / 3) % 2 === 0 ? 230 : 70) - (x % 5) * 4;
+
 describe('findBoundaries', () => {
   it('finds a hard cut between two steady shots', () => {
     const frames = [...[0, 1, 2, 3].map((k) => flat(60, t(k))), ...[4, 5, 6, 7].map((k) => flat(200, t(k)))];
@@ -59,6 +73,46 @@ describe('findBoundaries', () => {
     const frames = Array.from({ length: 16 }, (_, k) => panFrame(k * 3, t(k)));
 
     expect(findBoundaries(frames)).toEqual([]);
+  });
+
+  it('reads a fade out, a black hold and a fade in as one dip at the hold', () => {
+    const values = [180, 180, 180, 180, 120, 60, 0, 0, 0, 60, 120, 180, 180, 180, 180];
+    const boundaries = findBoundaries(values.map((v, k) => flat(v, t(k))));
+
+    expect(boundaries).toEqual([{ index: 6, time: 1.75, transition: 'dip' }]);
+  });
+
+  it('reads a dark but detailed shot as a shot, not as black', () => {
+    const night = (k: number) => painted((x) => (x % 2 === 0 ? 0 : 22), t(k));
+    const frames = [...[0, 1, 2, 3].map(night), ...[4, 5, 6, 7].map((k) => flat(200, t(k)))];
+
+    expect(findBoundaries(frames).map((b) => b.transition)).toEqual(['cut']);
+  });
+
+  it('finds a slow, even cross-fade spread over six samples', () => {
+    const blend = (a: number, k: number) =>
+      painted((x, y) => Math.round((1 - a) * shotA(x, y) + a * shotB(x, y)), t(k));
+    const frames = [
+      ...[0, 1, 2, 3, 4, 5].map((k) => blend(0, k)),
+      ...[1, 2, 3, 4, 5, 6].map((step) => blend(step / 7, 5 + step)),
+      ...[12, 13, 14, 15, 16, 17].map((k) => blend(1, k)),
+    ];
+    const boundaries = findBoundaries(frames);
+
+    expect(boundaries.map((b) => b.transition)).toEqual(['dissolve']);
+    expect(Math.abs(boundaries[0].time - 2.125)).toBeLessThanOrEqual(0.25);
+  });
+
+  it('reads a one-sample flash inside a shot as part of the shot, not as two cuts', () => {
+    const values = [100, 100, 100, 100, 240, 100, 100, 100, 100];
+
+    expect(findBoundaries(values.map((v, k) => flat(v, t(k))))).toEqual([]);
+  });
+
+  it('ignores a fade in from black at the start and a fade out at the end', () => {
+    const values = [0, 60, 120, 180, 180, 180, 180, 180, 180, 120, 60, 0];
+
+    expect(findBoundaries(values.map((v, k) => flat(v, t(k))))).toEqual([]);
   });
 
   it('falls back to a 0.25 s interval when frames carry no time', () => {
