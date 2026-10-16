@@ -24,7 +24,7 @@ const GENERIC_FAMILIES = new Set([
   'blinkmacsystemfont',
 ]);
 
-/** A family that is the site's own face: not a generic, a keyword, a metric fallback face or a size. */
+/** A family that is the site's own face: not a generic, a keyword, a metric fallback, an emoji face or a size. */
 function firstFamily(value: string): string | null {
   const first =
     value
@@ -34,7 +34,7 @@ function firstFamily(value: string): string | null {
 
   if (first === '' || first.startsWith('var(') || GENERIC_FAMILIES.has(first.toLowerCase())) return null;
 
-  if (/fallback/i.test(first) || /^[\d.+-]/.test(first)) return null;
+  if (/fallback|emoji|symbol/i.test(first) || /^[\d.+-]/.test(first)) return null;
 
   return first;
 }

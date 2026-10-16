@@ -263,3 +263,15 @@ describe('brand-named custom properties', () => {
     });
   });
 });
+
+describe('cssFonts and emoji faces', () => {
+  it('never takes an emoji or symbol face for a family', () => {
+    expect(
+      cssFonts(`
+        @font-face { font-family: "Apple Color Emoji"; src: local("Apple Color Emoji"); }
+        body { font-family: "Noto Color Emoji", "Acme Sans", sans-serif; }
+        .icons { font-family: "Segoe UI Symbol"; }
+      `)
+    ).toEqual({ display: null, body: null, mono: null, families: [] });
+  });
+});
