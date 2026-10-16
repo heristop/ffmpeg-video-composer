@@ -260,10 +260,10 @@ describe('FormatterManager', () => {
       expect(out).not.toContain('"');
     });
 
-    it('strips a double quote from the filter type', () => {
+    it('refuses a filter type that is not a filter name (a quote, a space, an option)', () => {
       const { manager } = build();
-      expect(manager.formatMultipleTypesValue({ type: 'drawbox" -i /etc/passwd', value: 'x' } as Filter)).not.toContain(
-        '"'
+      expect(() => manager.formatMultipleTypesValue({ type: 'drawbox" -i /etc/passwd', value: 'x' } as Filter)).toThrow(
+        /Unsafe filter type/
       );
     });
 

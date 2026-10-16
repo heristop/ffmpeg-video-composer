@@ -10,8 +10,13 @@ import type VariableManager from './VariableManager';
 import { isFontRef, fontRefSlug, type FontInput } from '@/core/fonts';
 import { escapeDrawtextText } from '@/core/drawtext-text';
 import { assertSafeColorToken } from '@/core/arg-guard';
-import { assertBareFontFile, assertSafeFilterValue } from '../utils/filter-option-guard';
-import { lutFileStem } from '../presets/lut-spec';
+import {
+  assertBareFontFile,
+  assertSafeFilterOptions,
+  assertSafeFilterType,
+  assertSafeFilterValue,
+} from '../utils/filter-option-guard';
+import { lutFileStem, parseLutValue } from '../presets/lut-spec';
 
 // The whole filtergraph is emitted as one double-quoted `-vf "…"` argv token, and parseCommand
 // toggles its quote state on any inner `"`. So a literal `"` (or a NUL) in a filter type/value would
@@ -41,6 +46,8 @@ class FormatterManager {
   formatMultipleTypesValue = (filter: Filter): string => {
     let result = '';
 
+    assertSafeFilterType(filter.type);
+
     switch (filter.type) {
       case 'setpts':
         result = this.formatSetpts(filter.value);
@@ -66,7 +73,7 @@ class FormatterManager {
         break;
 
       default:
-        result = `${stripFilterUnsafe(filter.type)}=${stripFilterUnsafe(String(filter.value ?? ''))}`;
+        result = `${filter.type}=${assertSafeFilterOptions(filter.type, stripFilterUnsafe(String(filter.value ?? '')))}`;
     }
 
     return result;
@@ -90,7 +97,7 @@ class FormatterManager {
   }
 
   private formatScale(value: Filter['value']): string {
-    if (value !== 'output') return `scale=${stripFilterUnsafe(String(value ?? ''))}`;
+    if (value !== 'output') return `scale=${assertSafeFilterOptions('scale', stripFilterUnsafe(String(value ?? '')))}`;
 
     // Finish a hand-framed scene at the actual project dimensions, preserving its aspect.
     const scale = stripFilterUnsafe(this.project.config.videoConfig?.scale ?? DefaultConfig.SCALE);
@@ -103,6 +110,12 @@ class FormatterManager {
   // reading the staged `.cube` from the build FS; a bare preset name keeps its historical file name.
   private formatLut3d(name: string): string {
     const spec = stripFilterUnsafe(name);
+    const parsed = parseLutValue(spec);
+
+    // A preset name becomes the staged file's stem inside a quoted path: a bare name only.
+    if (parsed.kind === 'preset' && !/^[A-Za-z0-9_-]+$/.test(parsed.name)) {
+      throw new Error(`Unsafe LUT "${spec}": a LUT preset is a bare name such as "teal-orange"`);
+    }
 
     if (!this.segment.tempLuts.includes(spec)) {
       this.segment.tempLuts.push(spec);
@@ -200,6 +213,8 @@ class FormatterManager {
   }
 
   formatMultipleTypesValues = (filter: Filter): string => {
+    assertSafeFilterType(filter.type);
+
     const filterValues = filter.values as ExtendedFilterValues | undefined;
 
     if (!filterValues) {

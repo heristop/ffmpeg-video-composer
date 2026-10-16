@@ -164,6 +164,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Raw filter values: the render refuses file-reading option keys, a font file that is not a bare font name,
   and a value that would end its option or its filter, so a raw value can no longer read a file or add
   options. `fontcolor_expr` is passed as a plain expression value.
+- Raw filters: a filter `type` must be a plain filter name, filters that read files, run commands or load
+  models are refused, a scalar `value` gets the same checks as `values` (including the filters it chains),
+  more file-capable option keys are refused, a dangling escape is refused, and a LUT look takes a bare
+  preset name only.
 - Transitions: a compile that skips validation now renders an unknown transition `type` as a fade instead of
   writing the name into the filter graph.
 

@@ -1881,6 +1881,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -2228,6 +2229,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -2566,6 +2568,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
+                      "pattern": "^[a-z0-9_]+$",
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
@@ -4908,6 +4911,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -5255,6 +5259,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -5593,6 +5598,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
+                      "pattern": "^[a-z0-9_]+$",
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
@@ -7978,6 +7984,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -8325,6 +8332,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -8663,6 +8671,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
+                      "pattern": "^[a-z0-9_]+$",
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
@@ -10772,6 +10781,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -11119,6 +11129,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -11457,6 +11468,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
+                      "pattern": "^[a-z0-9_]+$",
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
@@ -13546,6 +13558,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -13893,6 +13906,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -14231,6 +14245,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
+                      "pattern": "^[a-z0-9_]+$",
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
@@ -16802,6 +16817,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -17149,6 +17165,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -17487,6 +17504,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
+                      "pattern": "^[a-z0-9_]+$",
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
@@ -19576,6 +19594,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -19923,6 +19942,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -20261,6 +20281,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
+                      "pattern": "^[a-z0-9_]+$",
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {
@@ -22350,6 +22371,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -22697,6 +22719,7 @@
                         "properties": {
                           "type": {
                             "type": "string",
+                            "pattern": "^[a-z0-9_]+$",
                             "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                           },
                           "value": {
@@ -23035,6 +23058,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
+                      "pattern": "^[a-z0-9_]+$",
                       "description": "Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied."
                     },
                     "value": {

@@ -5,7 +5,7 @@
 // then the option pass splits that text on unquoted `:`. A value that stops either pass early ends
 // its filter or adds an option of its own (e.g. `textfile=`), whatever quoting it uses.
 
-/** Option keys that make a filter read a file: refused in authored raw values. */
+/** Option keys that make a filter read or write a file, or run commands: refused in raw values. */
 const FILE_OPTION_KEYS = new Set([
   'textfile',
   'filename',
@@ -15,6 +15,43 @@ const FILE_OPTION_KEYS = new Set([
   'pfile',
   'model_filename',
   'stats_file',
+  'model',
+  'm',
+  'sofa',
+  'cover',
+  'object',
+  'datapath',
+  'dumpfile',
+  'log_path',
+  'destination',
+  'commands',
+]);
+
+/**
+ * Filters that read files, run commands, open sockets or load plugins/models: refused as raw filter
+ * types. `lut3d` is not here: its value names a LUT the engine stages (formatLut3d), never a path.
+ */
+const UNSAFE_FILTER_TYPES = new Set([
+  'movie',
+  'amovie',
+  'subtitles',
+  'ass',
+  'sendcmd',
+  'asendcmd',
+  'lut1d',
+  'haldclut',
+  'zmq',
+  'azmq',
+  'ladspa',
+  'lv2',
+  'frei0r',
+  'arnndn',
+  'sofalizer',
+  'whisper',
+  'cover_rect',
+  'find_rect',
+  'removelogo',
+  'ocr',
 ]);
 
 interface Token {
@@ -22,7 +59,7 @@ interface Token {
   value: string;
   /** What follows the terminator (empty when the input was consumed). */
   rest: string;
-  /** A quote was left open. */
+  /** A quote or a trailing escape was left open. */
   open: boolean;
 }
 
@@ -34,8 +71,11 @@ function readToken(input: string, terminators: string): Token {
   while (index < input.length && !terminators.includes(input[index])) {
     const char = input[index];
 
+    // A trailing backslash is kept by FFmpeg and escapes whatever the engine writes next.
+    if (char === '\\' && index === input.length - 1) return { value, rest: '', open: true };
+
     if (char === '\\') {
-      value += input[index + 1] ?? '';
+      value += input[index + 1];
       index += 2;
       continue;
     }
@@ -61,13 +101,13 @@ function readToken(input: string, terminators: string): Token {
 function optionEscape(value: string): string | null {
   const graph = readToken(value, '[];,');
 
-  if (graph.open) return 'leaves a quote open';
+  if (graph.open) return 'leaves a quote or an escape open';
 
   if (graph.rest) return 'ends the filter (unquoted , ; [ or ])';
 
   const option = readToken(graph.value, ':');
 
-  if (option.open) return 'leaves a quote open';
+  if (option.open) return 'leaves a quote or an escape open';
 
   if (option.rest) return 'adds another option (unescaped :)';
 
@@ -99,4 +139,67 @@ export function assertBareFontFile(file: string): string {
   }
 
   return file;
+}
+
+/** A raw filter name: lower-case letters, digits and `_`, and not a file- or command-capable filter. */
+export function assertSafeFilterType(type: string): string {
+  if (!/^[a-z0-9_]+$/.test(type)) throw new Error(`Unsafe filter type "${type}": not a filter name`);
+
+  if (UNSAFE_FILTER_TYPES.has(type) || type.startsWith('dnn_')) {
+    throw new Error(`Unsafe filter type "${type}": it reads files, runs commands or loads models`);
+  }
+
+  return type;
+}
+
+/** Checks one filter's options (graph-level text already split off): keys, positional drawtext, quotes. */
+function checkOptions(type: string, options: string, value: string): void {
+  let rest = options;
+
+  while (rest.length > 0) {
+    const option = readToken(rest, ':');
+    const equals = option.value.indexOf('=');
+    const key = equals < 0 ? null : option.value.slice(0, equals).trim();
+
+    if (option.open) throw new Error(`Unsafe filter value ${type}: "${value}" leaves a quote or an escape open`);
+
+    if (key !== null && FILE_OPTION_KEYS.has(key)) {
+      throw new Error(`Unsafe filter value ${type}: option ${key} reads a file, which raw filter values cannot do`);
+    }
+
+    if (key === null && type === 'drawtext') {
+      throw new Error(`Unsafe filter value ${type}: positional options are not allowed (the first is fontfile)`);
+    }
+
+    rest = option.rest.slice(1);
+  }
+}
+
+/**
+ * A scalar `value` (`type=value`) may hold several options (`1280:720:color=black`) and may chain
+ * further filters with `,` (the engine's own `scale=…,crop=…`). Each chained filter is checked like a
+ * raw filter: a safe type, no file-reading option, no positional drawtext option, no open quote or
+ * escape. A `;`, `[` or `]` would start another chain or relabel pads, so it is refused.
+ */
+export function assertSafeFilterOptions(type: string, value: string): string {
+  let current = type;
+  let rest = value;
+
+  for (;;) {
+    const piece = readToken(rest, '[];,');
+
+    if (piece.open) throw new Error(`Unsafe filter value ${type}: "${value}" leaves a quote or an escape open`);
+
+    checkOptions(current, piece.value, value);
+
+    if (!piece.rest) return value;
+
+    if (piece.rest[0] !== ',') throw new Error(`Unsafe filter value ${type}: "${value}" leaves its filter chain`);
+
+    const next = /^([^=,;[\]]*)(=|(?=[,;[\]])|$)/.exec(piece.rest.slice(1));
+    const name = next?.[1] ?? '';
+
+    current = assertSafeFilterType(name);
+    rest = piece.rest.slice(1 + (next?.[0].length ?? 0));
+  }
 }
