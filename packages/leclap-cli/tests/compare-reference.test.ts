@@ -1,5 +1,6 @@
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { referenceFrameArgs } from '../src/commands/compare';
+import { referenceFrameArgs, referenceTilePath } from '../src/commands/compare';
 
 describe('compare --reference', () => {
   it('grabs one frame of the reference at the compared moment, scaled to the tile width', () => {
@@ -17,5 +18,9 @@ describe('compare --reference', () => {
       'scale=640:-2',
       'out/reference.png',
     ]);
+  });
+
+  it('names the reference tile like the other compare tiles, so a user file is left alone', () => {
+    expect(referenceTilePath('out')).toBe(path.join('out', 'compare-reference.png'));
   });
 });

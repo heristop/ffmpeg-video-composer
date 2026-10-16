@@ -24,9 +24,14 @@ export function referenceFrameArgs(clip: string, at: number, out: string, width:
   return ['-v', 'error', '-y', '-ss', String(at), '-i', clip, '-frames:v', '1', '-vf', `scale=${width}:-2`, out];
 }
 
+/** Where the reference tile is saved: named like the variant tiles (`compare-<n>-<label>.png`). */
+export function referenceTilePath(outDir: string): string {
+  return path.join(outDir, 'compare-reference.png');
+}
+
 /** The reference's frame at the compared second, saved in `outDir`; fails when the clip ends before it. */
 async function grabReference(clip: string, at: number, outDir: string, width: number) {
-  const out = path.join(outDir, 'reference.png');
+  const out = referenceTilePath(outDir);
 
   rmSync(out, { force: true });
   execFileSync(await resolveStyleFfmpeg(), referenceFrameArgs(clip, at, out, width), { stdio: 'pipe' });
