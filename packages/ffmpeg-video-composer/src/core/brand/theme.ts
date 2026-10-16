@@ -42,7 +42,10 @@ export function sanitizeBrandName(name: string | null): string | null {
     .trimEnd()}…`;
 }
 
-const DEFAULT_FONT: Record<FontRole, string> = { display: 'archivo-black', body: 'rubik', mono: 'mono' };
+// Headings default to the base theme's condensed face, which the bundled templates are sized for; a wide
+// face only when the brand's own family says it is one.
+const DEFAULT_FONT: Record<FontRole, string> = { display: 'bebas', body: 'rubik', mono: 'mono' };
+const WIDE_FACE = /(?:^|[^a-z])(?:black|heavy|extended|wide)(?![a-z])/;
 
 function cluster(hex: string, share: number): PaletteCluster {
   const { r, g, b } = hexToRgb(hex);
@@ -65,6 +68,8 @@ export function nearestBundledFont(family: string | null, role: FontRole): strin
   if (/serif|garamond|playfair|times|georgia|didot|bodoni/.test(name) && !name.includes('sans')) return 'playfair';
 
   if (/condensed|compressed|narrow/.test(name)) return 'oswald';
+
+  if (role === 'display' && WIDE_FACE.test(name)) return 'archivo-black';
 
   return DEFAULT_FONT[role];
 }

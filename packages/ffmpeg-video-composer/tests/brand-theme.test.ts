@@ -61,7 +61,7 @@ describe('brandTheme', () => {
   });
 
   it('maps fonts to bundled ids and keeps the exact families as suggestions', () => {
-    expect(brand.theme.fonts).toEqual({ display: 'archivo-black', body: 'rubik', mono: 'mono' });
+    expect(brand.theme.fonts).toEqual({ display: 'bebas', body: 'rubik', mono: 'mono' });
     expect(brand.fontRefs).toEqual({ display: { family: 'ABC Solar Display' }, body: { family: 'Inter' } });
   });
 
@@ -154,6 +154,17 @@ describe('nearestBundledFont', () => {
     expect(nearestBundledFont('Acme Condensed', 'display')).toBe('oswald');
     expect(nearestBundledFont('JetBrains Mono', 'mono')).toBe('mono');
     expect(nearestBundledFont(null, 'body')).toBe('rubik');
+  });
+
+  it('sets unknown headings in the condensed base face, a wide one only when the name says so', () => {
+    expect(nearestBundledFont(null, 'display')).toBe('bebas');
+    expect(nearestBundledFont('sohne-var', 'display')).toBe('bebas');
+    expect(nearestBundledFont('Blackbird Grotesk', 'display')).toBe('bebas');
+    expect(nearestBundledFont('Acme Black', 'display')).toBe('archivo-black');
+    expect(nearestBundledFont('acme-sans-HEAVY', 'display')).toBe('archivo-black');
+    expect(nearestBundledFont('Acme Extended', 'display')).toBe('archivo-black');
+    expect(nearestBundledFont('Wide Grotesk', 'display')).toBe('archivo-black');
+    expect(nearestBundledFont('Acme Black', 'body')).toBe('rubik');
   });
 });
 
