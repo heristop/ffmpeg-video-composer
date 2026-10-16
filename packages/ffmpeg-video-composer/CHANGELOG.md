@@ -154,6 +154,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Section `backgroundColor`: only a single colour (hex, a name, an `@alpha` suffix, a `$color.<name>` token or
   a `{{ VARIABLE }}`) is accepted, and the render refuses any other resolved value, so the colour can no
   longer carry FFmpeg filter syntax into the section's input.
+- Transitions: a compile that skips validation now renders an unknown transition `type` as a fade instead of
+  writing the name into the filter graph.
 
 ## [3.1.0] - 2026-10-11
 
