@@ -106,6 +106,9 @@ describe('brand css hardening', () => {
       'color:' + ' '.repeat(2_000_000),
       'x{font-family' + ' '.repeat(2_000_000),
       '/*'.repeat(1_000_000),
+      'x{font-family:' + 'var(--a,'.repeat(250_000),
+      ':root{' + '--a:var(--b);--b:var(--a);'.repeat(80_000) + '}body{font-family:var(--a)}',
+      'x{font-family:var(--a)}'.repeat(80_000) + ':root{--a:' + 'var(--a, '.repeat(100) + '}',
     ];
 
     // Best of three and a 3 s ceiling: quadratic parsing takes minutes here, a loaded host only adds noise.
@@ -153,5 +156,75 @@ describe('withThemeColor', () => {
   it('keeps a small fixed weight on a tiny palette and leaves the colours alone without a theme-color', () => {
     expect(withThemeColor([], '#3ce6ac')).toEqual([{ hex: '#3ce6ac', weight: 6, source: 'theme-color' }]);
     expect(withThemeColor(site, null)).toEqual(site);
+  });
+});
+
+describe('cssFonts through custom properties', () => {
+  it('follows var() chains, with their fallbacks, to the family a token names', () => {
+    const fonts = cssFonts(`
+      :root { --font-acme-sans: "Acme Sans", "Acme Sans Fallback", system-ui; --font-sans: var(--font-acme-sans); }
+      html { font-family: var(--default-font-family, var(--font-sans, ui-sans-serif)); }
+      :root { --default-font-family: var(--font-sans); }
+      .heading { font-family: var(--missing, "Acme Display", serif); }
+      code { font-family: var(--font-code, ui-monospace); }
+    `);
+
+    expect(fonts.body).toBe('Acme Sans');
+    expect(fonts.display).toBe('Acme Display');
+    expect(fonts.mono).toBeNull();
+  });
+
+  it('reads roles from utility classes and from family tokens named for the role', () => {
+    const fonts = cssFonts(`
+      @font-face { font-family: "Acme Title"; src: url(/t.woff2); }
+      :root {
+        --ds-font-size-title: 2.5rem;
+        --ds-title-font-stack: "Acme Title", sans-serif;
+        --ds-bodyMono-font-stack: "Acme Mono", monospace;
+        --ds-body-font-stack: "Acme Text", sans-serif;
+      }
+      body { font-family: var(--ds-body-font-stack); }
+      .font-display { font-family: "Acme Poster"; }
+    `);
+
+    expect(fonts).toEqual({
+      display: 'Acme Poster',
+      body: 'Acme Text',
+      mono: 'Acme Mono',
+      families: ['Acme Title', 'Acme Text', 'Acme Poster', 'Acme Mono'],
+    });
+  });
+
+  it('never takes a fallback face, a size or a system stack for a family', () => {
+    const fonts = cssFonts(`
+      :root { --font-size-heading: 3rem; --font-sans: -apple-system, "Segoe UI", sans-serif; }
+      @font-face { font-family: "Acme Fallback"; src: local(Arial); }
+      body { font-family: var(--font-sans); }
+    `);
+
+    expect(fonts).toEqual({ display: null, body: null, mono: null, families: [] });
+  });
+
+  it('tries every definition of a token, not only the first (a reset stack, then the site’s own face)', () => {
+    const fonts = cssFonts(`
+      :root { --font-mono: ui-monospace, Menlo, monospace; }
+      code, pre { font-family: var(--font-mono); }
+      .theme { --font-mono: var(--acme-2); }
+      .fonts { --acme-2: "Acme Mono", ui-monospace; }
+    `);
+
+    expect(fonts.mono).toBe('Acme Mono');
+  });
+
+  it('resolves self-referencing and deeply chained variables in bounded time', () => {
+    const chain = Array.from({ length: 50 }, (_, i) => `--f${i}: var(--f${i + 1});`).join('');
+
+    expect(
+      cssFonts(
+        `:root{--loop: var(--loop); ${chain} --f50: Acme} body{font-family:var(--loop)} h1{font-family:var(--f0)}`
+      )
+    ).toMatchObject({
+      body: null,
+    });
   });
 });

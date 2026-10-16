@@ -9,7 +9,7 @@ export interface BrandColor {
 }
 
 export interface BrandFonts {
-  /** Headings' family (h1–h3, .title, .display, .heading). */
+  /** Headings’ family (h1–h3, .title, .display, .heading, .font-display, or a display/heading/title font token). */
   display: string | null;
   /** Body copy's family (html, body, :root). */
   body: string | null;
