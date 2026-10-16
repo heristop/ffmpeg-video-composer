@@ -161,6 +161,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Gradient background layers and the remaining colour fields named otherwise (progress tracks, highlight
   markers, celebration palettes) take a single colour token too, and the render refuses a gradient stop
   that is not one.
+- Raw filter values: the render refuses file-reading option keys, a font file that is not a bare font name,
+  and a value that would end its option or its filter, so a raw value can no longer read a file or add
+  options. `fontcolor_expr` is passed as a plain expression value.
 - Transitions: a compile that skips validation now renders an unknown transition `type` as a fade instead of
   writing the name into the filter graph.
 

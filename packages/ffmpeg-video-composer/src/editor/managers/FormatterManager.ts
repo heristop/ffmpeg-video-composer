@@ -10,6 +10,7 @@ import type VariableManager from './VariableManager';
 import { isFontRef, fontRefSlug, type FontInput } from '@/core/fonts';
 import { escapeDrawtextText } from '@/core/drawtext-text';
 import { assertSafeColorToken } from '@/core/arg-guard';
+import { assertBareFontFile, assertSafeFilterValue } from '../utils/filter-option-guard';
 import { lutFileStem } from '../presets/lut-spec';
 
 // The whole filtergraph is emitted as one double-quoted `-vf "…"` argv token, and parseCommand
@@ -176,16 +177,17 @@ class FormatterManager {
   }
 
   // The resolved colour sits in a quoted filter option, so it must be one colour token: a quote, a
-  // separator or whitespace would close the option and chain filters. fontcolor_expr is an expression,
-  // not a token; only quotes are removed from it.
+  // separator or whitespace would close the option and chain filters.
   private formatColorValue(key: string, values: ExtendedFilterValues): string {
-    const color = this.formatColor(this.resolveColorFromValues(key, values));
-    const safe = key === 'fontcolor_expr' ? color.replace(/['"]/g, '') : assertSafeColorToken(color, key);
+    const color = assertSafeColorToken(this.formatColor(this.resolveColorFromValues(key, values)), key);
 
-    return `${stripFilterUnsafe(key)}='${stripFilterUnsafe(safe)}'`;
+    return `${stripFilterUnsafe(key)}='${stripFilterUnsafe(color)}'`;
   }
 
+  // An authored font is a bare file name staged under the fonts dir; a font ref (family) is resolved.
   private formatFontValue(values: ExtendedFilterValues): string {
+    if (typeof values.fontfile === 'string') assertBareFontFile(values.fontfile);
+
     return `fontfile='${stripFilterUnsafe(this.formatFont(values.fontfile ?? ''))}'`;
   }
 
@@ -193,7 +195,8 @@ class FormatterManager {
     const val = values[key];
     const stringVal = val === undefined ? '' : String(val);
 
-    return `${stripFilterUnsafe(key)}=${stripFilterUnsafe(stringVal)}`;
+    // Raw values reach FFmpeg as authored: refuse a file-reading key or a value that leaves its option.
+    return `${stripFilterUnsafe(key)}=${assertSafeFilterValue(key, stripFilterUnsafe(stringVal))}`;
   }
 
   formatMultipleTypesValues = (filter: Filter): string => {
@@ -221,16 +224,9 @@ class FormatterManager {
   }
 
   // drawtext/drawbox keys whose value is a colour token (`#rrggbb[@alpha]` or `{{ colorN }}`) and must
-  // go through formatColor — fontcolor/boxcolor plus the shadow/outline colours.
-  private static readonly COLOR_KEYS = new Set([
-    'boxcolor',
-    'fontcolor',
-    'fontcolor_expr',
-    'shadowcolor',
-    'bordercolor',
-    'color',
-    'c',
-  ]);
+  // go through formatColor — fontcolor/boxcolor plus the shadow/outline colours. fontcolor_expr is an
+  // expression, not a token: it is a plain raw value (formatDefaultValue).
+  private static readonly COLOR_KEYS = new Set(['boxcolor', 'fontcolor', 'shadowcolor', 'bordercolor', 'color', 'c']);
 
   private appendFormattedValue(
     key: string,

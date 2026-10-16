@@ -388,7 +388,7 @@ describe('FormatterManager', () => {
       expect(manager.formatMultipleTypesValues(filter)).toBe('fade=');
     });
 
-    it('formats color keys (fontcolor, boxcolor, color, c, fontcolor_expr)', () => {
+    it('formats color keys (fontcolor, boxcolor, color, c); fontcolor_expr is a plain raw value', () => {
       const { manager } = build({ section: { name: 's', type: 'video' } });
       const filter = {
         type: 'drawtext',
@@ -399,7 +399,7 @@ describe('FormatterManager', () => {
       expect(result).toContain("boxcolor='#000000'");
       expect(result).toContain("color='red'");
       expect(result).toContain("c='blue'");
-      expect(result).toContain("fontcolor_expr='#ABCABC'");
+      expect(result).toContain('fontcolor_expr=#ABCABC');
     });
 
     it('color value uses black when value is not a string', () => {
