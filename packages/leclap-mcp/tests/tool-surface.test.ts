@@ -12,6 +12,7 @@ const ALWAYS = [
   'analyze_sound',
   'compose_video',
   'edit_template',
+  'extract_structure',
   'extract_style',
   'get_capabilities',
   'get_motion_catalog',
