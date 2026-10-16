@@ -98,6 +98,30 @@ describe('parseBrandPage', () => {
     expect(parsed.logo).toEqual({ url: 'https://acme.test/p.png', type: 'png', source: 'apple-touch-icon' });
   });
 
+  it('lists the site-wide stylesheets first and colour-scheme variants last', () => {
+    // A bundler's hashed component sheets come before the layout sheet holding the tokens; a design system
+    // ships every colour scheme as its own sheet ahead of the site's.
+    const html = [
+      '<link rel="stylesheet" href="/dark-1a2b.css">',
+      '<link rel="stylesheet" href="/light_high_contrast-3c4d.css">',
+      '<link rel="stylesheet" href="/_next/static/css/Tpxbzi3N.css">',
+      '<link rel="stylesheet" href="/_next/static/css/BNNY1qpD.css">',
+      '<link rel="stylesheet" href="/print.css" media="print">',
+      '<link rel="stylesheet" href="/_next/static/css/layout.TfwOB7lY.css">',
+      '<link rel="stylesheet" href="/assets/global-58d1.css">',
+    ].join('');
+
+    expect(parseBrandPage(html, 'https://acme.test/').stylesheets).toEqual([
+      'https://acme.test/_next/static/css/layout.TfwOB7lY.css',
+      'https://acme.test/assets/global-58d1.css',
+      'https://acme.test/_next/static/css/Tpxbzi3N.css',
+      'https://acme.test/_next/static/css/BNNY1qpD.css',
+      'https://acme.test/dark-1a2b.css',
+      'https://acme.test/light_high_contrast-3c4d.css',
+      'https://acme.test/print.css',
+    ]);
+  });
+
   describe('hostile input stays linear', () => {
     const size = 2_000_000;
     const cases: Record<string, string> = {

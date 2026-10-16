@@ -267,6 +267,31 @@ function logoFrom(links: Attributes[], metas: Attributes[], base: string): Brand
   return null;
 }
 
+// A site-wide sheet (layout, global, main, app…) holds the tokens; a colour-scheme or print variant holds a
+// recolouring of them. Bundlers name the rest by hash, in no useful order.
+const SITE_WIDE_SHEET =
+  /(?:^|[._-])(global|globals|layout|main|app|index|style|styles|theme|base|site|common|root)(?:[._-]|$)/i;
+const VARIANT_SHEET =
+  /(?:^|[._-])(dark|high[_-]?contrast|colorblind|tritanopia|deuteranopia|protanopia|print|rtl)(?:[._-]|$)/i;
+
+function sheetRank(link: Attributes, url: string): number {
+  const file = new URL(url).pathname.split('/').at(-1) ?? '';
+
+  if (VARIANT_SHEET.test(file) || /print|dark/i.test(attr(link, 'media'))) return 2;
+
+  return SITE_WIDE_SHEET.test(file) ? 0 : 1;
+}
+
+/** The page's own stylesheets, resolved, site-wide sheets first and colour-scheme variants last. */
+function ownStylesheets(sheets: Attributes[], pageUrl: string): string[] {
+  return sheets
+    .map((link) => ({ link, url: resolve(attr(link, 'href'), pageUrl) }))
+    .filter((sheet): sheet is { link: Attributes; url: string } => sheet.url !== null)
+    .map((sheet) => ({ url: sheet.url, rank: sheetRank(sheet.link, sheet.url) }))
+    .sort((a, b) => a.rank - b.rank)
+    .map((sheet) => sheet.url);
+}
+
 function googleFamilies(href: string): string[] {
   const url = resolve(href, 'https://fonts.googleapis.com/');
 
@@ -296,10 +321,10 @@ export function parseBrandPage(html: string, pageUrl: string): BrandPage {
   return {
     name: siteName ?? (title === undefined || title === '' ? null : title),
     themeColor: themeColor ? normalizeColor(themeColor) : null,
-    stylesheets: sheets
-      .filter((l) => !google.includes(l))
-      .map((l) => resolve(attr(l, 'href'), pageUrl))
-      .filter((url): url is string => url !== null),
+    stylesheets: ownStylesheets(
+      sheets.filter((l) => !google.includes(l)),
+      pageUrl
+    ),
     inlineCss,
     googleFamilies: google.flatMap((l) => googleFamilies(attr(l, 'href'))),
     logo: logoFrom(links, metas, pageUrl),
