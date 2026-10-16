@@ -377,6 +377,7 @@ export {
   type StyleFrames,
   type StyleFramesOptions,
 } from './services/style-frames-node';
+export { analyzeStructureFile } from './services/structure-node';
 export {
   motionTimeline,
   type MotionBox,
