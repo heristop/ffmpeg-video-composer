@@ -65,7 +65,8 @@ function sampleBlock(samples: SampleDetail[]): string {
 
 export const REFERENCE_STYLE_HEADING =
   'Reference style guide (BINDING visual rules: they override the art direction and any theme hint where they ' +
-  'conflict. They carry the reference\u2019s palette and pacing only: never reproduce its subjects, logos or text):';
+  'conflict. They carry the reference\u2019s palette and pacing, plus its format for a clip: never reproduce its ' +
+  'subjects, logos or text):';
 
 /** The binding reference-style block (empty without rules), shared by the plan and template prompts. */
 export function referenceBlock(rules: string | undefined): string[] {

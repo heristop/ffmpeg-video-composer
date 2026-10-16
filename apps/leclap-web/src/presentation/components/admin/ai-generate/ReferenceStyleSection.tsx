@@ -1,5 +1,6 @@
 // "Match a reference" inside Generate with AI: analyse a reference image or clip and attach its style
-// guide, which the system prompt then carries as binding keep / avoid rules (palette and pacing only).
+// guide, which the system prompt then carries as binding keep / avoid rules (palette and pacing, plus a
+// clip's format).
 // Optional, so it sits behind a disclosure that starts collapsed; its summary says whether a style
 // guide is attached without opening it.
 import { useTranslation } from 'react-i18next';
