@@ -19,7 +19,38 @@ one dip, slow dissolves, flashes, 0.25 s grid up to five minutes).
 | `showcase/photo-backdrop.mp4` (13.2 s)                 | Photo, 0.6 s dissolve, footage, outro                                                                       | 3 (dissolve 3.5, outro 11.0)                                        | 4           | an extra 0.38 s first shot from the fade in from a dark (not black) frame; the 0.6 s dissolve reads as a cut; the outro's light flash no longer splits it                                                                                                                                          | partial |
 | `brand-motion/out/leclap-v3.mp4` (82.5 s)              | Launch film: dark UI scenes on a 120 BPM grid, internal panel changes                                       | 13 (scene cuts ≈ 6, 17, 22, 29, 34, 42, 49, 55, 59, 63, 70, 79)     | 12          | found 8 of 12: 6, 17, 22, 29, 49, 55, 70, 79 (dip); missed 34, 42, 59, 63 (dark-UI to dark-UI, diffs 0.05–0.07 under the cut floor); extras 10.9, 63.9, 72.9 are panel changes inside a scene                                                                                                      | partial |
 
+## Fix round 1 (2026-10-16): brightness ramps, grey fades, grain
+
+After `fix(engine): keep brightness ramps inside a shot and read grey fades as dips` (blends that are a
+gain and offset of one picture are not dissolves; a short blank dark-grey bottom of a fade is a dip).
+
+| Clip                                                | Before                                                                         | After                                            | Verdict |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------ | ------- |
+| the nine clips above                                | as in the table above                                                          | identical shot lists (diffed run outputs)        | same    |
+| `footage-exposure.mp4` (11.5 s, built for this run) | 3 shots: the 0.5 s dark-grey hold read as its own shot between two `dissolve`s | 2 shots, one `dip` at 6.13 (grey hold 6.0–6.5 s) | good    |
+
+`footage-exposure.mp4`: the selfie clip brightened by `eq` from 2 s to 4 s (an exposure ramp in one shot),
+a 0.75 s fade to `#262626`, a 0.5 s grey hold, a 0.75 s fade in to the café footage. The exposure ramp
+gives no boundary before or after the fix on this footage (the selfie's own motion already broke the
+blend test); the flat-frame ramps in `structure-shots.test.ts` covered the case it used to invent.
+
+Grain (carried item: anchor on grainy footage), `noise=alls=40:allf=t` added with mise's ffmpeg:
+
+| Clip (noisy) | Shots (clean → noisy)                                                                          | Anchors (clean → noisy)                                           | Verdict |
+| ------------ | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------- |
+| footage-edit | 7 → 7, same cuts                                                                               | 5 shots unchanged; shots 4–5 `bottom-left`/`bottom` → `spread`    | good    |
+| earth        | 1 → 1                                                                                          | `top-left` → `spread`                                             | good    |
+| interview    | 3 → 3: the title change at 2.5 now found (read as `dip`), the outro at 13.6 lost               | `center` kept on the talking head; title card `center` → `spread` | partial |
+| story-reel   | 3 → 1: grain on the pillarbox bars stops them reading as bars, so both swipes are missed again | `spread` → `center`                                               | partial |
+
+Heavy grain never pulled the anchor onto a spurious cell: the edge energy spreads evenly and the shot
+reads `spread`, which the prompt states as "detail spread across the frame". No anchor change was made.
+
 ## Limits seen on real clips (not fixed)
+
+- Grain over letterbox or pillarbox bars (a film-grain pass on the whole frame) keeps them from being
+  cropped, so the bars dilute the frame differences again.
+- A fast fade through dark grey whose bottom falls between two samples reads as a `dissolve`.
 
 - Low-contrast scene changes on dark grounds — a title card to a title card, a dark interface to another —
   stay under the cut detector's 0.1 absolute floor. Lowering it would also cut inside the same film's UI
