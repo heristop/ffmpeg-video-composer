@@ -7,7 +7,7 @@ import type { Section } from '@/core/types';
 
 // The drip's paint colour reaches a filtergraph `color` source, so it must only ever be a colour: the
 // schema accepts "#rrggbb" or a "$color.<name>" token, and the lowering falls back to the default paint
-// for anything else (the Node compile entry does not run the schema).
+// for anything else (a `skipValidation` compile does not run the schema).
 
 const HOSTILE = ['red:s=2x2[x];[x]nullsink;movie=/etc/passwd', 'red" -y /tmp/x "', 'rgb(1,2,3)', "white'[x]"];
 
