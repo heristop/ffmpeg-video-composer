@@ -247,6 +247,12 @@ describe('brand css strings and hues', () => {
     expect(cssFonts(css).display).toBe('Acme */ Display');
   });
 
+  it('ends a stray quote at the line break, so later comments are still dropped', () => {
+    const css = `.a{content:"unclosed}\n/* .b{color:#ff0000} */ .c{color:#3ce6ac}`;
+
+    expect(cssColors(css).map((c) => c.hex)).toEqual(['#3ce6ac']);
+  });
+
   it('wraps negative and large hsl hues', () => {
     expect(normalizeColor('hsl(-120 100% 50%)')).toBe(normalizeColor('hsl(240 100% 50%)'));
     expect(normalizeColor('hsl(-30deg, 100%, 50%)')).toBe(normalizeColor('hsl(330, 100%, 50%)'));

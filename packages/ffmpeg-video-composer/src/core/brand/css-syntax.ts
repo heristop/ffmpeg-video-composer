@@ -2,7 +2,10 @@
 // Just enough CSS syntax for the brand reader, each a single linear pass over untrusted text: comments
 // (string-aware), `prop: value` declarations and `selector { body }` rules.
 
-/** The index just past the string opened by the quote at `open` (escapes skipped); the end if unterminated. */
+/**
+ * The index just past the string opened by the quote at `open` (escapes skipped). Like CSS, an unescaped line
+ * break ends an unterminated (bad) string, so one stray quote can't swallow the rest of a sheet.
+ */
 function stringEnd(css: string, open: number): number {
   const quote = css[open];
 
@@ -13,6 +16,8 @@ function stringEnd(css: string, open: number): number {
     }
 
     if (css[i] === quote) return i + 1;
+
+    if (css[i] === '\n' || css[i] === '\r' || css[i] === '\f') return i;
   }
 
   return css.length;
