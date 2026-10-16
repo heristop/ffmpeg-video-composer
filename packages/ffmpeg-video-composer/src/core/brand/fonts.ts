@@ -25,9 +25,9 @@ const GENERIC_FAMILIES = new Set([
 ]);
 
 /** Real family names are a few words; a longer one is not a face the site ships. */
-const MAX_FAMILY_NAME = 80;
+export const MAX_FAMILY_NAME = 80;
 /** Distinct families kept in a kit; the roles still read every rule. */
-const MAX_FAMILIES = 64;
+export const MAX_BRAND_FAMILIES = 64;
 
 /** A family that is the site's own face: not a generic, a keyword, a metric fallback, an emoji face or a size. */
 function firstFamily(value: string): string | null {
@@ -184,9 +184,9 @@ function customProperties(css: string): Map<string, string[]> {
   return properties;
 }
 
-/** Adds a family once, in order of appearance, up to MAX_FAMILIES; `seen` keeps the check constant-time. */
+/** Adds a family once, in order of appearance, up to MAX_BRAND_FAMILIES; `seen` keeps the check constant-time. */
 function addFamily(fonts: BrandFonts, seen: Set<string>, family: string): void {
-  if (seen.has(family) || seen.size >= MAX_FAMILIES) return;
+  if (seen.has(family) || seen.size >= MAX_BRAND_FAMILIES) return;
 
   seen.add(family);
   fonts.families.push(family);

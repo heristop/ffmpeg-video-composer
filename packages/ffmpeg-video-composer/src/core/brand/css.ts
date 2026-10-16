@@ -6,7 +6,7 @@
 import { declarations, stripComments } from './css-syntax';
 import type { BrandColor } from './types';
 
-export { cssFonts } from './fonts';
+export { cssFonts, MAX_BRAND_FAMILIES, MAX_FAMILY_NAME } from './fonts';
 
 const WEIGHT = { brandProperty: 5, property: 2, background: 2, declaration: 1 } as const;
 // A whole word of the property's name, in any case and in camel case (`--color-brand-500`, `--PRIMARY`,
@@ -152,6 +152,9 @@ export function cssColors(input: string): BrandColor[] {
  * system's long tail of token shades would otherwise dilute every colour, the brand's included.
  */
 export const BRAND_PALETTE_SIZE = 16;
+
+/** Colours a kit keeps, heaviest first: room beyond the palette, without a design system's every shade. */
+export const MAX_BRAND_COLORS = 64;
 
 /**
  * The declared theme-color's least weight, and its share of the palette brandTheme builds: as much as one of

@@ -14,6 +14,9 @@ import path from 'node:path';
 import {
   cssColors,
   cssFonts,
+  MAX_BRAND_COLORS,
+  MAX_BRAND_FAMILIES,
+  MAX_FAMILY_NAME,
   parseBrandPage,
   sanitizeBrandName,
   withThemeColor,
@@ -243,6 +246,15 @@ function text(body: Uint8Array): string {
   return new TextDecoder().decode(body);
 }
 
+/** The kit's colours (the heaviest MAX_BRAND_COLORS) and families (the first MAX_BRAND_FAMILIES), bounded. */
+function bounded(kit: BrandKit): BrandKit {
+  return {
+    ...kit,
+    colors: kit.colors.toSorted((a, b) => b.weight - a.weight).slice(0, MAX_BRAND_COLORS),
+    fonts: { ...kit.fonts, families: kit.fonts.families.slice(0, MAX_BRAND_FAMILIES) },
+  };
+}
+
 /** Read a brand kit from an https:// site: its name, colours, fonts and the logo's URL (not downloaded). */
 export async function fetchBrandKit(url: string, options: BrandFetchOptions = {}): Promise<BrandKit> {
   const page = await safeGet(url, options);
@@ -260,17 +272,19 @@ export async function fetchBrandKit(url: string, options: BrandFetchOptions = {}
   const colors = cssColors(css);
   const fonts = cssFonts(css);
 
-  return {
+  const google = parsed.googleFamilies.filter((family) => family !== '' && family.length <= MAX_FAMILY_NAME);
+
+  return bounded({
     url: page.url,
     name: sanitizeBrandName(parsed.name),
     colors: withThemeColor(colors, parsed.themeColor),
     fonts: {
       ...fonts,
-      body: fonts.body ?? parsed.googleFamilies.at(0) ?? null,
-      families: [...new Set([...fonts.families, ...parsed.googleFamilies])],
+      body: fonts.body ?? google.at(0) ?? null,
+      families: [...new Set([...fonts.families, ...google])],
     },
     logo: parsed.logo,
-  };
+  });
 }
 
 /** Download a logo, at most 2 MB, as whichever allowed image type it comes back as; that type names the file. */
@@ -320,7 +334,7 @@ export async function saveBrandKit(
   const logoError = result && 'error' in result ? result.error : undefined;
   const logo = download ? path.join(dir, download.file) : null;
   const saved: BrandKit = {
-    ...kit,
+    ...bounded(kit),
     name: sanitizeBrandName(kit.name),
     logo: savedLogo(kit.logo, download?.file),
   };

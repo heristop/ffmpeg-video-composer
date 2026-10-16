@@ -1,15 +1,22 @@
 // Import a brand-kit.json written by `leclap brand` or the MCP tool extract_brand: check its shape, then
 // build the binding brand rules (theme, name, fonts). The builder can't fetch websites (CORS), so the kit
 // comes in as a file; its logo stays out of the rules, the user adds it through the watermark upload.
-// The file is untrusted and its text reaches an AI prompt, so its size, list lengths and font names are capped.
+// The file is untrusted and its text reaches an AI prompt, so its size and font names are capped, and its
+// lists are cut to what the engine keeps (a kit from an older engine may list every shade a site declares).
 import { z } from 'zod';
 
-/** A real kit is a few KB; past this the file is refused before it is read. */
+/** A real kit is a few KB; past this the file is refused before it is read, which also bounds its lists. */
 export const MAX_BRAND_KIT_BYTES = 512 * 1024;
-const MAX_LIST = 200;
+/** What the engine keeps: the heaviest colours and the first families. */
+const MAX_COLORS = 64;
+const MAX_FAMILIES = 64;
 const MAX_FONT_NAME = 80;
 
-const fontName = z.string().transform((name) => name.slice(0, MAX_FONT_NAME));
+function capFontName(name: string): string {
+  return name.slice(0, MAX_FONT_NAME);
+}
+
+const fontName = z.string().transform(capFontName);
 
 const BrandKitFile = z.object({
   url: z.url({ protocol: /^https?$/ }),
@@ -22,12 +29,12 @@ const BrandKitFile = z.object({
         source: z.enum(['theme-color', 'custom-property', 'declaration']),
       })
     )
-    .max(MAX_LIST),
+    .transform((colors) => colors.toSorted((a, b) => b.weight - a.weight).slice(0, MAX_COLORS)),
   fonts: z.object({
     display: fontName.nullable(),
     body: fontName.nullable(),
     mono: fontName.nullable(),
-    families: z.array(fontName).max(MAX_LIST),
+    families: z.array(z.string()).transform((families) => families.slice(0, MAX_FAMILIES).map(capFontName)),
   }),
   logo: z.unknown().nullable(),
 });

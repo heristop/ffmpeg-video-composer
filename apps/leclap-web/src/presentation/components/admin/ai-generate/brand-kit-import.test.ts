@@ -33,12 +33,22 @@ describe('importBrandKit', () => {
     await expect(importBrandKit('not json')).rejects.toThrow(/brand-kit\.json/);
   });
 
-  it('refuses an oversized file and an oversized colour list', async () => {
+  it('refuses an oversized file', async () => {
     await expect(importBrandKit(' '.repeat(MAX_BRAND_KIT_BYTES + 1))).rejects.toThrow(/too large/);
+  });
 
-    const colors = Array.from({ length: 201 }, () => kit.colors[0]);
+  it('imports a large design system’s kit, keeping its heaviest colours', async () => {
+    const shades = Array.from({ length: 600 }, (_, n) => ({
+      hex: `#${n.toString(16).padStart(6, '0')}`,
+      weight: 1,
+      source: 'declaration',
+    }));
+    const colors = [...shades, { hex: '#3ce6ac', weight: 5000, source: 'theme-color' }];
+    const families = Array.from({ length: 600 }, (_, n) => `Face${n}`);
+    const imported = await importBrandKit(JSON.stringify({ ...kit, colors, fonts: { ...kit.fonts, families } }));
 
-    await expect(importBrandKit(JSON.stringify({ ...kit, colors }))).rejects.toThrow(/brand-kit\.json/);
+    expect(imported.rules).toContain('Set global.theme to exactly:');
+    expect(imported.rules).toContain('#3ce6ac');
   });
 
   it('caps font family names before they reach the rules', async () => {

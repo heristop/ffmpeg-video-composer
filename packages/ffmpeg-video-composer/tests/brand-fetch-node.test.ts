@@ -60,6 +60,22 @@ const pages: Partial<
     body: '<title>Evil</title><link rel="apple-touch-icon" href="/..%2F..%2Fescape.png">',
   },
   'https://evil-logo.test/..%2F..%2Fescape.png': { type: 'image/png', body: new Uint8Array([1, 2, 3]) },
+  'https://many-colors.test/': {
+    type: 'text/html',
+    body:
+      '<title>Many colours</title><meta name="theme-color" content="#123456"><link rel="stylesheet" href="/a.css">' +
+      Array.from(
+        { length: 40 },
+        (_, n) => `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+${n}">`
+      ).join(''),
+  },
+  'https://many-colors.test/a.css': {
+    type: 'text/css',
+    body:
+      ':root{--brand:#ff0000}' +
+      Array.from({ length: 600 }, (_, n) => `.c${n}{color:#${n.toString(16).padStart(6, '0')}}`).join('') +
+      Array.from({ length: 60 }, (_, n) => `.f${n}{font-family:Face${n}}`).join(''),
+  },
 };
 
 const requests: { url: string; init: RequestInit | undefined }[] = [];
@@ -140,6 +156,15 @@ describe('fetchBrandKit', () => {
     expect(kit.colors[0].hex).toBe('#3ce6ac');
     expect(kit.fonts.body).toBe('Inter');
     expect(kit.logo?.url).toBe('https://brand.test/logo.png');
+  });
+
+  it('keeps the 64 heaviest colours and at most 64 families of a large design system', async () => {
+    const kit = await fetchBrandKit('https://many-colors.test/', options);
+
+    expect(kit.colors).toHaveLength(64);
+    expect(kit.colors.map((color) => color.hex).slice(0, 2)).toEqual(expect.arrayContaining(['#ff0000', '#123456']));
+    expect(kit.fonts.families).toHaveLength(64);
+    expect(kit.fonts.families.slice(0, 2)).toEqual(['Face0', 'Face1']);
   });
 
   it('refuses plain http, a downgrade redirect and a private host', async () => {
@@ -297,6 +322,26 @@ describe('fetchBrandKit', () => {
 describe('saveBrandKit', () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'brand-kit-'));
   afterAll(() => rmSync(dir, { recursive: true, force: true }));
+
+  it('writes at most 64 colours and 64 families, the heaviest colours first, from a kit built elsewhere', async () => {
+    const kit = await fetchBrandKit('https://brand.test/', options);
+    const colors = Array.from({ length: 600 }, (_, n) => ({
+      hex: `#${n.toString(16).padStart(6, '0')}`,
+      weight: n,
+      source: 'declaration' as const,
+    }));
+    const families = Array.from({ length: 100 }, (_, n) => `Face${n}`);
+    const saved = await saveBrandKit(
+      { ...kit, logo: null, colors, fonts: { ...kit.fonts, families } },
+      mkdtempSync(path.join(dir, 'big-')),
+      options
+    );
+    const written = JSON.parse(readFileSync(saved.json, 'utf8'));
+
+    expect(written.colors).toHaveLength(64);
+    expect(written.colors[0]).toEqual({ hex: '#000257', weight: 599, source: 'declaration' });
+    expect(written.fonts.families).toEqual(families.slice(0, 64));
+  });
 
   it('writes the kit and the logo beside it', async () => {
     const saved = await saveBrandKit(await fetchBrandKit('https://brand.test/', options), dir, options);
