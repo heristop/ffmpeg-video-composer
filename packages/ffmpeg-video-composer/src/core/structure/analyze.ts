@@ -1,6 +1,7 @@
 // A reference clip's structure: its shots (from the boundaries), each with its traits, and the rhythm.
 
 import type { StyleFrame } from '../style/types';
+import { cropBars } from './bars';
 import { anchorOf, groundOf, motionOf } from './shot-traits';
 import { DEFAULT_FRAME_INTERVAL, findBoundaries, frameTime } from './shots';
 import type { ReferenceStructure, Shot, StructureInput } from './types';
@@ -25,9 +26,9 @@ function framesWithin(frames: readonly StyleFrame[], start: number, end: number)
 }
 
 export function analyzeStructure(input: StructureInput): ReferenceStructure {
-  const { frames } = input;
+  if (input.frames.length < 2) throw new Error('A reference structure needs a clip (at least 2 frames), not a still.');
 
-  if (frames.length < 2) throw new Error('A reference structure needs a clip (at least 2 frames), not a still.');
+  const frames = cropBars(input.frames);
 
   const duration = clipDuration(frames, input.duration);
   const boundaries = findBoundaries(frames).filter((b) => b.time < duration);
