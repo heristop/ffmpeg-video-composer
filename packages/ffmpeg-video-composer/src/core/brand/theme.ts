@@ -24,13 +24,13 @@ export const BRAND_HEADING =
 /** A site name is untrusted text bound into prompt rules: one line, at most this many characters. */
 export const MAX_BRAND_NAME = 80;
 
-// Whitespace (line and paragraph separators included) and C0/C1 control characters.
-const NAME_BREAKS = /[\s\u0000-\u001f\u007f-\u009f]+/g;
+// Whitespace (line and paragraph separators included) and control characters.
+const NAME_BREAKS = /[\s\p{Cc}]+/gu;
 
 /** The name on one line (whitespace and control characters collapsed), capped with an ellipsis; null if empty. */
 export function sanitizeBrandName(name: string | null): string | null {
   const flat = (name ?? '').replace(NAME_BREAKS, ' ').trim();
-  const chars = Array.from(flat);
+  const chars = Array.from(new Intl.Segmenter().segment(flat), (part) => part.segment);
 
   if (chars.length === 0) return null;
 
