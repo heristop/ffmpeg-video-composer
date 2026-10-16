@@ -270,3 +270,23 @@ export function cssFonts(input: string): BrandFonts {
 
   return fonts;
 }
+
+/** The declared theme-color's least weight, and its share of the CSS palette on a large one. */
+const THEME_COLOR_WEIGHT = 6;
+const THEME_COLOR_SHARE = 0.05;
+
+/**
+ * The CSS palette with the page's declared theme-color folded in: added to the weight the CSS already gives
+ * that colour (never replacing it), and worth a share of the palette, so it still counts on a site whose CSS
+ * names hundreds of colours.
+ */
+export function withThemeColor(colors: BrandColor[], themeHex: string | null): BrandColor[] {
+  if (themeHex === null) return colors;
+
+  const total = colors.reduce((sum, color) => sum + color.weight, 0);
+  const weight = Math.max(THEME_COLOR_WEIGHT, Math.round(total * THEME_COLOR_SHARE));
+  const current = colors.find((color) => color.hex === themeHex);
+  const merged: BrandColor = { hex: themeHex, weight: weight + (current?.weight ?? 0), source: 'theme-color' };
+
+  return [merged, ...colors.filter((color) => color !== current)].sort((a, b) => b.weight - a.weight);
+}

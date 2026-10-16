@@ -11,7 +11,15 @@ import { lookup as dnsLookup } from 'node:dns/promises';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { isIP } from 'node:net';
 import path from 'node:path';
-import { cssColors, cssFonts, parseBrandPage, sanitizeBrandName, type BrandKit, type BrandLogo } from '../core/brand';
+import {
+  cssColors,
+  cssFonts,
+  parseBrandPage,
+  sanitizeBrandName,
+  withThemeColor,
+  type BrandKit,
+  type BrandLogo,
+} from '../core/brand';
 
 export interface BrandFetchOptions {
   fetch?: typeof fetch;
@@ -26,9 +34,6 @@ const MAX_LOGO_BYTES = 2_000_000;
 const TIMEOUT_MS = 10_000;
 const MAX_REDIRECTS = 3;
 const MAX_STYLESHEETS = 3;
-/** theme-color is the site's own statement of its brand colour: it outweighs any CSS declaration. */
-const THEME_COLOR_WEIGHT = 6;
-
 const HEADERS = { 'user-agent': 'LeClap brand reader', accept: 'text/html,text/css,image/*;q=0.9,*/*;q=0.5' };
 
 /** The image content types a logo may come back as, with the file each is saved to (never named by a URL). */
@@ -254,17 +259,11 @@ export async function fetchBrandKit(url: string, options: BrandFetchOptions = {}
   const css = [parsed.inlineCss, ...sheets].join('\n');
   const colors = cssColors(css);
   const fonts = cssFonts(css);
-  const themeHex = parsed.themeColor;
 
   return {
     url: page.url,
     name: sanitizeBrandName(parsed.name),
-    colors: themeHex
-      ? [
-          { hex: themeHex, weight: THEME_COLOR_WEIGHT, source: 'theme-color' as const },
-          ...colors.filter((c) => c.hex !== themeHex),
-        ]
-      : colors,
+    colors: withThemeColor(colors, parsed.themeColor),
     fonts: {
       ...fonts,
       body: fonts.body ?? parsed.googleFamilies.at(0) ?? null,

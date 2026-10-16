@@ -1,6 +1,6 @@
 // packages/ffmpeg-video-composer/tests/brand-css.test.ts
 import { describe, expect, it } from 'vitest';
-import { cssColors, cssFonts, normalizeColor } from '@/core/brand/css';
+import { cssColors, cssFonts, normalizeColor, withThemeColor } from '@/core/brand/css';
 
 describe('normalizeColor', () => {
   it('reads hex, rgb(), rgba() and hsl()', () => {
@@ -122,4 +122,36 @@ describe('brand css hardening', () => {
       expect(Math.min(...runs)).toBeLessThan(3000);
     }
   }, 60_000);
+});
+
+describe('withThemeColor', () => {
+  // A site whose CSS uses white 200 times declares white as its theme-color too (a light marketing page).
+  const site = [
+    { hex: '#000000', weight: 300, source: 'declaration' as const },
+    { hex: '#ffffff', weight: 200, source: 'declaration' as const },
+    { hex: '#ff385c', weight: 100, source: 'custom-property' as const },
+  ];
+
+  it('adds the theme-color to the weight the CSS already gives that colour', () => {
+    const colors = withThemeColor(site, '#ffffff');
+    const white = colors.find((c) => c.hex === '#ffffff');
+
+    expect(white?.source).toBe('theme-color');
+    expect(white?.weight).toBeGreaterThan(200);
+    expect(colors.map((c) => c.hex)).toEqual(['#000000', '#ffffff', '#ff385c']);
+  });
+
+  it('weighs a theme-color the CSS never uses as a share of the palette, not a fixed few points', () => {
+    const colors = withThemeColor(site, '#5e6ad2');
+    const total = colors.reduce((sum, c) => sum + c.weight, 0);
+    const declared = colors.find((c) => c.hex === '#5e6ad2');
+
+    expect(declared?.source).toBe('theme-color');
+    expect((declared?.weight ?? 0) / total).toBeGreaterThanOrEqual(0.04);
+  });
+
+  it('keeps a small fixed weight on a tiny palette and leaves the colours alone without a theme-color', () => {
+    expect(withThemeColor([], '#3ce6ac')).toEqual([{ hex: '#3ce6ac', weight: 6, source: 'theme-color' }]);
+    expect(withThemeColor(site, null)).toEqual(site);
+  });
 });
