@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--check template.json` exits 1 on drift. `leclap compare --reference <clip>` adds the reference's frame
   as the first tile.
 
+### Fixed
+
+- `leclap verify --rerender` validates the manifest's template before rendering it again, instead of
+  skipping validation.
+
 ## [0.5.0] - 2026-10-11
 
 ### Added

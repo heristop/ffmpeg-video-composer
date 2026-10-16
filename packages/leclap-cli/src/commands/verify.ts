@@ -38,15 +38,17 @@ function defaultVideoFor(manifestFile: string): string {
   return manifestFile.replace(/\.manifest\.json$/, '');
 }
 
-interface RerenderInput {
+export interface RerenderInput {
   manifest: RenderManifest;
   buildDir: string;
   assetsDir: string;
   inputs: Record<string, string>;
 }
 
-// The recorded config (locale, fields, codec, scale…) with this machine's directories and clips.
-function rerenderConfig(input: RerenderInput): ProjectConfig {
+// The recorded config (locale, fields, codec, scale…) with this machine's directories and clips. The
+// descriptor is validated again: a manifest is a file from anywhere, and the recorded descriptor is the
+// authored one the original render validated (the build works on a clone).
+export function rerenderConfig(input: RerenderInput): ProjectConfig {
   const recorded = input.manifest.config as Partial<ProjectConfig> & { videoCodec?: string | null };
 
   return {
@@ -60,7 +62,6 @@ function rerenderConfig(input: RerenderInput): ProjectConfig {
     ...(recorded.videoCodec && { codecConfig: { videoCodec: recorded.videoCodec } }),
     userVideoPaths: Object.keys(input.inputs).length > 0 ? input.inputs : undefined,
     deterministic: input.manifest.deterministic,
-    skipValidation: true,
   };
 }
 
