@@ -7,7 +7,7 @@ import type { EasingSpec } from '@/core/motion/easing';
 import type { MatteShape } from '@/core/motion/radial-matte';
 import type { ThroughMatte } from '@/core/motion/transition-through';
 import type { ThroughWindow } from '@/core/motion/transition-mattes';
-import { XFADE_TRANSITIONS } from '@/schemas/effects.schemas';
+import { XFADE_TRANSITIONS } from '../../schemas/effects.schemas';
 
 const XFADE_NAMES: ReadonlySet<string> = new Set(XFADE_TRANSITIONS);
 

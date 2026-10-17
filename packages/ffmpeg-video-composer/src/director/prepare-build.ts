@@ -15,7 +15,7 @@ import type AbstractLogger from '../platform/logging/AbstractLogger';
 import { analyzeTemplateMusic } from './beats-analysis';
 import { resolveBuildFormat } from '@/core/formats/resolve';
 import { assertFieldsResolved } from '@/core/fields';
-import { assertRawFiltersAllowed } from '@/editor/utils/filter-allow-list';
+import { assertRawFiltersAllowed } from '../editor/utils/filter-allow-list';
 
 export { discardOutput, publishOutput, resolveOutputPaths } from './output-staging';
 export { qcExpectations } from './qc-expectations';
