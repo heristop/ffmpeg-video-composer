@@ -257,7 +257,7 @@ The validator rejects:
 
 ### Designed transitions
 
-`transition.type` also accepts the designed transitions `push-left`, `push-right`, `push-up`, `push-down`, `swipe-left`, `swipe-right`, `zoom-through`, `iris` and `drip`, plus an `ease` (default `cubic-bezier(0.65, 0, 0.35, 1)`; springs overshoot a push). A designed boundary cuts the outgoing tail and the incoming head, and composes them with filters whose geometry is evaluated once per frame (pad/overlay/crop, zoompan, a built-in crossfade). It then concatenates the result back on the same timeline as `xfade`. It costs about the same as a built-in transition and runs on device. A plain `iris` uses the built-in circle reveal: from the centre, linearly. Give it an `origin` (`{ "x": 0.12, "y": 0.18 }`, frame fractions, 0 = left / top) to open the circle from a point of the frame, such as the icon the next scene grows out of, and an `ease` to shape the opening (default `linear` for an iris). The circle then reaches the frame corner farthest from the origin at the end. A `rim` (`"#F6C445"`, a #RRGGBB colour, off by default) outlines the circle's edge, about 8 px wide at 720p: give it the colour of the element the iris opens from, so the circle visibly grows out of it instead of a hole appearing inside it. The shaped iris draws its mask per pixel (an `xfade` custom expression) at a quarter of the frame size, scales it up as the incoming scene's alpha (`alphamerge`) and overlays it on the outgoing scene. That costs about 1/16 of a full-size per-pixel transition and stays on the on-device allowlist; a `rim` adds a second quarter-size ring mask over a plain colour.
+`transition.type` also accepts the designed transitions `push-left`, `push-right`, `push-up`, `push-down`, `swipe-left`, `swipe-right`, `zoom-through`, `iris`, the `whip-*` family, `drip` and `bands`, plus an `ease` (default `cubic-bezier(0.65, 0, 0.35, 1)`; springs overshoot a push). A designed boundary cuts the outgoing tail and the incoming head, and composes them with filters whose geometry is evaluated once per frame (pad/overlay/crop, zoompan, a built-in crossfade). It then concatenates the result back on the same timeline as `xfade`. It costs about the same as a built-in transition and runs on device. A plain `iris` uses the built-in circle reveal: from the centre, linearly. Give it an `origin` (`{ "x": 0.12, "y": 0.18 }`, frame fractions, 0 = left / top) to open the circle from a point of the frame, such as the icon the next scene grows out of, and an `ease` to shape the opening (default `linear` for an iris). The circle then reaches the frame corner farthest from the origin at the end. A `rim` (`"#F6C445"`, a #RRGGBB colour, off by default) outlines the circle's edge, about 8 px wide at 720p: give it the colour of the element the iris opens from, so the circle visibly grows out of it instead of a hole appearing inside it. The shaped iris draws its mask per pixel (an `xfade` custom expression) at a quarter of the frame size, scales it up as the incoming scene's alpha (`alphamerge`) and overlays it on the outgoing scene. That costs about 1/16 of a full-size per-pixel transition and stays on the on-device allowlist; a `rim` adds a second quarter-size ring mask over a plain colour.
 
 ![Every designed transition, mid-way](./media/gallery/transitions.webp)
 
@@ -272,6 +272,20 @@ More in the [gallery](./gallery.md#transitions).
 ```
 
 The drip shape is drawn once per half, as a still silhouette: the wall, each drip's body and rounded end, and a shallow shoulder where each drip leaves the wall. The rounded ends are cut from one anti-aliased disc (a radial `gradients` source thresholded with `lutyuv`). Each frame scales the silhouette vertically by the eased progress, so every drip grows with the wall and the longer ones fall faster. The scaled silhouette becomes the alpha of the paint (then of the incoming scene) through `alphamerge`. It runs on device and costs two scales, two `alphamerge` and two full-frame overlays per frame: about 13 ms per transition frame at 1280×720 on one laptop thread, against about 2 ms for `iris` and 1 ms for a push.
+
+`bands` sweeps parallel colour bands across the cut. The bands run at `angle` degrees (counter-clockwise from horizontal, −80..80, default 30) and share the frame equally. They slide in along their length from the right, one after the other (`stagger`, default 0.06 s, capped so each sweep keeps 40% of a half), and cover the whole frame at the midpoint. The cut happens under them, then they carry on the same way and uncover the next scene. `count` (2–8, default 4) sets how many bands there are; `colors` (cycled, `"#rrggbb"` or `$color.*`) defaults to the theme's `brand`, `accent`, `accent2` and `fg`; `ease` shapes each band's sweep (default `cubic-bezier(0.65, 0, 0.35, 1)`). Each band is one rectangle, turned once by `rotate` and held by `loop`, so per frame only the overlay positions move. Keep it to 0.8–1.2 s, at a chapter change.
+
+```jsonc
+"transition": { "type": "bands", "duration": 1, "count": 4, "angle": 30, "colors": ["$color.brand", "$color.accent", "$color.accent2", "$color.fg"] }
+```
+
+An `iris` takes a `shape`: `circle` (the default, the paths above, unchanged), `star`, `heart` or `rounded-square`. A shape opens from `origin` on the `ease`, like the shaped circle. Its geometry is drawn once at compile time as a reveal field: for each pixel of a half-size 16-bit image, the scale the shape must grow to before it covers that pixel. The field is added to the assembly as an input, and each frame compares it with the eased level on an `xfade` mask like the circle's, at half size rather than a quarter, because straight edges and points show the upscale's staircase where a round edge hides it. To make an iris feel like it comes out of an icon, put the `origin` on the icon and pick a curve that leaves fast (`ease-out-cubic`).
+
+`zoom-through` takes `through`: a window the camera flies into, showing the next scene, until the window covers the frame. The window is either a letter's counter, `{ "text": "ZOOM", "glyph"?, "font"?, "size"?, "x"?, "y"? }`, or a shape, `{ "shape": "circle" | "star" | "heart" | "rounded-square", "size", "x"?, "y"? }` (size is the window's width in px, x and y its centre). A text window is laid out exactly as a [kinetic block](#kinetic-typography) with the same `text`, `font`, `size`, `x` and `y` draws it, so copy those from the block the outgoing scene shows. The counter of `glyph` (0-based among the characters, default the first one that has a counter: the O of ZOOM) is the window. The glyph outline is read from the font file (TrueType `glyf` outlines; every bundled font has them). The window is drawn once as a matte image at full frame size. The outgoing tail and that matte run through the same zoom chain about the window's centre, so the hole and the letter around it stay locked together on every frame. The zoom is log-linear on the `ease`: exact sub-pixel up to ×2, then whole-pixel `zoompan` stages (×10 each, up to ×200) where the move is fast. The incoming scene takes the zoomed matte as its alpha and settles from a 15% push. A window that cannot be drawn (unreadable font, no counter in the text, a window too small to reach the frame corners by ×200) logs why and falls back to the plain `zoom-through`.
+
+```jsonc
+"transition": { "type": "zoom-through", "duration": 0.9, "ease": "ease-in-cubic", "through": { "text": "ZOOM", "font": "archivo-black", "size": 220 } }
+```
 
 ### xfade transition names
 
@@ -1128,6 +1142,12 @@ At `scaleX` 0 the layer is drawn 2 px wide: the card's edge.
 
 All five are in [`layer-keyframes.json`](../examples/motion-design/layer-keyframes.json).
 
+**Clip box (`options.clip`).** `{ x, y, w, h }` in px cuts a layer to a box, like the kinetic `clip`: the layer is overlaid on a copy of the frame as usual, the copy is cropped to the box and laid back over the frame. A card that slides up with a `y` track from below the box then rises out of a slot, over footage too.
+
+```jsonc
+"options": { "position": "540:300", "scale": "200:100", "clip": { "x": 540, "y": 300, "w": 200, "h": 100 }, "animate": { "y": [{ "v": "+110" }, { "t": 0.6, "v": "+0", "ease": "$snappy" }] } }
+```
+
 Limits: a layer is a raster. An `html` layer is drawn once at 2× and scaled per frame, so it stays sharp up to `scale` 2 (with a `rotate` track it is first scaled to its box, so it softens above 1); an image is only as sharp as its file. The turned square is the box diagonal, so the frame scaled on top of a turn grows with it.
 
 ## Whole-video animations
@@ -1549,6 +1569,7 @@ More in the [gallery](./gallery.md#kinetic-typography).
 | `wrap`                                          | `greedy`                                        | `balanced` keeps the line count but evens line widths and avoids ending a line on an article or preposition.                                                                    |
 | `trail`                                         | —                                               | `{ echoes: 2..6, delta = 0.04 s, fade = 0.5 }`: fading echoes of each unit while it moves; they collapse into it when it rests. Not on `counter`; at most 192 echoes per block. |
 | `fill`                                          | —                                               | Gradient, texture or shimmer inside the letters (see below).                                                                                                                    |
+| `clip`                                          | —                                               | `"block"`, `"line"` or `{ x, y, w, h }`: the block shows only inside that box (see below).                                                                                      |
 | `role`                                          | —                                               | A [motion role](#motion-roles).                                                                                                                                                 |
 
 Moving boxes (the highlight marker, the typewriter caret) are emitted as one box per frame, each gated by an `enable` window, because FFmpeg evaluates `drawbox` geometry only once. They are frame-exact and deterministic. Validation codes: `kinetic_font_unmeasurable`, and `invalid_kinetic` (a counter without numbers). Agents get every preset, its defaults, art-direction rules and a starter from MCP `get_motion_catalog` (or `motionCatalog()` in the library). See [`examples/motion-design/kinetic-type.json`](../examples/motion-design/kinetic-type.json).
@@ -1557,6 +1578,12 @@ Moving boxes (the highlight marker, the typewriter caret) are emitted as one box
 
 ```jsonc
 "kinetic": [{ "text": { "en": "{{ form_price }}" }, "preset": "counter", "counter": { "from": 0 }, "ease": "$expo", "delay": 0.4 }]
+```
+
+**Clipped text.** `clip` cuts the block to a box, so a `rise` reveals out of an invisible slot (above an underline) and a `drop` from under a rule, on any background, footage included. `"block"` is the block's own resting box (widened by 0.3 em on the sides and 0.1 em above). `"line"` gives each line its own box, so each line rises out of its own slot. `{ x, y, w, h }` is any box in px. The frame is split, the block is drawn on one copy exactly as it would be, and that copy is cropped to the box and laid back over the frame (`split`, `crop`, `overlay`). Nothing of the block can show outside the box, and nothing under it changes. A typewriter caret and scramble decoys are not clipped; a filled block clips as one block.
+
+```jsonc
+"kinetic": [{ "text": { "en": "Hello!" }, "preset": "rise", "clip": "line", "size": 150, "ease": "$snappy" }]
 ```
 
 **Filled text.** `fill: { gradient?: { from, to, angle? } | { stops: [2–8 colours], angle? }, texture?: url, sweep?: { duration?, width?, color?, delay?, every? } }` turns the block's units into a mask over the fill, keeping each unit's timing; `sweep` moves a soft band across it (a shimmer). The mask needs `alphamerge`: where the build lacks it, the block is drawn in its `color` and the advisory `mask_unavailable` is reported when the target build is known. Agents find it in `motionCatalog().compositing.kineticFill`.
