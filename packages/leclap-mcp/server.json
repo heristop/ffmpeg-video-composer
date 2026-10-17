@@ -50,6 +50,13 @@
           "isSecret": false
         },
         {
+          "name": "LECLAP_MCP_ALLOW_NETWORK",
+          "description": "Enable extract_brand, which fetches a website over HTTPS (public hosts only, size and time caps) to read its brand. Off by default.",
+          "format": "boolean",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
           "name": "LECLAP_MCP_ALLOW_REMOTION",
           "description": "Enable effect discovery, effect previews and the Remotion clip renderer. Rendering executes local JavaScript. Off by default.",
           "format": "boolean",
@@ -162,6 +169,10 @@
             "description": "Return a link that opens the template in the LeClap web builder; the template travels in the URL fragment, never uploaded."
           },
           {
+            "name": "extract_brand",
+            "description": "Read a website (https only) into a brand kit: name, colours, fonts and logo as a theme and binding rules. Gated \u2014 see notes."
+          },
+          {
             "name": "render_remotion_clip",
             "description": "Render a composition from your own Remotion project to an MP4. Gated \u2014 see notes."
           },
@@ -179,7 +190,7 @@
           }
         ],
         "prompts": ["compose-video"],
-        "notes": "Fifteen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, editing and rendering; callers cannot select executable source through effect JSON. edit_template, including its effect-prop edits, remains registered when Remotion is disabled."
+        "notes": "Fifteen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. extract_brand fetches websites and requires the network opt-in (--allow-network). Registered JSON effects use operator-configured trusted source and require a configured backend for validation, editing and rendering; callers cannot select executable source through effect JSON. edit_template, including its effect-prop edits, remains registered when Remotion is disabled."
       }
     }
   }
