@@ -221,10 +221,10 @@ function irisMask(b: DesignedBoundary, p: Pads): string {
 }
 
 // A shaped iris from its reveal field (radial-matte.ts): the field codes, per mask pixel, the scale the shape
-// must reach to cover it (0..255 over the scale that covers the frame), so the frame's mask is one
-// comparison per pixel against the eased level, on an xfade like the circle's, at half size. Like the
+// must reach to cover it (16-bit, 0..FIELD_LEVELS over the scale that covers the frame), so the frame's mask
+// is one comparison per pixel against the eased level, on an xfade like the circle's, at half size. Like the
 // circle's mask, every branch is restamped on one frame grid so the alphamerge and overlay never pair a
-// stale mask frame.
+// stale mask frame. A shaped iris draws no rim (`rim` outlines the circle only).
 function irisShaped(b: DesignedBoundary, p: Pads, matte: ThroughMatte): string {
   const [mw, mh] = [even(b.width / SHAPE_FIELD_DIVISOR), even(b.height / SHAPE_FIELD_DIVISOR)];
   const soft = (FIELD_LEVELS * IRIS_SOFT) / matte.scale;

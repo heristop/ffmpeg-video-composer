@@ -1,11 +1,12 @@
 // Compile-time mattes for the shaped transitions: a shape (circle, star, heart, rounded square, or a
-// glyph's counter) as a polygon around a centre, rasterised to an 8-bit grey image the transition reads as
-// an input. FFmpeg on device has no per-pixel shape filter (no geq), so the geometry is drawn here once.
+// glyph's counter) as a polygon around a centre, rasterised to a grey image the transition reads as an
+// input. FFmpeg on device has no per-pixel shape filter (no geq), so the geometry is drawn here once.
 //
 // - coverage(): the shape filled at its size, anti-aliased (4×4 samples per pixel): white inside.
-// - field(): per pixel, the scale the shape must grow to (about its centre) to cover that pixel, coded
-//   0..255 over [0, the scale that covers the whole frame]. Thresholding it at a level reveals the shape at
-//   that scale, so one image and one comparison per pixel draw the shape at any size (iris shapes).
+// - field(): per pixel, the scale the shape must grow to (about its centre) to cover that pixel, coded in
+//   16 bits, 0..FIELD_LEVELS (65535) over [0, the scale that covers the whole frame]. Thresholding it at a
+//   level reveals the shape at that scale, so one image and one comparison per pixel draw the shape at any
+//   size (iris shapes).
 //
 // The shapes are star-shaped about their centre (every ray from it crosses the outline once), which is
 // what makes a scale a single threshold. Pure functions of their inputs: deterministic on every platform.
