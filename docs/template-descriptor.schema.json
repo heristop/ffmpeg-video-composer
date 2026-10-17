@@ -29483,7 +29483,7 @@
                 "secondary": {
                   "description": "Colour of the second lobe: \"#rrggbb\" or a theme token (default rose #FF7A88; the first lobe is `color`, default amber #FFB36B, both nudged toward the theme accent).",
                   "type": "string",
-                  "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z]+)(@[0-9.]+)?$"
+                  "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                 },
                 "balance": {
                   "description": "Strength of the second lobe relative to the first (default 0.55–0.8). 0 = a single lobe.",
@@ -29632,7 +29632,7 @@
                 "glow": {
                   "description": "Bloom colour: \"#rrggbb\" or a theme token (default: the light colour pushed toward the theme accent). The hairline stays near-white.",
                   "type": "string",
-                  "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z]+)(@[0-9.]+)?$"
+                  "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                 },
                 "breathe": {
                   "description": "Opacity swing of the bloom, ± share (default 0.06; 0 = steady).",

@@ -1,11 +1,34 @@
 import { createHash } from 'node:crypto';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { leakStops, protectRamp } from '@/editor/presets/fx-leak';
+import { FxColorSchema } from '@/schemas/fx-light.schemas';
+import { GraphicsSchema } from '@/schemas/graphics.schemas';
 import { hasFfmpeg, lowerGraphic, lumaAt, renderFrames, type Lowered } from './fixtures/fx-test-kit';
 import { testBuildDir } from './fixtures/build-dir';
 
 const leak = (graphic: Record<string, unknown> = {}, options = {}): Lowered =>
   lowerGraphic({ effect: 'leak', ...graphic }, options);
+
+describe('fx colours', () => {
+  it('accept numbered theme colours, as the docs example uses', () => {
+    for (const color of ['$color.accent2', '$color.accent', '#F6C445', '#F6C445@0.5', '$color.fg2@0.4']) {
+      expect(FxColorSchema.safeParse(color).success, color).toBe(true);
+    }
+    for (const typo of ['$color.', '$color.2accent', 'accent2', '#F6C44']) {
+      expect(FxColorSchema.safeParse(typo).success, typo).toBe(false);
+    }
+    const leak = {
+      type: 'fx',
+      effect: 'leak',
+      edge: 'top-right',
+      duration: 2.4,
+      drift: -0.08,
+      secondary: '$color.accent2',
+    };
+
+    expect(GraphicsSchema.safeParse([leak]).success).toBe(true);
+  });
+});
 
 describe('fx leak: graph', () => {
   it('lowers to two radial lobes at half resolution, computed once, with an eased envelope', () => {
