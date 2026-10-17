@@ -191,10 +191,13 @@ describe('FormatterManager', () => {
       expect(manager.formatMultipleTypesValue({ type: 'setpts' } as Filter)).toBe('setpts=0.25*PTS');
     });
 
-    it.each(['PTS+0.5/TB', 'PTS-STARTPTS+1.2/TB', 'N/(30*TB)'])('setpts keeps the explicit expression %s', (value) => {
-      const { manager } = build({ section: { name: 's', type: 'video', options: { speed: 0.25 } } });
-      expect(manager.formatMultipleTypesValue({ type: 'setpts', value })).toBe(`setpts=${value}`);
-    });
+    it.each(['PTS+0.5/TB', 'PTS-STARTPTS', 'PTS-STARTPTS+1/TB', 'PTS-STARTPTS+1.2/TB', 'N/(30*TB)'])(
+      'setpts keeps the explicit expression %s',
+      (value) => {
+        const { manager } = build({ section: { name: 's', type: 'video', options: { speed: 0.25 } } });
+        expect(manager.formatMultipleTypesValue({ type: 'setpts', value })).toBe(`setpts=${value}`);
+      }
+    );
 
     it.each(['PTS', '2*PTS', '0.25*PTS'])('setpts still applies the section speed to the plain form %s', (value) => {
       const { manager } = build({ section: { name: 's', type: 'video', options: { speed: 0.5 } } });
