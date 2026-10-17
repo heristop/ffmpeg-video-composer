@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+<<<<<<< HEAD
 - Clip boxes: a kinetic block takes `clip` (`"block"`, its own resting box; `"line"`, one box per line; or
   `{ x, y, w, h }` in px) and an image, animation or html layer takes `options.clip` (a box). The element only
   shows inside the box, so a `rise` reveals out of an invisible slot above an underline, on any background,
@@ -36,6 +37,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `structureDrift` holds a template to it. `analyzeStructureFile` decodes a clip on Node. Format only: never
   the reference's subjects, logos or text.
 - Brand kits: `fetchBrandKit(url)` reads a website's name, colours (theme-color, brand-named custom properties, the most used declared colours), fonts (heading, body, code) and logo over HTTPS from public addresses only, with size, time and redirect caps; `saveBrandKit` writes the kit and keeps it when the logo fails (`logoError`); `brandTheme(kit)` turns it into a `global.theme` (roles with WCAG contrast, the nearest bundled fonts plus the exact families as `FontRef` suggestions) and `brandPromptRules` into binding generation rules.
+=======
+- Animated HTML cards: elements tagged `data-motion="name"` move on the input's `motion` map
+  (`{ name: { x, y, scale, rotate, opacity, stagger } }`, keyframes as in `options.animate`), so a card's tag,
+  lines and chips can come in one after another. The card is drawn at the output fps over the animated span
+  only, held frames drawn once, joined into one animated PNG and composited with the overlay path (no new
+  filter; the `apng` demuxer is on every backend), holding its final frame. Bounded (8 s, 240 frames, 500
+  megapixels: `html_motion_too_long`), `html_motion_unmatched` for a name no element carries, and a still in
+  its final state (`html_motion_static`) when the frames can't be produced. Sample:
+  `examples/motion-design/html-motion.json`.
+>>>>>>> 35498b2c (docs: animated html cards and their showcase sample)
 - Keyframe tracks on image, animation and html layer inputs: `inputs[].options.animate` takes `x`, `y`,
   `scale`, `scaleX`, `scaleY`, `rotate` and `opacity` tracks, with the same `{ t, v, ease? }` keys, easings,
   springs, tokens and time references as the drawtext tracks. Cards, badges and icons can now pop in with an

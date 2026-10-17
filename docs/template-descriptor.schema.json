@@ -1735,6 +1735,10 @@
                       "exclusiveMinimum": 0,
                       "maximum": 9007199254740991
                     },
+                    "motion": {
+                      "description": "html layer: per-element keyframes { name: { x, y, scale, rotate, opacity, stagger } } for the elements tagged data-motion=\"name\".",
+                      "$ref": "#/$defs/HtmlMotion"
+                    },
                     "options": {
                       "description": "Playback and compositing options for this input.",
                       "type": "object",
@@ -4785,6 +4789,10 @@
                       "type": "integer",
                       "exclusiveMinimum": 0,
                       "maximum": 9007199254740991
+                    },
+                    "motion": {
+                      "description": "html layer: per-element keyframes { name: { x, y, scale, rotate, opacity, stagger } } for the elements tagged data-motion=\"name\".",
+                      "$ref": "#/$defs/HtmlMotion"
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -7879,6 +7887,10 @@
                       "exclusiveMinimum": 0,
                       "maximum": 9007199254740991
                     },
+                    "motion": {
+                      "description": "html layer: per-element keyframes { name: { x, y, scale, rotate, opacity, stagger } } for the elements tagged data-motion=\"name\".",
+                      "$ref": "#/$defs/HtmlMotion"
+                    },
                     "options": {
                       "description": "Playback and compositing options for this input.",
                       "type": "object",
@@ -10697,6 +10709,10 @@
                       "exclusiveMinimum": 0,
                       "maximum": 9007199254740991
                     },
+                    "motion": {
+                      "description": "html layer: per-element keyframes { name: { x, y, scale, rotate, opacity, stagger } } for the elements tagged data-motion=\"name\".",
+                      "$ref": "#/$defs/HtmlMotion"
+                    },
                     "options": {
                       "description": "Playback and compositing options for this input.",
                       "type": "object",
@@ -13494,6 +13510,10 @@
                       "type": "integer",
                       "exclusiveMinimum": 0,
                       "maximum": 9007199254740991
+                    },
+                    "motion": {
+                      "description": "html layer: per-element keyframes { name: { x, y, scale, rotate, opacity, stagger } } for the elements tagged data-motion=\"name\".",
+                      "$ref": "#/$defs/HtmlMotion"
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -16779,6 +16799,10 @@
                       "exclusiveMinimum": 0,
                       "maximum": 9007199254740991
                     },
+                    "motion": {
+                      "description": "html layer: per-element keyframes { name: { x, y, scale, rotate, opacity, stagger } } for the elements tagged data-motion=\"name\".",
+                      "$ref": "#/$defs/HtmlMotion"
+                    },
                     "options": {
                       "description": "Playback and compositing options for this input.",
                       "type": "object",
@@ -19577,6 +19601,10 @@
                       "exclusiveMinimum": 0,
                       "maximum": 9007199254740991
                     },
+                    "motion": {
+                      "description": "html layer: per-element keyframes { name: { x, y, scale, rotate, opacity, stagger } } for the elements tagged data-motion=\"name\".",
+                      "$ref": "#/$defs/HtmlMotion"
+                    },
                     "options": {
                       "description": "Playback and compositing options for this input.",
                       "type": "object",
@@ -22373,6 +22401,10 @@
                       "type": "integer",
                       "exclusiveMinimum": 0,
                       "maximum": 9007199254740991
+                    },
+                    "motion": {
+                      "description": "html layer: per-element keyframes { name: { x, y, scale, rotate, opacity, stagger } } for the elements tagged data-motion=\"name\".",
+                      "$ref": "#/$defs/HtmlMotion"
                     },
                     "options": {
                       "description": "Playback and compositing options for this input.",
@@ -25959,40 +25991,47 @@
       "additionalProperties": false,
       "description": "Hz: cutoff, or from→to over each note. resonance = Q (default 0.707)."
     },
-    "LayerAnimate": {
+    "HtmlMotion": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/HtmlElementMotion"
+      },
+      "description": "html layer: keyframe tracks per element. Each key names the data-motion attribute of the elements it moves; times are section seconds. The card is drawn frame by frame over the animated span only."
+    },
+    "HtmlElementMotion": {
       "type": "object",
       "properties": {
         "x": {
-          "description": "Horizontal position track (overlay x): pixels, or \"+80\"/\"-40\" relative to options.position.",
+          "description": "Horizontal offset track in pixels from where the element is laid out (\"+40\" and 40 alike).",
           "$ref": "#/$defs/KeyframeTrack"
         },
         "y": {
-          "description": "Vertical position track (overlay y): pixels, or \"+80\"/\"-40\" relative to options.position.",
+          "description": "Vertical offset track in pixels from where the element is laid out.",
           "$ref": "#/$defs/KeyframeTrack"
         },
         "scale": {
-          "description": "Uniform scale track: a multiplier of the layer box (0..10).",
-          "$ref": "#/$defs/KeyframeTrack"
-        },
-        "scaleX": {
-          "description": "Horizontal scale track (0..10), multiplied with scale: squash and stretch, or a card flip (1 → 0 → 1).",
-          "$ref": "#/$defs/KeyframeTrack"
-        },
-        "scaleY": {
-          "description": "Vertical scale track (0..10), multiplied with scale.",
+          "description": "Scale track (0..10) about the element centre.",
           "$ref": "#/$defs/KeyframeTrack"
         },
         "rotate": {
-          "description": "Rotation track in degrees, clockwise: absolute, or \"+15\"/\"-15\" relative to options.rotation.",
+          "description": "Rotation track in degrees, clockwise, about the element centre.",
           "$ref": "#/$defs/KeyframeTrack"
         },
         "opacity": {
-          "description": "Opacity track 0..1, multiplied with options.opacity.",
+          "description": "Opacity track 0..1, multiplied with the element's own CSS opacity.",
           "$ref": "#/$defs/KeyframeTrack"
+        },
+        "stagger": {
+          "description": "Seconds each further element with this name starts after the previous one, in document order.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2
         }
       },
-      "additionalProperties": false,
-      "description": "Keyframe tracks for the layer, times in section seconds. Each key eases into the next. A track overrides the same property of options.motion (x/y over a rise or slide, opacity over a fade). scale/scaleX/scaleY/rotate need the layer box: an html layer, or options.scale as \"W:H\" pixels."
+      "additionalProperties": false
     },
     "KeyframeTrack": {
       "minItems": 1,
@@ -26035,6 +26074,41 @@
         "required": ["v"],
         "additionalProperties": false
       }
+    },
+    "LayerAnimate": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "description": "Horizontal position track (overlay x): pixels, or \"+80\"/\"-40\" relative to options.position.",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "y": {
+          "description": "Vertical position track (overlay y): pixels, or \"+80\"/\"-40\" relative to options.position.",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "scale": {
+          "description": "Uniform scale track: a multiplier of the layer box (0..10).",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "scaleX": {
+          "description": "Horizontal scale track (0..10), multiplied with scale: squash and stretch, or a card flip (1 → 0 → 1).",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "scaleY": {
+          "description": "Vertical scale track (0..10), multiplied with scale.",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "rotate": {
+          "description": "Rotation track in degrees, clockwise: absolute, or \"+15\"/\"-15\" relative to options.rotation.",
+          "$ref": "#/$defs/KeyframeTrack"
+        },
+        "opacity": {
+          "description": "Opacity track 0..1, multiplied with options.opacity.",
+          "$ref": "#/$defs/KeyframeTrack"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Keyframe tracks for the layer, times in section seconds. Each key eases into the next. A track overrides the same property of options.motion (x/y over a rise or slide, opacity over a fade). scale/scaleX/scaleY/rotate need the layer box: an html layer, or options.scale as \"W:H\" pixels."
     },
     "Animate": {
       "type": "object",
