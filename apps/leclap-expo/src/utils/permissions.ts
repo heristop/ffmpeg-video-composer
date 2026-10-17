@@ -70,13 +70,13 @@ export const requestAudioPermission = async (): Promise<boolean> => {
 export const requestMediaLibraryPermission = async (): Promise<boolean> => {
   const { status: existingStatus } = await MediaLibrary.getPermissionsAsync();
 
-  if (existingStatus === 'granted') {
+  if (existingStatus === MediaLibrary.PermissionStatus.GRANTED) {
     return true;
   }
 
   const { status } = await MediaLibrary.requestPermissionsAsync();
 
-  if (status !== 'granted') {
+  if (status !== MediaLibrary.PermissionStatus.GRANTED) {
     Alert.alert(i18n.t('permissions.mediaLibrary.title'), i18n.t('permissions.mediaLibrary.message'), [
       { text: i18n.t('actions.cancel', { ns: 'common' }), style: 'cancel' },
       {

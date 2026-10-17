@@ -116,7 +116,7 @@ class FFmpegStaticAdapter extends AbstractFFmpeg {
         source,
       ]);
 
-      const info: FFProbeData = JSON.parse(stdout);
+      const info = JSON.parse(stdout) as FFProbeData;
 
       const videoStream = info.streams.find((s) => s.codec_type === 'video');
       const audioStream = info.streams.find((s) => s.codec_type === 'audio');

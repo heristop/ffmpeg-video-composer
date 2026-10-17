@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Image, StatusBar, type ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -67,7 +67,9 @@ function HeaderLeft({
           <Ionicons name="chevron-back" size={24} color={textColor} />
         </PressableScale>
       ) : null}
-      {showLogo ? <Image source={logoImage} style={styles.logo} resizeMode="contain" accessible={false} /> : null}
+      {showLogo ? (
+        <Image source={logoImage as ImageSourcePropType} style={styles.logo} resizeMode="contain" accessible={false} />
+      ) : null}
       <HeaderIdentity title={title} slogan={slogan} textColor={textColor} transparent={transparent} />
     </View>
   );

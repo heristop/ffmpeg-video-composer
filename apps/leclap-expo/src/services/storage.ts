@@ -38,7 +38,7 @@ export const getCachedTemplates = async (): Promise<Template[] | null> => {
   try {
     const cachedData = await appStorage.getItem(TEMPLATES_CACHE_KEY);
 
-    return cachedData ? JSON.parse(cachedData) : null;
+    return cachedData ? (JSON.parse(cachedData) as Template[]) : null;
   } catch (error) {
     console.error('Error getting cached templates:', error);
 
@@ -53,7 +53,7 @@ export const getTemplatesCacheMetadata = async (): Promise<TemplatesCacheMetadat
   try {
     const metadata = await appStorage.getItem(TEMPLATES_METADATA_KEY);
 
-    return metadata ? JSON.parse(metadata) : null;
+    return metadata ? (JSON.parse(metadata) as TemplatesCacheMetadata) : null;
   } catch (error) {
     console.error('Error getting templates cache metadata:', error);
 

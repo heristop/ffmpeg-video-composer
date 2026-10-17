@@ -133,7 +133,7 @@ function sectionArray(section: EditorSection, kind: ElementRef['kind']): unknown
 
   if (!Array.isArray(value)) return [];
 
-  return value;
+  return value as unknown[];
 }
 
 // True when the section can gain an element of `kind`: array kinds need the owning section kind;

@@ -112,7 +112,7 @@ function patchSections(sections: unknown, patches: unknown, path: string, ctx: P
     ctx.issues.push(unknownTarget(joinPath(path, name), 'section', name, known));
   }
 
-  return sections.flatMap((section) => {
+  return (sections as unknown[]).flatMap((section) => {
     const name = sectionName(section);
     const patch = name !== undefined && Object.hasOwn(patches, name) ? patches[name] : undefined;
 

@@ -67,7 +67,8 @@ function tracksWithRole(tracks: Loose, axes: readonly string[], role: string): L
 
     if (!Array.isArray(keys)) continue;
 
-    out[axis] = keys.map((key, index) =>
+    const typedKeys = keys as unknown[];
+    out[axis] = typedKeys.map((key, index) =>
       index > 0 && isObject(key) && key.ease === undefined ? { ...key, ease: `$role.${role}` } : key
     );
   }
@@ -167,5 +168,9 @@ function declaresRole(section: unknown): boolean {
 export function applyMotionRoles(sections: unknown, table: RoleTable): unknown {
   if (!Array.isArray(sections) || !sections.some(declaresRole)) return sections;
 
-  return sections.map((section) => (declaresRole(section) ? sectionWithRoles(section, table) : section));
+  const resolved = sections.map((section): unknown =>
+    declaresRole(section) ? sectionWithRoles(section, table) : section
+  );
+
+  return resolved;
 }

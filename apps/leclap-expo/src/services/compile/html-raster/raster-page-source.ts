@@ -16,7 +16,7 @@ export interface RasterPageFile {
 let page: Promise<RasterPageFile> | undefined;
 
 async function locate(): Promise<RasterPageFile> {
-  const asset = await Asset.fromModule(rasterPage).downloadAsync();
+  const asset = await Asset.fromModule(rasterPage as number).downloadAsync();
   const uri = asset.localUri ?? asset.uri;
 
   return { uri, directory: uri.slice(0, uri.lastIndexOf('/') + 1) };

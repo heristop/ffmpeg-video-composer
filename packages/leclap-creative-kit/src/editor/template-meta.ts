@@ -89,7 +89,7 @@ export function renameTranscripts(
       return origin && name ? [[origin, name]] : [];
     })
   );
-  const renamed = Object.entries(transcripts).map(([section, record]) => [
+  const renamed: [string, (typeof transcripts)[string]][] = Object.entries(transcripts).map(([section, record]) => [
     renames.get(section) ?? section,
     { ...record, from: renames.get(record.from) ?? record.from },
   ]);

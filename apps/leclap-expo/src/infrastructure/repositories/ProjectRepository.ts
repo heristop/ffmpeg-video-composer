@@ -1,5 +1,6 @@
 import { appStorage } from '@/src/services/mmkv';
 import { Project } from '@/src/domain/entities/Project';
+import type { ProjectStatus } from '@/src/domain/valueObjects/ProjectStatus';
 import type { IProjectRepository } from '@/src/domain/repositories/IProjectRepository';
 
 const PROJECTS_STORAGE_KEY = 'le_clap_projects';
@@ -11,9 +12,15 @@ export class ProjectRepository implements IProjectRepository {
 
       if (!stored) return [];
 
-      const projectsData = JSON.parse(stored);
+      const projectsData = JSON.parse(stored) as unknown;
 
-      return projectsData.map((data: Record<string, unknown>) => Project.fromJSON(data));
+      if (!Array.isArray(projectsData)) return [];
+
+      return projectsData
+        .filter(
+          (data): data is Record<string, unknown> => data !== null && typeof data === 'object' && !Array.isArray(data)
+        )
+        .map((data) => Project.fromJSON(data));
     } catch (error) {
       console.error('Error loading projects from storage:', error);
 
@@ -45,7 +52,9 @@ export class ProjectRepository implements IProjectRepository {
   async findByStatus(status: string): Promise<Project[]> {
     const projects = await this.getStoredProjects();
 
-    return projects.filter((project) => project.status === status);
+    const projectStatus = status as ProjectStatus;
+
+    return projects.filter((project) => project.status === projectStatus);
   }
 
   async findByTemplate(templateName: string): Promise<Project[]> {

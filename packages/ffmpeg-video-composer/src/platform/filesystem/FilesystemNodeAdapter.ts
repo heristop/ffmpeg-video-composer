@@ -200,12 +200,14 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
         // Without listening on the source stream a mid-download failure (e.g. a
         // throttled connection) would leave a truncated file on disk that still
         // looks like a successful fetch.
-        response.data.on('error', reject);
+        const responseStream = response.data as NodeJS.ReadableStream;
+
+        responseStream.on('error', reject);
         writer.on('error', reject);
         writer.on('finish', () => {
           resolve();
         });
-        response.data.pipe(writer);
+        responseStream.pipe(writer);
       });
     } catch (error) {
       writer.destroy();
@@ -473,7 +475,7 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
       // Google Fonts CSS can answer 302, so redirects are followed but re-validated per hop.
       const response = await requestWithGuardedRedirects(url, 'text', url, 0, { headers });
 
-      return response.data;
+      return response.data as string;
     } catch (error) {
       const params = error instanceof Error ? { message: error.message } : undefined;
       this.logger?.error(`Error downloading from ${url}:`, params);

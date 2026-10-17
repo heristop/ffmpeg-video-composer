@@ -80,6 +80,7 @@ export const PreviewBgToggle = ({
           type="button"
           role="radio"
           aria-checked={value === key}
+          aria-label={title}
           title={title}
           onClick={() => {
             onChange(key);

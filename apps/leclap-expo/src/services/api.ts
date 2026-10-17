@@ -23,7 +23,7 @@ export type CompileRecordedVideos = Record<
 export const saveProject = async (project: Project): Promise<void> => {
   try {
     const projectsJson = await appStorage.getItem(PROJECTS_STORAGE_KEY);
-    const projects: Project[] = projectsJson ? JSON.parse(projectsJson) : [];
+    const projects: Project[] = projectsJson ? (JSON.parse(projectsJson) as Project[]) : [];
 
     const existingIndex = projects.findIndex((p) => p.id === project.id);
 
@@ -48,7 +48,7 @@ export const getProjects = async (): Promise<Project[]> => {
   try {
     const projectsJson = await appStorage.getItem(PROJECTS_STORAGE_KEY);
 
-    return projectsJson ? JSON.parse(projectsJson) : [];
+    return projectsJson ? (JSON.parse(projectsJson) as Project[]) : [];
   } catch (error) {
     console.error('Error getting projects:', error);
 

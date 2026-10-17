@@ -10,8 +10,10 @@ export function assertEffectsResolved(descriptor: unknown): TemplateDescriptor {
 
   if (Array.isArray(template.partials)) {
     for (const partial of template.partials) {
-      if (partial && typeof partial === 'object' && typeof partial.id === 'string') {
-        registry.set(partial.id, partial);
+      if (partial && typeof partial === 'object') {
+        const candidate = partial as { id?: unknown };
+
+        if (typeof candidate.id === 'string') registry.set(candidate.id, partial);
       }
     }
   }

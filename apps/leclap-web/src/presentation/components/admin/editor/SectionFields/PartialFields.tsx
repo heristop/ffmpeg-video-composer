@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { Trash2 } from '@/presentation/components/icons';
 import { PlusIcon } from '@/presentation/components/icons/plus';
 import { useIconHover } from '@/presentation/components/icons/useIconHover';
@@ -22,6 +22,9 @@ interface PartialFieldsProps {
 
 export const PartialFields = ({ section, partials, variables, onChange, inputCls }: PartialFieldsProps) => {
   const selected = partials.find((partial) => partial.id === section.ref);
+  const id = useId();
+  const partialId = `${id}-partial-ref`;
+  const prefixId = `${id}-partial-prefix`;
   const { ref: plusRef, hoverProps: plusHoverProps } = useIconHover();
 
   // When a partial is picked and the author hasn't entered any rows yet, seed the variable NAMES the
@@ -51,7 +54,10 @@ export const PartialFields = ({ section, partials, variables, onChange, inputCls
     <div className="space-y-3">
       <div className="grid gap-2 sm:grid-cols-[1fr_10rem]">
         <div>
-          <label className="mb-1 block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+          <label
+            htmlFor={partialId}
+            className="mb-1 block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400"
+          >
             Partial
           </label>
           <Select
@@ -61,7 +67,7 @@ export const PartialFields = ({ section, partials, variables, onChange, inputCls
             }}
             disabled={partials.length === 0}
           >
-            <SelectTrigger aria-label="Partial">
+            <SelectTrigger id={partialId} aria-label="Partial">
               <SelectValue placeholder="Select partial" />
             </SelectTrigger>
             <EditorSelectContent>
@@ -74,10 +80,14 @@ export const PartialFields = ({ section, partials, variables, onChange, inputCls
           </Select>
         </div>
         <div>
-          <label className="mb-1 block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+          <label
+            htmlFor={prefixId}
+            className="mb-1 block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400"
+          >
             Prefix
           </label>
           <input
+            id={prefixId}
             aria-label="Partial prefix"
             className={inputCls}
             value={section.prefix ?? ''}

@@ -72,9 +72,9 @@ const ModelField = ({ provider, model, onModelChange }: Omit<ProviderSettingsPro
           onModelChange(event.target.value);
         }}
       />
-      <datalist id={`${id}-models`}>
+      <datalist id={`${id}-models`} aria-label={t('provider.model')}>
         {provider.models.map((option) => (
-          <option key={option} value={option} />
+          <option key={option} value={option} aria-label={option} />
         ))}
       </datalist>
       <p id={`${id}-hint`} className={`mt-1.5 ${FIELD_HELP}`}>

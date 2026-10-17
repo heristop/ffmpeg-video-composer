@@ -91,7 +91,7 @@ export async function loadConfig(configPath: string): Promise<TemplateDescriptor
     const fileSystem = container.resolve<AbstractFilesystem>('filesystemAdapter');
     const content = await fileSystem.read(configPath);
 
-    return JSON.parse(content);
+    return JSON.parse(content) as TemplateDescriptor;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Failed to load config from ${configPath}: ${error.message}`);

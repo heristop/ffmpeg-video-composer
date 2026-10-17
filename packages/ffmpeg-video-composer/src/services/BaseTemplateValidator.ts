@@ -311,7 +311,7 @@ export class BaseTemplateValidator {
     try {
       const fs = await import('node:fs');
       const templateContent = fs.readFileSync(filePath, 'utf-8');
-      const templateData = JSON.parse(templateContent);
+      const templateData = JSON.parse(templateContent) as unknown;
 
       return this.validateTemplate(templateData);
     } catch (error) {
@@ -330,7 +330,7 @@ export class BaseTemplateValidator {
 
   validateTemplateFromJSON(jsonString: string): ValidationResult {
     try {
-      const templateData = JSON.parse(jsonString);
+      const templateData = JSON.parse(jsonString) as unknown;
 
       return this.validateTemplate(templateData);
     } catch {

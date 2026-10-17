@@ -9,7 +9,7 @@ export function applyVariables<T>(node: T, variables: Record<string, string>): T
   }
 
   if (Array.isArray(node)) {
-    return node.map((item) => applyVariables(item, variables)) as unknown as T;
+    return (node as unknown[]).map((item) => applyVariables(item, variables)) as unknown as T;
   }
 
   if (node !== null && typeof node === 'object') {

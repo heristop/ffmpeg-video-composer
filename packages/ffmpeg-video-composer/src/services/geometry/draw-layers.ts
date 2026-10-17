@@ -106,7 +106,7 @@ interface OverlayLike {
 
 // compileGlobalDecorations' fan-out, per overlay so each finding can name the overlay it came from.
 function globalLayers(section: Section, overlays: unknown, ctx: SugarContext): DrawLayer[] {
-  const list: (OverlayLike | null | undefined)[] = Array.isArray(overlays) ? overlays : [];
+  const list = Array.isArray(overlays) ? (overlays as unknown as (OverlayLike | null | undefined)[]) : [];
   const layers: DrawLayer[] = [];
 
   for (const [index, overlay] of list.entries()) {

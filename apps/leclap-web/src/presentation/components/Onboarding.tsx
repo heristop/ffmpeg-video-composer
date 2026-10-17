@@ -257,6 +257,7 @@ export const Onboarding = ({ onDone }: OnboardingProps) => {
       </div>
 
       <div
+        role="presentation"
         onClick={onBackdropClick}
         className="relative min-h-full flex items-center justify-center p-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:p-4 sm:pt-[max(1.5rem,env(safe-area-inset-top))] safe-b"
       >

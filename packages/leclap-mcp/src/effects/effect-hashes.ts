@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 
 export async function hashFile(file: string, hash = createHash('sha256')) {
   for await (const chunk of createReadStream(file)) {
-    hash.update(chunk);
+    hash.update(chunk as Uint8Array);
   }
 
   return hash;

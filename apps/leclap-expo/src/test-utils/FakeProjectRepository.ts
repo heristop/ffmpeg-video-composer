@@ -1,4 +1,5 @@
 import type { Project } from '@/src/domain/entities/Project';
+import type { ProjectStatus } from '@/src/domain/valueObjects/ProjectStatus';
 import type { IProjectRepository } from '@/src/domain/repositories/IProjectRepository';
 
 /**
@@ -40,7 +41,9 @@ export class FakeProjectRepository implements IProjectRepository {
   }
 
   findByStatus(status: string): Promise<Project[]> {
-    return Promise.resolve([...this.store.values()].filter((p) => p.status === status));
+    const projectStatus = status as ProjectStatus;
+
+    return Promise.resolve([...this.store.values()].filter((p) => p.status === projectStatus));
   }
 
   findByTemplate(templateName: string): Promise<Project[]> {

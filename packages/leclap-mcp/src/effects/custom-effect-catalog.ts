@@ -110,7 +110,7 @@ function jsonFieldEntries(value: object): PropertyDescriptorMap {
   return descriptors;
 }
 function jsonFields(value: object): [string, unknown][] {
-  if (!Array.isArray(value) && ![Object.prototype, null].includes(Object.getPrototypeOf(value))) {
+  if (!Array.isArray(value) && ![Object.prototype, null].includes(Reflect.getPrototypeOf(value))) {
     catalogError('catalog must contain plain JSON objects.');
   }
   const fields: [string, unknown][] = [];
@@ -144,7 +144,7 @@ function jsonSnapshot(input: unknown) {
 
   if (Buffer.byteLength(json) > MAX_CATALOG_BYTES) catalogError('catalog exceeds 256 KiB.');
 
-  return { value: JSON.parse(json), nodes: usage.nodes, bytes: Buffer.byteLength(json) };
+  return { value: JSON.parse(json) as unknown, nodes: usage.nodes, bytes: Buffer.byteLength(json) };
 }
 function freeze<T>(value: T): T {
   if (value && typeof value === 'object') {

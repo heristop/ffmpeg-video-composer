@@ -14,9 +14,12 @@ import { pageWasm } from './html-raster-webview/page-wasm';
 
 interface PageGlobals {
   ReactNativeWebView?: { postMessage(text: string): void };
+  opener?: Window;
+  parent: Window;
+  addEventListener(type: string, listener: (event: Event) => void): void;
 }
 
-const page = globalThis as unknown as PageGlobals & Window;
+const page = globalThis as unknown as PageGlobals;
 
 function post(text: string): void {
   if (page.ReactNativeWebView) {

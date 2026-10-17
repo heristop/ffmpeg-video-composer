@@ -63,7 +63,7 @@ class FFmpegNodeAdapter extends AbstractFFmpeg {
         execFileAsync('ffprobe', ['-v', 'quiet', '-print_format', 'json', '-show_streams', source])
       );
 
-      const info: FFProbeData = JSON.parse(stdout);
+      const info = JSON.parse(stdout) as FFProbeData;
 
       const videoStream = info.streams.find((s) => s.codec_type === 'video');
       const audioStream = info.streams.find((s) => s.codec_type === 'audio');

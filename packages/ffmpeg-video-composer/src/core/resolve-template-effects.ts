@@ -89,8 +89,8 @@ export async function resolveTemplateEffects(
   await Promise.all(
     effects.map(async (section) => options.preflight?.(structuredClone(section), structuredClone(descriptor)))
   );
-  const userVideoPaths: Record<string, string> = Object.create(null);
-  const provenance: Record<string, ResolvedEffectProvenance> = Object.create(null);
+  const userVideoPaths = Object.create(null) as Record<string, string>;
+  const provenance = Object.create(null) as Record<string, ResolvedEffectProvenance>;
 
   // Renderers may wrap a single native/WASM engine, so chain rendering sequentially.
   await effects.reduce(async (previous, section) => {

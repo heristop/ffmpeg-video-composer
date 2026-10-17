@@ -79,7 +79,7 @@ function patchById(base: unknown, byId: Record<string, unknown>, path: string, c
     ctx.issues.push(unknownTarget(joinPath(byIdPath, id), 'id', id, known));
   }
 
-  return base.flatMap((element) => {
+  return (base as unknown[]).flatMap((element) => {
     const id = elementId(element);
 
     return id !== undefined && Object.hasOwn(byId, id)
