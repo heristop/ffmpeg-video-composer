@@ -4,159 +4,107 @@
 
 # LeClap
 
-**Deterministic, on-device, agent-callable video — composed by prompt or by hand.**
-
-Describe a video in one JSON _template_ — sections, filters, music, overlays — then render **that same template** on a phone (React Native, **on-device**) or in the **browser** (WebAssembly). No upload, no server, no generative model: the render is deterministic and reproducible, not sampled.
+**Your video from one JSON template: camera, effects, music, transitions, rendered on the device. No server, no upload.**
 
 [![CI](https://github.com/heristop/leclap/actions/workflows/ci.yml/badge.svg)](https://github.com/heristop/leclap/actions/workflows/ci.yml)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D24.11.0-brightgreen.svg)](https://nodejs.org/en/)
-[![pnpm](https://img.shields.io/badge/pnpm-12-f69220.svg)](https://pnpm.io/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm](https://img.shields.io/npm/v/ffmpeg-video-composer.svg?label=ffmpeg-video-composer)](https://www.npmjs.com/package/ffmpeg-video-composer)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Trademark: LeClap](https://img.shields.io/badge/™-LeClap-blue.svg)](TRADEMARK.md)
 
-[Quick start](#-quick-start) · [Templates](docs/template-configuration.md) · [Library API](packages/ffmpeg-video-composer/README.md) · [Architecture](docs/architecture.md) · [Docs](#-documentation)
+[Try it](#-try-it-in-30-seconds) · [Examples](#-template-in-video-out) · [Comparison](#-why-leclap) · [Docs](https://leclap.dev/doc) · [Showcase](https://leclap.dev/showcase)
 
 </div>
 
----
-
-## ✨ What is LeClap?
-
-One JSON template. It renders on Node, in the browser via WebAssembly, and **natively on-device on React Native** — same template, same pipeline, reproducible run after run on a given platform. No upload, no server, no generative model.
-
 ## 🎥 Demo
 
-https://github.com/user-attachments/assets/e5e6f7a1-3c84-479b-b6d7-83209e83017d
+<a href="https://leclap.dev/#film"><img src="apps/leclap-web/public/videos/films/leclap-showcase.en.webp" alt="The LeClap showcase film: play it on leclap.dev" width="800" /></a>
+
+Click the frame: the film plays on [leclap.dev](https://leclap.dev/#film), with captions.
+
+## ⏱ Try it in 30 seconds
+
+Node 24.11 or later. FFmpeg is optional: the CLI brings `ffmpeg-static` along and uses it when there is no
+`ffmpeg` on your PATH.
+
+```bash
+npx @leclap/cli init hello --no-remotion --no-mcp
+cd hello && npm install && npm run render
+```
+
+That writes `build/output.mp4`: three seconds of "Hello, LeClap" on a navy card, from the
+`template.json` next to it. Edit the JSON, render again.
+
+If the title is missing, the `ffmpeg` on your PATH was built without `drawtext` (Homebrew's current build is
+one). `npx leclap diagnose` lists what your FFmpeg can and can't do.
+
+Rather not install anything? [Open the same template in the web builder](https://leclap.dev/studio/builder#t=v1.RZBBi9VAEIT_StNeFMaoKwjGm6ugKB4ET7IsnZlKMuy8njAzSfb5yH-XSZ5rHz-6q6rrwicU4fbCNkGKX_DJJ9jio3LLX7Wk6GYLigrqkqij1ZeRhBJySeIVzpCFFiQ4Kr6EuktCTtIDqSxnsqKL5IZ-ZdA6-gKyUR0014PzBEMDFCnOmRTDnoHyJBZU7aqTOOkCqPcqgcYYXEPfgIlOseakLnn0-_I0pylm9HP4QLJE78jG04TidaAR4oJXZIqJHGxMhxX6Hrbkhn5i8VipjKCMUsLTP1W5UqjzOjS8GR5C7CTU2mLy0CLXwoKoy1YmsOHTnL39rDW647aXkLEZzke5mdvfF1Y5gVvebdhwbYNbtjHEdN-JfRhSnNWx4Thdjy78n9_WPW752Wv3prsRNuzmdE3ydjPc-1CQDqertEuyFjwWNrxImLEr7qC9MOoHXxBCNPQdt0Gm-moftdh_Tv0-fNDs_4Db9-8MP3LLz9eXVeh-ffHqhg2fKxoPNB6o3vQ-1Bwf0Un-gRlNKT1v2912t_0F),
+where it renders in the tab through WebAssembly. The template travels in the URL fragment, which browsers
+don't send to servers. `leclap studio template.json` prints that link for any template.
+
+## 🎞 Template in, video out
+
+Three templates from this repo and what they render to. Click a frame to play the render.
+
+| Template                                                                                       | Render                                                                                                                                                                                     | What it shows                                                                                                                                    |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`footage-edit.json`](examples/motion-design/footage-edit.json)<br/>4 KB of JSON               | <a href="https://leclap.dev/videos/showcase/footage-edit.mp4"><img src="apps/leclap-web/public/videos/showcase/footage-edit.webp" alt="Footage edit render" width="260" /></a>             | Five recorded clips, five edits: a portrait clip over its own blur, a keyframed pan under a LUT, a speed ramp, a freeze frame, a B-roll cutaway. |
+| [`before-after.json`](examples/agentic-pr-video/before-after.json)<br/>a PR review clip        | <a href="https://leclap.dev/videos/showcase/before-after.mp4"><img src="apps/leclap-web/public/videos/showcase/before-after.webp" alt="Before/after PR evidence render" width="260" /></a> | The video an agent attaches to a pull request: the change named, the old behaviour, a wipe to the new one, what to check.                        |
+| [`effects-tour.json`](examples/motion-design/effects-tour.json)<br/>ten chapters, one template | <a href="https://leclap.dev/videos/showcase/effects-tour.mp4"><img src="apps/leclap-web/public/videos/showcase/effects-tour.webp" alt="The effects tour render" width="260" /></a>         | Seven minutes of kinetic type, camera moves, transitions, captions, light effects, looks, footage edits, sound and music.                        |
+
+All 50 samples, with their templates, are on the [showcase](https://leclap.dev/showcase). Each effect, one frame at a
+time, in the [gallery](docs/gallery.md).
 
 ## 🤔 Why LeClap?
 
-Generative tools can't reproduce a result twice. Cloud renderers can't run in your user's pocket. Remotion renders without a server, but needs a browser engine to do it — LeClap links FFmpeg into the app itself.
+Four ways to get a video out of JavaScript, and when each one is the right call. Claims about the others come
+from their own docs; a "—" means their docs don't say. The [full comparison](docs/comparison.md) has the
+sources and the caveats, ours first.
 
-|                                     |            **LeClap**             |             Remotion             |     Shotstack     |     Generative video     |
-| ----------------------------------- | :-------------------------------: | :------------------------------: | :---------------: | :----------------------: |
-| Renders in a native app, no browser | ✅ React Native, FFmpeg linked in |   ❌ needs a WebCodecs browser   |   ❌ cloud API    |       ❌ cloud API       |
-| Runs with no server                 |                ✅                 | ✅ in the browser, since 4.0.491 |   ❌ cloud API    |       ❌ cloud API       |
-| Same input → same output            |         ✅ per platform¹          |    ✅ if you avoid randomness    | ⚠️ not documented | ❌ sampled, not rendered |
-| Authored by an AI agent             |              ✅ MCP               |   ⚠️ an LLM writes React code    |  ✅ MCP (cloud)   |        ✅ prompt         |
+|                         | **LeClap**                                                  | Remotion                                                                                 | editly                                       | fluent-ffmpeg                                         |
+| ----------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------- | ----------------------------------------------------- |
+| What it is              | A JSON template compiled to FFmpeg                          | Videos written as React components                                                       | Declarative editing, as a CLI and a Node API | A chainable Node API over the `ffmpeg` CLI            |
+| You write               | JSON, validated against a schema                            | React (TypeScript)                                                                       | A JSON5 spec or CLI flags                    | Chained method calls                                  |
+| Node                    | ✅                                                          | ✅ also Lambda and Vercel                                                                | ✅ needs `ffmpeg`, `ffprobe`, headless GL    | ✅ needs `ffmpeg`, `ffprobe`                          |
+| Browser                 | ✅ WebAssembly                                              | ✅ WebCodecs, since 4.0.491                                                              | —                                            | —                                                     |
+| React Native, on-device | ✅ FFmpeg linked into the app                               | —                                                                                        | —                                            | —                                                     |
+| Same input, same output | ✅ per platform¹                                            | ✅ if animations derive from the frame number                                            | —                                            | —                                                     |
+| Agent tooling           | ✅ `@leclap/mcp`: schema, validate, render                  | ✅ a system prompt for LLMs writing React                                                | —                                            | —                                                     |
+| Licence                 | MIT                                                         | Free for individuals, non-profits and for-profit companies up to 3 employees; paid above | MIT                                          | MIT, archived in May 2025                             |
+| Pick it when            | The render happens in an app, or a program writes the video | You think in components, render on servers, or want the ecosystem                        | You want a slideshow from the terminal       | You already use it; its README says it's unmaintained |
 
-<sub>¹ Per platform, not across them: Node and the browser encode with libx264, Android with `libopenh264`, iOS with `h264_videotoolbox`, and the on-device build drops `boxblur` and rewrites `eq`→`lutyuv`. Same composition, different pixels.</sub>
+<sub>¹ Per platform, not across them: Node and the browser encode with libx264, Android with `libopenh264`, iOS
+with `h264_videotoolbox`, and the on-device build drops `boxblur` and rewrites `eq` to `lutyuv`. Same
+composition, different pixels.</sub>
 
-**[LeClap vs Remotion →](https://leclap.dev/compare/remotion)** — the reasoning behind each row, the full caveats, every claim sourced to vendor docs, and when to pick Remotion instead.
+Remotion wins more of this than a comparison table usually admits: [LeClap vs Remotion](https://leclap.dev/compare/remotion)
+spells out where.
 
-## 🧰 Highlights
+## 📦 Packages
 
-| Highlight                         | What it means                                                                                                                                                    |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🧩 **Template-driven**            | One JSON descriptor → a complete video. No imperative FFmpeg wrangling.                                                                                          |
-| 🌍 **Runs everywhere**            | Node.js, browser (WASM), and React Native — one shared core, reproducible on each (the encoder differs per platform, see above).                                 |
-| 📹 **Capture → compose → render** | Record from the camera, trim/crop, mix music, add transitions, and render — captured, edited, and composed on-device.                                            |
-| 🤖 **Agent-callable**             | An [MCP server](packages/leclap-mcp) lets an AI agent author & render a template — no LLM in the output path, so it's rendered, not sampled.                     |
-| 🧭 **Browser agents**             | The web builder registers 23 [WebMCP](docs/webmcp.md) tools with the agent built into your browser — every edit undoable, nothing consequential without your OK. |
-| 🎨 **Premium out of the box**     | A bundled [creative kit](packages/leclap-creative-kit) of polished, on-device-safe templates — by prompt or in the visual builder.                               |
-| 🧱 **Typed & validated**          | Zod-validated templates, strict TypeScript, dependency-injected architecture.                                                                                    |
+| Package                                                   | One line                                                                                        |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [`ffmpeg-video-composer`](packages/ffmpeg-video-composer) | The engine: `compile()` a JSON template on Node, in the browser or in React Native.             |
+| [`@leclap/cli`](packages/leclap-cli)                      | The `leclap` command: `init`, `render`, `validate`, `snapshot`, `verify`, `studio`, `diagnose`. |
+| [`@leclap/mcp`](packages/leclap-mcp)                      | The engine as tools an agent can call: read the schema, validate a template, render it.         |
 
-## 🎬 Don't describe the change. Show it.
+The rest of the monorepo is private: the [creative kit](packages/leclap-creative-kit) (templates, fonts, media),
+the [web builder](apps/leclap-web) (React, FFmpeg in WebAssembly), the [Expo app](apps/leclap-expo) (camera to
+render, on the phone) and the [Rust engine](packages/ffmpeg-engine) that links FFmpeg into it. Working on the
+repo itself: [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md).
 
-LeClap can sit inside an agentic development loop. After implementing a change, an agent collects a short screen recording and a precise review focus, authors a reusable template, validates it, and renders a deterministic MP4. The resulting clip can be attached to a pull or merge request beside the diff, so the reviewer sees the behavior before digging into the implementation.
+## 📚 Read next
 
-The workflow is explicit: **implement → collect evidence → author template → validate → render → attach to PR/MR**. LeClap creates the video artifact; the surrounding workflow decides when and where to upload it.
+- **[Descriptor reference](https://leclap.dev/doc)**: every section, transition, look, caption and filter, one page per topic.
+- **[Template configuration](docs/template-configuration.md)** and **[effects](docs/effects-configuration.md)**: the same reference, in the repo.
+- **[Engine configuration](docs/engine-configuration.md)**: `ProjectConfig`, environment variables, encoders.
+- **[Architecture](docs/architecture.md)** and **[on-device compilation](docs/on-device-compilation.md)**: how one core runs on three FFmpeg builds.
+- **[One descriptor, three FFmpeg builds](https://heristop.github.io/blog/2026-08-17-one-descriptor-three-ffmpeg-builds/)**: the long version, on the blog.
+- **[Agent-made PR videos](examples/agentic-pr-video)** and **[browser agents in the builder](docs/webmcp.md)**.
+- **[Showcase](https://leclap.dev/showcase)**: 50 templates with their renders.
 
-**[See the use case →](https://leclap.dev/#agentic)** · **[Run the example](examples/agentic-pr-video)** · **[Copy the agent skill](examples/agentic-pr-video/evidence-skill)**
+## 🤝 Contributing & licence
 
-## 🧭 Let your browser's agent drive the builder
+Issues and PRs welcome: start with [CONTRIBUTING.md](CONTRIBUTING.md). The code is [MIT](LICENSE).
 
-In a browser with WebMCP, the web template builder registers its tools with the browser's own agent: 9 read, 9 edit (each lands as one undo step; `undo` reverts the agent's own last one) and 5 consequential ones. Replacing the draft, opening a sample, rendering a preview and saving never run until you allow them in the page; capturing stills only reads a preview you already allowed. An **Agent** drawer turns it on or off, can ask before every edit, and logs each call with an **Undo**. The page holds no API key, and the tool names the builder shares with [`@leclap/mcp`](packages/leclap-mcp) mean the same on both surfaces.
-
-<img src=".github/pr-media/webmcp/03-activity-undo.webp" alt="The builder's Agent drawer: recent agent activity, with Undo on the edit that is still current" width="640" />
-
-**[Watch the 70 s walkthrough](.github/pr-media/webmcp/webmcp.mp4)** · **[Read the guide](docs/webmcp.md)**
-
-## 🚀 Quick start
-
-> 💡 **Recommended: [mise](https://mise.jdx.dev).** `mise install` provisions **Node 24, pnpm 12, FFmpeg 8.1.1, and stable Rust**. Node/pnpm release lines and Rust stable can advance; `packageManager` pins pnpm to **12.6.0**. Managing versions yourself? Bring **Node ≥ 24.11.0** and **pnpm 12.6.0**.
-
-```bash
-git clone https://github.com/heristop/leclap.git
-cd leclap
-mise install     # Node 24, pnpm 12, FFmpeg 8.1.1 + Rust
-pnpm install
-```
-
-Build the shared core, then pick an app:
-
-```bash
-pnpm --filter ffmpeg-video-composer build
-pnpm app:web      # web app — compiles videos in-browser (no server)
-pnpm app:expo     # Expo mobile app — compiles fully on-device (no server)
-```
-
-Or use the CLI — [`@leclap/cli`](packages/leclap-cli) is the `leclap` dev tool:
-
-```bash
-npx @leclap/cli samples list          # discover the packaged showcase
-npx @leclap/cli samples show web-app-promo
-npx @leclap/cli samples export native-timing --output timing.json
-npx @leclap/cli init my-video         # scaffold a starter project
-npx @leclap/cli render template.json  # render it (`leclap diagnose` checks your FFmpeg)
-```
-
-Or drive it from an AI agent: the [`@leclap/mcp`](packages/leclap-mcp) server exposes the engine as MCP tools — sample discovery → customize → validate → render — with no LLM in the output path.
-
-To hand a template to a person, `leclap studio template.json` (or the MCP `open_in_builder` tool) prints a
-`leclap.dev/studio/builder#t=…` link that opens it in the web builder. The template travels in the URL
-fragment, which browsers never send to a server: nothing is uploaded.
-
-The installed CLI and MCP expose all **50 showcase samples** (40 native, 10 Remotion), including creative
-direction and required clips, copy, fonts and assets. Exported descriptor JSON embeds referenced partials;
-supply your own media before rendering. Registered Remotion effects require the configured MCP
-Node/Chromium backend and, where indicated, a trusted operator catalog. Discovery itself needs neither
-FFmpeg nor Remotion. See [CLI sample commands](packages/leclap-cli/README.md#samples--discover-and-adapt-a-showcase)
-and [MCP discovery](packages/leclap-mcp/README.md#discover-samples-before-authoring).
-
-## 📦 Monorepo
-
-pnpm workspaces (`apps/*`, `packages/*`, plus `examples/llm-remotion-title`) — no turbo/nx. The root is a private orchestrator (`leclap`); `ffmpeg-video-composer`, `@leclap/cli`, and `@leclap/mcp` are published to npm. The web and mobile apps both run the same core — the mobile app drives it **fully on-device** via the embedded native engine (no server), the web app in-browser via WASM.
-
-| Package                                                   | Description                                                                      |
-| --------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| [`ffmpeg-video-composer`](packages/ffmpeg-video-composer) | **The library** — cross-platform composition engine (Node, browser, WASM).       |
-| [`@leclap/cli`](packages/leclap-cli)                      | **The CLI** — the `leclap` dev tool: scaffold (`init`), `render`, `diagnose`.    |
-| [`@leclap/creative-kit`](packages/leclap-creative-kit)    | Shared creative catalog — templates, partials, fonts, media, bundled assets.     |
-| [`@leclap/mcp`](packages/leclap-mcp)                      | MCP server — the engine as agent-callable tools (schema/validate/compose/probe). |
-| [`@leclap/web`](apps/leclap-web)                          | React 19 + Vite + Tailwind — in-browser FFmpeg via WASM _(reference)_.           |
-| [`@leclap/expo`](apps/leclap-expo)                        | Expo / React Native — on-device compiles via the native engine _(reference)_.    |
-| [`ffmpeg-engine`](packages/ffmpeg-engine)                 | Rust engine embedding FFmpeg fftools for on-device compiles.                     |
-
-## 🧩 Templates & library
-
-A **template** is a Zod-validated JSON descriptor — a `global` block plus an ordered list of `sections`, each a clip with its own `inputs → maps → filters` pipeline and `{{ variable }}` placeholders. Start from a [creative-kit template](packages/leclap-creative-kit) and tweak text, colors, and media — by prompt (MCP) or in the visual builder.
-
-- 📖 **[Template configuration reference](docs/template-configuration.md)** — global config, sections, the FFmpeg pipeline, placeholders.
-- 📥 **[Use it as a library](packages/ffmpeg-video-composer/README.md)** — install, the `compile()` API, entry points (Node / browser / RN), and automatic FFmpeg detection.
-
-## 📚 Documentation
-
-- **[🌐 Descriptor reference (web)](https://leclap.pages.dev/doc)** — the full, schema-driven descriptor reference, one page per topic (sections, transitions, looks, grade, motion, audio, captions, filters, examples, JSON Schema).
-- **[🧩 Template Configuration](docs/template-configuration.md)** — the template JSON reference.
-- **[🖼 Gallery](docs/gallery.md)** — what every kinetic preset, camera move, graphic, transition, caption style, layout, theme, platform, format, look and footage edit looks like, rendered with `leclap snapshot`.
-- **[🎬 Effects Configuration](docs/effects-configuration.md)** — generated effect contracts, custom registration, bounds, assets and preview/edit workflow.
-- **[⚙️ Engine Configuration](docs/engine-configuration.md)** — host `ProjectConfig`, CLI bindings, MCP flags, deadlines, cache and output precedence.
-- **[✨ Generate with AI](docs/ai-template-generation.md)** — bring-your-own-key template generation in the web builder, with validation, automatic repair and optional Jev brief routing.
-- **[🧭 Browser agents (WebMCP)](docs/webmcp.md)** — the builder's in-browser agent tools, confirmations, undo and security.
-- **[🏗 Architecture](docs/architecture.md)** — system architecture and design patterns.
-- **[🔧 FFmpeg Fallback Strategy](docs/architecture.md#cross-platform-support)** — how automatic FFmpeg detection works.
-- **[📱 On-Device Compilation](docs/on-device-compilation.md)** — the serverless Expo compile pipeline.
-- **[🤖 AGENTS.md](AGENTS.md)** — repo layout, commands, and conventions for contributors and AI agents.
-
-### Creative direction
-
-Record the visual brief in `meta.creativeDirection`, then implement it with explicit JSON settings or
-registered Remotion props. The CLI starter and MCP authoring prompt accept the same direction.
-See [the guide and distinct example treatments](docs/creative-direction.md).
-
-## 🤝 Contributing & License
-
-Issues and PRs welcome. Keep changes formatted (`pnpm fmt`) and lint-clean (`pnpm lint`) before committing. The code is licensed under the [MIT License](LICENSE).
-
-**Brand & trademark.** The MIT License covers the code, not the brand. The **LeClap** name and logo are trademarks of Alexandre Mogère — you can fork and reuse the code freely, but please give your fork a different name and don't imply endorsement. See [TRADEMARK.md](TRADEMARK.md) for details.
+The **LeClap** name and logo are trademarks of Alexandre Mogère. Fork and reuse the code freely, but give your
+fork a different name and don't imply endorsement. See [TRADEMARK.md](TRADEMARK.md).
