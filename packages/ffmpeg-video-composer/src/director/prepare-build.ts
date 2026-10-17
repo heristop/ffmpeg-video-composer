@@ -202,9 +202,9 @@ export function boundaryTransitions(
   });
 }
 
-const DESIGN_KEYS = ['count', 'angle', 'colors', 'stagger'] as const;
+const DESIGN_KEYS = ['shape', 'through', 'count', 'angle', 'colors', 'stagger'] as const;
 
-// The bands fields that are set; bands default their colours to the theme's.
+// The shape / window / bands fields that are set; bands default their colours to the theme's.
 function designFields(declared: NonNullable<DeclaredTransition>, theme: unknown): Partial<BoundaryTransition> {
   const fields = Object.fromEntries(
     DESIGN_KEYS.flatMap((key) => (declared[key] === undefined ? [] : [[key, declared[key]]]))

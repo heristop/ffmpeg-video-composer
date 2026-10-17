@@ -10,8 +10,10 @@
 //
 // Same timeline as xfade (offset + duration), so the audio crossfade and music windows are unchanged.
 // Only standard filters (split, trim, setpts, pad, overlay, crop, scale, format, zoompan, xfade, concat, gblur;
-// the drip adds gradients, color, lutyuv, drawbox, alphamerge and loop: transition-drip.ts; bands add rotate and
-// loop: transition-bands.ts), all in the on-device build.
+// color/alphamerge for an iris with an origin, an ease, a rim or a shape; the drip adds gradients, color, lutyuv,
+// drawbox, alphamerge and loop: transition-drip.ts; bands add rotate and loop: transition-bands.ts), all in the
+// on-device build. A shaped iris and a zoom-through `through` a window read a compile-time matte image
+// (transition-mattes.ts) the assembly adds as an input.
 
 import { parseEasing, type EasingSpec } from './easing';
 import { easedProgressExpr, fmt } from './hermite';
@@ -28,6 +30,8 @@ export {
 import { dripGraph, DRIP_FALLBACK_COLOR } from './transition-drip';
 import { fnv1a32 } from '../determinism/hash';
 import { bandsGraph } from './transition-bands';
+import { throughGraph, type ThroughMatte } from './transition-through';
+import { FIELD_LEVELS, SHAPE_FIELD_DIVISOR, type MatteShape } from './radial-matte';
 
 export const DESIGNED_TRANSITION_DESCRIPTIONS: Record<DesignedTransition, string> = {
   'push-left': 'The next scene pushes the current one out to the left, both moving together.',
@@ -36,8 +40,12 @@ export const DESIGNED_TRANSITION_DESCRIPTIONS: Record<DesignedTransition, string
   'push-down': 'The next scene pushes the current one down and out.',
   'swipe-left': 'The next scene slides over from the right while the current one drifts left beneath it.',
   'swipe-right': 'The next scene slides over from the left while the current one drifts right beneath it.',
-  'zoom-through': 'The camera flies through the current scene into the next: scale up, cross, settle.',
-  iris: 'A circle opens to reveal the next scene: from the centre, linearly, unless origin or ease is set.',
+  'zoom-through':
+    'The camera flies through the current scene into the next: scale up, cross, settle; with `through`, into a ' +
+    "letter's counter or a shape that frames the next scene.",
+  iris:
+    'A circle (or a star, heart or rounded square: shape) opens to reveal the next scene: from the centre, ' +
+    'linearly, unless origin or ease is set.',
   'whip-left': 'A whip pan: the next scene pushes in from the right, motion-blurred along the travel at peak speed.',
   'whip-right': 'A whip pan to the right: the next scene pushes in from the left, motion-blurred at peak speed.',
   'whip-up': 'A vertical whip: the next scene pushes in from below, motion-blurred along the travel.',
@@ -65,6 +73,10 @@ export interface DesignedBoundary {
   rim?: string;
   /** Drip only: the paint colour (hex; default the brand lavender, the director passes the theme accent). */
   color?: string;
+  /** Iris only: the opening's shape (default circle: the circle paths, unchanged). */
+  shape?: MatteShape;
+  /** A shaped iris's reveal field or a zoom-through's window: the matte input (transition-mattes.ts). */
+  matte?: ThroughMatte;
   /** Bands only. */
   count?: number;
   angle?: number;
@@ -208,8 +220,36 @@ function irisMask(b: DesignedBoundary, p: Pads): string {
   );
 }
 
-// The built-in circle reveal (centred, linear) unless an origin, an ease or a rim asks for the mask.
+// A shaped iris from its reveal field (radial-matte.ts): the field codes, per mask pixel, the scale the shape
+// must reach to cover it (0..255 over the scale that covers the frame), so the frame's mask is one
+// comparison per pixel against the eased level, on an xfade like the circle's, at half size. Like the
+// circle's mask, every branch is restamped on one frame grid so the alphamerge and overlay never pair a
+// stale mask frame.
+function irisShaped(b: DesignedBoundary, p: Pads, matte: ThroughMatte): string {
+  const [mw, mh] = [even(b.width / SHAPE_FIELD_DIVISOR), even(b.height / SHAPE_FIELD_DIVISOR)];
+  const soft = (FIELD_LEVELS * IRIS_SOFT) / matte.scale;
+  const d = fmt(b.duration);
+  const e = easedProgressExpr(parseEasing(b.ease ?? 'linear'), { delay: 0, duration: b.duration }, `(${d}*(1-P))`);
+  const level = `(${fmt(-soft / 2)}+${fmt(FIELD_LEVELS + soft)}*(${e}))`;
+  const expr = `${FIELD_LEVELS}*clip((${level}-A)/${fmt(soft)}+0.5,0,1)`;
+  const id = b.id;
+  const grid = `setpts=N/(${b.fps}*TB)`;
+
+  return (
+    `[${matte.label}]format=gray16le,setsar=1,setpts=PTS-STARTPTS[${id}m0];` +
+    `color=c=black:s=${mw}x${mh}:r=${b.fps}:d=${d},format=gray16le[${id}m1];` +
+    `[${id}m0][${id}m1]xfade=transition=custom:expr='${expr}':duration=${d}:offset=0,format=gray,` +
+    `scale=${b.width}:${b.height}:flags=bilinear,format=gray,settb=AVTB,${grid}[${id}mask];` +
+    `[${p.in}]${grid}[${id}ic];[${p.tail}]${grid}[${id}tc];` +
+    `[${id}ic][${id}mask]alphamerge[${id}ia];[${id}tc][${id}ia]overlay=0:0[${p.mix}]`
+  );
+}
+
+// The built-in circle reveal (centred, linear) unless an origin, an ease or a rim asks for the mask, or a
+// shape for its field (without its matte input, a shaped iris falls back to the circle).
 function iris(b: DesignedBoundary, p: Pads): string {
+  if (b.shape && b.shape !== 'circle' && b.matte) return irisShaped(b, p, b.matte);
+
   if (b.origin || b.ease || b.rim) return irisMask(b, p);
 
   return `[${p.tail}][${p.in}]xfade=transition=circleopen:duration=${fmt(b.duration)}:offset=0[${p.mix}]`;
@@ -237,6 +277,8 @@ function compose(b: DesignedBoundary, p: Pads): string {
   if (b.type === 'drip') return drip(b, p);
 
   if (b.type === 'bands') return bandsGraph({ ...b, ...p });
+
+  if (b.type === 'zoom-through' && b.matte) return throughGraph({ ...b, ...p }, b.matte);
 
   if (b.type === 'zoom-through') return zoomThrough(b, p);
 

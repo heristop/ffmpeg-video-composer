@@ -4,6 +4,9 @@
 
 import { designedTransitionGraph, isDesignedTransition, type FramePoint } from '@/core/motion/transitions';
 import type { EasingSpec } from '@/core/motion/easing';
+import type { MatteShape } from '@/core/motion/radial-matte';
+import type { ThroughMatte } from '@/core/motion/transition-through';
+import type { ThroughWindow } from '@/core/motion/transition-mattes';
 
 /** A boundary transition between two adjacent segments — `type` is an xfade name, `cut` or a designed one. */
 export type Transition = {
@@ -13,6 +16,10 @@ export type Transition = {
   origin?: FramePoint;
   rim?: string;
   color?: string;
+  /** iris: the opening's shape. */
+  shape?: MatteShape;
+  /** zoom-through: the window the camera flies through. */
+  through?: ThroughWindow;
   /** bands. */
   count?: number;
   angle?: number;
@@ -21,7 +28,7 @@ export type Transition = {
 };
 
 /** The designed fields a boundary carries over to its graph (each only when set). */
-const DESIGNED_FIELDS = ['origin', 'rim', 'color', 'count', 'angle', 'colors', 'stagger'] as const;
+const DESIGNED_FIELDS = ['origin', 'rim', 'color', 'shape', 'count', 'angle', 'colors', 'stagger'] as const;
 
 /** Per-segment probe result the assembly graph is built from. */
 export type SegmentProbe = { duration: number; hasAudio: boolean };
@@ -31,8 +38,11 @@ export function round(value: number): number {
   return Math.round(value * 1000) / 1000;
 }
 
-/** Output geometry designed transitions need to compose frames (VideoEditor passes the project's). */
-export type TransitionFrame = { scale: string; fps: number };
+/**
+ * Output geometry designed transitions need to compose frames (VideoEditor passes the project's), and the
+ * matte input of each boundary that reads one (a shaped iris, a zoom-through `through` a window).
+ */
+export type TransitionFrame = { scale: string; fps: number; mattes?: ReadonlyArray<ThroughMatte | undefined> };
 
 /**
  * xfade requires all inputs to share one resolution/SAR, and segments can disagree (forceAspectRatio
@@ -107,11 +117,13 @@ function boundaryLink(
     const fields = Object.fromEntries(
       DESIGNED_FIELDS.flatMap((key) => (transition[key] === undefined ? [] : [[key, transition[key]]]))
     );
+    const matte = frame.mattes?.[labels.k];
 
     return designedTransitionGraph({
       type: transition.type,
       ease: transition.ease,
       ...fields,
+      ...(matte ? { matte } : {}),
       left: strip(labels.left),
       right: strip(labels.right),
       out: strip(labels.out),
