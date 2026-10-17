@@ -35,8 +35,8 @@ const LIST_CACHE_HINT = { ttlMs: 300_000, cacheScope: 'private' } as const;
 // than imported: tsdown bundles this file into dist/index.js, and a static import would inline the
 // version at build time (drifting again the moment the package is bumped) or make the bundler try to
 // resolve the manifest as a module. From dist/, '../package.json' is the published manifest.
-const packageJson = createRequire(import.meta.url)('../package.json') as { version?: unknown };
-const SERVER_VERSION = typeof packageJson.version === 'string' ? packageJson.version : 'unknown';
+const packageJson = createRequire(import.meta.url)('../package.json') as { version?: string };
+const SERVER_VERSION = packageJson.version ?? 'unknown';
 
 // Side-effect-free: builds and configures the server but does NOT connect a transport, so it
 // stays unit-testable. The caller (index.ts) hands it to `serveStdio` as a per-connection factory.

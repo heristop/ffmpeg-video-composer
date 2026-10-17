@@ -41,13 +41,13 @@ export interface RequestLimits {
 // target against the current URL, re-run assertSafeRemoteUrl, then re-request — so a
 // redirect to 169.254.169.254 (or any RFC1918/loopback host) is rejected, while a
 // legitimate redirect to another public host is followed.
-async function requestWithGuardedRedirects(
+async function requestWithGuardedRedirects<T>(
   url: string,
   responseType: ResponseType,
   origin: string = url,
   hop = 0,
   options: RequestLimits & { headers?: Record<string, string> } = {}
-): Promise<AxiosResponse> {
+): Promise<AxiosResponse<T>> {
   if (hop > MAX_REDIRECT_HOPS) {
     throw new Error(`Too many redirects (more than ${MAX_REDIRECT_HOPS}) while fetching ${origin}`);
   }
@@ -84,7 +84,7 @@ async function requestWithGuardedRedirects(
   // then recurse so the destination is guarded before the next request.
   const next = new URL(location, url).toString();
 
-  return requestWithGuardedRedirects(next, responseType, origin, hop + 1, options);
+  return requestWithGuardedRedirects<T>(next, responseType, origin, hop + 1, options);
 }
 
 @injectable()
@@ -189,9 +189,11 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
 
     // SSRF guard: reject non-http(s) schemes and private/reserved destinations
     // (cloud metadata, loopback, RFC1918, ...) — re-checked on every redirect hop.
-    const response = await requestWithGuardedRedirects(remote, 'stream').catch((error: unknown) => {
-      throw remote === url ? error : catalogMissError(url, remote, this.assetsDir, error);
-    });
+    const response = await requestWithGuardedRedirects<NodeJS.ReadableStream>(remote, 'stream').catch(
+      (error: unknown) => {
+        throw remote === url ? error : catalogMissError(url, remote, this.assetsDir, error);
+      }
+    );
 
     const writer = createWriteStream(dest);
 
@@ -200,14 +202,12 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
         // Without listening on the source stream a mid-download failure (e.g. a
         // throttled connection) would leave a truncated file on disk that still
         // looks like a successful fetch.
-        const responseStream = response.data as NodeJS.ReadableStream;
-
-        responseStream.on('error', reject);
+        response.data.on('error', reject);
         writer.on('error', reject);
         writer.on('finish', () => {
           resolve();
         });
-        responseStream.pipe(writer);
+        response.data.pipe(writer);
       });
     } catch (error) {
       writer.destroy();
@@ -228,14 +228,14 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
   // with any render staging the same asset, which a caller that only wants the bytes has no business
   // truncating or deleting.
   fetchBytes = async (url: string, limits: RequestLimits): Promise<Uint8Array> => {
-    const response = await requestWithGuardedRedirects(url, 'arraybuffer', url, 0, limits);
+    const response = await requestWithGuardedRedirects<ArrayBuffer>(url, 'arraybuffer', url, 0, limits);
 
     // requestWithGuardedRedirects hands back a 3xx that carries no Location rather than following it.
     if (response.status >= 300) {
       throw new Error(`Unexpected HTTP ${response.status} while fetching ${url}`);
     }
 
-    return new Uint8Array(response.data as ArrayBuffer);
+    return new Uint8Array(response.data);
   };
 
   // Resolve a template asset to an already-present local file under the configured assetsDir, so a
@@ -473,9 +473,9 @@ class FilesystemNodeAdapter extends AbstractFilesystem {
       // SSRF guard: same class as fetch() — a template-supplied font URL must not be able to
       // reach cloud metadata, loopback, or RFC1918 hosts, on the first request or any redirect.
       // Google Fonts CSS can answer 302, so redirects are followed but re-validated per hop.
-      const response = await requestWithGuardedRedirects(url, 'text', url, 0, { headers });
+      const response = await requestWithGuardedRedirects<string>(url, 'text', url, 0, { headers });
 
-      return response.data as string;
+      return response.data;
     } catch (error) {
       const params = error instanceof Error ? { message: error.message } : undefined;
       this.logger?.error(`Error downloading from ${url}:`, params);

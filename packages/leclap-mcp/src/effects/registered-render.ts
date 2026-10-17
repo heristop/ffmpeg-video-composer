@@ -135,9 +135,9 @@ async function bundleJob(
   assertComposition(composition);
   const sourceHash = await hashFiles(serveUrl);
   const require = createRequire(import.meta.url);
-  const packageJson = require('@remotion/renderer/package.json') as { version?: unknown };
+  const packageJson = require('@remotion/renderer/package.json') as { version?: string };
   const renderer = {
-    version: typeof packageJson.version === 'string' ? packageJson.version : 'unknown',
+    version: packageJson.version ?? 'unknown',
     codec: 'h264',
     imageFormat: 'png',
     ...browser,

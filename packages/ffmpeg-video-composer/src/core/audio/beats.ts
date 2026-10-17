@@ -149,11 +149,11 @@ export function analyzeBeats(
 }
 
 function roundCues(cues: MusicCues): MusicCues {
-  const entries = Object.entries(cues) as [string, number | undefined][];
-
-  return Object.fromEntries(
-    entries.map(([name, at]) => [name, at === undefined ? undefined : round(at, 3)])
-  ) as unknown as MusicCues;
+  return {
+    build: cues.build === undefined ? undefined : round(cues.build, 3),
+    drop: cues.drop === undefined ? undefined : round(cues.drop, 3),
+    end: round(cues.end, 3),
+  };
 }
 
 /** Hop indices of the onsets in `samples`: exposed for diagnostics and tests. */
