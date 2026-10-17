@@ -199,8 +199,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Section names: a name takes letters, digits, `_`, `-` and `.` only (no `..`), at validation and again at
   render, since it becomes output file names in the FFmpeg command and pad labels in the filter graph; a
   space, a quote or a filtergraph separator in a name could add an FFmpeg argument or splice in a graph.
+  A name needs at least one letter or digit, effect sections follow the same rule, and a staged `videoUrl`
+  keeps a letters-and-digits extension only (`mp4` otherwise), so none can steer a file out of the build dir.
 - Overlay rotation, opacity, start and duration and layer keyframe values are checked as numbers (or
-  `+n`/`-n`) where the engine writes them, for callers that skip validation.
+  `+n`/`-n`) where the engine writes them, for callers that skip validation; so are a layer's rotation and
+  an overlay's loop `start`, `duration` and `loops`.
 
 ## [3.1.0] - 2026-10-11
 
