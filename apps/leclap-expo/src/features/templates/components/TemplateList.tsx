@@ -29,35 +29,34 @@ interface TemplateListProps {
   motionActive?: boolean;
 }
 
-export default function TemplateList({
-  templates,
-  onSelectTemplate,
-  onRefresh,
+interface TemplateListHeaderProps {
+  screenTitle?: string;
+  subtitle?: string;
+  fontScale: number;
+  focused: boolean;
+  motionActive: boolean;
+  searchQuery: string;
+  filteredCount: number;
+  onQueryChange: (value: string) => void;
+  onFocus: () => void;
+  onBlur: () => void;
+}
+
+const TemplateListHeader = ({
   screenTitle,
   subtitle,
-  motionActive = true,
-}: TemplateListProps) {
-  const { t, i18n } = useTranslation('templates');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [refreshing, setRefreshing] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const { width, fontScale } = useWindowDimensions();
-  const [containerWidth, setContainerWidth] = useState(0);
-  const columns = templateColumns(Math.min(containerWidth || width, CONTENT_MAX_WIDTH), fontScale);
-  const filtered = filterTemplates(templates, searchQuery, i18n.resolvedLanguage ?? i18n.language);
-  const handleRefresh = async () => {
-    if (!onRefresh || refreshing) return;
-    setRefreshing(true);
+  fontScale,
+  focused,
+  motionActive,
+  searchQuery,
+  filteredCount,
+  onQueryChange,
+  onFocus,
+  onBlur,
+}: TemplateListHeaderProps) => {
+  const { t } = useTranslation('templates');
 
-    try {
-      await onRefresh();
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  // An element, rather than an inline component type, preserves input focus while filtering.
-  const header = (
+  return (
     <View style={styles.header}>
       <View style={styles.welcome}>
         <View style={styles.welcomeCopy}>
@@ -78,13 +77,9 @@ export default function TemplateList({
           placeholderTextColor={colors.textSecondary}
           accessibilityLabel={t('search.placeholder')}
           value={searchQuery}
-          onChangeText={setSearchQuery}
-          onFocus={() => {
-            setFocused(true);
-          }}
-          onBlur={() => {
-            setFocused(false);
-          }}
+          onChangeText={onQueryChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
           autoCorrect={false}
           returnKeyType="search"
           selectionColor={colors.primaryDark}
@@ -94,7 +89,7 @@ export default function TemplateList({
             accessibilityRole="button"
             accessibilityLabel={t('search.clear')}
             onPress={() => {
-              setSearchQuery('');
+              onQueryChange('');
             }}
             style={({ pressed }) => [styles.clear, pressed && styles.pressed]}
           >
@@ -102,9 +97,68 @@ export default function TemplateList({
           </Pressable>
         ) : null}
       </View>
-      <Text style={styles.results}>{t('search.count', { count: filtered.length })}</Text>
+      <Text style={styles.results}>{t('search.count', { count: filteredCount })}</Text>
     </View>
   );
+};
+
+const TemplateListEmpty = ({
+  searchQuery,
+  motionActive,
+  onClear,
+}: {
+  searchQuery: string;
+  motionActive: boolean;
+  onClear: () => void;
+}) => {
+  const { t } = useTranslation('templates');
+
+  return (
+    <View style={styles.empty}>
+      <Clappy state="search" size={116} active={motionActive} />
+      <Text accessibilityRole="header" style={styles.emptyTitle}>
+        {t('search.emptyTitle')}
+      </Text>
+      <Text style={styles.emptyCopy}>{t('search.emptyBody')}</Text>
+      {searchQuery ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onClear}
+          style={({ pressed }) => [styles.reset, pressed && styles.pressed]}
+        >
+          <Text style={styles.resetText}>{t('search.clear')}</Text>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+};
+
+export default function TemplateList({
+  templates,
+  onSelectTemplate,
+  onRefresh,
+  screenTitle,
+  subtitle,
+  motionActive = true,
+}: TemplateListProps) {
+  const { i18n } = useTranslation('templates');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const { width, fontScale } = useWindowDimensions();
+  const [containerWidth, setContainerWidth] = useState(0);
+  const columns = templateColumns(Math.min(containerWidth || width, CONTENT_MAX_WIDTH), fontScale);
+  const filtered = filterTemplates(templates, searchQuery, i18n.resolvedLanguage ?? i18n.language);
+  const handleRefresh = async () => {
+    if (!onRefresh || refreshing) return;
+    setRefreshing(true);
+
+    try {
+      await onRefresh();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   return (
     <FlatList
@@ -122,26 +176,32 @@ export default function TemplateList({
       keyExtractor={(item) => `${item.source ?? 'sample'}:${item.id ?? item.name}`}
       numColumns={columns}
       contentContainerStyle={[styles.list, { paddingBottom: Math.max(112, 64 * fontScale + 48) }]}
-      ListHeaderComponent={header}
+      ListHeaderComponent={
+        <TemplateListHeader
+          screenTitle={screenTitle}
+          subtitle={subtitle}
+          fontScale={fontScale}
+          focused={focused}
+          motionActive={motionActive}
+          searchQuery={searchQuery}
+          filteredCount={filtered.length}
+          onQueryChange={setSearchQuery}
+          onFocus={() => {
+            setFocused(true);
+          }}
+          onBlur={() => {
+            setFocused(false);
+          }}
+        />
+      }
       ListEmptyComponent={
-        <View style={styles.empty}>
-          <Clappy state="search" size={116} active={motionActive} />
-          <Text accessibilityRole="header" style={styles.emptyTitle}>
-            {t('search.emptyTitle')}
-          </Text>
-          <Text style={styles.emptyCopy}>{t('search.emptyBody')}</Text>
-          {searchQuery ? (
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => {
-                setSearchQuery('');
-              }}
-              style={({ pressed }) => [styles.reset, pressed && styles.pressed]}
-            >
-              <Text style={styles.resetText}>{t('search.clear')}</Text>
-            </Pressable>
-          ) : null}
-        </View>
+        <TemplateListEmpty
+          searchQuery={searchQuery}
+          motionActive={motionActive}
+          onClear={() => {
+            setSearchQuery('');
+          }}
+        />
       }
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"

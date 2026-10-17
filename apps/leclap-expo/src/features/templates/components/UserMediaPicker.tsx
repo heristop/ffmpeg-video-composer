@@ -163,6 +163,72 @@ interface MusicCardProps {
   onPreviewChange: (next: boolean) => void;
 }
 
+const MusicArtwork = ({
+  item,
+  source,
+  previewing,
+  accentColor,
+  tileColor,
+  onPreviewChange,
+}: {
+  item: MediaCredit;
+  source: number | undefined;
+  previewing: boolean;
+  accentColor: string;
+  tileColor: string;
+  onPreviewChange: (next: boolean) => void;
+}) => (
+  <TouchableOpacity
+    onPress={() => {
+      onPreviewChange(!previewing);
+    }}
+    disabled={source === undefined}
+    activeOpacity={0.8}
+    accessibilityRole="button"
+    accessibilityLabel={`${previewing ? 'Pause' : 'Play'} preview of ${item.title}`}
+    style={[st.trackArt, { backgroundColor: tileColor }, previewing && { borderColor: accentColor }]}
+  >
+    {previewing ? (
+      <Equalizer color={accentColor} />
+    ) : (
+      <Ionicons
+        name={source === undefined ? 'musical-notes' : 'play'}
+        size={source === undefined ? 22 : 20}
+        color={accentColor}
+        style={source === undefined ? undefined : st.playGlyph}
+      />
+    )}
+  </TouchableOpacity>
+);
+
+const MusicSelection = ({ item, selected, onPress }: { item: MediaCredit; selected: boolean; onPress: () => void }) => (
+  <>
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      accessibilityRole="radio"
+      accessibilityState={{ selected }}
+      accessibilityLabel={`${item.title} by ${item.author}`}
+      style={st.trackBody}
+    >
+      <Text style={[st.trackTitle, selected && st.trackTitleSelected]} numberOfLines={1}>
+        {item.title}
+      </Text>
+      <Text style={st.trackAuthor} numberOfLines={1}>
+        {item.author}
+      </Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={onPress}
+      hitSlop={8}
+      importantForAccessibility="no-hide-descendants"
+      style={[st.trackCheck, selected && st.trackCheckSelected]}
+    >
+      {selected ? <Ionicons name="checkmark" size={16} color="#fff" /> : null}
+    </TouchableOpacity>
+  </>
+);
+
 function MusicCard({ item, selected, previewing, onPress, onPreviewChange }: MusicCardProps) {
   // Bundled track module (a Metro asset id) — only locally-bundled tracks can be previewed on-device.
   const source = musicAsset(item.id);
@@ -202,55 +268,15 @@ function MusicCard({ item, selected, previewing, onPress, onPreviewChange }: Mus
 
   return (
     <View style={[st.trackRow, selected && st.trackRowSelected]}>
-      {/* The art tile is the preview control; tapping it plays/pauses without changing selection. */}
-      <TouchableOpacity
-        onPress={() => {
-          onPreviewChange(!previewing);
-        }}
-        disabled={source === undefined}
-        activeOpacity={0.8}
-        accessibilityRole="button"
-        accessibilityLabel={`${previewing ? 'Pause' : 'Play'} preview of ${item.title}`}
-        style={[st.trackArt, { backgroundColor: tileColor }, previewing && { borderColor: accentColor }]}
-      >
-        {previewing ? (
-          <Equalizer color={accentColor} />
-        ) : (
-          <Ionicons
-            name={source === undefined ? 'musical-notes' : 'play'}
-            size={source === undefined ? 22 : 20}
-            color={accentColor}
-            style={source === undefined ? undefined : st.playGlyph}
-          />
-        )}
-      </TouchableOpacity>
-
-      {/* Tapping the body selects the track. */}
-      <TouchableOpacity
-        onPress={onPress}
-        activeOpacity={0.7}
-        accessibilityRole="radio"
-        accessibilityState={{ selected }}
-        accessibilityLabel={`${item.title} by ${item.author}`}
-        style={st.trackBody}
-      >
-        <Text style={[st.trackTitle, selected && st.trackTitleSelected]} numberOfLines={1}>
-          {item.title}
-        </Text>
-        <Text style={st.trackAuthor} numberOfLines={1}>
-          {item.author}
-        </Text>
-      </TouchableOpacity>
-
-      {/* Visual + larger touch target for selection; the row body already carries the radio semantics. */}
-      <TouchableOpacity
-        onPress={onPress}
-        hitSlop={8}
-        importantForAccessibility="no-hide-descendants"
-        style={[st.trackCheck, selected && st.trackCheckSelected]}
-      >
-        {selected && <Ionicons name="checkmark" size={16} color="#fff" />}
-      </TouchableOpacity>
+      <MusicArtwork
+        item={item}
+        source={source}
+        previewing={previewing}
+        accentColor={accentColor}
+        tileColor={tileColor}
+        onPreviewChange={onPreviewChange}
+      />
+      <MusicSelection item={item} selected={selected} onPress={onPress} />
     </View>
   );
 }

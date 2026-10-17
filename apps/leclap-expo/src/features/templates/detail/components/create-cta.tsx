@@ -12,6 +12,17 @@ import { styles } from '@/src/features/templates/detail/detail.styles';
 
 const QUALITY_TIERS: QualityTier[] = ['draft', 'standard', 'high'];
 
+function CtaVisuals({ isDisabled, isPending, color }: { isDisabled: boolean; isPending: boolean; color: string }) {
+  return (
+    <>
+      {isDisabled ? null : (
+        <LinearGradient colors={[...gradients.brand]} {...gradientDir.horizontal} style={StyleSheet.absoluteFill} />
+      )}
+      {isPending ? <ActivityIndicator size="small" color={color} /> : <Ionicons name="play" size={18} color={color} />}
+    </>
+  );
+}
+
 interface CreateCtaProps {
   sidePanel?: boolean;
   isDisabled: boolean;
@@ -59,14 +70,7 @@ export function CreateCta({
         accessibilityRole="button"
         accessibilityLabel={label}
       >
-        {isDisabled ? null : (
-          <LinearGradient colors={[...gradients.brand]} {...gradientDir.horizontal} style={StyleSheet.absoluteFill} />
-        )}
-        {isPending ? (
-          <ActivityIndicator size="small" color={contentColor} />
-        ) : (
-          <Ionicons name="play" size={18} color={contentColor} />
-        )}
+        <CtaVisuals isDisabled={isDisabled} isPending={isPending} color={contentColor} />
         <Text style={[styles.ctaText, isDisabled && styles.ctaTextDisabled]}>{label}</Text>
       </PressableScale>
 

@@ -10,6 +10,47 @@ interface FormSectionProps {
   onFormDataChange: (field: string, value: string) => void;
 }
 
+type FormFieldData = NonNullable<NonNullable<Section['options']>['fields']>[number];
+
+const FormField = ({
+  field,
+  formData,
+  isLandscape,
+  onFormDataChange,
+  t,
+}: {
+  field: FormFieldData;
+  formData: Record<string, string>;
+  isLandscape: boolean;
+  onFormDataChange: (field: string, value: string) => void;
+  t: ReturnType<typeof useTranslation<'editor'>>['t'];
+}) => (
+  <View style={[styles.fieldContainer, isLandscape && styles.landscapeFieldContainer]}>
+    <Text style={styles.label}>{field.label.en}</Text>
+    <FieldDescription description={field.description?.en} />
+    <TextInput
+      style={[styles.input, isLandscape && field.maxLength > 100 && styles.landscapeTextarea]}
+      value={formData[field.name] || ''}
+      onChangeText={(text) => {
+        onFormDataChange(field.name, text);
+      }}
+      maxLength={field.maxLength}
+      placeholder={t('enterField', { label: field.label.en })}
+      multiline={field.maxLength > 100}
+    />
+    <FieldCounter value={formData[field.name].length} maxLength={field.maxLength} />
+  </View>
+);
+
+const FieldDescription = ({ description }: { description?: string }) =>
+  description ? <Text style={styles.fieldDescription}>{description}</Text> : null;
+const FieldCounter = ({ value, maxLength }: { value: number; maxLength?: number }) =>
+  maxLength ? (
+    <Text style={styles.counter}>
+      {value}/{maxLength}
+    </Text>
+  ) : null;
+
 const FormSection: React.FC<FormSectionProps> = ({ section, formData, onFormDataChange }) => {
   const { t } = useTranslation('editor');
   const fields = section.options?.fields ?? [];
@@ -39,28 +80,14 @@ const FormSection: React.FC<FormSectionProps> = ({ section, formData, onFormData
 
       <View style={isLandscape ? styles.landscapeFieldsContainer : styles.fieldsContainer}>
         {fields.map((field) => (
-          <View key={field.name} style={[styles.fieldContainer, isLandscape && styles.landscapeFieldContainer]}>
-            <Text style={styles.label}>{field.label.en}</Text>
-
-            {/* Field description */}
-            {field.description?.en && <Text style={styles.fieldDescription}>{field.description.en}</Text>}
-
-            <TextInput
-              style={[styles.input, isLandscape && field.maxLength > 100 && styles.landscapeTextarea]}
-              value={formData[field.name] || ''}
-              onChangeText={(text) => {
-                onFormDataChange(field.name, text);
-              }}
-              maxLength={field.maxLength || 100}
-              placeholder={t('enterField', { label: field.label.en })}
-              multiline={field.maxLength > 100}
-            />
-            {field.maxLength && (
-              <Text style={styles.counter}>
-                {formData[field.name]?.length || 0}/{field.maxLength}
-              </Text>
-            )}
-          </View>
+          <FormField
+            key={field.name}
+            field={field}
+            formData={formData}
+            isLandscape={isLandscape}
+            onFormDataChange={onFormDataChange}
+            t={t}
+          />
         ))}
       </View>
     </ScrollView>

@@ -130,6 +130,104 @@ const saveLabel = (state: SaveState, t: TFunction<'preview'>): string => t(`expo
 const uploadLabel = (state: UploadState, progress: number, t: TFunction<'preview'>): string =>
   t(`export.upload.${state}`, { percent: progress });
 
+async function shareVideo(videoUri: string, title: string): Promise<void> {
+  const { isAvailableAsync, shareAsync } = await import('expo-sharing');
+
+  if (!(await isAvailableAsync())) throw new Error('Sharing unavailable');
+  await shareAsync(videoUri, { mimeType: 'video/mp4', UTI: 'public.mpeg-4', dialogTitle: title });
+}
+
+async function runShare(
+  videoUri: string,
+  title: string,
+  setSharing: (value: boolean) => void,
+  onError: () => void
+): Promise<void> {
+  setSharing(true);
+
+  try {
+    await shareVideo(videoUri, title);
+  } catch {
+    onError();
+  } finally {
+    setSharing(false);
+  }
+}
+
+const UploadSection = ({
+  open,
+  setOpen,
+  url,
+  setUrl,
+  state,
+  progress,
+  videoUri,
+  upload,
+  t,
+}: {
+  open: boolean;
+  setOpen: (value: boolean) => void;
+  url: string;
+  setUrl: (value: string) => void;
+  state: UploadState;
+  progress: number;
+  videoUri: string;
+  upload: (uri: string) => Promise<void>;
+  t: TFunction<'preview'>;
+}) => (
+  <View style={styles.uploadSection}>
+    <TouchableOpacity
+      onPress={() => {
+        setOpen(!open);
+      }}
+      accessibilityRole="button"
+      accessibilityLabel={t('export.uploadTitle')}
+      accessibilityState={{ expanded: open }}
+      style={styles.uploadDisclosure}
+    >
+      <Text style={styles.uploadTitle}>{t('export.uploadTitle')}</Text>
+      <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.textSecondary} />
+    </TouchableOpacity>
+    {open ? (
+      <View style={styles.uploadFields}>
+        <TextInput
+          style={styles.urlInput}
+          placeholder="https://example.com/upload"
+          placeholderTextColor={colors.textSecondary}
+          value={url}
+          onChangeText={setUrl}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="url"
+          accessibilityLabel={t('export.uploadTitle')}
+          selectionColor={colors.primaryDark}
+          editable={state !== 'uploading'}
+        />
+        {state === 'uploading' ? (
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: `${progress}%` }]} />
+          </View>
+        ) : null}
+        <TouchableOpacity
+          style={[
+            styles.uploadBtn,
+            (!url.trim() || state === 'uploading' || state === 'done') && styles.uploadBtnDisabled,
+          ]}
+          onPress={() => {
+            upload(videoUri).catch(() => {});
+          }}
+          disabled={!url.trim() || state === 'uploading' || state === 'done'}
+          accessibilityRole="button"
+          accessibilityLabel={uploadLabel(state, progress, t)}
+        >
+          {state === 'uploading' ? <ActivityIndicator size="small" color={colors.onPrimary} /> : null}
+          <Text style={styles.uploadBtnText}>{uploadLabel(state, progress, t)}</Text>
+        </TouchableOpacity>
+      </View>
+    ) : null}
+  </View>
+);
+
 // An output owns its entire export session. Pending work from the previous output can only
 // update its unmounted session, never disable actions for the new file.
 export const ExportSheet = (props: ExportSheetProps) => <ExportSession key={props.videoUri} {...props} />;
@@ -141,24 +239,10 @@ const ExportSession = ({ visible, videoUri, onClose }: ExportSheetProps) => {
   const { state: uploadState, progress, url, setUrl, upload } = useUpload();
 
   const [sharing, setSharing] = useState(false);
-  const handleShare = async () => {
-    setSharing(true);
-
-    try {
-      const { isAvailableAsync, shareAsync } = await import('expo-sharing');
-
-      if (!(await isAvailableAsync())) throw new Error('Sharing unavailable');
-      await shareAsync(videoUri, {
-        mimeType: 'video/mp4',
-        UTI: 'public.mpeg-4',
-        dialogTitle: t('export.shareTitle'),
-      });
-    } catch {
+  const handleShare = () =>
+    runShare(videoUri, t('export.shareTitle'), setSharing, () => {
       Alert.alert(t('export.shareErrorTitle'), t('export.shareErrorBody'));
-    } finally {
-      setSharing(false);
-    }
-  };
+    });
 
   return (
     <Sheet visible={visible} title={t('export.title')} onClose={onClose}>
@@ -192,57 +276,17 @@ const ExportSession = ({ visible, videoUri, onClose }: ExportSheetProps) => {
           busy={sharing}
         />
 
-        <View style={styles.uploadSection}>
-          <TouchableOpacity
-            onPress={() => {
-              setUploadOpen(!uploadOpen);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={t('export.uploadTitle')}
-            accessibilityState={{ expanded: uploadOpen }}
-            style={styles.uploadDisclosure}
-          >
-            <Text style={styles.uploadTitle}>{t('export.uploadTitle')}</Text>
-            <Ionicons name={uploadOpen ? 'chevron-up' : 'chevron-down'} size={18} color={colors.textSecondary} />
-          </TouchableOpacity>
-          {uploadOpen ? (
-            <View style={styles.uploadFields}>
-              <TextInput
-                style={styles.urlInput}
-                placeholder="https://example.com/upload"
-                placeholderTextColor={colors.textSecondary}
-                value={url}
-                onChangeText={setUrl}
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="url"
-                accessibilityLabel={t('export.uploadTitle')}
-                selectionColor={colors.primaryDark}
-                editable={uploadState !== 'uploading'}
-              />
-              {uploadState === 'uploading' ? (
-                <View style={styles.progressBar}>
-                  <View style={[styles.progressFill, { width: `${progress}%` }]} />
-                </View>
-              ) : null}
-              <TouchableOpacity
-                style={[
-                  styles.uploadBtn,
-                  (!url.trim() || uploadState === 'uploading' || uploadState === 'done') && styles.uploadBtnDisabled,
-                ]}
-                onPress={() => {
-                  upload(videoUri).catch(() => {});
-                }}
-                disabled={!url.trim() || uploadState === 'uploading' || uploadState === 'done'}
-                accessibilityRole="button"
-                accessibilityLabel={uploadLabel(uploadState, progress, t)}
-              >
-                {uploadState === 'uploading' ? <ActivityIndicator size="small" color={colors.onPrimary} /> : null}
-                <Text style={styles.uploadBtnText}>{uploadLabel(uploadState, progress, t)}</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
-        </View>
+        <UploadSection
+          open={uploadOpen}
+          setOpen={setUploadOpen}
+          url={url}
+          setUrl={setUrl}
+          state={uploadState}
+          progress={progress}
+          videoUri={videoUri}
+          upload={upload}
+          t={t}
+        />
       </View>
     </Sheet>
   );

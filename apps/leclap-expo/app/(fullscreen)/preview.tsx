@@ -46,6 +46,10 @@ function renderPreviewGuard(args: {
   return null;
 }
 
+const isSquarePreview = (orientation: string, mode: string) => orientation === 'square' && mode !== 'crop';
+const isCropMode = (mode: string, width: number) => mode === 'crop' && width > 0;
+const isMode = (mode: string, expected: string) => mode === expected;
+
 export default function PreviewPage() {
   const params = useLocalSearchParams<{
     projectId?: string;
@@ -108,7 +112,7 @@ export default function PreviewPage() {
         <StatusBar hidden translucent backgroundColor="transparent" />
 
         <View style={styles.videoArea} onLayout={onContainerLayout}>
-          {requiredOrientation === 'square' && mode !== 'crop' ? (
+          {isSquarePreview(requiredOrientation, mode) ? (
             // A square template records portrait, then the engine center-crops to 1:1 — so frame the
             // clip in a 1:1 box with cover here, making the preview match the rendered output.
             <View style={squareStyles.center}>
@@ -138,11 +142,9 @@ export default function PreviewPage() {
             />
           )}
 
-          {mode === 'crop' && containerWidth > 0 && (
-            <CropOverlay videoRect={videoRect} crop={crop} onChange={setCrop} />
-          )}
+          {isCropMode(mode, containerWidth) && <CropOverlay videoRect={videoRect} crop={crop} onChange={setCrop} />}
 
-          {mode === 'view' && (
+          {isMode(mode, 'view') && (
             <PreviewMonitorFrame
               onClose={() => {
                 router.back();
@@ -151,7 +153,7 @@ export default function PreviewPage() {
           )}
         </View>
 
-        {mode === 'view' && (
+        {isMode(mode, 'view') && (
           <PreviewViewControls
             key={videoUri}
             videoUri={videoUri}
@@ -190,7 +192,7 @@ export default function PreviewPage() {
           onClose={applyMode}
         />
 
-        {mode === 'trim' && (
+        {isMode(mode, 'trim') && (
           <TrimEditPanel
             duration={duration}
             value={trim}
@@ -202,7 +204,7 @@ export default function PreviewPage() {
           />
         )}
 
-        {mode === 'crop' && <CropEditPanel onReset={resetCrop} onCancel={cancelMode} onApply={applyMode} />}
+        {isMode(mode, 'crop') && <CropEditPanel onReset={resetCrop} onCancel={cancelMode} onApply={applyMode} />}
       </View>
     </SafeAreaView>
   );

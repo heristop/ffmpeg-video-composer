@@ -15,6 +15,83 @@ const copyStyle: CSSProperties = {
   overflowWrap: 'anywhere',
 };
 
+function EditorialHighlight({
+  timing,
+  marked,
+  accent,
+}: {
+  timing: ReturnType<typeof editorialTiming> | undefined;
+  marked: boolean;
+  accent: EditorialProps['accent'];
+}) {
+  if (!marked || !timing) return null;
+
+  return (
+    <span
+      style={{
+        position: 'absolute',
+        inset: '0.13em -0.025em 0.06em',
+        backgroundColor: accents[accent],
+        opacity: 0.28,
+        clipPath: `inset(0 ${(1 - timing.highlightProgress) * 100}% 0 0)`,
+      }}
+    />
+  );
+}
+
+function EditorialWord({
+  word,
+  index,
+  props,
+  frame,
+  durationInFrames,
+  highlighted,
+  last,
+}: {
+  word: string;
+  index: number;
+  props: EditorialProps;
+  frame?: number;
+  durationInFrames: number;
+  highlighted: number;
+  last: boolean;
+}) {
+  const timing = frame === undefined ? undefined : editorialTiming(frame, index, props, durationInFrames);
+  const marked = props.mode === 'highlight' && index === highlighted;
+
+  return (
+    <span>
+      <span
+        style={{
+          display: 'inline-block',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+          verticalAlign: 'top',
+          padding: '0.06em 0.025em',
+          overflow: props.mode === 'masked-rise' || props.mode === 'split-slide' ? 'hidden' : undefined,
+        }}
+      >
+        <span
+          style={{
+            display: 'block',
+            position: 'relative',
+            opacity: timing?.opacity,
+            transform: timing
+              ? `translate(${timing.translateX}px, ${timing.translateY}px) scale(${timing.scale})`
+              : undefined,
+            filter: timing?.blurPx ? `blur(${timing.blurPx}px)` : undefined,
+            transformOrigin: 'left bottom',
+          }}
+        >
+          <EditorialHighlight timing={timing} marked={marked} accent={props.accent} />
+          <span style={{ position: 'relative' }}>{word}</span>
+        </span>
+      </span>
+      {last ? ' ' : null}
+    </span>
+  );
+}
+
 /** Shared resting geometry for the invisible measurement and the visible animated words. */
 function EditorialWords({
   props,
@@ -28,52 +105,18 @@ function EditorialWords({
   const words = editorialWords(props.headline);
   const highlighted = Math.min(props.highlightWord, words.length - 1);
 
-  return words.map((word, index) => {
-    const timing = frame === undefined ? undefined : editorialTiming(frame, index, props, durationInFrames);
-    const marked = timing && props.mode === 'highlight' && index === highlighted;
-
-    return (
-      <span key={index}>
-        <span
-          style={{
-            display: 'inline-block',
-            maxWidth: '100%',
-            boxSizing: 'border-box',
-            verticalAlign: 'top',
-            padding: '0.06em 0.025em',
-            overflow: props.mode === 'masked-rise' || props.mode === 'split-slide' ? 'hidden' : undefined,
-          }}
-        >
-          <span
-            style={{
-              display: 'block',
-              position: 'relative',
-              opacity: timing?.opacity,
-              transform: timing
-                ? `translate(${timing.translateX}px, ${timing.translateY}px) scale(${timing.scale})`
-                : undefined,
-              filter: timing?.blurPx ? `blur(${timing.blurPx}px)` : undefined,
-              transformOrigin: 'left bottom',
-            }}
-          >
-            {marked && (
-              <span
-                style={{
-                  position: 'absolute',
-                  inset: '0.13em -0.025em 0.06em',
-                  backgroundColor: accents[props.accent],
-                  opacity: 0.28,
-                  clipPath: `inset(0 ${(1 - timing.highlightProgress) * 100}% 0 0)`,
-                }}
-              />
-            )}
-            <span style={{ position: 'relative' }}>{word}</span>
-          </span>
-        </span>
-        {index < words.length - 1 ? ' ' : null}
-      </span>
-    );
-  });
+  return words.map((word, index) => (
+    <EditorialWord
+      key={index}
+      word={word}
+      index={index}
+      props={props}
+      frame={frame}
+      durationInFrames={durationInFrames}
+      highlighted={highlighted}
+      last={index < words.length - 1}
+    />
+  ));
 }
 
 /** Opaque, asset-free editorial typography. Every animated style follows composition frame time. */

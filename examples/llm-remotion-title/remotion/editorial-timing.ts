@@ -35,14 +35,29 @@ function progress(frame: number, start: number, duration: number): number {
   return 1 - Math.pow(1 - linear, 3);
 }
 
+function modeMovement(mode: EditorialProps['mode'], linear: number, entrance: number): number {
+  const elastic = linear * (1 + (linear - 1) * (2.70158 * (linear - 1) - 1));
+
+  return mode === 'elastic-stagger' ? elastic : entrance;
+}
+
+function translateX(mode: EditorialProps['mode'], index: number, travel: number, entrance: number): number {
+  if (mode !== 'split-slide' || entrance >= 1) return 0;
+
+  return (index % 2 === 0 ? -1 : 1) * travel * (1 - entrance);
+}
+
+function translateY(mode: EditorialProps['mode'], travel: number, movement: number): number {
+  return mode === 'highlight' || mode === 'split-slide' ? 0 : travel * (1 - movement);
+}
+
 /** Pure frame-time sampling; geometry never changes during the highlight sweep. */
 export function editorialTiming(frame: number, index: number, props: EditorialProps, durationInFrames = 300) {
   const staggered = ['word-stagger', 'blur-rise', 'split-slide', 'elastic-stagger'].includes(props.mode);
   const start = staggered ? index * props.staggerFrames : 0;
   const entrance = progress(frame, start, props.entranceDurationFrames);
   const linear = Math.min(1, Math.max(0, (frame - start) / props.entranceDurationFrames));
-  const elastic = linear * (1 + (linear - 1) * (2.70158 * (linear - 1) - 1));
-  const movement = props.mode === 'elastic-stagger' ? elastic : entrance;
+  const movement = modeMovement(props.mode, linear, entrance);
   const highlightProgress =
     props.mode === 'highlight' ? progress(frame, props.entranceDurationFrames, props.entranceDurationFrames) : 1;
   const sceneOpacity = Math.min(1, Math.max(0, (durationInFrames - 1 - frame) / 12));
@@ -50,9 +65,8 @@ export function editorialTiming(frame: number, index: number, props: EditorialPr
   return {
     progress: entrance,
     opacity: Math.min(1, Math.max(0, movement)),
-    translateX:
-      props.mode === 'split-slide' && entrance < 1 ? (index % 2 === 0 ? -1 : 1) * props.travelPx * (1 - entrance) : 0,
-    translateY: props.mode === 'highlight' || props.mode === 'split-slide' ? 0 : props.travelPx * (1 - movement),
+    translateX: translateX(props.mode, index, props.travelPx, entrance),
+    translateY: translateY(props.mode, props.travelPx, movement),
     scale: editorialScale(props.mode, movement),
     blurPx: props.mode === 'blur-rise' ? 8 * (1 - entrance) : 0,
     highlightProgress,

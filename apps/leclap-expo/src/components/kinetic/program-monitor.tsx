@@ -22,6 +22,44 @@ interface ProgramMonitorProps {
   style?: StyleProp<ViewStyle>;
 }
 
+function MonitorDecorations({
+  showTicks,
+  label,
+  progress,
+  dark,
+  bracketColor,
+}: Pick<ProgramMonitorProps, 'showTicks' | 'label' | 'progress' | 'dark'> & { bracketColor: string }) {
+  return (
+    <>
+      {showTicks ? (
+        <>
+          <View style={[styles.bracket, styles.tl, { borderColor: bracketColor }]} />
+          <View style={[styles.bracket, styles.tr, { borderColor: bracketColor }]} />
+          <View style={[styles.bracket, styles.bl, { borderColor: bracketColor }]} />
+          <View style={[styles.bracket, styles.br, { borderColor: bracketColor }]} />
+        </>
+      ) : null}
+      {label ? (
+        <View style={[styles.chip, { backgroundColor: withAlpha(dark ? '#000000' : colors.textStrong, 0.55) }]}>
+          <View style={styles.chipDot} />
+          <Text style={styles.chipText}>{label}</Text>
+        </View>
+      ) : null}
+      {progress === undefined ? null : (
+        <View style={styles.scrubber}>
+          <GradientMeter progress={progress} variant="playhead" size={4} colorStops={gradients.brand} />
+        </View>
+      )}
+    </>
+  );
+}
+
+const monitorRatio = (aspect: MonitorAspect) => (typeof aspect === 'number' ? aspect : ASPECT_RATIO[aspect]);
+const monitorColors = (dark: boolean) => ({
+  frame: dark ? withAlpha('#FFFFFF', 0.16) : colors.hairline,
+  bracket: dark ? withAlpha('#FFFFFF', 0.5) : withAlpha(colors.primary, 0.6),
+});
+
 // Frames a preview like a video deck's program monitor: a hairline frame, corner registration
 // brackets, an optional `PROGRAM` tally chip and (when `progress` is given) a playhead scrubber. Light
 // by default; `dark` switches to the render-theater surface for the compile/preview stage.
@@ -34,35 +72,20 @@ export function ProgramMonitor({
   dark = false,
   style,
 }: ProgramMonitorProps) {
-  const ratio = typeof aspect === 'number' ? aspect : ASPECT_RATIO[aspect];
-  const frameColor = dark ? withAlpha('#FFFFFF', 0.16) : colors.hairline;
-  const bracketColor = dark ? withAlpha('#FFFFFF', 0.5) : withAlpha(colors.primary, 0.6);
+  const ratio = monitorRatio(aspect);
+  const { frame: frameColor, bracket: bracketColor } = monitorColors(dark);
 
   return (
     <View style={[styles.wrap, { aspectRatio: ratio, borderColor: frameColor }, style]}>
       <View style={styles.screen}>{children}</View>
 
-      {showTicks && (
-        <>
-          <View style={[styles.bracket, styles.tl, { borderColor: bracketColor }]} />
-          <View style={[styles.bracket, styles.tr, { borderColor: bracketColor }]} />
-          <View style={[styles.bracket, styles.bl, { borderColor: bracketColor }]} />
-          <View style={[styles.bracket, styles.br, { borderColor: bracketColor }]} />
-        </>
-      )}
-
-      {label && (
-        <View style={[styles.chip, { backgroundColor: withAlpha(dark ? '#000000' : colors.textStrong, 0.55) }]}>
-          <View style={styles.chipDot} />
-          <Text style={styles.chipText}>{label}</Text>
-        </View>
-      )}
-
-      {progress !== undefined && (
-        <View style={styles.scrubber}>
-          <GradientMeter progress={progress} variant="playhead" size={4} colorStops={gradients.brand} />
-        </View>
-      )}
+      <MonitorDecorations
+        showTicks={showTicks}
+        label={label}
+        progress={progress}
+        dark={dark}
+        bracketColor={bracketColor}
+      />
     </View>
   );
 }

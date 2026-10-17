@@ -43,6 +43,38 @@ const rotations: Record<ClappyState, number[]> = {
 };
 const lifts: Record<ClappyState, number> = { welcome: -0.025, success: -0.045, search: 0, error: 0, working: 0 };
 
+const clappyTranslateX = (state: ClappyState, size: number) =>
+  state === 'search' ? [0, size * 0.025, size * 0.015, 0] : [0, 0, 0, 0];
+
+const clappyScale = (state: ClappyState) => (state === 'success' ? [1, 1.06, 1.02, 1] : [1, 1, 1, 1]);
+const clappyMotionActive = (active: boolean, appActive: boolean, reducedMotion: boolean, state: ClappyState) =>
+  active && appActive && !reducedMotion && state !== 'working';
+const clappyWorking = (active: boolean, appActive: boolean, reducedMotion: boolean, state: ClappyState) =>
+  active && appActive && !reducedMotion && state === 'working';
+
+function useClappyAnimatedStyle(
+  state: ClappyState,
+  size: number,
+  moving: boolean,
+  reaction: ReturnType<typeof useSharedValue<number>>
+) {
+  return useAnimatedStyle(() => {
+    const phase = moving ? reaction.get() : 1;
+    const stops = [0, 0.35, 0.65, 1];
+    const rotation = rotations[state];
+    const lift = size * lifts[state];
+
+    return {
+      transform: [
+        { translateX: interpolate(phase, stops, clappyTranslateX(state, size)) },
+        { translateY: interpolate(phase, stops, [0, lift, lift * 0.3, 0]) },
+        { rotate: `${interpolate(phase, stops, rotation)}deg` },
+        { scale: interpolate(phase, stops, clappyScale(state)) },
+      ],
+    };
+  });
+}
+
 /** The same Clappy as the films and web app. Decorative; accompanying copy carries the state. */
 export function Clappy({
   size = 112,
@@ -59,7 +91,7 @@ export function Clappy({
   const id = useId().replace(/[^A-Za-z0-9_-]/g, '');
   const { reducedMotion, appActive } = useMotionPreferences();
   const reaction = useSharedValue(1);
-  const moving = active && appActive && !reducedMotion && state !== 'working';
+  const moving = clappyMotionActive(active, appActive, reducedMotion, state);
   useEffect(() => {
     reaction.set(1);
 
@@ -92,24 +124,8 @@ export function Clappy({
     };
   }, [state, moving, reaction]);
   // Animate the composited wrapper, never the SVG paths or React tree on every frame.
-  const animatedStyle = useAnimatedStyle(() => {
-    const phase = moving ? reaction.get() : 1;
-    const stops = [0, 0.35, 0.65, 1];
-    const rotation = rotations[state];
-    const lift = size * lifts[state];
-
-    return {
-      transform: [
-        {
-          translateX: interpolate(phase, stops, state === 'search' ? [0, size * 0.025, size * 0.015, 0] : [0, 0, 0, 0]),
-        },
-        { translateY: interpolate(phase, stops, [0, lift, lift * 0.3, 0]) },
-        { rotate: `${interpolate(phase, stops, rotation)}deg` },
-        { scale: interpolate(phase, stops, state === 'success' ? [1, 1.06, 1.02, 1] : [1, 1, 1, 1]) },
-      ],
-    };
-  });
-  const working = useClappyWorkingMotion(active && appActive && !reducedMotion && state === 'working', cheer, size);
+  const animatedStyle = useClappyAnimatedStyle(state, size, moving, reaction);
+  const working = useClappyWorkingMotion(clappyWorking(active, appActive, reducedMotion, state), cheer, size);
   const frame = layerFrame(size);
 
   return (

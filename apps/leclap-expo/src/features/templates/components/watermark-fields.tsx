@@ -31,13 +31,127 @@ interface WatermarkFieldProps {
   t: TFunction<'editor'>;
 }
 
+const WatermarkSource = ({
+  mode,
+  value,
+  urlDraft,
+  setUrlDraft,
+  setImage,
+  clear,
+  t,
+}: {
+  mode: ImageSource;
+  value: WatermarkChoice | undefined;
+  urlDraft: string;
+  setUrlDraft: (value: string) => void;
+  setImage: (image: MediaChoice) => void;
+  clear: () => void;
+  t: TFunction<'editor'>;
+}) =>
+  mode === 'library' ? (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.strip}>
+      <WatermarkCard label={t('watermark.none')} active={!value} onPress={clear} icon="ban-outline" />
+      {BACKGROUND_LIBRARY.map((background) => (
+        <WatermarkCard
+          key={background.id}
+          label={background.title}
+          active={value?.image.source === 'library' && value.image.id === background.id}
+          onPress={() => {
+            setImage({ source: 'library', id: background.id });
+          }}
+          source={backgroundAsset(background.id)}
+        />
+      ))}
+    </ScrollView>
+  ) : (
+    <View style={styles.urlRow}>
+      <TextInput
+        testID="watermark-url-input"
+        style={styles.urlInput}
+        value={urlDraft}
+        autoCapitalize="none"
+        autoCorrect={false}
+        keyboardType="url"
+        placeholder={t('watermark.urlPlaceholder')}
+        placeholderTextColor={colors.textSecondary}
+        onChangeText={(text) => {
+          setUrlDraft(text);
+
+          if (text.trim() === '') {
+            clear();
+
+            return;
+          }
+
+          setImage({ source: 'url', url: text.trim() });
+        }}
+      />
+    </View>
+  );
+
+const WatermarkControls = ({
+  value,
+  patch,
+  t,
+}: {
+  value: WatermarkChoice | undefined;
+  patch: (over: Partial<WatermarkChoice>) => void;
+  t: TFunction<'editor'>;
+}) =>
+  value ? (
+    <>
+      <Segmented<WatermarkPosition>
+        label={t('watermark.position')}
+        value={value.position ?? DEFAULT_POSITION}
+        options={WATERMARK_POSITIONS.map((pos) => ({ value: pos, label: t(`watermark.pos.${pos}`) }))}
+        onChange={(position) => {
+          patch({ position });
+        }}
+      />
+      <Slider
+        label={t('watermark.scale')}
+        value={value.scale ?? DEFAULT_SCALE}
+        min={0.02}
+        max={0.5}
+        step={0.01}
+        resetTo={DEFAULT_SCALE}
+        format={(v) => `${Math.round(v * 100)}%`}
+        onChange={(scale) => {
+          patch({ scale });
+        }}
+      />
+      <Slider
+        label={t('watermark.opacity')}
+        value={value.opacity ?? DEFAULT_OPACITY}
+        min={0}
+        max={1}
+        step={0.05}
+        resetTo={DEFAULT_OPACITY}
+        format={(v) => `${Math.round(v * 100)}%`}
+        onChange={(opacity) => {
+          patch({ opacity });
+        }}
+      />
+      <Slider
+        label={t('watermark.margin')}
+        value={value.margin ?? DEFAULT_MARGIN}
+        min={0}
+        max={200}
+        step={1}
+        resetTo={DEFAULT_MARGIN}
+        format={(v) => `${v}px`}
+        onChange={(margin) => {
+          patch({ margin });
+        }}
+      />
+    </>
+  ) : null;
+
 export const WatermarkField = ({ value, onChange, t }: WatermarkFieldProps) => {
   // Local tab state (like sceneFields.tsx's OverlaysField `kind`): independent of the chosen
   // MediaChoice so tapping "URL" opens the input even before anything has been typed into it.
   const [mode, setMode] = React.useState<ImageSource>(sourceOf(value?.image));
   const [urlDraft, setUrlDraft] = React.useState(value?.image.source === 'url' ? value.image.url : '');
-
-  const selectedLibraryId = value?.image.source === 'library' ? value.image.id : undefined;
 
   const setImage = (image: MediaChoice) => {
     onChange(value ? { ...value, image } : { image });
@@ -65,95 +179,16 @@ export const WatermarkField = ({ value, onChange, t }: WatermarkFieldProps) => {
         onChange={setMode}
       />
 
-      {mode === 'library' ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.strip}>
-          <WatermarkCard label={t('watermark.none')} active={!value} onPress={clear} icon="ban-outline" />
-          {BACKGROUND_LIBRARY.map((background) => (
-            <WatermarkCard
-              key={background.id}
-              label={background.title}
-              active={selectedLibraryId === background.id}
-              onPress={() => {
-                setImage({ source: 'library', id: background.id });
-              }}
-              source={backgroundAsset(background.id)}
-            />
-          ))}
-        </ScrollView>
-      ) : (
-        <View style={styles.urlRow}>
-          <TextInput
-            testID="watermark-url-input"
-            style={styles.urlInput}
-            value={urlDraft}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="url"
-            placeholder={t('watermark.urlPlaceholder')}
-            placeholderTextColor={colors.textSecondary}
-            onChangeText={(text) => {
-              setUrlDraft(text);
-
-              if (text.trim() === '') {
-                clear();
-
-                return;
-              }
-
-              setImage({ source: 'url', url: text.trim() });
-            }}
-          />
-        </View>
-      )}
-
-      {value ? (
-        <>
-          <Segmented<WatermarkPosition>
-            label={t('watermark.position')}
-            value={value.position ?? DEFAULT_POSITION}
-            options={WATERMARK_POSITIONS.map((pos) => ({ value: pos, label: t(`watermark.pos.${pos}`) }))}
-            onChange={(position) => {
-              patch({ position });
-            }}
-          />
-          <Slider
-            label={t('watermark.scale')}
-            value={value.scale ?? DEFAULT_SCALE}
-            min={0.02}
-            max={0.5}
-            step={0.01}
-            resetTo={DEFAULT_SCALE}
-            format={(v) => `${Math.round(v * 100)}%`}
-            onChange={(scale) => {
-              patch({ scale });
-            }}
-          />
-          <Slider
-            label={t('watermark.opacity')}
-            value={value.opacity ?? DEFAULT_OPACITY}
-            min={0}
-            max={1}
-            step={0.05}
-            resetTo={DEFAULT_OPACITY}
-            format={(v) => `${Math.round(v * 100)}%`}
-            onChange={(opacity) => {
-              patch({ opacity });
-            }}
-          />
-          <Slider
-            label={t('watermark.margin')}
-            value={value.margin ?? DEFAULT_MARGIN}
-            min={0}
-            max={200}
-            step={1}
-            resetTo={DEFAULT_MARGIN}
-            format={(v) => `${v}px`}
-            onChange={(margin) => {
-              patch({ margin });
-            }}
-          />
-        </>
-      ) : null}
+      <WatermarkSource
+        mode={mode}
+        value={value}
+        urlDraft={urlDraft}
+        setUrlDraft={setUrlDraft}
+        setImage={setImage}
+        clear={clear}
+        t={t}
+      />
+      <WatermarkControls value={value} patch={patch} t={t} />
     </View>
   );
 };

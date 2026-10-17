@@ -190,10 +190,61 @@ const runAsync = (fn: () => Promise<void>) => {
   fn().catch(() => {});
 };
 
+function pressButton(
+  unavailable: boolean,
+  variant: ButtonProps['variant'],
+  hapticFeedback: boolean,
+  onPress: (() => Promise<void> | void) | undefined
+): void {
+  if (unavailable) return;
+
+  const impact = variant === 'destructive' ? 'heavy' : 'light';
+  triggerHaptic(hapticFeedback ? impact : false);
+  runAsync(async () => {
+    await onPress?.();
+  });
+}
+
 function getButtonMotion(unavailable: boolean, preferences: ReturnType<typeof useMotionPreferences>) {
   const reduced = preferences.reducedMotion || !preferences.appActive;
 
   return { scales: getScales(unavailable, reduced), transition: reduced ? '0ms' : 'quicker' } as const;
+}
+
+function buttonSurfaceProps({
+  variantProps,
+  sizeProps,
+  unavailable,
+  loading,
+  disabled,
+  fullWidth,
+  isGhost,
+  scales,
+  transition,
+}: {
+  variantProps: ReturnType<typeof getVariantProps>;
+  sizeProps: ReturnType<typeof getSizeProps>;
+  unavailable: boolean;
+  loading: boolean;
+  disabled: boolean;
+  fullWidth: boolean;
+  isGhost: boolean;
+  scales: ReturnType<typeof getButtonMotion>['scales'];
+  transition: ReturnType<typeof getButtonMotion>['transition'];
+}) {
+  return {
+    ...variantProps,
+    ...sizeProps,
+    disabled: unavailable,
+    accessibilityState: { disabled: unavailable, busy: loading },
+    opacity: disabled ? 0.6 : 1,
+    width: fullWidth ? '100%' : 'auto',
+    shadowOpacity: isGhost ? 0 : 0.14,
+    transition,
+    scale: scales.default,
+    hoverStyle: { ...variantProps.hoverStyle, scale: scales.hover },
+    pressStyle: { ...variantProps.pressStyle, scale: scales.press },
+  };
 }
 
 export default function Button({
@@ -210,14 +261,7 @@ export default function Button({
 }: ButtonProps) {
   const unavailable = disabled || loading;
   const handlePress = () => {
-    if (unavailable) return;
-
-    const impact = variant === 'destructive' ? 'heavy' : 'light';
-    triggerHaptic(hapticFeedback ? impact : false);
-
-    runAsync(async () => {
-      await onPress?.();
-    });
+    pressButton(unavailable, variant, hapticFeedback, onPress);
   };
 
   const variantProps = getVariantProps(variant);
@@ -231,29 +275,23 @@ export default function Button({
 
   return (
     <TamaguiButton
-      {...variantProps}
-      {...sizeProps}
+      {...(buttonSurfaceProps({
+        variantProps,
+        sizeProps,
+        unavailable,
+        loading,
+        disabled,
+        fullWidth,
+        isGhost,
+        scales,
+        transition,
+      }) as object)}
       onPress={handlePress}
-      disabled={unavailable}
       accessibilityRole="button"
-      accessibilityState={{ disabled: unavailable, busy: loading }}
-      opacity={disabled ? 0.6 : 1}
-      width={fullWidth ? '100%' : 'auto'}
       borderRadius="$4"
       shadowColor={colors.primary as ColorTokens}
       shadowOffset={{ width: 0, height: 6 }}
-      shadowOpacity={isGhost ? 0 : 0.14}
       shadowRadius={14}
-      transition={transition}
-      scale={scales.default}
-      hoverStyle={{
-        ...variantProps.hoverStyle,
-        scale: scales.hover,
-      }}
-      pressStyle={{
-        ...variantProps.pressStyle,
-        scale: scales.press,
-      }}
     >
       <ButtonContent
         loading={loading}

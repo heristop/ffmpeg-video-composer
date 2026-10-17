@@ -19,6 +19,79 @@ interface HeaderProps {
   actions?: { icon: keyof typeof Ionicons.glyphMap; label: string; onPress: () => void; color?: string }[];
 }
 
+function backAction(onBackPress: (() => void) | undefined, router: ReturnType<typeof useRouter>): void {
+  if (onBackPress) {
+    onBackPress();
+
+    return;
+  }
+
+  if (router.canGoBack()) {
+    router.back();
+
+    return;
+  }
+
+  router.replace('/(app)');
+}
+
+function HeaderLeft({
+  showBackButton,
+  showLogo,
+  title,
+  slogan,
+  textColor,
+  transparent,
+  onBack,
+  backLabel,
+}: {
+  showBackButton: boolean;
+  showLogo: boolean;
+  title: string;
+  slogan?: string;
+  textColor: string;
+  transparent: boolean;
+  onBack: () => void;
+  backLabel: string;
+}) {
+  return (
+    <View style={styles.left}>
+      {showBackButton ? (
+        <PressableScale
+          accessibilityRole="button"
+          accessibilityLabel={backLabel}
+          onPress={onBack}
+          style={styles.action}
+          haptic={false}
+        >
+          <Ionicons name="chevron-back" size={24} color={textColor} />
+        </PressableScale>
+      ) : null}
+      {showLogo ? <Image source={logoImage} style={styles.logo} resizeMode="contain" accessible={false} /> : null}
+      <HeaderIdentity title={title} slogan={slogan} textColor={textColor} transparent={transparent} />
+    </View>
+  );
+}
+
+function HeaderActions({ actions, textColor }: { actions: HeaderProps['actions']; textColor: string }) {
+  return (
+    <>
+      {(actions ?? []).map((action, index) => (
+        <PressableScale
+          key={`${action.icon}-${index}`}
+          onPress={action.onPress}
+          accessibilityRole="button"
+          accessibilityLabel={action.label}
+          style={styles.action}
+          haptic={false}
+        >
+          <Ionicons name={action.icon} size={24} color={action.color ?? textColor} />
+        </PressableScale>
+      ))}
+    </>
+  );
+}
+
 export default function Header({
   title,
   showBackButton = false,
@@ -36,56 +109,24 @@ export default function Header({
   ];
   const textColor = variant === 'transparent' ? colors.monitorText : colors.text;
   const handleBack = () => {
-    if (onBackPress) {
-      onBackPress();
-
-      return;
-    }
-
-    if (router.canGoBack()) {
-      router.back();
-
-      return;
-    }
-    router.replace('/(app)');
+    backAction(onBackPress, router);
   };
 
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={{ backgroundColor }}>
       <StatusBar barStyle={variant === 'transparent' ? 'light-content' : 'dark-content'} />
       <View style={styles.container}>
-        <View style={styles.left}>
-          {showBackButton ? (
-            <PressableScale
-              accessibilityRole="button"
-              accessibilityLabel={t('back')}
-              onPress={handleBack}
-              style={styles.action}
-              haptic={false}
-            >
-              <Ionicons name="chevron-back" size={24} color={textColor} />
-            </PressableScale>
-          ) : null}
-          {showLogo ? <Image source={logoImage} style={styles.logo} resizeMode="contain" accessible={false} /> : null}
-          <HeaderIdentity
-            title={title ?? t('defaultTitle')}
-            slogan={showSlogan ? t('slogan') : undefined}
-            textColor={textColor}
-            transparent={variant === 'transparent'}
-          />
-        </View>
-        {actions.map((action, index) => (
-          <PressableScale
-            key={`${action.icon}-${index}`}
-            onPress={action.onPress}
-            accessibilityRole="button"
-            accessibilityLabel={action.label}
-            style={styles.action}
-            haptic={false}
-          >
-            <Ionicons name={action.icon} size={24} color={action.color ?? textColor} />
-          </PressableScale>
-        ))}
+        <HeaderLeft
+          showBackButton={showBackButton}
+          showLogo={showLogo}
+          title={title ?? t('defaultTitle')}
+          slogan={showSlogan ? t('slogan') : undefined}
+          textColor={textColor}
+          transparent={variant === 'transparent'}
+          onBack={handleBack}
+          backLabel={t('back')}
+        />
+        <HeaderActions actions={actions} textColor={textColor} />
         {rightContent}
       </View>
     </SafeAreaView>

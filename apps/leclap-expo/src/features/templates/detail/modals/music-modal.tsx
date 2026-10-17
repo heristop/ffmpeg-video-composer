@@ -14,6 +14,63 @@ interface MusicSectionPickerProps {
   onSelect: (id: string) => void;
 }
 
+function MusicTrackRow({
+  id,
+  selectedId,
+  onSelect,
+}: {
+  id: string;
+  selectedId: string | undefined;
+  onSelect: (id: string) => void;
+}) {
+  const track = findMusic(id);
+  const selected = selectedId === id;
+  const cover = musicCover(id);
+
+  return (
+    <PressableScale
+      accessibilityRole="radio"
+      accessibilityState={{ selected }}
+      accessibilityLabel={track?.title ?? id}
+      onPress={() => {
+        onSelect(id);
+      }}
+      style={[styles.musicRow, selected && styles.musicRowActive]}
+    >
+      <MusicTrackContent track={track} cover={cover} selected={selected} id={id} />
+    </PressableScale>
+  );
+}
+
+function MusicTrackContent({
+  track,
+  cover,
+  selected,
+  id,
+}: {
+  track: ReturnType<typeof findMusic>;
+  cover: ReturnType<typeof musicCover>;
+  selected: boolean;
+  id: string;
+}) {
+  return (
+    <>
+      <>
+        {cover ? (
+          <Image source={cover} style={styles.musicRowCover} accessibilityIgnoresInvertColors />
+        ) : (
+          <Ionicons name="musical-note" size={18} color={selected ? colors.primary : colors.textSecondary} />
+        )}
+      </>
+      <View style={styles.musicRowText}>
+        <Text style={styles.musicRowTitle}>{track?.title ?? id}</Text>
+        {track?.author ? <Text style={styles.musicRowAuthor}>{track.author}</Text> : null}
+      </View>
+      {selected ? <Ionicons name="checkmark-circle" size={20} color={colors.primary} /> : null}
+    </>
+  );
+}
+
 // Single-select track list. `allowed` (when set) restricts the library to the template's allowed ids.
 function MusicSectionPicker({ allowed, selectedId, onSelect }: MusicSectionPickerProps) {
   const ids = allowed ?? MUSIC_LIBRARY.map((m) => m.id);
@@ -21,33 +78,7 @@ function MusicSectionPicker({ allowed, selectedId, onSelect }: MusicSectionPicke
   return (
     <View>
       {ids.map((id) => {
-        const track = findMusic(id);
-        const selected = selectedId === id;
-        const cover = musicCover(id);
-
-        return (
-          <PressableScale
-            key={id}
-            accessibilityRole="radio"
-            accessibilityState={{ selected }}
-            accessibilityLabel={track?.title ?? id}
-            onPress={() => {
-              onSelect(id);
-            }}
-            style={[styles.musicRow, selected && styles.musicRowActive]}
-          >
-            {cover ? (
-              <Image source={cover} style={styles.musicRowCover} accessibilityIgnoresInvertColors />
-            ) : (
-              <Ionicons name="musical-note" size={18} color={selected ? colors.primary : colors.textSecondary} />
-            )}
-            <View style={styles.musicRowText}>
-              <Text style={styles.musicRowTitle}>{track?.title ?? id}</Text>
-              {track?.author ? <Text style={styles.musicRowAuthor}>{track.author}</Text> : null}
-            </View>
-            {selected ? <Ionicons name="checkmark-circle" size={20} color={colors.primary} /> : null}
-          </PressableScale>
-        );
+        return <MusicTrackRow key={id} id={id} selectedId={selectedId} onSelect={onSelect} />;
       })}
     </View>
   );

@@ -184,30 +184,35 @@ function useAutoExpand(
   }, [isOnline, isExpanded, showWhenOnline, setIsExpanded]);
 }
 
-function NetworkStatusIndicator({
-  showWhenOnline = false,
-  compact = false,
-  expandable = true,
-  showSyncStatus = true,
-}: NetworkStatusIndicatorProps) {
-  const { isOnline, isOffline, networkType, hasInternet } = useOffline();
-  const { data: syncStatus } = useTemplatesSyncStatus();
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [_lastStatusChange, setLastStatusChange] = useState<Date | null>(null);
-
-  useAutoExpand(isOnline, isExpanded, showWhenOnline, setIsExpanded, setLastStatusChange);
-
-  if (isOnline && !showWhenOnline) {
-    return null;
-  }
-
-  const connectionIcon = getConnectionIcon(isOffline, networkType);
-  const connectionColor = getConnectionColor(isOffline, hasInternet);
-  const statusText = getStatusText(isOffline, hasInternet);
-
+const NetworkStatusContent = ({
+  compact,
+  expandable,
+  connectionIcon,
+  connectionColor,
+  statusText,
+  networkType,
+  isOnline,
+  hasInternet,
+  isExpanded,
+  setIsExpanded,
+  syncStatus,
+  showSyncStatus,
+}: {
+  compact: boolean;
+  expandable: boolean;
+  connectionIcon: keyof typeof Ionicons.glyphMap;
+  connectionColor: string;
+  statusText: string;
+  networkType: string;
+  isOnline: boolean;
+  hasInternet: boolean;
+  isExpanded: boolean;
+  setIsExpanded: (value: boolean) => void;
+  syncStatus: ReturnType<typeof useTemplatesSyncStatus>['data'];
+  showSyncStatus: boolean;
+}) => {
   const handleToggleExpand = () => {
     if (!expandable) return;
-
     triggerHaptic();
     setIsExpanded(!isExpanded);
   };
@@ -239,10 +244,48 @@ function NetworkStatusIndicator({
           isExpanded={isExpanded}
           expandable={expandable}
         />
-
-        {isExpanded && showSyncStatus && syncStatus && <SyncStatusRows syncStatus={syncStatus} />}
+        {isExpanded && showSyncStatus && syncStatus ? <SyncStatusRows syncStatus={syncStatus} /> : null}
       </Card>
     </TouchableOpacity>
+  );
+};
+
+function NetworkStatusIndicator({
+  showWhenOnline = false,
+  compact = false,
+  expandable = true,
+  showSyncStatus = true,
+}: NetworkStatusIndicatorProps) {
+  const { isOnline, isOffline, networkType, hasInternet } = useOffline();
+  const { data: syncStatus } = useTemplatesSyncStatus();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [_lastStatusChange, setLastStatusChange] = useState<Date | null>(null);
+
+  useAutoExpand(isOnline, isExpanded, showWhenOnline, setIsExpanded, setLastStatusChange);
+
+  if (isOnline && !showWhenOnline) {
+    return null;
+  }
+
+  const connectionIcon = getConnectionIcon(isOffline, networkType);
+  const connectionColor = getConnectionColor(isOffline, hasInternet);
+  const statusText = getStatusText(isOffline, hasInternet);
+
+  return (
+    <NetworkStatusContent
+      compact={compact}
+      expandable={expandable}
+      connectionIcon={connectionIcon}
+      connectionColor={connectionColor}
+      statusText={statusText}
+      networkType={networkType ?? 'unknown'}
+      isOnline={isOnline}
+      hasInternet={hasInternet}
+      isExpanded={isExpanded}
+      setIsExpanded={setIsExpanded}
+      syncStatus={syncStatus}
+      showSyncStatus={showSyncStatus}
+    />
   );
 }
 

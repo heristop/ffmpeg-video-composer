@@ -21,6 +21,28 @@ import { CONTENT_MAX_WIDTH } from '@/src/styles/adaptive-layout';
 
 // The compose hub. All state/behaviour lives in useTemplateDetail; this file composes the editorial
 // masthead → program status strip → shot-list timeline → signature create CTA, plus the modals.
+function renderDetailGuard({
+  templateLoading,
+  templateError,
+  template,
+  projectMissing,
+  project,
+  goBack,
+}: {
+  templateLoading: boolean;
+  templateError: Error | null;
+  template: ReturnType<typeof useTemplateDetail>['template'];
+  projectMissing: boolean;
+  project: ReturnType<typeof useTemplateDetail>['project'];
+  goBack: () => void;
+}) {
+  if (templateError || !template || projectMissing) return <ErrorState error={templateError} onBack={goBack} />;
+
+  if (templateLoading || !project) return <LoadingState />;
+
+  return null;
+}
+
 const TemplateDetailScreen = () => {
   const params = useLocalSearchParams<{ id: string; projectId?: string }>();
   const { sidePanel } = useAdaptiveLayout();
@@ -61,26 +83,18 @@ const TemplateDetailScreen = () => {
     router,
   } = useTemplateDetail(params.id, params.projectId);
 
-  if (templateLoading) {
-    return <LoadingState />;
-  }
-
   const goBack = makeGoBack(router);
 
-  // Genuine failure: the template query errored / finished with no such template, or a projectId was
-  // passed that resolves to no project (deleted/stale link).
-  if (templateError || !template || projectMissing) {
-    return <ErrorState error={templateError} onBack={goBack} />;
-  }
+  const guard = renderDetailGuard({ templateLoading, templateError, template, projectMissing, project, goBack });
 
-  // Template is loaded but `project` (local state) is still being set by useProjectInitialization's
-  // effect — show the loader instead of flashing "not found" for that one render.
-  if (!project) {
-    return <LoadingState />;
-  }
+  if (guard) return guard;
+
+  const loadedTemplate = template as NonNullable<typeof template>;
+  const loadedProject = project as NonNullable<typeof project>;
 
   const isDisabled = isCompileDisabled(allDone, isPending);
-  const { allowedMusic, allowUploadMusic, allowedBackgrounds, allowUploadBackground } = template.content.global ?? {};
+  const { allowedMusic, allowUploadMusic, allowedBackgrounds, allowUploadBackground } =
+    loadedTemplate.content.global ?? {};
   const { totalItems, totalDone } = computeProgress(
     filteredSections,
     completedSectionsCount,
@@ -88,9 +102,9 @@ const TemplateDetailScreen = () => {
     mediaStepDone
   );
   const vars = buildDescriptionVars(
-    template.content.global?.variables,
-    template.content.global?.colorsList,
-    project.formData
+    loadedTemplate.content.global?.variables,
+    loadedTemplate.content.global?.colorsList,
+    loadedProject.formData
   );
 
   return (
@@ -110,7 +124,7 @@ const TemplateDetailScreen = () => {
           showsVerticalScrollIndicator={false}
         >
           <TemplateMasthead
-            title={template.name.replace('.json', '')}
+            title={loadedTemplate.name.replace('.json', '')}
             description={description}
             orientation={orientation}
             onBack={goBack}
@@ -118,7 +132,7 @@ const TemplateDetailScreen = () => {
           <ProgramStatusStrip totalDone={totalDone} totalItems={totalItems} />
           <ShotList
             sections={filteredSections}
-            project={project}
+            project={loadedProject}
             vars={vars}
             hasMediaStep={hasMediaStep}
             mediaStepDone={mediaStepDone}
@@ -144,7 +158,7 @@ const TemplateDetailScreen = () => {
 
       <FormModal
         section={activeFormSection}
-        formData={project.formData}
+        formData={loadedProject.formData}
         onFormDataChange={handleFormDataChange}
         onClose={() => {
           setActiveFormSection(null);
@@ -154,7 +168,7 @@ const TemplateDetailScreen = () => {
       <MusicModal
         section={activeMusicSection}
         allowedMusic={allowedMusic}
-        selectedId={activeMusicSelection(project, activeMusicSection)}
+        selectedId={activeMusicSelection(loadedProject, activeMusicSection)}
         onSelect={handleMusicSelect}
         onClose={() => {
           setActiveMusicSection(null);
