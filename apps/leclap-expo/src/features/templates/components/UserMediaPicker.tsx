@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -113,7 +113,7 @@ function trackHue(id: string): number {
 // Three audio bars that breathe while a track previews — the "now playing" signal on the art tile.
 // Animates scaleY only (native-driven), per the transform/opacity-only motion rule.
 function Equalizer({ color }: { color: string }) {
-  const bars = useRef([new Animated.Value(0.35), new Animated.Value(0.8), new Animated.Value(0.5)]).current;
+  const [bars] = useState(() => [new Animated.Value(0.35), new Animated.Value(0.8), new Animated.Value(0.5)]);
 
   useEffect(() => {
     const loops = bars.map((value, i) =>
@@ -180,7 +180,7 @@ function MusicCard({ item, selected, previewing, onPress, onPreviewChange }: Mus
     if (source === undefined) return;
 
     if (previewing) {
-      player.currentTime = 0;
+      player.seekBy(-player.currentTime);
       player.play();
 
       return;

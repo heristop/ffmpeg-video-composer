@@ -201,6 +201,7 @@ function eyelid(ms: number) {
 
 function blinkAt(ms: number) {
   'worklet';
+
   return BLINKS.reduce(
     (open, blink) => Math.min(open, eyelid(ms - blink.at), blink.double ? eyelid(ms - blink.at - DOUBLE_GAP) : 1),
     1

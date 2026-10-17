@@ -1,7 +1,7 @@
 // On-brand RN form primitives shared by the builder panels: a PanResponder slider (no slider
 // dependency in the app — PanResponder is the in-repo precedent), a segmented control, and a
 // labelled section header. Touch targets are >=44pt; every control is accessible.
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -37,24 +37,30 @@ interface SliderProps {
 // the thumb. Width is measured on layout so we can map x -> value.
 export const Slider = ({ label, value, min, max, step = 0.01, format, resetTo, onChange }: SliderProps) => {
   const [width, setWidth] = useState(0);
-  const widthRef = useRef(0);
+  const inputsRef = useRef({ width: 0, min, max, step, onChange });
   const showReset = resetTo !== undefined && value !== resetTo;
+
+  useEffect(() => {
+    inputsRef.current = { width, min, max, step, onChange };
+  }, [width, min, max, step, onChange]);
 
   const onLayout = (e: LayoutChangeEvent) => {
     const w = e.nativeEvent.layout.width;
-    widthRef.current = w;
     setWidth(w);
   };
 
-  const emitFromX = (x: number) => {
-    if (widthRef.current <= 0) return;
+  const [responder, setResponder] = useState<ReturnType<typeof PanResponder.create> | null>(null);
 
-    const ratio = clamp(x / widthRef.current, 0, 1);
-    onChange(snap(min + ratio * (max - min), min, max, step));
-  };
+  useEffect(() => {
+    const emitFromX = (x: number) => {
+      const { width: trackWidth, min: lower, max: upper, step: increment, onChange: emit } = inputsRef.current;
 
-  const responder = useRef(
-    PanResponder.create({
+      if (trackWidth <= 0) return;
+
+      const ratio = clamp(x / trackWidth, 0, 1);
+      emit(snap(lower + ratio * (upper - lower), lower, upper, increment));
+    };
+    const nextResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (e: GestureResponderEvent) => {
@@ -63,8 +69,15 @@ export const Slider = ({ label, value, min, max, step = 0.01, format, resetTo, o
       onPanResponderMove: (e: GestureResponderEvent) => {
         emitFromX(e.nativeEvent.locationX);
       },
-    })
-  ).current;
+    });
+    const timer = setTimeout(() => {
+      setResponder(nextResponder);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
 
   const ratio = max > min ? clamp((value - min) / (max - min), 0, 1) : 0;
   const fillW = width * ratio;
@@ -96,7 +109,7 @@ export const Slider = ({ label, value, min, max, step = 0.01, format, resetTo, o
         accessibilityRole="adjustable"
         accessibilityLabel={label}
         accessibilityValue={{ min, max, now: value }}
-        {...responder.panHandlers}
+        {...(responder?.panHandlers ?? {})}
       >
         <View style={styles.trackBar} />
         <View style={[styles.trackFill, { width: fillW }]} />

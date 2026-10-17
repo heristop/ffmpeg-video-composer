@@ -1,4 +1,4 @@
-import React, { useRef, type RefObject } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, PanResponder } from 'react-native';
 import { colors } from '@/src/styles/theme';
 
@@ -67,38 +67,57 @@ function CornerHandle({
   corner,
   rect,
   videoRect,
-  cropRef,
+  crop,
   onChange,
 }: {
   corner: Corner;
   rect: VideoRect; // pixel rect of the crop frame
   videoRect: VideoRect;
-  cropRef: RefObject<NormalizedCrop>;
+  crop: NormalizedCrop;
   onChange: (next: NormalizedCrop) => void;
 }) {
-  const startRef = useRef<NormalizedCrop>(cropRef.current);
+  const cropRef = useRef(crop);
+  const videoRectRef = useRef(videoRect);
+  const onChangeRef = useRef(onChange);
+  const startRef = useRef<NormalizedCrop>(crop);
 
-  const responder = useRef(
-    PanResponder.create({
+  useEffect(() => {
+    cropRef.current = crop;
+    videoRectRef.current = videoRect;
+    onChangeRef.current = onChange;
+  }, [crop, videoRect, onChange]);
+
+  const [responder, setResponder] = useState<ReturnType<typeof PanResponder.create> | null>(null);
+
+  useEffect(() => {
+    const nextResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
         startRef.current = cropRef.current;
       },
       onPanResponderMove: (_e, gesture) => {
-        const dnx = gesture.dx / videoRect.width;
-        const dny = gesture.dy / videoRect.height;
-        onChange(resizeByCorner(startRef.current, corner, dnx, dny));
+        const currentVideoRect = videoRectRef.current;
+        const dnx = gesture.dx / currentVideoRect.width;
+        const dny = gesture.dy / currentVideoRect.height;
+        onChangeRef.current(resizeByCorner(startRef.current, corner, dnx, dny));
       },
-    })
-  ).current;
+    });
+    const timer = setTimeout(() => {
+      setResponder(nextResponder);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [corner]);
 
   const isLeft = corner === 'tl' || corner === 'bl';
   const isTop = corner === 'tl' || corner === 'tr';
 
   return (
     <View
-      {...responder.panHandlers}
+      {...(responder?.panHandlers ?? {})}
       style={[
         styles.handle,
         {
@@ -125,28 +144,44 @@ export function CropOverlay({
   crop: NormalizedCrop;
   onChange: (next: NormalizedCrop) => void;
 }) {
-  const cropRef = useRef<NormalizedCrop>(crop);
-  cropRef.current = crop;
+  const videoRectRef = useRef(videoRect);
+  const onChangeRef = useRef(onChange);
+  const cropRef = useRef(crop);
+  useEffect(() => {
+    videoRectRef.current = videoRect;
+    onChangeRef.current = onChange;
+    cropRef.current = crop;
+  }, [videoRect, onChange, crop]);
 
   const moveStart = useRef<NormalizedCrop>(crop);
-  const moveResponder = useRef(
-    PanResponder.create({
+  const [moveResponder, setMoveResponder] = useState<ReturnType<typeof PanResponder.create> | null>(null);
+
+  useEffect(() => {
+    const nextResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
         moveStart.current = cropRef.current;
       },
       onPanResponderMove: (_e, gesture) => {
-        const dnx = gesture.dx / videoRect.width;
-        const dny = gesture.dy / videoRect.height;
-        onChange({
+        const currentVideoRect = videoRectRef.current;
+        const dnx = gesture.dx / currentVideoRect.width;
+        const dny = gesture.dy / currentVideoRect.height;
+        onChangeRef.current({
           ...moveStart.current,
           x: clamp(moveStart.current.x + dnx, 0, 1 - moveStart.current.w),
           y: clamp(moveStart.current.y + dny, 0, 1 - moveStart.current.h),
         });
       },
-    })
-  ).current;
+    });
+    const timer = setTimeout(() => {
+      setMoveResponder(nextResponder);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
 
   // Pixel rect of the crop frame within the screen.
   const rect: VideoRect = {
@@ -202,7 +237,7 @@ export function CropOverlay({
 
       {/* Draggable crop frame body. */}
       <View
-        {...moveResponder.panHandlers}
+        {...(moveResponder?.panHandlers ?? {})}
         style={[styles.frame, { left: rect.left, top: rect.top, width: rect.width, height: rect.height }]}
       >
         {/* Rule-of-thirds guides */}
@@ -213,7 +248,7 @@ export function CropOverlay({
       </View>
 
       {corners.map((c) => (
-        <CornerHandle key={c} corner={c} rect={rect} videoRect={videoRect} cropRef={cropRef} onChange={onChange} />
+        <CornerHandle key={c} corner={c} rect={rect} videoRect={videoRect} crop={crop} onChange={onChange} />
       ))}
     </>
   );

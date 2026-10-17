@@ -262,10 +262,16 @@ function useProjectInitialization(args: ProjectInitArgs) {
   // Date.now() id) and called setProject every render, causing an infinite update-depth loop and
   // spamming saveProjectMutation.mutate.
   const saveProjectMutationRef = useRef(saveProjectMutation);
-  saveProjectMutationRef.current = saveProjectMutation;
   const setProjectRef = useRef(setProject);
-  setProjectRef.current = setProject;
   const projectInitializedRef = useRef(false);
+
+  useEffect(() => {
+    saveProjectMutationRef.current = saveProjectMutation;
+  }, [saveProjectMutation]);
+
+  useEffect(() => {
+    setProjectRef.current = setProject;
+  }, [setProject]);
 
   useEffect(() => {
     if (!template || (projectId !== undefined && projectLoading)) return;
@@ -291,21 +297,21 @@ function useProjectInitialization(args: ProjectInitArgs) {
 /** Owns the user's media-step state (music/background choices + picker visibility). */
 function useMediaState(template: Template | undefined) {
   const [mediaPickerVisible, setMediaPickerVisible] = useState(false);
-  const [musicChoice, setMusicChoice] = useState<MediaChoice | null>(null);
+  const [musicState, setMusicState] = useState<{ initialized: boolean; choice: MediaChoice | null }>(() => ({
+    initialized: Boolean(template),
+    choice: template ? defaultMusicChoice(template) : null,
+  }));
   const [backgroundChoice, setBackgroundChoice] = useState<MediaChoice | null>(null);
-  const defaultApplied = useRef(false);
 
   // Pre-select the template's default soundtrack the first time it loads. Applied once, so a later user
   // change (picking another track or clearing it) is never overwritten.
-  useEffect(() => {
-    if (defaultApplied.current || !template) return;
-
-    defaultApplied.current = true;
-
-    const choice = defaultMusicChoice(template);
-
-    if (choice) setMusicChoice(choice);
-  }, [template]);
+  if (!musicState.initialized && template) {
+    setMusicState({ initialized: true, choice: defaultMusicChoice(template) });
+  }
+  const musicChoice = musicState.choice;
+  const setMusicChoice = (choice: MediaChoice | null) => {
+    setMusicState({ initialized: true, choice });
+  };
 
   const mediaChoices: MediaChoices = {
     music: musicChoice ?? undefined,

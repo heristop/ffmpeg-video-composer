@@ -14,6 +14,7 @@ export function adaptiveLayout(width: number, height: number, fontScale: number,
   const usableWidth = Math.max(0, width - insets.left - insets.right);
   const usableHeight = Math.max(0, height - insets.top - insets.bottom);
   let sizeClass = 'compact';
+
   if (usableWidth >= 600) sizeClass = 'medium';
 
   if (usableWidth >= 840) sizeClass = 'expanded';

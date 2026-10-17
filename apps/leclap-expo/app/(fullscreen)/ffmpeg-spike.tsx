@@ -106,8 +106,8 @@ export default function FFmpegSpikeScreen() {
 
   // Auto-run on mount so the on-device smoke test is deterministic.
   useEffect(() => {
-    checkVersion();
     const timer = setTimeout(() => {
+      checkVersion();
       autoRun();
     }, 600);
 

@@ -51,6 +51,7 @@ export function templateColumns(width: number, fontScale: number): number {
   if (fontScale >= 1.3 || width < 360) return 1;
 
   if (width >= 1000) return 4;
+
   if (width >= 700) return 3;
 
   return 2;

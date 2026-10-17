@@ -95,15 +95,26 @@ export function useSectionCaptions({ project, sectionName, clipPath, saveProject
       setStatus('error');
     }
   };
+  const transcribeRef = useRef(transcribe);
+
+  useEffect(() => {
+    transcribeRef.current = transcribe;
+  });
 
   // A captioned clip that was retaken since its transcription is transcribed again, once.
   useEffect(() => {
-    if (checkedStale.current || !stored || !clipPath) return;
+    if (checkedStale.current || !stored || !clipPath) return () => {};
 
-    checkedStale.current = true;
+    const timer = setTimeout(() => {
+      checkedStale.current = true;
 
-    if (isCaptionsStale(stored, clipPath)) transcribe().catch(console.error);
-  });
+      if (isCaptionsStale(stored, clipPath)) transcribeRef.current().catch(console.error);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [stored, clipPath]);
 
   const setEnabled = (enabled: boolean) => {
     if (enabled) {

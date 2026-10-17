@@ -2,13 +2,23 @@ import { useEffect, useState } from 'react';
 import { View, StyleSheet, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
-import Animated, { useAnimatedProps, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedProps,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  type SharedValue,
+} from 'react-native-reanimated';
 import { gradients, gradientDir } from '@/src/styles/gradients';
 import { colors, withAlpha } from '@/src/styles/theme';
 import { motion } from '@/src/styles/motion';
 import { arcRadius, circumference, dashOffset, barFill, clamp01 } from '@/src/components/kinetic/gradient-meter.logic';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+function animateSharedValue(value: SharedValue<number>, target: number, duration: number): void {
+  value.value = withTiming(target, { duration });
+}
 
 type MeterVariant = 'bar' | 'playhead' | 'arc';
 
@@ -78,7 +88,7 @@ function LinearMeter({ progress, height, colorStops, trackColor, duration, showT
   const fill = useSharedValue(0);
 
   useEffect(() => {
-    fill.value = withTiming(barFill(width, progress), { duration });
+    animateSharedValue(fill, barFill(width, progress), duration);
   }, [width, progress, duration, fill]);
 
   const fillStyle = useAnimatedStyle(() => ({ width: fill.value }));
@@ -121,7 +131,7 @@ function ArcMeter({ progress, size, stroke, colorStops, trackColor, duration, st
   const value = useSharedValue(0);
 
   useEffect(() => {
-    value.value = withTiming(clamp01(progress), { duration });
+    animateSharedValue(value, clamp01(progress), duration);
   }, [progress, duration, value]);
 
   const arcProps = useAnimatedProps(() => ({ strokeDashoffset: dashOffset(circ, value.value) }));

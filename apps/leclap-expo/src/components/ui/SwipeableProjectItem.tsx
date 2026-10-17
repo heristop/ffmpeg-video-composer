@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -61,15 +61,22 @@ function getSubtitleText(status: Project['status']): string {
 }
 
 function useSwipePan() {
-  const pan = useRef(new Animated.ValueXY()).current;
+  const [pan] = useState(() => new Animated.ValueXY());
   const panXValue = useRef(0);
+  const [panResponder, setPanResponder] = useState<ReturnType<typeof PanResponder.create> | null>(null);
 
-  pan.x.addListener(({ value }) => {
-    panXValue.current = value;
-  });
+  useEffect(() => {
+    const listener = pan.x.addListener(({ value }) => {
+      panXValue.current = value;
+    });
 
-  const panResponder = useRef(
-    PanResponder.create({
+    return () => {
+      pan.x.removeListener(listener);
+    };
+  }, [pan]);
+
+  useEffect(() => {
+    const nextResponder = PanResponder.create({
       onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 5,
       onPanResponderGrant: () => {
         pan.setOffset({ x: panXValue.current, y: 0 });
@@ -96,8 +103,15 @@ function useSwipePan() {
           useNativeDriver: true,
         }).start();
       },
-    })
-  ).current;
+    });
+    const timer = setTimeout(() => {
+      setPanResponder(nextResponder);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [pan]);
 
   const resetPan = () => {
     Animated.spring(pan, {
@@ -184,7 +198,7 @@ const SwipeableProjectItem = React.memo(function SwipeableProjectItem({
   const [_isPressed, setIsPressed] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [scaleAnim] = useState(() => new Animated.Value(1));
   const { pan, panResponder, resetPan, deleteButtonTranslateX } = useSwipePan();
 
   const handlePressIn = () => {
@@ -237,7 +251,7 @@ const SwipeableProjectItem = React.memo(function SwipeableProjectItem({
       />
       <Animated.View
         style={[styles.itemContainer, { transform: [{ translateX: pan.x }, { scale: scaleAnim }] }]}
-        {...panResponder.panHandlers}
+        {...(panResponder?.panHandlers ?? {})}
       >
         <TouchableOpacity
           activeOpacity={0.9}

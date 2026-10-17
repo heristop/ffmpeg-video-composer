@@ -61,15 +61,15 @@ export default function PreviewPage() {
 
   const requiredOrientation = parseOrientation(paramOrientation);
 
-  const { player, currentTime, duration, srcSize, status } = usePreviewPlayer(videoUri);
+  const { player, seekTo, currentTime, duration, srcSize } = usePreviewPlayer(videoUri);
 
   const { mode, crop, trim, setCrop, setTrim, enterMode, cancelMode, applyMode, resetCrop } = usePreviewState({
     player,
+    seekTo,
     project,
     sectionName,
     duration,
     currentTime,
-    status,
   });
 
   const { canEdit, canCaption, captionsActive, saving, handleRetake, handleDone } = usePreviewActions({
@@ -196,9 +196,7 @@ export default function PreviewPage() {
             value={trim}
             currentTime={currentTime}
             onChange={setTrim}
-            onSeek={(s) => {
-              player.currentTime = s;
-            }}
+            onSeek={seekTo}
             onCancel={cancelMode}
             onApply={applyMode}
           />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography } from '@/src/styles/theme';
@@ -42,12 +42,11 @@ export default function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   const [showModal, setShowModal] = useState(visible);
-  const scaleAnim = useRef(new Animated.Value(0.9)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const [scaleAnim] = useState(() => new Animated.Value(0.9));
+  const [opacityAnim] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     if (visible) {
-      setShowModal(true);
       Animated.parallel([
         Animated.spring(scaleAnim, {
           toValue: 1,
@@ -82,7 +81,7 @@ export default function ConfirmDialog({
     });
   }, [visible, scaleAnim, opacityAnim]);
 
-  if (!showModal) return null;
+  if (!visible && !showModal) return null;
 
   return (
     <Modal transparent visible={showModal} animationType="none" onRequestClose={onCancel}>

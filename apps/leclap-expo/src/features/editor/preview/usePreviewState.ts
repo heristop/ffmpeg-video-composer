@@ -7,11 +7,11 @@ import type { PreviewPlayer } from './usePreviewPlayer';
 
 interface UsePreviewStateArgs {
   player: PreviewPlayer;
+  seekTo: (seconds: number) => void;
   project: Project | null | undefined;
   sectionName: string | undefined;
   duration: number;
   currentTime: number;
-  status: string;
 }
 
 export interface PreviewState {
@@ -26,6 +26,16 @@ export interface PreviewState {
   resetCrop: () => void;
 }
 
+function seededEdits(project: Project | null | undefined, section: string, duration: number, seededFor: string) {
+  const saved = project?.recordedVideos[section];
+
+  return {
+    seededFor,
+    crop: saved?.crop ?? FULL_CROP,
+    trim: saved?.trim ?? { start: 0, end: duration },
+  };
+}
+
 /**
  * Owns the trim/crop editing state machine for the preview screen: seeds edits
  * from the saved section, loops playback within the trim window, pauses while
@@ -33,45 +43,44 @@ export interface PreviewState {
  */
 export function usePreviewState({
   player,
+  seekTo,
   project,
   sectionName,
   duration,
   currentTime,
-  status,
 }: UsePreviewStateArgs): PreviewState {
   const [mode, setMode] = useState<EditMode>('view');
-  const [crop, setCrop] = useState<NormalizedCrop>(FULL_CROP);
-  const [trim, setTrim] = useState<TrimRange>({ start: 0, end: 0 });
+  const [edits, setEdits] = useState<{
+    seededFor: string | null;
+    crop: NormalizedCrop;
+    trim: TrimRange;
+  }>({ seededFor: null, crop: FULL_CROP, trim: { start: 0, end: 0 } });
+  const crop = edits.crop;
+  const trim = edits.trim;
+  const setCrop = (next: NormalizedCrop) => {
+    setEdits((current) => ({ ...current, crop: next }));
+  };
+  const setTrim = (next: TrimRange) => {
+    setEdits((current) => ({ ...current, trim: next }));
+  };
   // Snapshot to restore when the user cancels an edit mode.
   const snapshot = useRef<{ crop: NormalizedCrop; trim: TrimRange } | null>(null);
-  // Guard so we only seed trim/crop from the saved project once.
-  const seeded = useRef(false);
+  // Key the initial edit values to the loaded clip so a new section starts with its saved crop/trim.
+  const sectionKey = sectionName;
+  const seededFor = sectionKey ? `${project?.id ?? 'new'}:${sectionKey}` : null;
 
-  // Seed trim/crop from the saved section (and default trim end to the clip duration) once ready.
-  useEffect(() => {
-    if (seeded.current || !sectionName) return;
-
-    const saved = project?.recordedVideos[sectionName];
-
-    if (duration > 0) {
-      setTrim(saved?.trim ?? { start: 0, end: duration });
-
-      if (saved?.crop) {
-        setCrop(saved.crop);
-      }
-
-      seeded.current = true;
-    }
-  }, [project, sectionName, duration, status]);
+  if (duration > 0 && sectionKey && seededFor && edits.seededFor !== seededFor) {
+    setEdits(seededEdits(project, sectionKey, duration, seededFor));
+  }
 
   // Loop playback within the trim window during preview.
   useEffect(() => {
     if (mode !== 'view') return;
 
     if (duration > 0 && currentTime >= trim.end - 0.05 && trim.end > 0) {
-      player.currentTime = trim.start;
+      seekTo(trim.start);
     }
-  }, [currentTime, trim, duration, mode, player]);
+  }, [currentTime, trim, duration, mode, seekTo]);
 
   // Pause while editing (stable frame for cropping / seeking); resume in view mode.
   useEffect(() => {
@@ -91,8 +100,8 @@ export function usePreviewState({
 
   const cancelMode = () => {
     if (snapshot.current) {
-      setCrop(snapshot.current.crop);
-      setTrim(snapshot.current.trim);
+      const saved = snapshot.current;
+      setEdits((current) => ({ ...current, crop: saved.crop, trim: saved.trim }));
     }
 
     setMode('view');

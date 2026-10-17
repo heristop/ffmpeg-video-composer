@@ -75,10 +75,13 @@ export const useOnlineStatusChange = (onOnline?: () => void, onOffline?: () => v
   // stable `isOnline` boolean. Listing the (inline) callbacks as deps re-ran this effect on
   // every render, and the previous setState made it re-render, causing an update-depth loop.
   const onOnlineRef = useRef(onOnline);
-  onOnlineRef.current = onOnline;
   const onOfflineRef = useRef(onOffline);
-  onOfflineRef.current = onOffline;
   const previouslyOnlineRef = useRef<boolean | null>(null);
+
+  useEffect(() => {
+    onOnlineRef.current = onOnline;
+    onOfflineRef.current = onOffline;
+  }, [onOnline, onOffline]);
 
   useEffect(() => {
     const previouslyOnline = previouslyOnlineRef.current;

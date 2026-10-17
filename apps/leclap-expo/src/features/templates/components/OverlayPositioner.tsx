@@ -2,7 +2,7 @@
 // normalized x/y, a slider sets fontsize, swatches set colour, a switch toggles the background box.
 // Edits one TextOverlay in the section's overlays[] array. Pinch-to-size is deferred in favour of
 // the fontsize slider (an acceptable fallback per the brief); drag uses PanResponder (in-repo precedent).
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal,
   View,
@@ -52,16 +52,24 @@ export const OverlayPositioner = ({
   const value = overlay ?? newOverlay();
   const [frame, setFrame] = useState({ width: 0, height: 0 });
   const frameRef = useRef({ width: 0, height: 0 });
+  const valueRef = useRef(value);
+  const onChangeRef = useRef(onChange);
+  const [responder, setResponder] = useState<ReturnType<typeof PanResponder.create> | null>(null);
   const aspect = ASPECT_RATIO[orientation];
+
+  useEffect(() => {
+    frameRef.current = frame;
+    valueRef.current = value;
+    onChangeRef.current = onChange;
+  }, [frame, value, onChange]);
 
   const onLayout = (e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
-    frameRef.current = { width, height };
     setFrame({ width, height });
   };
 
-  const responder = useRef(
-    PanResponder.create({
+  useEffect(() => {
+    const nextResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderMove: (e) => {
@@ -69,14 +77,21 @@ export const OverlayPositioner = ({
 
         if (width <= 0 || height <= 0) return;
 
-        onChange({
-          ...value,
+        onChangeRef.current({
+          ...valueRef.current,
           x: Math.round(clamp01(e.nativeEvent.locationX / width) * 1000) / 1000,
           y: Math.round(clamp01(e.nativeEvent.locationY / height) * 1000) / 1000,
         });
       },
-    })
-  ).current;
+    });
+    const timer = setTimeout(() => {
+      setResponder(nextResponder);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
 
   const previewSize = Math.max(10, (value.fontsize / 96) * Math.min(frame.width, frame.height) * 0.5);
   const left = clamp01(value.x) * frame.width;
@@ -97,7 +112,11 @@ export const OverlayPositioner = ({
           </View>
 
           <View style={styles.frameWrap}>
-            <View style={[styles.frame, { aspectRatio: aspect }]} onLayout={onLayout} {...responder.panHandlers}>
+            <View
+              style={[styles.frame, { aspectRatio: aspect }]}
+              onLayout={onLayout}
+              {...(responder?.panHandlers ?? {})}
+            >
               {frame.width > 0 ? (
                 <View
                   pointerEvents="none"

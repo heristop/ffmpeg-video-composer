@@ -109,8 +109,8 @@ function TimerOverlay({ isPortrait, recordingDuration }: TimerOverlayProps) {
 // Big centered "3 · 2 · 1" shown over the camera before recording starts. Each
 // number springs in (scale 1.4 → 1, fade) so the tick reads as a distinct beat.
 function CountdownOverlay({ value, t }: { value: number; t: TFunction<'recording'> }) {
-  const scale = useRef(new Animated.Value(1)).current;
-  const opacity = useRef(new Animated.Value(1)).current;
+  const [scale] = useState(() => new Animated.Value(1));
+  const [opacity] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     scale.setValue(1.4);
@@ -408,7 +408,6 @@ function useCameraPermissions() {
   const [blocked, setBlocked] = useState(false);
 
   const checkPermissions = async () => {
-    setIsCheckingPermissions(true);
     try {
       const camera = await Camera.requestCameraPermission();
       const microphone = await Camera.requestMicrophonePermission();
@@ -423,7 +422,9 @@ function useCameraPermissions() {
   };
 
   useEffect(() => {
-    checkPermissions().catch(console.error);
+    const checkTimer = setTimeout(() => {
+      checkPermissions().catch(console.error);
+    }, 0);
     const subscription = AppState.addEventListener('change', (state) => {
       if (state !== 'active') return;
       const camera = Camera.getCameraPermissionStatus();
@@ -431,53 +432,46 @@ function useCameraPermissions() {
       setHasPermission(camera === 'granted' && microphone === 'granted');
       setBlocked(camera === 'denied' || microphone === 'denied');
     });
+
     return () => {
+      clearTimeout(checkTimer);
       subscription.remove();
     };
   }, []);
 
   const requestAccess = () => {
     if (blocked) return Linking.openSettings();
+
     return checkPermissions();
   };
+
   return { hasPermission, isCheckingPermissions, blocked, requestAccess };
 }
 
 function useRecordingTimer(isRecording: boolean): number {
-  const [recordingDuration, setRecordingDuration] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [timerState, setTimerState] = useState({ isRecording, duration: 0 });
+
+  if (timerState.isRecording !== isRecording) {
+    setTimerState({ isRecording, duration: 0 });
+  }
 
   useEffect(() => {
-    if (isRecording) {
-      timerRef.current = setInterval(() => {
-        setRecordingDuration((prev) => prev + 1);
-      }, 1000);
+    if (!isRecording) return () => {};
 
-      return () => {
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-        }
-      };
-    }
-
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    setRecordingDuration(0);
+    const timer = setInterval(() => {
+      setTimerState((current) => ({ ...current, duration: current.duration + 1 }));
+    }, 1000);
 
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
+      clearInterval(timer);
     };
   }, [isRecording]);
 
-  return recordingDuration;
+  return isRecording ? timerState.duration : 0;
 }
 
 function usePulseAnimation(isRecording: boolean): Animated.Value {
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [pulseAnim] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     if (!isRecording) {
@@ -502,7 +496,10 @@ function usePulseAnimation(isRecording: boolean): Animated.Value {
 function useCountdown(onComplete: () => void) {
   const [value, setValue] = useState<number | null>(null);
   const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
 
   useEffect(() => {
     if (value === null) {
@@ -510,10 +507,14 @@ function useCountdown(onComplete: () => void) {
     }
 
     if (value <= 0) {
-      setValue(null);
-      onCompleteRef.current();
+      const id = setTimeout(() => {
+        setValue(null);
+        onCompleteRef.current();
+      }, 0);
 
-      return () => {};
+      return () => {
+        clearTimeout(id);
+      };
     }
 
     const id = setTimeout(() => {
@@ -547,7 +548,7 @@ function useCountdown(onComplete: () => void) {
 
 // Loops a 1 ⇄ 0.25 opacity pulse while `active`, used for the end-of-duration warning border.
 function useWarningPulse(active: boolean): Animated.Value {
-  const pulse = useRef(new Animated.Value(1)).current;
+  const [pulse] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     if (active) {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, StatusBar, Alert } from 'react-native';
 import { MotiView } from 'moti';
 import { Ionicons } from '@expo/vector-icons';
@@ -145,32 +145,25 @@ const useOrientationLock = (orientation: 'portrait' | 'landscape', enabled: bool
 };
 
 const useRecordingTimer = (isRecording: boolean) => {
-  const [recordingDuration, setRecordingDuration] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [timerState, setTimerState] = useState({ isRecording, duration: 0 });
+
+  if (timerState.isRecording !== isRecording) {
+    setTimerState({ isRecording, duration: 0 });
+  }
 
   useEffect(() => {
-    if (isRecording) {
-      timerRef.current = setInterval(() => {
-        setRecordingDuration((prev) => prev + 1);
-      }, 1000);
-    }
+    if (!isRecording) return () => {};
 
-    if (!isRecording) {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      setRecordingDuration(0);
-    }
+    const timer = setInterval(() => {
+      setTimerState((current) => ({ ...current, duration: current.duration + 1 }));
+    }, 1000);
 
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
+      clearInterval(timer);
     };
   }, [isRecording]);
 
-  return recordingDuration;
+  return isRecording ? timerState.duration : 0;
 };
 
 interface NavigateAfterRecordingParams {

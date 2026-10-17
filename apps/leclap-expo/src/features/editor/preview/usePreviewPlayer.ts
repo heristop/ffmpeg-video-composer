@@ -5,6 +5,7 @@ export type PreviewPlayer = ReturnType<typeof useVideoPlayer>;
 
 export interface PreviewPlayerState {
   player: PreviewPlayer;
+  seekTo: (seconds: number) => void;
   currentTime: number;
   duration: number;
   srcSize: { width: number; height: number } | null;
@@ -30,5 +31,9 @@ export function usePreviewPlayer(videoUri: string | undefined): PreviewPlayerSta
   const duration = player.duration > 0 ? player.duration : 0;
   const srcSize = videoTrack?.size ?? null;
 
-  return { player, currentTime, duration, srcSize, status };
+  const seekTo = (seconds: number) => {
+    player.seekBy(seconds - currentTime);
+  };
+
+  return { player, seekTo, currentTime, duration, srcSize, status };
 }

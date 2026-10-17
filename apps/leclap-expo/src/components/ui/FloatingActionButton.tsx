@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -147,17 +147,17 @@ export default function FloatingActionButton({
 }: FloatingActionButtonProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const rotateAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0)).current;
-  const menuItemAnims = useRef(
+  const [pulseAnim] = useState(() => new Animated.Value(1));
+  const [rotateAnim] = useState(() => new Animated.Value(0));
+  const [scaleAnim] = useState(() => new Animated.Value(0));
+  const [menuItemAnims] = useState(() =>
     menuItems.map(() => ({
       scale: new Animated.Value(0),
       opacity: new Animated.Value(0),
     }))
-  ).current;
+  );
 
-  // scaleAnim/pulseAnim are stable useRef().current instances, so this still runs once on mount.
+  // These animation values are stable for the lifetime of the mounted button.
   useEffect(() => startEntranceAndPulse(scaleAnim, pulseAnim), [scaleAnim, pulseAnim]);
 
   const toggleMenu = () => {
