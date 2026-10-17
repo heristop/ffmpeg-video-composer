@@ -2,6 +2,7 @@
 // section object; the slots write back in place, so callers walk a clone.
 
 import { LAYER_TRACKS } from '../../schemas/layer-animate.schemas';
+import { ELEMENT_MOTION_TRACKS } from '../html/limits';
 
 type Bag = Record<string, unknown>;
 
@@ -120,6 +121,15 @@ function cueSlots(accept: Accept, section: Bag): RawSlot[] {
   ];
 }
 
+// An html input's element tracks (inputs[i].motion.<name>.<track>[k].t), section time like options.animate.
+function elementMotionSlots(accept: Accept, input: Bag, i: number): RawSlot[] {
+  const motion = input.type === 'html' ? bag(input.motion) : undefined;
+
+  return Object.entries(motion ?? {}).flatMap(([name, spec]) =>
+    trackSlots(accept, bag(spec), ELEMENT_MOTION_TRACKS, `inputs[${i}].motion.${name}`)
+  );
+}
+
 function collectSlots(section: Bag, accept: Accept): RawSlot[] {
   return [
     ...footageSlots(accept, bag(section.options)),
@@ -133,9 +143,10 @@ function collectSlots(section: Bag, accept: Accept): RawSlot[] {
     ]),
     ...cameraSlots(accept, bag(section.camera)),
     ...list(section.filters).flatMap((filter, i) => filterSlots(accept, filter, `filters[${i}]`)),
-    ...list(section.inputs).flatMap((input, i) =>
-      trackSlots(accept, bag(bag(input.options)?.animate), LAYER_TRACKS, `inputs[${i}].options.animate`)
-    ),
+    ...list(section.inputs).flatMap((input, i) => [
+      ...trackSlots(accept, bag(bag(input.options)?.animate), LAYER_TRACKS, `inputs[${i}].options.animate`),
+      ...elementMotionSlots(accept, input, i),
+    ]),
     ...cueSlots(accept, section),
   ];
 }

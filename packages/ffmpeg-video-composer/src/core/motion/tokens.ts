@@ -159,6 +159,20 @@ function resolveSpecialNode(
   return { handled: false };
 }
 
+// An html input's `motion` is a map of element tracks (core/html/motion-frames.ts), not an entrance intent:
+// each named entry resolves like an `animate` block (its stagger, a plain number, passes through).
+function isHtmlMotion(key: string, owner: object): boolean {
+  return key === 'motion' && (owner as { type?: unknown }).type === 'html';
+}
+
+function resolveHtmlMotion(motion: unknown, tokens: ResolvedTokens): unknown {
+  if (motion === null || typeof motion !== 'object' || Array.isArray(motion)) return motion;
+
+  return Object.fromEntries(
+    Object.entries(motion as Record<string, unknown>).map(([name, spec]) => [name, resolveAnimate(spec, tokens)])
+  );
+}
+
 function resolveNode(value: unknown, tokens: ResolvedTokens, key: string): unknown {
   const special = resolveSpecialNode(value, tokens, key);
 
@@ -171,7 +185,9 @@ function resolveNode(value: unknown, tokens: ResolvedTokens, key: string): unkno
   const out: Record<string, unknown> = {};
 
   for (const [childKey, child] of Object.entries(value as Record<string, unknown>)) {
-    out[childKey] = resolveNode(child, tokens, childKey);
+    out[childKey] = isHtmlMotion(childKey, value)
+      ? resolveHtmlMotion(child, tokens)
+      : resolveNode(child, tokens, childKey);
   }
 
   return out;
