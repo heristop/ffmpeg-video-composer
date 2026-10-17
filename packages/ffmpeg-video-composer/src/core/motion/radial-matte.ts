@@ -211,49 +211,69 @@ export function fieldLevel(image: GreyImage, i: number): number {
   return (image.data[2 * i] << 8) | image.data[2 * i + 1];
 }
 
-function inside(polygons: Point[][], x: number, y: number): boolean {
-  let winding = 0;
+const SAMPLES = 4;
+
+interface Crossing {
+  x: number;
+  /** +1 for an edge going down the screen (y increasing), −1 going up. */
+  sign: number;
+}
+
+// Where the polygons' edges cross the sub-row y. A sample at x is inside when the signs of the crossings to
+// its right sum to non-zero (the non-zero winding rule of a ray cast to the right).
+function crossings(polygons: Point[][], y: number): Crossing[] {
+  const found: Crossing[] = [];
 
   for (const polygon of polygons) {
     for (let i = 0; i < polygon.length; i++) {
       const a = polygon[i];
       const b = polygon[(i + 1) % polygon.length];
+      const down = a.y <= y && b.y > y;
 
-      if (a.y <= y && b.y > y && (b.x - a.x) * (y - a.y) - (x - a.x) * (b.y - a.y) > 0) winding++;
-
-      if (a.y > y && b.y <= y && (b.x - a.x) * (y - a.y) - (x - a.x) * (b.y - a.y) < 0) winding--;
+      if (down || (a.y > y && b.y <= y)) {
+        found.push({ x: a.x + ((y - a.y) * (b.x - a.x)) / (b.y - a.y), sign: down ? 1 : -1 });
+      }
     }
   }
 
-  return winding !== 0;
+  return found.sort((p, q) => p.x - q.x);
 }
 
-const SAMPLES = 4;
+// Adds, per pixel of the row, the samples of sub-row y inside the polygons: the crossings sorted once, then
+// each span between two crossings filled when its winding is non-zero. Samples sit at (j + 0.5) / SAMPLES.
+function addSubRow(hits: Uint8Array, polygons: Point[][], y: number, width: number): void {
+  const row = crossings(polygons, y);
+  const last = width * SAMPLES;
+  let winding = row.reduce((sum, c) => sum + c.sign, 0);
 
-/** Samples of pixel (x, y) inside the polygons, out of SAMPLES². */
-function pixelHits(polygons: Point[][], x: number, y: number): number {
-  let hits = 0;
+  for (let k = 0; k < row.length; k++) {
+    winding -= row[k].sign;
 
-  for (let sy = 0; sy < SAMPLES; sy++) {
-    for (let sx = 0; sx < SAMPLES; sx++) {
-      hits += inside(polygons, x + (sx + 0.5) / SAMPLES, y + (sy + 0.5) / SAMPLES) ? 1 : 0;
-    }
+    if (winding === 0) continue;
+
+    const from = Math.max(0, Math.ceil(row[k].x * SAMPLES - 0.5));
+    const to = Math.min(last, k + 1 < row.length ? Math.ceil(row[k + 1].x * SAMPLES - 0.5) : last);
+
+    for (let j = from; j < to; j++) hits[Math.floor(j / SAMPLES)]++;
   }
-
-  return hits;
 }
 
-/** The polygons filled (non-zero winding) white on black over width × height, anti-aliased. */
+/**
+ * The polygons filled (non-zero winding) white on black over width × height, anti-aliased (4×4 samples per
+ * pixel). A scanline per sub-row: about height × 4 × edges crossings plus one pass over the samples, instead of
+ * every edge for every sample.
+ */
 export function coverage(polygons: Point[][], width: number, height: number): GreyImage {
   const data = new Uint8Array(width * height);
-  const points = polygons.flat();
-  const [x0, x1] = [Math.min(...points.map((p) => p.x)), Math.max(...points.map((p) => p.x))];
-  const [y0, y1] = [Math.min(...points.map((p) => p.y)), Math.max(...points.map((p) => p.y))];
+  const ys = polygons.flat().map((p) => p.y);
+  const hits = new Uint8Array(width);
 
-  for (let y = Math.max(0, Math.floor(y0)); y < Math.min(height, Math.ceil(y1) + 1); y++) {
-    for (let x = Math.max(0, Math.floor(x0)); x < Math.min(width, Math.ceil(x1) + 1); x++) {
-      data[y * width + x] = Math.round((255 * pixelHits(polygons, x, y)) / (SAMPLES * SAMPLES));
-    }
+  for (let y = Math.max(0, Math.floor(Math.min(...ys))); y < Math.min(height, Math.ceil(Math.max(...ys)) + 1); y++) {
+    hits.fill(0);
+
+    for (let sy = 0; sy < SAMPLES; sy++) addSubRow(hits, polygons, y + (sy + 0.5) / SAMPLES, width);
+
+    for (let x = 0; x < width; x++) data[y * width + x] = Math.round((255 * hits[x]) / (SAMPLES * SAMPLES));
   }
 
   return { width, height, data };
