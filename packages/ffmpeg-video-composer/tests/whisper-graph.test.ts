@@ -41,7 +41,7 @@ describe('whisperFilterGraph', () => {
 
     expect(graph).toContain(':language=auto:');
     expect(graph).not.toContain('pwn');
-    expect(unescaped(graph, ',;\\[\\]')).toEqual([]);
+    expect(unescaped(graph, String.raw`,;\[\]`)).toEqual([]);
   });
 
   it('keeps separators in paths inert at both the option and the graph level', () => {
@@ -51,9 +51,9 @@ describe('whisperFilterGraph', () => {
       destination: '/tmp/out:1.jsonl',
     });
 
-    expect(unescaped(graph, ',;\\[\\]')).toEqual([]);
+    expect(unescaped(graph, String.raw`,;\[\]`)).toEqual([]);
     // Option level: ":" → "\:"; graph level: "\" → "\\". FFmpeg unescapes it back to "/tmp/out:1.jsonl".
-    expect(graph).toContain(':destination=/tmp/out\\\\:1.jsonl:');
+    expect(graph).toContain(String.raw`:destination=/tmp/out\\:1.jsonl:`);
     // Only the four option separators the builder writes remain active at the option level.
     expect(graph.split(/(?<!\\):/)).toHaveLength(5);
   });

@@ -194,7 +194,7 @@ const thumbEntries = thumbs
     [
       '  {',
       `    id: '${entry.id}',`,
-      `    label: '${entry.label.replace(/'/g, "\\'")}',`,
+      `    label: '${entry.label.replace(/'/g, String.raw`\'`)}',`,
       `    kind: '${entry.kind}',`,
       `    thumb: '/assets/animation-thumbs/${entry.thumb}',`,
       `    poster: '/assets/animation-thumbs/${entry.poster}',`,

@@ -354,6 +354,7 @@ export async function handleValidate(args: ValidateArgs, config: RenderConfig, c
   if ('isError' in extras) return extras;
 
   const request = args.render === true ? { config, signal: ctx?.mcpReq.signal } : null;
+
   return withExtras(await summary(resolved.descriptor, args.template, request, config), extras);
 }
 

@@ -63,7 +63,7 @@ const NOT_OWN = new Set([
   'ease',
 ]);
 
-const COLOR_PATTERN_HINT = '\\$color';
+const COLOR_PATTERN_HINT = String.raw`\$color`;
 
 function stepFor(min: number | undefined, max: number | undefined, integer: boolean): number {
   if (integer) return 1;
