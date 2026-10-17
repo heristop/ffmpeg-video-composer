@@ -315,6 +315,12 @@ const REGULAR_WEIGHT = 400;
 // The line metrics Satori lays text out with (opentype's ascender / descender: hhea), so a caption raster
 // can put its baseline exactly where drawtext puts it, and the weight drawtext draws the face at, so the
 // raster's glyphs have the widths the caption was laid out with. Null when the tables are missing or unreadable.
+function readWeightClass(view: DataView, os2: { offset: number } | undefined): number {
+  if (!os2 || os2.offset + 6 > view.byteLength) return REGULAR_WEIGHT;
+
+  return view.getUint16(os2.offset + 4, false) || REGULAR_WEIGHT;
+}
+
 export function parseVerticalMetrics(bytes: Uint8Array): VerticalMetrics | null {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const tables = readTableDirectory(view, bytes);
@@ -327,12 +333,9 @@ export function parseVerticalMetrics(bytes: Uint8Array): VerticalMetrics | null 
 
   if (unitsPerEm === 0) return null;
 
-  const os2 = tables?.get('OS/2');
-  const weight = os2 && os2.offset + 6 <= view.byteLength ? view.getUint16(os2.offset + 4, false) : REGULAR_WEIGHT;
-
   return {
     ascent: view.getInt16(hhea.offset + 4, false) / unitsPerEm,
     descent: -view.getInt16(hhea.offset + 6, false) / unitsPerEm,
-    weight: weight || REGULAR_WEIGHT,
+    weight: readWeightClass(view, tables?.get('OS/2')),
   };
 }
