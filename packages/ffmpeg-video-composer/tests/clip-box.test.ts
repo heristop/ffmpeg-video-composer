@@ -247,4 +247,18 @@ describe('clip on real frames', () => {
     expect(changed(clipped.frames[layer(40)], free.frames[layer(40)])).toBeLessThan(10);
     expect(changed(clipped.frames[text(40)], bare.frames[text(40)])).toBeGreaterThan(500);
   }, 600_000);
+
+  it('renders a layer whose box is off the frame as nothing, its leg still consumed', async () => {
+    const offFrame = descriptor(true);
+    const section = offFrame.sections?.[1] as unknown as { inputs: Array<{ options: Record<string, unknown> }> };
+    section.inputs[0].options.clip = { x: 5000, y: 0, w: 100, h: 100 };
+    const bare = await render(descriptor(true, false));
+    const off = await render(offFrame);
+    const layer = (k: number) => bare.frames.length - 45 + k;
+
+    expect(off.frames.length).toBe(bare.frames.length);
+    for (const k of [0, 6, 20, 40]) {
+      expect(changed(off.frames[layer(k)], bare.frames[layer(k)]), `layer frame ${k}`).toBe(0);
+    }
+  }, 600_000);
 });

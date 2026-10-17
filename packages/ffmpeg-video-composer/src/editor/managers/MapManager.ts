@@ -227,12 +227,14 @@ class MapManager {
     const box = evenBox(input.options.clip as ClipBox, width, height);
     const name = input.name;
 
+    // A box off the frame shows nothing, but the registered leg must still be consumed (an unconnected
+    // output aborts the graph): an overlay that never enables passes the frame through.
     if (!box) {
       this.addMap({
-        inputs: [base],
-        filters: [{ type: 'null' }, ...(input.filters ?? [])],
+        inputs: [base, leg],
+        filters: [{ type: 'overlay', value: '0:0:enable=0' }, ...(input.filters ?? [])],
         outputs: [name],
-        options: {},
+        options: { useSectionFilters: false },
       });
 
       return;
