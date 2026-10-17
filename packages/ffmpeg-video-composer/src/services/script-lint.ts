@@ -2,7 +2,9 @@
 // - kinetic_unit_coarsened (always): a word/glyph kinetic block whose copy joins or runs right-to-left
 //   is drawn a line at a time, so its per-unit choreography collapses to one unit per line;
 // - rtl_unshaped / mask_unavailable (only when the caller names the target build's capabilities): the
-//   build can't reorder right-to-left lines (no libfribidi) or can't draw kinetic fills (no alphamerge).
+//   build can't reorder right-to-left lines (no libfribidi) or can't draw kinetic fills (no alphamerge);
+// - caption_html_unavailable (only when the caller says the host has no HTML rasteriser): subtitles asking
+//   for the html renderer are drawn with drawbox there.
 // Render-free and never errors, like the pacing lint.
 
 import { expandPartialsSafe } from '@/core/partials';
@@ -17,6 +19,8 @@ export interface ScriptLintCapabilities {
   textShaping: boolean;
   /** alphamerge (kinetic fills). */
   masks: boolean;
+  /** An HTML rasteriser on the host (HTML layers, subtitles.renderer "html"). Unset = assumed present. */
+  htmlLayers?: boolean;
 }
 
 interface BlockSite {
@@ -75,13 +79,37 @@ function capabilityWarnings({ block, path }: BlockSite, caps: ScriptLintCapabili
   return warnings;
 }
 
+// HTML captions fall back to drawbox on a host without an HTML rasteriser: same layout, plainer look.
+function htmlCaptionWarnings(template: unknown, caps: ScriptLintCapabilities | undefined): MotionWarning[] {
+  if (caps?.htmlLayers !== false) return [];
+
+  const sections = (template as { sections?: Array<{ subtitles?: { renderer?: string } }> } | null)?.sections ?? [];
+
+  return sections.flatMap((section, index) =>
+    section.subtitles?.renderer === 'html'
+      ? [
+          {
+            path: `sections[${index}].subtitles.renderer`,
+            code: 'caption_html_unavailable',
+            severity: 'warn' as const,
+            message: 'this host draws no HTML layers: these captions fall back to drawbox',
+            hint: 'Register an HTML rasteriser on the host, or use renderer "drawbox".',
+          },
+        ]
+      : []
+  );
+}
+
 export function collectScriptWarnings(template: unknown, caps?: ScriptLintCapabilities): MotionWarning[] {
   const expansion = expandPartialsSafe(template);
 
   if (!expansion.ok) return [];
 
-  return kineticSites(expansion.data).flatMap((site) => [
-    ...coarsened(site),
-    ...(caps ? capabilityWarnings(site, caps) : []),
-  ]);
+  return [
+    ...kineticSites(expansion.data).flatMap((site) => [
+      ...coarsened(site),
+      ...(caps ? capabilityWarnings(site, caps) : []),
+    ]),
+    ...htmlCaptionWarnings(expansion.data, caps),
+  ];
 }

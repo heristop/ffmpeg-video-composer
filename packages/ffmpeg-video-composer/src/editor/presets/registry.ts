@@ -7,7 +7,7 @@ import { OVERLAY_SUGAR_COMPILERS, type SugarCompiler, type SugarLayer } from './
 
 export type { SugarContext, KineticSugarContext } from './sugar-context';
 export type { SugarCompiler, SugarLayer } from './overlay-sugars';
-export { compositingContext, createExtraInputs } from './compositing';
+export { compositingContext, createExtraInputs, HTML_RASTERISER } from './compositing';
 // Emoji leave the lowered text right after the sugar compiles (editor/emoji); re-exported so the builder
 // stages both from one place.
 export { createEmojiPlan, type EmojiPlan } from '../emoji/EmojiPlan';

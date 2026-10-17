@@ -35,6 +35,7 @@ export function captionCatalog(): CaptionCatalog {
       'subtitles.position / size / minSize / maxLines / minDuration / offset',
       'subtitles.crown ("auto" or a phrase)',
       'subtitles.font / color / activeColor (overrides; colours accept $color.* tokens)',
+      'subtitles.renderer (drawbox | html)',
       'caption.wrap (greedy | balanced) and caption.fit { minSize, maxLines }',
       'kinetic[].wrap (greedy | balanced)',
     ],
@@ -45,7 +46,14 @@ export function captionCatalog(): CaptionCatalog {
       'Crown one payoff line per video ("auto" picks the last exclaimed or final cue of the section).',
       'Set global.platform so captions clear the app UI on vertical platforms.',
     ],
-    advisories: ['caption_split', 'caption_shrunk', 'subtitle_past_end', 'caption_crown_repeated'],
+    advisories: [
+      'caption_split',
+      'caption_shrunk',
+      'subtitle_past_end',
+      'caption_crown_repeated',
+      'caption_html_unavailable',
+      'caption_html_too_long',
+    ],
     errors: ['invalid_srt', 'invalid_word_timings', 'invalid_subtitle_cue', 'subtitle_font_unmeasurable'],
   };
 }

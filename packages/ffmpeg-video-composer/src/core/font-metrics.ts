@@ -301,3 +301,41 @@ export function measureTextWidth(metrics: FontMetrics, text: string, fontSizePx:
 
   return (units / metrics.unitsPerEm) * fontSizePx;
 }
+
+/** A face's hhea ascender and descender as fractions of its size (both positive), and its weight class. */
+export interface VerticalMetrics {
+  ascent: number;
+  descent: number;
+  /** OS/2 usWeightClass: the weight drawtext draws (a variable face's default instance); 400 without OS/2. */
+  weight: number;
+}
+
+const REGULAR_WEIGHT = 400;
+
+// The line metrics Satori lays text out with (opentype's ascender / descender: hhea), so a caption raster
+// can put its baseline exactly where drawtext puts it, and the weight drawtext draws the face at, so the
+// raster's glyphs have the widths the caption was laid out with. Null when the tables are missing or unreadable.
+function readWeightClass(view: DataView, os2: { offset: number } | undefined): number {
+  if (!os2 || os2.offset + 6 > view.byteLength) return REGULAR_WEIGHT;
+
+  return view.getUint16(os2.offset + 4, false) || REGULAR_WEIGHT;
+}
+
+export function parseVerticalMetrics(bytes: Uint8Array): VerticalMetrics | null {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const tables = readTableDirectory(view, bytes);
+  const head = tables?.get('head');
+  const hhea = tables?.get('hhea');
+
+  if (!head || !hhea || head.offset + 20 > view.byteLength || hhea.offset + 8 > view.byteLength) return null;
+
+  const unitsPerEm = view.getUint16(head.offset + 18, false);
+
+  if (unitsPerEm === 0) return null;
+
+  return {
+    ascent: view.getInt16(hhea.offset + 4, false) / unitsPerEm,
+    descent: -view.getInt16(hhea.offset + 6, false) / unitsPerEm,
+    weight: readWeightClass(view, tables?.get('OS/2')),
+  };
+}

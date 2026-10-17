@@ -10,9 +10,12 @@ import { TranscribeSchema } from './transcribe.schemas';
 // A subtitle track for one section: cues authored inline, an SRT document, or raw word timings from a
 // speech-to-text pass. The engine groups words into readable phrases, fits and balances each phrase on
 // at most `maxLines` lines, and draws it in a caption identity ("DNA") with optional karaoke. Lowered
-// to deterministic drawtext / drawbox filters with enable windows (editor/presets/subtitles.ts).
+// to deterministic drawtext / drawbox filters with enable windows (editor/presets/subtitles.ts), or with
+// `renderer: "html"` rasterised through the HTML layers (editor/presets/subtitles-html.ts).
 
 export const SUBTITLE_KARAOKE = ['word', 'fill', 'pop'] as const;
+
+export const SUBTITLE_RENDERERS = ['drawbox', 'html'] as const;
 
 export const WordTimingSchema = z
   .object({
@@ -149,6 +152,12 @@ export const SubtitlesSchema = z
     font: z.string().optional().describe('Bundled font id overriding the DNA font (must be bundled for layout).'),
     color: z.string().optional().describe('Base text colour overriding the DNA (hex or $color.* token).'),
     activeColor: z.string().optional().describe('Active-word colour overriding the DNA (hex or $color.* token).'),
+    renderer: z
+      .enum(SUBTITLE_RENDERERS)
+      .optional()
+      .describe(
+        'drawbox (filters) or html (rasterised, same layout). Default: html for a DNA with a plate, else drawbox.'
+      ),
   })
   .strict()
   .refine(

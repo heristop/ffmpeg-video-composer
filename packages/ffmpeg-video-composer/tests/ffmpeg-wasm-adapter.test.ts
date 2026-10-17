@@ -40,4 +40,33 @@ describe('FFmpegWasmAdapter', () => {
 
     expect(FFmpegWasmAdapter.parseConcatList('')).toEqual([]);
   });
+
+  // A segment command may read a concat list after other `-f` inputs (a lavfi silence, a colour source):
+  // an HTML caption track is one. Every list the command reads must be found.
+  it('finds every concat list a command reads, wherever its -f concat sits', async () => {
+    const { default: FFmpegWasmAdapter } = await import('@/platform/ffmpeg/FFmpegWasmAdapter');
+    const args = [
+      '-f',
+      'lavfi',
+      '-i',
+      'anullsrc',
+      '-i',
+      '/tmp/clip.mp4',
+      '-f',
+      'concat',
+      '-safe',
+      '0',
+      '-i',
+      '/tmp/panels/captions-1.ffconcat',
+      '-f',
+      'concat',
+      '-i',
+      '/tmp/list.txt',
+      '-y',
+      '/tmp/out.mp4',
+    ];
+
+    expect(FFmpegWasmAdapter.concatListPaths(args)).toEqual(['/tmp/panels/captions-1.ffconcat', '/tmp/list.txt']);
+    expect(FFmpegWasmAdapter.concatListPaths(['-f', 'lavfi', '-i', 'color'])).toEqual([]);
+  });
 });

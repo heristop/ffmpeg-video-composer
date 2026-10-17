@@ -1,5 +1,6 @@
 // Subtitles → drawtext / drawbox filters. The plan (core/captions/plan.ts) decides what is on screen
-// and where; this writes it: per cue an optional plate per line, then the words.
+// and where; this writes it: per cue an optional plate per line, then the words. `renderer: "html"`
+// hands the same plan to the HTML renderer instead (subtitles-html.ts), which falls back to this one.
 //
 // Karaoke modes, per word of a cue shown in [start, end):
 // - false: each line drawn once in the base colour.
@@ -11,10 +12,10 @@
 
 import type { Filter } from '@/core/types';
 import { easedProgressExpr, fmt } from '@/core/motion/hermite';
-import { parseEasing } from '@/core/motion/easing';
 import type { Subtitles } from '../../schemas/subtitles.schemas';
 import { planSubtitles, type PlacedCue, type PlacedLine, type PlacedWord } from '@/core/captions/plan';
 import type { SubtitleStyle } from '@/core/captions/style';
+import { activeWindow, POP_EASE, POP_SECONDS, type ActiveSpan } from '@/core/captions/karaoke';
 import {
   baselineY,
   paintedEffect,
@@ -27,11 +28,6 @@ import {
 } from './subtitle-draw';
 import type { SugarContext } from './sugar-context';
 
-/** A silence shorter than this keeps the previous word active, so the highlight doesn't flicker. */
-const ACTIVE_BRIDGE = 0.25;
-const POP_SECONDS = 0.24;
-const POP_EASE = parseEasing('ease-out-cubic');
-
 interface Palette {
   base: string;
   active: string;
@@ -39,23 +35,11 @@ interface Palette {
   plate: string | undefined;
 }
 
-type ActiveSpan = { from: number; to: number };
-
 interface CueDraw {
   cue: PlacedCue;
   style: SubtitleStyle;
   look: CueLook;
   palette: Palette;
-}
-
-// When the word is the active one: from its start to its end (or on to the next word across a short
-// silence), inside the cue.
-function activeWindow(cue: PlacedCue, words: readonly PlacedWord[], index: number): ActiveSpan {
-  const word = words[index];
-  const next = words.at(index + 1);
-  const bridged = next && next.start - word.end < ACTIVE_BRIDGE ? next.start : word.end;
-
-  return { from: Math.max(cue.start, word.start), to: Math.min(cue.end, Math.max(bridged, word.start + 0.04)) };
 }
 
 function staticLine(draw: CueDraw, line: PlacedLine, color: string): Filter {
@@ -181,6 +165,12 @@ export function subtitlesToFilters(subtitles: Subtitles | undefined, ctx: SugarC
   const paint = painter(ctx.theme);
   const colors = palette(subtitles, plan.style, paint);
   const effect = paintedEffect(plan.style.dna.effect, paint);
+  const explicit = subtitles.renderer === 'html';
+  // A plated DNA defaults to html: drawbox can't anti-alias the plate's corners cheaply.
+  const wantsHtml = explicit || (subtitles.renderer === undefined && plan.style.dna.box !== undefined);
+  const html = wantsHtml ? ctx.masks?.captions?.({ plan, palette: colors, effect, ctx, explicit }) : null;
+
+  if (html) return html;
 
   return plan.cues.flatMap((cue) =>
     cueFilters({ cue, style: plan.style, palette: colors, look: { dna: plan.style.dna, effect, start: cue.start } })
