@@ -7,12 +7,23 @@ describe('starterFiles (base)', () => {
 
   it('includes the core starter files', () => {
     expect(Object.keys(files).sort()).toEqual([
+      '.agents/skills/authoring-leclap-videos/SKILL.md',
+      'AGENTS.md',
+      'CLAUDE.md',
       'README.md',
       'assets/.gitkeep',
       'package.json',
       'pnpm-workspace.yaml',
       'template.json',
     ]);
+  });
+
+  // The agent guidance ships on every path, MCP or not: without it a --no-mcp project carries no
+  // LeClap context at all, which is the case that needs it most.
+  it('always scaffolds the agent skill and its pointer', () => {
+    expect(files['.agents/skills/authoring-leclap-videos/SKILL.md']).toContain('name: authoring-leclap-videos');
+    expect(files['AGENTS.md']).toContain('.agents/skills/authoring-leclap-videos/SKILL.md');
+    expect(files['CLAUDE.md']).toContain('@AGENTS.md');
   });
 
   it('produces a compile-valid template descriptor', () => {
@@ -61,7 +72,10 @@ describe('starterFiles (mcp + remotion)', () => {
 
   it('adds the .mcp.json and the remotion starter', () => {
     expect(Object.keys(files).sort()).toEqual([
+      '.agents/skills/authoring-leclap-videos/SKILL.md',
       '.mcp.json',
+      'AGENTS.md',
+      'CLAUDE.md',
       'README.md',
       'assets/.gitkeep',
       'package.json',
@@ -104,6 +118,12 @@ describe('starterFiles (mcp + remotion)', () => {
     const descriptor = JSON.parse(files['template.json']) as { sections: { name: string; type: string }[] };
     expect(descriptor.sections[0]).toMatchObject({ name: 'intro', type: 'project_video' });
     expect(TemplateDescriptorSchema.safeParse(descriptor).success).toBe(true);
+  });
+
+  it('teaches the agent the Remotion intro hand-off in the skill', () => {
+    const skill = files['.agents/skills/authoring-leclap-videos/SKILL.md'];
+    expect(skill).toContain('render_remotion_clip');
+    expect(skill).toContain('userVideoPaths');
   });
 
   it('registers an "Intro" Remotion composition', () => {

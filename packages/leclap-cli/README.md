@@ -296,8 +296,16 @@ missing feature. `leclap diagnose --json` prints the capability report; see
 
 `init` writes a minimal, immediately-renderable project: a no-external-media `template.json` (so the
 first `render` just works), `package.json`, `README.md`, `assets/`, and a `pnpm-workspace.yaml` whose
-`allowBuilds` lets pnpm 11+ run the `ffmpeg-static` download (npm, yarn and bun ignore it). It then
-**prompts** whether to also set up:
+`allowBuilds` lets pnpm 11+ run the `ffmpeg-static` download (npm, yarn and bun ignore it).
+
+It also writes agent guidance — an `AGENTS.md` pointer (imported by a one-line `CLAUDE.md`) and `.agents/skills/authoring-leclap-videos/SKILL.md` —
+so an AI agent opening the project knows the validate/render loop, which authoring layer to prefer,
+and the traps that never surface as errors. Its commands go through the package manager (`leclap` is
+a devDependency, not a global install), and it links to `llms.txt` rather than restating the schema,
+so it cannot drift out of date on a user's machine. When the MCP option below is on, the skill also
+tells the agent to iterate through `validate_template` and render with `compose_video`.
+
+It then **prompts** whether to also set up:
 
 - **the MCP server** (default Yes) — adds a project-scoped `.mcp.json` wiring [`@leclap/mcp`](../leclap-mcp)
   so an AI agent can author + render in this project (see below);
