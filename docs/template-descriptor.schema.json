@@ -1584,8 +1584,21 @@
               "maximum": 1
             },
             "curvesPreset": {
-              "description": "Named curves preset key applied on top of other grade settings.",
-              "type": "string"
+              "description": "FFmpeg curves preset applied on top of other grade settings (e.g. \"vintage\").",
+              "type": "string",
+              "enum": [
+                "none",
+                "color_negative",
+                "cross_process",
+                "darker",
+                "increase_contrast",
+                "lighter",
+                "linear_contrast",
+                "medium_contrast",
+                "negative",
+                "strong_contrast",
+                "vintage"
+              ]
             },
             "lut": {
               "description": "User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).",
@@ -3862,8 +3875,21 @@
                     "maximum": 1
                   },
                   "curvesPreset": {
-                    "description": "Named curves preset key applied on top of other grade settings.",
-                    "type": "string"
+                    "description": "FFmpeg curves preset applied on top of other grade settings (e.g. \"vintage\").",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "color_negative",
+                      "cross_process",
+                      "darker",
+                      "increase_contrast",
+                      "lighter",
+                      "linear_contrast",
+                      "medium_contrast",
+                      "negative",
+                      "strong_contrast",
+                      "vintage"
+                    ]
                   },
                   "lut": {
                     "description": "User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).",
@@ -6899,8 +6925,21 @@
                     "maximum": 1
                   },
                   "curvesPreset": {
-                    "description": "Named curves preset key applied on top of other grade settings.",
-                    "type": "string"
+                    "description": "FFmpeg curves preset applied on top of other grade settings (e.g. \"vintage\").",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "color_negative",
+                      "cross_process",
+                      "darker",
+                      "increase_contrast",
+                      "lighter",
+                      "linear_contrast",
+                      "medium_contrast",
+                      "negative",
+                      "strong_contrast",
+                      "vintage"
+                    ]
                   },
                   "lut": {
                     "description": "User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).",
@@ -9979,8 +10018,21 @@
                     "maximum": 1
                   },
                   "curvesPreset": {
-                    "description": "Named curves preset key applied on top of other grade settings.",
-                    "type": "string"
+                    "description": "FFmpeg curves preset applied on top of other grade settings (e.g. \"vintage\").",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "color_negative",
+                      "cross_process",
+                      "darker",
+                      "increase_contrast",
+                      "lighter",
+                      "linear_contrast",
+                      "medium_contrast",
+                      "negative",
+                      "strong_contrast",
+                      "vintage"
+                    ]
                   },
                   "lut": {
                     "description": "User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).",
@@ -12783,8 +12835,21 @@
                     "maximum": 1
                   },
                   "curvesPreset": {
-                    "description": "Named curves preset key applied on top of other grade settings.",
-                    "type": "string"
+                    "description": "FFmpeg curves preset applied on top of other grade settings (e.g. \"vintage\").",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "color_negative",
+                      "cross_process",
+                      "darker",
+                      "increase_contrast",
+                      "lighter",
+                      "linear_contrast",
+                      "medium_contrast",
+                      "negative",
+                      "strong_contrast",
+                      "vintage"
+                    ]
                   },
                   "lut": {
                     "description": "User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).",
@@ -15567,8 +15632,21 @@
                     "maximum": 1
                   },
                   "curvesPreset": {
-                    "description": "Named curves preset key applied on top of other grade settings.",
-                    "type": "string"
+                    "description": "FFmpeg curves preset applied on top of other grade settings (e.g. \"vintage\").",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "color_negative",
+                      "cross_process",
+                      "darker",
+                      "increase_contrast",
+                      "lighter",
+                      "linear_contrast",
+                      "medium_contrast",
+                      "negative",
+                      "strong_contrast",
+                      "vintage"
+                    ]
                   },
                   "lut": {
                     "description": "User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).",
@@ -18837,8 +18915,21 @@
                     "maximum": 1
                   },
                   "curvesPreset": {
-                    "description": "Named curves preset key applied on top of other grade settings.",
-                    "type": "string"
+                    "description": "FFmpeg curves preset applied on top of other grade settings (e.g. \"vintage\").",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "color_negative",
+                      "cross_process",
+                      "darker",
+                      "increase_contrast",
+                      "lighter",
+                      "linear_contrast",
+                      "medium_contrast",
+                      "negative",
+                      "strong_contrast",
+                      "vintage"
+                    ]
                   },
                   "lut": {
                     "description": "User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).",
@@ -21621,8 +21712,21 @@
                     "maximum": 1
                   },
                   "curvesPreset": {
-                    "description": "Named curves preset key applied on top of other grade settings.",
-                    "type": "string"
+                    "description": "FFmpeg curves preset applied on top of other grade settings (e.g. \"vintage\").",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "color_negative",
+                      "cross_process",
+                      "darker",
+                      "increase_contrast",
+                      "lighter",
+                      "linear_contrast",
+                      "medium_contrast",
+                      "negative",
+                      "strong_contrast",
+                      "vintage"
+                    ]
                   },
                   "lut": {
                     "description": "User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).",
@@ -24405,8 +24509,21 @@
                     "maximum": 1
                   },
                   "curvesPreset": {
-                    "description": "Named curves preset key applied on top of other grade settings.",
-                    "type": "string"
+                    "description": "FFmpeg curves preset applied on top of other grade settings (e.g. \"vintage\").",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "color_negative",
+                      "cross_process",
+                      "darker",
+                      "increase_contrast",
+                      "lighter",
+                      "linear_contrast",
+                      "medium_contrast",
+                      "negative",
+                      "strong_contrast",
+                      "vintage"
+                    ]
                   },
                   "lut": {
                     "description": "User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).",

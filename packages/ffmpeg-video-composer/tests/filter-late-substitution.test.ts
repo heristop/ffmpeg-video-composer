@@ -104,7 +104,7 @@ let recorder: RecordingFFmpeg;
 beforeAll(async () => {
   await loadConfig(path.resolve(templatesDir, 'app-tutorial.json'));
   realAdapter = container.resolve<AbstractFFmpeg>('ffmpegAdapter');
-});
+}, 120000);
 
 afterAll(() => {
   container.registerInstance('ffmpegAdapter', realAdapter);

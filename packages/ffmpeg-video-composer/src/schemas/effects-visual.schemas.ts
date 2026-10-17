@@ -7,6 +7,21 @@ import { FilterExpression } from './filter-expression.schemas';
 // layer/framing schemas — live here to keep `effects.schemas` under the max-lines budget; all are
 // re-exported from `./effects.schemas` so importers keep a single entry point.
 
+/** FFmpeg's `curves` presets (vf_curves.c), the only values `preset=` takes. */
+export const CURVES_PRESETS = [
+  'none',
+  'color_negative',
+  'cross_process',
+  'darker',
+  'increase_contrast',
+  'lighter',
+  'linear_contrast',
+  'medium_contrast',
+  'negative',
+  'strong_contrast',
+  'vintage',
+] as const;
+
 export const LOOK_PRESETS = [
   'cinematic',
   'warm',
@@ -97,7 +112,10 @@ export const GradeSchema = z
       .max(1)
       .optional()
       .describe('Film-grain strength, 0..1 (default 0; lowered to the FFmpeg noise filter).'),
-    curvesPreset: z.string().optional().describe('Named curves preset key applied on top of other grade settings.'),
+    curvesPreset: z
+      .enum(CURVES_PRESETS)
+      .optional()
+      .describe('FFmpeg curves preset applied on top of other grade settings (e.g. "vintage").'),
     lut: GradeLutSchema.optional().describe(
       'User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).'
     ),

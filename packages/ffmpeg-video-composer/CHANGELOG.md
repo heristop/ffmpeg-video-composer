@@ -194,6 +194,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parentheses, `:` between the parts), checked at validation and where the engine writes them into the filter
   graph, so they can no longer chain filters; an authored `values.textExpr` is refused in every mode, and an
   unsafe raw `values` entry is reported at validation.
+- Grade `curvesPreset`: only FFmpeg's curves preset names are accepted, at validation and where the engine
+  writes `curves=preset=…`, so it can no longer chain a filter.
 
 ## [3.1.0] - 2026-10-11
 

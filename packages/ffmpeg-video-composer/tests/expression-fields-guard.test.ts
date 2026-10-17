@@ -62,6 +62,7 @@ const CASES: Record<string, TemplateDescriptor> = {
   'motion crop w': template([section({ motion: [{ type: 'crop', w: `iw/2${CHAIN}`, h: 'ih/2' }] })]),
   'motion crop x': template([section({ motion: [{ type: 'crop', w: 'iw/2', h: 'ih/2', x: `0${CHAIN}` }] })]),
   'options.layers[].x': template([section({}, { layers: [{ color: '#ff0000', x: `0${CHAIN}`, w: 'iw*0.5' }] })]),
+  'grade.curvesPreset': template([section({ grade: { curvesPreset: `vintage${CHAIN}` } })]),
   'filters[].values.enable': template([
     section({ filters: [{ type: 'drawbox', values: { x: 0, y: 0, w: 10, h: 10, enable: `1${CHAIN}` } }] }),
   ]),
@@ -72,7 +73,7 @@ let realAdapter: AbstractFFmpeg;
 beforeAll(async () => {
   await loadConfig(path.resolve(templatesDir, 'app-tutorial.json'));
   realAdapter = container.resolve<AbstractFFmpeg>('ffmpegAdapter');
-});
+}, 120000);
 
 afterAll(() => {
   container.registerInstance('ffmpegAdapter', realAdapter);

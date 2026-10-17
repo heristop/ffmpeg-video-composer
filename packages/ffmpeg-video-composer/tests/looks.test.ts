@@ -161,7 +161,7 @@ describe('gradeToFilters', () => {
         highlights: { b: 0.08 },
       },
       blur: 1.5,
-      curvesPreset: 'warm',
+      curvesPreset: 'darker',
     };
 
     const filters = gradeToFilters(grade);
@@ -171,7 +171,7 @@ describe('gradeToFilters', () => {
       { type: 'hue', value: 'h=45' },
       { type: 'colorbalance', value: 'rs=0.1:gs=0:bs=-0.1:rm=0.05:bh=0.08' },
       { type: 'gblur', value: 'sigma=1.5' },
-      { type: 'curves', value: 'preset=warm' },
+      { type: 'curves', value: 'preset=darker' },
     ]);
   });
 
@@ -233,11 +233,11 @@ describe('gradeToFilters', () => {
   });
 
   it('grain emits after gblur and before curves', () => {
-    const filters = gradeToFilters({ blur: 2, grain: 0.5, curvesPreset: 'warm' });
+    const filters = gradeToFilters({ blur: 2, grain: 0.5, curvesPreset: 'darker' });
     expect(filters).toEqual<Filter[]>([
       { type: 'gblur', value: 'sigma=2' },
       { type: 'noise', value: 'alls=10:allf=t+u' },
-      { type: 'curves', value: 'preset=warm' },
+      { type: 'curves', value: 'preset=darker' },
     ]);
   });
 });
@@ -611,5 +611,11 @@ describe('layersToFilters', () => {
     (first[0].values as Record<string, unknown>).c = 'MUTATED';
     const second = layersToFilters([{ color: 'red' }]);
     expect((second[0].values as Record<string, unknown>).c).toBe('red@1');
+  });
+});
+
+describe('gradeToFilters: curves preset', () => {
+  it('refuses a name that is not an FFmpeg curves preset', () => {
+    expect(() => gradeToFilters({ curvesPreset: 'vintage,metadata=print' } as never)).toThrow(/curvesPreset/);
   });
 });
