@@ -88,7 +88,16 @@ async function fontFor(request: MatteRequest, fs: MatteFs): Promise<GlyphFont | 
   return bytes ? parseGlyphOutlines(bytes) : null;
 }
 
-async function stageOne(request: MatteRequest, k: number, frame: { width: number; height: number }, io: MatteIO) {
+// The writes in flight, by path: boundaries that share a geometry share its file (one draw, one write).
+type Writes = Map<string, Promise<void>>;
+
+async function stageOne(
+  request: MatteRequest,
+  k: number,
+  frame: { width: number; height: number },
+  io: MatteIO,
+  writes: Writes
+) {
   const result = boundaryMatte(request, frame, await fontFor(request, io.fs));
 
   if (!result.matte) {
@@ -100,7 +109,11 @@ async function stageOne(request: MatteRequest, k: number, frame: { width: number
   }
 
   const path = `${io.dir}/${result.matte.name}`;
-  await io.fs.writeFile(path, result.matte.png());
+  const { png } = result.matte;
+
+  if (!writes.has(path)) writes.set(path, io.fs.writeFile(path, png()));
+
+  await writes.get(path);
 
   return { k, path, centre: result.matte.centre, scale: result.matte.scale };
 }
@@ -111,7 +124,8 @@ export async function stageTransitionMattes(
   frame: { width: number; height: number },
   io: MatteIO
 ): Promise<StagedMatte[]> {
-  const staged = await Promise.all(transitions.map((request, k) => stageOne(request, k, frame, io)));
+  const writes: Writes = new Map();
+  const staged = await Promise.all(transitions.map((request, k) => stageOne(request, k, frame, io, writes)));
 
   return staged.filter((matte): matte is StagedMatte => matte !== null);
 }

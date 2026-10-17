@@ -7,7 +7,7 @@ import { parseGlyphOutlines } from '@/core/glyph-outline';
 import { parseFontMetrics } from '@/core/font-metrics';
 import { coverScale, coverage, fieldLevel, revealField, shapeOutline, signedArea } from '@/core/motion/radial-matte';
 import { boundaryMatte, counterOf } from '@/core/motion/transition-mattes';
-import { stageTransitionMattes } from '@/editor/utils/matte-staging';
+import { stageTransitionMattes, type MatteIO } from '@/editor/utils/matte-staging';
 
 // The compile-time mattes of the shaped transitions: glyph outlines, a letter's counter, shape fields.
 
@@ -200,7 +200,7 @@ function brokenGlyf(): Uint8Array {
   return bytes;
 }
 
-function stagingIO(readFile: (file: string) => Promise<Uint8Array>, warnings: string[]) {
+function stagingIO(readFile: (file: string) => Promise<Uint8Array>, warnings: string[]): MatteIO {
   return {
     fs: {
       getBuildPath: async (dir: string) => `/build/${dir}`,
@@ -213,7 +213,7 @@ function stagingIO(readFile: (file: string) => Promise<Uint8Array>, warnings: st
   };
 }
 
-describe('matte fonts: only bundled ones, read safely', () => {
+describe('matte staging: bundled fonts, safe reads, shared geometry', () => {
   const frame = { width: 640, height: 360 };
 
   it('never reads a window font that is not bundled, and falls back', async () => {
@@ -254,6 +254,25 @@ describe('matte fonts: only bundled ones, read safely', () => {
 
     expect(reads.every((file) => file.endsWith('/ArchivoBlack.ttf'))).toBe(true);
     expect(staged.map((matte) => matte.k)).toEqual([0, 1]);
+  });
+
+  it('draws and writes a matte once when several boundaries share its geometry', async () => {
+    const written: string[] = [];
+    const io = stagingIO(async () => archivo, []);
+    io.fs.writeFile = async (file: string) => {
+      written.push(file);
+    };
+    const window = { type: 'zoom-through', through: { shape: 'star', size: 300 } } as const;
+    const staged = await stageTransitionMattes(
+      [{ type: 'iris', shape: 'heart' }, window, { type: 'iris', shape: 'heart' }, window],
+      frame,
+      io
+    );
+
+    expect(staged.map((matte) => matte.k)).toEqual([0, 1, 2, 3]);
+    expect(staged[2].path).toBe(staged[0].path);
+    expect(staged[3].path).toBe(staged[1].path);
+    expect(written).toHaveLength(2);
   });
 
   it('a glyph that cannot be read has no contours instead of throwing', () => {
