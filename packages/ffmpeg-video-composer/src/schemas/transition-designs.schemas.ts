@@ -53,7 +53,9 @@ export const TRANSITION_DESIGN_FIELDS = {
   shape: z
     .enum(MATTE_SHAPES)
     .optional()
-    .describe('iris: the shape that opens (default circle); star, heart and rounded-square open from origin.'),
+    .describe(
+      'iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.'
+    ),
   through: z
     .union([ThroughTextSchema, ThroughShapeSchema])
     .optional()

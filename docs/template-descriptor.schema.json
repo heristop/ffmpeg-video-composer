@@ -741,7 +741,7 @@
               "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
             },
             "shape": {
-              "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
+              "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
               "type": "string",
               "enum": ["circle", "star", "heart", "rounded-square"]
             },
@@ -3022,7 +3022,7 @@
                     "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
-                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
                     "type": "string",
                     "enum": ["circle", "star", "heart", "rounded-square"]
                   },
@@ -6035,7 +6035,7 @@
                     "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
-                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
                     "type": "string",
                     "enum": ["circle", "star", "heart", "rounded-square"]
                   },
@@ -9091,7 +9091,7 @@
                     "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
-                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
                     "type": "string",
                     "enum": ["circle", "star", "heart", "rounded-square"]
                   },
@@ -11871,7 +11871,7 @@
                     "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
-                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
                     "type": "string",
                     "enum": ["circle", "star", "heart", "rounded-square"]
                   },
@@ -14631,7 +14631,7 @@
                     "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
-                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
                     "type": "string",
                     "enum": ["circle", "star", "heart", "rounded-square"]
                   },
@@ -17862,7 +17862,7 @@
                     "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
-                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
                     "type": "string",
                     "enum": ["circle", "star", "heart", "rounded-square"]
                   },
@@ -20622,7 +20622,7 @@
                     "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
-                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
                     "type": "string",
                     "enum": ["circle", "star", "heart", "rounded-square"]
                   },
@@ -23382,7 +23382,7 @@
                     "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
-                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
                     "type": "string",
                     "enum": ["circle", "star", "heart", "rounded-square"]
                   },
