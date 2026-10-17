@@ -55,6 +55,23 @@ describe('analyzeStructure', () => {
   it('refuses a single frame', () => {
     expect(() => analyzeStructure({ frames: [flat(1, 0)] })).toThrow(/clip/);
   });
+
+  it('reads an all-black clip as one dark shot, not a dip', () => {
+    const structure = analyzeStructure({ frames: [0, 1, 2, 3, 4, 5].map((k) => flat(0, k * 0.25)) });
+
+    expect(structure.shots).toHaveLength(1);
+    expect(structure.shots[0]).toMatchObject({ ground: 'dark', anchor: 'spread', transitionIn: null });
+    expect(structure.rhythm.cutsPerMinute).toBe(0);
+  });
+
+  it('reads the shortest clip, two frames, with no timestamps', () => {
+    const untimed: StyleFrame = { data: new Uint8Array(W * H * 3).fill(40), width: W, height: H };
+    const structure = analyzeStructure({ frames: [untimed, untimed] });
+
+    expect(structure.shots.length).toBeGreaterThan(0);
+    expect(structure.duration).toBeGreaterThan(0);
+    expect(structure.rhythm.shortest).toBeGreaterThan(0);
+  });
 });
 
 // A 60×30 frame painted by `paint(x, y)` (luma, written to every channel).
