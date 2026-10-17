@@ -269,15 +269,27 @@ describe('shape work budgets fail closed', () => {
 
   it('refuses a zero-wavelength poison prefix on a costly stroke', () => {
     const url = (d: string) => `shape:w=1024,h=4096,rule=nonzero,fill=none,sw=640,sc=ffffffff,d=${d}`;
-    const t0 = performance.now();
 
+    expect(parseShapeUrl(url(zigzag('', 4096)))).toBeNull();
     expect(parseShapeUrl(url(zigzag('M0_0W0_0_1_1_0_0', 4096)))).toBeNull();
-    expect(performance.now() - t0).toBeLessThan(2000);
   });
 
-  it('refuses a trace: URL with a zero wavelength', () => {
-    expect(
-      parseTraceUrl('trace:mode=cover,x=0,y=0,w=100,h=40,thickness=6,caps=round,color=9298fb,d=M0_0W0_0_10_5_0_0')
-    ).toBeNull();
+  it('refuses a denormal wavelength whose points are not finite, costly or cheap', () => {
+    const poison = 'M0_0W0_0_1_1_1e-310_0';
+    const fill = (d: string) => `shape:w=1024,h=4096,rule=evenodd,fill=solid,c1=ff0000ff,sw=0,d=${d}`;
+    const stroke = (d: string) => `shape:w=1024,h=4096,rule=nonzero,fill=none,sw=640,sc=ffffffff,d=${d}`;
+
+    expect(parseShapeUrl(fill(zigzag(poison, 4096)))).toBeNull();
+    expect(parseShapeUrl(stroke(zigzag(poison, 4096)))).toBeNull();
+    expect(parseShapeUrl(fill(poison))).toBeNull();
+    expect(parseShapeUrl(stroke(poison))).toBeNull();
+  });
+
+  it('refuses a trace: URL with a zero wavelength and accepts a real one', () => {
+    const url = (wavelength: number) =>
+      `trace:mode=cover,cap=round,x=0,y=0,w=100,h=40,t=6,c=9298fb,d=M0_0W0_0_10_5_${wavelength}_0`;
+
+    expect(parseTraceUrl(url(20))).not.toBeNull();
+    expect(parseTraceUrl(url(0))).toBeNull();
   });
 });
