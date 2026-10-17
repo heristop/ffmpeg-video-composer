@@ -127,11 +127,7 @@
           "color": "#f7f7f8",
           "fill": {
             "gradient": {
-              "stops": [
-                "#aeb2fb",
-                "#ffa8bf",
-                "#fff685"
-              ],
+              "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
               "angle": 90
             }
           },
@@ -307,11 +303,7 @@
           "color": "#f7f7f8",
           "fill": {
             "gradient": {
-              "stops": [
-                "#aeb2fb",
-                "#ffa8bf",
-                "#fff685"
-              ],
+              "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
               "angle": 90
             }
           },
@@ -435,11 +427,7 @@
           "color": "#f7f7f8",
           "fill": {
             "gradient": {
-              "stops": [
-                "#aeb2fb",
-                "#ffa8bf",
-                "#fff685"
-              ],
+              "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
               "angle": 90
             }
           },
