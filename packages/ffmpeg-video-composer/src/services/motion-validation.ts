@@ -18,7 +18,12 @@ import { parseTimeRef } from '@/core/timing/grammar';
 import { resolveTimeRefs } from '@/core/timing/resolve';
 
 import { motionRoleErrors } from './motion-roles-validation';
-import { LAYER_ANIMATE_PATH, layerAnimateErrors } from './layer-animate-validation';
+import {
+  LAYER_ANIMATE_PATH,
+  SHAPE_ANIMATE_PATH,
+  layerAnimateErrors,
+  shapeAnimateErrors,
+} from './layer-animate-validation';
 import { withEasingHint } from './validation/easing-hint';
 import { nearest } from './validation/suggest';
 import type { ValidationError } from './validation/types';
@@ -211,6 +216,11 @@ function animateUseErrors(use: Use, tokens: ResolvedTokens, template: TemplateDe
 
   if (HTML_MOTION_PATH.test(use.path)) {
     return layerAnimateErrors(use.path, tracks, { type: 'html' }, (keys) => keyTimingError(keys, tokens));
+  }
+
+  // A shape graphic's layer tracks (shape-draw.ts): the layer ranges and key timing, never the drawtext rules.
+  if (SHAPE_ANIMATE_PATH.test(use.path) && use.owner.type === 'shape') {
+    return shapeAnimateErrors(use.path, tracks, (keys) => keyTimingError(keys, tokens));
   }
 
   if (use.owner.type !== 'drawtext') {

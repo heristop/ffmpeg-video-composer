@@ -77,3 +77,19 @@ export function layerAnimateErrors(
     return message ? [{ path: at, message, code: 'invalid_keyframes' }] : [];
   });
 }
+
+/** Where a shape graphic's tracks sit: `sections[i].graphics[j].animate` (editor/presets/shape-draw.ts). */
+export const SHAPE_ANIMATE_PATH = /^sections\[\d+\]\.graphics\[\d+\]\.animate$/;
+
+/** The findings of a shape graphic's `animate`: the layer value ranges and key timing (its box is always known). */
+export function shapeAnimateErrors(
+  path: string,
+  animate: Record<string, TrackKey[]>,
+  timingError: (keys: TrackKey[]) => string | null
+): ValidationError[] {
+  return Object.entries(animate).flatMap(([axis, keys]) => {
+    const message = valueError(axis, keys) ?? timingError(keys);
+
+    return message ? [{ path: `${path}.${axis}`, message, code: 'invalid_keyframes' }] : [];
+  });
+}
