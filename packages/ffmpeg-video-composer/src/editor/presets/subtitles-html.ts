@@ -9,10 +9,8 @@
 
 import type { Filter } from '@/core/types';
 import { captionSlides } from '@/core/captions/caption-frames';
-import { captionBand, captionLook, type CaptionPalette } from '@/core/captions/caption-html';
-import type { CaptionDnaEffect } from '@/core/captions/dna';
-import type { SubtitlePlan } from '@/core/captions/plan';
-import type { SugarContext } from './sugar-context';
+import { captionBand, captionLook } from '@/core/captions/caption-html';
+import type { HtmlCaptionRequest } from './sugar-context';
 
 /** The extra input a section's caption track is registered under. */
 export const CAPTION_TRACK_KEY = 'subtitles';
@@ -20,15 +18,6 @@ export const CAPTION_TRACK_KEY = 'subtitles';
 const UNAVAILABLE =
   '[caption_html_unavailable] subtitles.renderer "html" needs an HTML rasteriser, which this host has not ' +
   'registered: the captions are drawn with the drawbox renderer';
-
-export interface HtmlCaptionRequest {
-  plan: SubtitlePlan;
-  palette: CaptionPalette;
-  effect: CaptionDnaEffect | undefined;
-  ctx: SugarContext;
-  /** `renderer: "html"` was authored (not the plated-DNA default): only then is a fallback worth a warning. */
-  explicit: boolean;
-}
 
 /** The filters compositing the caption track, or null when the drawbox renderer must draw it instead. */
 export function htmlCaptionFilters({ plan, palette, effect, ctx, explicit }: HtmlCaptionRequest): Filter[] | null {

@@ -2,8 +2,9 @@ import type { LayoutSectionRef } from '@/core/layout/sources';
 import type { Filter, Section } from '@/core/types';
 import type { FxGraphic } from '../../schemas/fx.schemas';
 import type { Graphic } from '../../schemas/graphics.schemas';
-import type { CaptionTrack } from '@/core/captions/caption-html';
-import type { HtmlCaptionRequest } from './subtitles-html';
+import type { CaptionPalette, CaptionTrack } from '@/core/captions/caption-html';
+import type { CaptionDnaEffect } from '@/core/captions/dna';
+import type { SubtitlePlan } from '@/core/captions/plan';
 
 /** One fx graphic to lower (editor/presets/fx.ts): the element, its window and where it sits. */
 export type FxRequest = {
@@ -43,6 +44,15 @@ export type SugarContext = {
   /** The template's sections, for layout panes that name another section. */
   sections?: readonly LayoutSectionRef[];
 };
+
+export interface HtmlCaptionRequest {
+  plan: SubtitlePlan;
+  palette: CaptionPalette;
+  effect: CaptionDnaEffect | undefined;
+  ctx: SugarContext;
+  /** `renderer: "html"` was authored (not the plated-DNA default): only then is a fallback worth a warning. */
+  explicit: boolean;
+}
 
 export type ExtraInputSource = { url: string; still: boolean } | { clip: string } | { captions: CaptionTrack };
 
