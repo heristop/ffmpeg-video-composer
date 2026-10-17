@@ -157,4 +157,55 @@ describe('animated html card, real compile', () => {
     expect(await averageRed(out as string, 1.2, crop)).toBeLessThan(30);
     expect(await averageRed(out as string, 3.0, crop)).toBeGreaterThan(200);
   }, 120_000);
+
+  it('lands a time reference on its section moment when the layer starts late', async () => {
+    const descriptor = {
+      global: { orientation: 'landscape', musicEnabled: false },
+      sections: [
+        {
+          name: 'ref',
+          type: 'color_background',
+          options: { backgroundColor: '#000000', duration: 4 },
+          inputs: [
+            {
+              name: 'card',
+              type: 'html',
+              html: '<div class="dot" data-motion="dot"></div>',
+              css: '.dot { width: 100px; height: 100px; background: #ff0000 }',
+              width: 100,
+              height: 100,
+              options: { position: '200:200', start: 1 },
+              motion: {
+                dot: {
+                  opacity: [
+                    { t: 0, v: 0 },
+                    { t: 'end - 2', v: 1 },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      ],
+    } as unknown as TemplateDescriptor;
+    const projectConfig = {
+      buildDir,
+      assetsDir: libDir,
+      currentLocale: 'en',
+      audioConfig: { sampleRate: 44100, channelLayout: 'stereo' },
+      videoConfig: { orientation: 'landscape', scale: '1280:720' },
+      fields: {},
+      userVideoPaths: {},
+    } as unknown as ProjectConfig;
+
+    const out = await compile(projectConfig, descriptor);
+
+    expect(out, 'the time reference template should compile').not.toBeNull();
+
+    const crop = '40:40:230:230';
+
+    // "end - 2" is the section's 2.0 s mark: the fade is under way at 1.5 s and complete by 2.2 s (it used to finish at 3.0 s).
+    expect(await averageRed(out as string, 1.5, crop)).toBeLessThan(200);
+    expect(await averageRed(out as string, 2.2, crop)).toBeGreaterThan(235);
+  }, 120_000);
 });

@@ -12,6 +12,8 @@ export interface TimeSlot {
   value: string;
   /** Id of the element this field starts, so a self-reference reads as a cycle. */
   owner?: string;
+  /** Seconds the field's own clock starts after the section (an html layer's `options.start`): a resolved reference is section time, written back relative to it. */
+  clockStart?: number;
   write: (seconds: number) => void;
 }
 
@@ -44,7 +46,7 @@ export interface SecondsSlot {
 // One walk serves both slot kinds: `accept` picks which raw values count (reference strings, or plain
 // numbers), so the list of time fields lives in one place.
 type Accept = (value: unknown) => boolean;
-type RawSlot = { path: string; value: unknown; owner?: string; write: (seconds: number) => void };
+type RawSlot = { path: string; value: unknown; owner?: string; clockStart?: number; write: (seconds: number) => void };
 
 function slot(accept: Accept, owner: Bag | undefined, key: string, path: string, id?: string): RawSlot[] {
   const value = owner?.[key];
@@ -121,13 +123,16 @@ function cueSlots(accept: Accept, section: Bag): RawSlot[] {
   ];
 }
 
-// An html input's element tracks (inputs[i].motion.<name>.<track>[k].t), section time like options.animate.
+// An html input's element tracks (inputs[i].motion.<name>.<track>[k].t) run on the layer's clock, which
+// starts at options.start; a reference still names a section moment, so its slot carries that start.
 function elementMotionSlots(accept: Accept, input: Bag, i: number): RawSlot[] {
   const motion = input.type === 'html' ? bag(input.motion) : undefined;
+  const start = Number(bag(input.options)?.start);
+  const clockStart = Number.isFinite(start) && start > 0 ? start : 0;
 
-  return Object.entries(motion ?? {}).flatMap(([name, spec]) =>
-    trackSlots(accept, bag(spec), ELEMENT_MOTION_TRACKS, `inputs[${i}].motion.${name}`)
-  );
+  return Object.entries(motion ?? {})
+    .flatMap(([name, spec]) => trackSlots(accept, bag(spec), ELEMENT_MOTION_TRACKS, `inputs[${i}].motion.${name}`))
+    .map((found) => ({ ...found, clockStart }));
 }
 
 function collectSlots(section: Bag, accept: Accept): RawSlot[] {

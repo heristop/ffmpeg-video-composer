@@ -4,7 +4,7 @@ import { resolveTimeRefs } from '@/core/timing/resolve';
 
 type Motion = Record<string, Record<string, unknown>>;
 
-function descriptor(motion: Motion, global: Record<string, unknown> = {}) {
+function descriptor(motion: Motion, global: Record<string, unknown> = {}, start?: number) {
   return {
     global: { orientation: 'landscape', musicEnabled: false, ...global },
     sections: [
@@ -12,7 +12,17 @@ function descriptor(motion: Motion, global: Record<string, unknown> = {}) {
         name: 'card',
         type: 'color_background',
         options: { backgroundColor: '#000000', duration: 4 },
-        inputs: [{ name: 'list', type: 'html', html: '<p data-motion="item">A</p>', width: 300, height: 100, motion }],
+        inputs: [
+          {
+            name: 'list',
+            type: 'html',
+            html: '<p data-motion="item">A</p>',
+            width: 300,
+            height: 100,
+            motion,
+            ...(start === undefined ? {} : { options: { start } }),
+          },
+        ],
       },
     ],
   };
@@ -92,7 +102,7 @@ describe('html element motion tokens', () => {
 });
 
 describe('html element motion time references', () => {
-  it('resolves time references in element tracks to section seconds', () => {
+  it('resolves time references in element tracks to layer seconds (section seconds when the layer starts with the section)', () => {
     const { descriptor: resolved, issues } = resolveTimeRefs(
       descriptor({
         item: {
@@ -109,5 +119,38 @@ describe('html element motion time references', () => {
       { t: 2, v: 0 },
       { t: 3, v: 1 },
     ]);
+  });
+
+  it('names a section moment and converts it to layer time by the layer start', () => {
+    const { descriptor: resolved, issues } = resolveTimeRefs(
+      descriptor(
+        {
+          item: {
+            opacity: [
+              { t: 0, v: 0 },
+              { t: 'end - 2', v: 1 },
+              { t: '25%', v: 0 },
+              { t: 2.5, v: 1 },
+            ],
+          },
+        },
+        {},
+        1
+      )
+    );
+
+    expect(issues).toEqual([]);
+    expect(motionOf(resolved).item.opacity).toEqual([
+      { t: 0, v: 0 },
+      { t: 1, v: 1 },
+      { t: 0, v: 0 },
+      { t: 2.5, v: 1 },
+    ]);
+  });
+
+  it('clamps a reference before the layer starts to 0', () => {
+    const { descriptor: resolved } = resolveTimeRefs(descriptor({ item: { opacity: [{ t: '25%', v: 0 }] } }, {}, 2));
+
+    expect(motionOf(resolved).item.opacity).toEqual([{ t: 0, v: 0 }]);
   });
 });
