@@ -4,6 +4,7 @@
 // shaped iris falls back to the circle, a zoom-through to the plain fly-through.
 
 import { kineticFontFile } from '@/core/kinetic/resolve';
+import { findFontByFile } from '@/core/fonts';
 import { parseGlyphOutlines, type GlyphFont } from '@/core/glyph-outline';
 import { boundaryMatte, matteFont, type MatteRequest } from '@/core/motion/transition-mattes';
 import type { ThroughMatte } from '@/core/motion/transition-through';
@@ -65,12 +66,24 @@ async function readFont(fs: MatteFs, file: string): Promise<Uint8Array | null> {
   return found?.status === 'fulfilled' ? found.value : null;
 }
 
+// The window's font file when it is a bundled one (by id or file), else null: the font is authored, so it
+// never becomes a path read off the build FS (a traversal, /dev/zero, a FIFO).
+function bundledFontFile(font: string | null): string | null {
+  const file = kineticFontFile(font ?? undefined);
+
+  return findFontByFile(file) ? file : null;
+}
+
 async function fontFor(request: MatteRequest, fs: MatteFs): Promise<GlyphFont | null> {
   const font = matteFont(request);
 
   if (font === undefined) return null;
 
-  const bytes = await readFont(fs, kineticFontFile(font ?? undefined));
+  const file = bundledFontFile(font);
+
+  if (!file) return null;
+
+  const bytes = await readFont(fs, file);
 
   return bytes ? parseGlyphOutlines(bytes) : null;
 }

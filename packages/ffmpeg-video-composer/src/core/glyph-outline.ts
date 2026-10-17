@@ -244,10 +244,17 @@ export function parseGlyphOutlines(bytes: Uint8Array): GlyphFont | null {
 
     return {
       unitsPerEm,
+      // A glyph read past its table (a malformed font) has no contours: the window falls back.
       contours: (codePoint) => {
         const glyph = charToGlyph.get(codePoint);
 
-        return glyph === undefined ? null : glyphContours({ view, glyf, offsets }, glyph, 0);
+        if (glyph === undefined) return null;
+
+        try {
+          return glyphContours({ view, glyf, offsets }, glyph, 0);
+        } catch {
+          return null;
+        }
       },
     };
   } catch {

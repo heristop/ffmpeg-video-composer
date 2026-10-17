@@ -184,6 +184,99 @@ describe('boundary mattes', () => {
   });
 });
 
+// A copy of Archivo Black whose glyf table points past the end of the file: it parses, its glyphs throw.
+function brokenGlyf(): Uint8Array {
+  const bytes = archivo.slice();
+  const view = new DataView(bytes.buffer);
+
+  for (let i = 0; i < view.getUint16(4); i++) {
+    const record = 12 + 16 * i;
+
+    if (String.fromCodePoint(...bytes.subarray(record, record + 4)) === 'glyf') {
+      view.setUint32(record + 8, bytes.length - 4);
+    }
+  }
+
+  return bytes;
+}
+
+function stagingIO(readFile: (file: string) => Promise<Uint8Array>, warnings: string[]) {
+  return {
+    fs: {
+      getBuildPath: async (dir: string) => `/build/${dir}`,
+      getAssetsDir: () => '/assets/fonts',
+      readFile,
+      writeFile: async () => undefined,
+    },
+    dir: '/build',
+    logger: { warn: (message: string) => warnings.push(message) },
+  };
+}
+
+describe('matte fonts: only bundled ones, read safely', () => {
+  const frame = { width: 640, height: 360 };
+
+  it('never reads a window font that is not bundled, and falls back', async () => {
+    const reads: string[] = [];
+    const warnings: string[] = [];
+    const io = stagingIO(async (file) => {
+      reads.push(file);
+
+      return archivo;
+    }, warnings);
+    const fonts = ['../../../../etc/passwd', '/dev/zero', 'Custom.ttf', 'not-a-font-id'];
+    const staged = await stageTransitionMattes(
+      fonts.map((font) => ({ type: 'zoom-through', through: { text: 'O', font } })),
+      frame,
+      io
+    );
+
+    expect(reads).toEqual([]);
+    expect(staged).toEqual([]);
+    expect(warnings).toHaveLength(fonts.length);
+  });
+
+  it('reads a bundled font by id or by file', async () => {
+    const reads: string[] = [];
+    const io = stagingIO(async (file) => {
+      reads.push(file);
+
+      return archivo;
+    }, []);
+    const staged = await stageTransitionMattes(
+      [
+        { type: 'zoom-through', through: { text: 'O', font: 'archivo-black', size: 200 } },
+        { type: 'zoom-through', through: { text: 'O', font: 'ArchivoBlack.ttf', size: 200 } },
+      ],
+      frame,
+      io
+    );
+
+    expect(reads.every((file) => file.endsWith('/ArchivoBlack.ttf'))).toBe(true);
+    expect(staged.map((matte) => matte.k)).toEqual([0, 1]);
+  });
+
+  it('a glyph that cannot be read has no contours instead of throwing', () => {
+    const font = parseGlyphOutlines(brokenGlyf());
+
+    expect(font).not.toBeNull();
+    expect(font?.contours(0x4f)).toBeNull();
+  });
+
+  it('a malformed font falls back instead of failing the staging', async () => {
+    const warnings: string[] = [];
+    const io = stagingIO(async () => brokenGlyf(), warnings);
+    const staged = await stageTransitionMattes(
+      [{ type: 'zoom-through', through: { text: 'O', font: 'archivo-black', size: 200 } }],
+      frame,
+      io
+    );
+
+    expect(staged).toEqual([]);
+    expect(warnings).toHaveLength(1);
+  });
+});
+
 // Real FFmpeg: the counter matte of an O sits exactly in the hole drawtext leaves, when the letter is drawn
 // where a kinetic block of the same text, font, size, x and y draws it (pen x, baseline 0.8 em below the top).
 describe.skipIf(!hasFfmpeg())('counter matte on a drawn letter', () => {
