@@ -1,5 +1,6 @@
 // Pure helpers for the "Match a reference" panel: which swatches to preview, how each one's contrast
 // reads, and how an analysed theme lands in the editor (as global.theme, object form).
+import type { ReferenceStructure } from 'ffmpeg-video-composer/src/core/structure/types.ts';
 import type { StyleAnalysis } from 'ffmpeg-video-composer/src/core/style/types.ts';
 import type { EditorMotion } from '../templateEditorModel';
 
@@ -56,4 +57,9 @@ export function isReferenceImage(file: File): boolean {
 
 export function isReferenceClip(file: File): boolean {
   return VIDEO_TYPES.test(file.type);
+}
+
+/** What the panel shows of a clip's format. */
+export function structureSummary(structure: ReferenceStructure): { shots: number; avgShot: number } {
+  return { shots: structure.rhythm.shots, avgShot: structure.rhythm.avgShot };
 }

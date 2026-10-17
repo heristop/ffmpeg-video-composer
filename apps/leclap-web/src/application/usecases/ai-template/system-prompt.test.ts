@@ -6,6 +6,10 @@ import { generationContext, promptFor } from './generation-context';
 import { buildSystemPrompt, buildUserBrief, DEFAULT_PROMPT_BUDGET, REFERENCE_STYLE_HEADING } from './system-prompt';
 import { artDirection, GENRE_FONTS } from './art-direction';
 import { buildPlanPrompt } from './plan-prompt';
+import { analyzeStructure } from 'ffmpeg-video-composer/src/core/structure/analyze.ts';
+import { structurePromptRules } from 'ffmpeg-video-composer/src/core/structure/prompt.ts';
+import { analyzeStyle, styleGuidePromptRules } from 'ffmpeg-video-composer/src/core/style/index.ts';
+import type { StyleFrame } from 'ffmpeg-video-composer/src/core/style/types.ts';
 
 describe('art direction', () => {
   it('ships the story spine and the lazy-defaults block, without pinned centring or a fixed font trio', () => {
@@ -239,6 +243,50 @@ describe('buildUserBrief', () => {
   });
 });
 
+// A 30 s reference clip as the builder samples it (120 frames, 0.25 s apart): 40 shots of 0.75 s alternating
+// dark and light grounds, each with a coloured block that moves through the 3x3 grid. Its rules come from the
+// real analyzers, so the budget test measures the block the builder actually sends.
+const CLIP_W = 160;
+const CLIP_H = 90;
+const CLIP_HUES = [
+  [230, 40, 60],
+  [30, 120, 230],
+  [250, 200, 30],
+  [40, 200, 120],
+  [180, 60, 220],
+  [250, 120, 20],
+  [20, 210, 230],
+];
+
+function clipFrame(shot: number, k: number, time: number): StyleFrame {
+  const data = new Uint8Array(CLIP_W * CLIP_H * 3);
+  const [r, g, b] = CLIP_HUES[shot % CLIP_HUES.length];
+  const ground = shot % 2 === 0 ? [r * 0.12, g * 0.12, b * 0.12] : [235 - r * 0.1, 235 - g * 0.1, 235 - b * 0.1];
+  const cell = shot % 9;
+  const left = (cell % 3) * (CLIP_W / 3) + 4 * k;
+  const top = Math.floor(cell / 3) * (CLIP_H / 3);
+
+  for (let y = 0; y < CLIP_H; y++) {
+    for (let x = 0; x < CLIP_W; x++) {
+      const inBlock = x >= left && x < left + CLIP_W / 3 - 8 && y >= top && y < top + CLIP_H / 3;
+      const color = inBlock ? [r, g, b] : ground;
+      const grain = ((x * 7 + y * 13 + k * 5) % 9) - 4;
+      const i = (y * CLIP_W + x) * 3;
+
+      for (let c = 0; c < 3; c++) data[i + c] = Math.max(0, Math.min(255, color[c] + grain));
+    }
+  }
+
+  return { data, width: CLIP_W, height: CLIP_H, time };
+}
+
+function clipReferenceRules(): { format: string; rules: string } {
+  const frames = Array.from({ length: 120 }, (_, f) => clipFrame(Math.floor(f / 3), f % 3, f * 0.25));
+  const format = structurePromptRules(analyzeStructure({ frames, duration: 30 }));
+
+  return { format, rules: `${styleGuidePromptRules(analyzeStyle({ frames, duration: 30 }))}\n\n${format}` };
+}
+
 describe('reference style guide', () => {
   const rules = 'Set global.theme to exactly: {"extends":"leclap","colors":{"bg":"#101830"}}\nAvoid:\n- Film grain';
 
@@ -250,6 +298,29 @@ describe('reference style guide', () => {
     expect(built.system).toContain('never reproduce its subjects, logos or text');
     expect(built.system.length).toBeLessThanOrEqual(DEFAULT_PROMPT_BUDGET);
   });
+
+  it('heads the block as carrying a clip’s format too, not the palette alone', () => {
+    expect(REFERENCE_STYLE_HEADING).toContain('format');
+    expect(REFERENCE_STYLE_HEADING).not.toContain('only');
+  });
+
+  it('fits a real reference clip’s style and format (more than 24 shots) under the budget', () => {
+    const { format, rules: clipRules } = clipReferenceRules();
+    const built = promptFor(
+      '30s product launch for a note-taking app, bold, punchy kinetic type',
+      { orientation: 'portrait', genre: 'product-launch' },
+      [],
+      clipRules
+    );
+
+    expect(format).toMatch(/and \d+ more shots in the same rhythm/);
+    expect(clipRules).toContain('Set global.theme to exactly:');
+    expect(clipRules).toContain('Avoid:');
+    expect(built.system).toContain(format);
+    expect(built.system.length).toBeLessThanOrEqual(DEFAULT_PROMPT_BUDGET);
+    expect(built.sampleIds).toContain('product-launch');
+    expect(built.schemaTruncated).toBe(false);
+  }, 60_000);
 
   it('carries the reference rules into the planning prompt', () => {
     const { catalog } = generationContext();

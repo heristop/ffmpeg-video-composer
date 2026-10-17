@@ -365,6 +365,8 @@ export * from './core/platforms';
 export * from './core/theme';
 // Reference-style analysis (pure) and its Node frame decoder: palette, texture and pacing as a theme.
 export * from './core/style';
+// Reference-structure analysis (pure): a clip's shots, rhythm and layout as binding prompt rules.
+export * from './core/structure';
 export {
   analyzeStyleFile,
   extractStyleFrames,
@@ -375,6 +377,7 @@ export {
   type StyleFrames,
   type StyleFramesOptions,
 } from './services/style-frames-node';
+export { analyzeStructureFile } from './services/structure-node';
 export {
   motionTimeline,
   type MotionBox,

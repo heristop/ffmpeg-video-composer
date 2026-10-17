@@ -24,6 +24,7 @@ video models, which sample rather than render.
 | `edit_template`        | JSON Patch `operations` and/or registered `effectProps` by section name over inline JSON, under `expectedRevision`, all-or-nothing → `{ template, revision, changedPaths, changedSections? }`                                                                                                                      |
 | `probe_media`          | Inspect a local media file → codecs, duration, sample rate, size, and HDR / colour / bit depth / VFR / rotation traits                                                                                                                                                                                             |
 | `extract_style`        | Reference image/clip under the media dir → `{ theme, styleGuide, confidence }`: palette roles + WCAG contrast, grain, pacing (palette and pacing only)                                                                                                                                                             |
+| `extract_structure`    | A reference clip's format (shots, rhythm, transitions, grounds, layout) as binding rules for a template. Format only; samples every 0.25 s for up to 2 minutes.                                                                                                                                                    |
 | `analyze_music`        | Measure a local music file → `{ bpm, offset, beatsPerBar, confidence, usable, cues, globalBeats }` for `global.beats` and `cue:drop`                                                                                                                                                                               |
 | `analyze_sound`        | Render an `sfx[].sound` (composed, or a preset with variations) → length, peak/RMS dBFS, centroid, high/low energy shares, attack, advisories + spectrogram and waveform PNGs                                                                                                                                      |
 | `transcribe_media`     | Transcribe a local audio/video file's speech with whisper.cpp, locally → `{ words, srt, language, confidence, advice }` to pin into `subtitles.words`                                                                                                                                                              |
@@ -212,9 +213,9 @@ template assets under the media dir (or PNG/JPEG data URIs); remote URLs and abs
 `html_too_large`. `get_template_schema` explains the input, and `get_motion_catalog` lists the CSS subset
 and four layout recipes under `html`.
 
-Fourteen tools are always registered: `get_samples`, `get_template_schema`, `get_motion_catalog`,
+Fifteen tools are always registered: `get_samples`, `get_template_schema`, `get_motion_catalog`,
 `validate_template`, `edit_template`, `compose_video`, `render_frames`, `probe_media`, `extract_style`,
-`analyze_music`, `analyze_sound`, `transcribe_media`, `get_capabilities` and `open_in_builder`. Opt-in adds
+`extract_structure`, `analyze_music`, `analyze_sound`, `transcribe_media`, `get_capabilities` and `open_in_builder`. Opt-in adds
 `get_effect_schema`, `render_preview` and `render_remotion_clip`. Effect-prop edits do not bypass
 effect-backend validation. Every tool's name and description is sent to the agent on each turn, so the
 surface stays small: 0.5.0 folded `patch_template` into `edit_template`, `list_samples` and `get_sample`

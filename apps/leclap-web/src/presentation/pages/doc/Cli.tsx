@@ -137,6 +137,10 @@ export const DocCli = () => (
         />
         <CommandPill command="leclap style <reference>" label="derive a theme and style guide from an image or clip" />
         <CommandPill
+          command="leclap reference <clip>"
+          label="read a clip's format — shots, rhythm, transitions, layout — as binding rules (--check a template)"
+        />
+        <CommandPill
           command="leclap beats <audio>"
           label="measure a track's tempo, beat grid and drop for global.beats"
         />

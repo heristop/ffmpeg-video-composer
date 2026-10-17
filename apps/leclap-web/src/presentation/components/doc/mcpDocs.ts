@@ -134,6 +134,13 @@ export const mcpDoc: McpDoc = {
       when: 'Use to match a reference look. Palette and pacing only: subjects, logos and text are never copied. The path must resolve inside the media dir.',
     },
     {
+      name: 'extract_structure',
+      args: 'path',
+      purpose:
+        "Reads a reference clip's format: its shots with lengths, the transition into each, light or dark ground, where the main element sits on a 3x3 grid and motion, plus the rhythm, as binding rules.",
+      when: 'Use to remake a reference video format: build one section per listed shot, in order, and take the palette from extract_style. Samples every 0.25 s for up to 2 minutes. The path must resolve inside the media dir.',
+    },
+    {
       name: 'analyze_music',
       args: 'path, beatsPerBar?, includeTimes?',
       purpose:

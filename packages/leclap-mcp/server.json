@@ -131,6 +131,10 @@
             "description": "Derive a global.theme and a style guide from a reference image or clip: palette roles with WCAG contrast, texture, pacing and motion energy."
           },
           {
+            "name": "extract_structure",
+            "description": "Read a reference clip's format: shots, transitions, grounds, layout and rhythm as binding rules for a template."
+          },
+          {
             "name": "analyze_music",
             "description": "Measure a local music file: tempo, beat grid, confidence and drop/build/end cues for global.beats."
           },
@@ -168,7 +172,7 @@
           }
         ],
         "prompts": ["compose-video"],
-        "notes": "Fourteen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, editing and rendering; callers cannot select executable source through effect JSON. edit_template, including its effect-prop edits, remains registered when Remotion is disabled."
+        "notes": "Fifteen tools are always registered. get_effect_schema, render_preview and render_remotion_clip require the Remotion opt-in. Registered JSON effects use operator-configured trusted source and require a configured backend for validation, editing and rendering; callers cannot select executable source through effect JSON. edit_template, including its effect-prop edits, remains registered when Remotion is disabled."
       }
     }
   }

@@ -1337,6 +1337,7 @@
     "analyse": "Referenz analysieren",
     "analysing": "Palette, Textur und Tempo werden gelesen…",
     "error": "Diese Referenz konnte nicht analysiert werden: {{message}}",
+    "structure": "Format: {{shots}} Einstellungen, im Schnitt {{avgShot}} s – die KI folgt ihm",
     "roles": {
       "bg": "Hintergrund",
       "fg": "Text",
