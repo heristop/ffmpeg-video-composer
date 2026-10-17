@@ -61,4 +61,34 @@ describe('shape graphic: track validation', () => {
       ],
     ]);
   });
+
+  it('reports a bad time string at the shape track axis', () => {
+    expect(findings({ animate: { x: [{ v: 0 }, { t: 'soon', v: 1 }] } })).toEqual([
+      [
+        'invalid_keyframes',
+        'sections[0].graphics[0].animate.x',
+        'time "soon" is not seconds, "+seconds", a duration token or a time reference',
+      ],
+    ]);
+  });
+
+  it('still refuses animate on a filter that is neither a shape nor drawtext', () => {
+    const descriptor = {
+      global: { orientation: 'landscape', musicEnabled: false },
+      sections: [
+        {
+          name: 's',
+          type: 'color_background',
+          options: { backgroundColor: '#000000', duration: 3 },
+          filters: [{ type: 'scale', animate: { x: [{ v: 0 }, { t: 1, v: 1 }] } }],
+        },
+      ],
+    } as unknown as TemplateDescriptor;
+    const errors = new TemplateValidator().validateTemplate(descriptor).errors ?? [];
+
+    expect(errors.map((e) => [e.path, e.message])).toContainEqual([
+      'sections[0].filters[0].animate',
+      'animate tracks apply to drawtext filters',
+    ]);
+  });
 });
