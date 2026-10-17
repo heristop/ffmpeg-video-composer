@@ -1,0 +1,31 @@
+{
+  "label": "Shape: star pops in on a spring and turns upright, ink outline",
+  "kind": "graphic",
+  "window": { "at": 0.3, "duration": 0.9 },
+  "section": {
+    "graphics": [
+      {
+        "type": "shape",
+        "at": "{{at}}",
+        "target": "{{target}}",
+        "preset": { "type": "star", "points": 5, "inner": 0.45 },
+        "x": 0.3,
+        "y": 0.15,
+        "width": 0.4,
+        "height": 0.7,
+        "color": "#FFF685",
+        "stroke": { "color": "#141416", "width": 6 },
+        "animate": {
+          "scale": [
+            { "t": "{{at}}", "v": 0 },
+            { "t": "{{end}}", "v": 1, "ease": "spring(300, 14)" }
+          ],
+          "rotate": [
+            { "t": "{{at}}", "v": -30 },
+            { "t": "{{end}}", "v": 0, "ease": "$expo" }
+          ]
+        }
+      }
+    ]
+  }
+}

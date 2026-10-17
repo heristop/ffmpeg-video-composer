@@ -1,0 +1,35 @@
+{
+  "label": "Shape: seeded blob, radial gradient, squash and settle from the bottom",
+  "kind": "graphic",
+  "window": { "at": 0.3, "duration": 1.2 },
+  "section": {
+    "graphics": [
+      {
+        "type": "shape",
+        "at": "{{at}}",
+        "target": "{{target}}",
+        "preset": { "type": "blob", "lobes": 7, "wobble": 0.3, "seed": 11 },
+        "x": 0.25,
+        "y": 0.1,
+        "width": 0.5,
+        "height": 0.8,
+        "gradient": { "from": "#9298FB", "to": "#F96F99@0.85", "shape": "radial" },
+        "origin": "bottom",
+        "animate": {
+          "opacity": [
+            { "t": "{{at}}", "v": 0 },
+            { "t": 0.5, "v": 1 }
+          ],
+          "scaleX": [
+            { "t": "{{at}}", "v": 1.25 },
+            { "t": "{{end}}", "v": 1, "ease": "spring(300, 14)" }
+          ],
+          "scaleY": [
+            { "t": "{{at}}", "v": 0.7 },
+            { "t": "{{end}}", "v": 1, "ease": "spring(300, 14)" }
+          ]
+        }
+      }
+    ]
+  }
+}
