@@ -23,6 +23,8 @@ function stripFilterUnsafe(value: string): string {
 // Extended filter values allowing runtime keys not captured in the core type.
 type ExtendedFilterValues = FilterValues & Record<string, string | number | undefined>;
 
+const SPEED_FORM = /^(?:[\d.]+\s*\*\s*)?PTS$/i;
+
 @injectable()
 class FormatterManager {
   constructor(
@@ -39,7 +41,7 @@ class FormatterManager {
 
     switch (filter.type) {
       case 'setpts':
-        result = this.formatVideoSpeed();
+        result = this.formatSetpts(filter.value);
         break;
 
       case 'atempo': {
@@ -67,6 +69,16 @@ class FormatterManager {
 
     return result;
   };
+
+  // `PTS` and `<n>*PTS` are the speed form: the section speed is the single source of that multiplier.
+  // Any other expression (a time shift, a frame-index restamp) is the author's and passes through.
+  private formatSetpts(value: Filter['value']): string {
+    const expression = stripFilterUnsafe(String(value ?? '')).trim();
+
+    if (expression && !SPEED_FORM.test(expression)) return `setpts=${expression}`;
+
+    return this.formatVideoSpeed();
+  }
 
   private formatVideoSpeed(): string {
     // Speed < 1 accelerates video; the descriptor speed is a PTS multiplier.

@@ -126,6 +126,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A `setpts` filter with an explicit expression (the fx time shift `PTS+<at>/TB` of the sheen, leak, bloom and goo
+  effects, the first-frame hold of the ambient ones) is no longer rewritten to the section speed. Only `PTS` and
+  `<n>*PTS` still take `options.speed`; the shift was silently lost and those effects ran from section start.
+
 - Browser entry: validating a template with a `global` block overflowed the stack. The build rewrote every
   `global` in the code to `globalThis`, locals and object keys included, so resolving a theme walked
   `globalThis`; only the free identifier is rewritten now. Error messages no longer read `globalThis.beats`.
