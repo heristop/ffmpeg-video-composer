@@ -13,6 +13,7 @@
 // at 25 fps), so it steps on every output frame.
 
 import type { OverlayFit, OverlayFlip, Reveal } from '@/core/types';
+import { assertFiniteNumber } from '@/core/arg-guard';
 import { fmt } from '@/core/motion/hermite';
 import { trackExpr } from '@/core/motion/tracks';
 import type { LayerAnimate, LayerOrigin } from '../../schemas/layer-animate.schemas';
@@ -86,7 +87,7 @@ function scaleOf(animate: LayerAnimate): Transform['scale'] {
 // The rotate track from options.rotation; a static rotation joins the turn when the layer also scales, so
 // its box stays known.
 function turnOf(options: LayerKeyframeOptions, scaled: boolean): Transform['turn'] {
-  const rotation = options.rotation ?? 0;
+  const rotation = assertFiniteNumber(options.rotation ?? 0, 'layer rotation');
 
   if (options.animate?.rotate) return trackExpr(options.animate.rotate, rotation);
 

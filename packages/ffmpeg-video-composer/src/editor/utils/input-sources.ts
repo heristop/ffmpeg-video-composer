@@ -24,12 +24,16 @@ type LoopOptions = { loop?: boolean; loops?: number; duration?: number; start?: 
  *   - none: play once (no flag).
  */
 export function buildLoopFlags(options: LoopOptions, maxDuration?: number): string {
-  const offset = options.start && options.start > 0 ? `-itsoffset ${options.start} ` : '';
+  const start = options.start === undefined ? undefined : assertFiniteNumber(options.start, 'overlay start');
+  const offset = start && start > 0 ? `-itsoffset ${start} ` : '';
 
-  if (options.duration !== undefined) return `-stream_loop -1 ${offset}-t ${options.duration} `;
+  if (options.duration !== undefined) {
+    return `-stream_loop -1 ${offset}-t ${assertFiniteNumber(options.duration, 'overlay duration')} `;
+  }
 
   if (options.loops !== undefined) {
-    const repeat = options.loops > 1 ? `-stream_loop ${options.loops - 1} ` : '';
+    const loops = assertFiniteNumber(options.loops, 'overlay loops');
+    const repeat = loops > 1 ? `-stream_loop ${loops - 1} ` : '';
     const ceiling = maxDuration === undefined ? '' : `-t ${maxDuration} `;
 
     return `${repeat}${offset}${ceiling}`;

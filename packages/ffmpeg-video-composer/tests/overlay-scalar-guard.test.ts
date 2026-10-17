@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildAnimationLegFilters, imageOverlayEnable } from '@/editor/utils/input-sources';
+import { buildAnimationLegFilters, buildLoopFlags, imageOverlayEnable } from '@/editor/utils/input-sources';
+import { layerKeyframes } from '@/editor/presets/layer-keyframes';
 import { trackExpr } from '@/core/motion/tracks';
 
 // Library callers that skip validation can hand the lowering any JSON value where the schema wants a
@@ -42,5 +43,21 @@ describe('layer keyframe values', () => {
 
   it('keeps relative and absolute values', () => {
     expect(trackExpr([{ v: '+80' }, { t: 1, v: 10 }] as never, 'W/2')).toContain('(W/2)+80');
+  });
+});
+
+describe('skipValidation callers', () => {
+  it.each([{ start: HOSTILE }, { duration: HOSTILE }, { loops: HOSTILE }])('refuses loop flags %o', (options) => {
+    expect(() => buildLoopFlags(options as never)).toThrow(/start|duration|loops/);
+  });
+
+  it('keeps numeric loop flags', () => {
+    expect(buildLoopFlags({ duration: 3, start: 1 })).toBe('-stream_loop -1 -itsoffset 1 -t 3 ');
+  });
+
+  it('refuses a keyframe rotation that is not a number', () => {
+    expect(() =>
+      layerKeyframes({ rotation: HOSTILE, animate: { rotate: [{ v: 0 }, { t: 1, v: 5 }] } } as never, 30)
+    ).toThrow(/rotation/);
   });
 });
