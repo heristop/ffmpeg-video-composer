@@ -43,6 +43,8 @@ export interface RerenderInput {
   buildDir: string;
   assetsDir: string;
   inputs: Record<string, string>;
+  /** `--allow-raw-filters`: trust the recorded template's raw filters (trusted manifests only). */
+  allowRawFilters?: boolean;
 }
 
 // The recorded config (locale, fields, codec, scale…) with this machine's directories and clips. The
@@ -62,6 +64,7 @@ export function rerenderConfig(input: RerenderInput): ProjectConfig {
     ...(recorded.videoCodec && { codecConfig: { videoCodec: recorded.videoCodec } }),
     userVideoPaths: Object.keys(input.inputs).length > 0 ? input.inputs : undefined,
     deterministic: input.manifest.deterministic,
+    ...(input.allowRawFilters ? { allowRawFilters: true } : {}),
   };
 }
 
@@ -110,6 +113,11 @@ export const verify = defineCommand({
     assets: { type: 'string', description: 'Assets directory for --rerender (default ./assets)' },
     build: { type: 'string', description: 'Build directory for --rerender (default ./build/verify)' },
     json: { type: 'boolean', description: 'Emit a machine-readable JSON result', default: false },
+    allowRawFilters: {
+      type: 'boolean',
+      description: 'With --rerender: trust the template raw filters (trusted manifests only)',
+      default: false,
+    },
   },
   async run({ args, rawArgs }) {
     setEngineLogLevel('silent');
@@ -126,6 +134,7 @@ export const verify = defineCommand({
           buildDir: path.resolve(args.build ?? 'build/verify'),
           assetsDir: path.resolve(args.assets ?? 'assets'),
           inputs: parseKeyValues(collectRepeated(rawArgs, 'input'), 'input'),
+          allowRawFilters: args.allowRawFilters,
         });
         checks.push(...compareRenders(manifest, fresh));
         diff = firstGraphDifference(manifest, fresh);

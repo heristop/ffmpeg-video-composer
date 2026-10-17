@@ -49,12 +49,12 @@ describe('CLI bundle (dist/index.js)', () => {
     expect(code).toBe(0);
   }, 90_000);
 
-  // An unknown filter type is schema-valid (filter types reach FFmpeg verbatim), so the failure happens
-  // while the engine renders the segment — the case that used to come back as a bare
-  // "Compilation failed to produce output".
+  // An unknown filter type trusted with --allow-raw-filters reaches FFmpeg, so the failure happens while
+  // the engine renders the segment — the case that used to come back as a bare
+  // "Compilation failed to produce output". (Without the flag it is refused as filter_not_allowed.)
   it('reports why the engine failed in the --json error', async () => {
     const fixture = path.join(here, 'fixtures/unknown-filter.json');
-    const { code, stdout } = await runCli(['render', fixture, '--json']);
+    const { code, stdout } = await runCli(['render', fixture, '--json', '--allow-raw-filters']);
     const result = JSON.parse(stdout) as { ok: boolean; error: string };
 
     expect(result.ok).toBe(false);

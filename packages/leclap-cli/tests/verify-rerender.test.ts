@@ -24,3 +24,23 @@ describe('verify --rerender config', () => {
     expect(config.skipValidation).not.toBe(true);
   });
 });
+
+describe('verify --rerender --allow-raw-filters', () => {
+  it('keeps the authored-filter allow-list by default', () => {
+    expect(
+      rerenderConfig({ manifest, buildDir: '/tmp/b', assetsDir: '/tmp/a', inputs: {} }).allowRawFilters
+    ).toBeFalsy();
+  });
+
+  it('trusts the recorded template raw filters only when asked', () => {
+    const config = rerenderConfig({
+      manifest,
+      buildDir: '/tmp/b',
+      assetsDir: '/tmp/a',
+      inputs: {},
+      allowRawFilters: true,
+    });
+
+    expect(config.allowRawFilters).toBe(true);
+  });
+});

@@ -30,6 +30,8 @@ export interface RenderFlags {
   cache?: string;
   /** Repeatable `--fonts <dir>`: directories `global.fonts[].src` may resolve in, after the template's own. */
   fonts?: string[];
+  /** `--allow-raw-filters`: trust the template's raw filters instead of the engine's allow-list. */
+  allowRawFilters?: boolean;
 }
 
 /**
@@ -106,6 +108,7 @@ export function buildProjectConfig(
     buildDir,
     assetsDir,
     fields: { ...parseKeyValues(flags.field, 'field'), ...parseKeyValues(flags.set, 'set') },
+    ...(flags.allowRawFilters ? { allowRawFilters: true } : {}),
   };
   const fontDirs = fontDirsFor(cwd, templatePath, flags.fonts);
 

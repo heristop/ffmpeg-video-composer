@@ -107,11 +107,7 @@ export const render = defineCommand({
     quiet: { type: 'boolean', alias: 'q', description: 'Print only the final result', default: false },
     json: { type: 'boolean', description: 'Emit a machine-readable JSON result', default: false },
     verbose: { type: 'boolean', description: 'Stream the underlying engine logs', default: false },
-    manifest: {
-      type: 'boolean',
-      description: 'Write <output>.manifest.json (digests for leclap verify)',
-      default: false,
-    },
+    manifest: { type: 'boolean', description: 'Write <output>.manifest.json (digests for verify)', default: false },
     deterministic: {
       type: 'boolean',
       description: 'Bit-exact muxing + pinned encoder threads (--no-deterministic to disable)',
@@ -120,6 +116,7 @@ export const render = defineCommand({
     qc: { type: 'boolean', description: 'Check the output (format + content); exit 1 on a failure', default: false },
     cache: { type: 'string', description: 'Per-section render cache directory' },
     downloadModel: { type: 'boolean', description: 'Allow the one-time whisper model download', default: false },
+    allowRawFilters: { type: 'boolean', description: 'Trust raw filters (trusted templates only)', default: false },
   },
   async run({ args, rawArgs }) {
     const json = args.json;
@@ -149,6 +146,7 @@ export const render = defineCommand({
       qc: args.qc,
       cache: args.cache,
       fonts: repeatedFlag(rawArgs, args.fonts, 'fonts'),
+      allowRawFilters: args.allowRawFilters,
     };
 
     const mode = { quiet, json, verbose, watch: args.watch, output: args.output, manifest: args.manifest };
