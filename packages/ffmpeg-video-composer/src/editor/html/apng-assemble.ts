@@ -18,6 +18,8 @@ interface PngChunk {
 }
 
 const MAX_TICKS = 0xffff;
+const IHDR_LENGTH = 13;
+const PALETTE_COLOUR_TYPE = 3;
 const CHUNK_OVERHEAD = 12; // length, type and checksum around the data
 
 function readUint32(bytes: Uint8Array, at: number): number {
@@ -64,6 +66,14 @@ function header(chunks: PngChunk[], index: number): Uint8Array {
   const ihdr = chunks.find((c) => c.type === 'IHDR');
 
   if (!ihdr) throw new Error(`frame ${index} has no IHDR`);
+
+  if (ihdr.data.length < IHDR_LENGTH) throw new Error(`frame ${index} has a short IHDR (${ihdr.data.length} bytes)`);
+
+  if (ihdr.data[9] === PALETTE_COLOUR_TYPE) throw new Error(`frame ${index} is a palette PNG`);
+
+  if (chunks.some((c) => c.type === 'tRNS')) throw new Error(`frame ${index} carries a tRNS chunk`);
+
+  if (!chunks.some((c) => c.type === 'IDAT')) throw new Error(`frame ${index} has no image data`);
 
   return ihdr.data;
 }

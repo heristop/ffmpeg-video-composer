@@ -95,6 +95,27 @@ describe('assembleApng', () => {
     expect(() => assembleApng([{ png: RED, ticks: 70_000 }], 30)).toThrow(/ticks/);
   });
 
+  it('refuses PNGs it cannot join: palette, tRNS, a short IHDR and a frame with no image data', () => {
+    const rebuilt = (
+      edit: (chunks: Array<{ type: string; data: Uint8Array }>) => Array<{ type: string; data: Uint8Array }>
+    ) => concat([PNG_SIGNATURE, ...edit(readPngChunks(RED)).map((c) => chunk(c.type, c.data))]);
+    const palette = rebuilt((all) =>
+      all.map((c) =>
+        c.type === 'IHDR' ? { type: c.type, data: Uint8Array.from(c.data, (b, i) => (i === 9 ? 3 : b)) } : c
+      )
+    );
+    const transparent = rebuilt((all) => [all[0], { type: 'tRNS', data: new Uint8Array([0]) }, ...all.slice(1)]);
+    const shortHeader = rebuilt((all) =>
+      all.map((c) => (c.type === 'IHDR' ? { type: c.type, data: c.data.subarray(0, 5) } : c))
+    );
+    const noData = rebuilt((all) => all.filter((c) => c.type !== 'IDAT'));
+
+    expect(() => assembleApng([{ png: palette, ticks: 1 }], 30)).toThrow(/palette/);
+    expect(() => assembleApng([{ png: transparent, ticks: 1 }], 30)).toThrow(/tRNS/);
+    expect(() => assembleApng([{ png: shortHeader, ticks: 1 }], 30)).toThrow(/IHDR/);
+    expect(() => assembleApng([{ png: noData, ticks: 1 }], 30)).toThrow(/no image data/);
+  });
+
   it('throws on truncated or non-PNG bytes instead of reading past the end', () => {
     expect(() => readPngChunks(RED.subarray(0, RED.length - 20))).toThrow(/truncated/);
     expect(() => readPngChunks(RED.subarray(0, 20))).toThrow(/truncated/);
