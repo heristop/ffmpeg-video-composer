@@ -1657,7 +1657,7 @@
             "properties": {
               "name": {
                 "type": "string",
-                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
+                "pattern": "^(?!.*\\.\\.)(?=.*[A-Za-z0-9])[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
@@ -4708,7 +4708,7 @@
             "properties": {
               "name": {
                 "type": "string",
-                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
+                "pattern": "^(?!.*\\.\\.)(?=.*[A-Za-z0-9])[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
@@ -7801,7 +7801,7 @@
             "properties": {
               "name": {
                 "type": "string",
-                "minLength": 1,
+                "pattern": "^(?!.*\\.\\.)(?=.*[A-Za-z0-9])[A-Za-z0-9_.-]+$",
                 "description": "Unique, nonempty section name used to bind the rendered effect clip."
               },
               "inputs": {
@@ -10619,7 +10619,7 @@
             "properties": {
               "name": {
                 "type": "string",
-                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
+                "pattern": "^(?!.*\\.\\.)(?=.*[A-Za-z0-9])[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
@@ -13417,7 +13417,7 @@
             "properties": {
               "name": {
                 "type": "string",
-                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
+                "pattern": "^(?!.*\\.\\.)(?=.*[A-Za-z0-9])[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
@@ -16701,7 +16701,7 @@
             "properties": {
               "name": {
                 "type": "string",
-                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
+                "pattern": "^(?!.*\\.\\.)(?=.*[A-Za-z0-9])[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
@@ -19499,7 +19499,7 @@
             "properties": {
               "name": {
                 "type": "string",
-                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
+                "pattern": "^(?!.*\\.\\.)(?=.*[A-Za-z0-9])[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
