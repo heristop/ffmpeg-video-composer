@@ -13,7 +13,7 @@
 
 import { fnv1a32 } from '@/core/determinism/hash';
 import { encodePng, type PngImage } from './png-encode';
-import { flatten, traceOf, type Pt } from './path-geometry';
+import { flatten, flattenWithin, traceOf, type Pt } from './path-geometry';
 import { decodeCommands } from './path-svg';
 
 export interface TraceSpec {
@@ -38,6 +38,12 @@ export interface TraceSpec {
 
 const SCHEME = 'trace:';
 const MAX_DIMENSION = 4096;
+/** The thickest line the path graphic's schema allows (px). */
+const MAX_THICKNESS = 80;
+/** Flattened points a `trace:` path may hold. */
+const MAX_TRACE_POINTS = 20_000;
+/** Pixel visits the painting of a spec may cost (the sum over its segments of the band each paints). */
+const MAX_TRACE_WORK = 20_000_000;
 
 /** The code a position along the path (fraction 0..1) is stored as. */
 export function codeOf(fraction: number): number {
@@ -92,6 +98,22 @@ function segmentsOf(subpaths: Pt[][], cum: number[][]): Segment[] {
   });
 }
 
+// The pixel columns of row `py` within reach of the segment: its bounding box, cut to the strip around the
+// infinite line (the whole bbox row when horizontal), so the cost follows the length times the thickness.
+function columnsOf(seg: Segment, spec: TraceSpec, py: number): [number, number] {
+  const [dx, dy] = [seg.b.x - seg.a.x, seg.b.y - seg.a.y];
+  const len = Math.hypot(dx, dy);
+  const reach = spec.thickness / 2 + 1.5;
+  const [bx0, bx1] = [Math.min(seg.a.x, seg.b.x) - reach - spec.x, Math.max(seg.a.x, seg.b.x) + reach - spec.x];
+  const [cy, ax] = [spec.y + py + 0.5 - seg.a.y, seg.a.x - spec.x];
+  const [lo, hi] =
+    Math.abs(dy) < 1e-9
+      ? [bx0, bx1]
+      : [(cy * dx - reach * len) / dy + ax, (cy * dx + reach * len) / dy + ax].sort((m, n) => m - n);
+
+  return [Math.max(0, Math.floor(Math.max(bx0, lo))), Math.min(spec.w - 1, Math.ceil(Math.min(bx1, hi)))];
+}
+
 // Every pixel near one straight piece of the path: keeps it when it is the nearest piece so far (ties go
 // to the earlier arc length), with its arc length and, at an open end, how far past the end it lies.
 function paintSegment(out: Field, seg: Segment, spec: TraceSpec): void {
@@ -101,14 +123,15 @@ function paintSegment(out: Field, seg: Segment, spec: TraceSpec): void {
 
   if (len < 1e-12) return;
 
-  const x0 = Math.max(0, Math.floor(Math.min(seg.a.x, seg.b.x) - reach - spec.x));
-  const x1 = Math.min(spec.w - 1, Math.ceil(Math.max(seg.a.x, seg.b.x) + reach - spec.x));
   const y0 = Math.max(0, Math.floor(Math.min(seg.a.y, seg.b.y) - reach - spec.y));
   const y1 = Math.min(spec.h - 1, Math.ceil(Math.max(seg.a.y, seg.b.y) + reach - spec.y));
 
   for (let py = y0; py <= y1; py++) {
+    const [x0, x1] = columnsOf(seg, spec, py);
+    const cy = spec.y + py + 0.5 - seg.a.y;
+
     for (let px = x0; px <= x1; px++) {
-      const [cx, cy] = [spec.x + px + 0.5 - seg.a.x, spec.y + py + 0.5 - seg.a.y];
+      const cx = spec.x + px + 0.5 - seg.a.x;
       const along = (cx * dx + cy * dy) / len;
       const u = Math.min(len, Math.max(0, along));
       const d = Math.hypot(cx - (dx * u) / len, cy - (dy * u) / len);
@@ -282,7 +305,14 @@ function coreOf(pairs: Map<string, string>): Omit<TraceSpec, 'dash' | 'color' | 
   const kinds = kindsOf(pairs);
   const path = pairs.get('d') ?? '';
   const [x, y, w, h, thickness] = ['x', 'y', 'w', 'h', 't'].map((key) => finite(pairs.get(key)));
-  const placed = x !== null && y !== null && sized(w) && sized(h) && thickness !== null && thickness > 0;
+  const placed =
+    x !== null &&
+    y !== null &&
+    sized(w) &&
+    sized(h) &&
+    thickness !== null &&
+    thickness > 0 &&
+    thickness <= MAX_THICKNESS;
 
   if (!kinds || !placed || decodeCommands(path) === null) return null;
 
@@ -310,6 +340,30 @@ function extrasOf(pairs: Map<string, string>): Pick<TraceSpec, 'dash' | 'color' 
   };
 }
 
+// Pixels a segment's band touches, upper bound (used to refuse a path before painting it).
+function segmentWork(a: Pt, b: Pt, spec: TraceSpec): number {
+  const reach = spec.thickness / 2 + 1.5;
+
+  return Math.min((Math.hypot(b.x - a.x, b.y - a.y) + 2 * reach) * 2 * reach, spec.w * spec.h);
+}
+
+// Whether the path is finite, within the point limit and cheap enough to paint (a NaN total fails closed).
+function affordable(spec: TraceSpec): boolean {
+  const commands = decodeCommands(spec.path);
+  const lines = commands && flattenWithin(commands, MAX_TRACE_POINTS);
+
+  if (!lines || !lines.every((points) => points.every((p) => Number.isFinite(p.x) && Number.isFinite(p.y)))) {
+    return false;
+  }
+
+  const work = lines.reduce(
+    (sum, points) => points.slice(1).reduce((n, b, j) => n + segmentWork(points[j], b, spec), sum),
+    0
+  );
+
+  return work <= MAX_TRACE_WORK;
+}
+
 /** Parses a `trace:` URL back to its spec; null for any other string or an invalid / oversized spec. */
 export function parseTraceUrl(url: string): TraceSpec | null {
   if (!url.startsWith(SCHEME)) return null;
@@ -322,7 +376,9 @@ export function parseTraceUrl(url: string): TraceSpec | null {
 
   const { path, ...rest } = core;
 
-  return { ...rest, ...extras, path };
+  const spec: TraceSpec = { ...rest, ...extras, path };
+
+  return affordable(spec) ? spec : null;
 }
 
 /** A deterministic file name for a spec, e.g. `trace-cover-1a2b3c4d.png`. */
