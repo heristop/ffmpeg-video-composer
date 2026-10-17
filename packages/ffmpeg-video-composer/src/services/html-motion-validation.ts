@@ -31,24 +31,28 @@ function tracksInOrder(motion: ElementMotionMap): boolean {
   );
 }
 
-function overBudget(path: string, problem: string): ValidationError {
+function overBudget(path: string, name: string, problem: string): ValidationError {
   return {
     path: `${path}.motion`,
     code: 'html_motion_too_long',
-    message: `html layer motion is over budget: ${problem}`,
+    message: `html layer motion is over budget for input "${name}": ${problem}`,
     hint: BUDGET_HINT,
     kind: 'judgement',
   };
 }
 
-function tooManyTargets(path: string, count: number): ValidationError {
+function tooManyTargets(path: string, name: string, count: number): ValidationError {
   return {
     path: `${path}.html`,
     code: 'html_motion_too_many_targets',
-    message: `html layer motion: ${count} elements carry data-motion (limit ${HTML_MOTION_MAX_TARGETS})`,
+    message: `html layer motion: input "${name}" has ${count} elements carrying data-motion (limit ${HTML_MOTION_MAX_TARGETS})`,
     hint: 'Tag a wrapper per row or group and move it, rather than every element one by one.',
     kind: 'judgement',
   };
+}
+
+function inputName(input: { name?: unknown }): string {
+  return typeof input.name === 'string' ? input.name : '';
 }
 
 function side(value: unknown): number {
@@ -64,19 +68,21 @@ function layerErrors({ input, path }: HtmlInputUse, fps: number): ValidationErro
   const css = typeof input.css === 'string' ? input.css : '';
   const names = motionTargets(prepareHtmlLayer({ html, css, width: 1, height: 1 }, 'Rubik').element);
 
-  if (names.length > HTML_MOTION_MAX_TARGETS) return [tooManyTargets(path, names.length)];
+  if (names.length > HTML_MOTION_MAX_TARGETS) return [tooManyTargets(path, inputName(input), names.length)];
 
   const result = planMotionFrames(names, motion, fps);
 
   if (result.kind === 'too-long') {
-    return [overBudget(path, `an animated span of ${result.span} s (limit ${HTML_MOTION_MAX_SPAN} s)`)];
+    return [
+      overBudget(path, inputName(input), `an animated span of ${result.span} s (limit ${HTML_MOTION_MAX_SPAN} s)`),
+    ];
   }
 
   if (result.kind === 'none') return [];
 
   const problem = motionBudget(result.plan, side(input.width), side(input.height)).problem;
 
-  return problem ? [overBudget(path, problem)] : [];
+  return problem ? [overBudget(path, inputName(input), problem)] : [];
 }
 
 export function validateHtmlMotion(template: unknown): ValidationError[] {

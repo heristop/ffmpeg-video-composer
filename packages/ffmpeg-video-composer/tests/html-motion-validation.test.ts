@@ -80,7 +80,7 @@ describe('html element motion validation', () => {
       expect.objectContaining({
         code: 'html_motion_too_long',
         path: 'sections[0].inputs[0].motion',
-        message: 'html layer motion is over budget: 475 distinct frames (limit 240)',
+        message: 'html layer motion is over budget for input "list": 475 distinct frames (limit 240)',
       }),
     ]);
   });
@@ -102,7 +102,10 @@ describe('html element motion validation', () => {
     });
 
     expect(errors(descriptor).map((error) => [error.code, error.message])).toEqual([
-      ['html_motion_too_long', 'html layer motion is over budget: an animated span of 9.2 s (limit 8 s)'],
+      [
+        'html_motion_too_long',
+        'html layer motion is over budget for input "list": an animated span of 9.2 s (limit 8 s)',
+      ],
     ]);
   });
 
@@ -114,7 +117,7 @@ describe('html element motion validation', () => {
       [
         'html_motion_too_many_targets',
         'sections[0].inputs[0].html',
-        'html layer motion: 49 elements carry data-motion (limit 48)',
+        'html layer motion: input "list" has 49 elements carrying data-motion (limit 48)',
       ],
     ]);
   });
