@@ -1,4 +1,4 @@
-import { assertSafeArgToken, assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
+import { assertFiniteNumber, assertSafeArgToken, assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
 import type { RevealEasing } from '../presets/text';
 import { easedRamp, phaseDuration } from '../presets/eased-ramp';
 import type { BackgroundLayer } from '../../schemas/template.schemas';
@@ -192,8 +192,8 @@ export function buildAnimationLegFilters(options: {
   rotation?: number;
   opacity?: number;
 }): string[] {
-  const opacity = options.opacity ?? 1;
-  const rotation = options.rotation ?? 0;
+  const opacity = assertFiniteNumber(options.opacity ?? 1, 'overlay opacity');
+  const rotation = assertFiniteNumber(options.rotation ?? 0, 'overlay rotation');
   const legFilters: string[] = [];
 
   // The scale lands unquoted in the leg chain: two expression terms only (core/arg-guard.ts).
@@ -329,10 +329,12 @@ export function buildSingleFileImageSource(path: string): string {
  * `start`/`duration` values (already in the right timebase) differ.
  */
 export function imageOverlayEnable(options: { start?: number; duration?: number }): string {
-  const start = options.start ?? 0;
+  const start = assertFiniteNumber(options.start ?? 0, 'overlay start');
 
   if (options.duration !== undefined) {
-    return `:enable='between(t,${trimNum(start)},${trimNum(start + options.duration)})'`;
+    const end = start + assertFiniteNumber(options.duration, 'overlay duration');
+
+    return `:enable='between(t,${trimNum(start)},${trimNum(end)})'`;
   }
 
   if (start > 0) {
