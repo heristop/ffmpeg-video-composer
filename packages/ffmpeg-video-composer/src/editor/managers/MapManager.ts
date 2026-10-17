@@ -114,7 +114,7 @@ class MapManager {
     // Only build a background map when the section has filters to bake in; otherwise the animation
     // overlays straight onto the (normalized) video leg.
     if ((this.currentSection.filters?.length ?? 0) > 0) {
-      const backgroundPad = `${name}_bg`;
+      const backgroundPad = assertSafePadLabel(`${name}_bg`);
       this.addMap({
         inputs: [baseStream],
         filters: [],

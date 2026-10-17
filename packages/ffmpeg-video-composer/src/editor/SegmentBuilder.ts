@@ -11,7 +11,7 @@ import type VariableManager from '../editor/managers/VariableManager';
 import type MapManager from '../editor/managers/MapManager';
 import type FilterManager from '../editor/managers/FilterManager';
 import type FormattersManager from '../editor/managers/FormatterManager';
-import { assertSafeArgToken, assertSafeColorToken } from '@/core/arg-guard';
+import { assertSafeArgToken, assertSafeColorToken, assertSafeSegmentName } from '@/core/arg-guard';
 import { SectionError } from '@/core/errors/section-error';
 import {
   compileSugarLayers,
@@ -612,7 +612,8 @@ class SegmentBuilder {
     }
 
     const compiled = overlayFilters.map((filter) => this.filterManager.addFilter(filter)).join(',');
-    const outPad = `${this.section.name}_text`;
+    // The section name grammar is a pad-label subset: the label stays one `[label]`.
+    const outPad = `${assertSafeSegmentName(this.section.name)}_text`;
 
     this.segment.filtersMapList.push(`[${lastPad}]${compiled}[${outPad}]`);
     this.segment.mapsList.push(outPad);

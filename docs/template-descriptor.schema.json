@@ -1657,6 +1657,7 @@
             "properties": {
               "name": {
                 "type": "string",
+                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
@@ -4707,6 +4708,7 @@
             "properties": {
               "name": {
                 "type": "string",
+                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
@@ -10617,6 +10619,7 @@
             "properties": {
               "name": {
                 "type": "string",
+                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
@@ -13414,6 +13417,7 @@
             "properties": {
               "name": {
                 "type": "string",
+                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
@@ -16697,6 +16701,7 @@
             "properties": {
               "name": {
                 "type": "string",
+                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {
@@ -19494,6 +19499,7 @@
             "properties": {
               "name": {
                 "type": "string",
+                "pattern": "^(?!.*\\.\\.)[A-Za-z0-9_.-]+$",
                 "description": "Unique identifier for the section within the template, used in section references."
               },
               "inputs": {

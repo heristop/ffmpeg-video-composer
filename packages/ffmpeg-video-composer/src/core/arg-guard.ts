@@ -1,4 +1,5 @@
 import { expressionPattern } from '../schemas/filter-expression.schemas';
+import { SECTION_NAME } from '../schemas/section-name.schemas';
 
 // Guard for template-derived values that are interpolated UNQUOTED into the FFmpeg command string.
 // The command is built as a string and then space-split by `parseCommand` into an argv array for
@@ -40,14 +41,15 @@ export function assertSafeColorToken(value: string, field: string): string {
 }
 
 // A section name is interpolated into output/asset file paths (`<buildDir>/<name>_output.mp4`, the
-// concat list, staged segment files). Reject path separators, parent refs, and NUL so a malicious
-// template's section name can't traverse out of the build/assets directory — other characters are
-// fine since names are author-chosen identifiers. The Node `compile` entry schema-validates unless the
-// caller passes `skipValidation` (e.g. `leclap verify --rerender`), so this runtime guard is the boundary
-// on that path and the backstop on the others.
+// concat list, staged segment files) written unquoted into the command string, and into pad labels. The
+// schema grammar (schemas/section-name.schemas.ts) leaves out separators, `..`, whitespace, quotes and
+// filtergraph syntax, so a name can neither traverse out of the build dir, add an argument nor splice a
+// graph. The Node `compile` entry schema-validates unless the caller passes `skipValidation` (e.g.
+// `leclap verify --rerender`), so this runtime guard is the boundary on that path and the backstop on
+// the others.
 export function assertSafeSegmentName(name: string): string {
-  if (name.includes('/') || name.includes('\\') || name.includes('..') || name.includes(NUL)) {
-    throw new Error(`Unsafe section name "${name}": must not contain path separators, "..", or a NUL byte`);
+  if (!SECTION_NAME.test(name)) {
+    throw new Error(`Unsafe section name "${name}": use letters, digits, "_", "-" and "." only (no "..")`);
   }
 
   return name;
@@ -64,4 +66,14 @@ export function assertSafeExpression(value: string | number, field: string, part
   }
 
   return text;
+}
+
+// A number the schema guarantees, written into a filter as text: a caller that skipped validation could
+// hand any JSON value, so it is coerced and must be finite.
+export function assertFiniteNumber(value: unknown, field: string): number {
+  const number = typeof value === 'number' || typeof value === 'string' ? Number(value) : Number.NaN;
+
+  if (!Number.isFinite(number)) throw new Error(`Unsafe ${field}: ${JSON.stringify(value)} is not a number`);
+
+  return number;
 }

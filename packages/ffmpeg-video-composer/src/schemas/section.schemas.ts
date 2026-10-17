@@ -25,6 +25,7 @@ import { TemplateMetaSchema } from './template-meta.schemas';
 export { TemplateMetaSchema } from './template-meta.schemas';
 import { CutawaysSchema, FIT_OPTION_FIELDS, FOOTAGE_OPTION_FIELDS } from './footage.schemas';
 import { BeatDurationSchema } from './time.schemas';
+import { SECTION_NAME } from './section-name.schemas';
 
 export {
   CAPTION_STYLES,
@@ -135,7 +136,10 @@ export const BaseSectionOptionsSchema = z
 
 export const BaseSectionSchema = z
   .object({
-    name: z.string().describe('Unique identifier for the section within the template, used in section references.'),
+    name: z
+      .string()
+      .regex(SECTION_NAME, 'A section name is a file and pad name: letters, digits, "_", "-" and "." (no "..")')
+      .describe('Unique identifier for the section within the template, used in section references.'),
     inputs: z
       .array(InputSchema)
       .optional()

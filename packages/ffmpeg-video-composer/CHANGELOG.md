@@ -196,6 +196,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   unsafe raw `values` entry is reported at validation.
 - Grade `curvesPreset`: only FFmpeg's curves preset names are accepted, at validation and where the engine
   writes `curves=preset=…`, so it can no longer chain a filter.
+- Section names: a name takes letters, digits, `_`, `-` and `.` only (no `..`), at validation and again at
+  render, since it becomes output file names in the FFmpeg command and pad labels in the filter graph; a
+  space, a quote or a filtergraph separator in a name could add an FFmpeg argument or splice in a graph.
+- Overlay rotation, opacity, start and duration and layer keyframe values are checked as numbers (or
+  `+n`/`-n`) where the engine writes them, for callers that skip validation.
 
 ## [3.1.0] - 2026-10-11
 
