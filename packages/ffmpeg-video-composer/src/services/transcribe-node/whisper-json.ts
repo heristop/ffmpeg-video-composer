@@ -53,12 +53,15 @@ function extend(word: Building, token: WhisperToken, text: string): void {
 }
 
 function appendToken(words: RawWord[], current: Building | null, token: WhisperToken, text: string): Building {
+  if (current !== null && !text.startsWith(' ')) {
+    extend(current, token, text);
+
+    return current;
+  }
+
   if (current?.text.trim()) words.push(finish(current));
 
-  const next =
-    current === null || text.startsWith(' ')
-      ? { text: '', from: seconds(token.offsets?.from), to: 0, dtw: null, scores: [] }
-      : current;
+  const next: Building = { text: '', from: seconds(token.offsets?.from), to: 0, dtw: null, scores: [] };
   extend(next, token, text);
 
   return next;

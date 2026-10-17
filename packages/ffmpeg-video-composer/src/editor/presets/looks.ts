@@ -187,7 +187,10 @@ export function gradeToFilters(grade?: Grade): Filter[] {
   addMapped(filters, grade.hue, (hue) => ({ type: 'hue', value: `h=${hue}` }));
   addParts(filters, buildCbParts(grade), 'colorbalance');
   addPositive(filters, grade.blur, (blur) => ({ type: 'gblur', value: `sigma=${blur}` }));
-  addPositive(filters, grade.grain, (grain) => ({ type: 'noise', value: `alls=${Math.round(grain * 20)}:allf=t+u` }));
+  addPositive(filters, grade.grain === undefined ? undefined : Math.round(grade.grain * 20), (strength) => ({
+    type: 'noise',
+    value: `alls=${strength}:allf=t+u`,
+  }));
   addMapped(filters, grade.curvesPreset, (preset) => ({ type: 'curves', value: `preset=${preset}` }));
 
   return filters;

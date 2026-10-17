@@ -87,10 +87,9 @@ function separators(locale: string): { group: string; mark: string } {
 }
 
 function counterLocale(counter: CounterSpec, activeLocale: string): string {
-  const authored = counter.locale?.trim().toLowerCase();
   const fallback = activeLocale.trim().toLowerCase();
 
-  return authored ?? (fallback.length > 0 ? fallback : 'en');
+  return counter.locale ?? (fallback.length > 0 ? fallback : 'en');
 }
 
 function numberFormat(counter: CounterSpec, activeLocale: string): NumberFormat {
