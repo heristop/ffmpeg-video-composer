@@ -28,7 +28,7 @@ export default defineConfig({
     'packages/{ffmpeg-video-composer,creative-kit}/**/*.{ts,tsx}': () => 'pnpm deps:check',
   },
   lint: {
-    plugins: ['typescript', 'unicorn', 'import', 'oxc', 'react'],
+    plugins: ['typescript', 'unicorn', 'import', 'oxc', 'react', 'jsx-a11y', 'promise', 'vitest', 'jest'],
     jsPlugins: ['./scripts/oxlint-plugin-local.ts'],
     ignorePatterns: [
       'dist/**',
@@ -53,6 +53,7 @@ export default defineConfig({
     options: {
       typeAware: true,
       typeCheck: true,
+      reportUnusedDisableDirectives: 'error',
     },
     rules: {
       // --- Correctness / suspicious (eslint core) ---
@@ -252,6 +253,79 @@ export default defineConfig({
       'react/no-danger': 'error',
       'react/self-closing-comp': 'error',
       'react/jsx-boolean-value': ['error', 'never'],
+      'react/rules-of-hooks': 'error',
+      'react/static-components': 'error',
+      'react/set-state-in-effect': 'error',
+      'react/set-state-in-render': 'error',
+
+      // --- promise ---
+      'promise/no-multiple-resolved': 'error',
+      'promise/no-callback-in-promise': ['error', { exceptions: ['callback', 'setState'] }],
+
+      // --- test isolation ---
+      'vitest/no-focused-tests': 'error',
+      'vitest/no-disabled-tests': 'error',
+      'jest/no-focused-tests': 'error',
+      'jest/no-disabled-tests': 'error',
+
+      // The built-in test plugin exposes additional advisory rules by default. Keep this policy
+      // explicit: only focused/disabled tests are repository errors today.
+      'jest/expect-expect': 'off',
+      'jest/no-conditional-expect': 'off',
+      'jest/no-export': 'off',
+      'jest/no-standalone-expect': 'off',
+      'jest/prefer-snapshot-hint': 'off',
+      'jest/require-to-throw-message': 'off',
+      'jest/valid-describe-callback': 'off',
+      'jest/valid-expect': 'off',
+      'jest/valid-expect-in-promise': 'off',
+      'jest/valid-title': 'off',
+      'vitest/expect-expect': 'off',
+      'vitest/hoisted-apis-on-top': 'off',
+      'vitest/no-conditional-expect': 'off',
+      'vitest/no-conditional-tests': 'off',
+      'vitest/no-standalone-expect': 'off',
+      'vitest/prefer-snapshot-hint': 'off',
+      'vitest/require-awaited-expect-poll': 'off',
+      'vitest/require-local-test-context-for-concurrent-snapshots': 'off',
+      'vitest/require-mock-type-parameters': 'off',
+      'vitest/require-to-throw-message': 'off',
+      'vitest/valid-describe-callback': 'off',
+      'vitest/valid-expect': 'off',
+      'vitest/valid-expect-in-promise': 'off',
+      'vitest/valid-title': 'off',
+      'vitest/warn-todo': 'off',
+
+      // JSX accessibility is enabled for the web override below. Disable the plugin's other
+      // advisory defaults so the selected accessibility policy stays warning-free and focused.
+      'jsx-a11y/anchor-has-content': 'off',
+      'jsx-a11y/aria-activedescendant-has-tabindex': 'off',
+      'jsx-a11y/aria-props': 'off',
+      'jsx-a11y/aria-proptypes': 'off',
+      'jsx-a11y/aria-role': 'off',
+      'jsx-a11y/aria-unsupported-elements': 'off',
+      'jsx-a11y/autocomplete-valid': 'off',
+      'jsx-a11y/click-events-have-key-events': 'off',
+      'jsx-a11y/heading-has-content': 'off',
+      'jsx-a11y/html-has-lang': 'off',
+      'jsx-a11y/iframe-has-title': 'off',
+      'jsx-a11y/img-redundant-alt': 'off',
+      'jsx-a11y/interactive-supports-focus': 'off',
+      'jsx-a11y/mouse-events-have-key-events': 'off',
+      'jsx-a11y/no-access-key': 'off',
+      'jsx-a11y/no-aria-hidden-on-focusable': 'off',
+      'jsx-a11y/no-autofocus': 'off',
+      'jsx-a11y/no-distracting-elements': 'off',
+      'jsx-a11y/no-interactive-element-to-noninteractive-role': 'off',
+      'jsx-a11y/no-noninteractive-element-interactions': 'off',
+      'jsx-a11y/no-noninteractive-element-to-interactive-role': 'off',
+      'jsx-a11y/no-noninteractive-tabindex': 'off',
+      'jsx-a11y/no-redundant-roles': 'off',
+      'jsx-a11y/prefer-tag-over-role': 'off',
+      'jsx-a11y/role-has-required-aria-props': 'off',
+      'jsx-a11y/role-supports-aria-props': 'off',
+      'jsx-a11y/scope': 'off',
+      'jsx-a11y/tabindex-no-positive': 'off',
 
       // --- unicorn (style) ---
       'unicorn/catch-error-name': [
@@ -301,7 +375,37 @@ export default defineConfig({
     },
     overrides: [
       {
-        files: ['**/*.test.ts', '**/*.spec.ts'],
+        // Unsafe-value rules are for shipped TypeScript APIs. Tests, examples and JavaScript
+        // tooling intentionally exercise untyped boundaries and are covered by their own checks.
+        files: ['packages/**/src/**/*.{ts,tsx}', 'apps/**/src/**/*.{ts,tsx}'],
+        rules: {
+          'typescript/no-unsafe-assignment': 'error',
+          'typescript/no-unsafe-argument': 'error',
+          'typescript/no-unsafe-call': 'error',
+          'typescript/no-unsafe-member-access': 'error',
+          'typescript/no-unsafe-return': 'error',
+          'typescript/no-unsafe-enum-comparison': 'error',
+        },
+      },
+      {
+        // Generated Metro asset maps and their hand-maintained static catalog are opaque by design:
+        // each `require()` returns a platform-specific numeric module id.
+        files: [
+          '**/*.generated.ts',
+          'apps/leclap-expo/src/data/mediaCatalog.ts',
+          'apps/leclap-expo/src/features/templates/template-posters.ts',
+        ],
+        rules: {
+          'typescript/no-unsafe-assignment': 'off',
+          'typescript/no-unsafe-argument': 'off',
+          'typescript/no-unsafe-call': 'off',
+          'typescript/no-unsafe-member-access': 'off',
+          'typescript/no-unsafe-return': 'off',
+          'typescript/no-unsafe-enum-comparison': 'off',
+        },
+      },
+      {
+        files: ['**/*.test.ts', '**/*.spec.ts', '**/*.test.tsx', '**/*.spec.tsx'],
         env: {
           jest: true,
           node: true,
@@ -321,6 +425,12 @@ export default defineConfig({
           'typescript/no-confusing-void-expression': 'off',
           'typescript/no-non-null-assertion': 'off',
           'typescript/no-unnecessary-type-assertion': 'off',
+          'typescript/no-unsafe-assignment': 'off',
+          'typescript/no-unsafe-argument': 'off',
+          'typescript/no-unsafe-call': 'off',
+          'typescript/no-unsafe-member-access': 'off',
+          'typescript/no-unsafe-return': 'off',
+          'typescript/no-unsafe-enum-comparison': 'off',
           'local/padding-line-before-statements': 'off',
           'unicorn/prefer-spread': 'off',
           'unicorn/no-array-sort': 'off',
@@ -370,7 +480,7 @@ export default defineConfig({
       {
         // leclap-web (React + Vite browser app)
         files: ['apps/leclap-web/**'],
-        plugins: ['typescript', 'unicorn', 'import', 'oxc', 'react'],
+        plugins: ['typescript', 'unicorn', 'import', 'oxc', 'react', 'jsx-a11y', 'promise', 'vitest', 'jest'],
         env: { browser: true, es2024: true },
         rules: {
           // Screens/components legitimately run long; the file/function size budgets are kept
@@ -379,12 +489,19 @@ export default defineConfig({
           'max-lines-per-function': 'off',
           // `const Component = () => <jsx>` is the React idiom — do not force declarations here.
           'func-style': 'off',
+          // Browser-facing JSX must expose accessible names and semantics.
+          'jsx-a11y/alt-text': 'error',
+          'jsx-a11y/control-has-associated-label': 'error',
+          'jsx-a11y/label-has-associated-control': 'error',
+          'jsx-a11y/anchor-is-valid': 'error',
+          'jsx-a11y/media-has-caption': 'error',
+          'jsx-a11y/no-static-element-interactions': 'error',
         },
       },
       {
         // leclap-expo (React Native / Expo app)
         files: ['apps/leclap-expo/**'],
-        plugins: ['typescript', 'unicorn', 'import', 'oxc', 'react'],
+        plugins: ['typescript', 'unicorn', 'import', 'oxc', 'react', 'jsx-a11y', 'promise', 'vitest', 'jest'],
         env: { browser: true, es2024: true },
         rules: {
           'max-lines': 'off',
@@ -410,8 +527,23 @@ export default defineConfig({
         },
       },
       {
+        // These previews have no caption source: music-only audio and generated/editor clips. Keep
+        // media-has-caption enforced for web media where a caption track can be supplied.
+        files: [
+          'apps/leclap-web/src/presentation/components/admin/MediaPicker.tsx',
+          'apps/leclap-web/src/presentation/components/player/video-player.tsx',
+          'apps/leclap-web/src/features/editor/TimelineEditor.tsx',
+          'apps/leclap-web/src/presentation/components/home/film-player.tsx',
+        ],
+        rules: { 'jsx-a11y/media-has-caption': 'off' },
+      },
+      {
+        files: ['apps/leclap-expo/app/**/*.{ts,tsx}'],
+        rules: { 'promise/no-callback-in-promise': 'off' },
+      },
+      {
         files: ['apps/**'],
-        plugins: ['typescript', 'unicorn', 'import', 'oxc', 'react'],
+        plugins: ['typescript', 'unicorn', 'import', 'oxc', 'react', 'jsx-a11y', 'promise', 'vitest', 'jest'],
         env: {
           browser: true,
           es2024: true,
