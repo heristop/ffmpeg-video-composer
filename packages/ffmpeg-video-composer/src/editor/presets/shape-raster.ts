@@ -195,9 +195,15 @@ function outlineOf(spec: ShapeSpec): { lines: Pt[][] } | { error: string } {
 
   if (!lines) return { error: `Shape outline exceeds ${MAX_SHAPE_POINTS} points` };
 
-  if (spec.fill !== 'none' && fillWork(lines, spec.h) > MAX_FILL_WORK) return { error: FILL_ERROR };
+  if (!lines.every((points) => points.every((p) => Number.isFinite(p.x) && Number.isFinite(p.y)))) {
+    return { error: 'Shape outline has a non-finite point' };
+  }
 
-  if (spec.sw > 0 && strokeWork(lines, spec) > MAX_STROKE_WORK) return { error: 'Shape stroke is too costly to paint' };
+  // Negated so a NaN total fails closed.
+  if (spec.fill !== 'none' && !(fillWork(lines, spec.h) <= MAX_FILL_WORK)) return { error: FILL_ERROR };
+
+  if (spec.sw > 0 && !(strokeWork(lines, spec) <= MAX_STROKE_WORK))
+    return { error: 'Shape stroke is too costly to paint' };
 
   return { lines };
 }

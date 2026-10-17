@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { generatedImage } from '@/editor/presets/generated-images';
+import { parseTraceUrl } from '@/editor/presets/path-raster';
 import { encodeCommands } from '@/editor/presets/path-svg';
 import type { PathCommand } from '@/editor/presets/path-geometry';
 import {
@@ -247,5 +248,36 @@ describe('shape: URLs', () => {
     expect(image?.name).toBe(shapeFileName(SQUARE));
     expect(image?.name).toMatch(/^shape-[0-9a-f]{8}\.png$/);
     expect(Array.from(image?.produce().slice(0, 4) ?? [])).toEqual([137, 80, 78, 71]);
+  });
+});
+
+describe('shape work budgets fail closed', () => {
+  function zigzag(prefix: string, h: number): string {
+    let d = prefix + 'M0_0';
+
+    for (let i = 0; d.length < MAX_ENCODED_PATH - 40; i++) d += `L${(i % 1000) + 1}_${i % 2 === 0 ? h : 0}`;
+
+    return d + 'Z';
+  }
+
+  it('refuses a zero-wavelength poison prefix on a costly fill', () => {
+    const url = (d: string) => `shape:w=1024,h=4096,rule=evenodd,fill=solid,c1=ff0000ff,sw=0,d=${d}`;
+
+    expect(parseShapeUrl(url(zigzag('', 4096)))).toBeNull();
+    expect(parseShapeUrl(url(zigzag('M0_0W0_0_1_1_0_0', 4096)))).toBeNull();
+  });
+
+  it('refuses a zero-wavelength poison prefix on a costly stroke', () => {
+    const url = (d: string) => `shape:w=1024,h=4096,rule=nonzero,fill=none,sw=640,sc=ffffffff,d=${d}`;
+    const t0 = performance.now();
+
+    expect(parseShapeUrl(url(zigzag('M0_0W0_0_1_1_0_0', 4096)))).toBeNull();
+    expect(performance.now() - t0).toBeLessThan(2000);
+  });
+
+  it('refuses a trace: URL with a zero wavelength', () => {
+    expect(
+      parseTraceUrl('trace:mode=cover,x=0,y=0,w=100,h=40,thickness=6,caps=round,color=9298fb,d=M0_0W0_0_10_5_0_0')
+    ).toBeNull();
   });
 });

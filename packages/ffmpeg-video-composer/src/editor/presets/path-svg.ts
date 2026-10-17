@@ -138,6 +138,9 @@ function decodePart(part: string): PathCommand | null {
 
   if (arity === undefined || args.length !== arity || args.some((v) => !Number.isFinite(v))) return null;
 
+  // A wave divides by its wavelength.
+  if (kind === 'W' && args[4] === 0) return null;
+
   return [kind, ...args] as PathCommand;
 }
 

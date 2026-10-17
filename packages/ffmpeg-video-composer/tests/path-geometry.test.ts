@@ -213,3 +213,21 @@ describe('path geometry: encoding', () => {
     expect(JSON.stringify(flatten(shape))).toBe(JSON.stringify(flatten(shape)));
   });
 });
+
+describe('path geometry: division by input', () => {
+  it('refuses a wave with a zero wavelength at decode', () => {
+    expect(decodeCommands('M0_0W0_0_10_5_0_0')).toBeNull();
+    expect(decodeCommands('M0_0W0_0_10_5_20_0')).not.toBeNull();
+  });
+
+  it('yields no NaN points for any decodable wave', () => {
+    const commands = decodeCommands('M0_0W0_0_10_5_-20_0');
+
+    expect(
+      commands &&
+        flatten(commands)
+          .flat()
+          .every((p) => Number.isFinite(p.x) && Number.isFinite(p.y))
+    ).toBe(true);
+  });
+});
