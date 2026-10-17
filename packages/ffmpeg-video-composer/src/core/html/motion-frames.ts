@@ -51,6 +51,9 @@ interface Bound {
 // Float noise in `seconds × fps` must not move a tick across a key time.
 const EPSILON = 1e-9;
 
+// The most ticks one plan walks (the span limit at a generous 240 fps), so a huge fps is refused before it loops.
+const MAX_TICKS = HTML_MOTION_MAX_SPAN * 240;
+
 function round(value: number, places: number): number {
   const factor = 10 ** places;
 
@@ -126,6 +129,8 @@ function sameStates(a: readonly ElementState[], b: readonly ElementState[]): boo
 
 /** The frames an animated card draws, for its tagged elements' names in document order. */
 export function planMotionFrames(names: readonly string[], motion: ElementMotionMap, fps: number): MotionPlanResult {
+  if (!Number.isFinite(fps) || fps <= 0) return { kind: 'none' };
+
   const bounds = boundTargets(names, motion);
   const span = animatedSpan(bounds);
 
@@ -133,8 +138,11 @@ export function planMotionFrames(names: readonly string[], motion: ElementMotion
 
   if (span.end - span.start > HTML_MOTION_MAX_SPAN) return { kind: 'too-long', span: round(span.end - span.start, 2) };
 
-  const first = Math.floor(span.start * fps + EPSILON);
+  const first = Math.max(0, Math.floor(span.start * fps + EPSILON));
   const last = Math.ceil(span.end * fps - EPSILON);
+
+  if (last - first + 1 > MAX_TICKS) return { kind: 'too-long', span: round(span.end - span.start, 2) };
+
   const frames: MotionFrame[] = [];
 
   for (let tick = first; tick <= last; tick++) {

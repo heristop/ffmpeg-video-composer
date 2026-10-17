@@ -178,3 +178,35 @@ describe('state clamping', () => {
     expect(finalStates(['a'], { a: broken })[0]).toEqual(REST_STATE);
   });
 });
+
+describe('planMotionFrames bounds', () => {
+  const late = {
+    x: [
+      { t: 1, v: 0 },
+      { t: 2, v: 10 },
+    ],
+  };
+
+  it('plans nothing for an fps that is not a positive finite number', () => {
+    for (const fps of [0, -30, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(planMotionFrames(['a'], { a: late }, fps)).toEqual({ kind: 'none' });
+    }
+  });
+
+  it('refuses an fps that would walk an unbounded number of ticks', () => {
+    expect(planMotionFrames(['a'], { a: late }, 1e9)).toEqual({ kind: 'too-long', span: 1 });
+  });
+
+  it('never gives the first frame fewer than one tick when a time is negative', () => {
+    const early = {
+      x: [
+        { t: -0.5, v: 0 },
+        { t: 0.5, v: 10 },
+      ],
+    };
+    const p = plan(['a'], { a: early });
+
+    expect(p.frames.every((frame) => frame.ticks >= 1)).toBe(true);
+    expect(p.frames[0].ticks).toBe(1);
+  });
+});
