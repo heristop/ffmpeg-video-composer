@@ -4,7 +4,13 @@
 
 import { HTML_CSS_PROPERTIES } from './css-properties';
 import { HTML_ALLOWED_TAGS } from './html-sanitise';
-import { HTML_LAYER_MAX_SIZE } from './limits';
+import {
+  HTML_LAYER_MAX_SIZE,
+  HTML_MOTION_MAX_FRAMES,
+  HTML_MOTION_MAX_PIXELS,
+  HTML_MOTION_MAX_SPAN,
+  HTML_MOTION_MAX_TARGETS,
+} from './limits';
 
 interface HtmlRecipe {
   use: string;
@@ -27,7 +33,7 @@ export interface HtmlCatalog {
   motion: string;
   limits: string;
   platforms: string;
-  recipes: Record<'card' | 'badge' | 'priceTag' | 'twoColumnStat', HtmlRecipe>;
+  recipes: Record<'card' | 'badge' | 'priceTag' | 'twoColumnStat' | 'staggeredList', HtmlRecipe>;
 }
 
 function text(defaultValue: string, maxLength = 60): { type: 'text'; default: string; maxLength: number } {
@@ -101,18 +107,55 @@ const RECIPES: HtmlCatalog['recipes'] = {
       options: { position: '64:520', motion: { type: 'rise', duration: 0.6 } },
     },
   },
+  staggeredList: {
+    use: 'A checklist whose items slide in one after another: per-element motion (data-motion + motion).',
+    fields: {
+      first: text('Open-plan kitchen'),
+      second: text('South-facing balcony'),
+      third: text('Metro 4 min away'),
+    },
+    input: {
+      name: 'features',
+      type: 'html',
+      html:
+        '<ul class="list"><li data-motion="item">{{ first }}</li><li data-motion="item">{{ second }}</li>' +
+        '<li data-motion="item">{{ third }}</li></ul>',
+      css:
+        '.list { display: flex; flex-direction: column; gap: 12px; padding: 24px 28px; border-radius: 20px; ' +
+        'background: $color.surface } li { color: $color.fg; font: 32px $font.body }',
+      width: 560,
+      height: 220,
+      options: { position: '64:440' },
+      motion: {
+        item: {
+          opacity: [
+            { t: 0.3, v: 0 },
+            { t: 0.6, v: 1 },
+          ],
+          x: [
+            { t: 0.3, v: -32 },
+            { t: 0.8, v: 0, ease: '$snappy' },
+          ],
+          stagger: 0.15,
+        },
+      },
+    },
+  },
 };
 
 export function htmlCatalog(): HtmlCatalog {
   return {
     description:
-      'inputs[] entry of type "html": HTML + CSS laid out with flexbox and drawn once to a transparent still ' +
-      '(Satori + resvg, deterministic), then composited like an image input: position, scale, motion, start, ' +
-      'duration and opacity work unchanged. For layout drawtext cannot do: cards, badges, price tags, stat rows.',
-    shape: '{ name, type: "html", html, css?, width, height, options?: { position, motion, … } }',
+      'inputs[] entry of type "html": HTML + CSS laid out with flexbox and drawn to a transparent still (Satori + ' +
+      'resvg, deterministic), or with a motion map to a frame sequence, then composited like an image input: ' +
+      'position, scale, motion, start, duration and opacity work unchanged. For layout drawtext cannot do: ' +
+      'cards, badges, price tags, stat rows, lists that come in item by item.',
+    shape:
+      '{ name, type: "html", html, css?, width, height, options?: { position, motion, … }, ' +
+      'motion?: { <data-motion name>: { x?, y?, scale?, rotate?, opacity?, stagger? } } }',
     tags: HTML_ALLOWED_TAGS,
     attributes:
-      'class and style everywhere; src, alt, width, height on img. Scripts, handlers, links, forms, iframes are removed.',
+      'Keep class, style and data-motion everywhere; img also keeps src, alt, width, height. Scripts, handlers, links, forms, iframes are removed.',
     css: HTML_CSS_PROPERTIES,
     selectors: 'tag, .class, tag.class and descendant (".card p"); no #id, pseudo-classes, > + ~ or @rules.',
     layout:
@@ -127,9 +170,17 @@ export function htmlCatalog(): HtmlCatalog {
     images:
       'img src and url() must be template assets (relative or /assets/ paths, PNG/JPEG); remote images are refused.',
     motion:
-      'The layer is a still: give it an entrance with options.motion (rise, slide-*, fade), keyframe it with ' +
-      'options.animate (x, y, scale, scaleX, scaleY, rotate, opacity about options.origin), and time it with ' +
-      'start/duration; camera and fx work on it too.',
+      'The card moves as a whole with options.motion (rise, slide-*, fade), options.animate (x, y, scale, scaleX, ' +
+      'scaleY, rotate, opacity about options.origin) and start/duration; camera and fx work on it too. Inside ' +
+      'it, tag elements data-motion="name" and add motion { name: { x, y, scale, rotate, opacity, stagger } } ' +
+      'on the input: keyframes as in options.animate, key times in seconds from the layer start, tokens and ' +
+      'springs allowed; stagger is the seconds each further element with that name starts after the previous ' +
+      'one. Names are lowercase and not ease, easing or animate. The card is drawn frame by frame over the ' +
+      `animated span only and holds its final frame. Budget: ${HTML_MOTION_MAX_SPAN} s span, ` +
+      `${HTML_MOTION_MAX_TARGETS} elements, ${HTML_MOTION_MAX_FRAMES} frames, ` +
+      `${HTML_MOTION_MAX_PIXELS / 1e6} megapixels; over it validation reports html_motion_too_long or ` +
+      'html_motion_too_many_targets and the card shows its final state (html_motion_static); a name no element ' +
+      'carries is html_motion_unmatched. Elements moved past the box are cut.',
     limits: `width and height in output pixels, ${HTML_LAYER_MAX_SIZE} max; drawn at 2× and scaled into the box. Content taller than the box is cut (html_overflow).`,
     platforms:
       'Node (CLI, MCP), the browser (web app) and the phone (a hidden WebView) render HTML layers, byte for ' +

@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `extract_structure`: a reference clip's format (shots, rhythm, transitions, grounds, layout) as binding
   rules, from at most 480 sampled frames.
+- `get_template_schema` and `get_motion_catalog` teach animated HTML cards: `data-motion` names, the input's
+  `motion` map with its stagger, the budget (`html_motion_too_long`, `html_motion_unmatched`) and a
+  `staggeredList` recipe.
 - `--allow-raw-filters` / `LECLAP_MCP_ALLOW_RAW_FILTERS` (off by default) trusts a template's raw filters for
   trusted local use; `get_capabilities` reports which mode the server runs in, and the template guide says so.
 - `extract_brand` (behind `--allow-network` / `LECLAP_MCP_ALLOW_NETWORK`): a website's brand kit as a theme and binding rules, saved under the media dir.
