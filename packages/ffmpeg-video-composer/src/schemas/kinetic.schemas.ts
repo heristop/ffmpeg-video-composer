@@ -4,6 +4,7 @@ import { TextEffectSchema } from './effects.schemas';
 import { EasingSpecSchema, MotionRoleSchema } from './motion.schemas';
 import { ElementIdSchema, timeValue } from './time.schemas';
 import { CounterSchema } from './text.schemas';
+import { KineticClipSchema } from './clip.schemas';
 
 // ── kinetic typography (docs/plans/motion-system.md §4.1) ──────────────────────
 //
@@ -186,6 +187,7 @@ export const KineticBlockSchema = z
     size: z.number().positive().max(600).optional().describe('Font size in px (default 11% of the frame height).'),
     color: z.string().optional().describe('Text colour (default #F5F3F7); the fallback when `fill` cannot render.'),
     fill: KineticFillSchema.optional(),
+    clip: KineticClipSchema.optional(),
     accent: z
       .object({
         words: z

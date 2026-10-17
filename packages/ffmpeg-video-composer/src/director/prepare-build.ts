@@ -12,6 +12,7 @@ import { resolveMotionDescriptor } from '@/core/motion/tokens';
 import { effectiveOrientation } from '@/core/platforms';
 import { resolveTheme, resolveThemeDescriptor } from '@/core/theme/resolve';
 import type { ThemeSpec } from '@/core/theme/themes';
+import { BANDS_FALLBACK_COLORS } from '@/core/motion/transition-bands';
 import { expandAutoSfx } from '@/core/audio/auto-sfx';
 import { assertEffectsResolved, expandPartialsSafe } from '@/core/partials';
 import type AbstractLogger from '../platform/logging/AbstractLogger';
@@ -196,6 +197,23 @@ export function boundaryTransitions(
       duration,
       ease: declared.ease,
       ...transitionOptions(declared, theme),
+      ...designFields(declared, theme),
     };
   });
+}
+
+const DESIGN_KEYS = ['shape', 'through', 'count', 'angle', 'colors', 'stagger'] as const;
+
+// The shape / window / bands fields that are set; bands default their colours to the theme's.
+function designFields(declared: NonNullable<DeclaredTransition>, theme: unknown): Partial<BoundaryTransition> {
+  const fields = Object.fromEntries(
+    DESIGN_KEYS.flatMap((key) => (declared[key] === undefined ? [] : [[key, declared[key]]]))
+  );
+
+  if (declared.type !== 'bands' || declared.colors) return fields;
+
+  const colors = resolveTheme(theme as ThemeSpec | undefined)?.colors;
+  const palette = colors ? [colors.brand, colors.accent, colors.accent2, colors.fg] : [...BANDS_FALLBACK_COLORS];
+
+  return { ...fields, colors: palette };
 }

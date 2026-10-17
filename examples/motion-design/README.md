@@ -103,6 +103,8 @@ Each phrase is fitted to at most two balanced lines, held for at least a second,
 
 [`fx-liquid.json`](./fx-liquid.json) shows two liquid cheat-sheet moves: a lavender blob that stretches, splits into three droplets that bounce apart and merges back on one frame (`goo` with keyframed `blobs`), then a rose paint `drip` transition into a title. Asset-free.
 
+[`fx-masks.json`](./fx-masks.json) shows four mask and transition moves: a greeting that rises out of an invisible slot above an underline over café footage (kinetic `clip: "line"`, opaque while the slot edge reveals it), diagonal colour bands that sweep across the cut (`bands`), an iris that opens out of a sun icon as a circle and out of a star icon as a star (`shape: "star"`), and a fly-through the O of ZOOM into the next scene (`zoom-through` with `through`). Needs the library footage (`--assets`).
+
 ## One story, three formats
 
 [`formats.json`](./formats.json) is one launch story composed for 16:9, 9:16 and 1:1. `$format` markers set per-format sizes, positions and holds; `formats.portrait` / `formats.square` patch sections by element id (the square cut drops the proof beat). Render every format with `leclap render formats.json --formats all` (one file per format); the showcase previews the landscape cut.

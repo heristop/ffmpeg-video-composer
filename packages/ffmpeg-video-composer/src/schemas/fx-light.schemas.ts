@@ -9,7 +9,10 @@ import { z } from 'zod';
 /** "#rrggbb" (after theme resolution) or a "$color.<name>" theme token; an @alpha suffix is ignored. */
 export const FxColorSchema = z
   .string()
-  .regex(/^(#[0-9a-fA-F]{6}|\$color\.[a-zA-Z]+)(@[0-9.]+)?$/, 'a "#rrggbb" colour or a "$color.<name>" theme token');
+  .regex(
+    /^(#[0-9a-fA-F]{6}|\$color\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$/,
+    'a "#rrggbb" colour or a "$color.<name>" theme token'
+  );
 
 /** The `$smooth` curve, spelled out (defaults are applied after token resolution). */
 export const SMOOTH = 'cubic-bezier(0.4, 0, 0.2, 1)';

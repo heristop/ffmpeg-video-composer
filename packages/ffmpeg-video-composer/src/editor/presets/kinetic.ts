@@ -20,6 +20,7 @@ import { trailEchoes } from './kinetic-trail';
 import { pieceFilter, type PieceDraw, type PieceStyle } from './kinetic-piece';
 import { fillGraph, type FillBox, type FillEnv } from './kinetic-fill';
 import type { SugarContext } from './sugar-context';
+import { clipParts, type ClipPart } from './clip-box';
 
 export { MAX_KINETIC_UNITS } from '@/core/kinetic/fit';
 const ACCENT_COLOR = '#FFF685';
@@ -31,6 +32,8 @@ export interface KineticContext extends KineticFrame {
   text: string;
   /** Where a `fill` draws (mask sub-graph); absent = the build can't, so the block stays solid. */
   fill?: FillEnv;
+  /** The block's index in the section (pad-name prefix of a `clip`). */
+  index?: number;
 }
 
 function accentWords(block: KineticBlock, layout: Layout): Set<number> {
@@ -55,17 +58,26 @@ interface Choreography {
   anchored: boolean;
 }
 
+// The clip slot a unit moves in, px tall: a line's box (clip "line", or "block" on one line); else none.
+function slotOf(block: KineticBlock, plan: Choreography): number | undefined {
+  const lines = plan.layout.lines.length;
+
+  return block.clip === 'line' || (block.clip === 'block' && lines === 1) ? plan.settings.lineHeight : undefined;
+}
+
 function pieceDraws(block: KineticBlock, plan: Choreography): PieceDraw[] {
   const { settings, layout, exit } = plan;
   const accents = accentWords(block, layout);
   const accentColor = block.accent?.color ?? (block.preset === 'highlight' ? settings.color : ACCENT_COLOR);
+
+  const slot = slotOf(block, plan);
 
   return plan.pieces.map((piece, index) => {
     const start = plan.starts[index];
     const arrive = start + settings.duration;
     const leave = exit ? Math.max(exit.at + plan.ranks[index] * exit.stagger, arrive + 1 / plan.fps) : null;
     const line = layout.lines[piece.line];
-    const tracks = unitTracks(settings, piece, line.x + line.width / 2, { start, arrive, leave }, exit);
+    const tracks = unitTracks(settings, piece, line.x + line.width / 2, { start, arrive, leave, slot }, exit);
 
     return {
       piece,
@@ -167,16 +179,67 @@ export function kineticToFilters(block: KineticBlock, ctx: KineticContext): Filt
 
   const plan: Choreography = choreograph(block, ctx, base, laid);
   const draws = pieceDraws(block, plan);
+  const filled = block.fill && ctx.fill ? [filledBlock(block, plan, draws, ctx.fill, ctx.seed)] : null;
 
-  if (block.fill && ctx.fill) return [filledBlock(block, plan, draws, ctx.fill, ctx.seed)];
+  if (block.clip) return clippedBlock(block, plan, draws, filled, ctx);
 
-  const style = { effect: block.effect, anchored: plan.anchored };
+  if (filled) return filled;
 
-  return [
-    ...markers(block, plan, draws),
-    ...unitFilters(block, plan, draws, { ...style, color: '' }),
-    ...extras(block, plan, ctx.seed),
-  ];
+  return [...drawnUnits(block, plan, draws), ...extras(block, plan, ctx.seed)];
+}
+
+function drawnUnits(block: KineticBlock, plan: Choreography, draws: PieceDraw[]): Filter[] {
+  const style = { effect: block.effect, anchored: plan.anchored, color: '' };
+
+  return [...markers(block, plan, draws), ...unitFilters(block, plan, draws, style)];
+}
+
+/** Horizontal room around a clipped line (overhangs, shadows), and above a clipped block, in em. */
+const CLIP_SIDE = 0.3;
+const CLIP_TOP = 0.1;
+
+// The block cut to its clip (clip-box.ts): a box, its own resting box, or one box per line (each line's
+// units drawn on their own copy, so a line rising out of its slot never shows in its neighbour's). The
+// typewriter caret and scramble decoys stay unclipped; a filled block clips as one block.
+function clippedBlock(
+  block: KineticBlock,
+  plan: Choreography,
+  draws: PieceDraw[],
+  filled: Filter[] | null,
+  ctx: KineticContext
+): Filter[] {
+  const clip = block.clip as NonNullable<KineticBlock['clip']>;
+  const { size, lineHeight } = plan.settings;
+  const frame = { width: ctx.width, height: ctx.height };
+  const prefix = `kc${ctx.index ?? 0}_`;
+  const loose = extras(block, plan, ctx.seed);
+  const all = filled ?? drawnUnits(block, plan, draws);
+
+  if (typeof clip === 'object') return [...loose, ...clipParts([{ box: clip, filters: all }], frame, prefix)];
+
+  if (clip === 'block' || filled) {
+    const box = blockBox(plan);
+    const padded = {
+      x: box.x - CLIP_SIDE * size,
+      y: box.y - CLIP_TOP * size,
+      w: box.w + 2 * CLIP_SIDE * size,
+      h: box.h + CLIP_TOP * size,
+    };
+
+    return [...loose, ...clipParts([{ box: padded, filters: all }], frame, prefix)];
+  }
+
+  const top = Math.min(...plan.pieces.map((piece) => piece.y));
+  const parts: ClipPart[] = plan.layout.lines.map((line, index) => ({
+    box: { x: line.x - CLIP_SIDE * size, y: top + line.y, w: line.width + 2 * CLIP_SIDE * size, h: lineHeight },
+    filters: drawnUnits(
+      block,
+      plan,
+      draws.filter((draw) => draw.piece.line === index)
+    ),
+  }));
+
+  return [...loose, ...clipParts(parts, frame, prefix)];
 }
 
 export const MASK_UNAVAILABLE_WARNING =
@@ -229,6 +292,7 @@ export function kineticBlocksToFilters(blocks: KineticBlock[] | undefined, ctx: 
       seed: motion.seedFor(`kinetic[${index}]`),
       text,
       fill: fillEnv(block, index, ctx),
+      index,
     });
   });
 }

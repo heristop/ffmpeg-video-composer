@@ -38,7 +38,9 @@ const GUIDE = [
     'Compose them by ' +
     "tuning each one's parameters (shape, colour, intensity, timing, repeat, seed) for the template instead " +
     'of using one stock look (get_motion_catalog → fx lists every field and when to use it); ' +
-    'designed transitions include whip-left/right/up/down and drip (paint drips over the cut, color); ' +
+    'designed transitions include whip-left/right/up/down, drip (paint drips over the cut, color), bands ' +
+    '(colour bands sweep across), iris shape (star, heart, rounded-square) and zoom-through `through` a letter ' +
+    'counter or shape; kinetic `clip` and layer options.clip reveal out of an invisible slot; ' +
     '`lowerThird.style` picks clean-bar, side-rule, kicker, stack-bars or pill. ' +
     'Call get_motion_catalog for presets, defaults, art-direction rules and a starter.',
   "Compose motion, don't pick it: derive it from meta.creativeDirection (audience, brand, energy), write a motion " +

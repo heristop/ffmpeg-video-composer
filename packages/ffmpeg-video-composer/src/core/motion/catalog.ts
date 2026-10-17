@@ -74,9 +74,14 @@ const ART_DIRECTION = [
     'with two faces swapped at the midpoint (start/duration). Needle: rotate about origin bottom with ' +
     'ease-out-back. Parallax: x tracks at different speeds per depth.',
   'Transitions: push for sequence, swipe for layering, zoom-through for energy, iris for reveals (origin on the ' +
-    'icon it opens from, rim in its colour, the icon scaling up as it opens), whip for a fast jump on the beat (0.3–0.5 s); drip for a playful brand-colour change (0.8–1.2 s, color: the paint); keep the others 0.5–0.8 s and prefer cut ' +
-    'between beats of the same idea. ' +
+    'icon it opens from, rim in its colour, the icon scaling up as it opens; shape: star / heart / ' +
+    'rounded-square), whip for a fast jump on the beat (0.3–0.5 s); drip for a playful brand-colour change ' +
+    '(0.8–1.2 s, color: the paint), bands for a brand-colour chapter change (0.8–1.2 s); zoom-through `through` ' +
+    'flies into a letter counter of the word on screen (same text, font, size, x, y as its kinetic block); keep ' +
+    'the others 0.5–0.8 s and prefer cut between beats of the same idea. ' +
     'Designed transitions ease like any other motion (ease: $snappy…).',
+  'Kinetic clip ("line", "block" or { x, y, w, h }) cuts the copy to a slot, so a rise or drop reveals out of an ' +
+    'invisible edge (above an underline), on footage too; layers take options.clip, a box.',
   'Kinetic trail ({ echoes, delta, fade }) smears fast travel (impact, drop, slide, whip-paced edits); skip it on ' +
     'calm presets and on long copy, where the echoes multiply the draw cost.',
   'Set global.platform (tiktok, reels, shorts, youtube, x, linkedin, facebook, square-feed) when the video ' +

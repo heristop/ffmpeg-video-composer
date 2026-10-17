@@ -38,7 +38,7 @@ import type { EffectReference } from '../schemas/effect-reference.schema';
 export type { EffectReference } from '../schemas/effect-reference.schema';
 // Visual grade / motion / background-layer config also lives in a sibling for the same budget reason.
 export type { ChannelAdjust, GradeConfig, MotionEffect, BackgroundLayer, Letterbox } from './descriptor-visual';
-import type { GradeConfig, MotionEffect, BackgroundLayer, Letterbox } from './descriptor-visual';
+import type { GradeConfig, MotionEffect, BackgroundLayer, Letterbox, TransitionDesign } from './descriptor-visual';
 export type * from './descriptor-footage';
 import type {
   ClipRange,
@@ -162,14 +162,16 @@ export type ProjectBuildInfos = TakeBuildInfos & {
   musicFilters: string[];
   fileConcatPath: string;
   musicPath: string;
-  transitions: Array<{
-    type: string;
-    duration: number;
-    ease?: RevealEasing;
-    origin?: { x: number; y: number };
-    rim?: string;
-    color?: string;
-  }>;
+  transitions: Array<
+    {
+      type: string;
+      duration: number;
+      ease?: RevealEasing;
+      origin?: { x: number; y: number };
+      rim?: string;
+      color?: string;
+    } & TransitionDesign
+  >;
 };
 
 export interface TemplateDescriptor {
@@ -222,7 +224,7 @@ export interface TemplateDescriptorGlobal {
   allowUploadBackground?: boolean;
 }
 
-interface SectionTransition {
+interface SectionTransition extends TransitionDesign {
   type: string;
   duration?: number;
   /** Curve of a designed transition. */

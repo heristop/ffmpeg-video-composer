@@ -48,8 +48,9 @@ export interface BuiltPrompt {
 }
 
 // The product-launch brief keeps its reference sample and the whole schema. After sharing short
-// schema fragments, burst + path + goo/drip together need 154,831 characters; 154,500 still truncates it.
-export const DEFAULT_PROMPT_BUDGET = 155_000;
+// schema fragments, burst + path + goo/drip together needed 154,831 characters (155,000); clip boxes, bands,
+// iris shapes and zoom-through windows bring it to 157,302, and 157,000 still truncates it.
+export const DEFAULT_PROMPT_BUDGET = 158_300;
 // The schema never takes more than this, even with room to spare: past it the model reads noise.
 const SCHEMA_CAP = 96_000;
 const MIN_SCHEMA = 12_000;

@@ -39,6 +39,9 @@ describe('drip: schema and boundary', () => {
     expect(DESIGNED_TRANSITIONS).toContain('drip');
     expect(TransitionSchema.safeParse({ type: 'drip', color: '#f96f99', duration: 1 }).success).toBe(true);
     expect(TransitionSchema.safeParse({ type: 'drip', color: '$color.accent' }).success).toBe(true);
+    expect(TransitionSchema.safeParse({ type: 'drip', color: '$color.accent2' }).success).toBe(true);
+    expect(TransitionSchema.safeParse({ type: 'drip', color: 'pink' }).success).toBe(false);
+    expect(TransitionSchema.safeParse({ type: 'drip', color: '#f96f9' }).success).toBe(false);
     expect(TransitionSchema.safeParse({ type: 'drip', color: 12 }).success).toBe(false);
   });
 

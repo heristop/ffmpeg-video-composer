@@ -4,6 +4,7 @@ import { FilterSchema } from './filter.schemas';
 import { TranslationSchema } from './global.schemas';
 import { HtmlInputShape, htmlInputIssues } from './html-input.schemas';
 import { LayerAnimateSchema, LayerOriginSchema } from './layer-animate.schemas';
+import { ClipBoxSchema } from './clip.schemas';
 
 // Input/shape/field media primitives — the animation input options, the editor-only shape recipe, the
 // input schema and the form-field schema — live here to keep `section.schemas` under the max-lines
@@ -44,6 +45,10 @@ export const InputOptionsSchema = z
     ),
     animate: LayerAnimateSchema.optional(),
     origin: LayerOriginSchema.optional(),
+    clip: ClipBoxSchema.optional().describe(
+      'Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; ' +
+        'works over footage.'
+    ),
   })
   .strict()
   .describe('Playback and compositing options for an animation input.');

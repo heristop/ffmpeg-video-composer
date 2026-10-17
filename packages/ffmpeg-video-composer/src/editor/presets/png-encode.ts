@@ -12,6 +12,8 @@ export interface PngImage {
   height: number;
   channels: 1 | 4;
   data: Uint8Array;
+  /** Bits per sample (default 8); 16-bit samples are stored big-endian, two bytes each. */
+  depth?: 8 | 16;
 }
 
 // CRC32 table for the standard PNG polynomial 0xEDB88320, built once at module load.
@@ -144,7 +146,7 @@ function concat(parts: Uint8Array[]): Uint8Array {
 
 // The scanlines PNG stores: each row prefixed with its filter-type byte (0 = None).
 function scanlines(image: PngImage): Uint8Array {
-  const stride = image.width * image.channels;
+  const stride = image.width * image.channels * ((image.depth ?? 8) / 8);
   const raw = new Uint8Array(image.height * (stride + 1));
 
   for (let y = 0; y < image.height; y++) {
@@ -156,12 +158,12 @@ function scanlines(image: PngImage): Uint8Array {
 
 const PNG_SIGNATURE = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 
-/** The PNG bytes of an 8-bit grayscale or RGBA image (straight alpha). Pure and deterministic. */
+/** The PNG bytes of a grayscale or RGBA image (straight alpha), 8-bit or 16-bit. Pure and deterministic. */
 export function encodePng(image: PngImage): Uint8Array {
   const ihdr = new Uint8Array(13);
   uint32(ihdr, 0, image.width);
   uint32(ihdr, 4, image.height);
-  ihdr[8] = 8; // bit depth
+  ihdr[8] = image.depth ?? 8; // bit depth
   ihdr[9] = image.channels === 4 ? 6 : 0; // colour type: RGBA or grayscale
   ihdr[10] = 0; // compression: deflate
   ihdr[11] = 0; // filter: adaptive

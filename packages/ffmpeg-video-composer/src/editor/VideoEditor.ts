@@ -25,6 +25,7 @@ import {
   type Transition,
 } from './utils/transition-graph';
 import { isDesignedTransition } from '@/core/motion/transitions';
+import { matteInputs, stageTransitionMattes, type StagedMatte } from './utils/matte-staging';
 
 @injectable()
 class VideoEditor {
@@ -162,13 +163,21 @@ class VideoEditor {
       const finalOutputPath = this.project.output.staging || `${buildDir}/output.mp4`;
       this.project.finalVideo = finalOutputPath;
 
-      const probes = await this.probeSegments(segmentFiles);
+      const [probes, mattes] = await Promise.all([
+        this.probeSegments(segmentFiles),
+        stageTransitionMattes(transitions, this.matteScale(), {
+          fs: this.filesystemAdapter,
+          dir: buildDir,
+          logger: this.logger,
+        }),
+      ]);
       const command = this.buildTransitionsCommand(
         segmentFiles,
         transitions,
         probes,
         finalOutputPath,
-        await this.stageOverlaysForFusion()
+        await this.stageOverlaysForFusion(),
+        mattes
       );
 
       this.logger.debug(`[Transitions][Command] ffmpeg ${command}`);
@@ -189,6 +198,12 @@ class VideoEditor {
       throw error;
     }
   };
+
+  private matteScale(): { width: number; height: number } {
+    const [width, height] = (this.project.config.videoConfig?.scale ?? DefaultConfig.SCALE).split(':').map(Number);
+
+    return { width, height };
+  }
 
   // Stage whole-video animations so xfade + overlay fuse into one re-encode (the separate overlay pass
   // in finalize then skips). Empty when none declared, or when FVC_DISABLE_FUSION forces the two-pass
@@ -233,7 +248,8 @@ class VideoEditor {
     transitions: Transition[],
     probes: SegmentProbe[],
     finalOutputPath: string,
-    staged: StagedAnimation[] = []
+    staged: StagedAnimation[],
+    mattes: StagedMatte[]
   ): string {
     const sampleRate = this.project.config.audioConfig?.sampleRate ?? 48000;
     const inputs = segmentFiles.map((file) => ` -i ${file} `).join('');
@@ -256,6 +272,9 @@ class VideoEditor {
     const offsets = computeOffsets(probes, effectiveDurations);
     const scale = this.project.config.videoConfig?.scale ?? DefaultConfig.SCALE;
     const fps = this.project.config.videoConfig?.fps ?? DefaultConfig.FPS;
+    // Matte inputs follow the segments and the silent audio legs.
+    const base = segmentFiles.length + silentInputs.length;
+    const matte = matteInputs(mattes, { base, fps, durations: effectiveDurations });
     const normalizeGraph = buildNormalizeGraph(
       segmentFiles.length,
       scale,
@@ -270,7 +289,7 @@ class VideoEditor {
     const assembledDuration = round(this.sum(probes.map((p) => p.duration)) - this.sum(effectiveDurations));
     const overlay = fuse
       ? this.animationComposer.buildFusedOverlay(staged, {
-          inputOffset: segmentFiles.length + silentInputs.length,
+          inputOffset: base + mattes.length,
           maxDuration: assembledDuration,
         })
       : { sources: '', graph: '' };
@@ -278,6 +297,7 @@ class VideoEditor {
     const videoGraph = buildVideoGraph(transitions, offsets, effectiveDurations, fuse ? '[vfx]' : '[vout]', {
       scale,
       fps,
+      mattes: matte.labels,
     });
     const filterComplex = [normalizeGraph, videoGraph, overlay.graph, audioGraph].filter(Boolean).join(';');
     const outputArgs = `${buildVideoEncoderArgs(this.project.config)} ${buildPixFmtArg(this.project.config)} ${buildColorMetadataArgs(this.project.config, this.project.ffmpegVersion)}`;
@@ -286,6 +306,7 @@ class VideoEditor {
       ' -y ' +
       inputs +
       silentInputs.join('') +
+      matte.args +
       (overlay.sources ? ` ${overlay.sources} ` : '') +
       ` -filter_complex "${filterComplex}" ` +
       ` -map "[vout]" -map "[aout]" -r ${fps} ${outputArgs} -c:a aac -ac 2 -movflags +faststart ${finalOutputPath} `

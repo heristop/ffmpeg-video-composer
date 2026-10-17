@@ -1,0 +1,276 @@
+{
+  "meta": {
+    "name": "Masks and transitions",
+    "description": "Four cheat-sheet moves from engine primitives: a greeting that rises out of an invisible slot above an underline over footage (kinetic clip), colour bands that sweep across the cut, an iris that opens out of a sun icon as a circle and out of a star icon as a star, and a fly-through the O of ZOOM into the next scene.",
+    "creativeDirection": "Audience: motion designers comparing LeClap with a motion-design cheat sheet. Direction: one move per beat on the house palette (ink, lavender, rose), springs near critical, short decays. The greeting draws its underline, then rises out of the slot just above it, over moving footage, so the clip shows it is not a panel; it sinks back before the cut. Four diagonal bands in the theme colours sweep in, cover, and sweep on out to a day scene. The night scene opens out of the sun as a circle; the next scene opens out of a star icon as a star. The last cut flies through the counter of the O in ZOOM into GO! Review: no text outside its slot at any frame, the bands land together on the midpoint, each iris is centred on its icon, the O's hole and the letter stay locked while the camera dives."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 11,
+    "theme": {
+      "extends": "leclap",
+      "colors": {
+        "bg": "#141416",
+        "fg": "#F5F3F7",
+        "surface": "#1E1E24",
+        "brand": "#9298fb",
+        "accent": "#f96f99",
+        "accent2": "#ffd27a"
+      },
+      "fonts": {
+        "display": "archivo-black",
+        "body": "bebas"
+      }
+    },
+    "variables": {
+      "footage": "videos/video_1.mp4"
+    },
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "hello",
+      "type": "video",
+      "purpose": "The underline draws, Hello! rises out of the slot above it over footage, the subline follows, both sink back.",
+      "options": {
+        "videoUrl": "{{ footage }}",
+        "duration": 3.4
+      },
+      "grade": {
+        "brightness": -0.16,
+        "saturation": 0.55
+      },
+      "graphics": [
+        {
+          "type": "underline",
+          "at": 0.1,
+          "x": 410,
+          "y": 404,
+          "width": 460,
+          "thickness": 8,
+          "caps": "round",
+          "color": "$color.accent",
+          "exit": "fade",
+          "until": 2.15,
+          "ease": "cubic-bezier(0.33, 0, 0.15, 1)"
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "Hello!"
+          },
+          "preset": "rise",
+          "unit": "line",
+          "clip": "line",
+          "font": "$font.display",
+          "size": 150,
+          "y": 236,
+          "color": "$color.fg",
+          "delay": 0.35,
+          "distance": 170,
+          "ease": "spring(420, 31)",
+          "exit": {
+            "preset": "drop",
+            "at": 1.8,
+            "duration": 0.35,
+            "distance": 170,
+            "ease": "cubic-bezier(0.7, 0, 0.84, 0)"
+          }
+        },
+        {
+          "text": {
+            "en": "BONJOUR"
+          },
+          "preset": "rise",
+          "unit": "line",
+          "clip": "line",
+          "font": "$font.body",
+          "size": 46,
+          "y": 424,
+          "color": "$color.brand",
+          "delay": 0.55,
+          "duration": 0.45,
+          "distance": 50,
+          "ease": "cubic-bezier(0.22, 1, 0.36, 1)",
+          "exit": {
+            "preset": "rise",
+            "at": 1.75,
+            "duration": 0.3,
+            "distance": 50,
+            "ease": "cubic-bezier(0.7, 0, 0.84, 0)"
+          }
+        }
+      ],
+      "transition": {
+        "type": "bands",
+        "duration": 1.1,
+        "count": 4,
+        "angle": 28,
+        "stagger": 0.07,
+        "colors": ["$color.brand", "$color.accent", "$color.accent2", "$color.fg"],
+        "ease": "cubic-bezier(0.65, 0, 0.35, 1)"
+      }
+    },
+    {
+      "name": "day",
+      "type": "color_background",
+      "purpose": "A sun sits left of DAY: the night opens out of it as a circle.",
+      "options": {
+        "backgroundColor": "$color.brand",
+        "duration": 2.8
+      },
+      "inputs": [
+        {
+          "name": "sun",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"sun\"></div></div>",
+          "css": ".wrap { display: flex; align-items: center; justify-content: center; width: 200px; height: 200px } .sun { width: 150px; height: 150px; border-radius: 75px; background: #f96f99; box-shadow: 0 0 0 20px rgba(255, 255, 255, 0.3) }",
+          "width": 200,
+          "height": 200,
+          "options": {
+            "position": "250:260"
+          }
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "DAY"
+          },
+          "preset": "drop",
+          "clip": "line",
+          "font": "$font.display",
+          "size": 190,
+          "x": 520,
+          "align": "left",
+          "y": "center",
+          "color": "$color.bg",
+          "delay": 0.15,
+          "duration": 0.5,
+          "ease": "cubic-bezier(0.16, 1, 0.3, 1)"
+        }
+      ],
+      "transition": {
+        "type": "iris",
+        "duration": 0.85,
+        "origin": {
+          "x": 0.273,
+          "y": 0.5
+        },
+        "ease": "cubic-bezier(0.5, 0, 0.8, 0.5)"
+      }
+    },
+    {
+      "name": "night",
+      "type": "color_background",
+      "purpose": "NIGHT, with a star where the sun was: the next scene opens out of the star as a star.",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 2.8
+      },
+      "inputs": [
+        {
+          "name": "star",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"star\"></div></div>",
+          "css": ".wrap { display: flex; align-items: center; justify-content: center; width: 200px; height: 200px } .star { width: 170px; height: 170px; background: #ffd27a; clip-path: polygon(50% 0%, 63.2% 31.8%, 97.6% 34.5%, 71.4% 56.8%, 79.4% 90.5%, 50% 72.5%, 20.6% 90.5%, 28.6% 56.8%, 2.4% 34.5%, 36.8% 31.8%) }",
+          "width": 200,
+          "height": 200,
+          "options": {
+            "position": "250:260"
+          }
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "NIGHT"
+          },
+          "preset": "slide",
+          "clip": "line",
+          "font": "$font.display",
+          "size": 190,
+          "x": 520,
+          "align": "left",
+          "y": "center",
+          "color": "$color.fg",
+          "delay": 0.25,
+          "duration": 0.5,
+          "ease": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "direction": "right"
+        }
+      ],
+      "transition": {
+        "type": "iris",
+        "shape": "star",
+        "duration": 0.85,
+        "origin": {
+          "x": 0.273,
+          "y": 0.5
+        },
+        "ease": "cubic-bezier(0.5, 0, 0.8, 0.5)"
+      }
+    },
+    {
+      "name": "zoom",
+      "type": "color_background",
+      "purpose": "ZOOM holds still; the camera then flies through the counter of its first O.",
+      "options": {
+        "backgroundColor": "$color.accent2",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "ZOOM"
+          },
+          "preset": "pop",
+          "unit": "line",
+          "font": "archivo-black",
+          "size": 230,
+          "color": "$color.bg",
+          "delay": 0.1,
+          "ease": "spring(380, 30)"
+        }
+      ],
+      "transition": {
+        "type": "zoom-through",
+        "duration": 1,
+        "ease": "cubic-bezier(0.7, 0, 0.3, 1)",
+        "through": {
+          "text": "ZOOM",
+          "font": "archivo-black",
+          "size": 230
+        }
+      }
+    },
+    {
+      "name": "go",
+      "type": "color_background",
+      "purpose": "GO! lands on lavender, seen first through the O.",
+      "options": {
+        "backgroundColor": "$color.brand",
+        "duration": 2.2
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "GO!"
+          },
+          "preset": "fade",
+          "unit": "line",
+          "font": "archivo-black",
+          "size": 230,
+          "color": "$color.fg",
+          "delay": 0.12,
+          "duration": 0.01
+        }
+      ]
+    }
+  ]
+}

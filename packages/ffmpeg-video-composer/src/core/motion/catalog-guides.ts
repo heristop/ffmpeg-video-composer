@@ -128,6 +128,12 @@ export const TRANSITION_GUIDES: Record<string, MotionGuide> = {
     'premium, calm or corporate tone, or more than once per video',
     ['goo', 'drop']
   ),
+  bands: guide(
+    'SWEEPS',
+    'a playful chapter change in brand colours, a section title card',
+    'calm or premium tone, or two in a row',
+    ['rise', 'clip']
+  ),
 };
 
 export const GRAPHIC_GUIDES: Record<string, MotionGuide> = {

@@ -18,7 +18,7 @@ export interface FontMetrics {
   advanceWidth(codePoint: number): number | null;
 }
 
-interface TableRecord {
+export interface TableRecord {
   offset: number;
   length: number;
 }
@@ -29,7 +29,7 @@ function readTag(bytes: Uint8Array, offset: number): string {
   return String.fromCodePoint(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]);
 }
 
-function readTableDirectory(view: DataView, bytes: Uint8Array): Map<string, TableRecord> | null {
+export function readTableDirectory(view: DataView, bytes: Uint8Array): Map<string, TableRecord> | null {
   // 12-byte offset table, then 16 bytes per table record.
   if (view.byteLength < 12) {
     return null;
@@ -154,7 +154,7 @@ function isUnicodeEncoding(platformId: number, encodingId: number): boolean {
   return platformId === 0;
 }
 
-function readCmap(view: DataView, table: TableRecord): Map<number, number> {
+export function readCmap(view: DataView, table: TableRecord): Map<number, number> {
   const numSubtables = view.getUint16(table.offset + 2, false);
 
   for (let i = 0; i < numSubtables; i++) {

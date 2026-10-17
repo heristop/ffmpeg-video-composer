@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Clip boxes: a kinetic block takes `clip` (`"block"`, its own resting box; `"line"`, one box per line; or
+  `{ x, y, w, h }` in px) and an image, animation or html layer takes `options.clip` (a box). The element only
+  shows inside the box, so a `rise` reveals out of an invisible slot above an underline, on any background,
+  footage included, without a background-coloured panel. The frame is split, the element is drawn on one copy
+  exactly as before, and the copy is cropped to the box and laid back over the frame (`split`, `crop`,
+  `overlay`, all on device). Elements without a clip compile to the same filters as before.
+- `bands`, a designed transition: `count` parallel colour bands (2–8, default 4) at `angle` degrees (default 30) sweep in along their length, staggered (`stagger`, default 0.06 s), cover the frame at the midpoint,
+  then carry on and uncover the next scene. `colors` default to the theme's brand, accent, accent2 and fg.
+  Each band is a rectangle turned once by `rotate` and held by `loop`; per frame only overlay positions move.
+- Iris shapes: a designed `iris` takes `shape` (`circle` by default, unchanged, or `star`, `heart`,
+  `rounded-square`). A shape opens from `origin` on the `ease` through a reveal field drawn once at compile
+  time (per pixel, the scale the shape must reach to cover it), compared with the eased level on a half-size
+  `xfade` mask like the circle's.
+- Zoom through a window: a designed `zoom-through` takes `through`, a letter's counter
+  (`{ text, glyph?, font?, size?, x?, y? }`, laid out exactly as the kinetic block with the same values draws
+  it: the O of ZOOM) or a shape (`{ shape, size, x?, y? }`). The window is a compile-time matte, read from the
+  font's TrueType outlines; the outgoing scene and the matte run through the same zoom chain about the
+  window's centre, so the letter and its hole stay locked together, and the next scene shows through the
+  hole until it covers the frame. A window that cannot be drawn falls back to the plain zoom-through with a
+  warning. Shaped irises and windows add their matte image as an input of the transition assembly.
 - Keyframe tracks on image, animation and html layer inputs: `inputs[].options.animate` takes `x`, `y`,
   `scale`, `scaleX`, `scaleY`, `rotate` and `opacity` tracks, with the same `{ t, v, ease? }` keys, easings,
   springs, tokens and time references as the drawtext tracks. Cards, badges and icons can now pop in with an

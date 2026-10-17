@@ -19,6 +19,8 @@ export interface UnitTiming {
   arrive: number;
   /** When this unit starts leaving, or null when the block holds to the cut. */
   leave: number | null;
+  /** Height of the clip slot the unit moves in (a `clip: "line"` block), when it has one. */
+  slot?: number;
 }
 
 const FADE_IN = 0.18;
@@ -87,6 +89,17 @@ function withExit(
   return [...keys, { t: leave, v: rest }, { t: leave + exit.duration, v: to, ease: exit.ease }];
 }
 
+// Inside a clip slot `slot` px tall, a unit that travels in (or out) vertically by at least the slot is
+// revealed (hidden) by the slot's edge: it stays opaque instead of fading, so no faint ghost trails it.
+function opacityTrack(keys: TrackKey[], from: { y: number }, out: { y: number }, slot: number | undefined) {
+  const edgeIn = slot !== undefined && Math.abs(from.y) >= slot;
+  const edgeOut = slot !== undefined && Math.abs(out.y) >= slot;
+  const entrance = edgeIn ? [{ t: keys[0].t, v: 1 }] : keys.slice(0, 2);
+  const leave = keys.slice(2);
+
+  return [...entrance, ...(edgeOut ? leave.map((key) => ({ ...key, v: 1 })) : leave)];
+}
+
 /** The tracks one unit follows for its preset, entrance and exit. */
 export function unitTracks(
   settings: ResolvedKinetic,
@@ -110,7 +123,7 @@ export function unitTracks(
   const tracks: UnitTracks = {
     x: withExit(enter(timing.start, timing.arrive, from.x, settings.ease), timing.leave, exit, out.x, 0),
     y: withExit(enter(timing.start, timing.arrive, from.y, settings.ease), timing.leave, exit, out.y, 0),
-    opacity: withExit(opacityIn, timing.leave, exit, 0, 1),
+    opacity: opacityTrack(withExit(opacityIn, timing.leave, exit, 0, 1), from, out, timing.slot),
   };
 
   if (scaleFrom !== undefined || shrinks) {

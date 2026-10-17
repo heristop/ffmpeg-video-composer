@@ -697,7 +697,8 @@
                     "whip-right",
                     "whip-up",
                     "whip-down",
-                    "drip"
+                    "drip",
+                    "bands"
                   ]
                 },
                 {
@@ -705,7 +706,7 @@
                   "const": "cut"
                 }
               ],
-              "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
+              "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint), bands (colour bands sweep across at an angle, then on out)."
             },
             "ease": {
               "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -736,7 +737,119 @@
             },
             "color": {
               "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+            },
+            "shape": {
+              "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
+              "type": "string",
+              "enum": ["circle", "star", "heart", "rounded-square"]
+            },
+            "through": {
+              "description": "zoom-through: fly into a window that shows the next scene, a letter counter ({ text, glyph, font, size, x, y }) or a shape ({ shape, size, x, y }); the window grows until it covers the frame.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 40,
+                      "description": "The word the window is cut from, e.g. \"ZOOM\"."
+                    },
+                    "glyph": {
+                      "description": "0-based index of the character whose counter is the window (default the first with one).",
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "font": {
+                      "description": "Bundled font id or .ttf file, as the kinetic block draws it (default bebas).",
+                      "type": "string"
+                    },
+                    "size": {
+                      "description": "Font size in px (default 11% of the frame height).",
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 600
+                    },
+                    "x": {
+                      "description": "Anchor x in px, centre of the line, as a kinetic block (default frame centre).",
+                      "type": "number"
+                    },
+                    "y": {
+                      "description": "Top of the line in px, or top / center / bottom, as a kinetic block (default center).",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["top", "center", "bottom"]
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["text"],
+                  "additionalProperties": false,
+                  "description": "A letter's counter (the hole of an O, the bowl of a P) laid out exactly as a kinetic block with the same text, font, size, x and y: give the transition the values of the block the outgoing scene shows."
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "shape": {
+                      "type": "string",
+                      "enum": ["circle", "star", "heart", "rounded-square"],
+                      "description": "The window: circle, star, heart or rounded-square."
+                    },
+                    "size": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 4000,
+                      "description": "Width of the window in px."
+                    },
+                    "x": {
+                      "description": "Centre x in px (default frame centre).",
+                      "type": "number"
+                    },
+                    "y": {
+                      "description": "Centre y in px (default frame centre).",
+                      "type": "number"
+                    }
+                  },
+                  "required": ["shape", "size"],
+                  "additionalProperties": false,
+                  "description": "A shaped window at a size and place."
+                }
+              ]
+            },
+            "count": {
+              "description": "bands: how many bands (default 4).",
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 8
+            },
+            "angle": {
+              "description": "bands: the bands’ angle in degrees, counter-clockwise from horizontal (default 30).",
+              "type": "number",
+              "minimum": -80,
+              "maximum": 80
+            },
+            "colors": {
+              "description": "bands: band colours, cycled (\"#rrggbb\" or \"$color.*\"; default brand, accent, accent2, fg).",
+              "minItems": 1,
+              "maxItems": 8,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+              }
+            },
+            "stagger": {
+              "description": "bands: seconds between two bands (default 0.06, capped to fit the transition).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.5
             },
             "duration": {
               "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -1719,6 +1832,38 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "clip": {
+                          "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Left edge in output px."
+                            },
+                            "y": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Top edge in output px."
+                            },
+                            "w": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Width in output px."
+                            },
+                            "h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Height in output px."
+                            }
+                          },
+                          "required": ["x", "y", "w", "h"],
+                          "additionalProperties": false
                         }
                       },
                       "additionalProperties": false
@@ -2833,7 +2978,8 @@
                           "whip-right",
                           "whip-up",
                           "whip-down",
-                          "drip"
+                          "drip",
+                          "bands"
                         ]
                       },
                       {
@@ -2841,7 +2987,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint), bands (colour bands sweep across at an angle, then on out)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -2872,7 +3018,119 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                  },
+                  "shape": {
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
+                    "type": "string",
+                    "enum": ["circle", "star", "heart", "rounded-square"]
+                  },
+                  "through": {
+                    "description": "zoom-through: fly into a window that shows the next scene, a letter counter ({ text, glyph, font, size, x, y }) or a shape ({ shape, size, x, y }); the window grows until it covers the frame.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 40,
+                            "description": "The word the window is cut from, e.g. \"ZOOM\"."
+                          },
+                          "glyph": {
+                            "description": "0-based index of the character whose counter is the window (default the first with one).",
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "font": {
+                            "description": "Bundled font id or .ttf file, as the kinetic block draws it (default bebas).",
+                            "type": "string"
+                          },
+                          "size": {
+                            "description": "Font size in px (default 11% of the frame height).",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 600
+                          },
+                          "x": {
+                            "description": "Anchor x in px, centre of the line, as a kinetic block (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Top of the line in px, or top / center / bottom, as a kinetic block (default center).",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["top", "center", "bottom"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["text"],
+                        "additionalProperties": false,
+                        "description": "A letter's counter (the hole of an O, the bowl of a P) laid out exactly as a kinetic block with the same text, font, size, x and y: give the transition the values of the block the outgoing scene shows."
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "shape": {
+                            "type": "string",
+                            "enum": ["circle", "star", "heart", "rounded-square"],
+                            "description": "The window: circle, star, heart or rounded-square."
+                          },
+                          "size": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 4000,
+                            "description": "Width of the window in px."
+                          },
+                          "x": {
+                            "description": "Centre x in px (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Centre y in px (default frame centre).",
+                            "type": "number"
+                          }
+                        },
+                        "required": ["shape", "size"],
+                        "additionalProperties": false,
+                        "description": "A shaped window at a size and place."
+                      }
+                    ]
+                  },
+                  "count": {
+                    "description": "bands: how many bands (default 4).",
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 8
+                  },
+                  "angle": {
+                    "description": "bands: the bands’ angle in degrees, counter-clockwise from horizontal (default 30).",
+                    "type": "number",
+                    "minimum": -80,
+                    "maximum": 80
+                  },
+                  "colors": {
+                    "description": "bands: band colours, cycled (\"#rrggbb\" or \"$color.*\"; default brand, accent, accent2, fg).",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                    }
+                  },
+                  "stagger": {
+                    "description": "bands: seconds between two bands (default 0.06, capped to fit the transition).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.5
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -4587,6 +4845,38 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "clip": {
+                          "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Left edge in output px."
+                            },
+                            "y": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Top edge in output px."
+                            },
+                            "w": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Width in output px."
+                            },
+                            "h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Height in output px."
+                            }
+                          },
+                          "required": ["x", "y", "w", "h"],
+                          "additionalProperties": false
                         }
                       },
                       "additionalProperties": false
@@ -5701,7 +5991,8 @@
                           "whip-right",
                           "whip-up",
                           "whip-down",
-                          "drip"
+                          "drip",
+                          "bands"
                         ]
                       },
                       {
@@ -5709,7 +6000,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint), bands (colour bands sweep across at an angle, then on out)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -5740,7 +6031,119 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                  },
+                  "shape": {
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
+                    "type": "string",
+                    "enum": ["circle", "star", "heart", "rounded-square"]
+                  },
+                  "through": {
+                    "description": "zoom-through: fly into a window that shows the next scene, a letter counter ({ text, glyph, font, size, x, y }) or a shape ({ shape, size, x, y }); the window grows until it covers the frame.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 40,
+                            "description": "The word the window is cut from, e.g. \"ZOOM\"."
+                          },
+                          "glyph": {
+                            "description": "0-based index of the character whose counter is the window (default the first with one).",
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "font": {
+                            "description": "Bundled font id or .ttf file, as the kinetic block draws it (default bebas).",
+                            "type": "string"
+                          },
+                          "size": {
+                            "description": "Font size in px (default 11% of the frame height).",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 600
+                          },
+                          "x": {
+                            "description": "Anchor x in px, centre of the line, as a kinetic block (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Top of the line in px, or top / center / bottom, as a kinetic block (default center).",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["top", "center", "bottom"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["text"],
+                        "additionalProperties": false,
+                        "description": "A letter's counter (the hole of an O, the bowl of a P) laid out exactly as a kinetic block with the same text, font, size, x and y: give the transition the values of the block the outgoing scene shows."
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "shape": {
+                            "type": "string",
+                            "enum": ["circle", "star", "heart", "rounded-square"],
+                            "description": "The window: circle, star, heart or rounded-square."
+                          },
+                          "size": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 4000,
+                            "description": "Width of the window in px."
+                          },
+                          "x": {
+                            "description": "Centre x in px (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Centre y in px (default frame centre).",
+                            "type": "number"
+                          }
+                        },
+                        "required": ["shape", "size"],
+                        "additionalProperties": false,
+                        "description": "A shaped window at a size and place."
+                      }
+                    ]
+                  },
+                  "count": {
+                    "description": "bands: how many bands (default 4).",
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 8
+                  },
+                  "angle": {
+                    "description": "bands: the bands’ angle in degrees, counter-clockwise from horizontal (default 30).",
+                    "type": "number",
+                    "minimum": -80,
+                    "maximum": 80
+                  },
+                  "colors": {
+                    "description": "bands: band colours, cycled (\"#rrggbb\" or \"$color.*\"; default brand, accent, accent2, fg).",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                    }
+                  },
+                  "stagger": {
+                    "description": "bands: seconds between two bands (default 0.06, capped to fit the transition).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.5
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -7498,6 +7901,38 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "clip": {
+                          "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Left edge in output px."
+                            },
+                            "y": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Top edge in output px."
+                            },
+                            "w": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Width in output px."
+                            },
+                            "h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Height in output px."
+                            }
+                          },
+                          "required": ["x", "y", "w", "h"],
+                          "additionalProperties": false
                         }
                       },
                       "additionalProperties": false
@@ -8612,7 +9047,8 @@
                           "whip-right",
                           "whip-up",
                           "whip-down",
-                          "drip"
+                          "drip",
+                          "bands"
                         ]
                       },
                       {
@@ -8620,7 +9056,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint), bands (colour bands sweep across at an angle, then on out)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -8651,7 +9087,119 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                  },
+                  "shape": {
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
+                    "type": "string",
+                    "enum": ["circle", "star", "heart", "rounded-square"]
+                  },
+                  "through": {
+                    "description": "zoom-through: fly into a window that shows the next scene, a letter counter ({ text, glyph, font, size, x, y }) or a shape ({ shape, size, x, y }); the window grows until it covers the frame.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 40,
+                            "description": "The word the window is cut from, e.g. \"ZOOM\"."
+                          },
+                          "glyph": {
+                            "description": "0-based index of the character whose counter is the window (default the first with one).",
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "font": {
+                            "description": "Bundled font id or .ttf file, as the kinetic block draws it (default bebas).",
+                            "type": "string"
+                          },
+                          "size": {
+                            "description": "Font size in px (default 11% of the frame height).",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 600
+                          },
+                          "x": {
+                            "description": "Anchor x in px, centre of the line, as a kinetic block (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Top of the line in px, or top / center / bottom, as a kinetic block (default center).",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["top", "center", "bottom"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["text"],
+                        "additionalProperties": false,
+                        "description": "A letter's counter (the hole of an O, the bowl of a P) laid out exactly as a kinetic block with the same text, font, size, x and y: give the transition the values of the block the outgoing scene shows."
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "shape": {
+                            "type": "string",
+                            "enum": ["circle", "star", "heart", "rounded-square"],
+                            "description": "The window: circle, star, heart or rounded-square."
+                          },
+                          "size": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 4000,
+                            "description": "Width of the window in px."
+                          },
+                          "x": {
+                            "description": "Centre x in px (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Centre y in px (default frame centre).",
+                            "type": "number"
+                          }
+                        },
+                        "required": ["shape", "size"],
+                        "additionalProperties": false,
+                        "description": "A shaped window at a size and place."
+                      }
+                    ]
+                  },
+                  "count": {
+                    "description": "bands: how many bands (default 4).",
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 8
+                  },
+                  "angle": {
+                    "description": "bands: the bands’ angle in degrees, counter-clockwise from horizontal (default 30).",
+                    "type": "number",
+                    "minimum": -80,
+                    "maximum": 80
+                  },
+                  "colors": {
+                    "description": "bands: band colours, cycled (\"#rrggbb\" or \"$color.*\"; default brand, accent, accent2, fg).",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                    }
+                  },
+                  "stagger": {
+                    "description": "bands: seconds between two bands (default 0.06, capped to fit the transition).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.5
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -10133,6 +10681,38 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "clip": {
+                          "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Left edge in output px."
+                            },
+                            "y": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Top edge in output px."
+                            },
+                            "w": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Width in output px."
+                            },
+                            "h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Height in output px."
+                            }
+                          },
+                          "required": ["x", "y", "w", "h"],
+                          "additionalProperties": false
                         }
                       },
                       "additionalProperties": false
@@ -11247,7 +11827,8 @@
                           "whip-right",
                           "whip-up",
                           "whip-down",
-                          "drip"
+                          "drip",
+                          "bands"
                         ]
                       },
                       {
@@ -11255,7 +11836,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint), bands (colour bands sweep across at an angle, then on out)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -11286,7 +11867,119 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                  },
+                  "shape": {
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
+                    "type": "string",
+                    "enum": ["circle", "star", "heart", "rounded-square"]
+                  },
+                  "through": {
+                    "description": "zoom-through: fly into a window that shows the next scene, a letter counter ({ text, glyph, font, size, x, y }) or a shape ({ shape, size, x, y }); the window grows until it covers the frame.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 40,
+                            "description": "The word the window is cut from, e.g. \"ZOOM\"."
+                          },
+                          "glyph": {
+                            "description": "0-based index of the character whose counter is the window (default the first with one).",
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "font": {
+                            "description": "Bundled font id or .ttf file, as the kinetic block draws it (default bebas).",
+                            "type": "string"
+                          },
+                          "size": {
+                            "description": "Font size in px (default 11% of the frame height).",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 600
+                          },
+                          "x": {
+                            "description": "Anchor x in px, centre of the line, as a kinetic block (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Top of the line in px, or top / center / bottom, as a kinetic block (default center).",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["top", "center", "bottom"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["text"],
+                        "additionalProperties": false,
+                        "description": "A letter's counter (the hole of an O, the bowl of a P) laid out exactly as a kinetic block with the same text, font, size, x and y: give the transition the values of the block the outgoing scene shows."
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "shape": {
+                            "type": "string",
+                            "enum": ["circle", "star", "heart", "rounded-square"],
+                            "description": "The window: circle, star, heart or rounded-square."
+                          },
+                          "size": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 4000,
+                            "description": "Width of the window in px."
+                          },
+                          "x": {
+                            "description": "Centre x in px (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Centre y in px (default frame centre).",
+                            "type": "number"
+                          }
+                        },
+                        "required": ["shape", "size"],
+                        "additionalProperties": false,
+                        "description": "A shaped window at a size and place."
+                      }
+                    ]
+                  },
+                  "count": {
+                    "description": "bands: how many bands (default 4).",
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 8
+                  },
+                  "angle": {
+                    "description": "bands: the bands’ angle in degrees, counter-clockwise from horizontal (default 30).",
+                    "type": "number",
+                    "minimum": -80,
+                    "maximum": 80
+                  },
+                  "colors": {
+                    "description": "bands: band colours, cycled (\"#rrggbb\" or \"$color.*\"; default brand, accent, accent2, fg).",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                    }
+                  },
+                  "stagger": {
+                    "description": "bands: seconds between two bands (default 0.06, capped to fit the transition).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.5
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -12748,6 +13441,38 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "clip": {
+                          "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Left edge in output px."
+                            },
+                            "y": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Top edge in output px."
+                            },
+                            "w": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Width in output px."
+                            },
+                            "h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Height in output px."
+                            }
+                          },
+                          "required": ["x", "y", "w", "h"],
+                          "additionalProperties": false
                         }
                       },
                       "additionalProperties": false
@@ -13862,7 +14587,8 @@
                           "whip-right",
                           "whip-up",
                           "whip-down",
-                          "drip"
+                          "drip",
+                          "bands"
                         ]
                       },
                       {
@@ -13870,7 +14596,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint), bands (colour bands sweep across at an angle, then on out)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -13901,7 +14627,119 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                  },
+                  "shape": {
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
+                    "type": "string",
+                    "enum": ["circle", "star", "heart", "rounded-square"]
+                  },
+                  "through": {
+                    "description": "zoom-through: fly into a window that shows the next scene, a letter counter ({ text, glyph, font, size, x, y }) or a shape ({ shape, size, x, y }); the window grows until it covers the frame.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 40,
+                            "description": "The word the window is cut from, e.g. \"ZOOM\"."
+                          },
+                          "glyph": {
+                            "description": "0-based index of the character whose counter is the window (default the first with one).",
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "font": {
+                            "description": "Bundled font id or .ttf file, as the kinetic block draws it (default bebas).",
+                            "type": "string"
+                          },
+                          "size": {
+                            "description": "Font size in px (default 11% of the frame height).",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 600
+                          },
+                          "x": {
+                            "description": "Anchor x in px, centre of the line, as a kinetic block (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Top of the line in px, or top / center / bottom, as a kinetic block (default center).",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["top", "center", "bottom"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["text"],
+                        "additionalProperties": false,
+                        "description": "A letter's counter (the hole of an O, the bowl of a P) laid out exactly as a kinetic block with the same text, font, size, x and y: give the transition the values of the block the outgoing scene shows."
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "shape": {
+                            "type": "string",
+                            "enum": ["circle", "star", "heart", "rounded-square"],
+                            "description": "The window: circle, star, heart or rounded-square."
+                          },
+                          "size": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 4000,
+                            "description": "Width of the window in px."
+                          },
+                          "x": {
+                            "description": "Centre x in px (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Centre y in px (default frame centre).",
+                            "type": "number"
+                          }
+                        },
+                        "required": ["shape", "size"],
+                        "additionalProperties": false,
+                        "description": "A shaped window at a size and place."
+                      }
+                    ]
+                  },
+                  "count": {
+                    "description": "bands: how many bands (default 4).",
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 8
+                  },
+                  "angle": {
+                    "description": "bands: the bands’ angle in degrees, counter-clockwise from horizontal (default 30).",
+                    "type": "number",
+                    "minimum": -80,
+                    "maximum": 80
+                  },
+                  "colors": {
+                    "description": "bands: band colours, cycled (\"#rrggbb\" or \"$color.*\"; default brand, accent, accent2, fg).",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                    }
+                  },
+                  "stagger": {
+                    "description": "bands: seconds between two bands (default 0.06, capped to fit the transition).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.5
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -15834,6 +16672,38 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "clip": {
+                          "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Left edge in output px."
+                            },
+                            "y": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Top edge in output px."
+                            },
+                            "w": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Width in output px."
+                            },
+                            "h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Height in output px."
+                            }
+                          },
+                          "required": ["x", "y", "w", "h"],
+                          "additionalProperties": false
                         }
                       },
                       "additionalProperties": false
@@ -16948,7 +17818,8 @@
                           "whip-right",
                           "whip-up",
                           "whip-down",
-                          "drip"
+                          "drip",
+                          "bands"
                         ]
                       },
                       {
@@ -16956,7 +17827,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint), bands (colour bands sweep across at an angle, then on out)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -16987,7 +17858,119 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                  },
+                  "shape": {
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
+                    "type": "string",
+                    "enum": ["circle", "star", "heart", "rounded-square"]
+                  },
+                  "through": {
+                    "description": "zoom-through: fly into a window that shows the next scene, a letter counter ({ text, glyph, font, size, x, y }) or a shape ({ shape, size, x, y }); the window grows until it covers the frame.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 40,
+                            "description": "The word the window is cut from, e.g. \"ZOOM\"."
+                          },
+                          "glyph": {
+                            "description": "0-based index of the character whose counter is the window (default the first with one).",
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "font": {
+                            "description": "Bundled font id or .ttf file, as the kinetic block draws it (default bebas).",
+                            "type": "string"
+                          },
+                          "size": {
+                            "description": "Font size in px (default 11% of the frame height).",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 600
+                          },
+                          "x": {
+                            "description": "Anchor x in px, centre of the line, as a kinetic block (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Top of the line in px, or top / center / bottom, as a kinetic block (default center).",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["top", "center", "bottom"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["text"],
+                        "additionalProperties": false,
+                        "description": "A letter's counter (the hole of an O, the bowl of a P) laid out exactly as a kinetic block with the same text, font, size, x and y: give the transition the values of the block the outgoing scene shows."
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "shape": {
+                            "type": "string",
+                            "enum": ["circle", "star", "heart", "rounded-square"],
+                            "description": "The window: circle, star, heart or rounded-square."
+                          },
+                          "size": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 4000,
+                            "description": "Width of the window in px."
+                          },
+                          "x": {
+                            "description": "Centre x in px (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Centre y in px (default frame centre).",
+                            "type": "number"
+                          }
+                        },
+                        "required": ["shape", "size"],
+                        "additionalProperties": false,
+                        "description": "A shaped window at a size and place."
+                      }
+                    ]
+                  },
+                  "count": {
+                    "description": "bands: how many bands (default 4).",
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 8
+                  },
+                  "angle": {
+                    "description": "bands: the bands’ angle in degrees, counter-clockwise from horizontal (default 30).",
+                    "type": "number",
+                    "minimum": -80,
+                    "maximum": 80
+                  },
+                  "colors": {
+                    "description": "bands: band colours, cycled (\"#rrggbb\" or \"$color.*\"; default brand, accent, accent2, fg).",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                    }
+                  },
+                  "stagger": {
+                    "description": "bands: seconds between two bands (default 0.06, capped to fit the transition).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.5
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -18449,6 +19432,38 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "clip": {
+                          "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Left edge in output px."
+                            },
+                            "y": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Top edge in output px."
+                            },
+                            "w": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Width in output px."
+                            },
+                            "h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Height in output px."
+                            }
+                          },
+                          "required": ["x", "y", "w", "h"],
+                          "additionalProperties": false
                         }
                       },
                       "additionalProperties": false
@@ -19563,7 +20578,8 @@
                           "whip-right",
                           "whip-up",
                           "whip-down",
-                          "drip"
+                          "drip",
+                          "bands"
                         ]
                       },
                       {
@@ -19571,7 +20587,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint), bands (colour bands sweep across at an angle, then on out)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -19602,7 +20618,119 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                  },
+                  "shape": {
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
+                    "type": "string",
+                    "enum": ["circle", "star", "heart", "rounded-square"]
+                  },
+                  "through": {
+                    "description": "zoom-through: fly into a window that shows the next scene, a letter counter ({ text, glyph, font, size, x, y }) or a shape ({ shape, size, x, y }); the window grows until it covers the frame.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 40,
+                            "description": "The word the window is cut from, e.g. \"ZOOM\"."
+                          },
+                          "glyph": {
+                            "description": "0-based index of the character whose counter is the window (default the first with one).",
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "font": {
+                            "description": "Bundled font id or .ttf file, as the kinetic block draws it (default bebas).",
+                            "type": "string"
+                          },
+                          "size": {
+                            "description": "Font size in px (default 11% of the frame height).",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 600
+                          },
+                          "x": {
+                            "description": "Anchor x in px, centre of the line, as a kinetic block (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Top of the line in px, or top / center / bottom, as a kinetic block (default center).",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["top", "center", "bottom"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["text"],
+                        "additionalProperties": false,
+                        "description": "A letter's counter (the hole of an O, the bowl of a P) laid out exactly as a kinetic block with the same text, font, size, x and y: give the transition the values of the block the outgoing scene shows."
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "shape": {
+                            "type": "string",
+                            "enum": ["circle", "star", "heart", "rounded-square"],
+                            "description": "The window: circle, star, heart or rounded-square."
+                          },
+                          "size": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 4000,
+                            "description": "Width of the window in px."
+                          },
+                          "x": {
+                            "description": "Centre x in px (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Centre y in px (default frame centre).",
+                            "type": "number"
+                          }
+                        },
+                        "required": ["shape", "size"],
+                        "additionalProperties": false,
+                        "description": "A shaped window at a size and place."
+                      }
+                    ]
+                  },
+                  "count": {
+                    "description": "bands: how many bands (default 4).",
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 8
+                  },
+                  "angle": {
+                    "description": "bands: the bands’ angle in degrees, counter-clockwise from horizontal (default 30).",
+                    "type": "number",
+                    "minimum": -80,
+                    "maximum": 80
+                  },
+                  "colors": {
+                    "description": "bands: band colours, cycled (\"#rrggbb\" or \"$color.*\"; default brand, accent, accent2, fg).",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                    }
+                  },
+                  "stagger": {
+                    "description": "bands: seconds between two bands (default 0.06, capped to fit the transition).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.5
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -21064,6 +22192,38 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "clip": {
+                          "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Left edge in output px."
+                            },
+                            "y": {
+                              "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
+                              "description": "Top edge in output px."
+                            },
+                            "w": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Width in output px."
+                            },
+                            "h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 20000,
+                              "description": "Height in output px."
+                            }
+                          },
+                          "required": ["x", "y", "w", "h"],
+                          "additionalProperties": false
                         }
                       },
                       "additionalProperties": false
@@ -22178,7 +23338,8 @@
                           "whip-right",
                           "whip-up",
                           "whip-down",
-                          "drip"
+                          "drip",
+                          "bands"
                         ]
                       },
                       {
@@ -22186,7 +23347,7 @@
                         "const": "cut"
                       }
                     ],
-                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint)."
+                    "description": "xfade transition name between this section and the next, \"cut\" for a hard cut, or a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the frame, then the next scene drips down over the paint), bands (colour bands sweep across at an angle, then on out)."
                   },
                   "ease": {
                     "description": "Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.",
@@ -22217,7 +23378,119 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                  },
+                  "shape": {
+                    "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin and ignore rim.",
+                    "type": "string",
+                    "enum": ["circle", "star", "heart", "rounded-square"]
+                  },
+                  "through": {
+                    "description": "zoom-through: fly into a window that shows the next scene, a letter counter ({ text, glyph, font, size, x, y }) or a shape ({ shape, size, x, y }); the window grows until it covers the frame.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 40,
+                            "description": "The word the window is cut from, e.g. \"ZOOM\"."
+                          },
+                          "glyph": {
+                            "description": "0-based index of the character whose counter is the window (default the first with one).",
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "font": {
+                            "description": "Bundled font id or .ttf file, as the kinetic block draws it (default bebas).",
+                            "type": "string"
+                          },
+                          "size": {
+                            "description": "Font size in px (default 11% of the frame height).",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 600
+                          },
+                          "x": {
+                            "description": "Anchor x in px, centre of the line, as a kinetic block (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Top of the line in px, or top / center / bottom, as a kinetic block (default center).",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["top", "center", "bottom"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["text"],
+                        "additionalProperties": false,
+                        "description": "A letter's counter (the hole of an O, the bowl of a P) laid out exactly as a kinetic block with the same text, font, size, x and y: give the transition the values of the block the outgoing scene shows."
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "shape": {
+                            "type": "string",
+                            "enum": ["circle", "star", "heart", "rounded-square"],
+                            "description": "The window: circle, star, heart or rounded-square."
+                          },
+                          "size": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 4000,
+                            "description": "Width of the window in px."
+                          },
+                          "x": {
+                            "description": "Centre x in px (default frame centre).",
+                            "type": "number"
+                          },
+                          "y": {
+                            "description": "Centre y in px (default frame centre).",
+                            "type": "number"
+                          }
+                        },
+                        "required": ["shape", "size"],
+                        "additionalProperties": false,
+                        "description": "A shaped window at a size and place."
+                      }
+                    ]
+                  },
+                  "count": {
+                    "description": "bands: how many bands (default 4).",
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 8
+                  },
+                  "angle": {
+                    "description": "bands: the bands’ angle in degrees, counter-clockwise from horizontal (default 30).",
+                    "type": "number",
+                    "minimum": -80,
+                    "maximum": 80
+                  },
+                  "colors": {
+                    "description": "bands: band colours, cycled (\"#rrggbb\" or \"$color.*\"; default brand, accent, accent2, fg).",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\\.\\d+)?|1(\\.0+)?))?$"
+                    }
+                  },
+                  "stagger": {
+                    "description": "bands: seconds between two bands (default 0.06, capped to fit the transition).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.5
                   },
                   "duration": {
                     "description": "Transition length in seconds (default: the global transition duration, then 0.3).",
@@ -24657,6 +25930,47 @@
           },
           "additionalProperties": false,
           "description": "Fill the letters with a gradient, a texture image and/or a shimmer sweep instead of a flat colour. Drawn as a mask (alphamerge), per-unit timing kept. Needs alphamerge: the on-device engine falls back to the solid colour with a warning when its build lacks it."
+        },
+        "clip": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["block", "line"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": -20000,
+                  "maximum": 20000,
+                  "description": "Left edge in output px."
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": -20000,
+                  "maximum": 20000,
+                  "description": "Top edge in output px."
+                },
+                "w": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 20000,
+                  "description": "Width in output px."
+                },
+                "h": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 20000,
+                  "description": "Height in output px."
+                }
+              },
+              "required": ["x", "y", "w", "h"],
+              "additionalProperties": false,
+              "description": "A box in output pixels; the element is cut to it."
+            }
+          ],
+          "description": "Cut the block to a box, so it reveals as if from behind an invisible edge (rise out of a slot, drop from under a rule), on any background: \"block\" = its own resting box, \"line\" = each line its own box (each line rises out of its own slot), or { x, y, w, h } in px."
         },
         "accent": {
           "description": "Emphasis for chosen words: a colour, and for the highlight preset a sweeping marker.",
@@ -28169,7 +29483,7 @@
                 "secondary": {
                   "description": "Colour of the second lobe: \"#rrggbb\" or a theme token (default rose #FF7A88; the first lobe is `color`, default amber #FFB36B, both nudged toward the theme accent).",
                   "type": "string",
-                  "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z]+)(@[0-9.]+)?$"
+                  "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                 },
                 "balance": {
                   "description": "Strength of the second lobe relative to the first (default 0.55–0.8). 0 = a single lobe.",
@@ -28318,7 +29632,7 @@
                 "glow": {
                   "description": "Bloom colour: \"#rrggbb\" or a theme token (default: the light colour pushed toward the theme accent). The hairline stays near-white.",
                   "type": "string",
-                  "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z]+)(@[0-9.]+)?$"
+                  "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                 },
                 "breathe": {
                   "description": "Opacity swing of the bloom, ± share (default 0.06; 0 = steady).",
