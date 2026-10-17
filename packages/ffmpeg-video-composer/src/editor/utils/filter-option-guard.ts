@@ -97,6 +97,24 @@ export function readToken(input: string, terminators: string): Token {
   return { value, rest: input.slice(index), open: false };
 }
 
+/** An absolute path (`/x`, `~/x`, `C:\\x`) or a `..` traversal. */
+const PATH_LIKE = /^\s*(\/|~|[A-Za-z]:[\\/])|(^|[\\/])\.\.([\\/]|$)/;
+
+/**
+ * A protocol prefix (`file:`, `http:`, `data:`, `concat:`, `subfile:`…) as FFmpeg reads the value once
+ * unescaped: `'file\:/x'` opens a file and `'http\://…'` a URL wherever a filter takes a path. A time
+ * (`00:00:01`) starts with a digit, so it never matches.
+ */
+const PROTOCOL = /^\s*[A-Za-z][\w+.-]*:/;
+
+/** Why an option value, unescaped, would name a file or a URL; null when it does not. */
+function locationProblem(value: string, isText = false): string | null {
+  if (PATH_LIKE.test(value)) return 'passes a file path';
+
+  // drawtext text is copy, never opened: "Note: …" stays text.
+  return !isText && PROTOCOL.test(value) ? 'passes a protocol (file:, http:…)' : null;
+}
+
 /** Why `value` would leave its `key=value` option, or null when it stays one option of one filter. */
 function optionEscape(value: string): string | null {
   const graph = readToken(value, '[];,');
@@ -122,7 +140,7 @@ export function assertSafeFilterValue(key: string, value: string): string {
     throw new Error(`Unsafe filter value ${key}: the option reads a file, which raw filter values cannot do`);
   }
 
-  const escape = optionEscape(value);
+  const escape = optionEscape(value) ?? locationProblem(readToken(readToken(value, '[];,').value, ':').value);
 
   if (escape) throw new Error(`Unsafe filter value ${key}: "${value}" ${escape}`);
 
@@ -141,6 +159,18 @@ export function assertBareFontFile(file: string): string {
   return file;
 }
 
+/**
+ * A filtergraph pad label (`[label]`): a stream (`0:v`), an `@input` reference or a plain name. A `]`,
+ * `[`, `;` or `,` in an author's input name would close the label and splice its own graph in.
+ */
+export function assertSafePadLabel(label: string): string {
+  if (!/^[A-Za-z0-9_.:@-]+$/.test(label)) {
+    throw new Error(`Unsafe pad label "${label}": use letters, digits, "_" or "-" in input names`);
+  }
+
+  return label;
+}
+
 /** A raw filter name: lower-case letters, digits and `_`, and not a file- or command-capable filter. */
 export function assertSafeFilterType(type: string): string {
   if (!/^[a-z0-9_]+$/.test(type)) throw new Error(`Unsafe filter type "${type}": not a filter name`);
@@ -151,9 +181,6 @@ export function assertSafeFilterType(type: string): string {
 
   return type;
 }
-
-/** An absolute path (`/x`, `~/x`, `C:\\x`) or a `..` traversal. */
-const PATH_LIKE = /^\s*(\/|~|[A-Za-z]:[\\/])|(^|[\\/])\.\.([\\/]|$)/;
 
 /** Checks one filter's options (graph-level text already split off): keys, positional drawtext, quotes. */
 function checkOptions(type: string, options: string, value: string): void {
@@ -171,10 +198,13 @@ function checkOptions(type: string, options: string, value: string): void {
     }
 
     // A positional option can be a file option (metadata's 6th, psnr's 1st, curves' 7th): a value that
-    // reads as an absolute path or a traversal is refused whatever its slot or key.
-    if (PATH_LIKE.test(equals < 0 ? option.value : option.value.slice(equals + 1))) {
-      throw new Error(`Unsafe filter value ${type}: "${value}" passes a file path`);
-    }
+    // reads as an absolute path, a traversal or a protocol is refused whatever its slot or key.
+    const optionValue = equals < 0 ? option.value : option.value.slice(equals + 1);
+    const location = locationProblem(optionValue, key === 'text');
+
+    if (location) throw new Error(`Unsafe filter value ${type}: "${value}" ${location}`);
+
+    if (key === 'fontfile' && type === 'drawtext') assertBareFontFile(optionValue);
 
     if (key === null && type === 'drawtext') {
       throw new Error(`Unsafe filter value ${type}: positional options are not allowed (the first is fontfile)`);

@@ -3,9 +3,12 @@
 // options with no key (metadata's 6th writes a file, psnr's 1st, curves' 7th reads one), so every round
 // of deny-listing found another one. Authored filters are checked here against an allow-list instead:
 // a known file-free type, its option names, and at most the positional options the table lists (each
-// a file-free option in FFmpeg's own order). Engine presets never pass through here: the check runs on
-// the authored descriptor, before the build expands its sugar into filters. `allowRawFilters` (trusted
-// local authors) skips it; the render-time deny-list (filter-option-guard.ts) stays on in both modes.
+// a file-free option in FFmpeg's own order). It runs twice: on the authored descriptor at validation
+// (agent-facing issues), and on the fully resolved descriptor right before lowering (formats, partial
+// variables, fields and theme tokens substituted; director/prepare-build.ts), which is the gate that
+// holds. Engine presets never pass through here: sugar is expanded into filters after both checks.
+// `allowRawFilters` (trusted local authors) skips it; the render-time deny-list (filter-option-guard.ts)
+// stays on in both modes.
 
 import { nearest } from '../../services/validation/suggest';
 import type { ValidationError } from '../../services/validation/types';
@@ -175,6 +178,18 @@ function allowedKey(rule: FilterRule, key: string): boolean {
   return rule.keys.includes(key) || COMMON_KEYS.has(key);
 }
 
+function fontProblem(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+
+  try {
+    assertBareFontFile(value);
+
+    return undefined;
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error);
+  }
+}
+
 // One `:`-separated option of a scalar value, against the rule: a named option must be allowed, and a
 // positional one must fit the rule's positional slots and come before any named option.
 function optionProblem(
@@ -188,7 +203,9 @@ function optionProblem(
     const key = text.slice(0, equals).trim();
     state.named = true;
 
-    return allowedKey(rule, key) ? undefined : `has no allowed option "${key}"`;
+    if (!allowedKey(rule, key)) return `has no allowed option "${key}"`;
+
+    return key === 'fontfile' ? fontProblem(text.slice(equals + 1)) : undefined;
   }
 
   const limit = rule.positional?.length ?? 0;
@@ -230,18 +247,6 @@ function valueProblem(type: string, value: string, rule: FilterRule): string | u
   return optionsProblem(value, rule);
 }
 
-function fontProblem(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined;
-
-  try {
-    assertBareFontFile(value);
-
-    return undefined;
-  } catch (error) {
-    return error instanceof Error ? error.message : String(error);
-  }
-}
-
 function valuesProblem(type: string, values: Record<string, unknown>, rule: FilterRule): string | undefined {
   if (type === 'lut3d') return 'a LUT look is a scalar preset name';
 
@@ -276,8 +281,31 @@ function record(value: unknown): Record<string, unknown> | undefined {
   return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : undefined;
 }
 
+// A `$format` object, a `{{ placeholder }}` or any non-scalar where FFmpeg reads raw text: it would be
+// substituted after the authored descriptor is read, so it is refused where a template is validated.
+function markerProblem(filter: Record<string, unknown>): string | undefined {
+  if (typeof filter.type !== 'string') return 'type must be a plain filter name, not an object or a placeholder';
+
+  if (filter.value !== undefined && scalar(filter.value) === undefined) {
+    return 'value must be a plain string or number, not an object or a $format block';
+  }
+
+  if (`${filter.type} ${scalar(filter.value) ?? ''}`.includes('{{')) {
+    return 'type and value cannot hold a {{ placeholder }}: write the filter text itself';
+  }
+
+  const values = Object.entries(record(filter.values) ?? {});
+  const formatted = values.find(([, value]) => record(value)?.$format !== undefined);
+
+  return formatted ? `values.${formatted[0]} cannot be a $format block` : undefined;
+}
+
 function filterIssue(filter: Record<string, unknown>, path: string): Issue | undefined {
-  const type = typeof filter.type === 'string' ? filter.type : '';
+  const marker = markerProblem(filter);
+
+  if (marker) return issue(path, `Filter ${marker}.`, OPT_IN);
+
+  const type = filter.type as string;
   const rule = Object.hasOwn(AUTHORED_FILTERS, type) ? AUTHORED_FILTERS[type] : undefined;
 
   if (!rule) return unknownFilter(type, path);
@@ -326,7 +354,7 @@ function elementIssues(child: unknown, key: string, at: string): Issue[] {
 
   if (key === 'maps') return mapIssues(element, at);
 
-  if (key !== 'filters' || typeof element.type !== 'string') return [];
+  if (key !== 'filters' || element.type === undefined) return [];
 
   const found = filterIssue(element, at);
 
@@ -362,8 +390,11 @@ export function authoredFilterIssues(descriptor: unknown): Issue[] {
   return issues;
 }
 
-/** The render-path gate: throws the first refused filters unless the caller trusts the template. */
-export function assertAuthoredFiltersAllowed(descriptor: unknown, allowRawFilters: boolean | undefined): void {
+/**
+ * The render-path gate, on the fully resolved descriptor right before lowering: throws the first refused
+ * filters unless the caller trusts the template.
+ */
+export function assertRawFiltersAllowed(descriptor: unknown, allowRawFilters: boolean | undefined): void {
   if (allowRawFilters) return;
 
   const issues = authoredFilterIssues(descriptor);

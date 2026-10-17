@@ -17,6 +17,7 @@ import { layerKeyframes } from '../presets/layer-keyframes';
 import { resolveFit } from '../utils/reframe';
 import { evenBox } from '../presets/clip-box';
 import type { ClipBox } from '../../schemas/clip.schemas';
+import { assertSafePadLabel } from '../utils/filter-option-guard';
 
 // Section.inputs is typed as Input[] for schema purposes, but at runtime it holds
 // MapAnimationInput objects indexed by string keys (used as a keyed record).
@@ -43,12 +44,13 @@ class MapManager {
     let mappedInputs = '';
     let mappedOutputs = '';
 
+    // Labels come from authored maps and input names: each must stay one `[label]`.
     for (const input of map.inputs) {
-      mappedInputs += `[${this.mapInputsVariables(input)}]`;
+      mappedInputs += `[${assertSafePadLabel(this.mapInputsVariables(input))}]`;
     }
 
     for (const output of map.outputs) {
-      mappedOutputs += `[${output}]`;
+      mappedOutputs += `[${assertSafePadLabel(output)}]`;
       this.segment.mapsList.push(output);
     }
 
@@ -100,7 +102,7 @@ class MapManager {
     // source whose ratio differs from the output (e.g. a portrait clip under a 1:1 square template). A
     // letterboxed section keeps the whole frame with bars instead, as it does without overlays.
     if (videoScale) {
-      const normalizedPad = `${name}_norm`;
+      const normalizedPad = assertSafePadLabel(`${name}_norm`);
       const fit =
         resolveFit(this.currentSection.options) === 'letterbox'
           ? `force_original_aspect_ratio=decrease,pad=${videoScale}:(ow-iw)/2:(oh-ih)/2`
@@ -149,7 +151,7 @@ class MapManager {
       return `${inputIndex}:v`;
     }
 
-    const animationPad = `${input.name}_src`;
+    const animationPad = assertSafePadLabel(`${input.name}_src`);
     this.segment.filtersMapList.unshift(`[${inputIndex}:v]${legFilters.join(',')}[${animationPad}]`);
 
     return animationPad;
@@ -304,7 +306,7 @@ class MapManager {
       return `${gradientIndex}:v`;
     }
 
-    const legPad = `${outputName}_op`;
+    const legPad = assertSafePadLabel(`${outputName}_op`);
     // unshift, not push: the pad must be defined before the overlay map that consumes it,
     // or ffmpeg fails with an undefined stream specifier.
     this.segment.filtersMapList.unshift(`[${gradientIndex}:v]${legFilters.join(',')}[${legPad}]`);

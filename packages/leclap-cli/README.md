@@ -105,7 +105,7 @@ Raw `filters` in a template are checked against the engine's
 [raw filter allow-list](../../docs/template-configuration.md#raw-filter-allow-list); a filter outside it
 fails with `filter_not_allowed`. `--allow-raw-filters` (on `render` and `verify --rerender`) trusts the
 template's raw filters instead: only for templates you wrote or reviewed, since some FFmpeg filters read
-or write files.
+or write files anywhere and open URLs, and the render-time deny-list that stays on is best-effort.
 
 Codec, quality tier and segment concurrency are configured through the library's `ProjectConfig`;
 the published CLI has no flags for those fields. MCP server flags belong to `leclap-mcp`, not

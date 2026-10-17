@@ -1229,16 +1229,21 @@ For a hand-framed scene, a final `{ "type": "scale", "value": "output" }` is a L
 A template can come from anywhere: an agent, a shared link, a downloaded file. Some FFmpeg filters read or
 write files, and several take a file as a **positional** option with no key (`metadata`'s 6th, `psnr`'s 1st,
 `curves`' 7th), so authored raw filters are checked against an allow-list by default, on every entry
-(validation, `compile()` with or without `skipValidation`, the browser and on-device paths):
+(validation, `compile()` with or without `skipValidation`, the browser and on-device paths). The render
+checks the descriptor it is about to lower, after `$format` values, partial `variables`, declared
+`fields` and theme tokens are substituted, so none of them can bring in a filter the list refuses:
 
 - the `type` must be one of the file-free filters below, with only the option names listed for it
   (`enable` is accepted everywhere);
+- `type` and `value` are plain text: a `$format` block or a `{{ placeholder }}` there (or a `$format` block
+  in a `values` entry) is refused at validation, and a declared field cannot fill them;
 - a scalar `value` may hold at most the positional options listed (in FFmpeg's order), and no `,`-chained
   filter;
 - `drawtext` takes no `textfile`, and its `fontfile` is a bare font name such as `Oswald.ttf`;
 - `lut3d` is a [LUT look](#looks) by preset name (`"teal-orange"`, `"teal-orange@0.6"`); a `url:` LUT needs
   the opt-in;
-- a `maps[]` pad label is a stream (`0:v`), an `@input` reference or a plain lower-case label;
+- a `maps[]` pad label is a stream (`0:v`), an `@input` reference or a plain lower-case label, and an
+  `inputs[].name` (a pad label too) uses letters, digits, `_` and `-` only;
 - an authored filter cannot carry an engine `graph` block.
 
 | Filters                                                                                                        | Notes                                                     |
@@ -1261,9 +1266,11 @@ validation fails before any FFmpeg command.
 --allow-raw-filters` / `leclap verify --rerender --allow-raw-filters`, or the MCP server's
 `--allow-raw-filters` / `LECLAP_MCP_ALLOW_RAW_FILTERS` restore the raw pass-through. A render-time deny-list
 stays on (file- and command-capable filter types, file option keys, filtergraph escapes, absolute or `..`
-paths in any option), but it cannot know every filter: a relative path in a positional file option still
-reaches FFmpeg. Only turn it on for templates you wrote or reviewed. Templates that use a filter outside the
-list need this opt-in.
+paths and protocol prefixes such as `file:` or `http:` in any option, once unescaped), but it is best-effort:
+it cannot know every filter or every way FFmpeg opens a file. A trusted template can still write files
+(relative to the working directory, or wherever an option the deny-list does not recognize points, absolute
+paths included) and reach the network. Only turn it on for templates you wrote or reviewed. Templates that
+use a filter outside the list need this opt-in.
 
 ## Variables & placeholders
 

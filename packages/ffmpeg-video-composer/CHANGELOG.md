@@ -183,6 +183,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   refuses absolute or `..` paths in any filter option.
 - Transitions: a compile that skips validation now renders an unknown transition `type` as a fade instead of
   writing the name into the filter graph.
+- Raw filters: the allow-list now also holds on the descriptor the build lowers, after `$format` values,
+  partial variables, declared fields and theme tokens are substituted, so none of them can bring in a refused
+  filter; a `$format` block or a placeholder in a filter `type` or `value` is a validation error, a field cannot
+  fill one, an input name is a plain label (also checked on every pad label at render), a scalar drawtext
+  `fontfile` must be a bare font name, and the deny-list refuses a protocol prefix (`file:`, `http:`…) in an
+  unescaped option value.
 
 ## [3.1.0] - 2026-10-11
 

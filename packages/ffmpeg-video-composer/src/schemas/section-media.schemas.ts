@@ -79,7 +79,10 @@ export const ShapeSpecSchema = z
 
 export const InputSchema = z
   .object({
-    name: z.string().describe('Unique identifier for this input within the section, used as a stream label in maps.'),
+    name: z
+      .string()
+      .regex(/^[A-Za-z0-9_-]+$/, 'An input name is a pad label: letters, digits, "_" or "-"')
+      .describe('Unique identifier for this input within the section, used as a stream label in maps.'),
     url: z
       .string()
       .optional()

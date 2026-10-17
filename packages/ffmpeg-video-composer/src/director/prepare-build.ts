@@ -19,7 +19,7 @@ import type AbstractLogger from '../platform/logging/AbstractLogger';
 import { analyzeTemplateMusic } from './beats-analysis';
 import { resolveBuildFormat } from '@/core/formats/resolve';
 import { assertFieldsResolved } from '@/core/fields';
-import { assertAuthoredFiltersAllowed } from '@/editor/utils/filter-allow-list';
+import { assertRawFiltersAllowed } from '@/editor/utils/filter-allow-list';
 
 export { discardOutput, publishOutput, resolveOutputPaths } from './output-staging';
 export { qcExpectations } from './qc-expectations';
@@ -71,13 +71,8 @@ export function expandForBuild(
   descriptor: TemplateDescriptor,
   logger: AbstractLogger,
   format?: string,
-  fields?: ProjectConfig['fields'],
-  trust: { allowRawFilters?: boolean } = {}
+  fields?: ProjectConfig['fields']
 ): ReturnType<typeof assertEffectsResolved> {
-  // Authored raw filters are untrusted by default, on every entry (Node, browser, device), validated or
-  // not: checked on the authored descriptor, before the build expands sugar into engine filters.
-  assertAuthoredFiltersAllowed(descriptor, trust.allowRawFilters);
-
   const cloned = structuredClone(descriptor);
   const expansion = expandPartialsSafe(cloned);
 
@@ -98,12 +93,13 @@ export function expandForBuild(
 }
 
 /** What the time-reference pass needs from the build: output frame, fps, locale and form fields. */
-export function timingOptions(config: ProjectConfig): TimingOptions {
+export function timingOptions(config: ProjectConfig): TimingOptions & Pick<ProjectConfig, 'allowRawFilters'> {
   return {
     scale: config.videoConfig?.scale,
     fps: config.videoConfig?.fps,
     locale: config.currentLocale,
     fields: config.fields,
+    allowRawFilters: config.allowRawFilters,
   };
 }
 
@@ -114,10 +110,14 @@ export function timingOptions(config: ProjectConfig): TimingOptions {
  * seconds (core/timing/resolve.ts), then `global.audio.sfx: "auto"` expanded into section sound effects
  * (core/audio/auto-sfx.ts). Lowering only ever sees numbers; a reference that cannot be resolved fails the
  * build here, naming the field, rather than rendering a wrong frame.
+ *
+ * Last, the raw filter allow-list on this fully resolved descriptor (formats, partial variables, fields and
+ * theme tokens all substituted), on every entry (Node, browser, device), validated or not: the gate that
+ * holds, since each of those passes rewrites filter text after the authored descriptor was validated.
  */
 export function prepareMotion<T extends { meta?: unknown; global?: unknown; sections?: unknown }>(
   descriptor: T,
-  timing: TimingOptions = {}
+  timing: TimingOptions & Pick<ProjectConfig, 'allowRawFilters'> = {}
 ): T {
   const { descriptor: resolved, issues } = resolveTimeRefs(
     resolveMotionDescriptor(resolveThemeDescriptor(descriptor)),
@@ -128,7 +128,11 @@ export function prepareMotion<T extends { meta?: unknown; global?: unknown; sect
     throw new Error(`Time references: ${issues.map((issue) => `${issue.path}: ${issue.message}`).join('; ')}`);
   }
 
-  return expandAutoSfx(resolved, timing);
+  const prepared = expandAutoSfx(resolved, timing);
+
+  assertRawFiltersAllowed(prepared, timing.allowRawFilters);
+
+  return prepared;
 }
 
 /**
@@ -143,7 +147,7 @@ export async function prepareMeasuredMotion(
 ): Promise<void> {
   const measured = await analyzeTemplateMusic(template.descriptor, project.buildInfos.musicPath);
 
-  template.descriptor = prepareMotion(measured, timing);
+  template.descriptor = prepareMotion(measured, { ...timing, allowRawFilters: project.config.allowRawFilters });
 }
 
 /** Logs which sections the host bound recorded clips to. */

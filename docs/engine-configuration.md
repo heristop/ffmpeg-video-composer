@@ -97,7 +97,7 @@ Final outputs on the Node and static adapters are written to `output.partial.mp4
 
 ### `allowRawFilters`
 
-`boolean` — off by default. Authored raw `filters` are checked against the [raw filter allow-list](./template-configuration.md#raw-filter-allow-list) on every path (Node, browser, React Native), whether or not the descriptor is validated; a refused one fails validation as `filter_not_allowed`, and the build before any FFmpeg command. `true` trusts the template's raw filters: only for templates you wrote or reviewed. The render-time deny-list stays on either way.
+`boolean` — off by default. Authored raw `filters` are checked against the [raw filter allow-list](./template-configuration.md#raw-filter-allow-list) on every path (Node, browser, React Native), whether or not the descriptor is validated; a refused one fails validation as `filter_not_allowed`, and the build before any FFmpeg command. The build checks the fully resolved descriptor (formats, partial variables, fields and theme tokens substituted), right before lowering. `true` trusts the template's raw filters: only for templates you wrote or reviewed, since a trusted template can still write files and reach the network. The best-effort render-time deny-list stays on either way.
 
 ### `codecConfig` / `hardwareConfig` / `audioConfig` / `videoConfig`
 

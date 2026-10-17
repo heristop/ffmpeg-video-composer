@@ -1652,6 +1652,7 @@
                   "properties": {
                     "name": {
                       "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]+$",
                       "description": "Unique identifier for this input within the section, used as a stream label in maps."
                     },
                     "url": {
@@ -4682,6 +4683,7 @@
                   "properties": {
                     "name": {
                       "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]+$",
                       "description": "Unique identifier for this input within the section, used as a stream label in maps."
                     },
                     "url": {
@@ -7755,6 +7757,7 @@
                   "properties": {
                     "name": {
                       "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]+$",
                       "description": "Unique identifier for this input within the section, used as a stream label in maps."
                     },
                     "url": {
@@ -10552,6 +10555,7 @@
                   "properties": {
                     "name": {
                       "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]+$",
                       "description": "Unique identifier for this input within the section, used as a stream label in maps."
                     },
                     "url": {
@@ -13329,6 +13333,7 @@
                   "properties": {
                     "name": {
                       "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]+$",
                       "description": "Unique identifier for this input within the section, used as a stream label in maps."
                     },
                     "url": {
@@ -16588,6 +16593,7 @@
                   "properties": {
                     "name": {
                       "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]+$",
                       "description": "Unique identifier for this input within the section, used as a stream label in maps."
                     },
                     "url": {
@@ -19365,6 +19371,7 @@
                   "properties": {
                     "name": {
                       "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]+$",
                       "description": "Unique identifier for this input within the section, used as a stream label in maps."
                     },
                     "url": {
@@ -22142,6 +22149,7 @@
                   "properties": {
                     "name": {
                       "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]+$",
                       "description": "Unique identifier for this input within the section, used as a stream label in maps."
                     },
                     "url": {
