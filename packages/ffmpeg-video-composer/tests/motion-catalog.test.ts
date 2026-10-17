@@ -92,6 +92,13 @@ describe('motion catalog', () => {
     }
   });
 
+  it('teaches the shape graphic in the graphics rule', () => {
+    const rule = motionCatalog().rules.find((text) => text.startsWith('Graphics:'));
+
+    expect(rule).toContain('shape to fill');
+    expect(rule).toContain('stroke.draw');
+  });
+
   it('keeps the starter valid', () => {
     expect(new TemplateValidator().validateTemplate(catalog.starter).errors ?? []).toEqual([]);
   });

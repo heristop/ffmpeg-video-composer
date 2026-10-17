@@ -67,7 +67,9 @@ const ART_DIRECTION = [
   'Graphics: corners or frame for focus, underline under a headline, panel as a backing plate, bars for cinema, ' +
     'wipe as an in-scene page turn, flash for impact (at most 3 per second), glitch for a hook hit, focus to rack ' +
     'into a beat, progress / ticker / bars-chart for data and broadcast, path to draw a line on (chart, ' +
-    'circled point, swash, ring).',
+    'circled point, swash, ring), shape to fill a star, heart, arrow, blob, badge or icon (preset, or an SVG d ' +
+    'with viewBox) and pop it in with animate tracks (scale 0 → 1 on a spring, origin as pivot) or reveal it ' +
+    'with stroke.draw. Two shapes moving per beat at most.',
   'Layers: cards, badges and icons (image, animation and html inputs) take options.animate keyframe tracks ' +
     '(x, y, scale, scaleX, scaleY, rotate, opacity; options.origin is the pivot). Pop-in with overshoot: scale ' +
     '0 → 1.15 → 1. Squash and stretch: scaleX and scaleY in opposition on the landing. Flip: scaleX 1 → 0 → 1 ' +

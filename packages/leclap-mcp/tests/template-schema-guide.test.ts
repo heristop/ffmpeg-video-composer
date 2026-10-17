@@ -28,6 +28,16 @@ describe('get_template_schema guide', () => {
     expect(text).toContain('"html"');
   });
 
+  it('documents the shape graphic, its icon path, its draw-on and its advisory', () => {
+    const text = guideText();
+
+    expect(text).toContain('`shape` fills a preset');
+    expect(text).toContain('viewBox');
+    expect(text).toContain('stroke.draw');
+    expect(text).toContain('shape_unavailable');
+    expect(text).toContain('shape_too_large');
+  });
+
   it('tells agents raw filters are allow-listed and how an operator opts in', () => {
     const text = guideText();
 
