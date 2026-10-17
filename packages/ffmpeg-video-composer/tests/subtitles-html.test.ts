@@ -153,3 +153,22 @@ describe('subtitles.renderer', () => {
     expect(codes()).toEqual([]);
   });
 });
+
+describe('html caption volume', () => {
+  it('draws a transcript needing more rasters than the cap with drawbox, and says so', () => {
+    const words = Array.from({ length: 4000 }, (_, index) => ({
+      text: `w${index}`,
+      start: index * 0.5,
+      end: index * 0.5 + 0.4,
+    }));
+    const { context, inputs, warn } = masks();
+    const filters = subtitlesToFilters(
+      { words, style: 'boxed', karaoke: 'fill', renderer: 'html' },
+      { ...ctx(context), duration: 2000 }
+    );
+
+    expect(inputs).toEqual([]);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('caption_html_too_long'));
+    expect(types(filters)).toContain('drawtext');
+  });
+});

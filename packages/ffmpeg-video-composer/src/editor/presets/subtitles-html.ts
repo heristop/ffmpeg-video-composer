@@ -8,7 +8,7 @@
 // rasteriser on the host, the caller draws the drawbox renderer instead.
 
 import type { Filter } from '@/core/types';
-import { captionSlides } from '@/core/captions/caption-frames';
+import { captionSlides, stateKey } from '@/core/captions/caption-frames';
 import { captionBand, captionLook } from '@/core/captions/caption-html';
 import type { HtmlCaptionRequest } from './sugar-context';
 
@@ -18,6 +18,16 @@ export const CAPTION_TRACK_KEY = 'subtitles';
 const UNAVAILABLE =
   '[caption_html_unavailable] subtitles.renderer "html" needs an HTML rasteriser, which this host has not ' +
   'registered: the captions are drawn with the drawbox renderer';
+
+/**
+ * Most distinct looks one section's caption track may rasterise: each is a draw (a WebView round trip on a
+ * phone), so a longer transcript is drawn by the drawbox renderer instead.
+ */
+export const CAPTION_RASTER_LIMIT = 1200;
+
+const TOO_LONG =
+  `[caption_html_too_long] subtitles.renderer "html" would rasterise more than ${CAPTION_RASTER_LIMIT} ` +
+  'caption looks in this section: the captions are drawn with the drawbox renderer';
 
 /** The filters compositing the caption track, or null when the drawbox renderer must draw it instead. */
 export function htmlCaptionFilters({ plan, palette, effect, ctx, explicit }: HtmlCaptionRequest): Filter[] | null {
@@ -35,6 +45,12 @@ export function htmlCaptionFilters({ plan, palette, effect, ctx, explicit }: Htm
   const slides = captionSlides(plan, ctx.fps);
 
   if (slides.length === 0) return [];
+
+  if (new Set(slides.map((slide) => stateKey(slide.state))).size > CAPTION_RASTER_LIMIT) {
+    if (explicit) masks.warn(TOO_LONG);
+
+    return null;
+  }
 
   const look = captionLook(plan.style, palette, effect);
   const band = captionBand(plan, { width, height }, look);

@@ -57,6 +57,19 @@ describe('cssColor', () => {
     expect(cssColor('0x00ff00')).toBe('#00ff00');
     expect(cssColor('white@0.25')).toBe('white');
   });
+
+  it('never lets a colour carry markup or extra declarations into the style attribute', () => {
+    for (const hostile of [
+      'red;background-image:url(http://x/y.png)',
+      '#fff" onclick="x',
+      'red}</div><script>',
+      'a(b)',
+    ]) {
+      expect(cssColor(hostile)).toBe('#ffffff');
+    }
+
+    expect(cssColor('#fff@calc(1)')).toBe('#fff');
+  });
 });
 
 describe('captionHtml', () => {

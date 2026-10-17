@@ -74,16 +74,29 @@ function px(value: number): string {
   return `${Object.is(fixed, -0) ? 0 : fixed}px`;
 }
 
-/** An FFmpeg colour (`#rrggbb`, `0xrrggbb`, with `@alpha`) as CSS; a named colour keeps its name. */
+const SAFE_COLOR = /^(?:#[\da-f]{3,8}|[a-z]+)$/i;
+const FALLBACK_COLOR = '#ffffff';
+
+/**
+ * An FFmpeg colour (`#rrggbb`, `0xrrggbb`, with `@alpha`) as CSS; a named colour keeps its name. Colours
+ * come from the template, so anything that is not a hex or a plain name (a stray quote, `;`, `url(`) is
+ * replaced by white before it can reach the style attribute.
+ */
 export function cssColor(value: string): string {
   const at = value.indexOf('@');
   const hex = (at === -1 ? value : value.slice(0, at)).replace(/^0x/i, '#');
 
+  if (!SAFE_COLOR.test(hex)) return FALLBACK_COLOR;
+
   if (at === -1 || !/^#[\da-f]{6}$/i.test(hex)) return hex;
+
+  const alpha = Number(value.slice(at + 1));
+
+  if (!Number.isFinite(alpha)) return hex;
 
   const channels = [1, 3, 5].map((offset) => Number.parseInt(hex.slice(offset, offset + 2), 16));
 
-  return `rgba(${channels.join(',')},${Number(Number(value.slice(at + 1)).toFixed(3))})`;
+  return `rgba(${channels.join(',')},${Number(alpha.toFixed(3))})`;
 }
 
 /** The look a subtitle style draws with, its colours and effect already resolved against the theme. */

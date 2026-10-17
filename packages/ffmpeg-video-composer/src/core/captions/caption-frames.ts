@@ -88,6 +88,11 @@ function revealLevel(plan: Plan, cue: PlacedCue, t: number): number {
   return Math.round(parseEasing(entrance.easing).fn(progress) * ENTRANCE_LEVELS);
 }
 
+/** A state's identity: two states with the same key draw the same raster. */
+export function stateKey(state: CaptionState): string {
+  return `${state.cue}:${state.active}:${state.filled}:${state.bump}:${state.reveal}`;
+}
+
 function sameState(a: CaptionState, b: CaptionState): boolean {
   return (
     a.cue === b.cue && a.active === b.active && a.filled === b.filled && a.bump === b.bump && a.reveal === b.reveal

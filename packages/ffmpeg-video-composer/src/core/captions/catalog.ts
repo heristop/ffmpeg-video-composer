@@ -52,6 +52,7 @@ export function captionCatalog(): CaptionCatalog {
       'subtitle_past_end',
       'caption_crown_repeated',
       'caption_html_unavailable',
+      'caption_html_too_long',
     ],
     errors: ['invalid_srt', 'invalid_word_timings', 'invalid_subtitle_cue', 'subtitle_font_unmeasurable'],
   };

@@ -10,7 +10,7 @@
 import { parseVerticalMetrics } from '@/core/font-metrics';
 import { assertSafeArgToken } from '@/core/arg-guard';
 import { captionHtml, type CaptionMetrics, type CaptionTrack } from '@/core/captions/caption-html';
-import type { CaptionState } from '@/core/captions/caption-frames';
+import { stateKey } from '@/core/captions/caption-frames';
 import { utf8 } from '@/core/determinism/hash';
 import { sha256Hex } from '@/core/determinism/sha256';
 import { fmt } from '@/core/motion/hermite';
@@ -30,10 +30,6 @@ interface Entry {
   path: string;
   from: number;
   to: number;
-}
-
-function stateKey(state: CaptionState): string {
-  return `${state.cue}:${state.active}:${state.filled}:${state.bump}:${state.reveal}`;
 }
 
 async function metricsOf(track: CaptionTrack, ctx: HtmlStageContext): Promise<CaptionMetrics> {
