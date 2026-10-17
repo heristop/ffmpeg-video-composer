@@ -40,6 +40,8 @@ function list(value: unknown): Bag[] {
 export interface SecondsSlot {
   path: string;
   value: number;
+  /** Seconds the field's own clock starts after the section (an html layer's `options.start`). */
+  clockStart?: number;
   write: (seconds: number) => void;
 }
 
@@ -178,7 +180,12 @@ export function secondsSlots(section: Bag): SecondsSlot[] {
     slot(isSeconds, bag(entry.visibleBy), 'at', `assert[${i}].visibleBy`)
   );
 
-  return [...collectSlots(section, isSeconds), ...asserts] as SecondsSlot[];
+  // A layer's own start is a section moment, so it remaps like any other.
+  const layerStarts = list(section.inputs).flatMap((input, i) =>
+    slot(isSeconds, bag(input.options), 'start', `inputs[${i}].options`)
+  );
+
+  return [...collectSlots(section, isSeconds), ...asserts, ...layerStarts] as SecondsSlot[];
 }
 
 /** Every element of the section that carries an id, in document order. */

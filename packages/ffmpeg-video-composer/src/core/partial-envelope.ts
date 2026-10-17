@@ -16,7 +16,8 @@
 // at/until, camera delay/hits/keys, drawtext reveal/exit/keys, assert visibleBy) and every cue is mapped
 // through m in partial time, so elements in IN keep their absolute times and elements at or after H shift
 // with the outro. Time references need nothing: "end - 0.5" follows the new end, "cue:x" the mapped cue.
-// Raw FFmpeg expressions (enable=…, filter range) are not re-timed. Without an envelope the whole partial
+// An html layer moves with the envelope too: its options.start and duration map as section moments, and its
+// element-motion key times (layer seconds) land at map(s + start + t). Raw FFmpeg expressions (enable=…, filter range) are not re-timed. Without an envelope the whole partial
 // is IN (in = T, out = 0): a longer duration holds the tail, a shorter one compresses everything.
 // Pure and deterministic.
 
@@ -126,10 +127,36 @@ function remapCues(cues: unknown, start: number, map: TimeMap): Bag | undefined 
   );
 }
 
+function layerSpans(clone: Bag): Array<{ options: Bag; from: number; duration: number }> {
+  const inputs = Array.isArray(clone.inputs) ? (clone.inputs as unknown[]) : [];
+
+  return inputs.flatMap((input) => {
+    const options = bag(bag(input).options);
+    const { duration, start } = options;
+
+    if (typeof duration !== 'number') return [];
+
+    return [{ options, from: typeof start === 'number' ? start : 0, duration }];
+  });
+}
+
 function remapSection(section: unknown, start: number, end: number, map: TimeMap): Bag {
   const clone = structuredClone(bag(section));
 
-  for (const slot of secondsSlots(clone)) slot.write(round(Math.max(0, map(start + slot.value) - map(start))));
+  // A layer's duration is a span from its start: read the starts before the slots move them.
+  const spans = layerSpans(clone);
+
+  for (const slot of secondsSlots(clone)) {
+    const origin = start + (slot.clockStart ?? 0);
+
+    slot.write(round(Math.max(0, map(origin + slot.value) - map(origin))));
+  }
+
+  for (const span of spans) {
+    const from = start + span.from;
+
+    span.options.duration = round(Math.max(0, map(from + span.duration) - map(from)));
+  }
 
   clone.options = { ...bag(clone.options), duration: round(map(end) - map(start)) };
 
