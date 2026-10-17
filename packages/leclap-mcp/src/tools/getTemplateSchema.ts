@@ -140,7 +140,8 @@ const GUIDE = [
     'validate_template warns html_unsupported_css/markup, html_font_unknown, font_unused, html_missing_field and (measured) ' +
     'html_overflow; get_motion_catalog html lists the subset and recipes; render_frames previews the layer. ' +
     'Per-element motion: tag elements data-motion="name" and add motion { name: { x|y|scale|rotate|opacity: ' +
-    'keyframes, stagger: seconds } } on the input, so items come in one after another; the card renders as a ' +
+    'keyframes, stagger: seconds } } on the input, so items come in one after another (key times are layer ' +
+    'seconds from options.start; a reference like "end - 2" names a section moment and is converted); the card renders as a ' +
     'frame sequence over the animated span (8 s, 240 frames, 48 elements at most: html_motion_too_long, ' +
     'html_motion_too_many_targets; html_motion_unmatched for a name no element carries). ' +
     'get_motion_catalog html.recipes.staggeredList is a starting point.',

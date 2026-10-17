@@ -38,7 +38,7 @@ export const HtmlMotionSchema = z
   })
   .describe(
     'html layer: keyframe tracks per element. Each key names the data-motion attribute of the elements it ' +
-      'moves; times are section seconds. The card is drawn frame by frame over the animated span only.'
+      'moves; times are layer seconds (0 is when the layer appears, options.start); a time reference such as "end - 2" names a section moment and is converted to layer seconds, clamped to 0. The card is drawn frame by frame over the animated span only.'
   )
   .meta({ id: 'HtmlMotion' });
 

@@ -174,7 +174,8 @@ export function htmlCatalog(): HtmlCatalog {
       'scaleY, rotate, opacity about options.origin) and start/duration; camera and fx work on it too. Inside ' +
       'it, tag elements data-motion="name" and add motion { name: { x, y, scale, rotate, opacity, stagger } } ' +
       'on the input: keyframes as in options.animate, key times in seconds from the layer start, tokens and ' +
-      'springs allowed; stagger is the seconds each further element with that name starts after the previous ' +
+      'springs allowed, and a time reference ("end - 2", "50%", "cue:x") names a section moment, converted to ' +
+      'layer time by subtracting options.start; stagger is the seconds each further element with that name starts after the previous ' +
       'one. Names are lowercase and not ease, easing or animate. The card is drawn frame by frame over the ' +
       `animated span only and holds its final frame. Budget: ${HTML_MOTION_MAX_SPAN} s span, ` +
       `${HTML_MOTION_MAX_TARGETS} elements, ${HTML_MOTION_MAX_FRAMES} frames, ` +

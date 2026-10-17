@@ -1011,8 +1011,10 @@ Tag elements inside a card with `data-motion="name"` and give the input a `motio
 tracks of [layer keyframes](#layer-keyframes-optionsanimate) — `x` and `y` (pixels from where the element is
 laid out), `scale`, `rotate` (degrees, about the element's centre) and `opacity` — and a `stagger`, the seconds
 each further element with that name starts after the previous one, in document order. Key times are seconds from the
-layer's start (a card with `start` begins its motion when it appears) and take duration tokens, springs and time
-references like any track. Names are lowercase letters, digits and dashes, and can't be `ease`, `easing` or
+layer's start (a card with `start` begins its motion when it appears) and take duration tokens and springs like
+any track. A time reference still names a section moment: `"end - 2"` is the section's 2-seconds-before-the-end
+mark whatever the card's `start`, converted to layer time by subtracting `start` (a reference before the card
+appears clamps to 0). Names are lowercase letters, digits and dashes, and can't be `ease`, `easing` or
 `animate`.
 
 ```jsonc
@@ -1042,8 +1044,8 @@ references like any track. Names are lowercase letters, digits and dashes, and c
 
 - **How it renders** — the card is drawn frame by frame at the output frame rate, over the animated span only
   (first key to last, staggers included); frames where nothing moves are drawn once and held. The frames are
-  joined into one animated PNG and composited like the still card: the first state shows from the section
-  start and the last frame holds to the section end. `options.motion`, `options.animate`, `start`, `duration`
+  joined into one animated PNG and composited like the still card: the first state shows from the layer's
+  start (when it appears) and the last frame holds to the section end. `options.motion`, `options.animate`, `start`, `duration`
   and `opacity` still move the card as a whole.
 - **Bounds** — 16 names and 48 tagged elements per card; an animated span of 8 s (first key to last, staggers
   included), 240 distinct frames and 500 megapixels of frames (box × 2 for the drawing density × frames) at

@@ -1,6 +1,6 @@
 // What an animated card draws: its tagged elements' states sampled at the output fps over the animated span
 // only (first key to last, staggers included). Ticks where nothing moves are merged into one held frame, the
-// first state shows from the section start (the lead) and the last is held by the overlay, so a 0.6 s
+// first state shows from the layer's start (the lead) and the last is held by the overlay, so a 0.6 s
 // entrance in a 6 s section draws ~18 frames. States are rounded, so the plan, and the frames drawn from it,
 // are the same on every host. Bounded: a span over HTML_MOTION_MAX_SPAN is refused before it is walked.
 
@@ -32,7 +32,7 @@ export interface MotionFrame {
 export interface MotionFramePlan {
   fps: number;
   frames: MotionFrame[];
-  /** The first and last animated instants, section seconds. */
+  /** The first and last animated instants, layer seconds. */
   start: number;
   end: number;
 }
