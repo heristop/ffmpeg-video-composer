@@ -9,6 +9,7 @@ describe('starterFiles (base)', () => {
     expect(Object.keys(files).sort()).toEqual([
       '.agents/skills/authoring-leclap-videos/SKILL.md',
       'AGENTS.md',
+      'CLAUDE.md',
       'README.md',
       'assets/.gitkeep',
       'package.json',
@@ -22,6 +23,7 @@ describe('starterFiles (base)', () => {
   it('always scaffolds the agent skill and its pointer', () => {
     expect(files['.agents/skills/authoring-leclap-videos/SKILL.md']).toContain('name: authoring-leclap-videos');
     expect(files['AGENTS.md']).toContain('.agents/skills/authoring-leclap-videos/SKILL.md');
+    expect(files['CLAUDE.md']).toContain('@AGENTS.md');
   });
 
   it('produces a compile-valid template descriptor', () => {
@@ -73,6 +75,7 @@ describe('starterFiles (mcp + remotion)', () => {
       '.agents/skills/authoring-leclap-videos/SKILL.md',
       '.mcp.json',
       'AGENTS.md',
+      'CLAUDE.md',
       'README.md',
       'assets/.gitkeep',
       'package.json',

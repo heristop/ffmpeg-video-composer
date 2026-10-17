@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { agentsMd, starterSkill } from '../src/commands/starter-skill';
+import { agentsMd, claudeMd, starterSkill } from '../src/commands/starter-skill';
 
 // The scaffolded skill is the only LeClap guidance an agent gets inside a generated project — there
 // is no monorepo, no docs/ and (without --mcp) no get_template_schema. These tests pin the two
@@ -112,6 +112,13 @@ describe('starterSkill', () => {
     expect(skill).toContain('https://leclap.dev/llms.txt');
   });
 
+  // The /doc routes are the same empty client-rendered shell the llms.txt note warns about, so the
+  // tier reference must be a plain-text URL an agent can actually read.
+  it('never sends a fetching agent to a client-rendered /doc route', () => {
+    expect(skill).not.toMatch(/leclap\.dev\/doc/);
+    expect(skill).toContain('raw.githubusercontent.com/heristop/leclap/main/docs/template-configuration.md');
+  });
+
   it('stays short enough to be read in full', () => {
     expect(skill.split('\n').length).toBeLessThan(130);
   });
@@ -171,6 +178,14 @@ describe('starterSkill — conditional sections', () => {
     expect(description).toBe(
       'description: "Use when editing template.json in my: reel #2, adding or changing sections, transitions, looks, colour grading, motion or audio, or when a render fails or looks wrong."'
     );
+  });
+});
+
+describe('claudeMd', () => {
+  // Claude Code reads CLAUDE.md, not AGENTS.md, and does not load .agents/skills/; importing AGENTS.md
+  // is how the scaffolded guidance reaches it.
+  it('imports AGENTS.md so Claude Code sees the same guidance', () => {
+    expect(claudeMd()).toContain('@AGENTS.md');
   });
 });
 

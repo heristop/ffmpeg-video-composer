@@ -246,11 +246,12 @@ export const DocCli = () => (
           prints that one&apos;s install and run commands.
         </p>
         <p>
-          It also writes agent guidance: an <Code>AGENTS.md</Code> pointer and{' '}
-          <Code>.agents/skills/authoring-leclap-videos/SKILL.md</Code>, so an AI agent opening the project knows the
-          check/render loop, which authoring layer to prefer, and the traps that never surface as errors. It links to{' '}
-          <Code>llms.txt</Code> rather than restating the schema, so it cannot drift on a user&apos;s machine. With the
-          MCP option on, it also points the agent at <Code>validate_template</Code> and <Code>compose_video</Code>.
+          It also writes agent guidance: an <Code>AGENTS.md</Code> pointer (imported by a one-line{' '}
+          <Code>CLAUDE.md</Code>) and <Code>.agents/skills/authoring-leclap-videos/SKILL.md</Code>, so an AI agent
+          opening the project knows the check/render loop, which authoring layer to prefer, and the traps that never
+          surface as errors. It links to <Code>llms.txt</Code> rather than restating the schema, so it cannot drift on a
+          user&apos;s machine. With the MCP option on, it also points the agent at <Code>validate_template</Code> and{' '}
+          <Code>compose_video</Code>.
         </p>
         <p>It then asks whether to also wire two optional pieces:</p>
         <ul>

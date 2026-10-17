@@ -31,7 +31,8 @@ const RUN_SCRIPT: Record<PackageManagerName, (script: string) => string> = {
 // React hydrates (scripts/seo-prerender.ts pre-bakes <head> alone), so an agent that fetches a /doc
 // route receives an empty shell. llms.txt is served as text and indexes the rest.
 const LLMS_URL = 'https://leclap.dev/llms.txt';
-const DOC_URL = 'https://leclap.dev/doc';
+// Plain markdown, so a fetching agent gets the text rather than a client-rendered shell.
+const REFERENCE_URL = 'https://raw.githubusercontent.com/heristop/leclap/main/docs/template-configuration.md';
 
 // Where the descriptor's authoritative shape comes from. With the MCP wired the agent can fetch it
 // in-session; without it, llms.txt is the machine-readable entry point.
@@ -148,7 +149,7 @@ Above the raw FFmpeg layer sits a structured tier — \`transition\`, \`look\`, 
 raw escape hatch: it takes FFmpeg-native keys, and a mistake there surfaces as a filtergraph error
 rather than a validation one.
 
-Reference for the tier: ${DOC_URL}
+Reference for the tier: ${REFERENCE_URL}
 
 ## What a render costs
 
@@ -198,4 +199,10 @@ Before editing the template or debugging a render, read
 It covers the check/render loop, which authoring layer to use, and the traps that do not surface as
 errors.
 `;
+}
+
+// Claude Code reads CLAUDE.md, not AGENTS.md, and does not load `.agents/skills/` on its own — the
+// import is what carries the pointer (and through it the skill) to that client.
+export function claudeMd(): string {
+  return '@AGENTS.md\n';
 }
