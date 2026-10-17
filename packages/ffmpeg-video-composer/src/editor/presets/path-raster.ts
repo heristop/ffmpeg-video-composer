@@ -260,10 +260,11 @@ function optional(pairs: Map<string, string>, key: string): number | undefined |
   return pairs.has(key) ? finite(pairs.get(key)) : undefined;
 }
 
-function pairsOf(url: string): Map<string, string> {
+/** The `key=value` pairs of a generated-image URL after its scheme (shared with shape-raster.ts). */
+export function urlPairs(url: string, scheme: string): Map<string, string> {
   return new Map(
     url
-      .slice(SCHEME.length)
+      .slice(scheme.length)
       .split(',')
       .map((part) => [part.slice(0, part.indexOf('=')), part.slice(part.indexOf('=') + 1)] as [string, string])
   );
@@ -313,7 +314,7 @@ function extrasOf(pairs: Map<string, string>): Pick<TraceSpec, 'dash' | 'color' 
 export function parseTraceUrl(url: string): TraceSpec | null {
   if (!url.startsWith(SCHEME)) return null;
 
-  const pairs = pairsOf(url);
+  const pairs = urlPairs(url, SCHEME);
   const core = coreOf(pairs);
   const extras = extrasOf(pairs);
 

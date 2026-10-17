@@ -1,0 +1,169 @@
+import { describe, expect, it } from 'vitest';
+import { generatedImage } from '@/editor/presets/generated-images';
+import { encodeCommands } from '@/editor/presets/path-svg';
+import type { PathCommand } from '@/editor/presets/path-geometry';
+import {
+  MAX_ENCODED_PATH,
+  MAX_SHAPE_PIXELS,
+  MAX_SHAPE_SIDE,
+  parseShapeUrl,
+  shapeFileName,
+  shapeImage,
+  shapePng,
+  shapeUrl,
+  type ShapeSpec,
+} from '@/editor/presets/shape-raster';
+
+const SQUARE: ShapeSpec = {
+  w: 20,
+  h: 20,
+  rule: 'nonzero',
+  fill: 'solid',
+  c1: 'ff0000ff',
+  sw: 0,
+  path: 'M5_5L15_5L15_15L5_15Z',
+};
+const FULL = 'M0_0L20_0L20_20L0_20Z';
+
+function px(spec: ShapeSpec, x: number, y: number): number[] {
+  const image = shapeImage(spec);
+  const i = (y * image.width + x) * 4;
+
+  return Array.from(image.data.slice(i, i + 4));
+}
+
+function pentagram(): string {
+  const points = Array.from({ length: 5 }, (_, k) => {
+    const angle = ((-90 + k * 144) * Math.PI) / 180;
+
+    return [50 + 40 * Math.cos(angle), 50 + 40 * Math.sin(angle)];
+  });
+  const commands: PathCommand[] = [
+    ['M', points[0][0], points[0][1]],
+    ...points.slice(1).map(([x, y]): PathCommand => ['L', x, y]),
+    ['Z'],
+  ];
+
+  return encodeCommands(commands);
+}
+
+describe('shapeImage', () => {
+  it('fills inside, and keeps the fill colour under transparent pixels so scaling never darkens the edge', () => {
+    expect(px(SQUARE, 10, 10)).toEqual([255, 0, 0, 255]);
+    expect(px(SQUARE, 1, 1)).toEqual([255, 0, 0, 0]);
+  });
+
+  it('anti-aliases a half-covered edge pixel and honours the colour alpha', () => {
+    expect(px({ ...SQUARE, path: 'M5.5_5L15_5L15_15L5.5_15Z' }, 5, 10)).toEqual([255, 0, 0, 128]);
+    expect(px({ ...SQUARE, c1: 'ff000080' }, 10, 10)).toEqual([255, 0, 0, 128]);
+  });
+
+  it('sweeps a linear gradient along its CSS angle (90: left to right)', () => {
+    const spec: ShapeSpec = { ...SQUARE, fill: 'linear', c1: 'ff0000ff', c2: '0000ffff', angle: 90, path: FULL };
+    const [left, right] = [px(spec, 0, 10), px(spec, 19, 10)];
+
+    expect(left[0]).toBeGreaterThan(240);
+    expect(left[2]).toBeLessThan(15);
+    expect(right[0]).toBeLessThan(15);
+    expect(right[2]).toBeGreaterThan(240);
+  });
+
+  it('runs a radial gradient from the centre out to the box edge', () => {
+    const spec: ShapeSpec = { ...SQUARE, fill: 'radial', c1: 'ffffffff', c2: '000000ff', path: FULL };
+
+    expect(px(spec, 10, 10)[0]).toBeGreaterThan(230);
+    expect(px(spec, 0, 0).slice(0, 3)).toEqual([0, 0, 0]);
+  });
+
+  it('lays the outline over the fill', () => {
+    const stroked: ShapeSpec = { ...SQUARE, sw: 2, sc: '00ff00ff' };
+
+    expect(px(stroked, 5, 10)).toEqual([0, 255, 0, 255]);
+    expect(px(stroked, 4, 10)).toEqual([0, 255, 0, 255]);
+    expect(px(stroked, 10, 10)).toEqual([255, 0, 0, 255]);
+    expect(px({ ...stroked, fill: 'none', c1: undefined }, 10, 10)[3]).toBe(0);
+  });
+
+  it('applies the fill rule', () => {
+    const star: ShapeSpec = {
+      w: 100,
+      h: 100,
+      rule: 'nonzero',
+      fill: 'solid',
+      c1: 'ffffffff',
+      sw: 0,
+      path: pentagram(),
+    };
+
+    expect(px(star, 50, 50)[3]).toBe(255);
+    expect(px({ ...star, rule: 'evenodd' }, 50, 50)[3]).toBe(0);
+  });
+
+  it('is byte-for-byte deterministic', () => {
+    expect(shapePng(SQUARE)).toEqual(shapePng({ ...SQUARE }));
+  });
+});
+
+describe('shapeImage raster bounds', () => {
+  it.each([0, -1, 1.5, Number.NaN, MAX_SHAPE_SIDE + 1])('refuses a width of %s before allocating', (w) => {
+    expect(() => shapeImage({ ...SQUARE, w })).toThrow(/size/);
+  });
+
+  it('refuses a raster over the pixel limit', () => {
+    expect(() => shapeImage({ ...SQUARE, w: 4096, h: 2048 })).toThrow(/size/);
+  });
+});
+
+describe('shape: URLs', () => {
+  it('round-trips a spec, gradient and outline included', () => {
+    const spec: ShapeSpec = {
+      w: 40,
+      h: 30,
+      rule: 'evenodd',
+      fill: 'linear',
+      c1: '9298fbff',
+      c2: 'f96f99d9',
+      angle: 135,
+      sw: 6,
+      sc: 'f5f3f7ff',
+      path: 'M2_2L38_2L20_28Z',
+    };
+
+    expect(shapeUrl(spec)).toBe(
+      'shape:w=40,h=30,rule=evenodd,fill=linear,c1=9298fbff,c2=f96f99d9,a=135,sw=6,sc=f5f3f7ff,d=M2_2L38_2L20_28Z'
+    );
+    expect(parseShapeUrl(shapeUrl(spec))).toEqual(spec);
+  });
+
+  it('refuses oversized, malformed and foreign URLs before any pixel is allocated', () => {
+    const url = (patch: Partial<ShapeSpec>) => shapeUrl({ ...SQUARE, ...patch });
+
+    expect(parseShapeUrl(url({ w: 5000 }))).toBeNull();
+    expect(parseShapeUrl(url({ w: 4096, h: 2048 }))).toBeNull();
+    expect(4096 * 2048).toBeGreaterThan(MAX_SHAPE_PIXELS);
+    expect(parseShapeUrl(url({ c1: 'red' }))).toBeNull();
+    expect('L1_1'.repeat(20000).length).toBeGreaterThan(MAX_ENCODED_PATH);
+    expect(MAX_ENCODED_PATH).toBe(65_536);
+    expect(parseShapeUrl(url({ path: 'M5_5L15' }))).toBeNull();
+    expect(parseShapeUrl(url({ sw: -1 }))).toBeNull();
+    expect(parseShapeUrl(url({ path: `M0_0${'L1_1'.repeat(20000)}Z` }))).toBeNull();
+    expect(parseShapeUrl(shapeUrl(SQUARE).replace('fill=solid', 'fill=pattern'))).toBeNull();
+    expect(parseShapeUrl('panel:w=10,h=10')).toBeNull();
+  });
+
+  it('refuses an over-cap spec instead of rasterising it', () => {
+    const over = shapeUrl({ ...SQUARE, path: `M0_0${'L1_1'.repeat(20000)}Z` });
+
+    expect(generatedImage(over)).toBeNull();
+    expect(generatedImage(shapeUrl({ ...SQUARE, w: MAX_SHAPE_SIDE + 1 }))).toBeNull();
+  });
+
+  it('is a generated image with a deterministic name', () => {
+    const image = generatedImage(shapeUrl(SQUARE));
+
+    expect(image?.label).toBe('Shape');
+    expect(image?.name).toBe(shapeFileName(SQUARE));
+    expect(image?.name).toMatch(/^shape-[0-9a-f]{8}\.png$/);
+    expect(Array.from(image?.produce().slice(0, 4) ?? [])).toEqual([137, 80, 78, 71]);
+  });
+});
