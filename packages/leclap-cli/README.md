@@ -302,7 +302,8 @@ It also writes agent guidance — an `AGENTS.md` pointer and `.agents/skills/aut
 so an AI agent opening the project knows the validate/render loop, which authoring layer to prefer,
 and the traps that never surface as errors. Its commands go through the package manager (`leclap` is
 a devDependency, not a global install), and it links to `llms.txt` rather than restating the schema,
-so it cannot drift out of date on a user's machine.
+so it cannot drift out of date on a user's machine. When the MCP option below is on, the skill also
+tells the agent to iterate through `validate_template` and render with `compose_video`.
 
 It then **prompts** whether to also set up:
 
