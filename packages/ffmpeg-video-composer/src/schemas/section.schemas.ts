@@ -197,7 +197,10 @@ export const VideoSectionSchema = BaseSectionSchema.extend({
 
 export const EffectSectionSchema = BaseSectionSchema.extend({
   type: z.literal('effect').describe('Section type: a versioned effect rendered to a clip before composition.'),
-  name: z.string().trim().min(1).describe('Unique, nonempty section name used to bind the rendered effect clip.'),
+  name: z
+    .string()
+    .regex(SECTION_NAME, 'A section name is a file and pad name: letters, digits, "_", "-" and "." (no "..")')
+    .describe('Unique, nonempty section name used to bind the rendered effect clip.'),
   effect: EffectReferenceSchema.describe('Versioned effect reference with JSON properties and named assets.'),
   options: BaseSectionOptionsSchema.omit({ useVideoSection: true, videoUrl: true, pictureUrl: true })
     .extend({ duration: z.number().positive().describe('Required effect duration in seconds.') })

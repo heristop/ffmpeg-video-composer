@@ -7,6 +7,8 @@ import type { ProjectConfig, TemplateDescriptor } from '@/core/types';
 import type AbstractFFmpeg from '@/platform/ffmpeg/AbstractFFmpeg';
 import { assertSafeSegmentName } from '@/core/arg-guard';
 import { parseCommand } from '@/platform/ffmpeg/parse-command';
+import { EffectSectionSchema } from '@/schemas/section.schemas';
+import { stagedExtension } from '@/director/footage-source';
 import { TemplateValidator } from '@/services/TemplateValidator';
 import { DryRunFFmpeg } from './fixtures/dry-run-ffmpeg';
 import { testBuildDir } from './fixtures/build-dir';
@@ -118,5 +120,27 @@ describe('a section name never adds an argument or a graph', () => {
 
   it('still refuses a traversal', () => {
     expect(() => assertSafeSegmentName('a..b')).toThrow(/section name/);
+  });
+
+  it.each(['.', '-', '_.', '-.-'])('refuses %j, which names no file', (name) => {
+    expect(() => assertSafeSegmentName(name)).toThrow(/section name/);
+    expect(new TemplateValidator().validateTemplate(template(name)).success).toBe(false);
+  });
+
+  it('applies the same grammar to an effect section', () => {
+    const effect = {
+      type: 'effect',
+      effect: { id: 'x', version: '1.0.0', props: {}, assets: {} },
+      options: { duration: 1 },
+    };
+
+    expect(EffectSectionSchema.safeParse({ ...effect, name: 'a b' }).success).toBe(false);
+    expect(EffectSectionSchema.safeParse({ ...effect, name: 'fx_1' }).success).toBe(true);
+  });
+
+  it('stages a videoUrl under a letters-and-digits extension only', () => {
+    expect(stagedExtension('https://host/a./tmp/x')).toBe('mp4');
+    expect(stagedExtension('https://host/clip.mov')).toBe('mov');
+    expect(stagedExtension('https://host/clip')).toBe('mp4');
   });
 });

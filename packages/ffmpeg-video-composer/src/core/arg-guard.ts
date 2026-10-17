@@ -49,7 +49,9 @@ export function assertSafeColorToken(value: string, field: string): string {
 // the others.
 export function assertSafeSegmentName(name: string): string {
   if (!SECTION_NAME.test(name)) {
-    throw new Error(`Unsafe section name "${name}": use letters, digits, "_", "-" and "." only (no "..")`);
+    throw new Error(
+      `Unsafe section name "${name}": use letters, digits, "_", "-" and "." only (no "..", at least one letter or digit)`
+    );
   }
 
   return name;

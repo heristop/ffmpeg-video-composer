@@ -12,6 +12,15 @@ export interface FootageSourceDeps extends SectionInfosDeps {
   mediaCache: Record<string, string>;
 }
 
+const SAFE_EXTENSION = /^[A-Za-z0-9]{1,8}$/;
+
+/** The staged file's extension: letters and digits only, so a `/` in the URL cannot steer the target path. */
+export function stagedExtension(url: string): string {
+  const extension = url.split('.').pop() ?? '';
+
+  return SAFE_EXTENSION.test(extension) ? extension : 'mp4';
+}
+
 async function stageVideoUrl(deps: FootageSourceDeps, section: Section, url: string): Promise<string | null> {
   if (url.includes('{{')) {
     deps.logger.warn(`[Footage] ${section.name}: videoUrl uses a variable, so the clip is not analysed before render`);
@@ -24,7 +33,7 @@ async function stageVideoUrl(deps: FootageSourceDeps, section: Section, url: str
   if (cached) return cached;
 
   const local = await deps.filesystemAdapter.resolveLocalAsset(url);
-  const target = `${await deps.filesystemAdapter.getBuildPath('assets')}/${section.name}.${url.split('.').pop() ?? 'mp4'}`;
+  const target = `${await deps.filesystemAdapter.getBuildPath('assets')}/${section.name}.${stagedExtension(url)}`;
 
   if (!local) await deps.filesystemAdapter.move(await deps.filesystemAdapter.fetch(url), target);
 
