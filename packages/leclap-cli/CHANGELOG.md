@@ -26,7 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   keyframe tracks (pop-in, squash and stretch, flip, needle, parallax).
 - `leclap render` and `leclap validate` take everything `ffmpeg-video-composer` 3.2.0 adds: layer keyframe
   tracks (`options.animate`, `options.origin`), the `path` graphic, the `burst` and `goo` fx, the `drip`
-  transition, glitch `tear`, iris `origin`/`ease`/`rim` and sheen `profile: "gloss"`.
+  and `bands` transitions, clip boxes (`clip`, `options.clip`), shaped iris, `zoom-through` windows, glitch
+  `tear`, iris `origin`/`ease`/`rim` and sheen `profile: "gloss"`.
 
 ### Changed
 

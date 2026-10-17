@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `extract_brand` (behind `--allow-network` / `LECLAP_MCP_ALLOW_NETWORK`): a website's brand kit as a theme and binding rules, saved under the media dir.
 - `get_template_schema`'s guide describes layer keyframe tracks (`options.animate` with x/y/scale/scaleX/
   scaleY/rotate/opacity and `options.origin` on image, animation and html inputs), the `path` graphic and the
-  `drip` transition. `get_motion_catalog` lists the `burst` and `goo` fx and the art-direction rules for the
+  `drip` and `bands` transitions, clip boxes, shaped iris and `zoom-through` windows. `get_motion_catalog` lists the `burst` and `goo` fx and the art-direction rules for the
   new effects; `validate_template` and `compose_video` accept everything `ffmpeg-video-composer` 3.2.0 adds.
 
 ### Changed
