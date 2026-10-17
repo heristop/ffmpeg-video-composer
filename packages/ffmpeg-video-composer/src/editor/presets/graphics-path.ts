@@ -33,8 +33,11 @@ function scaleOf(box: Rect | null): Scale {
   return box ? (x, y) => [box.x + x * box.w, box.y + y * box.h] : (x, y) => [x, y];
 }
 
-// Px commands of authored ones: every coordinate pair goes through `at`.
-function mapped(commands: PathCommand[], at: Scale): PathCommand[] {
+/** Commands with every coordinate pair passed through `at` (E, W and Z pass unchanged). */
+export function mapCommands(
+  commands: readonly PathCommand[],
+  at: (x: number, y: number) => [number, number]
+): PathCommand[] {
   return commands.map((command) => {
     const [kind, ...args] = command;
 
@@ -82,7 +85,7 @@ export function pathCommandsOf(g: PathGraphic, box: Rect | null): PathCommand[] 
   if (g.d !== undefined) {
     const parsed = parseSvgPath(g.d);
 
-    return parsed && mapped(parsed, scaleOf(box));
+    return parsed && mapCommands(parsed, scaleOf(box));
   }
 
   const points = (g.points ?? []).map(([x, y]) => {

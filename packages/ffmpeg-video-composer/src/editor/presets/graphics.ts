@@ -26,6 +26,7 @@ import { CHART_SPECS } from './graphics-chart';
 import { fxSpec } from './fx-spec';
 import { cornersSpec, frameSpec, underlineSpec } from './graphics-lines';
 import { pathSpec } from './graphics-path';
+import { shapeSpec } from './graphics-shape';
 
 export type { Frame, GraphicEnv, Rect } from './graphics-spec';
 
@@ -113,6 +114,7 @@ const SPECS: { [T in Graphic['type']]: (g: Of<T>, frame: Frame, base: Base) => S
   frame: frameSpec,
   corners: cornersSpec,
   path: pathSpec,
+  shape: shapeSpec,
   wipe: wipeSpec,
   panel: panelSpec,
   ...FX_SPECS,

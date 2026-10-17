@@ -24,6 +24,11 @@ export type StrokeRequest = Omit<FxRequest, 'graphic'> & {
   graphic: Extract<Graphic, { type: 'frame' | 'corners' | 'underline' | 'path' }>;
 };
 
+/** One shape graphic to lower (editor/presets/shape-draw.ts). */
+export type ShapeRequest = Omit<FxRequest, 'graphic'> & {
+  graphic: Extract<Graphic, { type: 'shape' }>;
+};
+
 // Context a sugar compiler needs to lower time/space-dependent effects (motion calibrates its
 // Ken Burns curve over the clip length and scale). Built once per section by SegmentBuilder.
 export type SugarContext = {
@@ -89,6 +94,11 @@ export type MaskSugarContext = {
    * it they draw nothing.
    */
   strokes?: (request: StrokeRequest) => Filter[] | null;
+  /**
+   * Lowers shape graphics (editor/presets/shape-draw.ts), compile path only like `effects`; without it
+   * they draw nothing.
+   */
+  shapes?: (request: ShapeRequest) => Filter[];
 };
 
 export type KineticSugarContext = {
