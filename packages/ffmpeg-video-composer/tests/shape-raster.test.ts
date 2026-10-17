@@ -5,6 +5,7 @@ import type { PathCommand } from '@/editor/presets/path-geometry';
 import {
   MAX_ENCODED_PATH,
   MAX_SHAPE_PIXELS,
+  MAX_SHAPE_POINTS,
   MAX_SHAPE_SIDE,
   parseShapeUrl,
   shapeFileName,
@@ -104,6 +105,54 @@ describe('shapeImage', () => {
   });
 });
 
+describe('work bounds', () => {
+  const CURVES = 'M0_0C0_0_99999_0_0_99999'.repeat(2000);
+
+  it('refuses an outline that flattens past the point budget, without flattening it all', () => {
+    const spec: ShapeSpec = { ...SQUARE, w: 64, h: 64, path: CURVES };
+    const started = Date.now();
+
+    expect(MAX_SHAPE_POINTS).toBe(20_000);
+    expect(() => shapeImage(spec)).toThrow(/points/);
+    expect(parseShapeUrl(shapeUrl(spec))).toBeNull();
+    expect(generatedImage(shapeUrl(spec))).toBeNull();
+    expect(Date.now() - started).toBeLessThan(2000);
+  });
+
+  it('refuses a stroke whose pixel work exceeds the budget', () => {
+    const lines = 'L2047_2047L0_2047L2047_0'.repeat(10);
+    const spec: ShapeSpec = {
+      ...SQUARE,
+      w: 2048,
+      h: 2048,
+      fill: 'none',
+      sw: 640,
+      sc: '00ff00ff',
+      path: `M0_0${lines}`,
+    };
+
+    expect(() => shapeImage(spec)).toThrow(/stroke/);
+    expect(parseShapeUrl(shapeUrl(spec))).toBeNull();
+  });
+
+  it('paints a long diagonal stroke by its band, not its bounding box', () => {
+    const spec: ShapeSpec = {
+      ...SQUARE,
+      w: 2048,
+      h: 2048,
+      fill: 'none',
+      sw: 4,
+      sc: '00ff00ff',
+      path: 'M0_0L2047_2047',
+    };
+    const started = Date.now();
+
+    expect(px(spec, 1000, 1000)[3]).toBe(255);
+    expect(px(spec, 1000, 1100)[3]).toBe(0);
+    expect(Date.now() - started).toBeLessThan(3000);
+  });
+});
+
 describe('shapeImage raster bounds', () => {
   it.each([0, -1, 1.5, Number.NaN, MAX_SHAPE_SIDE + 1])('refuses a width of %s before allocating', (w) => {
     expect(() => shapeImage({ ...SQUARE, w })).toThrow(/size/);
@@ -156,6 +205,33 @@ describe('shape: URLs', () => {
 
     expect(generatedImage(over)).toBeNull();
     expect(generatedImage(shapeUrl({ ...SQUARE, w: MAX_SHAPE_SIDE + 1 }))).toBeNull();
+  });
+
+  it('refuses a path just over the encoded cap, whatever else is valid', () => {
+    const over = `M0_0${'L1_1'.repeat(16_400)}`;
+    const atCap = `M0_0${'L1_1'.repeat(16_383)}`;
+
+    expect(over.length).toBeGreaterThan(MAX_ENCODED_PATH);
+    expect(over.length).toBeLessThan(66_000);
+    expect(atCap.length).toBe(MAX_ENCODED_PATH);
+    expect(parseShapeUrl(shapeUrl({ ...SQUARE, path: over }))).toBeNull();
+    expect(parseShapeUrl(shapeUrl({ ...SQUARE, path: atCap }))).not.toBeNull();
+  });
+
+  it('parses strictly and rounds to the cache key', () => {
+    const url = shapeUrl(SQUARE);
+
+    expect(parseShapeUrl(url.replace('w=20', 'w=0x10'))).toBeNull();
+    expect(parseShapeUrl(url.replace('sw=0', 'sw='))).toBeNull();
+    expect(parseShapeUrl(url.replace('sw=0', 'sw=1e2'))).toBeNull();
+    expect(parseShapeUrl(url.replace(',sw=0', ',a=,sw=0'))).toBeNull();
+    expect(parseShapeUrl(url.replace(',sw=0', ',a=361,sw=0'))).toBeNull();
+    expect(parseShapeUrl(url.replace(',sw=0', ',a=-361,sw=0'))).toBeNull();
+    expect(parseShapeUrl(url.replace('c1=ff0000ff,', ''))).toBeNull();
+    expect(parseShapeUrl(url.replace('fill=solid', 'fill=linear'))).toBeNull();
+    expect(parseShapeUrl(url.replace('fill=solid', 'fill=radial'))).toBeNull();
+    expect(parseShapeUrl(url.replace('sw=0', 'sw=1.23456'))?.sw).toBe(1.235);
+    expect(parseShapeUrl(url.replace(',sw=0', ',a=90.12345,sw=0'))?.angle).toBe(90.123);
   });
 
   it('is a generated image with a deterministic name', () => {

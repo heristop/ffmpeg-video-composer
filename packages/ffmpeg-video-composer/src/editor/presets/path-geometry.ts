@@ -117,6 +117,13 @@ class Pen {
   current: Pt[] = [];
   start: Pt = { x: 0, y: 0 };
 
+  private flushed = 0;
+
+  /** Points held so far (finished subpaths plus the open one). */
+  get count(): number {
+    return this.flushed + this.current.length;
+  }
+
   last(): Pt {
     return this.current.at(-1) ?? this.start;
   }
@@ -152,7 +159,10 @@ class Pen {
   }
 
   flush(): void {
-    if (this.current.length > 1) this.done.push(this.current);
+    if (this.current.length > 1) {
+      this.done.push(this.current);
+      this.flushed += this.current.length;
+    }
 
     if (this.current.length > 0) this.start = this.current[0];
 
@@ -162,9 +172,16 @@ class Pen {
 
 /** The commands as polylines (one per subpath, ≥ 2 points each). */
 export function flatten(commands: readonly PathCommand[]): Pt[][] {
+  return flattenWithin(commands, Infinity) as Pt[][];
+}
+
+/** `flatten`, but null as soon as the polylines pass `maxPoints` points, so untrusted paths never grow past it. */
+export function flattenWithin(commands: readonly PathCommand[], maxPoints: number): Pt[][] | null {
   const pen = new Pen();
 
   for (const command of commands) {
+    if (pen.count > maxPoints) return null;
+
     const [kind, ...c] = command as [string, ...number[]];
 
     if (kind === 'M') pen.moveTo({ x: c[0], y: c[1] });
@@ -184,7 +201,7 @@ export function flatten(commands: readonly PathCommand[]): Pt[][] {
 
   pen.flush();
 
-  return pen.done;
+  return pen.count > maxPoints ? null : pen.done;
 }
 
 // ── arc length ─────────────────────────────────────────────────────────────────

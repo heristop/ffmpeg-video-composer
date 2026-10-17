@@ -9,8 +9,8 @@
 
 import { fnv1a32 } from '@/core/determinism/hash';
 import { encodePng, type PngImage } from './png-encode';
-import { flatten } from './path-geometry';
-import { traceImage, urlPairs } from './path-raster';
+import { flattenWithin, type Pt } from './path-geometry';
+import { urlPairs } from './path-raster';
 import { decodeCommands } from './path-svg';
 import { fillCoverage, type FillRule } from './shape-fill';
 
@@ -18,6 +18,10 @@ export const MAX_SHAPE_SIDE = 4096;
 /** 4 MP: a 16 MB RGBA buffer at most, on the memory-constrained WASM and Hermes targets too. */
 export const MAX_SHAPE_PIXELS = 4_194_304;
 const MAX_STROKE = 640;
+/** Flattened points a spec may hold (a bundled preset or svg outline stays far below it). */
+export const MAX_SHAPE_POINTS = 20_000;
+/** Pixel visits the outline's stroke may cost (the sum over its segments of the band each paints). */
+const MAX_STROKE_WORK = 50_000_000;
 /** Characters of the encoded outline a spec may carry (refused before decoding, so a hostile URL costs nothing). */
 export const MAX_ENCODED_PATH = 65_536;
 const SCHEME = 'shape:';
@@ -73,40 +77,85 @@ function gradientAt(spec: ShapeSpec, x: number, y: number): number {
   return clamp01((dx * ux + dy * uy) / span + 0.5);
 }
 
-function paintAt(spec: ShapeSpec, x: number, y: number, c1: Rgba, c2: Rgba): Rgba {
-  if (spec.fill !== 'linear' && spec.fill !== 'radial') return c1;
+// The fill paint of pixel (x, y) into `out` (reused across pixels: no per-pixel allocation).
+function paintAt(spec: ShapeSpec, x: number, y: number, [c1, c2]: [Rgba, Rgba], out: Rgba): void {
+  const t = spec.fill === 'linear' || spec.fill === 'radial' ? gradientAt(spec, x, y) : 0;
 
-  const t = gradientAt(spec, x, y);
-
-  return c1.map((value, i) => value + (c2[i] - value) * t) as Rgba;
+  for (let i = 0; i < 4; i++) out[i] = c1[i] + (c2[i] - c1[i]) * t;
 }
 
-// The outline over the fill ("over", straight alpha); a transparent pixel keeps the fill's RGB.
-function blend(fill: Rgba, stroke: Rgba, fa: number, sa: number): number[] {
+// The outline over the fill ("over", straight alpha) written at data[at]; a transparent pixel keeps the fill's RGB.
+function blendInto(data: Uint8Array, at: number, fill: Rgba, stroke: Rgba, [fa, sa]: [number, number]): void {
   const alpha = sa + fa * (1 - sa);
 
-  if (alpha <= 0) return [Math.round(fill[0]), Math.round(fill[1]), Math.round(fill[2]), 0];
+  for (let i = 0; i < 3; i++) {
+    data[at + i] = Math.round(alpha <= 0 ? fill[i] : (stroke[i] * sa + fill[i] * fa * (1 - sa)) / alpha);
+  }
 
-  const rgb = [0, 1, 2].map((i) => Math.round((stroke[i] * sa + fill[i] * fa * (1 - sa)) / alpha));
-
-  return [...rgb, Math.round(255 * alpha)];
+  data[at + 3] = alpha <= 0 ? 0 : Math.round(255 * alpha);
 }
 
-function strokeCover(spec: ShapeSpec): Uint8Array | null {
+// Pixels a segment's capsule touches, upper bound (used to refuse a stroke before painting it).
+function segmentWork(a: Pt, b: Pt, reach: number, spec: ShapeSpec): number {
+  const area = (Math.hypot(b.x - a.x, b.y - a.y) + 2 * reach + 2) * (2 * reach + 2);
+
+  return Math.min(area, spec.w * spec.h);
+}
+
+function strokeWork(lines: Pt[][], spec: ShapeSpec): number {
+  const reach = spec.sw / 2 + 1;
+
+  return lines.reduce(
+    (sum, points) => points.slice(1).reduce((n, b, j) => n + segmentWork(points[j], b, reach, spec), sum),
+    0
+  );
+}
+
+// One segment's capsule over the cover: only the band of each row near the segment is visited, so the cost
+// follows its length times the stroke width, not its bounding box.
+function paintStroke(cover: Float32Array, a: Pt, b: Pt, spec: ShapeSpec): void {
+  const [dx, dy] = [b.x - a.x, b.y - a.y];
+  const len = Math.hypot(dx, dy);
+  const [half, reach] = [spec.sw / 2, spec.sw / 2 + 1];
+
+  if (len < 1e-12) return;
+
+  const y0 = Math.max(0, Math.floor(Math.min(a.y, b.y) - reach));
+  const y1 = Math.min(spec.h - 1, Math.ceil(Math.max(a.y, b.y) + reach));
+  const [bx0, bx1] = [Math.min(a.x, b.x) - reach, Math.max(a.x, b.x) + reach];
+
+  for (let py = y0; py <= y1; py++) {
+    const cy = py + 0.5 - a.y;
+    // x where the pixel centre lies within `reach` of the infinite line (the whole bbox row when horizontal).
+    const [lo, hi] =
+      Math.abs(dy) < 1e-9
+        ? [bx0, bx1]
+        : [(cy * dx - reach * len) / dy + a.x, (cy * dx + reach * len) / dy + a.x].sort((m, n) => m - n);
+    const x0 = Math.max(0, Math.floor(Math.max(bx0, lo)));
+    const x1 = Math.min(spec.w - 1, Math.ceil(Math.min(bx1, hi)));
+
+    for (let px = x0; px <= x1; px++) {
+      const cx = px + 0.5 - a.x;
+      const u = Math.min(len, Math.max(0, (cx * dx + cy * dy) / len));
+      const [ex, ey] = [cx - (dx * u) / len, cy - (dy * u) / len];
+      const d = Math.sqrt(ex * ex + ey * ey);
+      const k = py * spec.w + px;
+
+      cover[k] = Math.max(cover[k], clamp01(half - d + 0.5));
+    }
+  }
+}
+
+function strokeCover(lines: Pt[][], spec: ShapeSpec): Float32Array | null {
   if (spec.sw <= 0) return null;
 
-  const cover = traceImage({
-    mode: 'cover',
-    x: 0,
-    y: 0,
-    w: spec.w,
-    h: spec.h,
-    thickness: spec.sw,
-    caps: 'round',
-    path: spec.path,
-  });
+  const cover = new Float32Array(spec.w * spec.h);
 
-  return cover.data;
+  for (const points of lines) {
+    for (let j = 1; j < points.length; j++) paintStroke(cover, points[j - 1], points[j], spec);
+  }
+
+  return cover;
 }
 
 /** Integer sides of 1..MAX_SHAPE_SIDE within MAX_SHAPE_PIXELS in all. */
@@ -116,24 +165,38 @@ function validSize(w: number, h: number): boolean {
   return inRange && w * h <= MAX_SHAPE_PIXELS;
 }
 
+/** The spec's flattened outline, or why it is refused (too many points, or a stroke too costly to paint). */
+function outlineOf(spec: ShapeSpec): { lines: Pt[][] } | { error: string } {
+  const commands = decodeCommands(spec.path);
+  const lines = commands && flattenWithin(commands, MAX_SHAPE_POINTS);
+
+  if (!lines) return { error: `Shape outline exceeds ${MAX_SHAPE_POINTS} points` };
+
+  if (spec.sw > 0 && strokeWork(lines, spec) > MAX_STROKE_WORK) return { error: 'Shape stroke is too costly to paint' };
+
+  return { lines };
+}
+
 /** The RGBA image a spec describes; throws on a raster size outside the limits, before allocating. */
 export function shapeImage(spec: ShapeSpec): PngImage {
   const { w, h } = spec;
 
   if (!validSize(w, h)) throw new Error(`Invalid shape size ${w}x${h}`);
 
+  const outline = outlineOf(spec);
+
+  if ('error' in outline) throw new Error(outline.error);
+
   const data = new Uint8Array(w * h * 4);
-  const commands = decodeCommands(spec.path);
-  const cover = commands && spec.fill !== 'none' ? fillCoverage(flatten(commands), w, h, spec.rule) : null;
-  const stroke = commands ? strokeCover(spec) : null;
+  const cover = spec.fill === 'none' ? null : fillCoverage(outline.lines, w, h, spec.rule);
+  const stroke = strokeCover(outline.lines, spec);
   const [c1, c2, sc] = [rgbaOf(spec.c1 ?? spec.sc), rgbaOf(spec.c2), rgbaOf(spec.sc)];
 
-  for (let k = 0; k < w * h; k++) {
-    const fill = paintAt(spec, k % w, Math.floor(k / w), c1, c2);
-    const fa = cover ? cover[k] * fill[3] : 0;
-    const sa = stroke ? (stroke[k * 4 + 3] / 255) * sc[3] : 0;
+  const fill: Rgba = [0, 0, 0, 0];
 
-    data.set(blend(fill, sc, fa, sa), k * 4);
+  for (let k = 0; k < w * h; k++) {
+    paintAt(spec, k % w, Math.floor(k / w), [c1, c2], fill);
+    blendInto(data, k * 4, fill, sc, [cover ? cover[k] * fill[3] : 0, stroke ? stroke[k] * sc[3] : 0]);
   }
 
   return { width: w, height: h, channels: 4, data };
@@ -165,10 +228,23 @@ export function shapeUrl(spec: ShapeSpec): string {
   return `${SCHEME}${parts.join(',')}`;
 }
 
-function sizeOf(pairs: Map<string, string>): [number, number] | null {
-  const [w, h] = ['w', 'h'].map((key) => Number(pairs.get(key)));
+const DIGITS = /^\d{1,5}$/;
+const DECIMAL = /^-?\d{1,6}(\.\d{1,9})?$/;
 
-  return validSize(w, h) ? [w, h] : null;
+/** A decimal field rounded to the 3 places the URL prints, so the hashed URL and the painted spec agree. */
+function decimal(pairs: Map<string, string>, key: string): number | undefined | null {
+  const value = pairs.get(key);
+
+  if (value === undefined) return undefined;
+
+  return DECIMAL.test(value) ? Math.round(Number(value) * 1000) / 1000 : null;
+}
+
+function sizeOf(pairs: Map<string, string>): [number, number] | null {
+  const [wText, hText] = [pairs.get('w') ?? '', pairs.get('h') ?? ''];
+  const [w, h] = [Number(wText), Number(hText)];
+
+  return DIGITS.test(wText) && DIGITS.test(hText) && validSize(w, h) ? [w, h] : null;
 }
 
 // A colour field: absent, a valid rrggbbaa, or null when present but malformed.
@@ -180,44 +256,55 @@ function colour(pairs: Map<string, string>, key: string): string | undefined | n
   return HEX8.test(value) ? value : null;
 }
 
+// The colours a fill needs: solid its c1, a gradient c1 and c2.
+function hasColours(fill: ShapeFill, c1: string | undefined, c2: string | undefined): boolean {
+  if (fill === 'solid') return c1 !== undefined;
+
+  return fill === 'none' || (c1 !== undefined && c2 !== undefined);
+}
+
 function paintOf(pairs: Map<string, string>): Pick<ShapeSpec, 'fill' | 'c1' | 'c2' | 'angle' | 'sc'> | null {
   const fill = pairs.get('fill') as ShapeFill;
   const [c1, c2, sc] = ['c1', 'c2', 'sc'].map((key) => colour(pairs, key));
-  const angle = pairs.has('a') ? Number(pairs.get('a')) : undefined;
+  const angle = decimal(pairs, 'a');
 
-  if (!FILLS.includes(fill) || [c1, c2, sc].includes(null)) return null;
+  if (!FILLS.includes(fill) || [c1, c2, sc, angle].includes(null)) return null;
 
-  if (angle !== undefined && !Number.isFinite(angle)) return null;
+  if (angle !== undefined && Math.abs(angle as number) > 360) return null;
+
+  if (!hasColours(fill, c1 as string | undefined, c2 as string | undefined)) return null;
 
   return {
     fill,
     ...(c1 ? { c1 } : {}),
     ...(c2 ? { c2 } : {}),
-    ...(angle === undefined ? {} : { angle }),
+    ...(angle === undefined ? {} : { angle: angle as number }),
     ...(sc ? { sc } : {}),
   };
 }
 
-/** Parses a `shape:` URL back to its spec; null for any other string or an invalid or oversized spec. */
-export function parseShapeUrl(url: string): ShapeSpec | null {
-  if (!url.startsWith(SCHEME)) return null;
+function strokeWidthOk(sw: number | null | undefined): boolean {
+  return sw !== undefined && sw !== null && sw >= 0 && sw <= MAX_STROKE;
+}
 
-  if (url.length > MAX_ENCODED_PATH + 512) return null;
+/** Parses a `shape:` URL back to its spec; null for any other string or an invalid, oversized or too costly spec. */
+export function parseShapeUrl(url: string): ShapeSpec | null {
+  if (!url.startsWith(SCHEME) || url.length > MAX_ENCODED_PATH + 512) return null;
 
   const pairs = urlPairs(url, SCHEME);
   const size = sizeOf(pairs);
   const paint = paintOf(pairs);
   const rule = pairs.get('rule');
-  const sw = Number(pairs.get('sw'));
+  const sw = decimal(pairs, 'sw');
   const path = pairs.get('d') ?? '';
 
   if (!size || !paint || (rule !== 'nonzero' && rule !== 'evenodd')) return null;
 
-  if (!(sw >= 0 && sw <= MAX_STROKE)) return null;
+  if (!strokeWidthOk(sw) || path.length > MAX_ENCODED_PATH || decodeCommands(path) === null) return null;
 
-  if (path.length > MAX_ENCODED_PATH || decodeCommands(path) === null) return null;
+  const spec: ShapeSpec = { w: size[0], h: size[1], rule, ...paint, sw: sw as number, path };
 
-  return { w: size[0], h: size[1], rule, ...paint, sw, path };
+  return 'error' in outlineOf(spec) ? null : spec;
 }
 
 /** A deterministic file name for a spec, e.g. `shape-1a2b3c4d.png`. */
