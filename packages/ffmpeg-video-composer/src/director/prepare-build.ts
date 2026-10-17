@@ -19,6 +19,7 @@ import type AbstractLogger from '../platform/logging/AbstractLogger';
 import { analyzeTemplateMusic } from './beats-analysis';
 import { resolveBuildFormat } from '@/core/formats/resolve';
 import { assertFieldsResolved } from '@/core/fields';
+import { assertAuthoredFiltersAllowed } from '@/editor/utils/filter-allow-list';
 
 export { discardOutput, publishOutput, resolveOutputPaths } from './output-staging';
 export { qcExpectations } from './qc-expectations';
@@ -70,8 +71,13 @@ export function expandForBuild(
   descriptor: TemplateDescriptor,
   logger: AbstractLogger,
   format?: string,
-  fields?: ProjectConfig['fields']
+  fields?: ProjectConfig['fields'],
+  trust: { allowRawFilters?: boolean } = {}
 ): ReturnType<typeof assertEffectsResolved> {
+  // Authored raw filters are untrusted by default, on every entry (Node, browser, device), validated or
+  // not: checked on the authored descriptor, before the build expands sugar into engine filters.
+  assertAuthoredFiltersAllowed(descriptor, trust.allowRawFilters);
+
   const cloned = structuredClone(descriptor);
   const expansion = expandPartialsSafe(cloned);
 

@@ -39,6 +39,8 @@ export interface RenderCheckOptions {
   currentLocale?: string;
   fields?: Record<string, string>;
   loadFont?: FontLoader;
+  // Trust the template's raw filters (ProjectConfig.allowRawFilters); default: the allow-list.
+  allowRawFilters?: boolean;
 }
 
 export interface RenderedGeometry {
@@ -154,6 +156,7 @@ function projectConfig(buildDir: string, options: RenderCheckOptions): ProjectCo
     assetsDir: options.assetsDir,
     currentLocale: options.currentLocale,
     fields: options.fields,
+    allowRawFilters: options.allowRawFilters,
   };
 }
 

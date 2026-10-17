@@ -113,6 +113,10 @@ export type ProjectConfig = {
   // Skip descriptor validation before compiling (trusted callers only; validation is on by default).
   // Applies to the Node `compile()` path only — the browser and React Native paths always validate.
   skipValidation?: boolean;
+  // Trust the template's raw `filters` (trusted local authors only). Off by default: authored filters are
+  // checked against an allow-list of file-free types and options (editor/utils/filter-allow-list.ts) on
+  // every path, validated or not. The render-time deny-list stays on either way.
+  allowRawFilters?: boolean;
   // Named render-quality tier resolved by core/encoding.ts (default 'standard'). Encoder numbers
   // (crf/preset/bitrate) stay an app concern — templates never carry them.
   qualityTier?: 'draft' | 'standard' | 'high';

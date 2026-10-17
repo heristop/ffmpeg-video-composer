@@ -47,6 +47,8 @@ export interface SnapshotRenderOptions {
   userVideoPaths?: Record<string, string>;
   /** Format to look at (`formats[format]` + `$format` values); default: the template's own orientation. */
   format?: 'landscape' | 'portrait' | 'square';
+  /** Trust the template's raw filters (ProjectConfig.allowRawFilters); default: the allow-list. */
+  allowRawFilters?: boolean;
 }
 
 export interface SnapshotOptions extends SnapshotPlan, SnapshotRenderOptions {
@@ -147,6 +149,7 @@ function projectConfig(buildDir: string, options: SnapshotRenderOptions): Projec
     fields: options.fields,
     currentLocale: options.currentLocale,
     userVideoPaths: options.userVideoPaths,
+    allowRawFilters: options.allowRawFilters,
   };
 }
 

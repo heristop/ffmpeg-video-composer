@@ -54,7 +54,7 @@ const UNSAFE_FILTER_TYPES = new Set([
   'ocr',
 ]);
 
-interface Token {
+export interface Token {
   /** Unquoted, unescaped text up to the terminator. */
   value: string;
   /** What follows the terminator (empty when the input was consumed). */
@@ -64,7 +64,7 @@ interface Token {
 }
 
 // One av_get_token: \x is a literal x, '…' is literal text, an unquoted terminator ends the token.
-function readToken(input: string, terminators: string): Token {
+export function readToken(input: string, terminators: string): Token {
   let value = '';
   let index = 0;
 
@@ -152,6 +152,9 @@ export function assertSafeFilterType(type: string): string {
   return type;
 }
 
+/** An absolute path (`/x`, `~/x`, `C:\\x`) or a `..` traversal. */
+const PATH_LIKE = /^\s*(\/|~|[A-Za-z]:[\\/])|(^|[\\/])\.\.([\\/]|$)/;
+
 /** Checks one filter's options (graph-level text already split off): keys, positional drawtext, quotes. */
 function checkOptions(type: string, options: string, value: string): void {
   let rest = options;
@@ -165,6 +168,12 @@ function checkOptions(type: string, options: string, value: string): void {
 
     if (key !== null && FILE_OPTION_KEYS.has(key)) {
       throw new Error(`Unsafe filter value ${type}: option ${key} reads a file, which raw filter values cannot do`);
+    }
+
+    // A positional option can be a file option (metadata's 6th, psnr's 1st, curves' 7th): a value that
+    // reads as an absolute path or a traversal is refused whatever its slot or key.
+    if (PATH_LIKE.test(equals < 0 ? option.value : option.value.slice(equals + 1))) {
+      throw new Error(`Unsafe filter value ${type}: "${value}" passes a file path`);
     }
 
     if (key === null && type === 'drawtext') {

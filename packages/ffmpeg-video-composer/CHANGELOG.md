@@ -121,6 +121,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Raw filters are allow-listed by default. A template's `filters`, input filters and map filters may use only
+  file-free filters (text, boxes, fades, geometry, colour, blur, a few audio filters) with their listed option
+  names and positional options; anything else is the validation error `filter_not_allowed` with the nearest
+  allowed filter, and a build that skipped validation stops before any FFmpeg command. Templates that use a
+  filter outside the list now need `ProjectConfig.allowRawFilters` (trusted local templates only). See the raw
+  filter allow-list in the template reference.
+
+### Changed
+
 - Browser entry: the template validator loads on demand, like the compile pipeline. It lowers every overlay
   (text, lower thirds, kinetic type, subtitles, graphics) to find where text lands, so it made up most of what a
   page loaded before its first compile, and every new graphic or effect added to it. The eager load drops from
@@ -168,6 +177,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   models are refused, a scalar `value` gets the same checks as `values` (including the filters it chains),
   more file-capable option keys are refused, a dangling escape is refused, and a LUT look takes a bare
   preset name only.
+- Raw filters: positional options could still reach file options with no key, so authored filters are now
+  checked against an allow-list (see Changed); map pad labels are limited to streams, `@input` references and
+  plain labels, `url:` LUT looks and authored graph blocks need the opt-in, and the render-time deny-list also
+  refuses absolute or `..` paths in any filter option.
 - Transitions: a compile that skips validation now renders an unknown transition `type` as a fade instead of
   writing the name into the filter graph.
 
