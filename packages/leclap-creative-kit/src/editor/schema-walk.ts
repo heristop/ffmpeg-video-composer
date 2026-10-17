@@ -148,6 +148,18 @@ function unionMemberLiteral(variant: JsonSchemaNode): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
+function unionMemberNode(
+  node: JsonSchemaNode | undefined,
+  key: string,
+  discriminant: string
+): JsonSchemaNode | undefined {
+  const field = prop(node, key);
+  const items = field?.type === 'array' && field.items ? field.items : field;
+  const variants = items?.oneOf ?? items?.anyOf ?? [];
+
+  return variants.find((variant) => unionMemberLiteral(variant) === discriminant);
+}
+
 // Unwrap one path segment: arrays forward to their `items` before the property lookup, so a fixed
 // segment convention like "inputs.options.flip" reads through the array without a special case per
 // caller. A bracketed segment ("motion[shake]") instead selects one union member by its `type`
@@ -157,11 +169,8 @@ function descend(node: JsonSchemaNode | undefined, segment: string): JsonSchemaN
 
   if (unionMember) {
     const [, key, discriminant] = unionMember;
-    const field = prop(node, key);
-    const items = field?.type === 'array' && field.items ? field.items : field;
-    const variants = items?.oneOf ?? items?.anyOf ?? [];
 
-    return variants.find((variant) => unionMemberLiteral(variant) === discriminant);
+    return unionMemberNode(node, key, discriminant);
   }
 
   const unwrapped = node?.type === 'array' && node.items ? node.items : node;

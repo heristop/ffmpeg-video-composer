@@ -283,28 +283,32 @@ function makeReporter(opts: RenderOptions, live: LiveRenderer | null): ReporterB
   return { reporter, flushLog, logRel: path.relative(process.cwd(), logPath) };
 }
 
+function finishRenderError(error: unknown, live: LiveRenderer | null, quiet: boolean, logRel: string): never {
+  live?.finishError();
+
+  if (!quiet) console.error(hint(`  full log → ${logRel}`));
+  printErrorHints(error);
+  process.exit(1);
+}
+
 async function renderWithReporter(opts: RenderOptions): Promise<void> {
-  const label = `Rendering ${pc.bold(path.basename(opts.templatePath))}…`;
-  const live = process.stdout.isTTY && !opts.quiet ? new LiveRenderer(label) : null;
+  const live =
+    process.stdout.isTTY && !opts.quiet
+      ? new LiveRenderer(`Rendering ${pc.bold(path.basename(opts.templatePath))}…`)
+      : null;
   const { reporter, flushLog, logRel } = makeReporter(opts, live);
-  const startedAt = Date.now();
 
   if (live) live.start();
 
-  if (!live && !opts.quiet) console.log(label);
+  if (!live && !opts.quiet) console.log(`Rendering ${pc.bold(path.basename(opts.templatePath))}…`);
 
   try {
     const output = await compileOnce(opts, reporter);
     flushLog();
-    finishSuccess(output, startedAt, live, opts.quiet ? null : logRel);
+    finishSuccess(output, Date.now(), live, opts.quiet ? null : logRel);
   } catch (error) {
     flushLog();
-    live?.finishError();
-
-    if (!opts.quiet) console.error(hint(`  full log → ${logRel}`));
-
-    printErrorHints(error);
-    process.exit(1);
+    finishRenderError(error, live, opts.quiet, logRel);
   }
 
   if (reportQc(opts.qc, opts.quiet)) process.exit(1);

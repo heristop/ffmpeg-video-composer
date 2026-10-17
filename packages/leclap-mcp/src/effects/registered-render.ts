@@ -209,24 +209,31 @@ export async function prepareTitleJob(
   }
 }
 
+function validStill(request: Extract<TitleRender, { kind: 'still' }>): boolean {
+  return Number.isInteger(request.frame) && request.frame >= 0 && request.frame <= 299;
+}
+
+function validRange(request: Extract<TitleRender, { kind: 'range' }>): boolean {
+  return (
+    Number.isInteger(request.from) &&
+    Number.isInteger(request.to) &&
+    request.from >= 0 &&
+    request.to <= 299 &&
+    request.to >= request.from &&
+    request.to - request.from + 1 <= 90
+  );
+}
+
 function assertRequest(request: TitleRender) {
   if (request.kind === 'still') {
-    if (!Number.isInteger(request.frame) || request.frame < 0 || request.frame > 299) {
+    if (!validStill(request)) {
       throw new Error('preview_frame_invalid: expected frame 0..299.');
     }
 
     return;
   }
 
-  if (
-    request.kind === 'range' &&
-    (!Number.isInteger(request.from) ||
-      !Number.isInteger(request.to) ||
-      request.from < 0 ||
-      request.to > 299 ||
-      request.to < request.from ||
-      request.to - request.from + 1 > 90)
-  ) {
+  if (request.kind === 'range' && !validRange(request)) {
     throw new Error('preview_range_invalid: expected up to 90 frames within 0..299.');
   }
 }

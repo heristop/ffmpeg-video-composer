@@ -62,13 +62,18 @@ function propConstraints(node: PropNode): string {
 
   if (node.pattern) constraints.push(`pattern ${node.pattern}`);
 
-  if (node.items && typeof node.items === 'object' && !Array.isArray(node.items)) {
-    if (node.items.minLength !== undefined) constraints.push(`item length ≥ ${node.items.minLength}`);
-
-    if (node.items.maxLength !== undefined) constraints.push(`item length ≤ ${node.items.maxLength}`);
-  }
+  constraints.push(...itemConstraints(node.items));
 
   return constraints.join('; ') || '—';
+}
+
+function itemConstraints(items: PropNode['items']): string[] {
+  if (!items || typeof items !== 'object' || Array.isArray(items)) return [];
+
+  return [
+    ...(items.minLength === undefined ? [] : [`item length ≥ ${items.minLength}`]),
+    ...(items.maxLength === undefined ? [] : [`item length ≤ ${items.maxLength}`]),
+  ];
 }
 
 export function effectContractMarkdown(catalog: unknown): string {

@@ -283,6 +283,21 @@ async function renderDisabled(job: TitleJob, request: TitleRender, render: typeo
 
   return response(result, 'disabled');
 }
+
+async function renderCacheMiss(
+  job: TitleJob,
+  root: string | null | undefined,
+  key: string,
+  request: TitleRender,
+  render: typeof renderTitleJob
+) {
+  const result = await render(job, request);
+  job.signal?.throwIfAborted();
+  const written = root ? await optionalPublish(job, root, key, result, request) : false;
+  job.signal?.throwIfAborted();
+
+  return { result, written };
+}
 /** Exact rendered artifacts are copied and verified before reuse; caching errors only reduce reuse. */
 export async function renderTitleJobCached(job: TitleJob, request: TitleRender, render = renderTitleJob) {
   job.signal?.throwIfAborted();
@@ -298,10 +313,7 @@ export async function renderTitleJobCached(job: TitleJob, request: TitleRender, 
   job.signal?.throwIfAborted();
 
   if (hit) return response(hit, 'hit');
-  const result = await render(job, request);
-  job.signal?.throwIfAborted();
-  const written = root ? await optionalPublish(job, root, key, result, request) : false;
-  job.signal?.throwIfAborted();
+  const { result, written } = await renderCacheMiss(job, root, key, request, render);
 
   return response(result, written ? 'miss' : 'bypass', Number(written));
 }

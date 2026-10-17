@@ -129,21 +129,24 @@ function gapLogConfig(argv: readonly string[]): Pick<McpConfig, 'catalogGapLog'>
   return catalogGapLog ? { catalogGapLog } : {};
 }
 
-export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
-  // An empty value counts as unset: path.resolve('') is the working directory, which would widen the
-  // media sandbox to wherever the server was started.
+function directoryConfig(argv: readonly string[]): Pick<McpConfig, 'outputDir' | 'mediaDir'> {
   const outputDir =
     nonEmpty(readFlag(argv, '--output-dir')) ??
     nonEmpty(process.env.LECLAP_MCP_OUTPUT_DIR) ??
     path.join(os.homedir(), '.leclap', 'renders');
-
-  // Narrow default: confining reads to the whole home directory would let probe_media/compose_video
-  // read any file under $HOME. Operators who keep media elsewhere set --media-dir / LECLAP_MCP_MEDIA_DIR.
   const mediaDir =
     nonEmpty(readFlag(argv, '--media-dir')) ??
     nonEmpty(process.env.LECLAP_MCP_MEDIA_DIR) ??
     path.join(os.homedir(), '.leclap', 'media');
 
+  return { outputDir: path.resolve(outputDir), mediaDir: path.resolve(mediaDir) };
+}
+
+export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
+  // An empty value counts as unset: path.resolve('') is the working directory, which would widen the
+  // media sandbox to wherever the server was started.
+  // Narrow default: confining reads to the whole home directory would let probe_media/compose_video
+  // read any file under $HOME. Operators who keep media elsewhere set --media-dir / LECLAP_MCP_MEDIA_DIR.
   const renderTimeoutMs = resolveTimeout(
     readFlag(argv, '--render-timeout-ms') ?? process.env.LECLAP_MCP_RENDER_TIMEOUT_MS
   );
@@ -153,8 +156,7 @@ export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
   const allowRemotion = readBoolean(argv, '--allow-remotion', process.env.LECLAP_MCP_ALLOW_REMOTION);
 
   return {
-    outputDir: path.resolve(outputDir),
-    mediaDir: path.resolve(mediaDir),
+    ...directoryConfig(argv),
     ...fontsDirConfig(argv),
     renderTimeoutMs,
     effectCacheMaxBytes: resolveEffectCacheBudget(

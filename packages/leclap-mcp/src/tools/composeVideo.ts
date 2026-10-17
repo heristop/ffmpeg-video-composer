@@ -272,6 +272,19 @@ function checkEffectBindings(descriptor: TemplateDescriptor, provided: Record<st
   return checkSectionCoverage(descriptor, provided);
 }
 
+async function prepareEffects(
+  descriptor: TemplateDescriptor,
+  config: McpConfig,
+  paths: Record<string, string>,
+  signal?: AbortSignal
+): Promise<PreparedCompose | ToolError> {
+  try {
+    return await resolveComposeEffects(descriptor as Record<string, unknown>, config, paths, signal);
+  } catch (error) {
+    return errorResult(`Effect preparation failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 // Validate the descriptor, contain its raw filter chain, check section coverage, and realpath-guard
 // every supplied clip — returning either the render-ready inputs or the first tool error.
 export async function prepareCompose(
@@ -302,15 +315,7 @@ export async function prepareCompose(
   if ('isError' in resolved) return resolved;
 
   if (descriptor.descriptor.sections?.some((section) => section.type === 'effect')) {
-    try {
-      // The validated descriptor, its declared fields already filled with this render's values: the effects
-      // render from it and the build receives it as is.
-      const filled = descriptor.descriptor as Record<string, unknown>;
-
-      return await resolveComposeEffects(filled, config, resolved.paths, signal);
-    } catch (error) {
-      return errorResult(`Effect preparation failed: ${error instanceof Error ? error.message : String(error)}`);
-    }
+    return prepareEffects(descriptor.descriptor, config, resolved.paths, signal);
   }
 
   return { ok: true, descriptor: descriptor.descriptor, paths: resolved.paths };

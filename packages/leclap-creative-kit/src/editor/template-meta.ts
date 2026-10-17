@@ -1,21 +1,42 @@
 import type { TemplateDescriptor, EditorState, EditableTemplate } from './model';
 
-export function editorIdentityFrom(
+type IdentityFields = Pick<
+  EditorState,
+  'name' | 'description' | 'creativeDirection' | 'brief' | 'requirePurpose' | 'resolved'
+>;
+
+function setIdentityField<K extends keyof IdentityFields>(
+  target: IdentityFields,
+  key: K,
+  value: IdentityFields[K] | undefined
+): void {
+  if (value !== undefined) target[key] = value;
+}
+
+function identityMeta(
   template: EditableTemplate
 ): Pick<EditorState, 'name' | 'description' | 'creativeDirection' | 'brief' | 'requirePurpose' | 'resolved'> {
   const meta = template.descriptor.meta;
-
-  // Embedded metadata wins per field; legacy descriptors retain the catalog identity. The brief switches
-  // (meta.brief / meta.requirePurpose) have no control yet: carried through so a save never strips them.
-  return {
+  const identity: Pick<
+    EditorState,
+    'name' | 'description' | 'creativeDirection' | 'brief' | 'requirePurpose' | 'resolved'
+  > = {
     name: meta?.name ?? template.name,
     description: meta?.description ?? template.description,
     creativeDirection: meta?.creativeDirection,
-    ...(meta?.brief === undefined ? {} : { brief: meta.brief }),
-    ...(meta?.requirePurpose === undefined ? {} : { requirePurpose: meta.requirePurpose }),
-    // Pinned transcripts (meta.resolved) are written by resolve passes, never edited here.
-    ...(meta?.resolved === undefined ? {} : { resolved: meta.resolved }),
   };
+
+  setIdentityField(identity, 'brief', meta?.brief);
+  setIdentityField(identity, 'requirePurpose', meta?.requirePurpose);
+  setIdentityField(identity, 'resolved', meta?.resolved);
+
+  return identity;
+}
+
+export function editorIdentityFrom(
+  template: EditableTemplate
+): Pick<EditorState, 'name' | 'description' | 'creativeDirection' | 'brief' | 'requirePurpose' | 'resolved'> {
+  return identityMeta(template);
 }
 
 // The brief switches have no control yet: carried through untouched (blank brief dropped).

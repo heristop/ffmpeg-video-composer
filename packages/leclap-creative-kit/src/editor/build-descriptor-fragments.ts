@@ -59,22 +59,33 @@ function animationExtent(a: AnimationOverlay) {
   return { loop: a.loop ?? true };
 }
 
+function animationPlacement(animation: AnimationOverlay) {
+  return {
+    persistent: animation.persistent ?? true,
+    ...(animation.start ? { start: animation.start } : {}),
+    ...(animation.position ? { position: animation.position } : {}),
+    ...(animation.scale ? { scale: animation.scale } : {}),
+    ...(animation.fit && animation.fit !== 'stretch' ? { fit: animation.fit } : {}),
+  };
+}
+
+function animationAppearance(animation: AnimationOverlay) {
+  return {
+    ...(animation.opacity !== undefined && animation.opacity < 1 ? { opacity: animation.opacity } : {}),
+    ...(animation.rotation ? { rotation: animation.rotation } : {}),
+    ...(animation.flip ? { flip: animation.flip } : {}),
+    ...(animation.motion ? { motion: animation.motion } : {}),
+  };
+}
+
 // Placement/playback options shared by a section animation input and a whole-video global animation:
 // extent (duration | loops | loop), persistent, start, position/scale; opacity only when it fades (< 1),
 // rotation only when nonzero, flip/motion when set — so opaque/upright/static overlays stay clean.
 function animationOptions(animation: AnimationOverlay) {
   return {
     ...animationExtent(animation),
-    persistent: animation.persistent ?? true,
-    ...(animation.start ? { start: animation.start } : {}),
-    ...(animation.position ? { position: animation.position } : {}),
-    ...(animation.scale ? { scale: animation.scale } : {}),
-    // 'stretch' is the engine default, so only a real aspect choice (contain/cover) is written.
-    ...(animation.fit && animation.fit !== 'stretch' ? { fit: animation.fit } : {}),
-    ...(animation.opacity !== undefined && animation.opacity < 1 ? { opacity: animation.opacity } : {}),
-    ...(animation.rotation ? { rotation: animation.rotation } : {}),
-    ...(animation.flip ? { flip: animation.flip } : {}),
-    ...(animation.motion ? { motion: animation.motion } : {}),
+    ...animationPlacement(animation),
+    ...animationAppearance(animation),
   };
 }
 
@@ -149,13 +160,7 @@ function imageTimingFrom(overlay: ImageOverlay): { start?: number; duration?: nu
 // ignores; the actual pixels are the choice's pre-rasterized PNG data: URL.
 function imageInputFrom(overlay: ImageOverlay, index: number): NonNullable<Section['inputs']>[number] {
   const options = {
-    ...(overlay.position ? { position: overlay.position } : {}),
-    ...(overlay.scale ? { scale: overlay.scale } : {}),
-    // 'stretch' is the engine default, so only a real aspect choice (contain/cover) is written.
-    ...(overlay.fit && overlay.fit !== 'stretch' ? { fit: overlay.fit } : {}),
-    ...(overlay.opacity !== undefined && overlay.opacity < 1 ? { opacity: overlay.opacity } : {}),
-    ...(overlay.rotation ? { rotation: overlay.rotation } : {}),
-    ...(overlay.flip ? { flip: overlay.flip } : {}),
+    ...imagePlacementFrom(overlay),
     ...imageTimingFrom(overlay),
     ...(overlay.motion ? { motion: overlay.motion } : {}),
   };
@@ -166,6 +171,17 @@ function imageInputFrom(overlay: ImageOverlay, index: number): NonNullable<Secti
     type: 'image',
     ...(overlay.shape ? { shape: overlay.shape } : {}),
     options,
+  };
+}
+
+function imagePlacementFrom(overlay: ImageOverlay): NonNullable<Section['inputs']>[number]['options'] {
+  return {
+    ...(overlay.position ? { position: overlay.position } : {}),
+    ...(overlay.scale ? { scale: overlay.scale } : {}),
+    ...(overlay.fit && overlay.fit !== 'stretch' ? { fit: overlay.fit } : {}),
+    ...(overlay.opacity !== undefined && overlay.opacity < 1 ? { opacity: overlay.opacity } : {}),
+    ...(overlay.rotation ? { rotation: overlay.rotation } : {}),
+    ...(overlay.flip ? { flip: overlay.flip } : {}),
   };
 }
 

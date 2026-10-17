@@ -25,15 +25,16 @@ import {
   type FootageEdits,
 } from './model';
 import { audioFrom, colorsListFrom, defaultTransitionFrom, globalVariablesFrom } from './to-editor-global';
-import { editorMotionFrom, motionBlocksOf, type MotionBlocks } from './motion-passthrough';
-import { editorFormatsFrom } from './formats-passthrough';
+import { motionBlocksOf, type MotionBlocks } from './motion-passthrough';
 import { overlaysFromFilters, videoFilterStateFrom } from './overlay-parsing';
 import { pruneEmpty } from './prune';
 import { editorIdentityFrom, renameTranscripts } from './template-meta';
 import { emittedSectionNames } from './build-descriptor';
-import { animationsFrom, choiceFromMarker, imagesFrom, overlayOptionsFrom, watermarkFrom } from './to-editor-overlay';
+import { animationsFrom, imagesFrom, overlayOptionsFrom } from './to-editor-overlay';
 import { htmlLayersFrom, type HtmlLayer } from './html-layer';
 import { sectionAudioExtrasFrom } from './visual-audio';
+import { optionalTemplateFields } from './optional-template-fields';
+import { videoSectionOptions } from './video-section-fields';
 
 function formSectionFrom(s: Section): EditorSection {
   const fields = (s.options?.fields ?? []) as Array<{
@@ -100,21 +101,32 @@ type VisualExtras = MotionBlocks & {
   htmlLayers?: HtmlLayer[];
 };
 
+function visualCoreFrom(s: Section, caption: EditorCaption | undefined): VisualExtras {
+  return {
+    ...(s.transition ? { transitionAfter: s.transition } : {}),
+    ...(caption ? { caption } : {}),
+    ...(s.look ? { look: typeof s.look === 'string' ? s.look : s.look.preset } : {}),
+    ...(s.grade ? { grade: s.grade } : {}),
+    ...(s.letterbox ? { letterbox: s.letterbox } : {}),
+  };
+}
+
+function visualCollectionsFrom(s: Section, animations: AnimationOverlay[], htmlLayers: HtmlLayer[]): VisualExtras {
+  return {
+    ...(s.motion && s.motion.length > 0 ? { motion: s.motion } : {}),
+    ...(animations.length > 0 ? { animations } : {}),
+    ...(htmlLayers.length > 0 ? { htmlLayers } : {}),
+  };
+}
+
 function visualExtrasFrom(s: Section): VisualExtras {
   const caption = captionFrom(s);
   const animations = animationsFrom(s);
   const htmlLayers = htmlLayersFrom(s);
 
   return {
-    ...(s.transition ? { transitionAfter: s.transition } : {}),
-    ...(caption ? { caption } : {}),
-    // The editor picks looks by name; a { preset, strength } look opens as its preset.
-    ...(s.look ? { look: typeof s.look === 'string' ? s.look : s.look.preset } : {}),
-    ...(s.grade ? { grade: s.grade } : {}),
-    ...(s.letterbox ? { letterbox: s.letterbox } : {}),
-    ...(s.motion && s.motion.length > 0 ? { motion: s.motion } : {}),
-    ...(animations.length > 0 ? { animations } : {}),
-    ...(htmlLayers.length > 0 ? { htmlLayers } : {}),
+    ...visualCoreFrom(s, caption),
+    ...visualCollectionsFrom(s, animations, htmlLayers),
     ...motionBlocksOf(s),
   };
 }
@@ -214,16 +226,10 @@ function videoSectionFrom(s: Section): EditorSection {
     // A stored `type: 'video'` section carries its fixed clip source in options.videoUrl — hydrate
     // it back to a MediaChoice so the section re-opens (and re-builds) as an asset-backed clip
     // instead of silently converting into a camera scene.
-    ...(s.options?.videoUrl ? { videoUrl: choiceFromMarker(s.options.videoUrl) } : {}),
+    ...videoSectionOptions(s),
     ...(images.length > 0 ? { images } : {}),
-    duration: s.options?.duration ?? 8,
-    mute: Boolean(s.options?.muteSection),
     ...videoFilterStateFrom(s.filters),
     ...(description ? { description } : {}),
-    countdown: Boolean(s.options?.countdown),
-    countdownSeconds: s.options?.countdownDuration ?? 4,
-    // A stored countdown is an explicit author choice, so re-opening never re-syncs it to clip duration.
-    countdownCustomized: true,
     ...videoExtrasFrom(s),
     ...sectionAudioExtrasFrom(s),
     ...sectionPlaybackFrom(s),
@@ -342,13 +348,10 @@ export function toEditorState(template: EditableTemplate | null): EditorState {
   const global = template.descriptor.global;
   const imported = editorSectionsFrom(template.descriptor);
   const colorsList = colorsListFrom(global);
-  const watermark = watermarkFrom(global);
 
   return {
     id: template.id,
     ...importedIdentity(template, imported),
-    ...(editorMotionFrom(template.descriptor.global) ? { motion: editorMotionFrom(template.descriptor.global) } : {}),
-    ...(editorFormatsFrom(template.descriptor) ? { formats: editorFormatsFrom(template.descriptor) } : {}),
     orientation: template.orientation,
     sections: imported.map(({ section }) => section),
     globalVariables: globalVariablesFrom(global),
@@ -356,8 +359,7 @@ export function toEditorState(template: EditableTemplate | null): EditorState {
     defaultTransition: defaultTransitionFrom(global),
     globalAnimations: globalAnimationsFrom(global),
     globalOverlays: globalOverlaysFrom(global),
-    ...(watermark ? { watermark } : {}),
-    ...(global?.look ? { globalLook: typeof global.look === 'string' ? global.look : global.look.preset } : {}),
+    ...optionalTemplateFields(template),
     ...(global?.grade ? { globalGrade: global.grade } : {}),
     ...(colorsList.length > 0 ? { colorsList } : {}),
   };

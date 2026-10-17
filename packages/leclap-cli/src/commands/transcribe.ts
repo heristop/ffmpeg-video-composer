@@ -34,6 +34,25 @@ interface Flags {
   assets?: string;
 }
 
+interface TemplateTranscribeConfigInput {
+  flags: Flags;
+  model: WhisperModelName | undefined;
+  cwd: string;
+  userVideoPaths: Record<string, string>;
+}
+
+function templateTranscribeConfig({ flags, model, cwd, userVideoPaths }: TemplateTranscribeConfigInput) {
+  return {
+    assetsDir: path.resolve(cwd, flags.assets ?? 'assets'),
+    ...(Object.keys(userVideoPaths).length > 0 && { userVideoPaths }),
+    ...(flags.section && { sections: flags.section.split(',').map((name) => name.trim()) }),
+    ...(flags.language && { language: flags.language }),
+    ...(model && { model }),
+    force: Boolean(flags.force),
+    now: () => new Date().toISOString(),
+  };
+}
+
 function parseModel(value: string | undefined): WhisperModelName | undefined {
   if (value === undefined) return undefined;
 
@@ -100,15 +119,7 @@ async function transcribeTemplateFile(flags: Flags, model: WhisperModelName | un
   const userVideoPaths = Object.fromEntries(
     Object.entries(videos).map(([name, file]) => [name, path.resolve(cwd, file)])
   );
-  const result = await transcribeTemplate(descriptor, {
-    assetsDir: path.resolve(cwd, flags.assets ?? 'assets'),
-    ...(Object.keys(userVideoPaths).length > 0 && { userVideoPaths }),
-    ...(flags.section && { sections: flags.section.split(',').map((name) => name.trim()) }),
-    ...(flags.language && { language: flags.language }),
-    ...(model && { model }),
-    force: Boolean(flags.force),
-    now: () => new Date().toISOString(),
-  });
+  const result = await transcribeTemplate(descriptor, templateTranscribeConfig({ flags, model, cwd, userVideoPaths }));
 
   if (flags.json) {
     process.stdout.write(`${JSON.stringify(result.descriptor, null, 2)}\n`);

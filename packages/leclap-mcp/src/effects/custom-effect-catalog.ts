@@ -90,14 +90,12 @@ function primitiveJson(value: unknown, budget: JsonBudget): boolean {
 
   return true;
 }
-function jsonFields(value: object): [string, unknown][] {
-  if (!Array.isArray(value) && ![Object.prototype, null].includes(Object.getPrototypeOf(value))) {
-    catalogError('catalog must contain plain JSON objects.');
-  }
-  const fields: [string, unknown][] = [];
+function jsonFieldEntries(value: object): PropertyDescriptorMap {
+  const descriptors: PropertyDescriptorMap = {};
 
   for (const key of Reflect.ownKeys(value)) {
     if (Array.isArray(value) && key === 'length') continue;
+
     const descriptor = Object.getOwnPropertyDescriptor(value, key);
 
     if (typeof key !== 'string' || !descriptor?.enumerable || !('value' in descriptor)) {
@@ -105,6 +103,19 @@ function jsonFields(value: object): [string, unknown][] {
     }
 
     if (key in Object.prototype || key === 'prototype') catalogError(`unsafe JSON key ${key}.`);
+
+    descriptors[key] = descriptor;
+  }
+
+  return descriptors;
+}
+function jsonFields(value: object): [string, unknown][] {
+  if (!Array.isArray(value) && ![Object.prototype, null].includes(Object.getPrototypeOf(value))) {
+    catalogError('catalog must contain plain JSON objects.');
+  }
+  const fields: [string, unknown][] = [];
+
+  for (const [key, descriptor] of Object.entries(jsonFieldEntries(value))) {
     fields.push([key, descriptor.value]);
   }
 

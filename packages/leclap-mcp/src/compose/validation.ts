@@ -57,6 +57,29 @@ function effectFields(section: unknown, depth: number, pending: SectionGroup[]):
 
   return [effect?.props, effect?.assets];
 }
+
+function walkEffectGroups(pending: SectionGroup[], values: unknown[], visited: number): number | null {
+  let count = visited;
+
+  while (pending.length > 0) {
+    const next = pending.pop();
+
+    if (!next) break;
+
+    if (++count > MAX_EFFECT_NODES || next.depth > MAX_EFFECT_DEPTH) return null;
+
+    if (!Array.isArray(next.sections)) continue;
+
+    for (const section of next.sections) {
+      if (++count > MAX_EFFECT_NODES) return null;
+
+      values.push(...effectFields(section, next.depth, pending));
+    }
+  }
+
+  return count;
+}
+
 export function effectKeyError(raw: unknown): string | undefined {
   const template = objectRecord(raw);
 
@@ -69,22 +92,9 @@ export function effectKeyError(raw: unknown): string | undefined {
     ...partials.map((partial) => ({ sections: objectRecord(partial)?.sections, depth: 0 })),
   ];
   const values: unknown[] = [];
-  let visited = partials.length;
+  const visited = partials.length;
 
-  while (pending.length > 0) {
-    const next = pending.pop();
-
-    if (!next) break;
-
-    if (++visited > MAX_EFFECT_NODES || next.depth > MAX_EFFECT_DEPTH) return EFFECT_BOUNDS_ERROR;
-
-    if (!Array.isArray(next.sections)) continue;
-
-    for (const section of next.sections) {
-      if (++visited > MAX_EFFECT_NODES) return EFFECT_BOUNDS_ERROR;
-      values.push(...effectFields(section, next.depth, pending));
-    }
-  }
+  if (walkEffectGroups(pending, values, visited) === null) return EFFECT_BOUNDS_ERROR;
 
   return unsafeEffectValue(values);
 }

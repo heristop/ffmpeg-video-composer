@@ -55,16 +55,27 @@ function windowFrom(options: NonNullable<StoredInput['options']>): Pick<HtmlLaye
   };
 }
 
-function layerFrom(input: StoredInput): HtmlLayer {
-  const options = input.options ?? {};
+function layerPlacementOptions(layer: HtmlLayer): NonNullable<StoredInput['options']> {
+  return {
+    ...(layer.position ? { position: layer.position } : {}),
+    ...(layer.scale ? { scale: layer.scale } : {}),
+    ...(layer.opacity !== undefined && layer.opacity < 1 ? { opacity: layer.opacity } : {}),
+    ...(layer.rotation ? { rotation: layer.rotation } : {}),
+  };
+}
+
+function layerWindowOptions(layer: HtmlLayer): NonNullable<StoredInput['options']> {
+  const start = layer.start ?? 0;
 
   return {
-    id: input.name,
-    name: input.name,
-    html: input.html ?? '',
+    ...(start > 0 ? { start } : {}),
+    ...(layer.end !== undefined && layer.end > start ? { duration: seconds(layer.end - start) } : {}),
+  };
+}
+
+function layerStoredFields(input: StoredInput, options: NonNullable<StoredInput['options']>): Partial<HtmlLayer> {
+  return {
     ...(input.css === undefined ? {} : { css: input.css }),
-    width: input.width ?? 0,
-    height: input.height ?? 0,
     ...(options.position ? { position: options.position } : {}),
     ...(options.scale ? { scale: options.scale } : {}),
     ...(options.opacity !== undefined && options.opacity < 1 ? { opacity: options.opacity } : {}),
@@ -74,21 +85,28 @@ function layerFrom(input: StoredInput): HtmlLayer {
   };
 }
 
+function layerFrom(input: StoredInput): HtmlLayer {
+  const options = input.options ?? {};
+
+  return {
+    id: input.name,
+    name: input.name,
+    html: input.html ?? '',
+    width: input.width ?? 0,
+    height: input.height ?? 0,
+    ...layerStoredFields(input, options),
+  };
+}
+
 /** The section's HTML layers, in their stored order. */
 export function htmlLayersFrom(section: Section): HtmlLayer[] {
   return (section.inputs ?? []).filter((input) => input.type === 'html').map(layerFrom);
 }
 
 function optionsOf(layer: HtmlLayer): NonNullable<StoredInput['options']> {
-  const start = layer.start ?? 0;
-
   return {
-    ...(layer.position ? { position: layer.position } : {}),
-    ...(layer.scale ? { scale: layer.scale } : {}),
-    ...(layer.opacity !== undefined && layer.opacity < 1 ? { opacity: layer.opacity } : {}),
-    ...(layer.rotation ? { rotation: layer.rotation } : {}),
-    ...(start > 0 ? { start } : {}),
-    ...(layer.end !== undefined && layer.end > start ? { duration: seconds(layer.end - start) } : {}),
+    ...layerPlacementOptions(layer),
+    ...layerWindowOptions(layer),
     ...(layer.motion ? { motion: layer.motion } : {}),
   };
 }

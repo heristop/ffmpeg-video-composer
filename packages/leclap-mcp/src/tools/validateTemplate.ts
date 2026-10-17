@@ -25,6 +25,7 @@ import { featureNote, featureWarningsSchema } from './featureWarnings.js';
 import { fieldContract, fieldContractSchema, formFields } from '../compose/field-values.js';
 import { extrasInput, extrasOutput, validateExtras, withExtras, type ExtrasArgs } from './validate-extras.js';
 import { withReadableFonts } from '../compose/template-fonts.js';
+import { requirementSummary } from './validation-summary.js';
 
 const inputSchema = z.object({
   template: z.record(z.string(), z.unknown()),
@@ -289,6 +290,7 @@ function effectCapabilities(hasEffects: boolean, config: RenderConfig) {
     },
   };
 }
+
 async function summary(
   descriptor: TemplateDescriptor,
   authored: TemplateDescriptor,
@@ -307,11 +309,7 @@ async function summary(
     : await findings(descriptor, authored, request);
   const motion = motionWarnings(authored);
   const features = await capabilityWarnings(authored);
-  const needs = [
-    clips.length > 0 ? `clips: ${clips.join(', ')}` : 'no clips',
-    fields.length > 0 ? `fields: ${fields.join(', ')}` : 'no fields',
-    ...(contract ? [`declared fields: ${contract.map((field) => `${field.name} (${field.type})`).join(', ')}`] : []),
-  ].join('; ');
+  const needs = requirementSummary(clips, fields, contract);
 
   return {
     content: [

@@ -48,13 +48,27 @@ const SPEC = {
   help: { type: 'boolean', default: false },
 } as const;
 
-/** Parse argv; returns null when --help was asked. */
-export function parseOptions(argv: string[], repoRoot: string): ReviewOptions | null {
-  const { values } = parseArgs({ args: argv, options: SPEC, allowPositionals: false });
+interface ParsedReviewValues {
+  help?: boolean;
+  ref?: string;
+  before?: string;
+  label?: string;
+  out?: string;
+  assets?: string;
+  'templates-only'?: boolean;
+  'effects-only'?: boolean;
+  only?: string[];
+  formats?: string;
+  backgrounds?: string;
+  jobs?: string;
+  build?: boolean;
+  showcase?: string;
+}
 
-  if (values.help) return null;
-
-  // `--before <ref>` is shorthand for `--ref <ref> --label before`.
+function reviewPaths(
+  values: ParsedReviewValues,
+  repoRoot: string
+): Pick<ReviewOptions, 'out' | 'label' | 'ref' | 'assets'> {
   const ref = values.ref ?? values.before;
 
   return {
@@ -62,6 +76,18 @@ export function parseOptions(argv: string[], repoRoot: string): ReviewOptions | 
     label: values.label ?? (values.before === undefined ? 'after' : 'before'),
     ...(ref !== undefined && { ref }),
     assets: path.resolve(values.assets ?? path.join(repoRoot, 'apps/leclap-web/public/assets')),
+  };
+}
+
+/** Parse argv; returns null when --help was asked. */
+export function parseOptions(argv: string[], repoRoot: string): ReviewOptions | null {
+  const { values } = parseArgs({ args: argv, options: SPEC, allowPositionals: false });
+
+  if (values.help) return null;
+
+  // `--before <ref>` is shorthand for `--ref <ref> --label before`.
+  return {
+    ...reviewPaths(values, repoRoot),
     effects: !values['templates-only'],
     templates: !values['effects-only'],
     only: (values.only ?? []).flatMap((item) => item.split(',')).filter(Boolean),

@@ -137,6 +137,23 @@ function parseEffect(v: DrawtextValues): TextEffect | undefined {
   return { ...(shadow === undefined ? {} : { shadow }), ...(outline === undefined ? {} : { outline }) };
 }
 
+function overlayOptionalFields(
+  v: DrawtextValues,
+  dt: { reveal?: TextOverlay['reveal']; exit?: TextOverlay['exit'] },
+  effect: TextEffect | undefined
+): Partial<TextOverlay> {
+  const boxPadding = parseBoxPadding(v);
+  const textOpacity = parseOpacityToken(v.fontcolor);
+
+  return {
+    ...(boxPadding === undefined ? {} : { boxPadding }),
+    ...(textOpacity === undefined ? {} : { textOpacity }),
+    ...(dt.reveal ? { reveal: dt.reveal } : {}),
+    ...(dt.exit ? { exit: dt.exit } : {}),
+    ...(effect ? { effect } : {}),
+  };
+}
+
 export function overlayFrom(dt: {
   values?: DrawtextValues;
   reveal?: TextOverlay['reveal'];
@@ -146,11 +163,6 @@ export function overlayFrom(dt: {
   const effect = parseEffect(v);
   // Watermark alpha rides the fontcolor as `#hex@a`; absent suffix → no field, so overlays saved
   // before text opacity existed round-trip without a spurious key.
-  const textOpacity = parseOpacityToken(v.fontcolor);
-  // Non-default boxborderw rides back as boxPadding; the 12 default collapses to an absent field so
-  // overlays saved before the padding control existed round-trip unchanged.
-  const boxPadding = parseBoxPadding(v);
-
   return {
     text: v.text?.en ?? '',
     ...positionFrom(v),
@@ -160,11 +172,7 @@ export function overlayFrom(dt: {
     box: v.box !== undefined,
     boxcolor: (v.boxcolor ?? '#000000').split('@')[0],
     boxOpacity: parseOpacity(v.boxcolor),
-    ...(boxPadding === undefined ? {} : { boxPadding }),
-    ...(textOpacity === undefined ? {} : { textOpacity }),
-    ...(dt.reveal ? { reveal: dt.reveal } : {}),
-    ...(dt.exit ? { exit: dt.exit } : {}),
-    ...(effect ? { effect } : {}),
+    ...overlayOptionalFields(v, dt, effect),
   };
 }
 
@@ -299,25 +307,33 @@ export function filterStagesFromFilters(filters: Section['filters']): VideoFilte
     }
     const previous: StoredFilter | undefined = list.at(index - 1);
 
-    if (
-      index > 0 &&
-      previous?.type === 'drawtext' &&
-      accentFrom(filter, Number(previous.values?.fontsize ?? 48)) !== undefined
-    ) {
-      continue;
-    }
+    if (isAccentFilter(index, filter, previous)) continue;
 
-    let stage = stages.at(-1);
-
-    if (!stage || stage.beforeOverlay !== beforeOverlay) {
-      stage = { beforeOverlay, filters: [] };
-      stages.push(stage);
-    }
+    const stage = stageFor(stages, beforeOverlay);
     // Filter descriptors are plain JSON; this also works on native runtimes without structuredClone.
     stage.filters.push(JSON.parse(JSON.stringify(filter)) as StoredFilter);
   }
 
   return stages;
+}
+
+function isAccentFilter(index: number, filter: StoredFilter, previous: StoredFilter | undefined): boolean {
+  return (
+    index > 0 &&
+    previous?.type === 'drawtext' &&
+    accentFrom(filter, Number(previous.values?.fontsize ?? 48)) !== undefined
+  );
+}
+
+function stageFor(stages: VideoFilterStage[], beforeOverlay: number): VideoFilterStage {
+  const existing = stages.at(-1);
+
+  if (existing?.beforeOverlay === beforeOverlay) return existing;
+
+  const stage = { beforeOverlay, filters: [] as StoredFilter[] };
+  stages.push(stage);
+
+  return stage;
 }
 
 export function videoFilterStateFrom(

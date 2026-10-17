@@ -79,6 +79,23 @@ function errorResult(text: string) {
   return { isError: true as const, content: [{ type: 'text' as const, text }] };
 }
 
+function transcriptResult(transcript: Awaited<ReturnType<MediaTranscriber>>) {
+  const confidence = meanConfidence(transcript.words, 1) ?? undefined;
+  const low = confidence !== undefined && confidence < LOW_TRANSCRIPT_CONFIDENCE;
+
+  return {
+    result: {
+      ...transcript,
+      wordCount: transcript.words.length,
+      ...(confidence === undefined ? {} : { confidence }),
+      lowConfidence: low,
+      srt: transcriptSrt(transcript.words),
+      advice: advice(transcript, low),
+    },
+    summary: `${transcript.words.length} words (${transcript.engine}, ${transcript.language ?? 'language unknown'})`,
+  };
+}
+
 async function handleTranscribe(args: Args, config: McpConfig, transcriber: MediaTranscriber, signal?: AbortSignal) {
   // Checked here too, not only by the input schema: the language reaches the transcriber's command line.
   if (args.language !== undefined && !LANGUAGE_TAG.test(args.language)) {
@@ -95,17 +112,7 @@ async function handleTranscribe(args: Args, config: McpConfig, transcriber: Medi
 
   try {
     const transcript = await transcriber(realPath, { language: args.language, model: args.model, signal });
-    const confidence = meanConfidence(transcript.words, 1) ?? undefined;
-    const low = confidence !== undefined && confidence < LOW_TRANSCRIPT_CONFIDENCE;
-    const result = {
-      ...transcript,
-      wordCount: transcript.words.length,
-      ...(confidence === undefined ? {} : { confidence }),
-      lowConfidence: low,
-      srt: transcriptSrt(transcript.words),
-      advice: advice(transcript, low),
-    };
-    const summary = `${transcript.words.length} words (${transcript.engine}, ${transcript.language ?? 'language unknown'})`;
+    const { result, summary } = transcriptResult(transcript);
 
     return {
       content: [{ type: 'text' as const, text: `Transcribed ${realPath}: ${summary}.` }],

@@ -196,17 +196,21 @@ function elapsedDuration(timestamp: number | null, startTime: string | undefined
   return Math.max(0, timestamp - (Number.isFinite(start) ? Math.max(0, start) : 0));
 }
 
+function parseTaggedDuration(stream: FFProbeStream | undefined): number | null {
+  const tag = stream?.tags?.DURATION ?? stream?.tags?.duration;
+  const match = tag?.match(/^(\d+):([0-5]\d):([0-5]\d(?:\.\d+)?)$/);
+
+  if (!match) return null;
+
+  return elapsedDuration(Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]), stream?.start_time);
+}
+
 function parseDuration(stream: FFProbeStream | undefined): number | null {
   const duration = numericDuration(stream?.duration);
 
   if (duration !== null) return duration;
-  // Matroska/WebM commonly stores per-stream duration as HH:MM:SS in tags instead.
-  const tag = stream?.tags?.DURATION ?? stream?.tags?.duration;
-  const match = tag?.match(/^(\d+):([0-5]\d):([0-5]\d(?:\.\d+)?)$/);
 
-  return match
-    ? elapsedDuration(Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]), stream?.start_time)
-    : null;
+  return parseTaggedDuration(stream);
 }
 
 function parseSampleRate(stream: FFProbeStream | undefined): number | null {

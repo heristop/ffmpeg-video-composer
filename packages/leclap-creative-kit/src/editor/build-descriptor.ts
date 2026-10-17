@@ -110,21 +110,7 @@ function videoDescriptorFrom(section: VideoSection, index: number): Section {
   return {
     name: `video_${index}`,
     type: 'project_video',
-    options: {
-      duration: section.duration,
-      muteSection: section.mute,
-      ...(section.countdown ? { countdown: true, countdownDuration: section.countdownSeconds } : {}),
-      ...(section.framingGuide ? { framingGuide: section.framingGuide } : {}),
-      // Recorder metadata (never lowered to filters): the preselected mode and the allowed set,
-      // each emitted only when the author set them (omitted = front / all four).
-      ...(section.captureMode ? { captureMode: section.captureMode } : {}),
-      ...(section.allowedCaptureModes && section.allowedCaptureModes.length > 0
-        ? { allowedCaptureModes: section.allowedCaptureModes }
-        : {}),
-      ...sectionAudioOptions(section),
-      ...sectionPlaybackOptions(section),
-      ...sectionFitOptions(section),
-    },
+    options: videoDescriptorOptions(section),
     // Recording instructions for the filmer, keyed under the app's default locale.
     // A blank/whitespace-only description emits nothing.
     ...(description ? { description: { [DEFAULT_LOCALE]: description } } : {}),
@@ -132,6 +118,22 @@ function videoDescriptorFrom(section: VideoSection, index: number): Section {
     ...(filters.length > 0 ? { filters } : {}),
     ...visualExtras(section),
     ...(overlayInputs.length > 0 ? { inputs: overlayInputs } : {}),
+  };
+}
+
+function videoDescriptorOptions(section: VideoSection) {
+  return {
+    duration: section.duration,
+    muteSection: section.mute,
+    ...(section.countdown ? { countdown: true, countdownDuration: section.countdownSeconds } : {}),
+    ...(section.framingGuide ? { framingGuide: section.framingGuide } : {}),
+    ...(section.captureMode ? { captureMode: section.captureMode } : {}),
+    ...(section.allowedCaptureModes && section.allowedCaptureModes.length > 0
+      ? { allowedCaptureModes: section.allowedCaptureModes }
+      : {}),
+    ...sectionAudioOptions(section),
+    ...sectionPlaybackOptions(section),
+    ...sectionFitOptions(section),
   };
 }
 

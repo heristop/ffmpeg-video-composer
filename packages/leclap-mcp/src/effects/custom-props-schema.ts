@@ -62,6 +62,14 @@ function validateKeywords(schema: JsonPropsSchema, location: string): string {
 
   return schema.type;
 }
+function validateBoundValue(value: unknown, type: string, key: string, location: string): void {
+  if (typeof value !== 'number' || !Number.isFinite(value)) catalogError(`${location}: invalid ${key}.`);
+
+  if (['string', 'array'].includes(type) && (!Number.isInteger(value) || value < 0)) {
+    catalogError(`${location}: invalid ${key}.`);
+  }
+}
+
 function validateBounds(schema: JsonPropsSchema, type: string, location: string): void {
   const keys = boundKeys[type];
 
@@ -71,11 +79,7 @@ function validateBounds(schema: JsonPropsSchema, type: string, location: string)
     if (!(key in schema)) continue;
     const value = schema[key];
 
-    if (typeof value !== 'number' || !Number.isFinite(value)) catalogError(`${location}: invalid ${key}.`);
-
-    if (['string', 'array'].includes(type) && (!Number.isInteger(value) || value < 0)) {
-      catalogError(`${location}: invalid ${key}.`);
-    }
+    validateBoundValue(value, type, key, location);
   }
   const minimum = schema[keys[0]];
   const maximum = schema[keys[1]];

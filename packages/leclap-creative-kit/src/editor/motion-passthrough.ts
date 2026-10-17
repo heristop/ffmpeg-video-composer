@@ -60,6 +60,14 @@ export interface EditorMotion {
   fields?: FieldsDeclaration;
 }
 
+function setMotionField<K extends keyof EditorMotion>(
+  target: EditorMotion,
+  key: K,
+  value: EditorMotion[K] | undefined
+): void {
+  if (value !== undefined) target[key] = value;
+}
+
 /** Section audio options the builder has no controls for yet, carried verbatim (options.voice / audioAutomation). */
 export interface ClipAudioPassthrough {
   voice?: VoicePreset;
@@ -86,15 +94,21 @@ export function motionBlocksOf(source: MotionBlocks): MotionBlocks {
   };
 }
 
+function motionFields(global: TemplateDescriptor['global']): EditorMotion {
+  const fields: EditorMotion = {};
+
+  setMotionField(fields, 'seed', global?.seed);
+  setMotionField(fields, 'tokens', global?.motion);
+  setMotionField(fields, 'theme', global?.theme);
+  setMotionField(fields, 'platform', global?.platform);
+  setMotionField(fields, 'fields', global?.fields);
+
+  return fields;
+}
+
 /** global.seed, global.motion, global.theme, global.platform and global.fields as editor state, or undefined when the template sets none. */
 export function editorMotionFrom(global: TemplateDescriptor['global']): EditorMotion | undefined {
-  const motion: EditorMotion = {
-    ...(global?.seed === undefined ? {} : { seed: global.seed }),
-    ...(global?.motion ? { tokens: global.motion } : {}),
-    ...(global?.theme === undefined ? {} : { theme: global.theme }),
-    ...(global?.platform ? { platform: global.platform } : {}),
-    ...(global?.fields === undefined ? {} : { fields: global.fields }),
-  };
+  const motion = motionFields(global);
 
   return Object.keys(motion).length > 0 ? motion : undefined;
 }
@@ -103,11 +117,13 @@ export function editorMotionFrom(global: TemplateDescriptor['global']): EditorMo
 export function motionGlobalFrom(
   motion: EditorMotion | undefined
 ): Pick<NonNullable<TemplateDescriptor['global']>, 'seed' | 'motion' | 'theme' | 'platform' | 'fields'> {
-  return {
-    ...(motion?.seed === undefined ? {} : { seed: motion.seed }),
-    ...(motion?.tokens ? { motion: motion.tokens } : {}),
-    ...(motion?.theme === undefined ? {} : { theme: motion.theme }),
-    ...(motion?.platform ? { platform: motion.platform } : {}),
-    ...(motion?.fields === undefined ? {} : { fields: motion.fields }),
-  };
+  return motion
+    ? {
+        ...(motion.seed === undefined ? {} : { seed: motion.seed }),
+        ...(motion.tokens ? { motion: motion.tokens } : {}),
+        ...(motion.theme === undefined ? {} : { theme: motion.theme }),
+        ...(motion.platform ? { platform: motion.platform } : {}),
+        ...(motion.fields === undefined ? {} : { fields: motion.fields }),
+      }
+    : {};
 }
