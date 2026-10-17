@@ -11,7 +11,7 @@ import {
 import type FormattersManager from './FormatterManager';
 import type FilterManager from './FilterManager';
 import { escapeRegExp } from './VariableManager';
-import { assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
+import { assertFiniteNumber, assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
 import { isBackgroundInput } from '../utils/background-input';
 import { layerKeyframes } from '../presets/layer-keyframes';
 import { resolveFit } from '../utils/reframe';
@@ -231,7 +231,17 @@ class MapManager {
   ): void => {
     // The frame size bounds the box; unknown (no section scale), the box is taken as authored.
     const [width, height] = /^\d+:\d+$/.test(videoScale) ? videoScale.split(':').map(Number) : [Infinity, Infinity];
-    const box = evenBox(input.options.clip as ClipBox, width, height);
+    const clip = input.options.clip as ClipBox;
+    const box = evenBox(
+      {
+        x: assertFiniteNumber(clip.x, 'clip x'),
+        y: assertFiniteNumber(clip.y, 'clip y'),
+        w: assertFiniteNumber(clip.w, 'clip w'),
+        h: assertFiniteNumber(clip.h, 'clip h'),
+      },
+      width,
+      height
+    );
     const name = input.name;
 
     // A box off the frame shows nothing, but the registered leg must still be consumed (an unconnected

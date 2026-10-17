@@ -1187,6 +1187,13 @@ describe('MapManager', () => {
       expect(segment.mapsList).toContain('anim2');
     });
 
+    it('refuses a clip box that is not numeric, from a caller that skipped the schema', () => {
+      const { manager } = build({ section: animationSection() });
+      const clip = { x: 0, y: 0, w: '10,metadata=print:a:b', h: 10 } as never;
+
+      expect(() => manager.addAnimationOverlay(makeAnimInput({ clip }), 2, '1280:720')).toThrow(/clip w/);
+    });
+
     it('scales the animation leg to the input scale (pre-overlay), not via a post-overlay filter', () => {
       const { manager, segment } = build({ section: animationSection() });
       manager.addAnimationOverlay(makeAnimInput({ scale: '640:360' }), 2);
