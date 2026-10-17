@@ -6,6 +6,7 @@ import { engineCapabilities, hasFilter, type EngineFeatures } from '../utils/fil
 import { ExtraInputs } from '../utils/extra-inputs';
 import type { MaskSugarContext } from './sugar-context';
 import { lowerFx } from './fx';
+import { lowerShape } from './shape-draw';
 import { lowerStroke } from './stroke-graphics';
 import { htmlCaptionFilters } from './subtitles-html';
 
@@ -45,5 +46,6 @@ export function compositingContext(options: CompositingOptions): MaskSugarContex
     effects: lowerFx,
     strokes: lowerStroke,
     captions: htmlCaptionFilters,
+    shapes: lowerShape,
   };
 }

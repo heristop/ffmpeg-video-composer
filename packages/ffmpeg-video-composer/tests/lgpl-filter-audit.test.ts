@@ -19,6 +19,7 @@ import type { Filter } from '@/core/types';
 import { VOICE_FILTERS, VOICE_PRESETS, voiceChain } from '@/core/audio/voice-presets';
 import { sfxGraph } from '@/editor/utils/sfx-mix';
 import { REGISTERED_FX, lowerFx } from '@/editor/presets/fx';
+import { lowerShape } from '@/editor/presets/shape-draw';
 import { lowerStroke } from '@/editor/presets/stroke-graphics';
 import { FX_DOCS } from '@/schemas/fx-docs';
 import { layerKeyframes } from '@/editor/presets/layer-keyframes';
@@ -358,6 +359,47 @@ describe('LGPL device filter audit', () => {
 
     for (const type of emitted) {
       expect(enabled.has(type), `stroke graphics emit "${type}"`).toBe(true);
+      expect(ENGINE_EMITTED_FILTERS as readonly string[], type).toContain(type);
+    }
+  });
+
+  it('shape graphics lower to allow-listed filters only', () => {
+    const types = (filters: Filter[]): string[] =>
+      filters.flatMap((f) => (f.graph ? f.graph.flatMap((chain) => types(chain.filters)) : [f.type]));
+    const shapes = [
+      { type: 'shape', preset: { type: 'star' } },
+      {
+        type: 'shape',
+        preset: { type: 'heart' },
+        gradient: { from: '#9298fb', to: '#f96f99' },
+        stroke: { draw: true, width: 6 },
+        origin: 'bottom',
+        animate: { rotate: [{ v: -30 }, { t: 1, v: 0 }], scale: [{ v: 0 }, { t: 0.6, v: 1 }] },
+      },
+    ];
+    const lowered = shapes.flatMap((graphic, index) => {
+      const section = { name: 's', type: 'color_background', options: { duration: 3 } } as never;
+      const ctx = {
+        duration: 3,
+        scale: '640:360',
+        fps: 25,
+        isVideo: false,
+        masks: {
+          available: true,
+          input: (key: string) => `input:${key}`,
+          color: (c: string) => c,
+          warn: () => undefined,
+        },
+      };
+
+      return lowerShape({ graphic, at: 0.2, until: 2, seed: 3, index, section, ctx } as never);
+    });
+    const emitted = new Set(types(lowered));
+
+    expect(emitted).toContain('overlay');
+
+    for (const type of emitted) {
+      expect(enabled.has(type), `shape graphics emit "${type}"`).toBe(true);
       expect(ENGINE_EMITTED_FILTERS as readonly string[], type).toContain(type);
     }
   });
