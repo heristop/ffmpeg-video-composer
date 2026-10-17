@@ -187,33 +187,39 @@ export function assertSafeFilterType(type: string): string {
   return type;
 }
 
+/** Checks one option of a filter: a file-reading key, a path or protocol value, positional drawtext. */
+function checkOption(type: string, option: { value: string }, value: string): void {
+  const equals = option.value.indexOf('=');
+  const key = equals < 0 ? null : option.value.slice(0, equals).trim();
+
+  if (key !== null && FILE_OPTION_KEYS.has(key)) {
+    throw new Error(`Unsafe filter value ${type}: option ${key} reads a file, which raw filter values cannot do`);
+  }
+
+  // A positional option can be a file option (metadata's 6th, psnr's 1st, curves' 7th): a value that
+  // reads as an absolute path, a traversal or a protocol is refused whatever its slot or key.
+  const optionValue = equals < 0 ? option.value : option.value.slice(equals + 1);
+  const location = locationProblem(optionValue, key === 'text');
+
+  if (location) throw new Error(`Unsafe filter value ${type}: "${value}" ${location}`);
+
+  if (key === 'fontfile' && type === 'drawtext') assertBareFontFile(optionValue);
+
+  if (key === null && type === 'drawtext') {
+    throw new Error(`Unsafe filter value ${type}: positional options are not allowed (the first is fontfile)`);
+  }
+}
+
 /** Checks one filter's options (graph-level text already split off): keys, positional drawtext, quotes. */
 function checkOptions(type: string, options: string, value: string): void {
   let rest = options;
 
   while (rest.length > 0) {
     const option = readToken(rest, ':');
-    const equals = option.value.indexOf('=');
-    const key = equals < 0 ? null : option.value.slice(0, equals).trim();
 
     if (option.open) throw new Error(`Unsafe filter value ${type}: "${value}" leaves a quote or an escape open`);
 
-    if (key !== null && FILE_OPTION_KEYS.has(key)) {
-      throw new Error(`Unsafe filter value ${type}: option ${key} reads a file, which raw filter values cannot do`);
-    }
-
-    // A positional option can be a file option (metadata's 6th, psnr's 1st, curves' 7th): a value that
-    // reads as an absolute path, a traversal or a protocol is refused whatever its slot or key.
-    const optionValue = equals < 0 ? option.value : option.value.slice(equals + 1);
-    const location = locationProblem(optionValue, key === 'text');
-
-    if (location) throw new Error(`Unsafe filter value ${type}: "${value}" ${location}`);
-
-    if (key === 'fontfile' && type === 'drawtext') assertBareFontFile(optionValue);
-
-    if (key === null && type === 'drawtext') {
-      throw new Error(`Unsafe filter value ${type}: positional options are not allowed (the first is fontfile)`);
-    }
+    checkOption(type, option, value);
 
     rest = option.rest.slice(1);
   }

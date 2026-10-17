@@ -198,11 +198,12 @@ export function gradeToFilters(grade?: Grade): Filter[] {
   addMapped(filters, grade.hue, (hue) => ({ type: 'hue', value: `h=${hue}` }));
   addParts(filters, buildCbParts(grade), 'colorbalance');
   addPositive(filters, grade.blur, (blur) => ({ type: 'gblur', value: `sigma=${blur}` }));
+  // A grain that rounds to strength 0 is a no-op: no noise filter.
   addPositive(filters, grade.grain === undefined ? undefined : Math.round(grade.grain * 20), (strength) => ({
     type: 'noise',
     value: `alls=${strength}:allf=t+u`,
   }));
-  addMapped(filters, grade.curvesPreset || undefined, (preset) => ({
+  addMapped(filters, grade.curvesPreset, (preset) => ({
     type: 'curves',
     value: `preset=${curvesPreset(preset)}`,
   }));

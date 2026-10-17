@@ -128,6 +128,13 @@ export function buildProjectConfig(
     config.currentLocale = flags.locale;
   }
 
+  applyOutputFlags(config, cwd, flags);
+
+  return config;
+}
+
+// The output-side flags (determinism, QC, cache, format), set only when passed.
+function applyOutputFlags(config: ProjectConfig, cwd: string, flags: RenderFlags): void {
   if (flags.deterministic !== undefined) {
     config.deterministic = flags.deterministic;
   }
@@ -143,8 +150,6 @@ export function buildProjectConfig(
   if (flags.format) {
     config.format = parseFormatFlag(flags.format);
   }
-
-  return config;
 }
 
 /**

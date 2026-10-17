@@ -243,7 +243,7 @@ class AnimationComposer {
     const motion = overlayMotionExpr(anim.motion, position);
     const legRef = this.appendOverlayLeg(anim, firstInputIndex + index, index, legs, motion);
     const out = index === total - 1 ? outLabel : `[${chainPrefix}${index}]`;
-    const placement = motion.x || motion.y ? `x='${motion.x}':y='${motion.y}'` : (anim.position ?? '0:0');
+    const placement = motion.x || motion.y ? `x='${motion.x}':y='${motion.y}'` : position;
     const timeline = isStillAnimation(anim, path)
       ? imageOverlayEnable({ start: anim.start, duration: anim.duration })
       : '';
