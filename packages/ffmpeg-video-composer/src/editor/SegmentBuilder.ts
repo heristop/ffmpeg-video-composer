@@ -20,13 +20,13 @@ import {
   createEmojiPlan,
   createExtraInputs,
   HTML_RASTERISER,
-  buildHtmlLayerSource,
   type EmojiPlan,
   type SugarContext,
 } from './presets/registry';
 import {
   buildSingleFileAnimationSource,
   buildSingleFileImageSource,
+  buildHtmlLayerSource,
   buildGradientSource,
   resolveLayerGeometry,
 } from './utils/input-sources';

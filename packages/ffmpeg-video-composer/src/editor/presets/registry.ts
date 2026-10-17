@@ -11,7 +11,6 @@ export { compositingContext, createExtraInputs, HTML_RASTERISER } from './compos
 // Emoji leave the lowered text right after the sugar compiles (editor/emoji); re-exported so the builder
 // stages both from one place.
 export { createEmojiPlan, type EmojiPlan } from '../emoji/EmojiPlan';
-export { buildHtmlLayerSource } from '../html/html-sequence-source';
 import type { SugarContext } from './sugar-context';
 
 // The background sugars bake into the video before overlays. The overlay sugars (caption onward) live in

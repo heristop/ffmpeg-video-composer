@@ -3,6 +3,7 @@ import type { RevealEasing } from '../presets/text';
 import { easedRamp, phaseDuration } from '../presets/eased-ramp';
 import type { BackgroundLayer } from '../../schemas/template.schemas';
 import type { GlobalAnimation } from '@/core/types';
+import { isHtmlSequence } from '../html/html-sequence-source';
 
 // Pure builders for the `-i` source fragments of composited inputs (animations and gradient layers).
 // They return fully-formed fragment strings (already containing `-i`, plus any `-framerate` /
@@ -315,6 +316,24 @@ export function overlayMotionExpr(motion: OverlayMotionInput | undefined, positi
  */
 export function buildSingleFileImageSource(path: string): string {
   return `-loop 1 -i ${assertSafeArgToken(path, 'image source')}`;
+}
+
+/**
+ * The `-i` source of a staged html layer at `path`. A still card is held like an image. An animated card is
+ * an animated PNG opened with a plain `-i`, played once; its motion keys are relative to the layer's start,
+ * so `-itsoffset <start>` begins the sequence when the layer appears (the overlay's `enable` gate alone
+ * would play it hidden), and the overlay repeats its last frame (MapManager).
+ */
+export function buildHtmlLayerSource(
+  input: { type?: string; url?: string; options?: { start?: number } },
+  path: string
+): string {
+  if (!isHtmlSequence(input)) return buildSingleFileImageSource(path);
+
+  const start = input.options?.start;
+  const offset = start && start > 0 ? `-itsoffset ${start} ` : '';
+
+  return `${offset}-i ${assertSafeArgToken(path, 'html sequence source')}`;
 }
 
 /**
