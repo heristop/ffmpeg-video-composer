@@ -27,4 +27,11 @@ describe('get_template_schema guide', () => {
     expect(text).toContain('get_motion_catalog html');
     expect(text).toContain('"html"');
   });
+
+  it('tells agents raw filters are allow-listed and how an operator opts in', () => {
+    const text = guideText();
+
+    expect(text).toContain('filter_not_allowed');
+    expect(text).toContain('--allow-raw-filters');
+  });
 });

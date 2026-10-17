@@ -141,6 +141,7 @@ function snapshotOptions(args: FramesArgs, config: McpConfig, outDir: string, pa
   return {
     outDir,
     assetsDir: config.mediaDir,
+    allowRawFilters: config.allowRawFilters,
     cacheDir: path.join(config.outputDir, '.section-cache'),
     workDir: config.outputDir,
     fields: fieldValues(args.fields),

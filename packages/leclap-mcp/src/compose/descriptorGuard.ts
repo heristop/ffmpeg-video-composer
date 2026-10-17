@@ -2,7 +2,6 @@ import path from 'node:path';
 
 import type { TemplateDescriptor } from 'ffmpeg-video-composer';
 
-import { assertWithinMediaDir } from './pathGuard.js';
 import { assertMediaRefsLocal } from './media-refs.js';
 
 // compose_video schema-validates the descriptor but then forwards its filter chain to ffmpeg
@@ -117,8 +116,9 @@ function* objectNodes(value: unknown): Generator<Record<string, unknown>> {
 
 // A bare bundled font name (e.g. "BebasNeue.ttf") has no path separator and no traversal — those
 // resolve from the engine's font registry and are safe. Anything path-like must be contained.
-function fontfileNeedsContainment(fontfile: string): boolean {
-  return fontfile.includes('/') || fontfile.includes('\\') || fontfile.includes('..') || path.isAbsolute(fontfile);
+// Aligned with the engine (assertBareFontFile): a drawtext fontfile is a bare font name the engine stages.
+function fontfileIsNotBare(fontfile: string): boolean {
+  return /[/\\':]/.test(fontfile) || fontfile.includes('..') || path.isAbsolute(fontfile);
 }
 
 function unsafeScalarValueReason(value: string): string | undefined {
@@ -141,7 +141,7 @@ function unsafeScalarValueReason(value: string): string | undefined {
 
 // Every string a filter hands to ffmpeg: the scalar `value` plus the structured `values` leaves.
 // Caption text and fontfile are excluded: text is free copy (a URL in a caption is not a fetch) and
-// fontfile has its own realpath containment below.
+// fontfile has its own bare-name rule below.
 function filterStrings(node: Record<string, unknown>): string[] {
   const strings: string[] = [];
 
@@ -255,21 +255,9 @@ function collectFontfiles(descriptor: TemplateDescriptor): string[] {
   return files;
 }
 
-// Realpath-contain one path-like fontfile; returns an error message on escape, undefined when safe.
-async function containFontfile(fontfile: string, mediaDir: string): Promise<string | undefined> {
-  try {
-    await assertWithinMediaDir(fontfile, mediaDir);
-
-    return undefined;
-  } catch (error) {
-    return `fontfile ${error instanceof Error ? error.message : String(error)}`;
-  }
-}
-
 // Reject dangerous filter types, file/URL-bearing scalar values and source/file filter syntax in any
-// string field, confirm every path-like fontfile
-// stays under the media dir, and that every local media path is there (media-refs.ts). Async because
-// containment is realpath-checked (symlink-safe).
+// string field, a fontfile that is not a bare font name, and any local media path outside the media dir
+// (media-refs.ts, realpath-checked so symlink-safe, hence async).
 export async function assertDescriptorSafe(descriptor: TemplateDescriptor, mediaDir: string): Promise<GuardResult> {
   const escape = findFilterEscape(descriptor) ?? findChainedEscape(descriptor);
 
@@ -277,12 +265,15 @@ export async function assertDescriptorSafe(descriptor: TemplateDescriptor, media
     return { ok: false, message: escape };
   }
 
-  const pathLike = collectFontfiles(descriptor).filter(fontfileNeedsContainment);
-  const checks = await Promise.all(pathLike.map((fontfile) => containFontfile(fontfile, mediaDir)));
-  const failure = checks.find((message) => message !== undefined);
+  const pathLike = collectFontfiles(descriptor).find(fontfileIsNotBare);
 
-  if (failure) {
-    return { ok: false, message: failure };
+  if (pathLike !== undefined) {
+    return {
+      ok: false,
+      message:
+        `fontfile "${pathLike}" must be a bare font name such as "Oswald.ttf"; a font file from the media dir ` +
+        'is declared in global.fonts instead.',
+    };
   }
 
   return assertMediaRefsLocal(descriptor, mediaDir);

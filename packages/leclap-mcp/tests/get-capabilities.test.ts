@@ -71,9 +71,25 @@ describe('get_capabilities', () => {
   it('returns the probe report as structured content and text', async () => {
     const result = await handler().run();
 
-    expect(result.structuredContent).toEqual(report(['drawtext']));
+    expect(result.structuredContent).toMatchObject(report(['drawtext']));
     expect(JSON.parse(result.content[0].text)).toEqual(result.structuredContent);
     expect(probeMock).toHaveBeenCalledWith({ binary: 'ffmpeg' });
+  });
+
+  it('reports that raw filters are allow-listed by default', async () => {
+    const result = await handler().run();
+
+    expect(result.structuredContent.rawFilters).toMatchObject({ mode: 'allow-list' });
+  });
+
+  it('reports trusted raw filters when the server opted in', async () => {
+    let captured: Handler | undefined;
+    registerGetCapabilities(
+      { registerTool: (_name: string, _meta: unknown, run: Handler) => (captured = run) } as never,
+      { allowRawFilters: true }
+    );
+
+    expect((await captured?.())?.structuredContent.rawFilters).toMatchObject({ mode: 'trusted' });
   });
 
   it('probes ffmpeg-static when that is what renders', async () => {

@@ -89,7 +89,8 @@ const outputSchema = z.object({
 
 type ValidateArgs = ExtrasArgs & { render?: boolean };
 type RenderSummary = { measured: number; seconds: number; unavailable?: string };
-type RenderConfig = Pick<McpConfig, 'mediaDir' | 'outputDir' | 'renderTimeoutMs' | 'fontsDir'> & EffectConfig;
+type RenderConfig = Pick<McpConfig, 'mediaDir' | 'outputDir' | 'renderTimeoutMs' | 'fontsDir' | 'allowRawFilters'> &
+  EffectConfig;
 type ToolError = {
   isError: true;
   content: [{ type: 'text'; text: string }];
@@ -166,7 +167,7 @@ async function renderInWorker(
   const job = {
     kind: 'geometry' as const,
     descriptor: authored as unknown as GeometryDescriptor,
-    options: { assetsDir: config.mediaDir, workDir: config.outputDir },
+    options: { assetsDir: config.mediaDir, workDir: config.outputDir, allowRawFilters: config.allowRawFilters },
   };
   const result = await runGeometryCheck(job, { timeoutMs: config.renderTimeoutMs, signal }).catch((error: unknown) => ({
     ok: false as const,

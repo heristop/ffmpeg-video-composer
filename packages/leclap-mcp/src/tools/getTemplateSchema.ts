@@ -24,7 +24,10 @@ const GUIDE = [
     '(kenburns [image_background only], rotate, crop, flip); audio polish via global.audio ' +
     '(sourceVolume, musicVolume, normalize, ducking) and options.audioFade; color_background `layers`; ' +
     'and project_video `framingGuide` (a recording-UI overlay, never rendered). They compile to ' +
-    'ordinary on-device-safe FFmpeg filters. `filters[]` remains the raw escape hatch (FFmpeg-native keys).',
+    'ordinary on-device-safe FFmpeg filters. `filters[]` remains the raw escape hatch (FFmpeg-native keys), ' +
+    'allow-listed: only file-free filters (drawtext, drawbox, fade, scale, crop, pad, overlay, vignette, eq, ' +
+    'hue, blur…) with their listed options pass; anything else is filter_not_allowed (get_capabilities ' +
+    'rawFilters). Only the operator can lift it, for trusted local templates (--allow-raw-filters).',
   'Motion system: section `kinetic` blocks animate copy natively per word or ' +
     'glyph (cascade, rise, drop, slide, pop, impact, tracking-in, typewriter, scramble, wave, highlight, counter, ' +
     'split, fade) with accents and exits; easings add springs (spring(k,c)), cubic-bezier, named curves and ' +

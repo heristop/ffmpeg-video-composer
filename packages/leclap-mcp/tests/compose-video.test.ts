@@ -192,6 +192,51 @@ describe('compose_video handler', () => {
     expect(runRenderMock).not.toHaveBeenCalled();
   });
 
+  // Raw filters are allow-listed for agent templates: a positional file option (metadata's 6th writes
+  // a file) is refused as a validation error, never rendered.
+  it('refuses a raw filter off the allow-list before rendering', async () => {
+    const hostile = {
+      global: { orientation: 'landscape', musicEnabled: false },
+      sections: [
+        {
+          name: 'card',
+          type: 'color_background',
+          options: { backgroundColor: '#000000', duration: 2 },
+          filters: [{ type: 'metadata', value: 'print:k:v:same_str:1:/tmp/pwned' }],
+        },
+      ],
+    };
+    const result = (await setup()({ template: hostile })) as { isError?: boolean; content: { text: string }[] };
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('metadata');
+    expect(runRenderMock).not.toHaveBeenCalled();
+  });
+
+  it('hands the raw-filter opt-in to the engine', async () => {
+    runRenderMock.mockResolvedValue({
+      ok: true,
+      outputPath: '/tmp/leclap-compose-test/out.mp4',
+      durationSeconds: 1,
+      sizeBytes: 1,
+      videoCodec: 'h264',
+      audioCodec: null,
+    });
+
+    await captureHandler({ ...config, allowRawFilters: true })({
+      template: clipTemplate,
+      userVideoPaths: await stageClip(),
+    });
+    const trusted = runRenderMock.mock.calls.at(-1)?.[0] as { projectConfig: { allowRawFilters?: boolean } };
+
+    expect(trusted.projectConfig.allowRawFilters).toBe(true);
+
+    await setup()({ template: clipTemplate, userVideoPaths: await stageClip() });
+    const untrusted = runRenderMock.mock.calls.at(-1)?.[0] as { projectConfig: { allowRawFilters?: boolean } };
+
+    expect(untrusted.projectConfig.allowRawFilters).toBeFalsy();
+  });
+
   it('rejects an invalid inline template before rendering', async () => {
     const result = (await setup()({ template: { sections: 'not-an-array' } })) as {
       isError?: boolean;

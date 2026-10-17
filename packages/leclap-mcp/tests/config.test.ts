@@ -59,6 +59,16 @@ describe('loadConfig', () => {
     }
   );
 
+  it('trusts raw filters only when explicitly opted in', () => {
+    expect(loadConfig([]).allowRawFilters).toBe(false);
+    expect(loadConfig(['--allow-raw-filters']).allowRawFilters).toBe(true);
+    expect(loadConfig(['--allow-raw-filters=false']).allowRawFilters).toBe(false);
+
+    process.env.LECLAP_MCP_ALLOW_RAW_FILTERS = '1';
+    expect(loadConfig([]).allowRawFilters).toBe(true);
+    delete process.env.LECLAP_MCP_ALLOW_RAW_FILTERS;
+  });
+
   it('enables Remotion only when explicitly opted in', () => {
     expect(loadConfig([]).allowRemotion).toBe(false);
     expect(loadConfig(['--allow-remotion']).allowRemotion).toBe(true);

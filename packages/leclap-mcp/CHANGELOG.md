@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `extract_structure`: a reference clip's format (shots, rhythm, transitions, grounds, layout) as binding
   rules, from at most 480 sampled frames.
+- `--allow-raw-filters` / `LECLAP_MCP_ALLOW_RAW_FILTERS` (off by default) trusts a template's raw filters for
+  trusted local use; `get_capabilities` reports which mode the server runs in, and the template guide says so.
+
+### Changed
+
+- Raw filters in agent templates are allow-listed by the engine: a filter outside the list is a
+  `filter_not_allowed` validation error instead of a render. A drawtext `fontfile` is a bare font name; fonts
+  from the media dir go through `global.fonts`.
 
 ### Fixed
 

@@ -196,13 +196,16 @@ describe('assertDescriptorSafe', () => {
     expect(result.ok).toBe(false);
   });
 
-  it('allows an absolute fontfile contained in the media dir', async () => {
+  // Aligned with the engine: a drawtext fontfile is a bare font name it stages (bundled, catalog, cache);
+  // a font file of the media dir is declared in global.fonts instead.
+  it('rejects a fontfile path even inside the media dir', async () => {
     const inside = path.join(mediaDir, 'brand.ttf');
     await fs.writeFile(inside, 'x');
 
     const result = await assertDescriptorSafe(drawtextDescriptor(inside), mediaDir);
 
-    expect(result.ok).toBe(true);
+    expect(result.ok).toBe(false);
+    expect(!result.ok && result.message).toMatch(/global\.fonts/);
   });
 });
 

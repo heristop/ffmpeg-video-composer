@@ -13,8 +13,8 @@
       },
       "filters": [
         {
-          "type": "definitelynotafilter",
-          "value": 1
+          "type": "format",
+          "value": "definitelynotapixfmt"
         }
       ]
     }
