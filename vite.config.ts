@@ -20,7 +20,7 @@ export default defineConfig({
   // Run via `vp staged`.
   staged: {
     '*.{ts,tsx,js,cjs,mjs,json,md,yml,yaml}': 'vp fmt',
-    '*.{ts,tsx}': 'vp lint',
+    '*.{ts,tsx}': 'vp lint --deny-warnings',
     // Block commits that introduce a circular / forbidden module dependency. A function task (not a
     // string) so the staged filenames are NOT appended — depcruise cruises the whole core graph (which
     // follows into creative-kit, where such cycles surface), not a file list. Static analysis only, so
