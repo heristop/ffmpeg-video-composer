@@ -93,6 +93,9 @@ export function normalizeColor(value: string): string | null {
 
   if (parts.length < 3 || alphaOf(parts) < 0.5) return null;
 
+  // `none` and other non-numeric components would otherwise surface as "NaN" digits in a hex.
+  if (parts.slice(0, 3).some((p) => Number.isNaN(Number.parseFloat(p)))) return null;
+
   if (fn[1].startsWith('rgb')) {
     return `#${parts
       .slice(0, 3)

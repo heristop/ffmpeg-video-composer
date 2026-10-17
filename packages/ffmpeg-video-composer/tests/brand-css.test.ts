@@ -18,6 +18,12 @@ describe('normalizeColor', () => {
     expect(normalizeColor('var(--brand)')).toBeNull();
   });
 
+  it('drops colour functions with a component that is not a number', () => {
+    expect(normalizeColor('rgb(none 0 0)')).toBeNull();
+    expect(normalizeColor('hsl(120deg none 50%)')).toBeNull();
+    expect(cssColors('a{color:rgb(none 0 0)}')).toEqual([]);
+  });
+
   it('keeps black and white keywords', () => {
     expect(normalizeColor('white')).toBe('#ffffff');
     expect(normalizeColor('black')).toBe('#000000');
