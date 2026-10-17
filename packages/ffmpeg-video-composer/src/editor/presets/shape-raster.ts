@@ -202,8 +202,9 @@ function outlineOf(spec: ShapeSpec): { lines: Pt[][] } | { error: string } {
   // Negated so a NaN total fails closed.
   if (spec.fill !== 'none' && !(fillWork(lines, spec.h) <= MAX_FILL_WORK)) return { error: FILL_ERROR };
 
-  if (spec.sw > 0 && !(strokeWork(lines, spec) <= MAX_STROKE_WORK))
-    return { error: 'Shape stroke is too costly to paint' };
+  const strokeTooCostly = spec.sw > 0 && !(strokeWork(lines, spec) <= MAX_STROKE_WORK);
+
+  if (strokeTooCostly) return { error: 'Shape stroke is too costly to paint' };
 
   return { lines };
 }
