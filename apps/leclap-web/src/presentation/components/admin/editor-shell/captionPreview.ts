@@ -81,9 +81,7 @@ export function captionPreview(
   const f = previewScale(previewH, orientation);
   const preset = STYLE_PRESETS[caption.style ?? 'bar'];
   const anchor = POSITION_ANCHORS[caption.position ?? 'lower-third'];
-  const align = caption.align ?? 'center';
-  const x: SugarAnchorX = align === 'center' ? { side: 'center' } : { side: align, px: ALIGN_MARGIN * f };
-  const y: SugarAnchorY = anchor.edge === 'center' ? anchor : { edge: anchor.edge, px: anchor.px * f };
+  const { x, y } = captionCoordinates(caption, anchor, f);
   const box = captionBox(caption, preset, f);
 
   return {
@@ -98,4 +96,16 @@ export function captionPreview(
     // The engine applies the caption effect to the drawtext (captions.ts applyTextEffect).
     ...(caption.effect ? { effect: caption.effect } : {}),
   };
+}
+
+function captionCoordinates(
+  caption: EditorCaption,
+  anchor: SugarAnchorY,
+  scale: number
+): { x: SugarAnchorX; y: SugarAnchorY } {
+  const align = caption.align ?? 'center';
+  const x: SugarAnchorX = align === 'center' ? { side: 'center' } : { side: align, px: ALIGN_MARGIN * scale };
+  const y: SugarAnchorY = anchor.edge === 'center' ? anchor : { edge: anchor.edge, px: anchor.px * scale };
+
+  return { x, y };
 }

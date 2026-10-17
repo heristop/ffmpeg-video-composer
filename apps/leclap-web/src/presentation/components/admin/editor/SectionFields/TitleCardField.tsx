@@ -65,6 +65,71 @@ interface TitleCardFieldProps {
   inputCls: string;
 }
 
+const TitleCardLines = ({
+  card,
+  patch,
+  variables,
+  inputCls,
+  t,
+}: {
+  card: TitleCard | undefined;
+  patch: (next: Partial<TitleCard>) => void;
+  variables: string[];
+  inputCls: string;
+  t: ReturnType<typeof useTranslation<'admin'>>['t'];
+}) => (
+  <>
+    <CardLine
+      label={t('titleCard.kicker')}
+      placeholder={t('titleCard.kickerPlaceholder')}
+      value={lineText(card?.kicker)}
+      variables={variables}
+      inputCls={inputCls}
+      onText={(v) => {
+        patch({ kicker: setLine(v) });
+      }}
+      styleLabel={t('titleCard.kickerStyleLabel')}
+      style={card?.kickerStyle}
+      styleDefaults={{ ...LINE_DEFAULTS.kicker, color: card?.accent ?? LINE_DEFAULTS.kicker.color }}
+      onStyle={(kickerStyle) => {
+        patch({ kickerStyle });
+      }}
+    />
+    <CardLine
+      label={t('titleCard.headline')}
+      placeholder={t('titleCard.headlinePlaceholder')}
+      value={lineText(card?.headline)}
+      variables={variables}
+      inputCls={inputCls}
+      onText={(v) => {
+        patch({ headline: setLine(v) });
+      }}
+      styleLabel={t('titleCard.headlineStyleLabel')}
+      style={card?.headlineStyle}
+      styleDefaults={LINE_DEFAULTS.headline}
+      onStyle={(headlineStyle) => {
+        patch({ headlineStyle });
+      }}
+    />
+    <CardLine
+      label={t('titleCard.subtitle')}
+      placeholder={t('titleCard.subtitlePlaceholder')}
+      value={lineText(card?.subtitle)}
+      variables={variables}
+      inputCls={inputCls}
+      onText={(v) => {
+        patch({ subtitle: setLine(v) });
+      }}
+      styleLabel={t('titleCard.subtitleStyleLabel')}
+      style={card?.subtitleStyle}
+      styleDefaults={LINE_DEFAULTS.subtitle}
+      onStyle={(subtitleStyle) => {
+        patch({ subtitleStyle });
+      }}
+    />
+  </>
+);
+
 export const TitleCardField = ({ titleCard, onChange, variables, inputCls }: TitleCardFieldProps) => {
   const { t } = useTranslation('admin');
   const card = titleCard;
@@ -76,55 +141,7 @@ export const TitleCardField = ({ titleCard, onChange, variables, inputCls }: Tit
   return (
     <div className="space-y-3">
       <p className="text-xs text-gray-500 dark:text-gray-400">{t('titleCard.hint')}</p>
-      <CardLine
-        label={t('titleCard.kicker')}
-        placeholder={t('titleCard.kickerPlaceholder')}
-        value={lineText(card?.kicker)}
-        variables={variables}
-        inputCls={inputCls}
-        onText={(v) => {
-          patch({ kicker: setLine(v) });
-        }}
-        styleLabel={t('titleCard.kickerStyleLabel')}
-        style={card?.kickerStyle}
-        // The engine tints an unstyled kicker with the accent (styledLook's colour default).
-        styleDefaults={{ ...LINE_DEFAULTS.kicker, color: card?.accent ?? LINE_DEFAULTS.kicker.color }}
-        onStyle={(kickerStyle) => {
-          patch({ kickerStyle });
-        }}
-      />
-      <CardLine
-        label={t('titleCard.headline')}
-        placeholder={t('titleCard.headlinePlaceholder')}
-        value={lineText(card?.headline)}
-        variables={variables}
-        inputCls={inputCls}
-        onText={(v) => {
-          patch({ headline: setLine(v) });
-        }}
-        styleLabel={t('titleCard.headlineStyleLabel')}
-        style={card?.headlineStyle}
-        styleDefaults={LINE_DEFAULTS.headline}
-        onStyle={(headlineStyle) => {
-          patch({ headlineStyle });
-        }}
-      />
-      <CardLine
-        label={t('titleCard.subtitle')}
-        placeholder={t('titleCard.subtitlePlaceholder')}
-        value={lineText(card?.subtitle)}
-        variables={variables}
-        inputCls={inputCls}
-        onText={(v) => {
-          patch({ subtitle: setLine(v) });
-        }}
-        styleLabel={t('titleCard.subtitleStyleLabel')}
-        style={card?.subtitleStyle}
-        styleDefaults={LINE_DEFAULTS.subtitle}
-        onStyle={(subtitleStyle) => {
-          patch({ subtitleStyle });
-        }}
-      />
+      <TitleCardLines card={card} patch={patch} variables={variables} inputCls={inputCls} t={t} />
       {card && hasAnyText(card) && <CardOptions card={card} patch={patch} />}
     </div>
   );
@@ -143,88 +160,120 @@ const CardOptions = ({ card, patch }: { card: TitleCard; patch: (next: Partial<T
 
   return (
     <>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {/* The shared accent control (same as the lower third + text overlays): the engine draws the
-            underline bar and tints an unstyled kicker only when an accent is set. */}
-        <AccentControl
-          accent={card.accent}
-          hint={t('accent.hintTitleCard')}
-          onChange={(accent) => {
-            patch({ accent });
-          }}
-        />
-        <SegmentedControl
-          label={t('titleCard.align')}
-          value={align}
-          options={alignOptions}
-          onChange={(next) => {
-            patch({ align: next });
-          }}
-        />
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div>
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-widest text-gray-400">
-            {t('titleCard.background')}
-          </span>
-          {/* The card's fade colour; the engine defaults to the section background when unset. */}
-          <ColorPicker
-            aria-label={t('titleCard.background')}
-            value={card.background ?? '#000000'}
-            onChange={(background) => {
-              patch({ background });
-            }}
-          />
-        </div>
-        <div>
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-widest text-gray-400">
-            {t('titleCard.fade')}
-          </span>
-          <div className="flex flex-col gap-1.5">
-            <FadeToggle
-              label={t('titleCard.fadeIn')}
-              checked={card.fade?.in ?? true}
-              onChange={(on) => {
-                patch({ fade: { ...card.fade, in: on } });
-              }}
-            />
-            <FadeToggle
-              label={t('titleCard.fadeOut')}
-              checked={card.fade?.out ?? true}
-              onChange={(on) => {
-                patch({ fade: { ...card.fade, out: on } });
-              }}
-            />
-          </div>
-        </div>
-      </div>
-      <RevealControl
-        reveal={card.reveal}
-        onChange={(reveal) => {
-          patch({ reveal });
-        }}
-      />
-      <RangeSlider
-        label={t('titleCard.stagger')}
-        value={card.stagger ?? 0.15}
-        min={STAGGER_SPEC?.min ?? 0}
-        max={STAGGER_SPEC?.max ?? 1}
-        step={0.01}
-        resetTo={0.15}
-        format={(value) => `${value}s`}
-        onChange={(stagger) => {
-          patch({ stagger: stagger === 0.15 ? undefined : stagger });
-        }}
-      />
-      <TextEffectControl
-        effect={card.effect}
-        onChange={(effect) => {
-          patch({ effect });
-        }}
-      />
+      <CardAppearance card={card} patch={patch} t={t} align={align} alignOptions={alignOptions} />
+      <CardTiming card={card} patch={patch} t={t} />
     </>
   );
 };
+
+const CardAppearance = ({
+  card,
+  patch,
+  t,
+  align,
+  alignOptions,
+}: {
+  card: TitleCard;
+  patch: (next: Partial<TitleCard>) => void;
+  t: ReturnType<typeof useTranslation<'admin'>>['t'];
+  align: Align;
+  alignOptions: ReadonlyArray<SegmentOption<Align>>;
+}) => (
+  <>
+    <div className="grid gap-3 sm:grid-cols-2">
+      {/* The shared accent control (same as the lower third + text overlays): the engine draws the
+            underline bar and tints an unstyled kicker only when an accent is set. */}
+      <AccentControl
+        accent={card.accent}
+        hint={t('accent.hintTitleCard')}
+        onChange={(accent) => {
+          patch({ accent });
+        }}
+      />
+      <SegmentedControl
+        label={t('titleCard.align')}
+        value={align}
+        options={alignOptions}
+        onChange={(next) => {
+          patch({ align: next });
+        }}
+      />
+    </div>
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div>
+        <span className="mb-1 block text-xs font-semibold uppercase tracking-widest text-gray-400">
+          {t('titleCard.background')}
+        </span>
+        {/* The card's fade colour; the engine defaults to the section background when unset. */}
+        <ColorPicker
+          aria-label={t('titleCard.background')}
+          value={card.background ?? '#000000'}
+          onChange={(background) => {
+            patch({ background });
+          }}
+        />
+      </div>
+      <div>
+        <span className="mb-1 block text-xs font-semibold uppercase tracking-widest text-gray-400">
+          {t('titleCard.fade')}
+        </span>
+        <div className="flex flex-col gap-1.5">
+          <FadeToggle
+            label={t('titleCard.fadeIn')}
+            checked={card.fade?.in ?? true}
+            onChange={(on) => {
+              patch({ fade: { ...card.fade, in: on } });
+            }}
+          />
+          <FadeToggle
+            label={t('titleCard.fadeOut')}
+            checked={card.fade?.out ?? true}
+            onChange={(on) => {
+              patch({ fade: { ...card.fade, out: on } });
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  </>
+);
+
+const CardTiming = ({
+  card,
+  patch,
+  t,
+}: {
+  card: TitleCard;
+  patch: (next: Partial<TitleCard>) => void;
+  t: ReturnType<typeof useTranslation<'admin'>>['t'];
+}) => (
+  <>
+    <RevealControl
+      reveal={card.reveal}
+      onChange={(reveal) => {
+        patch({ reveal });
+      }}
+    />
+    <RangeSlider
+      label={t('titleCard.stagger')}
+      value={card.stagger ?? 0.15}
+      min={STAGGER_SPEC?.min ?? 0}
+      max={STAGGER_SPEC?.max ?? 1}
+      step={0.01}
+      resetTo={0.15}
+      format={(value) => `${value}s`}
+      onChange={(stagger) => {
+        patch({ stagger: stagger === 0.15 ? undefined : stagger });
+      }}
+    />
+    <TextEffectControl
+      effect={card.effect}
+      onChange={(effect) => {
+        patch({ effect });
+      }}
+    />
+  </>
+);
 
 // One card line: the text input plus its per-line style disclosure (shown once the line has text).
 const CardLine = ({

@@ -125,6 +125,10 @@ const NAVIGATION_KEYS = new Set([
 ]);
 const MENU_ROLES = new Set(['menu', 'menuitem', 'menuitemradio', 'menuitemcheckbox']);
 
+function buttonTarget(target: KeyTarget): boolean {
+  return target.tag === 'BUTTON' || target.tag === 'A' || target.role === 'button';
+}
+
 // Keys the focused control answers itself: typing in a field, every key in a menu (its letters jump to an item), a
 // button's own press, a slider's arrows.
 function ownedByTarget(key: string, target: KeyTarget | undefined): boolean {
@@ -132,7 +136,7 @@ function ownedByTarget(key: string, target: KeyTarget | undefined): boolean {
 
   if (FIELD_TAGS.has(target.tag) || target.editable || MENU_ROLES.has(target.role ?? '')) return true;
 
-  if (PRESS_KEYS.has(key) && (target.tag === 'BUTTON' || target.tag === 'A' || target.role === 'button')) return true;
+  if (PRESS_KEYS.has(key) && buttonTarget(target)) return true;
 
   return NAVIGATION_KEYS.has(key) && target.role === 'slider';
 }

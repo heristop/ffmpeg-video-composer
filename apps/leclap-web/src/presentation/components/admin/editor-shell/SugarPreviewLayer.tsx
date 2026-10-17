@@ -380,6 +380,17 @@ interface SugarLineProps {
   };
 }
 
+const sugarLineClassName = (editing: boolean, shift: SugarLineProps['shift'], active: boolean) =>
+  cn(
+    'pointer-events-auto touch-none outline-none',
+    editing ? 'cursor-text' : 'cursor-move',
+    shift && 'opacity-80',
+    active && 'rounded-[0.2em] ring-2 ring-brand-500/60'
+  );
+
+const SugarLineText = ({ editing, editor, line }: Pick<SugarLineProps, 'editing' | 'editor' | 'line'>) =>
+  editing ? <SugarLineEditor {...editor} /> : displayFromTokens(line.text);
+
 // One drawtext line: the real font family/size/colour, plus the drawbox-style background when the
 // line carries a box (caption bar, badge pill). lineHeight 1 approximates drawtext's glyph-box y.
 const SugarLine = ({ line, lineIndex, gestures, editing, effectScale, shift, resize, editor }: SugarLineProps) => {
@@ -418,14 +429,9 @@ const SugarLine = ({ line, lineIndex, gestures, editing, effectScale, shift, res
           : {}),
         ...textEffectCss(line.effect, effectScale, colorVars),
       }}
-      className={cn(
-        'pointer-events-auto touch-none outline-none',
-        editing ? 'cursor-text' : 'cursor-move',
-        shift && 'opacity-80',
-        gestures.active && 'rounded-[0.2em] ring-2 ring-brand-500/60'
-      )}
+      className={sugarLineClassName(editing, shift, gestures.active)}
     >
-      {editing ? <SugarLineEditor {...editor} /> : displayFromTokens(line.text)}
+      <SugarLineText editing={editing} editor={editor} line={line} />
       {gestures.active && !editing && resize && <ResizeHandles onHandleDown={g.onResizeHandleDown} />}
     </span>
   );

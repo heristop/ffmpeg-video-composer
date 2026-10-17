@@ -36,6 +36,18 @@ function cleanNameMap(node: Json, maxDescription: number): Json {
   return Object.fromEntries(Object.entries(node).map(([name, child]) => [name, cleanNode(child, maxDescription)]));
 }
 
+function cleanEntry(key: string, value: Json, maxDescription: number): [string, Json] | null {
+  if (DROPPED_KEYS.has(key) || (key === 'additionalProperties' && value === false)) return null;
+
+  if (key === 'description') {
+    const clipped = clipDescription(value, maxDescription);
+
+    return clipped === undefined ? null : [key, clipped];
+  }
+
+  return [key, NAME_MAPS.has(key) ? cleanNameMap(value, maxDescription) : cleanNode(value, maxDescription)];
+}
+
 function cleanNode(node: Json, maxDescription: number): Json {
   if (Array.isArray(node)) return node.map((child) => cleanNode(child, maxDescription));
 
@@ -44,15 +56,9 @@ function cleanNode(node: Json, maxDescription: number): Json {
   const out: { [key: string]: Json } = {};
 
   for (const [key, value] of Object.entries(node)) {
-    if (DROPPED_KEYS.has(key) || (key === 'additionalProperties' && value === false)) continue;
+    const entry = cleanEntry(key, value, maxDescription);
 
-    if (key === 'description') {
-      const clipped = clipDescription(value, maxDescription);
-
-      if (clipped !== undefined) out[key] = clipped;
-      continue;
-    }
-    out[key] = NAME_MAPS.has(key) ? cleanNameMap(value, maxDescription) : cleanNode(value, maxDescription);
+    if (entry) out[entry[0]] = entry[1];
   }
 
   return out;

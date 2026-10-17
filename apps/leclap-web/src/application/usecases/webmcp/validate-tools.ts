@@ -103,6 +103,44 @@ function validSummary(descriptor: TemplateDescriptor, clips: string[], fields: s
   return `Valid template — ${String(descriptor.sections?.length ?? 0)} section(s), ${orientation ?? 'default'} orientation. Requires ${needs}.`;
 }
 
+function validTemplateOutput({
+  descriptor,
+  clips,
+  fields,
+  orientation,
+  motion,
+  geometry,
+  advisories,
+  render,
+}: {
+  descriptor: TemplateDescriptor;
+  clips: string[];
+  fields: string[];
+  orientation: string | null;
+  motion: ReturnType<typeof motionWarnings>;
+  geometry: Awaited<ReturnType<typeof geometryWarnings>>;
+  advisories: ReturnType<typeof builderAdvisories>;
+  render: { measured: number; seconds: number; unavailable: string } | undefined;
+}) {
+  const structured = {
+    valid: true,
+    revision: revisionOf(descriptor),
+    sectionCount: descriptor.sections?.length ?? 0,
+    orientation,
+    requiredClips: clips,
+    formFields: fields,
+    ...(motion ? { motionWarnings: motion } : {}),
+    ...(geometry ? { geometry } : {}),
+    ...(advisories ? { advisories } : {}),
+    ...(render ? { render } : {}),
+  };
+
+  return capOutput(
+    ok(structured, validSummary(descriptor, clips, fields, orientation)),
+    'Validate a smaller template.'
+  );
+}
+
 const validateTemplate = defineTool({
   name: 'validate_template',
   title: 'Validate Template',
@@ -134,23 +172,8 @@ const validateTemplate = defineTool({
     const render = args.render
       ? { measured: 0, seconds: 0, unavailable: 'not in the builder: ask the user to run Preview render' }
       : undefined;
-    const structured = {
-      valid: true,
-      revision: revisionOf(descriptor),
-      sectionCount: descriptor.sections?.length ?? 0,
-      orientation,
-      requiredClips: clips,
-      formFields: fields,
-      ...(motion ? { motionWarnings: motion } : {}),
-      ...(geometry ? { geometry } : {}),
-      ...(advisories ? { advisories } : {}),
-      ...(render ? { render } : {}),
-    };
 
-    return capOutput(
-      ok(structured, validSummary(descriptor, clips, fields, orientation)),
-      'Validate a smaller template.'
-    );
+    return validTemplateOutput({ descriptor, clips, fields, orientation, motion, geometry, advisories, render });
   },
 });
 

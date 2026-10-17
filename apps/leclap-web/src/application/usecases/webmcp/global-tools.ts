@@ -100,7 +100,7 @@ function applyMusic(global: Global, args: MusicArgs): void {
 
   if (args.allowUpload !== undefined) global.allowUploadMusic = args.allowUpload;
 
-  global.musicEnabled = (global.allowedMusic?.length ?? 0) > 0 || global.allowUploadMusic === true;
+  global.musicEnabled = musicEnabled(global);
 
   const audio: NonNullable<Global['audio']> = { ...global.audio };
 
@@ -114,6 +114,10 @@ function applyMusic(global: Global, args: MusicArgs): void {
   if (args.ducking === true && !audio.ducking) audio.ducking = true;
 
   global.audio = audio;
+}
+
+function musicEnabled(global: Global): boolean {
+  return (global.allowedMusic?.length ?? 0) > 0 || global.allowUploadMusic === true;
 }
 
 const volume = z.number().min(0).max(1);

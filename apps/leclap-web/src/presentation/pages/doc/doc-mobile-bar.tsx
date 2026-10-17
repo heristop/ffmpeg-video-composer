@@ -15,6 +15,57 @@ interface DocMobileBarProps {
   activeId: string | null;
 }
 
+const MobileBarSection = ({ section }: { section: TocItem | undefined }) =>
+  section ? (
+    <>
+      <span aria-hidden="true" className="text-gray-600">
+        /
+      </span>
+      <span className={cn('min-w-0 truncate text-gray-400', section.code && 'font-mono text-[0.8rem]')}>
+        {section.label}
+      </span>
+    </>
+  ) : null;
+
+const MobileBarPanel = ({
+  open,
+  reduced,
+  panelId,
+  items,
+  activeId,
+  close,
+}: {
+  open: boolean;
+  reduced: boolean;
+  panelId: string;
+  items: readonly TocItem[];
+  activeId: string | null;
+  close: () => void;
+}) =>
+  open ? (
+    <motion.div
+      key="panel"
+      id={panelId}
+      initial={reduced ? { opacity: 0 } : { opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={reduced ? { opacity: 0 } : { opacity: 0, y: -4 }}
+      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+      className="absolute inset-x-0 top-full max-h-[calc(100dvh-10rem)] overflow-y-auto overscroll-contain border-b border-divider bg-surface px-4 pb-6 pt-5 shadow-[var(--shadow-lg)]"
+    >
+      {items.length > 1 ? (
+        <nav aria-labelledby={`${panelId}-toc`} className="mb-7">
+          <p id={`${panelId}-toc`} className={cn(NAV_LABEL, 'mb-2.5')}>
+            On this page
+          </p>
+          <TocList items={items} activeId={activeId} roomy onNavigate={close} />
+        </nav>
+      ) : null}
+      <nav aria-label="Documentation" className="lg:hidden">
+        <DocNavList roomy onNavigate={close} />
+      </nav>
+    </motion.div>
+  ) : null;
+
 // Below `lg` the docs navigation is a bar pinned under the site header: the page you are on and the
 // section you are reading, one tap from every page and every section. It replaces a sideways-scrolling
 // chip rail that scrolled away with the page and could park the current chip off-screen. Between `lg`
@@ -88,16 +139,7 @@ export const DocMobileBar = ({ items, activeId }: DocMobileBarProps) => {
       >
         <span className="sr-only">Documentation menu: </span>
         <span className="shrink-0 font-medium text-foreground">{page?.label ?? 'Documentation'}</span>
-        {section ? (
-          <>
-            <span aria-hidden="true" className="text-gray-600">
-              /
-            </span>
-            <span className={cn('min-w-0 truncate text-gray-400', section.code && 'font-mono text-[0.8rem]')}>
-              {section.label}
-            </span>
-          </>
-        ) : null}
+        <MobileBarSection section={section} />
         <ChevronDownIcon
           size={16}
           aria-hidden="true"
@@ -109,29 +151,14 @@ export const DocMobileBar = ({ items, activeId }: DocMobileBarProps) => {
       </button>
 
       <AnimatePresence>
-        {open ? (
-          <motion.div
-            key="panel"
-            id={panelId}
-            initial={reduced ? { opacity: 0 } : { opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -4 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-x-0 top-full max-h-[calc(100dvh-10rem)] overflow-y-auto overscroll-contain border-b border-divider bg-surface px-4 pb-6 pt-5 shadow-[var(--shadow-lg)]"
-          >
-            {items.length > 1 ? (
-              <nav aria-labelledby={`${panelId}-toc`} className="mb-7">
-                <p id={`${panelId}-toc`} className={cn(NAV_LABEL, 'mb-2.5')}>
-                  On this page
-                </p>
-                <TocList items={items} activeId={activeId} roomy onNavigate={close} />
-              </nav>
-            ) : null}
-            <nav aria-label="Documentation" className="lg:hidden">
-              <DocNavList roomy onNavigate={close} />
-            </nav>
-          </motion.div>
-        ) : null}
+        <MobileBarPanel
+          open={open}
+          reduced={reduced}
+          panelId={panelId}
+          items={items}
+          activeId={activeId}
+          close={close}
+        />
       </AnimatePresence>
     </div>
   );

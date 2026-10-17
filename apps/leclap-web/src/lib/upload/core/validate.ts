@@ -32,6 +32,16 @@ const reject = (file: File, codes: RejectionCode[]): Rejection => ({
   errors: codes.map((code) => ({ code, message: MESSAGE[code] })),
 });
 
+function fileRejectionCodes(file: File, accept: AcceptSpec, maxSize: number | undefined): RejectionCode[] {
+  const codes: RejectionCode[] = [];
+
+  if (!matches(file, accept)) codes.push('file-invalid-type');
+
+  if (maxSize !== undefined && file.size > maxSize) codes.push('file-too-large');
+
+  return codes;
+}
+
 export const validateFiles = (files: File[], options: ValidateOptions = {}): ValidateResult => {
   const { accept = [], maxSize, remaining, multiple } = options;
   // The stricter of the two caps wins, and an explicit `remaining: 0` still means zero.
@@ -40,11 +50,7 @@ export const validateFiles = (files: File[], options: ValidateOptions = {}): Val
   const rejections: Rejection[] = [];
 
   for (const file of files) {
-    const codes: RejectionCode[] = [];
-
-    if (!matches(file, accept)) codes.push('file-invalid-type');
-
-    if (maxSize !== undefined && file.size > maxSize) codes.push('file-too-large');
+    const codes = fileRejectionCodes(file, accept, maxSize);
 
     if (codes.length > 0) {
       rejections.push(reject(file, codes));

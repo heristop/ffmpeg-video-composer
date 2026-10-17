@@ -51,6 +51,25 @@ const isElementRef = (value: unknown): value is ElementRef => {
   return isElementKind(ref.kind) && typeof ref.index === 'number';
 };
 
+function parseLibraryPayload(value: Record<string, unknown>): DropPayload | null {
+  if (value.source !== 'library') return null;
+
+  if (value.element === 'image' && typeof value.choice === 'object' && value.choice !== null) {
+    return { source: 'library', element: 'image', choice: value.choice as MediaChoice };
+  }
+
+  if (value.element === 'animation' && typeof value.url === 'string') {
+    return {
+      source: 'library',
+      element: 'animation',
+      url: value.url,
+      label: typeof value.label === 'string' ? value.label : undefined,
+    };
+  }
+
+  return null;
+}
+
 // Validate a parsed dataTransfer value into a DropPayload (returns null on any shape mismatch).
 export const parseDropPayload = (value: unknown): DropPayload | null => {
   if (typeof value !== 'object' || value === null) return null;
@@ -59,19 +78,7 @@ export const parseDropPayload = (value: unknown): DropPayload | null => {
 
   if (p.source === 'element-row') return isElementRef(p.ref) ? { source: 'element-row', ref: p.ref } : null;
 
-  if (p.source !== 'library') return null;
-
-  if (p.element === 'image' && typeof p.choice === 'object' && p.choice !== null) {
-    return { source: 'library', element: 'image', choice: p.choice as MediaChoice };
-  }
-
-  if (p.element === 'animation' && typeof p.url === 'string') {
-    const label = typeof p.label === 'string' ? p.label : undefined;
-
-    return { source: 'library', element: 'animation', url: p.url, label };
-  }
-
-  return null;
+  return parseLibraryPayload(p);
 };
 
 // Read a section's element array for a kind (empty when the array is absent).

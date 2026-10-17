@@ -61,6 +61,52 @@ const useUndoShortcuts = (undo: () => void, redo: () => void) => {
   }, [undo, redo]);
 };
 
+const TimelineHistory = ({
+  visible,
+  canUndo,
+  canRedo,
+  undo,
+  redo,
+  mod,
+  t,
+}: {
+  visible: boolean;
+  canUndo: boolean;
+  canRedo: boolean;
+  undo: () => void;
+  redo: () => void;
+  mod: string;
+  t: ReturnType<typeof useTranslation<'builder'>>['t'];
+}) =>
+  visible ? (
+    <div className="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={undo}
+        disabled={!canUndo}
+        aria-label={t('edit.undo')}
+        aria-keyshortcuts="Meta+Z Control+Z"
+        title={`${t('edit.undo')} (${mod}Z)`}
+        className="text-gray-400 hover:text-foreground [&_svg]:size-4"
+      >
+        <Undo2 />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={redo}
+        disabled={!canRedo}
+        aria-label={t('edit.redo')}
+        aria-keyshortcuts="Meta+Shift+Z Control+Shift+Z"
+        title={`${t('edit.redo')} (${mod}⇧Z)`}
+        className="text-gray-400 hover:text-foreground [&_svg]:size-4"
+      >
+        <Redo2 />
+      </Button>
+    </div>
+  ) : null;
+
 // The trim/split/speed/crop editor, hosted in the program monitor's place. It fills the area it is
 // given: the video takes whatever height the controls leave, so the timeline — the thing being edited
 // — stays on screen instead of below a fixed-height player.
@@ -101,34 +147,15 @@ export function TimelineEditor({ file, label, edit, onChange }: TimelineEditorPr
             {t('edit.crop')}
           </ModeButton>
         </div>
-        {e.mode === 'timeline' && (
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={e.undo}
-              disabled={!e.canUndo}
-              aria-label={t('edit.undo')}
-              aria-keyshortcuts="Meta+Z Control+Z"
-              title={`${t('edit.undo')} (${mod}Z)`}
-              className="text-gray-400 hover:text-foreground [&_svg]:size-4"
-            >
-              <Undo2 />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={e.redo}
-              disabled={!e.canRedo}
-              aria-label={t('edit.redo')}
-              aria-keyshortcuts="Meta+Shift+Z Control+Shift+Z"
-              title={`${t('edit.redo')} (${mod}⇧Z)`}
-              className="text-gray-400 hover:text-foreground [&_svg]:size-4"
-            >
-              <Redo2 />
-            </Button>
-          </div>
-        )}
+        <TimelineHistory
+          visible={e.mode === 'timeline'}
+          canUndo={e.canUndo}
+          canRedo={e.canRedo}
+          undo={e.undo}
+          redo={e.redo}
+          mod={mod}
+          t={t}
+        />
       </div>
 
       <div ref={containerRef} className="relative min-h-40 flex-1 overflow-hidden rounded-xl bg-black">

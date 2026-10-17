@@ -50,6 +50,10 @@ function makeId(): string {
   }
 }
 
+function staleOutputKeys(current: StoredProject | undefined, prune: string[]): string[] {
+  return current?.output ? [...prune, current.output.blobKey] : prune;
+}
+
 // Persist (or update) a draft: write any new take bytes, prune replaced/removed ones, then save the
 // metadata record. Every recorded take is persisted; the selected clip shares the matching take's
 // blobKey (no double-write). Editing always lands as a `draft` — a prior compiled output is invalidated.
@@ -61,8 +65,7 @@ export async function saveDraft(model: WizardModel, template: Template, currentI
   const rushes = await materializeRushes(prevRushes, { ...model, rushesBySection: effectiveRushes }, rushDiff);
   const clips = deriveSelectedClips(rushes, model);
 
-  const stalePrune = current?.output ? [...rushDiff.prune, current.output.blobKey] : rushDiff.prune;
-  await Promise.all(stalePrune.map((key) => projectBlobStore.delete(key)));
+  await Promise.all(staleOutputKeys(current, rushDiff.prune).map((key) => projectBlobStore.delete(key)));
 
   return projectStore.save(
     modelToProject({

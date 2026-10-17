@@ -170,6 +170,23 @@ const CameraErrorView = ({ error, onRetry }: ErrorViewProps) => {
 // ~0.7s. The overlay is page chrome, so the beat is seen and never recorded.
 const ACTION_BEAT_MS = 700;
 
+const CountdownCopy = ({ value, counting, t }: { value: number | null; counting: boolean; t: TFunction<'media'> }) =>
+  counting ? (
+    <>
+      <span
+        key={value}
+        className="pop-in -mt-1 block font-display font-extrabold leading-none text-white tabular-nums text-[6rem] sm:text-[8rem] [text-shadow:0_4px_28px_oklch(0_0_0/0.6)]"
+      >
+        {value}
+      </span>
+      <p className="mt-1 text-sm font-semibold uppercase tracking-[0.2em] text-white/85">{t('camera.getReady')}</p>
+    </>
+  ) : (
+    <span className="pop-in mt-3 block font-display text-4xl font-extrabold uppercase tracking-wide text-white sm:text-5xl [text-shadow:0_4px_28px_oklch(0_0_0/0.6)]">
+      {t('camera.action')}
+    </span>
+  );
+
 // True for the moment right after a countdown hands over to the recording — the slate's "Action!".
 // A countdown the user cancels goes back to idle instead, and gets no slam.
 const useActionBeat = (state: CaptureState): boolean => {
@@ -228,23 +245,7 @@ const CountdownOverlay = ({ value, action }: { value: number | null; action: boo
         transition={counting || reduced ? { duration: 0 } : { duration: ACTION_BEAT_MS / 1000, times: [0, 0.75, 1] }}
       >
         <ClappyCountdown value={value} size={112} />
-        {counting ? (
-          <>
-            <span
-              key={value}
-              className="pop-in -mt-1 block font-display font-extrabold leading-none text-white tabular-nums text-[6rem] sm:text-[8rem] [text-shadow:0_4px_28px_oklch(0_0_0/0.6)]"
-            >
-              {value}
-            </span>
-            <p className="mt-1 text-sm font-semibold uppercase tracking-[0.2em] text-white/85">
-              {t('camera.getReady')}
-            </p>
-          </>
-        ) : (
-          <span className="pop-in mt-3 block font-display text-4xl font-extrabold uppercase tracking-wide text-white sm:text-5xl [text-shadow:0_4px_28px_oklch(0_0_0/0.6)]">
-            {t('camera.action')}
-          </span>
-        )}
+        <CountdownCopy value={value} counting={counting} t={t} />
       </motion.div>
     </div>
   );

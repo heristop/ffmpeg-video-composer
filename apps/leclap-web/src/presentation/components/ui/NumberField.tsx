@@ -35,6 +35,20 @@ interface NumberFieldProps {
 
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
+function handleNumberInputChange(
+  event: React.ChangeEvent<HTMLInputElement>,
+  onEmpty: (() => void) | undefined,
+  commit: (value: number) => void
+): void {
+  if (event.target.value === '' && onEmpty) {
+    onEmpty();
+
+    return;
+  }
+
+  commit(Number(event.target.value));
+}
+
 interface MoveArgs {
   key: string;
   value: number;
@@ -134,6 +148,63 @@ interface AffordanceProps {
   onStep: (delta: number) => void;
 }
 
+interface NumberInputProps {
+  inputRef: RefObject<HTMLInputElement | null>;
+  fieldId: string;
+  min: number | undefined;
+  max: number | undefined;
+  step: number;
+  shown: number | null;
+  resolvedAria: string | undefined;
+  ariaInvalid: boolean | undefined;
+  ariaDescribedBy: string | undefined;
+  ariaRequired: boolean | undefined;
+  onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  onEmpty: (() => void) | undefined;
+  commit: (value: number) => void;
+  inputCls: string | undefined;
+}
+
+const NumberInput = ({
+  inputRef,
+  fieldId,
+  min,
+  max,
+  step,
+  shown,
+  resolvedAria,
+  ariaInvalid,
+  ariaDescribedBy,
+  ariaRequired,
+  onKeyDown,
+  onEmpty,
+  commit,
+  inputCls,
+}: NumberInputProps) => (
+  <input
+    ref={inputRef}
+    id={fieldId}
+    type="number"
+    inputMode="numeric"
+    min={min}
+    max={max}
+    step={step}
+    value={shown ?? ''}
+    aria-label={resolvedAria}
+    aria-invalid={ariaInvalid}
+    aria-describedby={ariaDescribedBy}
+    aria-required={ariaRequired}
+    onKeyDown={onKeyDown}
+    onChange={(event) => {
+      handleNumberInputChange(event, onEmpty, commit);
+    }}
+    className={cn(
+      'take-counter-input field-focus-gradient [--field-fill:var(--color-surface-inset)] bg-surface-inset',
+      inputCls
+    )}
+  />
+);
+
 // The film cues + ▲▼ steppers that decorate the editable input — all mouse/decorative, so the unit is
 // aria-hidden (the input's value carries meaning) and the buttons are out of the tab order.
 const CounterAffordances = ({ unit, aria, step, onStep }: AffordanceProps) => (
@@ -213,33 +284,21 @@ export const NumberField = ({
         data-scrubbing={scrub.scrubbing}
         onPointerDown={scrub.onPointerDown}
       >
-        <input
-          ref={inputRef}
-          id={fieldId}
-          type="number"
-          inputMode="numeric"
+        <NumberInput
+          inputRef={inputRef}
+          fieldId={fieldId}
           min={minAttr}
           max={maxAttr}
           step={step}
-          value={shown ?? ''}
-          aria-label={resolvedAria}
-          aria-invalid={ariaInvalid}
-          aria-describedby={ariaDescribedBy}
-          aria-required={ariaRequired}
+          shown={shown}
+          resolvedAria={resolvedAria}
+          ariaInvalid={ariaInvalid}
+          ariaDescribedBy={ariaDescribedBy}
+          ariaRequired={ariaRequired}
           onKeyDown={handleKeyDown}
-          onChange={(e) => {
-            if (e.target.value === '' && onEmpty) {
-              onEmpty();
-
-              return;
-            }
-
-            commit(Number(e.target.value));
-          }}
-          className={cn(
-            'take-counter-input field-focus-gradient [--field-fill:var(--color-surface-inset)] bg-surface-inset',
-            inputCls
-          )}
+          onEmpty={onEmpty}
+          commit={commit}
+          inputCls={inputCls}
         />
         <CounterAffordances
           unit={unit}

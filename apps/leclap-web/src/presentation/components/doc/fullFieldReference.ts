@@ -71,6 +71,22 @@ function resolveReference(root: ReferenceNode, reference: string): ReferenceNode
 
 export function recursiveFieldRows(node: ReferenceNode, prefix: string, root: ReferenceNode = node): FieldRow[] {
   const rows: FieldRow[] = [];
+  const walkProperties = (current: ReferenceNode, name: string, refs: ReadonlySet<string>) => {
+    for (const [key, child] of Object.entries(current.properties ?? {})) {
+      walk(child, `${name}.${key}`, current.required?.includes(key) ?? false, refs);
+    }
+  };
+  const walkVariants = (current: ReferenceNode, name: string, refs: ReadonlySet<string>) => {
+    for (const [index, variant] of (current.anyOf ?? current.oneOf ?? []).entries()) {
+      const discriminant = referenceProperty(variant, 'type')?.const;
+      walk(
+        variant,
+        `${name} (${discriminant === undefined ? `variant ${index + 1}` : `type=${discriminant}`})`,
+        false,
+        refs
+      );
+    }
+  };
   function walk(current: ReferenceNode, name: string, required: boolean, refs: ReadonlySet<string>) {
     rows.push({
       name,
@@ -93,9 +109,7 @@ export function recursiveFieldRows(node: ReferenceNode, prefix: string, root: Re
     walkChildren(current, name, refs);
   }
   function walkChildren(current: ReferenceNode, name: string, refs: ReadonlySet<string>) {
-    for (const [key, child] of Object.entries(current.properties ?? {})) {
-      walk(child, `${name}.${key}`, current.required?.includes(key) ?? false, refs);
-    }
+    walkProperties(current, name, refs);
 
     if (current.items) walk(current.items, `${name}[]`, false, refs);
 
@@ -103,15 +117,7 @@ export function recursiveFieldRows(node: ReferenceNode, prefix: string, root: Re
       walk(current.additionalProperties, `${name}[key]`, false, refs);
     }
 
-    for (const [index, variant] of (current.anyOf ?? current.oneOf ?? []).entries()) {
-      const discriminant = referenceProperty(variant, 'type')?.const;
-      walk(
-        variant,
-        `${name} (${discriminant === undefined ? `variant ${index + 1}` : `type=${discriminant}`})`,
-        false,
-        refs
-      );
-    }
+    walkVariants(current, name, refs);
   }
   walk(node, prefix, false, new Set());
 

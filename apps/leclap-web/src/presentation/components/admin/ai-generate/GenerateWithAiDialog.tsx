@@ -103,6 +103,70 @@ function blockedCopy(t: AiT, hasKey: boolean, provider: string, onAddKey: () => 
   };
 }
 
+function GenerateDialogFooter({
+  run,
+  form,
+  ready,
+  pending,
+  keyValue,
+  t,
+  setProviderOpen,
+  setPending,
+  load,
+  onLoad,
+  close,
+  generate,
+}: {
+  run: ReturnType<typeof useAiGeneration>;
+  form: ReturnType<typeof useBriefState>;
+  ready: boolean;
+  pending: EditorState | null;
+  keyValue: string;
+  t: AiT;
+  setProviderOpen: (open: boolean) => void;
+  setPending: (value: EditorState | null) => void;
+  load: (state: EditorState) => void;
+  onLoad: (state: EditorState) => void;
+  close: () => void;
+  generate: () => void;
+}) {
+  return (
+    <DialogFooterActions
+      status={run.status}
+      confirming={pending !== null}
+      canGenerate={ready}
+      statusSlot={<GenerationStatus status={run.status} providerLabel={form.provider.label} planned={form.planFirst} />}
+      {...blockedCopy(t, keyValue !== '', form.provider.label, () => {
+        setProviderOpen(true);
+        focusKeyField();
+      })}
+      onGenerate={generate}
+      onCancel={run.cancel}
+      onOpen={() => {
+        if (run.status.kind === 'ready') load(generatedToEditorState(run.status.result.descriptor, t('title')));
+      }}
+      onConfirmReplace={() => {
+        if (pending) {
+          onLoad(pending);
+          run.reset();
+          close();
+        }
+      }}
+      onKeepEditing={() => {
+        setPending(null);
+      }}
+      canWritePlan={run.status.kind === 'plan-ready' && planIsComplete(run.status.plan)}
+      onWritePlan={() => {
+        if (run.status.kind === 'plan-ready') run.writeFromPlan(run.status.plan).catch(() => {});
+      }}
+      onRegenerate={() => {
+        setPending(null);
+        run.reset();
+      }}
+    />
+  );
+}
+
 const GenerateWithAiDialog = ({ open, onOpenChange, hasUnsavedWork, onLoad }: GenerateWithAiDialogProps) => {
   const { t } = useTranslation('ai');
   const form = useBriefState();
@@ -171,41 +235,20 @@ const GenerateWithAiDialog = ({ open, onOpenChange, hasUnsavedWork, onLoad }: Ge
           : undefined
       }
       footer={
-        <DialogFooterActions
-          status={run.status}
-          confirming={pending !== null}
-          canGenerate={ready}
-          statusSlot={
-            <GenerationStatus status={run.status} providerLabel={form.provider.label} planned={form.planFirst} />
-          }
-          {...blockedCopy(t, key !== '', form.provider.label, () => {
-            setProviderOpen(true);
-            focusKeyField();
-          })}
-          onGenerate={() => {
+        <GenerateDialogFooter
+          run={run}
+          form={form}
+          ready={ready}
+          pending={pending}
+          keyValue={key}
+          t={t}
+          setProviderOpen={setProviderOpen}
+          setPending={setPending}
+          load={load}
+          onLoad={onLoad}
+          close={close}
+          generate={() => {
             generate().catch(() => {});
-          }}
-          onCancel={run.cancel}
-          onOpen={() => {
-            if (run.status.kind === 'ready') load(generatedToEditorState(run.status.result.descriptor, t('title')));
-          }}
-          onConfirmReplace={() => {
-            if (pending) {
-              onLoad(pending);
-              run.reset();
-              close();
-            }
-          }}
-          onKeepEditing={() => {
-            setPending(null);
-          }}
-          canWritePlan={run.status.kind === 'plan-ready' && planIsComplete(run.status.plan)}
-          onWritePlan={() => {
-            if (run.status.kind === 'plan-ready') run.writeFromPlan(run.status.plan).catch(() => {});
-          }}
-          onRegenerate={() => {
-            setPending(null);
-            run.reset();
           }}
         />
       }

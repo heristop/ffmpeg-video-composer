@@ -159,6 +159,97 @@ const RecordWithCamera = ({ compact, disabled, onOpen, t }: RecordWithCameraProp
   );
 };
 
+function processDrop({
+  acceptedFiles,
+  rejectedFiles,
+  maxSizeInMB,
+  maxFiles,
+  t,
+  setUploadErrors,
+  setDropCount,
+  uploadedFiles,
+  onFilesUploaded,
+}: {
+  acceptedFiles: File[];
+  rejectedFiles: Rejection[];
+  maxSizeInMB: number;
+  maxFiles: number;
+  t: ReturnType<typeof useTranslation<'media'>>['t'];
+  setUploadErrors: (errors: string[]) => void;
+  setDropCount: React.Dispatch<React.SetStateAction<number>>;
+  uploadedFiles: File[];
+  onFilesUploaded: (files: File[]) => void;
+}): void {
+  setUploadErrors(collectDropErrors(rejectedFiles, maxSizeInMB, maxFiles, t));
+
+  if (acceptedFiles.length === 0) return;
+
+  setDropCount((count) => count + 1);
+  startTransition(() => {
+    onFilesUploaded([...uploadedFiles, ...acceptedFiles].slice(0, maxFiles));
+  });
+}
+
+const captureUploadedFile = (
+  file: File,
+  uploadedFiles: File[],
+  maxFiles: number,
+  onFilesUploaded: (files: File[]) => void
+) => {
+  startTransition(() => {
+    onFilesUploaded([...uploadedFiles, file].slice(0, maxFiles));
+  });
+};
+const removeUploadedFile = (index: number, uploadedFiles: File[], onFilesUploaded: (files: File[]) => void) => {
+  startTransition(() => {
+    onFilesUploaded(uploadedFiles.filter((_, current) => current !== index));
+  });
+};
+
+const UploadedFilesList = ({
+  files,
+  onRemove,
+  t,
+}: {
+  files: File[];
+  onRemove: (index: number) => void;
+  t: ReturnType<typeof useTranslation<'media'>>['t'];
+}) =>
+  files.length > 0 ? (
+    <div className="space-y-2 fade-in">
+      <h4 className="text-sm font-medium text-gray-300">{t('upload.uploadedFiles')}</h4>
+      <div className="space-y-2">
+        {files.map((file, index) => (
+          <UploadedFileItem key={`${file.name}-${index}`} file={file} index={index} onRemove={onRemove} />
+        ))}
+      </div>
+    </div>
+  ) : null;
+const CameraCaptureOverlay = ({
+  open,
+  onCapture,
+  onClose,
+  props,
+}: {
+  open: boolean;
+  onCapture: (file: File) => void;
+  onClose: () => void;
+  props: Omit<FileUploadProps, 'onFilesUploaded' | 'uploadedFiles'>;
+}) =>
+  open ? (
+    <CameraCapture
+      onCapture={onCapture}
+      onClose={onClose}
+      countdownSeconds={props.countdownSeconds}
+      maxDurationSeconds={props.maxDurationSeconds}
+      framingGuide={props.framingGuide}
+      description={props.description}
+      orientation={props.orientation}
+      defaultCaptureMode={props.defaultCaptureMode}
+      allowedCaptureModes={props.allowedCaptureModes}
+    />
+  ) : null;
+
 export const FileUpload = ({
   onFilesUploaded,
   uploadedFiles,
@@ -184,31 +275,27 @@ export const FileUpload = ({
 
   const handleCameraCapture = (file: File) => {
     setUploadErrors([]);
-    startTransition(() => {
-      onFilesUploaded([...uploadedFiles, file].slice(0, maxFiles));
-    });
+    captureUploadedFile(file, uploadedFiles, maxFiles, onFilesUploaded);
   };
 
   // Report rejections WITHOUT discarding what came through: an over-limit drop now yields the files
   // that fit plus a too-many-files rejection, and the old early return would have thrown them away.
   const onDrop = (acceptedFiles: File[], rejectedFiles: Rejection[]) => {
-    setUploadErrors(collectDropErrors(rejectedFiles, maxSizeInMB, maxFiles, t));
-
-    if (acceptedFiles.length === 0) return;
-
-    setDropCount((count) => count + 1);
-
-    startTransition(() => {
-      const newFiles = [...uploadedFiles, ...acceptedFiles].slice(0, maxFiles);
-      onFilesUploaded(newFiles);
+    processDrop({
+      acceptedFiles,
+      rejectedFiles,
+      maxSizeInMB,
+      maxFiles,
+      t,
+      setUploadErrors,
+      setDropCount,
+      uploadedFiles,
+      onFilesUploaded,
     });
   };
 
   const removeFile = (indexToRemove: number) => {
-    startTransition(() => {
-      const newFiles = uploadedFiles.filter((_, index) => index !== indexToRemove);
-      onFilesUploaded(newFiles);
-    });
+    removeUploadedFile(indexToRemove, uploadedFiles, onFilesUploaded);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useMediaDrop({
@@ -258,32 +345,24 @@ export const FileUpload = ({
 
       <RejectionSlate title={t('upload.errorsTitle')} messages={uploadErrors} />
 
-      {showCamera && (
-        <CameraCapture
-          onCapture={handleCameraCapture}
-          onClose={() => {
-            setShowCamera(false);
-          }}
-          countdownSeconds={countdownSeconds}
-          maxDurationSeconds={maxDurationSeconds}
-          framingGuide={framingGuide}
-          description={description}
-          orientation={orientation}
-          defaultCaptureMode={defaultCaptureMode}
-          allowedCaptureModes={allowedCaptureModes}
-        />
-      )}
+      <CameraCaptureOverlay
+        open={showCamera}
+        onCapture={handleCameraCapture}
+        onClose={() => {
+          setShowCamera(false);
+        }}
+        props={{
+          countdownSeconds,
+          maxDurationSeconds,
+          framingGuide,
+          description,
+          orientation,
+          defaultCaptureMode,
+          allowedCaptureModes,
+        }}
+      />
 
-      {uploadedFiles.length > 0 && (
-        <div className="space-y-2 fade-in">
-          <h4 className="text-sm font-medium text-gray-300">{t('upload.uploadedFiles')}</h4>
-          <div className="space-y-2">
-            {uploadedFiles.map((file, index) => (
-              <UploadedFileItem key={`${file.name}-${index}`} file={file} index={index} onRemove={removeFile} />
-            ))}
-          </div>
-        </div>
-      )}
+      <UploadedFilesList files={uploadedFiles} onRemove={removeFile} t={t} />
     </div>
   );
 };

@@ -278,6 +278,89 @@ const StatusPill = ({ checked, browserInfo, onOpen, t }: StatusPillProps) => (
   </button>
 );
 
+const BrowserSummaryCard = ({
+  isOk,
+  isExpanded,
+  setIsExpanded,
+  browserInfo,
+  BrowserIcon,
+  checks,
+  supportedCount,
+  overallStatus,
+  t,
+}: {
+  isOk: boolean;
+  isExpanded: boolean;
+  setIsExpanded: (value: boolean) => void;
+  browserInfo: BrowserInfo | null;
+  BrowserIcon: typeof Info;
+  checks: CompatibilityCheck[];
+  supportedCount: number;
+  overallStatus: 'supported' | 'partial';
+  t: ReturnType<typeof useTranslation<'browser'>>['t'];
+}) => (
+  <div className="mb-8 fade-in">
+    <Card
+      elevation="flat"
+      className={clsx(
+        'transition-colors duration-300 overflow-hidden',
+        isOk
+          ? 'bg-[var(--color-success)]/[0.07] border-[var(--color-success)]/25'
+          : 'bg-[var(--color-warning)]/[0.07] border-[var(--color-warning)]/25'
+      )}
+    >
+      <Button
+        variant="ghost"
+        type="button"
+        onClick={() => {
+          setIsExpanded(!isExpanded);
+        }}
+        aria-expanded={isExpanded}
+        className="flex w-full items-center justify-between gap-4 p-4 text-left rounded-2xl rounded-b-none font-normal hover:bg-foreground/[0.03] [&_svg]:size-auto"
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <span
+            className={clsx(
+              'grid place-items-center w-10 h-10 rounded-xl shadow-sm shrink-0',
+              isOk
+                ? 'bg-[var(--color-success)] shadow-[var(--color-success)]/20'
+                : 'bg-[var(--color-warning)] shadow-[var(--color-warning)]/20'
+            )}
+          >
+            {isOk ? <CheckCircle2 className="w-5 h-5 text-white" /> : <AlertTriangle className="w-5 h-5 text-white" />}
+          </span>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-foreground">{t('title')}</h3>
+            <p className="text-xs text-gray-400 truncate">{isOk ? t('statusOk') : t('statusLimited')}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          {browserInfo ? (
+            <Badge
+              variant="neutral"
+              className="hidden sm:inline-flex gap-1.5 text-xs normal-case tracking-normal font-normal text-gray-400 px-3 py-1.5"
+            >
+              {createElement(BrowserIcon, { className: 'w-3.5 h-3.5' })}
+              {browserInfo.name} {browserInfo.version}
+            </Badge>
+          ) : null}
+          <ChevronDown
+            className={clsx('w-5 h-5 text-gray-400 transition-transform duration-300', isExpanded && 'rotate-180')}
+          />
+        </div>
+      </Button>
+      <ExpandedContent
+        checks={checks}
+        supportedCount={supportedCount}
+        overallStatus={overallStatus}
+        isExpanded={isExpanded}
+        browserInfo={browserInfo}
+        t={t}
+      />
+    </Card>
+  </div>
+);
+
 export const BrowserCompatibility = () => {
   const { t } = useTranslation('browser');
   const [checks, setChecks] = useState<CompatibilityCheck[]>(() => INITIAL_CHECKS.map((check) => ({ ...check })));
@@ -326,71 +409,16 @@ export const BrowserCompatibility = () => {
   }
 
   return (
-    <div className="mb-8 fade-in">
-      <Card
-        elevation="flat"
-        className={clsx(
-          'transition-colors duration-300 overflow-hidden',
-          isOk
-            ? 'bg-[var(--color-success)]/[0.07] border-[var(--color-success)]/25'
-            : 'bg-[var(--color-warning)]/[0.07] border-[var(--color-warning)]/25'
-        )}
-      >
-        <Button
-          variant="ghost"
-          type="button"
-          onClick={() => {
-            setIsExpanded(!isExpanded);
-          }}
-          aria-expanded={isExpanded}
-          className="flex w-full items-center justify-between gap-4 p-4 text-left rounded-2xl rounded-b-none font-normal hover:bg-foreground/[0.03] [&_svg]:size-auto"
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <span
-              className={clsx(
-                'grid place-items-center w-10 h-10 rounded-xl shadow-sm shrink-0',
-                isOk
-                  ? 'bg-[var(--color-success)] shadow-[var(--color-success)]/20'
-                  : 'bg-[var(--color-warning)] shadow-[var(--color-warning)]/20'
-              )}
-            >
-              {isOk ? (
-                <CheckCircle2 className="w-5 h-5 text-white" />
-              ) : (
-                <AlertTriangle className="w-5 h-5 text-white" />
-              )}
-            </span>
-            <div className="min-w-0">
-              <h3 className="text-sm font-semibold text-foreground">{t('title')}</h3>
-              <p className="text-xs text-gray-400 truncate">{isOk ? t('statusOk') : t('statusLimited')}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0">
-            {browserInfo && (
-              <Badge
-                variant="neutral"
-                className="hidden sm:inline-flex gap-1.5 text-xs normal-case tracking-normal font-normal text-gray-400 px-3 py-1.5"
-              >
-                {createElement(BrowserIcon, { className: 'w-3.5 h-3.5' })}
-                {browserInfo.name} {browserInfo.version}
-              </Badge>
-            )}
-            <ChevronDown
-              className={clsx('w-5 h-5 text-gray-400 transition-transform duration-300', isExpanded && 'rotate-180')}
-            />
-          </div>
-        </Button>
-
-        <ExpandedContent
-          checks={checks}
-          supportedCount={supportedCount}
-          overallStatus={overallStatus}
-          isExpanded={isExpanded}
-          browserInfo={browserInfo}
-          t={t}
-        />
-      </Card>
-    </div>
+    <BrowserSummaryCard
+      isOk={isOk}
+      isExpanded={isExpanded}
+      setIsExpanded={setIsExpanded}
+      browserInfo={browserInfo}
+      BrowserIcon={BrowserIcon}
+      checks={checks}
+      supportedCount={supportedCount}
+      overallStatus={overallStatus}
+      t={t}
+    />
   );
 };

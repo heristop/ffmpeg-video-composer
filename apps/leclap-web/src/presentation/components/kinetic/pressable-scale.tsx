@@ -23,6 +23,13 @@ const OUTCOME_HAPTICS = new Set(['success', 'warning', 'error', 'notification'])
 
 const firesOnCommit = (input: HapticInput): boolean => typeof input === 'string' && OUTCOME_HAPTICS.has(input);
 
+function motionFeedback(reduced: boolean | null, disabled: boolean | undefined, hoverLift: boolean, scaleTo: number) {
+  return {
+    whileTap: reduced || disabled ? undefined : { scale: scaleTo },
+    whileHover: reduced || disabled || !hoverLift ? undefined : { y: -2 },
+  };
+}
+
 // Tactile tap for anything that isn't a full Button — CTAs, tiles, chips. Dips on press with the
 // shared `tap` spring and fires a best-effort haptic, so the surface has native "give". Renders a
 // real <button> for accessibility. Honours reduced-motion (no scale/lift). Forwards its ref to the
@@ -44,6 +51,7 @@ export const PressableScale = forwardRef<HTMLButtonElement, PressableScaleProps>
 ) {
   const reduced = useReducedMotion();
   const onCommit = haptic !== null && firesOnCommit(haptic);
+  const feedback = motionFeedback(reduced, disabled, hoverLift, scaleTo);
 
   // Press feedback rides pointer-down so the buzz and the scale dip land on the same frame.
   const handlePointerDown: PressableScaleProps['onPointerDown'] = (event) => {
@@ -68,8 +76,7 @@ export const PressableScale = forwardRef<HTMLButtonElement, PressableScaleProps>
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       className={cn('touch-manipulation', className)}
-      whileTap={reduced || disabled ? undefined : { scale: scaleTo }}
-      whileHover={reduced || disabled || !hoverLift ? undefined : { y: -2 }}
+      {...feedback}
       transition={kineticMotion.spring.tap}
       {...props}
     >

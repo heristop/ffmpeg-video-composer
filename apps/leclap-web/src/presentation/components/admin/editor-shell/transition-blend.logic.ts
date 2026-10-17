@@ -23,65 +23,38 @@ const clamp01 = (p: number): number => Math.min(1, Math.max(0, p));
 export function transitionBlendAt(family: PreviewFamily, progress: number): BlendStyle {
   const p = clamp01(progress);
 
-  if (family === 'wipe') {
-    return {
-      outgoing: {},
-      incoming: { clipPath: `inset(0 ${((1 - p) * 100).toFixed(2)}% 0 0)` },
-    };
+  switch (family) {
+    case 'wipe':
+      return { outgoing: {}, incoming: { clipPath: `inset(0 ${((1 - p) * 100).toFixed(2)}% 0 0)` } };
+    case 'slide':
+      return {
+        outgoing: { transform: `translateX(${(-p * 100).toFixed(2)}%)` },
+        incoming: { transform: `translateX(${((1 - p) * 100).toFixed(2)}%)` },
+      };
+    case 'cover':
+      return { outgoing: {}, incoming: { transform: `translateX(${((1 - p) * 100).toFixed(2)}%)` } };
+    case 'circle':
+      return { outgoing: {}, incoming: { clipPath: `circle(${(p * 75).toFixed(2)}% at 50% 50%)` } };
+    case 'slice':
+      return { outgoing: {}, incoming: { clipPath: `inset(0 0 ${((1 - p) * 100).toFixed(2)}% 0)` } };
+    case 'reveal':
+      return { outgoing: {}, incoming: { clipPath: `inset(0 0 0 ${((1 - p) * 100).toFixed(2)}%)` } };
+    case 'zoom':
+      return {
+        outgoing: { opacity: 1 - p, transform: `scale(${(1 + p * 0.2).toFixed(3)})` },
+        incoming: { opacity: p },
+      };
+    case 'blur':
+      return {
+        outgoing: { opacity: 1 - p, filter: `blur(${(p * 12).toFixed(1)}px)` },
+        incoming: { opacity: p, filter: `blur(${((1 - p) * 12).toFixed(1)}px)` },
+      };
+    case 'pixel':
+      return {
+        outgoing: { opacity: 1 - p, filter: `contrast(${(1 + p * 0.4).toFixed(2)})` },
+        incoming: { opacity: p, filter: `contrast(${(1 + (1 - p) * 0.4).toFixed(2)})` },
+      };
+    default:
+      return { outgoing: { opacity: 1 - p }, incoming: { opacity: p } };
   }
-
-  if (family === 'slide' || family === 'cover') {
-    return {
-      outgoing: family === 'slide' ? { transform: `translateX(${(-p * 100).toFixed(2)}%)` } : {},
-      incoming: { transform: `translateX(${((1 - p) * 100).toFixed(2)}%)` },
-    };
-  }
-
-  if (family === 'circle') {
-    return {
-      outgoing: {},
-      incoming: { clipPath: `circle(${(p * 75).toFixed(2)}% at 50% 50%)` },
-    };
-  }
-
-  if (family === 'slice') {
-    // Approximate the slicing variants with a top-down wipe (distinct from the horizontal wipe family).
-    return {
-      outgoing: {},
-      incoming: { clipPath: `inset(0 0 ${((1 - p) * 100).toFixed(2)}% 0)` },
-    };
-  }
-
-  if (family === 'reveal') {
-    // The incoming layer is stacked on top, so "peeling the outgoing away" is expressed as the
-    // mirror wipe: the incoming grows from the right edge (wipe grows from the left).
-    return {
-      outgoing: {},
-      incoming: { clipPath: `inset(0 0 0 ${((1 - p) * 100).toFixed(2)}%)` },
-    };
-  }
-
-  if (family === 'zoom') {
-    return {
-      outgoing: { opacity: 1 - p, transform: `scale(${(1 + p * 0.2).toFixed(3)})` },
-      incoming: { opacity: p },
-    };
-  }
-
-  if (family === 'blur') {
-    return {
-      outgoing: { opacity: 1 - p, filter: `blur(${(p * 12).toFixed(1)}px)` },
-      incoming: { opacity: p, filter: `blur(${((1 - p) * 12).toFixed(1)}px)` },
-    };
-  }
-
-  if (family === 'pixel') {
-    // CSS has no pixelate filter — approximate the dissolve with a contrasty crossfade.
-    return {
-      outgoing: { opacity: 1 - p, filter: `contrast(${(1 + p * 0.4).toFixed(2)})` },
-      incoming: { opacity: p, filter: `contrast(${(1 + (1 - p) * 0.4).toFixed(2)})` },
-    };
-  }
-
-  return { outgoing: { opacity: 1 - p }, incoming: { opacity: p } };
 }

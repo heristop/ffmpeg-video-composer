@@ -6,6 +6,50 @@ import { mediaPath, type ShowcaseSample } from './catalog';
 
 type SourceState = { text: string; direction?: string };
 
+function SourceDetails({
+  source,
+  sample,
+  copyState,
+  copyMessage,
+  onCopy,
+  t,
+}: {
+  source: SourceState;
+  sample: ShowcaseSample;
+  copyState: 'idle' | 'copied' | 'failed';
+  copyMessage: string;
+  onCopy: () => void;
+  t: ReturnType<typeof useTranslation<'showcase'>>['t'];
+}) {
+  return (
+    <details className="group border-t border-divider pt-4">
+      <summary className="flex min-h-11 items-center justify-between gap-3 rounded-md text-base text-foreground focus-visible:outline-2 focus-visible:outline-brand-500">
+        {t('directionAndSource')}
+        <ChevronDown size={18} aria-hidden="true" className="transition-transform duration-200 group-open:rotate-180" />
+      </summary>
+      <div className="space-y-5 pt-4">
+        {source.direction ? (
+          <div>
+            <h3 className="mb-2 text-base font-semibold">{t('creativeDirection')}</h3>
+            <p className="text-base leading-relaxed text-muted-foreground">{source.direction}</p>
+          </div>
+        ) : null}
+        <p className="break-all font-mono text-xs leading-relaxed text-muted-foreground">{sample.source}</p>
+        <Button variant="outline" size="sm" className="min-h-11 rounded-full" onClick={onCopy}>
+          {copyState === 'copied' ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
+          {copyState === 'copied' ? t('copied') : t('copyJson')}
+        </Button>
+        <p role="status" className="text-sm text-muted-foreground">
+          {copyMessage}
+        </p>
+        <pre className="max-h-80 overflow-auto rounded-lg bg-surface p-4 text-xs leading-relaxed">
+          <code>{source.text}</code>
+        </pre>
+      </div>
+    </details>
+  );
+}
+
 export function SampleSource({ sample }: { sample: ShowcaseSample }) {
   const { t } = useTranslation('showcase');
   const [source, setSource] = useState<SourceState>();
@@ -89,44 +133,16 @@ export function SampleSource({ sample }: { sample: ShowcaseSample }) {
           {t('sourceError')}
         </p>
       )}
-      {source && (
-        <details className="group border-t border-divider pt-4">
-          <summary className="flex min-h-11 items-center justify-between gap-3 rounded-md text-base text-foreground focus-visible:outline-2 focus-visible:outline-brand-500">
-            {t('directionAndSource')}
-            <ChevronDown
-              size={18}
-              aria-hidden="true"
-              className="transition-transform duration-200 group-open:rotate-180"
-            />
-          </summary>
-          <div className="space-y-5 pt-4">
-            {source.direction && (
-              <div>
-                <h3 className="mb-2 text-base font-semibold">{t('creativeDirection')}</h3>
-                <p className="text-base leading-relaxed text-muted-foreground">{source.direction}</p>
-              </div>
-            )}
-            <p className="break-all font-mono text-xs leading-relaxed text-muted-foreground">{sample.source}</p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="min-h-11 rounded-full"
-              onClick={() => {
-                copy();
-              }}
-            >
-              {copyState === 'copied' ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
-              {copyState === 'copied' ? t('copied') : t('copyJson')}
-            </Button>
-            <p role="status" className="text-sm text-muted-foreground">
-              {copyMessage}
-            </p>
-            <pre className="max-h-80 overflow-auto rounded-lg bg-surface p-4 text-xs leading-relaxed">
-              <code>{source.text}</code>
-            </pre>
-          </div>
-        </details>
-      )}
+      {source ? (
+        <SourceDetails
+          source={source}
+          sample={sample}
+          copyState={copyState}
+          copyMessage={copyMessage}
+          onCopy={copy}
+          t={t}
+        />
+      ) : null}
     </div>
   );
 }

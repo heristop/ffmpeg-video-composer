@@ -26,6 +26,16 @@ interface ShellChromeProps {
   panelFocusKey?: string;
 }
 
+function monitorStackedClass(tabbed: boolean, onMonitor: boolean): string {
+  return tabbed
+    ? `min-h-0 flex-1 animate-surface-in-right motion-reduce:animate-none ${onMonitor ? 'block' : 'hidden'}`
+    : 'h-[var(--monitor-h)] min-h-0 shrink-0';
+}
+
+function panelClass(tabbed: boolean, onMonitor: boolean): string {
+  return `order-3 min-h-0 flex-1 flex-col overflow-hidden border-foreground/10 bg-surface desk:order-none desk:flex desk:animate-none desk:border-r ${tabbed ? 'animate-surface-in-left motion-reduce:animate-none' : ''} ${onMonitor ? 'hidden' : 'flex'}`;
+}
+
 // The studio/editor app frame: a full-viewport portal sitting BELOW the global LeClap header
 // (fixed, ~4rem, z-50) so the site header stays visible and on top. Locks body scroll while open.
 export const ShellChrome = ({
@@ -54,9 +64,7 @@ export const ShellChrome = ({
   const onMonitor = tabbed && view === 'monitor';
   // Untabbed shells keep the draggable split, so the monitor is a fixed slice of the stack; tabbed
   // ones give the selected surface everything that is left.
-  const monitorStacked = tabbed
-    ? `min-h-0 flex-1 animate-surface-in-right motion-reduce:animate-none ${onMonitor ? 'block' : 'hidden'}`
-    : 'h-[var(--monitor-h)] min-h-0 shrink-0';
+  const monitorStacked = monitorStackedClass(tabbed, onMonitor);
 
   return createPortal(
     <>
@@ -80,13 +88,7 @@ export const ShellChrome = ({
           className="flex min-h-0 flex-1 flex-col desk:grid desk:grid-cols-[3.75rem_19rem_minmax(0,1fr)] desk:grid-rows-[minmax(0,1fr)_auto] lg:grid-cols-[5rem_22rem_minmax(0,1fr)] xl:grid-cols-[5rem_24rem_minmax(0,1fr)]"
         >
           {dock}
-          <section
-            className={`order-3 min-h-0 flex-1 flex-col overflow-hidden border-foreground/10 bg-surface desk:order-none desk:flex desk:animate-none desk:border-r ${
-              tabbed ? 'animate-surface-in-left motion-reduce:animate-none' : ''
-            } ${onMonitor ? 'hidden' : 'flex'}`}
-          >
-            {panel}
-          </section>
+          <section className={panelClass(tabbed, onMonitor)}>{panel}</section>
           <div
             className={`order-1 desk:order-none desk:block desk:h-auto desk:flex-none desk:shrink desk:animate-none ${monitorStacked}`}
             style={tabbed ? undefined : ({ '--monitor-h': monitorHeight } as CSSProperties)}

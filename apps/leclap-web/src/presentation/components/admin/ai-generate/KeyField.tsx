@@ -22,6 +22,30 @@ const LINK =
 const QUIET =
   'tap inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-divider px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40';
 
+const KeyMessages = ({
+  suspicious,
+  persistFailed,
+  forgotten,
+  t,
+  providerLabel,
+  placeholder,
+}: {
+  suspicious: boolean;
+  persistFailed: boolean;
+  forgotten: boolean;
+  t: ReturnType<typeof useTranslation<'ai'>>['t'];
+  providerLabel: string;
+  placeholder: string;
+}) => (
+  <div aria-live="polite" className="grid gap-1 empty:hidden">
+    {suspicious ? (
+      <p className="text-xs text-[var(--color-warning)]">{t('key.format', { provider: providerLabel, placeholder })}</p>
+    ) : null}
+    {persistFailed ? <p className="text-xs text-muted-foreground">{t('key.persistFailed')}</p> : null}
+    {forgotten ? <p className="text-xs text-muted-foreground">{t('key.forgotten')}</p> : null}
+  </div>
+);
+
 export const KeyField = ({ providerId, providerLabel, placeholder, keyUrl, looksLikeKey, inputId }: KeyFieldProps) => {
   const { t } = useTranslation('ai');
   const generatedId = useId();
@@ -83,15 +107,14 @@ export const KeyField = ({ providerId, providerLabel, placeholder, keyUrl, looks
           </button>
         )}
       </div>
-      <div aria-live="polite" className="grid gap-1 empty:hidden">
-        {suspicious && (
-          <p className="text-xs text-[var(--color-warning)]">
-            {t('key.format', { provider: providerLabel, placeholder })}
-          </p>
-        )}
-        {persistFailed && <p className="text-xs text-muted-foreground">{t('key.persistFailed')}</p>}
-        {forgotten && <p className="text-xs text-muted-foreground">{t('key.forgotten')}</p>}
-      </div>
+      <KeyMessages
+        suspicious={suspicious}
+        persistFailed={persistFailed}
+        forgotten={forgotten}
+        t={t}
+        providerLabel={providerLabel}
+        placeholder={placeholder}
+      />
       <p id={`${id}-privacy`} className="flex items-start gap-1.5 text-xs text-muted-foreground">
         <Shield aria-hidden className="mt-px size-3.5 shrink-0" />
         <span className="text-pretty">{t('key.privacy', { provider: providerLabel })}</span>

@@ -34,6 +34,26 @@ const HIDDEN = {
   none: 'opacity-0',
 } as const;
 
+function revealClassName(
+  from: RevealProps['from'],
+  inView: boolean,
+  landed: boolean,
+  scale: boolean,
+  className?: string
+): string {
+  const state = inView
+    ? cn('translate-x-0 translate-y-0 opacity-100', scale && 'scale-100')
+    : cn(HIDDEN[from ?? 'up'], scale && 'scale-[0.96]', 'will-change-[transform,opacity]');
+
+  return cn(
+    'transition-all duration-700 ease-[var(--ease-spring)]',
+    'motion-reduce:transition-none motion-reduce:!translate-x-0 motion-reduce:!translate-y-0 motion-reduce:!scale-100 motion-reduce:!opacity-100',
+    state,
+    className,
+    landed && 'transition-opacity duration-150 ease-out'
+  );
+}
+
 interface RevealTrigger {
   threshold?: number;
   rootMargin?: string;
@@ -88,19 +108,7 @@ export const Reveal = ({
   return (
     <div
       ref={ref}
-      className={cn(
-        'transition-all duration-700 ease-[var(--ease-spring)]',
-        'motion-reduce:transition-none motion-reduce:!translate-x-0 motion-reduce:!translate-y-0 motion-reduce:!scale-100 motion-reduce:!opacity-100',
-        // will-change only while hidden so the entrance is hinted; once revealed the element is
-        // static, so we drop the hint and free its compositor layer (avoids scroll jank when many
-        // Reveals are on a page).
-        inView
-          ? cn('translate-x-0 translate-y-0 opacity-100', scale && 'scale-100')
-          : cn(HIDDEN[from], scale && 'scale-[0.96]', 'will-change-[transform,opacity]'),
-        className,
-        // Landed on: the transform snaps into place and only the opacity fades, briefly.
-        landed && 'transition-opacity duration-150 ease-out'
-      )}
+      className={revealClassName(from, inView, landed, scale, className)}
       style={{ transitionDelay: inView && !landed ? `${delay + staggerDelay}ms` : '0ms', ...style }}
       {...props}
     >

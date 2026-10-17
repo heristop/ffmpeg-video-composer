@@ -102,18 +102,29 @@ export function ProgramMonitor({
     >
       <div className="h-full">{children}</div>
 
+      <MonitorOverlays scanline={scanline} showBrackets={showBrackets} label={label} dark={dark} progress={progress} />
+    </div>
+  );
+}
+
+function MonitorOverlays({
+  scanline = false,
+  showBrackets = false,
+  label,
+  dark = false,
+  progress,
+}: Pick<ProgramMonitorProps, 'scanline' | 'showBrackets' | 'label' | 'dark' | 'progress'>) {
+  return (
+    <>
       {scanline && <Scanline />}
-
       {showBrackets && <Brackets dark={dark} />}
-
       {label && <TallyChip label={label} dark={dark} />}
-
-      {progress !== undefined && (
+      {progress === undefined ? null : (
         <div className="absolute inset-x-3.5 bottom-3.5">
           <GradientMeter progress={progress} variant="playhead" size={4} />
         </div>
       )}
-    </div>
+    </>
   );
 }
 

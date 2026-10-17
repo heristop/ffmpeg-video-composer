@@ -76,6 +76,148 @@ const SceneSkeleton = () => (
   </motion.div>
 );
 
+function SceneItemCard({
+  section,
+  index,
+  selectedIndex,
+  carried,
+  ringed,
+  canDelete,
+  sectionTitle,
+  sectionKindLabel,
+  itemPointerDown,
+  onSelect,
+  onDuplicate,
+  onDelete,
+  t,
+}: {
+  section: EditorSection;
+  index: number;
+  selectedIndex: number;
+  carried: boolean;
+  ringed: boolean;
+  canDelete: boolean;
+  sectionTitle: (section: EditorSection, index: number) => string;
+  sectionKindLabel: (section: EditorSection) => string;
+  itemPointerDown: (index: number) => React.PointerEventHandler<HTMLDivElement>;
+  onSelect: (index: number) => void;
+  onDuplicate: (index: number) => void;
+  onDelete: (index: number) => void;
+  t: (key: string) => string;
+}) {
+  return (
+    <motion.div
+      layout={!carried}
+      transition={REORDER_SPRING}
+      data-reorder-index={index}
+      data-agent-highlight={ringed ? '' : undefined}
+      onPointerDown={itemPointerDown(index)}
+      className={cn(
+        'cursor-grab touch-pan-x rounded-xl active:cursor-grabbing',
+        ringed && 'agent-highlight ring-2 ring-brand-400 ring-offset-2 ring-offset-background'
+      )}
+    >
+      <SceneCell
+        index={index}
+        role="button"
+        title={displayFromTokens(sectionTitle(section, index))}
+        eyebrow={sectionKindLabel(section)}
+        icon={SECTION_ICON[section.kind]}
+        active={index === selectedIndex}
+        tabIndex={index === selectedIndex ? 0 : -1}
+        onSelect={() => {
+          onSelect(index);
+        }}
+        trailing={
+          index === selectedIndex ? (
+            <CellActions
+              canDelete={canDelete}
+              onDuplicate={() => {
+                onDuplicate(index);
+              }}
+              onDelete={() => {
+                onDelete(index);
+              }}
+              t={t}
+            />
+          ) : undefined
+        }
+      />
+    </motion.div>
+  );
+}
+
+function SceneItem({
+  section,
+  index,
+  sections,
+  selectedIndex,
+  draggingIndex,
+  highlighted,
+  canDelete,
+  defaultTransition,
+  sectionTitle,
+  sectionKindLabel,
+  itemPointerDown,
+  onSelect,
+  onDuplicate,
+  onDelete,
+  onTransition,
+  t,
+}: {
+  section: EditorSection;
+  index: number;
+  sections: EditorSection[];
+  selectedIndex: number;
+  draggingIndex: number | null;
+  highlighted?: ReadonlySet<number>;
+  canDelete: boolean;
+  defaultTransition?: DefaultTransition;
+  sectionTitle: (section: EditorSection, index: number) => string;
+  sectionKindLabel: (section: EditorSection) => string;
+  itemPointerDown: (index: number) => React.PointerEventHandler<HTMLDivElement>;
+  onSelect: (index: number) => void;
+  onDuplicate: (index: number) => void;
+  onDelete: (index: number) => void;
+  onTransition: (index: number, transition: SectionTransition | undefined) => void;
+  t: (key: string) => string;
+}) {
+  const carried = draggingIndex === index;
+  const ringed = highlighted?.has(index) === true;
+
+  return (
+    <Fragment key={keyOf(section)}>
+      {draggingIndex !== null && !carried ? <SceneSkeleton /> : null}
+      <SceneItemCard
+        section={section}
+        index={index}
+        selectedIndex={selectedIndex}
+        carried={carried}
+        ringed={ringed}
+        canDelete={canDelete}
+        sectionTitle={sectionTitle}
+        sectionKindLabel={sectionKindLabel}
+        itemPointerDown={itemPointerDown}
+        onSelect={onSelect}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+        t={t}
+      />
+      {draggingIndex === null && hasVisualAfter(sections, index) ? (
+        <span className="grid shrink-0 place-items-center" aria-label={t('shell.transitionAfter')}>
+          <TransitionPicker
+            transition={'transitionAfter' in section ? section.transitionAfter : undefined}
+            defaultTransition={defaultTransition}
+            onChange={(transition) => {
+              onTransition(index, transition);
+            }}
+          />
+        </span>
+      ) : null}
+    </Fragment>
+  );
+}
+
 // The bottom scene lane for the template editor: one SceneCell per section in order, drag-reorderable
 // with pointer events (mouse + touch via usePointerReorder) — the cards spring aside (framer `layout`)
 // and the dragged card shows as a ghost placeholder at its drop slot. Per-cell duplicate/delete on the
@@ -97,7 +239,7 @@ export const EditorSceneTimeline = ({
   highlighted,
 }: EditorSceneTimelineProps) => {
   const { t } = useTranslation('admin');
-  const { containerRef, draggingIndex, overIndex, itemPointerDown } = usePointerReorder(onReorder);
+  const { containerRef, draggingIndex, itemPointerDown } = usePointerReorder(onReorder);
   const canDelete = sections.length > 1;
   const pristine = Boolean(onBrowsePresets) && isPristineTimeline(sections);
 
@@ -116,68 +258,27 @@ export const EditorSceneTimeline = ({
           {t('shell.dragToReorder')}
         </span>
       )}
-      {sections.map((section, i) => {
-        // The carried card is lifted out of flow + glued to the pointer by the hook (layout off so framer
-        // doesn't fight its fixed position); a skeleton marks where it will drop and the rest spring aside.
-        const carried = draggingIndex === i;
-        const ringed = highlighted?.has(i) === true;
-
-        return (
-          <Fragment key={keyOf(section)}>
-            {draggingIndex !== null && !carried && overIndex === i && <SceneSkeleton />}
-            <motion.div
-              layout={!carried}
-              transition={REORDER_SPRING}
-              data-reorder-index={i}
-              data-agent-highlight={ringed ? '' : undefined}
-              onPointerDown={itemPointerDown(i)}
-              className={cn(
-                'cursor-grab touch-pan-x rounded-xl active:cursor-grabbing',
-                ringed && 'agent-highlight ring-2 ring-brand-400 ring-offset-2 ring-offset-background'
-              )}
-            >
-              <SceneCell
-                index={i}
-                role="button"
-                title={displayFromTokens(sectionTitle(section, i))}
-                eyebrow={sectionKindLabel(section)}
-                icon={SECTION_ICON[section.kind]}
-                active={i === selectedIndex}
-                tabIndex={i === selectedIndex ? 0 : -1}
-                onSelect={() => {
-                  onSelect(i);
-                }}
-                trailing={
-                  i === selectedIndex ? (
-                    <CellActions
-                      canDelete={canDelete}
-                      onDuplicate={() => {
-                        onDuplicate(i);
-                      }}
-                      onDelete={() => {
-                        onDelete(i);
-                      }}
-                      t={t}
-                    />
-                  ) : undefined
-                }
-              />
-            </motion.div>
-            {/* Transition chips are hidden mid-drag; `layout` springs the gap closed so it stays smooth. */}
-            {draggingIndex === null && hasVisualAfter(sections, i) && (
-              <span className="grid shrink-0 place-items-center" aria-label={t('shell.transitionAfter')}>
-                <TransitionPicker
-                  transition={'transitionAfter' in section ? section.transitionAfter : undefined}
-                  defaultTransition={defaultTransition}
-                  onChange={(transition) => {
-                    onTransition(i, transition);
-                  }}
-                />
-              </span>
-            )}
-          </Fragment>
-        );
-      })}
+      {sections.map((section, i) => (
+        <SceneItem
+          key={keyOf(section)}
+          section={section}
+          index={i}
+          sections={sections}
+          selectedIndex={selectedIndex}
+          draggingIndex={draggingIndex}
+          highlighted={highlighted}
+          canDelete={canDelete}
+          defaultTransition={defaultTransition}
+          sectionTitle={sectionTitle}
+          sectionKindLabel={sectionKindLabel}
+          itemPointerDown={itemPointerDown}
+          onSelect={onSelect}
+          onDuplicate={onDuplicate}
+          onDelete={onDelete}
+          onTransition={onTransition}
+          t={t}
+        />
+      ))}
       <motion.div layout transition={REORDER_SPRING} className="flex">
         <AddSceneMenu onAdd={onAdd} kinds={addKinds} />
       </motion.div>

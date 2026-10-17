@@ -42,6 +42,32 @@ export interface InputSection {
   description?: Translation;
 }
 
+function templateSectionCounts(template: TemplateDescriptor) {
+  let formSections = 0;
+  let videoSections = 0;
+  let totalFilters = 0;
+
+  for (const section of template.sections ?? []) {
+    formSections += section.type === 'form' ? 1 : 0;
+    videoSections += section.type === 'project_video' ? 1 : 0;
+    totalFilters += section.filters?.length ?? 0;
+  }
+
+  return { formSections, videoSections, totalFilters };
+}
+
+function templateComplexityOf(template: TemplateDescriptor): 'simple' | 'intermediate' | 'advanced' {
+  const { formSections, videoSections, totalFilters } = templateSectionCounts(template);
+  const isAdvanced = formSections > 2 || totalFilters > 15;
+  const isIntermediate = formSections > 0 || videoSections > 1 || totalFilters > 5;
+
+  if (isAdvanced) return 'advanced';
+
+  if (isIntermediate) return 'intermediate';
+
+  return 'simple';
+}
+
 const getServerUrl = () => {
   // Configured at build time via VITE_API_URL; falls back to the local dev server.
   return import.meta.env.VITE_API_URL ?? 'http://localhost:8082';
@@ -214,25 +240,7 @@ class TemplateService {
   }
 
   getTemplateComplexity(template: TemplateDescriptor): 'simple' | 'intermediate' | 'advanced' {
-    const materialized = this.materializeForRead(template);
-    // Single pass over the sections instead of three separate traversals.
-    let formSections = 0;
-    let videoSections = 0;
-    let totalFilters = 0;
-
-    for (const section of materialized.sections ?? []) {
-      if (section.type === 'form') formSections++;
-
-      if (section.type === 'project_video') videoSections++;
-
-      totalFilters += section.filters?.length ?? 0;
-    }
-
-    if (formSections > 2 || totalFilters > 15) return 'advanced';
-
-    if (formSections > 0 || videoSections > 1 || totalFilters > 5) return 'intermediate';
-
-    return 'simple';
+    return templateComplexityOf(this.materializeForRead(template));
   }
 
   // Test server connection

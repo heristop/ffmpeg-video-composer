@@ -21,6 +21,51 @@ export interface ClappyRunnerProps {
   className?: string;
 }
 
+function RunnerMotion({
+  laneWidth,
+  progress,
+  size,
+  reduced,
+  pose,
+  bob,
+  lean,
+  squash,
+  followPointer,
+  clapOnClick,
+  done,
+}: {
+  laneWidth: number;
+  progress: number;
+  size: number;
+  reduced: boolean;
+  pose: ReturnType<typeof runnerFrame>['pose'];
+  bob: number;
+  lean: number;
+  squash: number;
+  followPointer: boolean;
+  clapOnClick: boolean;
+  done: boolean;
+}) {
+  return (
+    <motion.div
+      className="absolute bottom-0 left-0"
+      initial={{ x: railLeft(0, laneWidth, size) }}
+      animate={{ x: railLeft(progress, laneWidth, size) }}
+      transition={{ duration: reduced ? 0 : kineticMotion.duration.ring, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <>{pose.stride === undefined ? null : <Dust size={size} stride={pose.stride} />}</>
+      <div
+        style={{
+          transform: `translateY(${-bob * (size / 12)}px) rotate(${lean}deg) scale(${1 + squash}, ${1 - squash})`,
+          transformOrigin: '50% 92%',
+        }}
+      >
+        <Clappy size={size} {...pose} followPointer={followPointer && done} clapOnClick={clapOnClick} />
+      </div>
+    </motion.div>
+  );
+}
+
 // The render loader, as the showcase film plays it: Clappy runs the lane above a progress bar, keeping pace
 // with its fill — feet trading places, arms pumping, the clapper clacking on each step, dust puffing behind —
 // and throws his arms up at the finish. He is the loader's one ambient mover, so he keeps running while a slow
@@ -47,24 +92,21 @@ export function ClappyRunner({
       {/* He stands on the fill's leading edge (clappy-rail.logic.ts): his back half behind the line at the
           start, pulled up inside the lane at the finish. He moves on the meter's own transition, from the
           line as the fill grows from empty, so he keeps pace with the edge. Placed once the lane is measured. */}
-      {laneWidth > 0 && (
-        <motion.div
-          className="absolute bottom-0 left-0"
-          initial={{ x: railLeft(0, laneWidth, size) }}
-          animate={{ x: railLeft(progress, laneWidth, size) }}
-          transition={{ duration: reduced ? 0 : kineticMotion.duration.ring, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {pose.stride !== undefined && <Dust size={size} stride={pose.stride} />}
-          <div
-            style={{
-              transform: `translateY(${-bob * (size / 12)}px) rotate(${lean}deg) scale(${1 + squash}, ${1 - squash})`,
-              transformOrigin: '50% 92%',
-            }}
-          >
-            <Clappy size={size} {...pose} followPointer={followPointer && done} clapOnClick={clapOnClick} />
-          </div>
-        </motion.div>
-      )}
+      {laneWidth > 0 ? (
+        <RunnerMotion
+          laneWidth={laneWidth}
+          progress={progress}
+          size={size}
+          reduced={reduced}
+          pose={pose}
+          bob={bob}
+          lean={lean}
+          squash={squash}
+          followPointer={followPointer}
+          clapOnClick={clapOnClick}
+          done={done}
+        />
+      ) : null}
     </div>
   );
 }

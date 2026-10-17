@@ -112,32 +112,21 @@ const effectPreview = (
     : { graphics: sectionGraphics(section), only, env: previewEnvOf(state, section, reduced) };
 };
 
-// The selected section's editable preview, rendered inside ProgramMonitor's children slot. A thin
-// dispatcher: no section → empty state; visual sections → the centered WYSIWYG SectionCanvas (real
-// backdrop + draggable text overlays) wired back through patchSection; other kinds → a labelled frame.
-// The center canvas is now the ONLY draggable surface — its text styling controls live in the left
-// OverlayInspector, sharing this `selection`.
-export const EditorMonitor = ({
+function EditorMonitorCanvas({
   state,
   section,
-  onPatchSection,
   selection,
+  onPatchSection,
   onSelectElement,
   onBeginEdit,
   onEndEdit,
-}: EditorMonitorProps) => {
-  const { t } = useTranslation('admin');
-  // Asset-backed video sections preview their fixed clip as the canvas backdrop (mirrors the render's
-  // base layer); camera sections keep the neutral frame. Resolved before any early return (hooks rule).
-  const clipPreviewUrl = useClipPreviewUrl(section?.kind === 'video' ? section.videoUrl : undefined);
-  const reduced = useReducedMotion();
-
-  if (!section) return <EmptyState label={t('shell.monitorEmpty')} />;
-
-  if (section.kind === 'partial') return <PartialPreview section={section} />;
-
-  if (!hasOverlayCanvas(section)) return <FallbackPreview section={section} />;
-
+  clipPreviewUrl,
+  reduced,
+}: EditorMonitorProps & {
+  clipPreviewUrl?: string;
+  reduced: boolean;
+  section: Extract<EditorSection, { kind: 'video' | 'color' | 'image' }>;
+}) {
   const onCanvasDrop = (payload: DropPayload, point: DropPoint) => {
     const result = resolveCanvasDrop(section, selection, payload, point, state.orientation);
 
@@ -160,7 +149,6 @@ export const EditorMonitor = ({
         overlays={section.overlays}
         orientation={state.orientation}
         background={canvasBackground()}
-        // The section's source-footage fit, mirrored on the backdrop (video clip / background image).
         backgroundFit={section.kind === 'color' ? undefined : section.fit}
         layers={
           section.kind === 'color'
@@ -221,5 +209,46 @@ export const EditorMonitor = ({
         fx={effectPreview(state, section, selection, reduced)}
       />
     </div>
+  );
+}
+
+// The selected section's editable preview, rendered inside ProgramMonitor's children slot. A thin
+// dispatcher: no section → empty state; visual sections → the centered WYSIWYG SectionCanvas (real
+// backdrop + draggable text overlays) wired back through patchSection; other kinds → a labelled frame.
+// The center canvas is now the ONLY draggable surface — its text styling controls live in the left
+// OverlayInspector, sharing this `selection`.
+export const EditorMonitor = ({
+  state,
+  section,
+  onPatchSection,
+  selection,
+  onSelectElement,
+  onBeginEdit,
+  onEndEdit,
+}: EditorMonitorProps) => {
+  const { t } = useTranslation('admin');
+  // Asset-backed video sections preview their fixed clip as the canvas backdrop (mirrors the render's
+  // base layer); camera sections keep the neutral frame. Resolved before any early return (hooks rule).
+  const clipPreviewUrl = useClipPreviewUrl(section?.kind === 'video' ? section.videoUrl : undefined);
+  const reduced = useReducedMotion();
+
+  if (!section) return <EmptyState label={t('shell.monitorEmpty')} />;
+
+  if (section.kind === 'partial') return <PartialPreview section={section} />;
+
+  if (!hasOverlayCanvas(section)) return <FallbackPreview section={section} />;
+
+  return (
+    <EditorMonitorCanvas
+      state={state}
+      section={section}
+      selection={selection}
+      onPatchSection={onPatchSection}
+      onSelectElement={onSelectElement}
+      onBeginEdit={onBeginEdit}
+      onEndEdit={onEndEdit}
+      clipPreviewUrl={clipPreviewUrl}
+      reduced={reduced}
+    />
   );
 };

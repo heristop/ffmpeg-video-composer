@@ -51,14 +51,18 @@ export function currentDescriptor(state: EditorState): TemplateDescriptor {
   return buildDescriptor(state);
 }
 
+function redactString(value: string, key: string, parent: Record<string, unknown> | null): string {
+  if (/^(blob|data):/i.test(value)) return REDACTED;
+
+  const sibling = parent?.url ?? parent?.src;
+  const nextToUpload = typeof sibling === 'string' && sibling.startsWith('media://');
+
+  return key === 'label' && nextToUpload ? 'user upload' : value;
+}
+
 function redactValue(value: unknown, key: string, parent: Record<string, unknown> | null): unknown {
   if (typeof value === 'string') {
-    if (/^(blob|data):/i.test(value)) return REDACTED;
-
-    const sibling = parent?.url ?? parent?.src;
-    const nextToUpload = typeof sibling === 'string' && sibling.startsWith('media://');
-
-    return key === 'label' && nextToUpload ? 'user upload' : value;
+    return redactString(value, key, parent);
   }
 
   if (Array.isArray(value)) return value.map((item) => redactValue(item, '', null));

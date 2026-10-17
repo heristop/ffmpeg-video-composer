@@ -17,6 +17,18 @@ const LEVEL_SIZE: Record<DisplayLevel, string> = {
   s: 'var(--text-display-s)',
 };
 
+function headingReveal(reduced: boolean, revealOnView: boolean) {
+  return reduced || !revealOnView ? { animate: { opacity: 1, y: 0 } } : { whileInView: { opacity: 1, y: 0 } };
+}
+
+function headingTransition(reduced: boolean, index: number, stagger: number, delay: number) {
+  return {
+    duration: reduced ? 0 : kineticMotion.duration.base,
+    delay: reduced ? 0 : revealDelay(index, stagger, delay),
+    ease: [0.16, 1, 0.3, 1] as const,
+  };
+}
+
 export interface KineticHeadingProps {
   text: string;
   level?: DisplayLevel;
@@ -50,11 +62,10 @@ export function KineticHeading({
   className,
 }: KineticHeadingProps) {
   const words = splitWords(text);
-  const reduced = useReducedMotion();
-  const settled = { opacity: 1, y: 0 };
+  const reduced = useReducedMotion() ?? false;
   // Reduced motion renders settled; otherwise reveal either on mount (`animate`) or once the heading
   // scrolls into view (`whileInView`) for below-the-fold section titles.
-  const revealProps = reduced || !revealOnView ? { animate: settled } : { whileInView: settled };
+  const revealProps = headingReveal(reduced, revealOnView);
 
   return (
     <Tag
@@ -75,11 +86,7 @@ export function KineticHeading({
           initial={reduced ? false : { opacity: 0, y: '0.5em' }}
           {...revealProps}
           viewport={revealOnView ? { once: true, amount: 0.5 } : undefined}
-          transition={{
-            duration: reduced ? 0 : kineticMotion.duration.base,
-            delay: reduced ? 0 : revealDelay(index, stagger, delay),
-            ease: [0.16, 1, 0.3, 1],
-          }}
+          transition={headingTransition(reduced, index, stagger, delay)}
         >
           {word}
         </motion.span>

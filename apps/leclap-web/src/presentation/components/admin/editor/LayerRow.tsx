@@ -57,6 +57,44 @@ const gradientShapes = (t: TFunction<'admin'>) => [
   { value: 'spiral' as const, label: t('layer.shapeSpiral') },
 ];
 
+function LayerConditionalFields({
+  layer,
+  isBase,
+  t,
+  onPatch,
+}: Pick<LayerRowProps, 'layer' | 'isBase' | 'onPatch'> & { t: TFunction<'admin'> }) {
+  return (
+    <>
+      {!layer.gradient && <BorderToggle layer={layer} t={t} onPatch={onPatch} />}
+      {!layer.gradient && layer.border && <BorderFields layer={layer} t={t} onPatch={onPatch} />}
+      <RevealControl
+        reveal={layer.reveal}
+        onChange={(reveal) => {
+          onPatch({ reveal });
+        }}
+      />
+      {layer.reveal !== undefined && (
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          {t(layer.gradient ? 'layer.revealHintGradient' : 'layer.revealHintSolid')}
+        </p>
+      )}
+      {!isBase && (
+        <LayerGeometryFields
+          values={{
+            x: exprToPercent(layer.x, 25),
+            y: exprToPercent(layer.y, 25),
+            w: exprToPercent(layer.w, 50),
+            h: exprToPercent(layer.h, 50),
+          }}
+          onChange={(axis, percent) => {
+            onPatch({ [axis]: percentToExpr(axis, percent) });
+          }}
+        />
+      )}
+    </>
+  );
+}
+
 export const LayerRow = ({
   layer,
   index,
@@ -137,37 +175,7 @@ export const LayerRow = ({
             onPatch({ opacity });
           }}
         />
-        {/* The engine ignores a border on gradient layers (compiled by the maps pipeline), so the
-            outline controls only show for solid layers. */}
-        {!layer.gradient && <BorderToggle layer={layer} t={t} onPatch={onPatch} />}
-        {!layer.gradient && layer.border && <BorderFields layer={layer} t={t} onPatch={onPatch} />}
-        {/* Animated entrance for the layer — the same reveal vocabulary as text/images. Gradient
-            layers get the full fade/slide (overlaid lavfi legs); solid drawbox layers cannot ramp
-            alpha, so they appear at the delay — the hint spells the difference out. */}
-        <RevealControl
-          reveal={layer.reveal}
-          onChange={(reveal) => {
-            onPatch({ reveal });
-          }}
-        />
-        {layer.reveal !== undefined && (
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {t(layer.gradient ? 'layer.revealHintGradient' : 'layer.revealHintSolid')}
-          </p>
-        )}
-        {!isBase && (
-          <LayerGeometryFields
-            values={{
-              x: exprToPercent(layer.x, 25),
-              y: exprToPercent(layer.y, 25),
-              w: exprToPercent(layer.w, 50),
-              h: exprToPercent(layer.h, 50),
-            }}
-            onChange={(axis, percent) => {
-              onPatch({ [axis]: percentToExpr(axis, percent) });
-            }}
-          />
-        )}
+        <LayerConditionalFields layer={layer} isBase={isBase} t={t} onPatch={onPatch} />
       </div>
     </div>
   );

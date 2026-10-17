@@ -367,57 +367,82 @@ export const SoundControl = ({
         setHovered(false);
       }}
     >
-      <button
-        type="button"
-        onClick={onToggle}
+      <SoundButton
+        muted={muted}
+        labelled={labelled}
+        onToggle={onToggle}
         onFocus={() => {
           setFocused(true);
         }}
         onBlur={() => {
           setFocused(false);
         }}
-        aria-label={muted ? t('sound.on') : t('sound.off')}
-        title={muted ? t('sound.on') : t('sound.off')}
-        data-player-mute=""
-        className="tap group/snd relative flex h-11 min-w-11 cursor-pointer items-center rounded-full transition-[transform,background-color] duration-150 hover:bg-player-fg/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
-      >
-        {/* The lit chip the label arrives on; it fades back into the glass as the label settles. */}
-        <span
-          aria-hidden="true"
-          className={cn(
-            'absolute inset-x-0 inset-y-1.5 rounded-full bg-brand-50 transition-[opacity,background-color] duration-300 group-hover/snd:bg-brand-100',
-            labelled ? 'opacity-100' : 'opacity-0'
-          )}
-        />
-        {labelled && (
-          <span
-            aria-hidden="true"
-            className="sound-ping pointer-events-none absolute inset-x-0 inset-y-1.5 rounded-full"
-          />
-        )}
-        <span
-          className={cn(
-            'relative grid size-11 place-items-center transition-colors duration-300 [&_svg]:size-5',
-            labelled ? 'text-brand-900' : 'text-player-fg/85 group-hover/snd:text-player-fg'
-          )}
-        >
-          {muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
-        </span>
-        <span
-          aria-hidden="true"
-          className={cn(
-            'relative -ml-1.5 grid ease-[var(--ease-out-expo)] transition-[grid-template-columns,opacity]',
-            labelled ? 'grid-cols-[1fr] opacity-100 duration-500' : 'grid-cols-[0fr] opacity-0 duration-300'
-          )}
-        >
-          <span className="min-w-0 overflow-hidden">
-            <span className="block whitespace-nowrap pr-3.5 text-xs font-semibold tracking-[0.02em] text-brand-900 sm:text-sm">
-              {t('sound.on')}
-            </span>
-          </span>
-        </span>
-      </button>
+        onLabel={t('sound.on')}
+        offLabel={t('sound.off')}
+      />
       {!labelled && <PlayerVolumeSlider level={muted ? 0 : volume} onVolume={onVolume} />}
     </div>
   );
 };
+
+const SoundButton = ({
+  muted,
+  labelled,
+  onToggle,
+  onFocus,
+  onBlur,
+  onLabel,
+  offLabel,
+}: {
+  muted: boolean;
+  labelled: boolean;
+  onToggle: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
+  onLabel: string;
+  offLabel: string;
+}) => (
+  <button
+    type="button"
+    onClick={onToggle}
+    onFocus={onFocus}
+    onBlur={onBlur}
+    aria-label={muted ? onLabel : offLabel}
+    title={muted ? onLabel : offLabel}
+    data-player-mute=""
+    className="tap group/snd relative flex h-11 min-w-11 cursor-pointer items-center rounded-full transition-[transform,background-color] duration-150 hover:bg-player-fg/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+  >
+    {/* The lit chip the label arrives on; it fades back into the glass as the label settles. */}
+    <span
+      aria-hidden="true"
+      className={cn(
+        'absolute inset-x-0 inset-y-1.5 rounded-full bg-brand-50 transition-[opacity,background-color] duration-300 group-hover/snd:bg-brand-100',
+        labelled ? 'opacity-100' : 'opacity-0'
+      )}
+    />
+    {labelled && (
+      <span aria-hidden="true" className="sound-ping pointer-events-none absolute inset-x-0 inset-y-1.5 rounded-full" />
+    )}
+    <span
+      className={cn(
+        'relative grid size-11 place-items-center transition-colors duration-300 [&_svg]:size-5',
+        labelled ? 'text-brand-900' : 'text-player-fg/85 group-hover/snd:text-player-fg'
+      )}
+    >
+      {muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
+    </span>
+    <span
+      aria-hidden="true"
+      className={cn(
+        'relative -ml-1.5 grid ease-[var(--ease-out-expo)] transition-[grid-template-columns,opacity]',
+        labelled ? 'grid-cols-[1fr] opacity-100 duration-500' : 'grid-cols-[0fr] opacity-0 duration-300'
+      )}
+    >
+      <span className="min-w-0 overflow-hidden">
+        <span className="block whitespace-nowrap pr-3.5 text-xs font-semibold tracking-[0.02em] text-brand-900 sm:text-sm">
+          {onLabel}
+        </span>
+      </span>
+    </span>
+  </button>
+);

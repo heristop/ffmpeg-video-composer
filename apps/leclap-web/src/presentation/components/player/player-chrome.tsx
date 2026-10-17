@@ -129,6 +129,45 @@ function PlayerMoments({ clap, floating }: { clap: number; floating: boolean }) 
   );
 }
 
+function PlayerCoverOverlay({
+  media,
+  title,
+  meta,
+  posterCard,
+  fullscreen,
+  floating,
+}: {
+  media: MediaState;
+  title?: string;
+  meta?: CardMeta;
+  posterCard: boolean;
+  fullscreen: boolean;
+  floating: boolean;
+}) {
+  const ready = !media.failed && !media.waiting && !floating;
+  const poster = posterCard && ready && media.paused && !media.started;
+
+  return poster || fullscreen ? <PlayerCover media={media} title={title} meta={meta} fullscreen={fullscreen} /> : null;
+}
+
+function PlayerPauseOverlay({
+  waitingForVisitor,
+  media,
+  playLabel,
+  onToggle,
+}: {
+  waitingForVisitor: boolean;
+  media: MediaState;
+  playLabel: string;
+  onToggle: () => void;
+}) {
+  const ready = !media.failed && !media.waiting;
+
+  return waitingForVisitor && media.paused && ready ? (
+    <PlayerCenterButton label={playLabel} onToggle={onToggle} />
+  ) : null;
+}
+
 /**
  * Over the screen: the cover while the video waits on its poster (and, larger, in fullscreen), the centre call to
  * action while the visitor holds it paused, the clap when they start it, the loader while it stalls, and Clappy
@@ -167,13 +206,22 @@ export function PlayerOverlays({
   onRetry: () => void;
   statusLabels?: Partial<{ loading: string; error: string; retry: string }>;
 }) {
-  const ready = !media.failed && !media.waiting && !floating;
-  const poster = posterCard && ready && media.paused && !media.started;
-
   return (
     <>
-      {(poster || fullscreen) && <PlayerCover media={media} title={title} meta={meta} fullscreen={fullscreen} />}
-      {waitingForVisitor && media.paused && ready && <PlayerCenterButton label={playLabel} onToggle={onToggle} />}
+      <PlayerCoverOverlay
+        media={media}
+        title={title}
+        meta={meta}
+        posterCard={posterCard}
+        fullscreen={fullscreen}
+        floating={floating}
+      />
+      <PlayerPauseOverlay
+        waitingForVisitor={waitingForVisitor}
+        media={media}
+        playLabel={playLabel}
+        onToggle={onToggle}
+      />
       <PlayerMoments clap={clap} floating={floating} />
       <PlayerStatus media={media} labels={statusLabels} onRetry={onRetry} />
     </>

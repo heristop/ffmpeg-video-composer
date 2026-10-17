@@ -81,6 +81,81 @@ const pickerShellClass = '@container rounded-xl border border-foreground/10 bg-s
 // breakpoint gave three ~85px tiles, truncating every title under a play button that covered the art.
 const libraryGridClass = 'grid grid-cols-2 gap-2 @md:grid-cols-3';
 
+function initialTab(kind: MediaKind, multiple: boolean | undefined, value: MediaChoice | null | undefined): Tab {
+  if (multiple) return 'library';
+
+  if (value?.source === 'upload') return 'upload';
+
+  if (value?.source === 'url') return 'url';
+
+  return kind === 'video' ? 'upload' : 'library';
+}
+
+interface PickerContentProps extends MediaPickerProps {
+  tab: Tab;
+  setTab: (tab: Tab) => void;
+}
+
+function TabPickerContent({ kind, value, onChange, allowedIds, allowUpload, tab, setTab }: PickerContentProps) {
+  const choice = value ?? null;
+  const handleChange = onChange ?? noop;
+
+  return (
+    <>
+      <TabSwitch kind={kind} tab={tab} setTab={setTab} allowUpload={allowUpload ?? true} />
+      {tab === 'library' ? (
+        <SingleLibraryGrid kind={kind} value={choice} onChange={handleChange} allowedIds={allowedIds} />
+      ) : null}
+      {tab === 'upload' ? <UploadPane kind={kind} value={choice} onChange={handleChange} /> : null}
+      {tab === 'url' ? <UrlPane value={choice} onChange={handleChange} /> : null}
+    </>
+  );
+}
+
+function PickerContent({
+  kind,
+  value,
+  onChange,
+  multiple,
+  selectedIds,
+  onToggleId,
+  selectedId,
+  onSelectId,
+  allowedIds,
+  allowUpload = true,
+  tab,
+  setTab,
+}: PickerContentProps) {
+  if (multiple) {
+    return (
+      <MultiLibraryGrid
+        kind={kind}
+        selectedIds={selectedIds ?? []}
+        onToggleId={onToggleId ?? noop}
+        allowedIds={allowedIds}
+      />
+    );
+  }
+
+  if (onSelectId) {
+    return (
+      <SingleByIdGrid kind={kind} selectedId={selectedId ?? null} onSelectId={onSelectId} allowedIds={allowedIds} />
+    );
+  }
+
+  return (
+    <TabPickerContent
+      kind={kind}
+      value={value}
+      onChange={onChange}
+      allowedIds={allowedIds}
+      allowUpload={allowUpload}
+      tab={tab}
+      setTab={setTab}
+    />
+  );
+}
+
 // On-brand empty state for a library grid: a compact dashed brand panel with the kind's glyph, instead
 // of a bare line of grey text. Static (no motion), so it's reduced-motion safe by construction.
 const MediaEmpty = ({ kind, message }: { kind: MediaKind; message: string }) => {
@@ -110,52 +185,24 @@ export const MediaPicker = ({
 }: MediaPickerProps) => {
   // Open on the tab matching the current single-select choice (so re-opening a URL/upload choice
   // lands you back where you set it); the multi-select editor only has the library grid.
-  const pickInitialTab = (): Tab => {
-    if (multiple) return 'library';
-
-    if (value?.source === 'upload') return 'upload';
-
-    if (value?.source === 'url') return 'url';
-
-    // Video clips have no curated library (yet) — the picker opens on Upload instead.
-    if (kind === 'video') return 'upload';
-
-    return 'library';
-  };
-  const [tab, setTab] = useState<Tab>(pickInitialTab);
-
-  if (multiple) {
-    return (
-      <div className={pickerShellClass}>
-        <MultiLibraryGrid
-          kind={kind}
-          selectedIds={selectedIds ?? []}
-          onToggleId={onToggleId ?? noop}
-          allowedIds={allowedIds}
-        />
-      </div>
-    );
-  }
-
-  if (onSelectId) {
-    return (
-      <div className={pickerShellClass}>
-        <SingleByIdGrid kind={kind} selectedId={selectedId ?? null} onSelectId={onSelectId} allowedIds={allowedIds} />
-      </div>
-    );
-  }
-
-  const choice = value ?? null;
-  const handleChange = onChange ?? noop;
+  const [tab, setTab] = useState<Tab>(() => initialTab(kind, multiple, value));
 
   return (
     <div className={pickerShellClass}>
-      <TabSwitch kind={kind} tab={tab} setTab={setTab} allowUpload={allowUpload} />
-      {tab === 'library' ? (
-        <SingleLibraryGrid kind={kind} value={choice} onChange={handleChange} allowedIds={allowedIds} />
-      ) : null}
-      {tab === 'upload' ? <UploadPane kind={kind} value={choice} onChange={handleChange} /> : null}
-      {tab === 'url' ? <UrlPane value={choice} onChange={handleChange} /> : null}
+      <PickerContent
+        kind={kind}
+        value={value}
+        onChange={onChange}
+        multiple={multiple}
+        selectedIds={selectedIds}
+        onToggleId={onToggleId}
+        selectedId={selectedId}
+        onSelectId={onSelectId}
+        allowedIds={allowedIds}
+        allowUpload={allowUpload}
+        tab={tab}
+        setTab={setTab}
+      />
     </div>
   );
 };

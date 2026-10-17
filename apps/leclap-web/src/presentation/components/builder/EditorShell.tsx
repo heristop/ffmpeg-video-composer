@@ -372,10 +372,54 @@ const PanelHeader = ({ title, eyebrow }: { title: string | null; eyebrow: string
 
 // The three-pane edit surface: tool dock · contextual panel · program monitor, with the scene
 // timeline lane below.
+const clipForEditor = (p: EditorBodyProps) =>
+  p.tool === 'content' && p.section?.kind === 'clip' ? p.model.clipsBySection[p.section.name] : undefined;
+const editForEditor = (p: EditorBodyProps) => (p.section ? p.model.editsBySection[p.section.name] : undefined);
+const selectEditorScene = (
+  name: string,
+  setSceneName: (value: string) => void,
+  setTool: (value: Tool) => void,
+  setMobileView: (value: ShellView) => void
+) => {
+  setSceneName(name);
+  setTool('content');
+  setMobileView('panel');
+};
+const selectEditorTool = (next: Tool, setTool: (value: Tool) => void, setMobileView: (value: ShellView) => void) => {
+  setTool(next);
+  setMobileView('panel');
+};
+function editorShellViewState(
+  tool: Tool,
+  showMedia: boolean,
+  section: InputSection | null,
+  language: string,
+  t: ReturnType<typeof useTranslation<'builder'>>['t']
+) {
+  const rail: RailItem[] = [
+    { tool: 'content', icon: Film, label: t('editor.content') },
+    ...(showMedia ? [{ tool: 'media' as const, icon: Music, label: t('editor.media') }] : []),
+    { tool: 'format', icon: Proportions, label: t('editor.format') },
+  ];
+  const activeRail = rail.find((r) => r.tool === tool) ?? rail[0];
+  const viewTabs: [ViewTab, ViewTab] = [
+    { id: 'panel', icon: activeRail.icon, label: activeRail.label },
+    { id: 'monitor', icon: Monitor, label: t('editor.preview') },
+  ];
+  const onContent = tool === 'content';
+  const sceneTitle = section && (resolveTranslation(section.title, language) ?? t('hub.section'));
+
+  return {
+    rail,
+    viewTabs,
+    panelTitle: onContent ? sceneTitle : t(`editor.${tool}`),
+    panelEyebrow: onContent && section ? t(sectionKindMeta(section).labelKey) : null,
+  };
+}
+
 const EditorBody = (p: EditorBodyProps) => {
-  const clipFile =
-    p.tool === 'content' && p.section?.kind === 'clip' ? p.model.clipsBySection[p.section.name] : undefined;
-  const editForClip = p.section ? p.model.editsBySection[p.section.name] : undefined;
+  const clipFile = clipForEditor(p);
+  const editForClip = editForEditor(p);
   // Phones show one surface at a time (see MobileViewTabs); the other is unmounted from the flow, not
   // merely shrunk, so whichever one you are on gets the full height between the tabs and the lane.
   const onMonitor = p.mobileView === 'monitor';
@@ -479,38 +523,17 @@ export const EditorShell = (p: EditorShellProps) => {
   // Choosing a scene or a tool is an intent to edit it, so both pull the phone back to the panel;
   // otherwise the tap would silently change what the hidden surface is showing.
   const onSelectScene = (name: string) => {
-    setSceneName(name);
-    setTool('content');
-    setMobileView('panel');
+    selectEditorScene(name, setSceneName, setTool, setMobileView);
   };
-
   const onSelectTool = (next: Tool) => {
-    setTool(next);
-    setMobileView('panel');
+    selectEditorTool(next, setTool, setMobileView);
   };
 
-  const rail: RailItem[] = [
-    { tool: 'content', icon: Film, label: t('editor.content') },
-    ...(showMedia ? [{ tool: 'media' as const, icon: Music, label: t('editor.media') }] : []),
-    { tool: 'format', icon: Proportions, label: t('editor.format') },
-  ];
-  const activeRail = rail.find((r) => r.tool === tool) ?? rail[0];
+  const { rail, viewTabs, panelTitle, panelEyebrow } = editorShellViewState(tool, showMedia, section, i18n.language, t);
   // Editing sits left, the monitor right — the same order as the desktop columns, so the phone is a
   // narrowed version of the same room rather than a different arrangement. The editing tab is named
   // for the tool it will show (Content / Media / Format) rather than a generic "Edit", so the label
   // always says what is behind it.
-  const viewTabs: [ViewTab, ViewTab] = [
-    { id: 'panel', icon: activeRail.icon, label: activeRail.label },
-    { id: 'monitor', icon: Monitor, label: t('editor.preview') },
-  ];
-
-  // Per-item framing: when editing content, the panel header shows the section's kind (Record/Details)
-  // as an eyebrow above its title, instead of an umbrella word.
-  const onContent = tool === 'content';
-  const sceneTitle = section && (resolveTranslation(section.title, i18n.language) ?? t('hub.section'));
-  const panelTitle = onContent ? sceneTitle : t(`editor.${tool}`);
-  const panelEyebrow = onContent && section ? t(sectionKindMeta(section).labelKey) : null;
-
   // Sit BELOW the global LeClap header (fixed, ~4rem, z-50) rather than covering it — the site header
   // stays visible and on top. The shell fills the rest of the viewport with its own toolbar + panels.
   // The exception is a short viewport (a phone held sideways): there the site header's 4rem is the

@@ -200,6 +200,68 @@ function useOverlayResize(
   return { resizeStart, resizeTo };
 }
 
+function useCanvasActions({
+  overlays,
+  images,
+  animations,
+  frameRect,
+  onChange,
+  onChangeImages,
+  onChangeAnimations,
+  onSelectElement,
+}: Pick<
+  SectionCanvasProps,
+  'overlays' | 'images' | 'animations' | 'onChange' | 'onChangeImages' | 'onChangeAnimations' | 'onSelectElement'
+> & { frameRect: () => DOMRect | undefined }) {
+  const imageList = images ?? [];
+  const animationList = animations ?? [];
+  const moveTo = (index: number, clientX: number, clientY: number) => {
+    const rect = frameRect();
+
+    if (!rect) return;
+    onChange(
+      withOverlay(overlays, index, {
+        x: clampFraction(clientX - rect.left, rect.width),
+        y: clampFraction(clientY - rect.top, rect.height),
+      })
+    );
+  };
+  const nudge = (index: number, dx: number, dy: number) => {
+    const overlay = overlays[index];
+    onChange(withOverlay(overlays, index, { x: clamp01(overlay.x + dx), y: clamp01(overlay.y + dy) }));
+  };
+  const removeAt = (index: number) => {
+    onSelectElement(null);
+    onChange(overlays.filter((_, i) => i !== index));
+  };
+  const patchImage = (index: number, patch: MediaPatch) => {
+    onChangeImages?.(withMedia(imageList, index, patch));
+  };
+  const removeImage = (index: number) => {
+    onSelectElement(null);
+    onChangeImages?.(imageList.filter((_, i) => i !== index));
+  };
+  const patchAnimation = (index: number, patch: MediaPatch) => {
+    onChangeAnimations?.(withMedia(animationList, index, patch));
+  };
+  const removeAnimation = (index: number) => {
+    onSelectElement(null);
+    onChangeAnimations?.(animationList.filter((_, i) => i !== index));
+  };
+
+  return { moveTo, nudge, removeAt, patchImage, removeImage, patchAnimation, removeAnimation };
+}
+
+const activeCanvasIndices = (selection: SectionSelectionState) => ({
+  text: activeIndex(selection, 'text'),
+  layer: activeIndex(selection, 'layer'),
+  image: activeIndex(selection, 'image'),
+  animation: activeIndex(selection, 'animation'),
+});
+
+const hasCanvasBackground = (background: CanvasBackground | undefined, layers: SectionCanvasProps['layers']) =>
+  Boolean(background?.imageUrl ?? background?.videoUrl ?? layers?.items.length);
+
 export const SectionCanvas = ({
   overlays,
   orientation,
@@ -238,13 +300,8 @@ export const SectionCanvas = ({
   const frameRect = (): DOMRect | undefined => frameRef.current?.getBoundingClientRect();
   const drop = useCanvasDropTarget({ frameRect, onCanvasDrop });
 
-  const active = {
-    text: activeIndex(selection, 'text'),
-    layer: activeIndex(selection, 'layer'),
-    image: activeIndex(selection, 'image'),
-    animation: activeIndex(selection, 'animation'),
-  };
-  const hasBackground = Boolean(background?.imageUrl ?? background?.videoUrl ?? layers?.items.length);
+  const active = activeCanvasIndices(selection);
+  const hasBackground = hasCanvasBackground(background, layers);
   const imageList = images ?? [];
   const animationList = animations ?? [];
   // CSS approximation of the section's look + grade chained with the whole-video one, applied to
@@ -252,44 +309,17 @@ export const SectionCanvas = ({
   const gradeCss = combinedLookGradeFilter({ look, grade }, { look: globalLook, grade: globalGrade });
   const backdropFilter = gradeCss ? { filter: gradeCss } : undefined;
 
-  const moveTo = (index: number, clientX: number, clientY: number) => {
-    const rect = frameRect();
-
-    if (!rect) return;
-    const x = clampFraction(clientX - rect.left, rect.width);
-    const y = clampFraction(clientY - rect.top, rect.height);
-    onChange(withOverlay(overlays, index, { x, y }));
-  };
-
   const { resizeStart, resizeTo } = useOverlayResize(overlays, frameRect, onChange);
-
-  const nudge = (index: number, dx: number, dy: number) => {
-    const overlay = overlays[index];
-    onChange(withOverlay(overlays, index, { x: clamp01(overlay.x + dx), y: clamp01(overlay.y + dy) }));
-  };
-
-  const removeAt = (index: number) => {
-    onSelectElement(null);
-    onChange(overlays.filter((_, i) => i !== index));
-  };
-
-  const patchImage = (index: number, patch: MediaPatch) => {
-    onChangeImages?.(withMedia(imageList, index, patch));
-  };
-
-  const removeImage = (index: number) => {
-    onSelectElement(null);
-    onChangeImages?.(imageList.filter((_, i) => i !== index));
-  };
-
-  const patchAnimation = (index: number, patch: MediaPatch) => {
-    onChangeAnimations?.(withMedia(animationList, index, patch));
-  };
-
-  const removeAnimation = (index: number) => {
-    onSelectElement(null);
-    onChangeAnimations?.(animationList.filter((_, i) => i !== index));
-  };
+  const { moveTo, nudge, removeAt, patchImage, removeImage, patchAnimation, removeAnimation } = useCanvasActions({
+    overlays,
+    images,
+    animations,
+    frameRect,
+    onChange,
+    onChangeImages,
+    onChangeAnimations,
+    onSelectElement,
+  });
 
   return (
     <div

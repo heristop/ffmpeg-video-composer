@@ -53,6 +53,45 @@ function parseElementRowDrag(raw: string): { ref: ElementRef } | null {
   return null;
 }
 
+const countElementsByKind = (elements: ElementDescriptor[]) =>
+  elements.reduce<Partial<Record<ElementRef['kind'], number>>>((acc, { kind }) => {
+    acc[kind] = (acc[kind] ?? 0) + 1;
+
+    return acc;
+  }, {});
+
+const handleRowDrop = (
+  event: React.DragEvent<HTMLLIElement>,
+  ref: ElementRef,
+  onMove: RowProps['onMove'],
+  setDropTarget: (value: boolean) => void
+): void => {
+  setDropTarget(false);
+  const raw = event.dataTransfer.getData(CANVAS_DND_MIME);
+
+  if (!raw) return;
+  event.preventDefault();
+  event.stopPropagation();
+
+  const payload = parseElementRowDrag(raw);
+
+  if (!payload || payload.ref.kind !== ref.kind) return;
+  onMove(payload.ref, ref.index - payload.ref.index);
+};
+
+const handleRowDragOver = (
+  event: React.DragEvent<HTMLLIElement>,
+  acceptsDrag: boolean,
+  setDropTarget: (value: boolean) => void
+): void => {
+  if (!event.dataTransfer.types.includes(CANVAS_DND_MIME)) return;
+
+  if (!acceptsDrag) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  setDropTarget(true);
+};
+
 interface ElementListProps {
   elements: ElementDescriptor[];
   activeRef: ElementRef | null;
@@ -61,6 +100,48 @@ interface ElementListProps {
   onMove: (ref: ElementRef, delta: number) => void;
 }
 
+const ElementRows = ({
+  elements,
+  countByKind,
+  draggingKind,
+  activeRef,
+  onDragKind,
+  onSelect,
+  onDelete,
+  onMove,
+  hint,
+}: ElementListProps & {
+  countByKind: Partial<Record<ElementRef['kind'], number>>;
+  draggingKind: ElementRef['kind'] | null;
+  onDragKind: (kind: ElementRef['kind'] | null) => void;
+  hint: string;
+}) => (
+  <div className="space-y-2">
+    <ul className="space-y-1">
+      {elements.map((descriptor) => {
+        const reorderable = (countByKind[descriptor.kind] ?? 1) > 1;
+
+        return (
+          <Row
+            key={`${descriptor.kind}:${descriptor.ref.index}`}
+            descriptor={descriptor}
+            active={sameRef(descriptor.ref, activeRef)}
+            first={descriptor.ref.index === 0}
+            last={descriptor.ref.index === (countByKind[descriptor.kind] ?? 1) - 1}
+            reorderable={reorderable}
+            draggingKind={draggingKind}
+            onDragKind={onDragKind}
+            onSelect={onSelect}
+            onDelete={onDelete}
+            onMove={onMove}
+          />
+        );
+      })}
+    </ul>
+    <p className="px-1 text-xs leading-snug text-gray-500 dark:text-gray-400">{hint}</p>
+  </div>
+);
+
 export const ElementList = ({ elements, activeRef, onSelect, onDelete, onMove }: ElementListProps) => {
   const { t } = useTranslation('admin');
 
@@ -68,11 +149,7 @@ export const ElementList = ({ elements, activeRef, onSelect, onDelete, onMove }:
   // engine composites the kinds in a fixed order), so the move arrows must reflect each element's
   // position WITHIN its kind — not its index in the flattened list — or they read as enabled while
   // doing nothing (e.g. a lone text above a lone image).
-  const countByKind = elements.reduce<Partial<Record<ElementRef['kind'], number>>>((acc, { kind }) => {
-    acc[kind] = (acc[kind] ?? 0) + 1;
-
-    return acc;
-  }, {});
+  const countByKind = countElementsByKind(elements);
 
   // Which kind is currently being dragged (set on dragStart, cleared on dragEnd). Rows use it to
   // highlight only same-kind drop targets and show a "can't drop here" cursor on the rest — so the
@@ -90,33 +167,17 @@ export const ElementList = ({ elements, activeRef, onSelect, onDelete, onMove }:
   }
 
   return (
-    <div className="space-y-2">
-      <ul className="space-y-1">
-        {elements.map((descriptor) => {
-          // Reorder only exists between siblings of the same kind; a lone element of its kind shows no
-          // move arrows at all (dim, permanently-disabled arrows on every row read as "broken").
-          const reorderable = (countByKind[descriptor.kind] ?? 1) > 1;
-
-          return (
-            <Row
-              key={`${descriptor.kind}:${descriptor.ref.index}`}
-              descriptor={descriptor}
-              active={sameRef(descriptor.ref, activeRef)}
-              first={descriptor.ref.index === 0}
-              last={descriptor.ref.index === (countByKind[descriptor.kind] ?? 1) - 1}
-              reorderable={reorderable}
-              draggingKind={draggingKind}
-              onDragKind={setDraggingKind}
-              onSelect={onSelect}
-              onDelete={onDelete}
-              onMove={onMove}
-            />
-          );
-        })}
-      </ul>
-      {/* One line demystifying the model: layering is by type, arrows/drag reorder within a type. */}
-      <p className="px-1 text-xs leading-snug text-gray-500 dark:text-gray-400">{t('element.reorderHint')}</p>
-    </div>
+    <ElementRows
+      elements={elements}
+      countByKind={countByKind}
+      draggingKind={draggingKind}
+      activeRef={activeRef}
+      onDragKind={setDraggingKind}
+      onSelect={onSelect}
+      onDelete={onDelete}
+      onMove={onMove}
+      hint={t('element.reorderHint')}
+    />
   );
 };
 
@@ -133,6 +194,107 @@ interface RowProps {
   onMove: (ref: ElementRef, delta: number) => void;
 }
 
+const RowLabel = ({
+  descriptor,
+  active,
+  onSelect,
+  t,
+}: {
+  descriptor: ElementDescriptor;
+  active: boolean;
+  onSelect: (ref: ElementRef) => void;
+  t: TFunction<'admin'>;
+}) => {
+  const { ref, family } = descriptor;
+
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      title={descriptor.previewText}
+      aria-label={family ? rowAriaLabel(t, descriptor) : undefined}
+      onClick={() => {
+        onSelect(ref);
+      }}
+      className={cn(
+        'tap flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40',
+        active ? 'bg-brand-500/15 text-foreground' : 'text-gray-600 hover:bg-foreground/5 dark:text-gray-300'
+      )}
+    >
+      <RowIcon descriptor={descriptor} />
+      <span className="shrink-0">{t(descriptor.labelKey, descriptor.labelParams)}</span>
+      {descriptor.previewKey ? (
+        <span className="truncate text-gray-400 dark:text-gray-500">{t(descriptor.previewKey)}</span>
+      ) : null}
+      {descriptor.previewText ? (
+        <span className="truncate text-gray-400 dark:text-gray-500">{descriptor.previewText}</span>
+      ) : null}
+    </button>
+  );
+};
+
+const RowActions = ({
+  reorderable,
+  first,
+  last,
+  elementRef,
+  onMove,
+  onDelete,
+  t,
+  upIconRef,
+  downIconRef,
+  upHoverProps,
+  downHoverProps,
+}: {
+  reorderable: boolean;
+  first: boolean;
+  last: boolean;
+  elementRef: ElementRef;
+  onMove: RowProps['onMove'];
+  onDelete: RowProps['onDelete'];
+  t: TFunction<'admin'>;
+  upIconRef: ReturnType<typeof useIconHover>['ref'];
+  downIconRef: ReturnType<typeof useIconHover>['ref'];
+  upHoverProps: ReturnType<typeof useIconHover>['hoverProps'];
+  downHoverProps: ReturnType<typeof useIconHover>['hoverProps'];
+}) => (
+  <>
+    {reorderable ? (
+      <>
+        <IconButton
+          label={t('element.moveUp')}
+          disabled={first}
+          onClick={() => {
+            onMove(elementRef, -1);
+          }}
+          hoverProps={upHoverProps}
+        >
+          <ChevronUpIcon ref={upIconRef} size={14} />
+        </IconButton>
+        <IconButton
+          label={t('element.moveDown')}
+          disabled={last}
+          onClick={() => {
+            onMove(elementRef, 1);
+          }}
+          hoverProps={downHoverProps}
+        >
+          <ChevronDownIcon ref={downIconRef} size={14} />
+        </IconButton>
+      </>
+    ) : null}
+    <IconButton
+      label={t('element.delete')}
+      danger
+      onClick={() => {
+        onDelete(elementRef);
+      }}
+    >
+      <Trash2 className="h-3.5 w-3.5" />
+    </IconButton>
+  </>
+);
+
 const Row = ({
   descriptor,
   active,
@@ -146,7 +308,7 @@ const Row = ({
   onMove,
 }: RowProps) => {
   const { t } = useTranslation('admin');
-  const { ref, family } = descriptor;
+  const { ref } = descriptor;
   const { ref: chevronUpRef, hoverProps: chevronUpHoverProps } = useIconHover();
   const { ref: chevronDownRef, hoverProps: chevronDownHoverProps } = useIconHover();
   const [dropTarget, setDropTarget] = useState(false);
@@ -160,20 +322,6 @@ const Row = ({
   // A row dragged onto ANOTHER row reorders the list (same kind only). The same draggable also feeds the
   // canvas (effectAllowed copyMove), so dropping on the canvas still adds the element; dropping on a
   // same-kind row moves it.
-  const onRowDrop = (event: React.DragEvent<HTMLLIElement>): void => {
-    setDropTarget(false);
-    const raw = event.dataTransfer.getData(CANVAS_DND_MIME);
-
-    if (!raw) return;
-    event.preventDefault();
-    event.stopPropagation();
-
-    const payload = parseElementRowDrag(raw);
-
-    if (!payload || payload.ref.kind !== ref.kind) return;
-    onMove(payload.ref, ref.index - payload.ref.index);
-  };
-
   return (
     <li
       // cursor-grab on the row gaps hints that rows are draggable (buttons keep their own cursor); a
@@ -195,76 +343,29 @@ const Row = ({
         setDropTarget(false);
       }}
       onDragOver={(event) => {
-        if (!event.dataTransfer.types.includes(CANVAS_DND_MIME)) return;
-        // Only a same-kind row is a real drop target; leave incompatible rows to the browser's
-        // default "no-drop" so the reject is visible rather than a fake highlight.
-        if (!acceptsDrag) return;
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
-        setDropTarget(true);
+        handleRowDragOver(event, acceptsDrag, setDropTarget);
       }}
       onDragLeave={() => {
         setDropTarget(false);
       }}
-      onDrop={onRowDrop}
+      onDrop={(event) => {
+        handleRowDrop(event, ref, onMove, setDropTarget);
+      }}
     >
-      <button
-        type="button"
-        aria-pressed={active}
-        // The preview text truncates in the narrow panel; the title surfaces the full text on hover.
-        title={descriptor.previewText}
-        // An effect or a file states its kind first ("Effect: Sheen", "Animation file: confetti.apng").
-        aria-label={family ? rowAriaLabel(t, descriptor) : undefined}
-        onClick={() => {
-          onSelect(ref);
-        }}
-        className={cn(
-          'tap flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40',
-          active ? 'bg-brand-500/15 text-foreground' : 'text-gray-600 hover:bg-foreground/5 dark:text-gray-300'
-        )}
-      >
-        <RowIcon descriptor={descriptor} />
-        <span className="shrink-0">{t(descriptor.labelKey, descriptor.labelParams)}</span>
-        {descriptor.previewKey ? (
-          <span className="truncate text-gray-400 dark:text-gray-500">{t(descriptor.previewKey)}</span>
-        ) : null}
-        {descriptor.previewText && (
-          <span className="truncate text-gray-400 dark:text-gray-500">{descriptor.previewText}</span>
-        )}
-      </button>
-      {reorderable && (
-        <>
-          <IconButton
-            label={t('element.moveUp')}
-            disabled={first}
-            onClick={() => {
-              onMove(ref, -1);
-            }}
-            hoverProps={chevronUpHoverProps}
-          >
-            <ChevronUpIcon ref={chevronUpRef} size={14} />
-          </IconButton>
-          <IconButton
-            label={t('element.moveDown')}
-            disabled={last}
-            onClick={() => {
-              onMove(ref, 1);
-            }}
-            hoverProps={chevronDownHoverProps}
-          >
-            <ChevronDownIcon ref={chevronDownRef} size={14} />
-          </IconButton>
-        </>
-      )}
-      <IconButton
-        label={t('element.delete')}
-        danger
-        onClick={() => {
-          onDelete(ref);
-        }}
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </IconButton>
+      <RowLabel descriptor={descriptor} active={active} onSelect={onSelect} t={t} />
+      <RowActions
+        reorderable={reorderable}
+        first={first}
+        last={last}
+        elementRef={ref}
+        onMove={onMove}
+        onDelete={onDelete}
+        t={t}
+        upIconRef={chevronUpRef}
+        downIconRef={chevronDownRef}
+        upHoverProps={chevronUpHoverProps}
+        downHoverProps={chevronDownHoverProps}
+      />
     </li>
   );
 };

@@ -68,6 +68,85 @@ const SLIDERS: SliderSpec[] = [
   { key: 'grain', min: 0, max: 1, step: 0.02, format: (v) => `${Math.round(v * 100)}%` },
 ];
 
+const GradeIndicators = ({
+  active,
+  open,
+  count,
+  t,
+}: {
+  active: boolean;
+  open: boolean;
+  count: number;
+  t: TFunction<'admin'>;
+}) => (
+  <>
+    {active && open ? (
+      <span className="h-1.5 w-1.5 rounded-full bg-brand-500" role="img" aria-label={t('grade.customised')} />
+    ) : null}
+    {active && !open ? (
+      <span className="ml-auto shrink-0 truncate rounded-md bg-foreground/[0.06] px-2 py-0.5 text-[0.7rem] font-medium normal-case tracking-normal text-gray-500 dark:text-gray-400">
+        {t('grade.adjustedCount', { count })}
+      </span>
+    ) : null}
+  </>
+);
+
+const GradeBody = ({
+  grade,
+  t,
+  setField,
+  setBalance,
+  setCurves,
+}: {
+  grade: Grade | undefined;
+  t: TFunction<'admin'>;
+  setField: (key: GradeKey, value: number) => void;
+  setBalance: (range: ColorBalanceRange, channel: ColorChannel, value: number) => void;
+  setCurves: (preset: string) => void;
+}) => (
+  <div className="grid gap-4 px-3 pb-3 sm:grid-cols-[1fr_8rem]">
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        {SLIDERS.map((spec) => (
+          <RangeSlider
+            key={spec.key}
+            label={t(`grade.${spec.key}`)}
+            value={grade?.[spec.key] ?? GRADE_DEFAULTS[spec.key]}
+            min={spec.min}
+            max={spec.max}
+            step={spec.step}
+            format={spec.format}
+            resetTo={GRADE_DEFAULTS[spec.key]}
+            onChange={(v) => {
+              setField(spec.key, v);
+            }}
+          />
+        ))}
+      </div>
+      <ColorBalanceBlock grade={grade} t={t} onSet={setBalance} />
+      <div>
+        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-400">
+          {t('grade.curvesPreset')}
+        </span>
+        <Select value={grade?.curvesPreset ?? CURVES_NONE} onValueChange={setCurves}>
+          <SelectTrigger aria-label={t('grade.curvesPreset')} className="w-full">
+            <SelectValue placeholder={t('grade.curvesNone')} />
+          </SelectTrigger>
+          <EditorSelectContent>
+            <SelectItem value={CURVES_NONE}>{t('grade.curvesNone')}</SelectItem>
+            {CURVES_PRESETS.map((preset) => (
+              <SelectItem key={preset} value={preset}>
+                {t(`grade.curves.${preset}`)}
+              </SelectItem>
+            ))}
+          </EditorSelectContent>
+        </Select>
+      </div>
+    </div>
+    <PreviewSurface filter={gradeFilter(grade)} className="h-24 w-full sm:sticky sm:top-2 sm:self-start" />
+  </div>
+);
+
 export const GradePanel = ({ grade, onChange }: GradePanelProps) => {
   const { t } = useTranslation('admin');
   const [open, setOpen] = useState(false);
@@ -111,64 +190,16 @@ export const GradePanel = ({ grade, onChange }: GradePanelProps) => {
         }}
       >
         <SlidersHorizontalIcon ref={slidersRef} size={14} /> {t('grade.fineTune')}
-        {active && open && (
-          <span className="h-1.5 w-1.5 rounded-full bg-brand-500" role="img" aria-label={t('grade.customised')} />
-        )}
-        {/* Collapsed at-a-glance state, mirroring the SectionDisclosure summary chip. */}
-        {active && !open && (
-          <span className="ml-auto shrink-0 truncate rounded-md bg-foreground/[0.06] px-2 py-0.5 text-[0.7rem] font-medium normal-case tracking-normal text-gray-500 dark:text-gray-400">
-            {t('grade.adjustedCount', { count: adjustedCount })}
-          </span>
-        )}
+        <GradeIndicators active={active} open={open} count={adjustedCount} t={t} />
         <ChevronDownIcon
           ref={chevronRef}
           size={16}
           className={cn('transition-transform', open && 'rotate-180', (open || !active) && 'ml-auto')}
         />
       </button>
-      {open && (
-        <div className="grid gap-4 px-3 pb-3 sm:grid-cols-[1fr_8rem]">
-          <div className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {SLIDERS.map((spec) => (
-                <RangeSlider
-                  key={spec.key}
-                  label={t(`grade.${spec.key}`)}
-                  value={grade?.[spec.key] ?? GRADE_DEFAULTS[spec.key]}
-                  min={spec.min}
-                  max={spec.max}
-                  step={spec.step}
-                  format={spec.format}
-                  resetTo={GRADE_DEFAULTS[spec.key]}
-                  onChange={(v) => {
-                    setField(spec.key, v);
-                  }}
-                />
-              ))}
-            </div>
-            <ColorBalanceBlock grade={grade} t={t} onSet={setBalance} />
-            <div>
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-400">
-                {t('grade.curvesPreset')}
-              </span>
-              <Select value={grade?.curvesPreset ?? CURVES_NONE} onValueChange={setCurves}>
-                <SelectTrigger aria-label={t('grade.curvesPreset')} className="w-full">
-                  <SelectValue placeholder={t('grade.curvesNone')} />
-                </SelectTrigger>
-                <EditorSelectContent>
-                  <SelectItem value={CURVES_NONE}>{t('grade.curvesNone')}</SelectItem>
-                  {CURVES_PRESETS.map((preset) => (
-                    <SelectItem key={preset} value={preset}>
-                      {t(`grade.curves.${preset}`)}
-                    </SelectItem>
-                  ))}
-                </EditorSelectContent>
-              </Select>
-            </div>
-          </div>
-          <PreviewSurface filter={gradeFilter(grade)} className="h-24 w-full sm:sticky sm:top-2 sm:self-start" />
-        </div>
-      )}
+      {open ? (
+        <GradeBody grade={grade} t={t} setField={setField} setBalance={setBalance} setCurves={setCurves} />
+      ) : null}
     </div>
   );
 };

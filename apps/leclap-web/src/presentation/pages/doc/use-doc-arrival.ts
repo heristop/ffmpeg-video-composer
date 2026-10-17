@@ -19,6 +19,34 @@ import { useNavigationType } from 'react-router-dom';
 // this, a keyboard or screen-reader user stays parked at the bottom of a page that has already
 // scrolled away beneath them. The first page of a visit keeps the browser's own focus start, so the
 // skip link still comes first.
+function arriveDoc(root: HTMLElement, previous: string | null, pathname: string, navigationType: string): void {
+  const firstPage = previous === null;
+  const pageChanged = !firstPage && previous !== pathname;
+  const forward = pageChanged && navigationType !== 'POP';
+  const { hash } = window.location;
+
+  if (hash.length > 1) {
+    if (!firstPage && !forward) return;
+
+    const target = document.getElementById(hash.slice(1));
+    const jump = () => {
+      target?.scrollIntoView({ block: 'start', behavior: 'instant' });
+    };
+
+    document.fonts.ready.then(jump, jump);
+
+    return;
+  }
+
+  if (!pageChanged) return;
+
+  if (forward) window.scrollTo({ top: 0, behavior: 'instant' });
+
+  const title = root.querySelector('h1');
+  title?.setAttribute('tabindex', '-1');
+  title?.focus({ preventScroll: true });
+}
+
 export function useDocArrival(contentRef: RefObject<HTMLElement | null>, pathname: string): void {
   // The page the last run saw. Comparing paths, not a "has run" flag, is what keeps a re-run on the
   // same page — StrictMode's double mount, a navigation-type change — from reading as an arrival.
@@ -28,40 +56,9 @@ export function useDocArrival(contentRef: RefObject<HTMLElement | null>, pathnam
   useLayoutEffect(() => {
     const root = contentRef.current;
     const previous = lastPath.current;
-    const firstPage = previous === null;
-    const pageChanged = !firstPage && previous !== pathname;
-    const forward = pageChanged && navigationType !== 'POP';
-    // Read live rather than from the router: an in-page anchor click keeps the path, and the browser
-    // has already scrolled it natively.
-    const { hash } = window.location;
 
     lastPath.current = pathname;
 
-    if (!root) return;
-
-    if (hash.length > 1) {
-      if (!firstPage && !forward) return;
-
-      const target = document.getElementById(hash.slice(1));
-      const jump = () => {
-        target?.scrollIntoView({ block: 'start', behavior: 'instant' });
-      };
-
-      // `ready` never rejects; taking both paths just guarantees the jump happens either way.
-      document.fonts.ready.then(jump, jump);
-
-      return;
-    }
-
-    if (!pageChanged) return;
-
-    if (forward) window.scrollTo({ top: 0, behavior: 'instant' });
-
-    // KineticHeading owns the h1 and takes no tabIndex prop; -1 makes it a focus target without
-    // adding a tab stop (DocPageHeader also drops the ring a script-focused heading would draw).
-    const title = root.querySelector('h1');
-
-    title?.setAttribute('tabindex', '-1');
-    title?.focus({ preventScroll: true });
+    if (root) arriveDoc(root, previous, pathname, navigationType);
   }, [contentRef, pathname, navigationType]);
 }

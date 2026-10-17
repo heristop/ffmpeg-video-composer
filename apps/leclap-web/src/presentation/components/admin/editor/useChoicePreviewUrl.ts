@@ -3,14 +3,16 @@ import { findBackground } from '@/data/mediaCatalog';
 import { browserMediaService } from '@/services/browserMediaService';
 import type { MediaChoice } from '../templateEditorModel';
 
+function directPreviewUrl(choice: MediaChoice | undefined): string {
+  if (choice?.source === 'library') return findBackground(choice.id)?.url ?? '';
+
+  return choice?.source === 'url' ? choice.url : '';
+}
+
 // Resolve a MediaChoice to a previewable URL for the placement canvas: library → curated url, pasted
 // url → as-is, upload → a transient object URL read back from IndexedDB (revoked when the choice changes).
 export function useChoicePreviewUrl(choice: MediaChoice | undefined): string {
-  let directUrl = '';
-
-  if (choice?.source === 'library') directUrl = findBackground(choice.id)?.url ?? '';
-
-  if (choice?.source === 'url') directUrl = choice.url;
+  const directUrl = directPreviewUrl(choice);
   const uploadKey = choice?.source === 'upload' ? choice.key : undefined;
   const [upload, setUpload] = useState<{ key: string; url: string } | null>(null);
 

@@ -89,97 +89,89 @@ export const ElementInspector = ({
 
   if (!activeRef) return <Hint label={t('element.selectHint')} />;
 
-  if (activeRef.kind === 'html') {
-    return (
-      <HtmlSettings
-        section={section}
-        activeRef={activeRef}
-        env={htmlEnv ?? EMPTY_HTML_ENV}
-        t={t}
-        onPatchSection={onPatchSection}
-        onSelectElement={onSelectElement}
-      />
-    );
-  }
+  switch (activeRef.kind) {
+    case 'html':
+      return (
+        <HtmlSettings
+          section={section}
+          activeRef={activeRef}
+          env={htmlEnv ?? EMPTY_HTML_ENV}
+          t={t}
+          onPatchSection={onPatchSection}
+          onSelectElement={onSelectElement}
+        />
+      );
+    case 'effect':
+      return (
+        <EffectSettings
+          section={section}
+          activeRef={activeRef}
+          theme={theme}
+          t={t}
+          onPatchSection={onPatchSection}
+          onSelectElement={onSelectElement}
+        />
+      );
+    case 'text':
+      return (
+        <TextSettings
+          section={section}
+          activeRef={activeRef}
+          variables={variables}
+          t={t}
+          onPatchSection={onPatchSection}
+          onSelectElement={onSelectElement}
+        />
+      );
+    case 'layer':
+      return (
+        <LayerSettings
+          section={section}
+          activeRef={activeRef}
+          t={t}
+          onPatchSection={onPatchSection}
+          onSelectElement={onSelectElement}
+        />
+      );
+    case 'image':
+      return (
+        <ImageSettings
+          section={section}
+          activeRef={activeRef}
+          orientation={orientation}
+          t={t}
+          onPatchSection={onPatchSection}
+        />
+      );
+    default:
+      if (isSugarKind(activeRef.kind)) {
+        return (
+          <SugarSettings
+            kind={activeRef.kind}
+            section={section}
+            variables={variables}
+            orientation={orientation}
+            t={t}
+            onPatchSection={onPatchSection}
+            onSelectElement={onSelectElement}
+          />
+        );
+      }
 
-  if (activeRef.kind === 'effect') {
-    return (
-      <EffectSettings
-        section={section}
-        activeRef={activeRef}
-        theme={theme}
-        t={t}
-        onPatchSection={onPatchSection}
-        onSelectElement={onSelectElement}
-      />
-    );
+      return (
+        <AnimationSettings
+          key={activeRef.index}
+          initialMode={slotMode?.index === activeRef.index ? slotMode.mode : undefined}
+          section={section}
+          activeRef={activeRef}
+          orientation={orientation}
+          salt={salt}
+          t={t}
+          onPatchSection={onPatchSection}
+          onSelectElement={onSelectElement}
+        />
+      );
   }
-
-  if (activeRef.kind === 'text') {
-    return (
-      <TextSettings
-        section={section}
-        activeRef={activeRef}
-        variables={variables}
-        t={t}
-        onPatchSection={onPatchSection}
-        onSelectElement={onSelectElement}
-      />
-    );
-  }
-
-  if (activeRef.kind === 'layer') {
-    return (
-      <LayerSettings
-        section={section}
-        activeRef={activeRef}
-        t={t}
-        onPatchSection={onPatchSection}
-        onSelectElement={onSelectElement}
-      />
-    );
-  }
-
-  if (activeRef.kind === 'image') {
-    return (
-      <ImageSettings
-        section={section}
-        activeRef={activeRef}
-        orientation={orientation}
-        t={t}
-        onPatchSection={onPatchSection}
-      />
-    );
-  }
-
-  if (isSugarKind(activeRef.kind)) {
-    return (
-      <SugarSettings
-        kind={activeRef.kind}
-        section={section}
-        variables={variables}
-        orientation={orientation}
-        t={t}
-        onPatchSection={onPatchSection}
-        onSelectElement={onSelectElement}
-      />
-    );
-  }
-
-  return (
-    <AnimationSettings
-      // Keyed by index so each animation keeps its own picker state (side, tab) instead of inheriting it.
-      key={activeRef.index}
-      initialMode={slotMode?.index === activeRef.index ? slotMode.mode : undefined}
-      section={section}
-      activeRef={activeRef}
-      orientation={orientation}
-      salt={salt}
-      t={t}
-      onPatchSection={onPatchSection}
-      onSelectElement={onSelectElement}
-    />
-  );
 };
 
 interface SugarSettingsProps {

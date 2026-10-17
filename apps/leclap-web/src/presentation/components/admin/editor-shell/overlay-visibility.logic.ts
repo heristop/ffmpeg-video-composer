@@ -34,6 +34,38 @@ interface NormalizedExit {
   distance: number;
 }
 
+function optionalField<K extends string, V>(key: K, value: V | undefined): Record<K, V> | Record<string, never> {
+  if (value === undefined) return {};
+
+  return { [key]: value } as Record<K, V>;
+}
+
+function revealTiming(reveal: Reveal): Pick<NormalizedReveal, 'delay' | 'duration' | 'distance' | 'easing'> {
+  if (typeof reveal !== 'string') {
+    return {
+      delay: reveal.delay ?? REVEAL_DEFAULTS.delay,
+      duration: phaseDuration(reveal.duration, reveal.easing, REVEAL_DEFAULTS.duration),
+      distance: reveal.distance ?? REVEAL_DEFAULTS.distance,
+      ...optionalField('easing', reveal.easing),
+    };
+  }
+
+  return REVEAL_DEFAULTS;
+}
+
+function exitTiming(exit: Exit): Pick<NormalizedExit, 'after' | 'duration' | 'distance' | 'easing'> {
+  if (typeof exit !== 'string') {
+    return {
+      ...optionalField('after', exit.after),
+      duration: phaseDuration(exit.duration, exit.easing, EXIT_DEFAULTS.duration),
+      ...optionalField('easing', exit.easing),
+      distance: exit.distance ?? EXIT_DEFAULTS.distance,
+    };
+  }
+
+  return EXIT_DEFAULTS;
+}
+
 // A Reveal is either a bare style name or an object with timing overrides — normalize to one shape.
 function normalizeReveal(reveal: Reveal | undefined): NormalizedReveal | null {
   if (!reveal) return null;
@@ -42,16 +74,7 @@ function normalizeReveal(reveal: Reveal | undefined): NormalizedReveal | null {
 
   if (obj.type === 'none') return null;
 
-  return {
-    type: obj.type,
-    delay: typeof reveal === 'string' ? REVEAL_DEFAULTS.delay : (reveal.delay ?? REVEAL_DEFAULTS.delay),
-    duration:
-      typeof reveal === 'string'
-        ? REVEAL_DEFAULTS.duration
-        : phaseDuration(reveal.duration, reveal.easing, REVEAL_DEFAULTS.duration),
-    distance: typeof reveal === 'string' ? REVEAL_DEFAULTS.distance : (reveal.distance ?? REVEAL_DEFAULTS.distance),
-    ...(typeof reveal === 'object' && reveal.easing !== undefined ? { easing: reveal.easing } : {}),
-  };
+  return { type: obj.type, ...revealTiming(reveal) };
 }
 
 function normalizeExit(exit: Exit | undefined): NormalizedExit | null {
@@ -61,16 +84,7 @@ function normalizeExit(exit: Exit | undefined): NormalizedExit | null {
 
   if (obj.type === 'none') return null;
 
-  return {
-    type: obj.type,
-    ...(typeof exit === 'object' && exit.after !== undefined ? { after: exit.after } : {}),
-    duration:
-      typeof exit === 'string'
-        ? EXIT_DEFAULTS.duration
-        : phaseDuration(exit.duration, exit.easing, EXIT_DEFAULTS.duration),
-    ...(typeof exit === 'object' && exit.easing !== undefined ? { easing: exit.easing } : {}),
-    distance: typeof exit === 'string' ? EXIT_DEFAULTS.distance : (exit.distance ?? EXIT_DEFAULTS.distance),
-  };
+  return { type: obj.type, ...exitTiming(exit) };
 }
 
 // The app's signature ease-out-expo curve, sampled numerically (same feel as gradient-meter).
