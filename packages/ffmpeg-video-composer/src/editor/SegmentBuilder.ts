@@ -611,18 +611,26 @@ class SegmentBuilder {
     this.segment.mapsList.push(outPad);
   };
 
+  private readonly sugarTiming = (): { scale: string; isVideo: boolean; duration: number; fps: number } => {
+    const scale = this.project.config.videoConfig?.scale ?? DefaultConfig.SCALE;
+    const isVideo = this.section.type === 'project_video' || this.section.type === 'video';
+    const probedDuration = isVideo ? this.project.buildInfos.durations[this.section.name] : undefined;
+
+    return {
+      scale,
+      isVideo,
+      duration: probedDuration ?? this.section.options?.duration ?? 0,
+      fps: this.project.config.videoConfig?.fps ?? DefaultConfig.FPS,
+    };
+  };
+
   // The context each sugar compiler needs to lower time/space-dependent effects (Ken Burns calibrates
   // over the clip length + scale). Real footage drives zoompan one output frame per input frame and
   // calibrates over the clip's TRUE length: project_video clips are usually shorter than their declared
   // options.duration; their probed length is filled into buildInfos.durations by
   // TemplateDirector.calculateTotalLength before segments build, so read it here.
   private readonly sugarContext = (): SugarContext => {
-    const scale = this.project.config.videoConfig?.scale ?? DefaultConfig.SCALE;
-    const isVideo = this.section.type === 'project_video' || this.section.type === 'video';
-    const probedDuration = isVideo ? this.project.buildInfos.durations[this.section.name] : undefined;
-    const duration = probedDuration ?? this.section.options?.duration ?? 0;
-
-    const fps = this.project.config.videoConfig?.fps ?? DefaultConfig.FPS;
+    const { scale, isVideo, duration, fps } = this.sugarTiming();
     const motion = motionSugarContext(this.template.descriptor, this.section.name);
 
     const platform = this.template.descriptor.global?.platform;

@@ -24,6 +24,32 @@ function baseCoordinate(value: unknown): string | number {
   return '0';
 }
 
+function rangeEnableValue(
+  range: string,
+  sectionDuration: number,
+  defaultEnd: number
+): { start: number; end: number } | null {
+  const durations = range.split(':');
+
+  if (durations.length < 2) return null;
+
+  function read(pattern: RegExp, duration: string): number | undefined {
+    const matches = pattern.exec(duration);
+
+    if (!matches) return undefined;
+
+    const parsed = parseFloat(matches[1].replace('{{ section_duration }}', sectionDuration.toString()));
+
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+
+  const start = read(/start=(.*)/, durations[0]);
+
+  if (start === undefined) return { start: 0, end: defaultEnd };
+
+  return { start, end: read(/end=(.*)/, durations[1]) ?? defaultEnd };
+}
+
 @injectable()
 class FilterManager {
   constructor(
@@ -130,45 +156,20 @@ class FilterManager {
       return filter;
     }
 
-    const durations = filter.range.split(':');
-
-    if (durations.length < 2) {
-      return filter;
-    }
-
     // `{{ section_duration }}` is substituted BEFORE parsing: parseFloat on the raw token yields
     // NaN, which used to slip past the undefined checks and emit between(t,…,NaN) — an enable
     // expression that is never true, silently disabling the filter for the whole section.
     const sectionDuration = this.segment.currentSection?.options?.duration ?? 0;
 
-    function extractTimeValue(pattern: RegExp, duration: string): number | undefined {
-      const matches = pattern.exec(duration);
+    const range = rangeEnableValue(
+      filter.range,
+      sectionDuration,
+      this.template.descriptor.global?.transition?.duration ?? 0
+    );
 
-      if (!matches) {
-        return undefined;
-      }
+    if (!range) return filter;
 
-      const parsed = parseFloat(matches[1].replace('{{ section_duration }}', sectionDuration.toString()));
-
-      return Number.isFinite(parsed) ? parsed : undefined;
-    }
-
-    let end = this.template.descriptor.global?.transition?.duration ?? 0;
-    let start = 0;
-
-    const startTime = extractTimeValue(/start=(.*)/, durations[0]);
-
-    if (undefined !== startTime) {
-      start = startTime;
-
-      const endTime = extractTimeValue(/end=(.*)/, durations[1]);
-
-      if (undefined !== endTime) {
-        end = endTime;
-      }
-    }
-
-    filter.value = `${filter.value}:enable='between(t,${start},${end})'`;
+    filter.value = `${filter.value}:enable='between(t,${range.start},${range.end})'`;
 
     return filter;
   };

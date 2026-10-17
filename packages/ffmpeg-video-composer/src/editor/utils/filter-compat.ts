@@ -31,6 +31,16 @@ export type EngineCapabilities = {
 
 export type { EngineFeatures } from '@/core/capabilities';
 
+function gplAvailable(device: boolean, features: EngineFeatures | null): boolean {
+  return !device && (features?.gpl ?? true);
+}
+
+function textShapingAvailable(device: boolean, features: EngineFeatures | null): boolean {
+  if (features) return features.fribidi;
+
+  return device && DEVICE_LIBRARIES.has('fribidi');
+}
+
 // lut3d/colorkey are standard default-enabled filters present on every backend (host GPL, on-device
 // LGPL, the 6.x WASM core), so they're advertised as available everywhere; the web e2e confirms the
 // WASM core and these flags can be flipped if a filter ever turns out absent (the FILTER_COMPAT rules
@@ -41,10 +51,10 @@ export function engineCapabilities(config: ProjectConfig, features: EngineFeatur
   const device = usesLgplEngine(config);
 
   return {
-    gpl: !device && (features?.gpl ?? true),
+    gpl: gplAvailable(device, features),
     lut3d: features?.missingFilters?.has('lut3d') !== true,
     colorkey: true,
-    textShaping: features ? features.fribidi : device && DEVICE_LIBRARIES.has('fribidi'),
+    textShaping: textShapingAvailable(device, features),
     deviceFilters: device ? DEVICE_FILTERS : null,
     missingFilters: features?.missingFilters ?? null,
   };

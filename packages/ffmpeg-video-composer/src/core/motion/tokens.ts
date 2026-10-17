@@ -143,12 +143,26 @@ function resolveAnimate(animate: unknown, tokens: ResolvedTokens): unknown {
   return tracks;
 }
 
+function resolveSpecialNode(
+  value: unknown,
+  tokens: ResolvedTokens,
+  key: string
+): { handled: boolean; value?: unknown } {
+  if (key === 'animate') return { handled: true, value: resolveAnimate(value, tokens) };
+
+  if (TRAVEL_KEYS.has(key) && !Array.isArray(value)) return { handled: true, value: scaleTravel(value, tokens) };
+
+  if (key === 'easing' || key === 'ease') {
+    return typeof value === 'string' ? { handled: true, value: resolveEasingRef(value, tokens) } : { handled: false };
+  }
+
+  return { handled: false };
+}
+
 function resolveNode(value: unknown, tokens: ResolvedTokens, key: string): unknown {
-  if (key === 'animate') return resolveAnimate(value, tokens);
+  const special = resolveSpecialNode(value, tokens, key);
 
-  if (TRAVEL_KEYS.has(key) && !Array.isArray(value)) return scaleTravel(value, tokens);
-
-  if ((key === 'easing' || key === 'ease') && typeof value === 'string') return resolveEasingRef(value, tokens);
+  if (special.handled) return special.value;
 
   if (Array.isArray(value)) return value.map((item) => resolveNode(item, tokens, ''));
 

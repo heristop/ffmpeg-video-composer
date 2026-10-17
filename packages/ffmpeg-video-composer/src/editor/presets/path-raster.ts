@@ -162,6 +162,37 @@ function colorOf(spec: TraceSpec): [number, number, number] {
   return [0, 2, 4].map((at) => parseInt(hex.slice(at, at + 2), 16)) as [number, number, number];
 }
 
+interface PixelContext {
+  data: Uint8Array;
+  channels: number;
+  rgb: [number, number, number];
+  fieldValue: ReturnType<typeof field>;
+  spec: TraceSpec;
+  lo: number;
+  hi: number;
+}
+
+function paintPixel(index: number, context: PixelContext): void {
+  const { data, channels, rgb, fieldValue, spec, lo, hi } = context;
+
+  if (channels === 4) data.set(rgb, index * 4);
+
+  if (!fieldValue || fieldValue.total <= 0) return;
+
+  const caps = spec.caps === 'butt' ? clamp01(0.5 - fieldValue.beyond[index]) : 1;
+  const coverage =
+    clamp01(spec.thickness / 2 - fieldValue.dist[index] + 0.5) * caps * dashAt(fieldValue.s[index], spec.dash);
+  const code = codeOf(fieldValue.s[index] / fieldValue.total);
+
+  if (channels === 1) {
+    data[index] = coverage > 0 ? code : 0;
+
+    return;
+  }
+
+  data[index * 4 + 3] = Math.round(255 * coverage * bandAt(code, lo, hi));
+}
+
 /** The image a spec describes: RGBA cover or grayscale code mask. */
 export function traceImage(spec: TraceSpec): PngImage {
   const { w, h } = spec;
@@ -170,22 +201,10 @@ export function traceImage(spec: TraceSpec): PngImage {
   const data = new Uint8Array(w * h * channels);
   const rgb = colorOf(spec);
   const [lo, hi] = [spec.lo ?? 0, spec.hi ?? 1];
+  const pixel = { data, channels, rgb, fieldValue: f, spec, lo, hi };
 
   for (let k = 0; k < w * h; k++) {
-    if (channels === 4) data.set(rgb, k * 4);
-
-    if (!f || f.total <= 0) continue;
-
-    const caps = spec.caps === 'butt' ? clamp01(0.5 - f.beyond[k]) : 1;
-    const coverage = clamp01(spec.thickness / 2 - f.dist[k] + 0.5) * caps * dashAt(f.s[k], spec.dash);
-    const code = codeOf(f.s[k] / f.total);
-
-    if (channels === 1) {
-      data[k] = coverage > 0 ? code : 0;
-      continue;
-    }
-
-    data[k * 4 + 3] = Math.round(255 * coverage * bandAt(code, lo, hi));
+    paintPixel(k, pixel);
   }
 
   return { width: w, height: h, channels, data };

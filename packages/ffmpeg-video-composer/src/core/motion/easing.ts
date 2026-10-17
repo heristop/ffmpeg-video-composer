@@ -62,13 +62,9 @@ function parseSpring(args: string): Curve {
 export function validSpring(params: SpringParams): SpringParams {
   const { stiffness, damping, mass = 1, velocity = 0 } = params;
 
-  if (stiffness < 1 || stiffness > 2000) throw new EasingError(`spring stiffness ${stiffness} outside 1..2000`);
+  const rangeError = springRangeError(stiffness, damping, mass, velocity);
 
-  if (damping < 1 || damping > 200) throw new EasingError(`spring damping ${damping} outside 1..200`);
-
-  if (mass < 0.1 || mass > 20) throw new EasingError(`spring mass ${mass} outside 0.1..20`);
-
-  if (Math.abs(velocity) > 50) throw new EasingError(`spring velocity ${velocity} outside -50..50`);
+  if (rangeError) throw new EasingError(rangeError);
 
   // Below ζ = 0.1 a spring rings for dozens of cycles: a vibrating string, not motion, and an
   // unbounded expression. ζ = 0.1 still overshoots by ~73%.
@@ -79,6 +75,24 @@ export function validSpring(params: SpringParams): SpringParams {
   }
 
   return { stiffness, damping, mass, velocity };
+}
+
+function springRangeError(stiffness: number, damping: number, mass: number, velocity: number): string | undefined {
+  if (stiffness < 1) return `spring stiffness ${stiffness} outside 1..2000`;
+
+  if (stiffness > 2000) return `spring stiffness ${stiffness} outside 1..2000`;
+
+  if (damping < 1) return `spring damping ${damping} outside 1..200`;
+
+  if (damping > 200) return `spring damping ${damping} outside 1..200`;
+
+  if (mass < 0.1) return `spring mass ${mass} outside 0.1..20`;
+
+  if (mass > 20) return `spring mass ${mass} outside 0.1..20`;
+
+  if (Math.abs(velocity) > 50) return `spring velocity ${velocity} outside -50..50`;
+
+  return undefined;
 }
 
 function parseBezier(args: string): Curve {

@@ -149,20 +149,18 @@ function partialSourcePath(raw: TemplateDescriptor, entry: LoosePartialRef, inde
 // expansion maps each authored section to 0..n expanded ones *in order*, so expanding one authored
 // section at a time (against the same descriptor, so its `partials` registry still resolves) yields
 // the counts, and a partial's k-th expanded section is its source's k-th section.
+function authoredSectionPaths(raw: TemplateDescriptor, section: unknown, index: number): string[] {
+  const one = expandPartialsSafe({ ...raw, sections: [section] });
+  const produced = one.ok ? ((one.data as TemplateDescriptor).sections?.length ?? 0) : 1;
+  const entry = (section ?? {}) as LoosePartialRef;
+  const source = entry.type === 'partial' && one.ok ? partialSourcePath(raw, entry, index) : null;
+
+  return Array.from({ length: produced }, (_, k) => (source === null ? `sections[${index}]` : `${source}[${k}]`));
+}
+
 function authoredPaths(raw: TemplateDescriptor, expandedCount: number): string[] {
   const authored: unknown[] = Array.isArray(raw.sections) ? raw.sections : [];
-  const paths: string[] = [];
-
-  for (const [index, section] of authored.entries()) {
-    const one = expandPartialsSafe({ ...raw, sections: [section] });
-    const produced = one.ok ? ((one.data as TemplateDescriptor).sections?.length ?? 0) : 1;
-    const entry = (section ?? {}) as LoosePartialRef;
-    const source = entry.type === 'partial' && one.ok ? partialSourcePath(raw, entry, index) : null;
-
-    for (let k = 0; k < produced; k++) {
-      paths.push(source === null ? `sections[${index}]` : `${source}[${k}]`);
-    }
-  }
+  const paths = authored.flatMap((section, index) => authoredSectionPaths(raw, section, index));
 
   // A disagreement means the per-section walk and the whole-descriptor one diverged, which would
   // silently mis-address every finding. Identity is wrong in the same way the old code was, but it

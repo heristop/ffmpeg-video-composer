@@ -86,12 +86,19 @@ function separators(locale: string): { group: string; mark: string } {
   return COMMA_DECIMAL.has(base) ? SEPARATORS.de : SEPARATORS.en;
 }
 
+function counterLocale(counter: CounterSpec, activeLocale: string): string {
+  const authored = counter.locale?.trim().toLowerCase();
+  const fallback = activeLocale.trim().toLowerCase();
+
+  return authored ?? (fallback.length > 0 ? fallback : 'en');
+}
+
 function numberFormat(counter: CounterSpec, activeLocale: string): NumberFormat {
   const scale = 10 ** (counter.decimals ?? 0);
   const to = counter.to ?? counter.from;
   const peak = Math.max(counter.from, to) * (1 + (counter.overshoot ?? 0));
   const grouping = counter.grouping ?? String(Math.floor(peak)).length >= 5;
-  const { group, mark } = separators(counter.locale ?? (activeLocale.trim().toLowerCase() || 'en'));
+  const { group, mark } = separators(counterLocale(counter, activeLocale));
 
   return {
     from: Math.round(counter.from * scale),

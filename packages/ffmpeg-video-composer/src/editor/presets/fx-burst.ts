@@ -389,19 +389,13 @@ function rayStreams(fx: Ctx, plan: BurstPlan, rays: Ray[]) {
   };
 }
 
-function lower(fx: Ctx): FxLayer[] | null {
-  if (!fx.has('scale')) return null;
-
-  const plan = planOf(fx);
-
-  if (!plan) return null;
-
+function renderBurst(fx: Ctx, plan: BurstPlan): FxLayer[] | null {
   const rays = fx.reduced ? plan.rays.filter((ray) => ray.start < fx.at + fx.duration) : plan.rays;
   const dots = fx.reduced ? [] : plan.dots;
   const streams = rayStreams(fx, plan, rays);
   const dotStream = dots.length > 0 ? spriteStream(fx, 'dot', dotSpec(plan), dots.length, alphaScale(fx.peak)) : null;
 
-  if (!streams || (dots.length > 0 && !dotStream)) return null;
+  if (streams === null || (dots.length > 0 && dotStream === null)) return null;
 
   const rayLayers = rays.map((ray, i): FxLayer => {
     const label = `${fx.prefix}ry${i}`;
@@ -410,11 +404,21 @@ function lower(fx: Ctx): FxLayer[] | null {
 
     return { chains: [{ inputs: [streams.inputs[i]], filters, outputs: [label] }], label, ...at };
   });
-  const dotLayers = dots.map((dot, i) => dotLayer(fx, plan, dot, dotStream?.labels[i] ?? '', `${fx.prefix}dt${i}`));
-  const layers = [...dotLayers, ...rayLayers];
+  const layers = [
+    ...dots.map((dot, i) => dotLayer(fx, plan, dot, dotStream?.labels[i] ?? '', `${fx.prefix}dt${i}`)),
+    ...rayLayers,
+  ];
   const prep = [...streams.prep, ...(dotStream?.chains ?? [])];
 
   return [{ ...layers[0], chains: [...prep, ...layers[0].chains] }, ...layers.slice(1)];
+}
+
+function lower(fx: Ctx): FxLayer[] | null {
+  if (!fx.has('scale')) return null;
+
+  const plan = planOf(fx);
+
+  return plan ? renderBurst(fx, plan) : null;
 }
 
 export const BURST: FxEffect<'burst'> = { lower };

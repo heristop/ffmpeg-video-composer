@@ -7,6 +7,8 @@ import { automationFilter } from '@/core/audio/automation';
 import { seconds } from '@/core/timing/seconds';
 import { sfxOverBed, type SfxGraph } from './sfx-mix';
 
+type DuckingConfig = Extract<NonNullable<NonNullable<TemplateDescriptorGlobal['audio']>['ducking']>, object>;
+
 /** The loudnorm target: the delivery platform's when `global.platform` names one, else the default. */
 export function loudnessTarget(global: TemplateDescriptorGlobal | undefined): LoudnessTarget {
   const platform = resolvePlatform(global?.platform);
@@ -37,6 +39,14 @@ export function normalizeSuffix(global: TemplateDescriptorGlobal | undefined, ce
   return normalize === 'dynaudnorm' ? ',dynaudnorm=f=150:g=15' : '';
 }
 
+function duckingConfigOf(global: TemplateDescriptorGlobal | undefined): DuckingConfig | null {
+  const ducking = global?.audio?.ducking;
+
+  if (ducking === true) return {};
+
+  return typeof ducking === 'object' ? ducking : null;
+}
+
 /** Ducking mix: sidechain-compresses music under voice when ducking is enabled, then amix into `out`. */
 export function duckingMix(
   global: TemplateDescriptorGlobal | undefined,
@@ -44,14 +54,12 @@ export function duckingMix(
   suffix: string,
   out = 'final'
 ): string {
-  const duckingConfig = global?.audio?.ducking;
-  const isDucking = duckingConfig === true || typeof duckingConfig === 'object';
+  const cfg = duckingConfigOf(global);
 
-  if (!isDucking) {
+  if (!cfg) {
     return `[${labels.voice}][${labels.music}]amix=inputs=2:duration=first${suffix}[${out}]`;
   }
 
-  const cfg = typeof duckingConfig === 'object' ? duckingConfig : {};
   const sc = `sidechaincompress=threshold=${cfg.threshold ?? 0.05}:ratio=${cfg.ratio ?? 8}:attack=${cfg.attack ?? 20}:release=${cfg.release ?? 400}`;
 
   return (

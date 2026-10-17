@@ -107,6 +107,21 @@ function asDrawn(text: string, options: TextCaseOptions | undefined): string {
   return options?.lowerCase ? upper.toLowerCase() : upper;
 }
 
+function measureLine(
+  line: string,
+  fontSize: number,
+  metrics: FontMetrics | null
+): { width: number; approxReason?: ApproxReason } {
+  const templated = isTemplated(line);
+  const literal = templated ? line.replace(PLACEHOLDER, '') : line;
+  const exact = metrics ? measureTextWidth(metrics, literal, fontSize) : null;
+  let approxReason: ApproxReason | undefined;
+
+  if (templated || exact === null) approxReason = exact === null ? 'font' : 'variable';
+
+  return { width: exact ?? codePointCount(literal) * ASSUMED_ADVANCE_EM * fontSize, approxReason };
+}
+
 // The widest line of the widest locale wins, measured rather than counted: 24 "W"s render three times
 // wider than 26 "l"s, so picking the locale with the most UTF-16 code units drops real overflows and
 // invents fake ones. Every locale is a candidate because any of them may be the one that ships.
@@ -133,17 +148,9 @@ export function measure(
     lines = Math.max(lines, drawn.length);
 
     for (const line of drawn) {
-      const templated = isTemplated(line);
-      const literal = templated ? line.replace(PLACEHOLDER, '') : line;
-      const exact = metrics ? measureTextWidth(metrics, literal, fontSize) : null;
-
-      if (templated || exact === null) {
-        approxReason ??= exact === null ? 'font' : 'variable';
-      }
-
-      // The estimate is built only when the measurement genuinely failed. Computed unconditionally it
-      // was a second full code-point walk of every line, discarded on the whole happy path.
-      width = Math.max(width, exact ?? codePointCount(literal) * ASSUMED_ADVANCE_EM * fontSize);
+      const result = measureLine(line, fontSize, metrics);
+      width = Math.max(width, result.width);
+      approxReason ??= result.approxReason;
     }
   }
 

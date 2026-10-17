@@ -136,6 +136,16 @@ export function restPosition(options: PositionInput, transform: PositionTransfor
   return restOf(options.position, transform.box).join(':');
 }
 
+function layerBase(options: PositionInput, transform: PositionTransform, motion: OverlayMotion): [string, string] {
+  const [rx, ry] = restOf(options.position, transform.box);
+  const animate = options.animate ?? {};
+
+  return [
+    animate.x ? trackExpr(animate.x, rx) : (motion.x ?? rx),
+    animate.y ? trackExpr(animate.y, ry) : (motion.y ?? ry),
+  ];
+}
+
 /**
  * The overlay x / y expressions, given the entrance motion lowered from the resting position. A track
  * overrides the entrance on its axis.
@@ -145,12 +155,7 @@ export function placeLayer(
   transform: PositionTransform,
   motion: OverlayMotion
 ): { x: string; y: string } {
-  const [rx, ry] = restOf(options.position, transform.box);
-  const animate = options.animate ?? {};
-  const base: [string, string] = [
-    animate.x ? trackExpr(animate.x, rx) : (motion.x ?? rx),
-    animate.y ? trackExpr(animate.y, ry) : (motion.y ?? ry),
-  ];
+  const base = layerBase(options, transform, motion);
   const { box } = transform;
 
   if (box === null || (transform.turn === null && transform.scale === null)) return { x: base[0], y: base[1] };

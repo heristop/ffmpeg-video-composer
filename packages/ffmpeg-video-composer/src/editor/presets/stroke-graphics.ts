@@ -102,18 +102,23 @@ function backgroundLumas(o: Outline): (number | null)[] {
   });
 }
 
-export function inkOf(o: Outline): Ink {
-  const g = o.request.graphic;
-  const authored = g.color ? (o.request.ctx.masks?.color(g.color) ?? g.color) : null;
-  const { hex, alpha } = splitColor(authored ?? `${INK}@${g.type === 'frame' ? 0.9 : 1}`);
-  const contrast = g.contrast ?? 'auto';
-  const shadow = { offset: Math.max(2, even(o.thickness / 2)), alpha: SHADOW_ALPHA };
+function authoredInk(o: Outline, authored: string | null, hex: string, alpha: number, shadow: StrokeShadow): Ink {
+  const contrast = o.request.graphic.contrast ?? 'auto';
 
   if (contrast !== 'auto') return { color: hex, alpha, shadow: contrast === 'shadow' ? shadow : null };
 
   const ink = pickInk(authored && parseHex(hex) ? hex : null, INK, backgroundLumas(o));
 
   return { color: ink.color, alpha, shadow: ink.shadow ? shadow : null };
+}
+
+export function inkOf(o: Outline): Ink {
+  const g = o.request.graphic;
+  const authored = g.color ? (o.request.ctx.masks?.color(g.color) ?? g.color) : null;
+  const { hex, alpha } = splitColor(authored ?? `${INK}@${g.type === 'frame' ? 0.9 : 1}`);
+  const shadow = { offset: Math.max(2, even(o.thickness / 2)), alpha: SHADOW_ALPHA };
+
+  return authoredInk(o, authored, hex, alpha, shadow);
 }
 
 function drawOutline(o: Outline, ink: Ink, radius: number): Filter[] | null {

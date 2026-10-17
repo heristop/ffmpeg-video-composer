@@ -147,15 +147,22 @@ function assetKind(
 ): SampleAsset['kind'] | undefined {
   if (path.includes('.effect.assets.')) return 'effect-asset';
 
-  if (key === 'font' && findFont(value)) return undefined;
-
-  if (key === 'fontfile' || key === 'font') return 'font';
-
-  if (key === 'videoUrl') return 'video';
-
-  if (['pictureUrl', 'backgroundUrl', 'logoUrl'].includes(key)) return 'image';
-
-  if (key === 'url') return urlKind(value, path, parent);
+  switch (key) {
+    case 'font':
+      return findFont(value) ? undefined : 'font';
+    case 'fontfile':
+      return 'font';
+    case 'videoUrl':
+      return 'video';
+    case 'pictureUrl':
+    case 'backgroundUrl':
+    case 'logoUrl':
+      return 'image';
+    case 'url':
+      return urlKind(value, path, parent);
+    default:
+      break;
+  }
 
   if (
     path.startsWith('global.variables.') &&

@@ -201,6 +201,10 @@ function orbitSprites(fx: Ctx, size: number): { head: SpriteSpec; glow: SpriteSp
   return { head, glow: { kind: 'disc', w: even(sigma * 6), h: even(sigma * 6), sigma, color } };
 }
 
+function hasTrail(slots: Slot[], headCount: number, trail: ReturnType<typeof spriteStream>): boolean {
+  return slots.length <= headCount || trail !== null;
+}
+
 /** The orbit path: `count` lights around the target edge, each with up to three trail ghosts. */
 export function orbitLayers(fx: Ctx): FxLayer[] | null {
   const { head, glow } = orbitSprites(fx, fx.graphic.size ?? 34);
@@ -213,7 +217,7 @@ export function orbitLayers(fx: Ctx): FxLayer[] | null {
   const heads = spriteStream(fx, 'head', head, headCount, alphaScale(fx.peak));
   const trail = spriteStream(fx, 'ghost', glow, slots.length - headCount, alphaScale(fx.peak));
 
-  if (!heads || (slots.length > headCount && !trail)) return null;
+  if (!heads || !hasTrail(slots, headCount, trail)) return null;
 
   const pools = [[...heads.labels], [...(trail?.labels ?? [])]];
   const layers = slots.map((slot) => light(fx, orbit, pools[slot.m === 0 ? 0 : 1].shift() as string, slot));

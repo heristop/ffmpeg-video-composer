@@ -71,6 +71,23 @@ function sourceSections(
   return (Object.keys(variables).length > 0 ? applyVariables(sections, variables) : sections) as Section[];
 }
 
+function partialSource(
+  section: Section & PartialRefSection,
+  registry: Registry,
+  stack: string[],
+  path: string
+): { source: Section[] | null; ref: string; stack: string[] } {
+  const ref = (section.ref ?? '').trim();
+
+  if (ref && stack.includes(ref)) {
+    throw new PartialError(path, 'cyclic_partial', `Cyclic template partial: "${ref}"`);
+  }
+
+  const source = sourceSections(section, ref ? registry[ref] : undefined, path);
+
+  return { source, ref, stack: ref ? [...stack, ref] : stack };
+}
+
 function withPrefix(sections: Section[], prefix: string): Section[] {
   return sections.map((s) => (prefix && typeof s.name === 'string' ? { ...s, name: `${prefix}${s.name}` } : s));
 }
@@ -78,14 +95,7 @@ function withPrefix(sections: Section[], prefix: string): Section[] {
 // Expand one ref: its nested refs first (so the timing sees real sections), then its timing, then the
 // name prefix. `path` is the authored top-level ref; `depth` > 0 inside another partial.
 function expandRef(section: Section & PartialRefSection, registry: Registry, stack: string[], path: string): Expanded {
-  const ref = (section.ref ?? '').trim();
-
-  if (ref && stack.includes(ref)) {
-    throw new PartialError(path, 'cyclic_partial', `Cyclic template partial: "${ref}"`);
-  }
-
-  const partial = ref ? registry[ref] : undefined;
-  const source = sourceSections(section, partial, path);
+  const { source, ref, stack: nextStack } = partialSource(section, registry, stack, path);
 
   if (!source) return { sections: [], aligns: [], warnings: [] };
 
@@ -93,7 +103,8 @@ function expandRef(section: Section & PartialRefSection, registry: Registry, sta
     throw new PartialError(`${path}.align`, 'align_nested', 'align is only supported on top-level partial refs');
   }
 
-  const inner = expandSections(source, registry, ref ? [...stack, ref] : stack, path);
+  const inner = expandSections(source, registry, nextStack, path);
+  const partial = ref ? registry[ref] : undefined;
   const timed = timePartial(inner.sections, partial, section as unknown as Bag, path);
   const align = timed.align && { path, first: 0, ...timed.align };
 

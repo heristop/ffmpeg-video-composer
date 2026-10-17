@@ -158,10 +158,16 @@ interface Boundary {
   path: string;
 }
 
-function boundary(section: LooseSection, index: number, global: LooseDescriptor['global']): Boundary | null {
+function boundaryDetails(section: LooseSection, global: LooseDescriptor['global']): Transition | null {
   const declared = section.transition ?? global?.transition;
 
-  if (!declared || declared.type === 'cut') return null;
+  return !declared || declared.type === 'cut' ? null : declared;
+}
+
+function boundary(section: LooseSection, index: number, global: LooseDescriptor['global']): Boundary | null {
+  const declared = boundaryDetails(section, global);
+
+  if (!declared) return null;
 
   const duration = declared.duration ?? global?.transition?.duration ?? DEFAULT_TRANSITION_DURATION;
   const ease = isDesignedTransition(declared.type) ? easeKey(declared.ease ?? DEFAULT_TRANSITION_EASE) : 'linear';

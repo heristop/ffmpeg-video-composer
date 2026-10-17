@@ -45,6 +45,58 @@ function fieldWarnings(template: unknown): MotionWarning[] {
   return fieldAdvisories(template).map((w) => ({ ...w, severity: 'warn' as const }));
 }
 
+function checkVariableString(
+  value: string,
+  path: string,
+  variablePattern: RegExp,
+  definedVariables: Set<string>,
+  errors: ValidationError[]
+): void {
+  let match;
+
+  while ((match = variablePattern.exec(value)) !== null) {
+    const variable = match[1];
+
+    if (!definedVariables.has(variable)) {
+      errors.push(
+        referenceFinding(path, `Undefined variable reference: ${variable}`, 'undefined_variable', {
+          name: variable,
+          known: [...definedVariables],
+          fix: `define "${variable}" in global.variables`,
+        })
+      );
+    }
+  }
+}
+
+function collectVariableReferences(
+  value: unknown,
+  path: string,
+  variablePattern: RegExp,
+  definedVariables: Set<string>,
+  errors: ValidationError[]
+): void {
+  if (typeof value === 'string') {
+    checkVariableString(value, path, variablePattern, definedVariables, errors);
+
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    for (const [index, item] of value.entries()) {
+      collectVariableReferences(item, `${path}[${index}]`, variablePattern, definedVariables, errors);
+    }
+
+    return;
+  }
+
+  if (!value || typeof value !== 'object') return;
+
+  for (const [key, child] of Object.entries(value)) {
+    collectVariableReferences(child, path ? `${path}.${key}` : key, variablePattern, definedVariables, errors);
+  }
+}
+
 // The full validator: everything BaseTemplateValidator checks, plus the advisory passes. Advisories
 // never enter `errors` nor flip `success` — a template that renders badly still renders.
 export class TemplateValidator extends BaseTemplateValidator {
@@ -59,44 +111,7 @@ export class TemplateValidator extends BaseTemplateValidator {
 
     const variablePattern = /\{\{\s*(\w+)\s*\}\}/g;
 
-    function checkVariableReferences(obj: unknown, path = ''): void {
-      if (typeof obj === 'string') {
-        let match;
-
-        while ((match = variablePattern.exec(obj)) !== null) {
-          const variable = match[1];
-
-          if (!definedVariables.has(variable)) {
-            errors.push(
-              referenceFinding(path, `Undefined variable reference: ${variable}`, 'undefined_variable', {
-                name: variable,
-                known: [...definedVariables],
-                fix: `define "${variable}" in global.variables`,
-              })
-            );
-          }
-        }
-
-        return;
-      }
-
-      if (Array.isArray(obj)) {
-        for (let index = 0; index < obj.length; index++) {
-          checkVariableReferences(obj[index], `${path}[${index}]`);
-        }
-
-        return;
-      }
-
-      if (obj && typeof obj === 'object') {
-        for (const [key, value] of Object.entries(obj)) {
-          const newPath = path ? `${path}.${key}` : key;
-          checkVariableReferences(value, newPath);
-        }
-      }
-    }
-
-    checkVariableReferences(template, 'template');
+    collectVariableReferences(template, 'template', variablePattern, definedVariables, errors);
 
     return errors;
   }

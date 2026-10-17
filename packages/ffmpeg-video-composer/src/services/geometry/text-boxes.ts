@@ -120,6 +120,60 @@ interface Placement {
   variables: TextVariables | undefined;
 }
 
+interface BoxPositionInput {
+  layer: DrawLayer;
+  drawIndex: number;
+  placement: Placement;
+  fontSize: number;
+  measured: NonNullable<ReturnType<typeof measure>>;
+  position: NonNullable<ReturnType<typeof track>>;
+  vars: { text_w: number; text_h: number };
+  padding: number;
+}
+
+function boxFromPosition({
+  layer,
+  drawIndex,
+  placement,
+  fontSize,
+  measured,
+  position,
+  vars,
+  padding,
+}: BoxPositionInput): Box {
+  const { entry } = placement;
+  const values = layer.values;
+
+  return {
+    path: layer.path,
+    label: layer.label,
+    x: position.x - padding,
+    y: position.y - padding,
+    width: vars.text_w + padding * 2,
+    height: vars.text_h + padding * 2,
+    fontSize,
+    startSec: entry.startSec + position.from,
+    endSec: entry.startSec + position.to,
+    settledSec: entry.startSec + position.at,
+    timingAssumed: entry.timingAssumed,
+    approx: measured.approx,
+    approxReason: measured.approxReason,
+    color: typeof values.fontcolor === 'string' ? values.fontcolor : null,
+    backdrop: null,
+    legibilityAid: hasLegibilityAid(values),
+    verticalPositionAuthored: layer.authoredPosition,
+    anchoredSide: anchoredSide(values, vars, vars.text_w, position.at),
+    sectionIndex: entry.sectionIndex,
+    drawIndex,
+  };
+}
+
+function boxPadding(values: Record<string, unknown>, frame: { w: number; h: number }): number {
+  if (!boxPaints(values)) return 0;
+
+  return evaluateExpr(values.boxborderw ?? 0, frame) ?? 0;
+}
+
 function textBox(layer: DrawLayer, drawIndex: number, placement: Placement): Box | null {
   const { entry, canvas, resolve, variables } = placement;
   const values = layer.values;
@@ -151,30 +205,9 @@ function textBox(layer: DrawLayer, drawIndex: number, placement: Placement): Box
   }
 
   // drawtext anchors the GLYPH box; its background box then grows outward by `boxborderw`.
-  const padding = boxPaints(values) ? (evaluateExpr(values.boxborderw ?? 0, frame) ?? 0) : 0;
+  const padding = boxPadding(values, frame);
 
-  return {
-    path: layer.path,
-    label: layer.label,
-    x: position.x - padding,
-    y: position.y - padding,
-    width: vars.text_w + padding * 2,
-    height: vars.text_h + padding * 2,
-    fontSize,
-    startSec: entry.startSec + position.from,
-    endSec: entry.startSec + position.to,
-    settledSec: entry.startSec + position.at,
-    timingAssumed: entry.timingAssumed,
-    approx: measured.approx,
-    approxReason: measured.approxReason,
-    color: typeof values.fontcolor === 'string' ? values.fontcolor : null,
-    backdrop: null,
-    legibilityAid: hasLegibilityAid(values),
-    verticalPositionAuthored: layer.authoredPosition,
-    anchoredSide: anchoredSide(values, vars, vars.text_w, position.at),
-    sectionIndex: entry.sectionIndex,
-    drawIndex,
-  };
+  return boxFromPosition({ layer, drawIndex, placement, fontSize, measured, position, vars, padding });
 }
 
 export function measureLayers(

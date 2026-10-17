@@ -46,6 +46,13 @@ interface Split {
   pop: boolean;
 }
 
+function splitRoom(ux: number, uy: number, last: number, w: number, h: number): number {
+  const horizontal = Math.abs(ux) > 1e-6 ? (w / 2 - last) / Math.abs(ux) : Infinity;
+  const vertical = Math.abs(uy) > 1e-6 ? (h / 2 - last) / Math.abs(uy) : Infinity;
+
+  return Math.min(horizontal, vertical);
+}
+
 // The split's geometry; seeded draws in a fixed order: droplet count, side, angle jitter, distance jitters.
 function splitOf(g: Graphic, w: number, h: number, random: () => number): Split {
   const count = g.droplets ?? 2 + (random() < 0.5 ? 1 : 0);
@@ -56,10 +63,7 @@ function splitOf(g: Graphic, w: number, h: number, random: () => number): Split 
   const sizes = DROPLET_SIZES.slice(0, count).map((share) => share * main);
   const last = sizes.at(-1) as number;
   // The farthest droplet (with its overshoot and drift) stays inside the target.
-  const room = Math.min(
-    Math.abs(ux) > 1e-6 ? (w / 2 - last) / Math.abs(ux) : Infinity,
-    Math.abs(uy) > 1e-6 ? (h / 2 - last) / Math.abs(uy) : Infinity
-  );
+  const room = splitRoom(ux, uy, last, w, h);
   const travel = Math.min((g.spread ?? 0.3) * w, room / 1.12);
   // Evenly spaced along the travel, but never closer than the goo reach to the blob before (they would stay
   // fused), unless the target has no room for that.

@@ -64,6 +64,45 @@ function isClip(input: StyleInput): boolean {
   return (input.kind ?? (input.frames.length > 1 ? 'clip' : 'image')) === 'clip' && input.frames.length > 1;
 }
 
+interface StyleGuideInput {
+  input: StyleInput;
+  clip: boolean;
+  palette: readonly PaletteCluster[];
+  result: RoleResult;
+  texture: ReturnType<typeof estimateTexture>;
+  motion: ClipMotion | null;
+  genre: ReturnType<typeof suggestGenre> | null;
+  advice: AdviceInput;
+}
+
+function styleGuideOf({
+  input,
+  clip,
+  palette,
+  result,
+  texture,
+  motion,
+  genre,
+  advice,
+}: StyleGuideInput): StyleAnalysis['styleGuide'] {
+  return {
+    source: {
+      kind: clip ? 'clip' : 'image',
+      frames: input.frames.length,
+      ...(input.duration ? { duration: input.duration } : {}),
+    },
+    palette: paletteEntries(palette, result),
+    roles: result.roles,
+    contrast: contrastChecks(result.roles),
+    pacing: motion?.pacing ?? null,
+    motion: motion ? { energy: motion.energy } : null,
+    texture,
+    genre,
+    rules: { keep: keepRules(advice), avoid: avoidRules(advice) },
+    suggestions: suggestions(advice),
+  };
+}
+
 /** Analyses a reference image or clip into a `global.theme` object and a style guide. */
 export function analyzeStyle(input: StyleInput): StyleAnalysis {
   if (input.frames.length === 0) throw new Error('analyzeStyle needs at least one frame');
@@ -84,22 +123,7 @@ export function analyzeStyle(input: StyleInput): StyleAnalysis {
 
   return {
     theme,
-    styleGuide: {
-      source: {
-        kind: clip ? 'clip' : 'image',
-        frames: input.frames.length,
-        ...(input.duration ? { duration: input.duration } : {}),
-      },
-      palette: paletteEntries(palette, result),
-      roles: result.roles,
-      contrast: contrastChecks(result.roles),
-      pacing: motion?.pacing ?? null,
-      motion: motion ? { energy: motion.energy } : null,
-      texture,
-      genre,
-      rules: { keep: keepRules(advice), avoid: avoidRules(advice) },
-      suggestions: suggestions(advice),
-    },
+    styleGuide: styleGuideOf({ input, clip, palette, result, texture, motion, genre, advice }),
     confidence: confidenceOf(palette, result.roles, input.frames.length, clip),
   };
 }

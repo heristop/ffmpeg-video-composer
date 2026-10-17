@@ -181,38 +181,28 @@ export function gradeToFilters(grade?: Grade): Filter[] {
 
   // A user LUT (camera Log → Rec.709, a colourist's cube) converts the footage first, so the eq/balance/
   // curves adjustments below work on display-referred pixels.
-  const filters: Filter[] = grade.lut ? [{ type: 'lut3d', value: urlLutValue(grade.lut.url, grade.lut.strength) }] : [];
-  const eqParts = buildEqParts(grade);
-
-  if (eqParts.length > 0) {
-    filters.push({ type: 'eq', value: eqParts.join(':') });
-  }
-
-  if (grade.hue !== undefined) {
-    filters.push({ type: 'hue', value: `h=${grade.hue}` });
-  }
-
-  const cbParts = buildCbParts(grade);
-
-  if (cbParts.length > 0) {
-    filters.push({ type: 'colorbalance', value: cbParts.join(':') });
-  }
-
-  if (grade.blur !== undefined && grade.blur > 0) {
-    filters.push({ type: 'gblur', value: `sigma=${grade.blur}` });
-  }
-
-  const grainStrength = grade.grain === undefined ? 0 : Math.round(grade.grain * 20);
-
-  if (grainStrength > 0) {
-    filters.push({ type: 'noise', value: `alls=${grainStrength}:allf=t+u` });
-  }
-
-  if (grade.curvesPreset) {
-    filters.push({ type: 'curves', value: `preset=${grade.curvesPreset}` });
-  }
+  const filters: Filter[] = [];
+  addMapped(filters, grade.lut, (lut) => ({ type: 'lut3d', value: urlLutValue(lut.url, lut.strength) }));
+  addParts(filters, buildEqParts(grade), 'eq');
+  addMapped(filters, grade.hue, (hue) => ({ type: 'hue', value: `h=${hue}` }));
+  addParts(filters, buildCbParts(grade), 'colorbalance');
+  addPositive(filters, grade.blur, (blur) => ({ type: 'gblur', value: `sigma=${blur}` }));
+  addPositive(filters, grade.grain, (grain) => ({ type: 'noise', value: `alls=${Math.round(grain * 20)}:allf=t+u` }));
+  addMapped(filters, grade.curvesPreset, (preset) => ({ type: 'curves', value: `preset=${preset}` }));
 
   return filters;
+}
+
+function addMapped<T>(filters: Filter[], value: T | undefined, create: (value: T) => Filter): void {
+  if (value !== undefined) filters.push(create(value));
+}
+
+function addParts(filters: Filter[], parts: string[], type: string): void {
+  if (parts.length > 0) filters.push({ type, value: parts.join(':') });
+}
+
+function addPositive(filters: Filter[], value: number | undefined, create: (value: number) => Filter): void {
+  if (value !== undefined && value > 0) filters.push(create(value));
 }
 
 // ---------------------------------------------------------------------------

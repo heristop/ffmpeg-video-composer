@@ -202,6 +202,20 @@ export function traceOf(subpaths: Pt[][]): Traced {
   return { subpaths, cum, total };
 }
 
+function pointOnSubpath(points: Pt[], cum: number[], target: number): Pt | undefined {
+  for (let j = 1; j < points.length; j++) {
+    if (target > cum[j] && j < points.length - 1) continue;
+
+    const span = cum[j] - cum[j - 1];
+    const u = span > 0 ? Math.min(1, Math.max(0, (target - cum[j - 1]) / span)) : 1;
+    const [a, b] = [points[j - 1], points[j]];
+
+    return u === 1 ? b : { x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u };
+  }
+
+  return undefined;
+}
+
 /** The point at `fraction` (0..1, clamped) of the path's length. */
 export function pointAt(traced: Traced, fraction: number): Pt {
   const target = Math.min(1, Math.max(0, fraction)) * traced.total;
@@ -211,15 +225,9 @@ export function pointAt(traced: Traced, fraction: number): Pt {
 
     if (target > (cum.at(-1) as number) && i < traced.subpaths.length - 1) continue;
 
-    for (let j = 1; j < points.length; j++) {
-      if (target > cum[j] && j < points.length - 1) continue;
+    const point = pointOnSubpath(points, cum, target);
 
-      const span = cum[j] - cum[j - 1];
-      const u = span > 0 ? Math.min(1, Math.max(0, (target - cum[j - 1]) / span)) : 1;
-      const [a, b] = [points[j - 1], points[j]];
-
-      return u === 1 ? b : { x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u };
-    }
+    if (point) return point;
   }
 
   return traced.subpaths.at(-1)?.at(-1) ?? { x: 0, y: 0 };

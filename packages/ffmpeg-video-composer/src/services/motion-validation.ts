@@ -30,17 +30,7 @@ interface Use {
   owner: Record<string, unknown>;
 }
 
-function collect(value: unknown, path: string, uses: Use[]): void {
-  if (Array.isArray(value)) {
-    for (const [index, item] of value.entries()) collect(item, `${path}[${index}]`, uses);
-
-    return;
-  }
-
-  if (value === null || typeof value !== 'object') return;
-
-  const record = value as Record<string, unknown>;
-
+function collectRecord(record: Record<string, unknown>, path: string, uses: Use[]): void {
   for (const [key, child] of Object.entries(record)) {
     const childPath = `${path}.${key}`;
 
@@ -50,6 +40,18 @@ function collect(value: unknown, path: string, uses: Use[]): void {
 
     if (key !== 'motion' || path !== 'global') collect(child, childPath, uses);
   }
+}
+
+function collect(value: unknown, path: string, uses: Use[]): void {
+  if (Array.isArray(value)) {
+    for (const [index, item] of value.entries()) collect(item, `${path}[${index}]`, uses);
+
+    return;
+  }
+
+  if (value === null || typeof value !== 'object') return;
+
+  collectRecord(value as Record<string, unknown>, path, uses);
 }
 
 function motionUses(template: TemplateDescriptor): Use[] {

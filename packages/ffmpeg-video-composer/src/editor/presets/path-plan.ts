@@ -83,6 +83,10 @@ function boxOf(traced: Traced, thickness: number, scale: string): Rect | null {
 
 /** The path in frame px, measured and boxed; null (after a warning) when there is nothing to draw. */
 export function geometryOf(request: PathRequest): Geometry | null {
+  return geometryParts(request);
+}
+
+function geometryParts(request: PathRequest): Geometry | null {
   const g = request.graphic;
   const target = g.target === undefined ? null : resolveFxTarget(g.target, request);
 
@@ -94,8 +98,7 @@ export function geometryOf(request: PathRequest): Geometry | null {
 
   const commands = pathCommandsOf(g, target);
   const traced = commands && traceOf(flatten(commands));
-  const box =
-    traced && traced.total > 0 ? boxOf(traced, g.thickness ?? PATH_DEFAULTS.thickness, request.ctx.scale) : null;
+  const box = pathBox(traced, g.thickness ?? PATH_DEFAULTS.thickness, request.ctx.scale);
 
   if (!commands || !traced || !box) {
     warn(request, 'path_empty', 'the path is empty or entirely outside the frame; skipped');
@@ -104,6 +107,12 @@ export function geometryOf(request: PathRequest): Geometry | null {
   }
 
   return { commands, traced, box };
+}
+
+function pathBox(traced: Traced | null, thickness: number, scale: string): Rect | null {
+  if (!traced || traced.total <= 0) return null;
+
+  return boxOf(traced, thickness, scale);
 }
 
 // The exit window and the end of the graphic's life.

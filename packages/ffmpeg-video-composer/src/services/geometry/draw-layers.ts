@@ -49,30 +49,35 @@ interface Owner {
   label: string;
 }
 
-function sugarLayers(section: Section, ctx: SugarContext, owner: Owner): DrawLayer[] {
-  const layers: DrawLayer[] = [];
+function compilerLayers(
+  section: Section,
+  compiler: (typeof OVERLAY_COMPILERS)[number],
+  owner: Owner,
+  ctx: SugarContext
+): DrawLayer[] {
+  const spec = SUGAR_TEXT_FIELDS[compiler.key] as { label: string; fields: string[] } | undefined;
+  const sugar = (section as unknown as Record<string, Record<string, unknown> | undefined>)[compiler.key];
 
-  for (const compiler of OVERLAY_COMPILERS) {
-    const spec = SUGAR_TEXT_FIELDS[compiler.key] as { label: string; fields: string[] } | undefined;
-    const sugar = (section as unknown as Record<string, Record<string, unknown> | undefined>)[compiler.key];
-
-    for (const filter of compiler.compile(section, ctx).filter(isDrawFilter)) {
+  return compiler
+    .compile(section, ctx)
+    .filter(isDrawFilter)
+    .map((filter) => {
       const field =
         spec && sugar && compiler.key !== 'caption' ? sourceField(sugar, spec.fields, filter.values.text) : null;
       const kind = kindOf(filter);
 
-      layers.push({
+      return {
         kind,
         values: filter.values,
         path: `${owner.path}.${compiler.key}${field ? `.${field}` : ''}`,
         label: `${owner.label} ${spec?.label ?? compiler.key}${field ? ` ${field}` : ''}`,
-        // Only a caption's position is a choice the author makes (`position`/`align`).
         authoredPosition: compiler.key === 'caption' && kind === 'text',
-      });
-    }
-  }
+      };
+    });
+}
 
-  return layers;
+function sugarLayers(section: Section, ctx: SugarContext, owner: Owner): DrawLayer[] {
+  return OVERLAY_COMPILERS.flatMap((compiler) => compilerLayers(section, compiler, owner, ctx));
 }
 
 // Authored drawtext/drawbox filters run first — SegmentBuilder puts the overlay sugar on top of them.

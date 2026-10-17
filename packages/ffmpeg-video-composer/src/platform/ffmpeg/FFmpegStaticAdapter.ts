@@ -28,6 +28,18 @@ interface FFProbeData {
   streams: FFProbeStream[];
 }
 
+function infosFromStreams(videoStream: FFProbeStream | undefined, audioStream: FFProbeStream | undefined): FFMpegInfos {
+  const parsedDuration = videoStream ? parseFloat(videoStream.duration) : NaN;
+
+  return {
+    duration: Number.isFinite(parsedDuration) ? parsedDuration : null,
+    videoCodec: videoStream?.codec_name ?? null,
+    audioCodec: audioStream?.codec_name ?? null,
+    sampleRate: audioStream?.sample_rate ? parseInt(audioStream.sample_rate, 10) : null,
+    ...reportedTraits(videoStream),
+  };
+}
+
 @injectable()
 class FFmpegStaticAdapter extends AbstractFFmpeg {
   private ffmpegPath: string | null = null;
@@ -108,17 +120,8 @@ class FFmpegStaticAdapter extends AbstractFFmpeg {
 
       const videoStream = info.streams.find((s) => s.codec_type === 'video');
       const audioStream = info.streams.find((s) => s.codec_type === 'audio');
-      // WebM/MKV streams often carry no duration (or 'N/A'); parseFloat would yield NaN, which
-      // slips past `!== null` checks and defeats the declared-duration fallback downstream.
-      const parsedDuration = videoStream ? parseFloat(videoStream.duration) : NaN;
 
-      return {
-        duration: Number.isFinite(parsedDuration) ? parsedDuration : null,
-        videoCodec: videoStream?.codec_name ?? null,
-        audioCodec: audioStream?.codec_name ?? null,
-        sampleRate: audioStream?.sample_rate ? parseInt(audioStream.sample_rate, 10) : null,
-        ...reportedTraits(videoStream),
-      };
+      return infosFromStreams(videoStream, audioStream);
     } catch (error) {
       const execError = error as ExecException & { stderr: string };
 

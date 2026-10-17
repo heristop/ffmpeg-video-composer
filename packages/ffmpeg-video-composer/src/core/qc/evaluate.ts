@@ -229,10 +229,17 @@ function checkLoudness(content: QcContentMeasure, expected: QcExpectations): QcF
   });
 }
 
+function peakExpectation(
+  expected: QcExpectations,
+  loudness?: LoudnessReport | null
+): { kind: QcKind; ceiling: number } {
+  if (expected.normalize !== 'loudnorm') return { kind: 'judgement', ceiling: 0 };
+
+  return { kind: 'format', ceiling: loudness?.target ?? expected.loudnessTarget?.truePeak ?? LOUDNORM_TRUE_PEAK };
+}
+
 function checkTruePeak(truePeak: number | null, expected: QcExpectations, loudness?: LoudnessReport | null): QcFinding {
-  const normalized = expected.normalize === 'loudnorm';
-  const kind: QcKind = normalized ? 'format' : 'judgement';
-  const ceiling = normalized ? (loudness?.target ?? expected.loudnessTarget?.truePeak ?? LOUDNORM_TRUE_PEAK) : 0;
+  const { kind, ceiling } = peakExpectation(expected, loudness);
 
   if (truePeak === null) {
     return finding('true_peak', kind, { status: 'pass', value: null, expected: null, reason: 'no audio' });

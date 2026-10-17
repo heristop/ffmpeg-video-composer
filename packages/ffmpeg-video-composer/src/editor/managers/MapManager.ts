@@ -20,6 +20,7 @@ import type { ClipBox } from '../../schemas/clip.schemas';
 // Section.inputs is typed as Input[] for schema purposes, but at runtime it holds
 // MapAnimationInput objects indexed by string keys (used as a keyed record).
 type SectionInputsCache = Record<string, MapAnimationInput>;
+type OverlayPlan = { legFilters: string[]; x?: string; y?: string };
 
 @injectable()
 class MapManager {
@@ -169,6 +170,11 @@ class MapManager {
     return { legFilters: this.animationLegFilters(input, motion), x: motion.x, y: motion.y };
   };
 
+  private readonly overlayValue = (plan: OverlayPlan, position: string, eofAction: string, timeline: string): string =>
+    plan.x || plan.y
+      ? `x='${plan.x}':y='${plan.y}':eof_action=${eofAction}${timeline}`
+      : `${position}:eof_action=${eofAction}${timeline}`;
+
   addAnimationOverlay = (input: MapAnimationInput, inputIndex: number, videoScale = ''): void => {
     const videoStream = `${this.getVideoInputIncrement()}:v`;
     const eofAction = input.options.persistent ? 'repeat' : 'pass';
@@ -193,10 +199,7 @@ class MapManager {
 
     // Moving entrances use the named, single-quoted overlay form so the comma-bearing time expressions
     // are not mis-parsed as extra filter options; otherwise the static positional "x:y" form.
-    const overlayValue =
-      plan.x || plan.y
-        ? `x='${plan.x}':y='${plan.y}':eof_action=${eofAction}${timeline}`
-        : `${position}:eof_action=${eofAction}${timeline}`;
+    const overlayValue = this.overlayValue(plan, position, eofAction, timeline);
 
     // The animation overlays on top of the already-filtered background; no section filters here.
     // `input.filters` is optional in the schema (builder-authored inputs omit it), so default to none.

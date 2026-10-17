@@ -47,6 +47,13 @@ export interface FootageAudioContext {
   clipSound: boolean;
 }
 
+function audioFormat(config: ProjectConfig): { sampleRate: number; channelLayout: string } {
+  return {
+    sampleRate: config.audioConfig?.sampleRate ?? DefaultConfig.SAMPLE_RATE,
+    channelLayout: config.audioConfig?.channelLayout ?? DefaultConfig.CHANNEL_LAYOUT,
+  };
+}
+
 /**
  * The footage `-af` prefix plus the section length the audio fades time against: unchanged (no prefix,
  * declared duration) for an unedited section or one whose mapped audio is not the clip's own sound.
@@ -58,10 +65,5 @@ export function footageAudio(section: Section, ctx: FootageAudioContext): { head
 
   if (!plan || !ctx.clipSound) return { head: [], duration };
 
-  const format = {
-    sampleRate: ctx.config.audioConfig?.sampleRate ?? DefaultConfig.SAMPLE_RATE,
-    channelLayout: ctx.config.audioConfig?.channelLayout ?? DefaultConfig.CHANNEL_LAYOUT,
-  };
-
-  return { head: footageAudioChain(plan, fps, format, section.options ?? {}), duration };
+  return { head: footageAudioChain(plan, fps, audioFormat(ctx.config), section.options ?? {}), duration };
 }

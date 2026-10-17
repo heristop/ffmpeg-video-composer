@@ -217,6 +217,37 @@ class AnimationComposer {
     return this.buildOverlayGraph(staged, {});
   }
 
+  private overlayEntry({
+    staged,
+    index,
+    total,
+    firstInputIndex,
+    chainPrefix,
+    outLabel,
+    base,
+    legs,
+  }: {
+    staged: StagedAnimation;
+    index: number;
+    total: number;
+    firstInputIndex: number;
+    chainPrefix: string;
+    outLabel: string;
+    base: string;
+    legs: string[];
+  }): string {
+    const { anim, path } = staged;
+    const motion = overlayMotionExpr(anim.motion, anim.position ?? '0:0');
+    const legRef = this.appendOverlayLeg(anim, firstInputIndex + index, index, legs, motion);
+    const out = index === total - 1 ? outLabel : `[${chainPrefix}${index}]`;
+    const placement = motion.x || motion.y ? `x='${motion.x}':y='${motion.y}'` : (anim.position ?? '0:0');
+    const timeline = isStillAnimation(anim, path)
+      ? imageOverlayEnable({ start: anim.start, duration: anim.duration })
+      : '';
+
+    return `${base}${legRef}overlay=${placement}:eof_action=${this.overlayEof(anim, path)}${timeline}${out}`;
+  }
+
   /**
    * Build the overlay filtergraph: each animation's leg (scale/rotate/opacity) overlaid over a running
    * base. Parameterized so it works both standalone (base `[0:v]`, the joined video as input 0) and
@@ -236,26 +267,19 @@ class AnimationComposer {
     const overlays: string[] = [];
     let base = opts.baseLabel ?? '[0:v]';
 
-    for (const [k, { anim, path }] of staged.entries()) {
-      // An optional `motion` animates the entrance, same lowering as the per-section overlay
-      // (MapManager.addAnimationOverlay): slide/rise emit overlay x/y time expressions easing back to
-      // the static position; fade adds an alpha fade-in to the overlay leg. All LGPL-safe (fade/format/overlay).
-      const motion = overlayMotionExpr(anim.motion, anim.position ?? '0:0');
-      const legRef = this.appendOverlayLeg(anim, firstInputIndex + k, k, legs, motion);
-      const out = k === staged.length - 1 ? outLabel : `[${chainPrefix}${k}]`;
-
-      // Moving entrances use the named, single-quoted overlay form so the comma-bearing time
-      // expressions are not mis-parsed as extra filter options; otherwise the static positional form.
-      const placement = motion.x || motion.y ? `x='${motion.x}':y='${motion.y}'` : (anim.position ?? '0:0');
-
-      // A still image's start/duration never reach its `-loop 1` source (buildOverlaySources), so they
-      // lower here to the overlay filter's own timeline support instead — the same imageOverlayEnable
-      // expression the per-section overlay uses, just against the video-global `t` this pass sees.
-      const timeline = isStillAnimation(anim, path)
-        ? imageOverlayEnable({ start: anim.start, duration: anim.duration })
-        : '';
-
-      overlays.push(`${base}${legRef}overlay=${placement}:eof_action=${this.overlayEof(anim, path)}${timeline}${out}`);
+    for (const [k, stagedAnimation] of staged.entries()) {
+      overlays.push(
+        this.overlayEntry({
+          staged: stagedAnimation,
+          index: k,
+          total: staged.length,
+          firstInputIndex,
+          chainPrefix,
+          outLabel,
+          base,
+          legs,
+        })
+      );
       base = `[${chainPrefix}${k}]`;
     }
 

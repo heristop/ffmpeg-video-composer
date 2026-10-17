@@ -52,6 +52,18 @@ function extend(word: Building, token: WhisperToken, text: string): void {
   if (typeof token.t_dtw === 'number' && token.t_dtw >= 0 && !PUNCTUATION.test(text)) word.dtw = token.t_dtw / 100;
 }
 
+function appendToken(words: RawWord[], current: Building | null, token: WhisperToken, text: string): Building {
+  if (current?.text.trim()) words.push(finish(current));
+
+  const next =
+    current === null || text.startsWith(' ')
+      ? { text: '', from: seconds(token.offsets?.from), to: 0, dtw: null, scores: [] }
+      : current;
+  extend(next, token, text);
+
+  return next;
+}
+
 function tokenWords(tokens: readonly WhisperToken[]): RawWord[] {
   const words: RawWord[] = [];
   let current: Building | null = null;
@@ -61,13 +73,7 @@ function tokenWords(tokens: readonly WhisperToken[]): RawWord[] {
 
     if (!text || SPECIAL.test(text.trim())) continue;
 
-    if (current === null || text.startsWith(' ')) {
-      if (current?.text.trim()) words.push(finish(current));
-
-      current = { text: '', from: seconds(token.offsets?.from), to: 0, dtw: null, scores: [] };
-    }
-
-    extend(current, token, text);
+    current = appendToken(words, current, token, text);
   }
 
   if (current?.text.trim()) words.push(finish(current));

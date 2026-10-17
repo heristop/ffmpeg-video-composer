@@ -205,6 +205,18 @@ function checkValue(value: unknown, ctx: Ctx): void {
   }
 }
 
+function validateOperationFields(record: Record<string, unknown>, op: string, ctx: Ctx): void {
+  if (!OPS.has(op)) fail(ctx, 'invalid_operation', `unknown op "${op}"`);
+
+  if (op === 'move' || op === 'copy') {
+    if (typeof record.from !== 'string') fail(ctx, 'invalid_operation', `"${op}" needs a string "from"`);
+
+    return;
+  }
+
+  if (VALUE_OPS.has(op) && !Object.hasOwn(record, 'value')) fail(ctx, 'invalid_operation', `"${op}" needs a "value"`);
+}
+
 function readOperation(raw: unknown, ctx: Ctx): JsonPatchOperation {
   if (!isContainer(raw) || Array.isArray(raw)) fail(ctx, 'invalid_operation', 'operation must be an object');
   const record = raw;
@@ -213,13 +225,7 @@ function readOperation(raw: unknown, ctx: Ctx): JsonPatchOperation {
   ctx.path = record.path;
   const op = typeof record.op === 'string' ? record.op : '';
 
-  if (!OPS.has(op)) fail(ctx, 'invalid_operation', `unknown op "${op}"`);
-
-  if ((op === 'move' || op === 'copy') && typeof record.from !== 'string') {
-    fail(ctx, 'invalid_operation', `"${op}" needs a string "from"`);
-  }
-
-  if (VALUE_OPS.has(op) && !Object.hasOwn(record, 'value')) fail(ctx, 'invalid_operation', `"${op}" needs a "value"`);
+  validateOperationFields(record, op, ctx);
 
   return record as unknown as JsonPatchOperation;
 }

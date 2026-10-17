@@ -38,6 +38,14 @@ export interface Stylesheet {
 const COMPOUND = /^(\*|[a-zA-Z][a-zA-Z0-9-]*)?((?:\.[a-zA-Z_-][\w-]*)*)$/;
 const IMPORTANT = /\s*!important\s*$/i;
 
+function updateDepth(char: string, depth: number): number {
+  if (char === '(') return depth + 1;
+
+  if (char === ')') return Math.max(0, depth - 1);
+
+  return depth;
+}
+
 function cssFinding(message: string): HtmlFinding {
   return { code: 'html_unsupported_css', message, source: 'css' };
 }
@@ -60,9 +68,7 @@ function splitTopLevel(text: string, separator: string): string[] {
 
     if (char === '"' || char === "'") quote = char;
 
-    if (char === '(') depth++;
-
-    if (char === ')') depth = Math.max(0, depth - 1);
+    depth = updateDepth(char, depth);
 
     if (char === separator && depth === 0 && !quote) {
       parts.push(text.slice(start, index));

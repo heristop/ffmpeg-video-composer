@@ -190,6 +190,18 @@ function coverSpec(request: PathRequest, p: Plan, paint: Paint, path: string): T
   };
 }
 
+function holdLabel(
+  request: PathRequest,
+  cover: TraceSpec,
+  holds: boolean,
+  sharesCover: boolean,
+  final: number
+): string | null {
+  if (!holds || sharesCover) return null;
+
+  return traceInput(request, 'hold', { ...cover, hi: Math.max(0, final) });
+}
+
 // The cover, the code mask and, when the settled stroke is not the whole cover, the held still.
 function register(request: PathRequest, p: Plan, paint: Paint, path: string): Labels | null {
   const cover = coverSpec(request, p, paint, path);
@@ -198,7 +210,7 @@ function register(request: PathRequest, p: Plan, paint: Paint, path: string): La
   const sharesCover = holds && final >= 1;
   const coverLabel = traceInput(request, 'cover', cover);
   const codeLabel = traceInput(request, 'code', { ...cover, mode: 'code', color: undefined });
-  const hold = holds && !sharesCover ? traceInput(request, 'hold', { ...cover, hi: Math.max(0, final) }) : null;
+  const hold = holdLabel(request, cover, holds, sharesCover, final);
 
   if (!coverLabel || !codeLabel || (holds && !sharesCover && !hold)) return null;
 

@@ -129,6 +129,23 @@ function stringProblems(value: string, path: string, theme: ResolvedTheme): stri
   return problem ? [problem] : [];
 }
 
+function collectArrayTokenIssues(
+  value: readonly unknown[],
+  path: string,
+  theme: ResolvedTheme,
+  out: ThemeIssue[]
+): void {
+  for (const [index, item] of value.entries()) collectTokenIssues(item, `${path}[${index}]`, theme, out);
+}
+
+function collectObjectTokenIssues(value: object, path: string, theme: ResolvedTheme, out: ThemeIssue[]): void {
+  for (const [key, child] of Object.entries(value)) {
+    const own = path === 'global' && (key === 'theme' || key === 'motion');
+
+    if (!own) collectTokenIssues(child, `${path}.${key}`, theme, out);
+  }
+}
+
 function collectTokenIssues(value: unknown, path: string, theme: ResolvedTheme, out: ThemeIssue[]): void {
   if (typeof value === 'string') {
     for (const problem of stringProblems(value, path, theme)) {
@@ -139,18 +156,14 @@ function collectTokenIssues(value: unknown, path: string, theme: ResolvedTheme, 
   }
 
   if (Array.isArray(value)) {
-    for (const [index, item] of value.entries()) collectTokenIssues(item, `${path}[${index}]`, theme, out);
+    collectArrayTokenIssues(value, path, theme, out);
 
     return;
   }
 
   if (value === null || typeof value !== 'object') return;
 
-  for (const [key, child] of Object.entries(value)) {
-    const own = path === 'global' && (key === 'theme' || key === 'motion');
-
-    if (!own) collectTokenIssues(child, `${path}.${key}`, theme, out);
-  }
+  collectObjectTokenIssues(value, path, theme, out);
 }
 
 /** Every theme error in a descriptor (schema-valid input assumed, as with the other descriptor rules). */

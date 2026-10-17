@@ -48,11 +48,15 @@ function digestFile(file: string): { sha256: string; bytes: number } {
   return { sha256: sha256Hex(new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength)), bytes: bytes.length };
 }
 
+function collectAssetString(value: string, key: string, assetsDir: string, found: Set<string>): void {
+  const candidate = path.resolve(assetsDir, value);
+
+  if (ASSET_KEYS.has(key) && !value.includes('{{') && isFile(candidate)) found.add(candidate);
+}
+
 function collectDescriptorAssets(value: unknown, assetsDir: string, found: Set<string>, key = ''): void {
   if (typeof value === 'string') {
-    const candidate = path.resolve(assetsDir, value);
-
-    if (ASSET_KEYS.has(key) && !value.includes('{{') && isFile(candidate)) found.add(candidate);
+    collectAssetString(value, key, assetsDir, found);
 
     return;
   }

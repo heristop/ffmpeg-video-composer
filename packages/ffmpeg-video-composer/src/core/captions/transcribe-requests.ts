@@ -42,6 +42,19 @@ function sourceIndexOf(
   return sections.findIndex((section) => section?.name === from);
 }
 
+function transcriptionSource(
+  sections: ReadonlyArray<LooseSection | null | undefined>,
+  index: number,
+  from: string | undefined
+): { name: string | null; index: number } {
+  const sourceIndex = sourceIndexOf(sections, index, from);
+  const source = sourceIndex < 0 ? undefined : sections[sourceIndex];
+
+  if (!source || !CLIP_SECTION_TYPES.has(String(source.type))) return { name: null, index: -1 };
+
+  return { name: String(source.name), index: sourceIndex };
+}
+
 /** Every `subtitles.transcribe` request of a descriptor, with its source section resolved. */
 export function transcribeTargets(descriptor: unknown): TranscribeTarget[] {
   const sections = sectionsOf(descriptor);
@@ -51,17 +64,15 @@ export function transcribeTargets(descriptor: unknown): TranscribeTarget[] {
 
     if (!request || typeof request !== 'object') return [];
 
-    const sourceIndex = sourceIndexOf(sections, index, request.from);
-    const source = sourceIndex < 0 ? undefined : sections[sourceIndex];
-    const isClip = Boolean(source) && CLIP_SECTION_TYPES.has(String(source?.type));
+    const source = transcriptionSource(sections, index, request.from);
 
     return [
       {
         index,
         name: String(section.name),
         request,
-        source: isClip ? String(source?.name) : null,
-        sourceIndex: isClip ? sourceIndex : -1,
+        source: source.name,
+        sourceIndex: source.index,
       },
     ];
   });

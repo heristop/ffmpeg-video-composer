@@ -297,6 +297,24 @@ function measurer(ctx: StyledLowerThirdContext): Look['measure'] {
   };
 }
 
+function styledLook(block: LowerThird, ctx: StyledLowerThirdContext, w: number, h: number): Look {
+  return {
+    w,
+    h,
+    fps: ctx.fps ?? 30,
+    margin: round(w * 0.06),
+    pad: Math.max(6, round(h * 0.014)),
+    top: block.position === 'top' ? round(h * 0.08) : h - round(h * 0.24),
+    title: round(h * 0.05),
+    sub: round(h * 0.028),
+    accent: block.accent ?? BRAND,
+    band: block.bandColor ?? BAND,
+    reveal: block.reveal ?? LOWER_THIRD_STYLE_REVEALS[block.style ?? 'clean-bar'],
+    block,
+    measure: measurer(ctx),
+  };
+}
+
 /** A lower third in its authored style; the original band when `style` is unset (byte-identical). */
 export function lowerThirdFilters(block: LowerThird | undefined, ctx: StyledLowerThirdContext): Filter[] {
   if (!block?.style) return lowerThirdToFilters(block, ctx);
@@ -304,22 +322,7 @@ export function lowerThirdFilters(block: LowerThird | undefined, ctx: StyledLowe
   if (!hasText(block.title) && !hasText(block.subtitle) && !hasText(block.badge)) return [];
 
   const { w, h } = parseScale(ctx.scale);
-  const title = round(h * 0.05);
-  const look: Look = {
-    w,
-    h,
-    fps: ctx.fps ?? 30,
-    margin: round(w * 0.06),
-    pad: Math.max(6, round(h * 0.014)),
-    top: block.position === 'top' ? round(h * 0.08) : h - round(h * 0.24),
-    title,
-    sub: round(h * 0.028),
-    accent: block.accent ?? BRAND,
-    band: block.bandColor ?? BAND,
-    reveal: block.reveal ?? LOWER_THIRD_STYLE_REVEALS[block.style],
-    block,
-    measure: measurer(ctx),
-  };
+  const look = styledLook(block, ctx, w, h);
 
   return [...STYLES[block.style](look), ...badge(look)];
 }

@@ -247,6 +247,10 @@ function trimmedSpan(from: number, to: number | undefined, sourceLength: number 
   return round6(available === undefined ? to - from : Math.min(to - from, available));
 }
 
+function invalidRamp(ramp: FootageOptions['speedRamp'], keys: RampKey[] | null): boolean {
+  return ramp !== undefined && keys === null;
+}
+
 /**
  * The edit plan for a section, or null while a time field is still an unresolved reference. The source
  * length is the probed clip length (project_video) or undefined when it is not probed (video sections);
@@ -265,7 +269,7 @@ export function footagePlan(
 
   const keys = rampKeys(options.speedRamp, span ?? options.duration ?? 1, (time) => rampTimeOf(time, freezes, fps));
 
-  if (options.speedRamp !== undefined && keys === null) return null;
+  if (invalidRamp(options.speedRamp, keys)) return null;
 
   const pieces = keys ? rampPieces(keys) : null;
 

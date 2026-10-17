@@ -234,6 +234,29 @@ type OverlayMotionInput =
   | string
   | { type: string; delay?: number; duration?: number; distance?: number; easing?: RevealEasing };
 
+function motionResult(args: {
+  type: string;
+  bx: string;
+  by: string;
+  ramp: string;
+  distance: number;
+  delay: number;
+  duration: number;
+}): OverlayMotion {
+  const { type, bx, by, ramp, distance, delay, duration } = args;
+
+  switch (type) {
+    case 'fade':
+      return { legFilter: `fade=t=in:st=${trimNum(delay)}:d=${trimNum(duration)}:alpha=1` };
+    case 'rise':
+      return { x: bx, y: `(${by})+(1-(${ramp}))*${distance}` };
+    case 'slide-left':
+      return { x: `(${bx})+(1-(${ramp}))*${distance}`, y: by };
+    default:
+      return { x: `(${bx})-(1-(${ramp}))*${distance}`, y: by };
+  }
+}
+
 export type OverlayMotion = {
   /** Overlay x expression (already incorporates the base x); paired with `y` for slide/rise. */
   x?: string;
@@ -272,20 +295,7 @@ export function overlayMotionExpr(motion: OverlayMotionInput | undefined, positi
   const [bx = '0', by = '0'] = position.split(':');
   const ramp = easedRamp(delay, duration, intent.easing);
 
-  if (intent.type === 'fade') {
-    return { legFilter: `fade=t=in:st=${trimNum(delay)}:d=${trimNum(duration)}:alpha=1` };
-  }
-
-  if (intent.type === 'rise') {
-    return { x: bx, y: `(${by})+(1-(${ramp}))*${distance}` };
-  }
-
-  if (intent.type === 'slide-left') {
-    return { x: `(${bx})+(1-(${ramp}))*${distance}`, y: by };
-  }
-
-  // slide-right enters from the left.
-  return { x: `(${bx})-(1-(${ramp}))*${distance}`, y: by };
+  return motionResult({ type: intent.type, bx, by, ramp, distance, delay, duration });
 }
 
 /**

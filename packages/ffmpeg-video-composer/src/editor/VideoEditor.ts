@@ -27,6 +27,24 @@ import {
 import { isDesignedTransition } from '@/core/motion/transitions';
 import { matteInputs, stageTransitionMattes, type StagedMatte } from './utils/matte-staging';
 
+function audioInputIndexes(
+  segmentFiles: string[],
+  probes: SegmentProbe[],
+  sampleRate: number
+): { silentInputs: string[]; indexes: number[] } {
+  const silentInputs: string[] = [];
+  const indexes = probes.map((probe, index) => {
+    if (probe.hasAudio) return index;
+
+    const inputIndex = segmentFiles.length + silentInputs.length;
+    silentInputs.push(` -f lavfi -i aevalsrc=0:d=${probe.duration}:s=${sampleRate} `);
+
+    return inputIndex;
+  });
+
+  return { silentInputs, indexes };
+}
+
 @injectable()
 class VideoEditor {
   public emitter: IEventEmitter | undefined;
@@ -72,6 +90,12 @@ class VideoEditor {
     this.logger.info(`[Concat][Command] Copied single file to ${finalOutputPath}`);
 
     return finalOutputPath;
+  }
+
+  private buildOverlayGraph(staged: StagedAnimation[], inputCount: number, duration: number) {
+    if (staged.length === 0) return { sources: '', graph: '' };
+
+    return this.animationComposer.buildFusedOverlay(staged, { inputOffset: inputCount, maxDuration: duration });
   }
 
   // Returns true on a successful faststart remux, false on any failure. Adapters differ: the Node
@@ -256,17 +280,7 @@ class VideoEditor {
 
     // Each silent segment gets one extra lavfi input appended after the n segment inputs. Track which
     // input index carries the audio leg for every segment (its own `[k:a]`, or the synthesized source).
-    const silentInputs: string[] = [];
-    const audioInputIndex = probes.map((probe, k) => {
-      if (probe.hasAudio) {
-        return k;
-      }
-
-      const index = segmentFiles.length + silentInputs.length;
-      silentInputs.push(` -f lavfi -i aevalsrc=0:d=${probe.duration}:s=${sampleRate} `);
-
-      return index;
-    });
+    const { silentInputs, indexes: audioInputIndex } = audioInputIndexes(segmentFiles, probes, sampleRate);
 
     const effectiveDurations = computeEffectiveDurations(transitions, probes);
     const offsets = computeOffsets(probes, effectiveDurations);
@@ -287,12 +301,7 @@ class VideoEditor {
     // (buildFusedOverlay offsets the animation inputs past the segments + uses a distinct `ov` chain).
     const fuse = staged.length > 0;
     const assembledDuration = round(this.sum(probes.map((p) => p.duration)) - this.sum(effectiveDurations));
-    const overlay = fuse
-      ? this.animationComposer.buildFusedOverlay(staged, {
-          inputOffset: base + mattes.length,
-          maxDuration: assembledDuration,
-        })
-      : { sources: '', graph: '' };
+    const overlay = this.buildOverlayGraph(staged, base + mattes.length, assembledDuration);
 
     const videoGraph = buildVideoGraph(transitions, offsets, effectiveDurations, fuse ? '[vfx]' : '[vout]', {
       scale,

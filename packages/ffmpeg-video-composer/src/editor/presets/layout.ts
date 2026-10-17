@@ -160,12 +160,20 @@ export function wipeEdge(wipe: BeforeAfterLayout['wipe'], span: number): string 
   return `2*floor(${span}*(${reversed ? `1-(${progress})` : progress})/2)`;
 }
 
+function wipeIsHorizontal(direction: BeforeAfterLayout['wipe']['direction']): boolean {
+  return direction !== 'down' && direction !== 'up';
+}
+
+function wipeIsLeading(direction: BeforeAfterLayout['wipe']['direction']): boolean {
+  return direction === undefined || direction === 'right' || direction === 'down';
+}
+
 // pad / crop / overlay settings per edge direction (see the header).
 function wipeGeometry(wipe: BeforeAfterLayout['wipe'], env: LayoutEnv) {
   const { width: w, height: h } = env;
-  const horizontal = wipe.direction !== 'down' && wipe.direction !== 'up';
+  const horizontal = wipeIsHorizontal(wipe.direction);
   const edge = wipeEdge(wipe, horizontal ? w : h);
-  const leading = wipe.direction === undefined || wipe.direction === 'right' || wipe.direction === 'down';
+  const leading = wipeIsLeading(wipe.direction);
   const shift = leading ? `${edge}-${horizontal ? w : h}` : edge;
   const pad = horizontal ? `w=${2 * w}:h=${h}:x=${leading ? w : 0}:y=0` : `w=${w}:h=${2 * h}:x=0:y=${leading ? h : 0}`;
   const crop = horizontal ? `w=${w}:h=${h}:x='${edge}':y=0` : `w=${w}:h=${h}:x=0:y='${edge}'`;

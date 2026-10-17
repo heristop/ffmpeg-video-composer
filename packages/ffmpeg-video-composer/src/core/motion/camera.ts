@@ -110,11 +110,15 @@ interface Rig {
   shake: Camera['shake'];
 }
 
+function hasCameraMotion(tracks: CameraTracks): boolean {
+  return Boolean(tracks.zoom ?? tracks.x ?? tracks.y ?? tracks.rotate);
+}
+
 function rig(camera: Camera, frame: CameraFrame): Rig | null {
   const preset = presetTracks(camera, frame);
   const tracks: CameraTracks = { ...preset, ...pick(camera) };
   const shake = camera.shake ?? (camera.preset === 'handheld' ? {} : undefined);
-  const moves = Boolean(tracks.zoom ?? tracks.x ?? tracks.y ?? tracks.rotate);
+  const moves = hasCameraMotion(tracks);
 
   return moves || (camera.hits?.length ?? 0) > 0 || shake ? { tracks, shake } : null;
 }

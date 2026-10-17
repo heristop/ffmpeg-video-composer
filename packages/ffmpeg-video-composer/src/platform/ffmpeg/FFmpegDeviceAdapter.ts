@@ -52,6 +52,26 @@ interface ProbeStream {
   sample_rate?: string;
 }
 
+function probeDuration(video: ProbeStream | undefined, audio: ProbeStream | undefined): number | null {
+  const value = video?.duration ?? audio?.duration;
+
+  return value ? parseFloat(value) : null;
+}
+
+function probeSampleRate(audio: ProbeStream | undefined): number | null {
+  return audio?.sample_rate ? parseInt(audio.sample_rate, 10) : null;
+}
+
+function infosFromProbeStreams(video: ProbeStream | undefined, audio: ProbeStream | undefined): FFMpegInfos {
+  return {
+    duration: probeDuration(video, audio),
+    videoCodec: video?.codec_name ?? null,
+    audioCodec: audio?.codec_name ?? null,
+    sampleRate: probeSampleRate(audio),
+    ...reportedTraits(video),
+  };
+}
+
 /**
  * Drives the on-device FFmpeg CLI engine. The core hands `execute()` a full command string (no
  * program name); we split it to argv and run it natively — no MEMFS bridging, since the engine reads
@@ -171,15 +191,8 @@ class FFmpegDeviceAdapter extends AbstractFFmpeg {
 
     const video = streams.find((s) => s.codec_type === 'video');
     const audio = streams.find((s) => s.codec_type === 'audio');
-    const durationStr = video?.duration ?? audio?.duration;
 
-    return {
-      duration: durationStr ? parseFloat(durationStr) : null,
-      videoCodec: video?.codec_name ?? null,
-      audioCodec: audio?.codec_name ?? null,
-      sampleRate: audio?.sample_rate ? parseInt(audio.sample_rate, 10) : null,
-      ...reportedTraits(video),
-    };
+    return infosFromProbeStreams(video, audio);
   };
 }
 

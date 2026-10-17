@@ -52,31 +52,44 @@ function fittingTransitionDuration(smaller: number): number {
   return Math.max(0.01, Math.floor(smaller * 50) / 100);
 }
 
+function transitionPairDurations(sectionA: Section, sectionB: Section): [number, number] | null {
+  const durationA = sectionA.options?.duration;
+  const durationB = sectionB.options?.duration;
+
+  if (typeof durationA !== 'number' || typeof durationB !== 'number') return null;
+
+  return [durationA, durationB];
+}
+
+function transitionPairDetails(
+  sectionA: Section,
+  sectionB: Section,
+  template: TemplateDescriptor
+): { effectiveDuration: number; smaller: number } | null {
+  if (!sectionA.transition || sectionA.transition.type === 'cut') return null;
+
+  const durations = transitionPairDurations(sectionA, sectionB);
+
+  if (!durations) return null;
+
+  const effectiveDuration =
+    sectionA.transition.duration ?? template.global?.transition?.duration ?? DEFAULT_TRANSITION_DURATION;
+  const smaller = Math.min(...durations);
+
+  return effectiveDuration < smaller ? null : { effectiveDuration, smaller };
+}
+
 // transition_too_long: effective transition duration >= smaller of the two adjacent explicit durations
 function transitionPairError(
   { section: sectionA, index: indexA }: IndexedSection,
   { section: sectionB }: IndexedSection,
   template: TemplateDescriptor
 ): ValidationError | null {
-  if (!sectionA.transition || sectionA.transition.type === 'cut') {
-    return null;
-  }
+  const details = transitionPairDetails(sectionA, sectionB, template);
 
-  const durationA = sectionA.options?.duration;
-  const durationB = sectionB.options?.duration;
+  if (!details) return null;
 
-  // Skip when either adjacent duration is undeclared (or still in beats: the grid awaits the analysis)
-  if (typeof durationA !== 'number' || typeof durationB !== 'number') {
-    return null;
-  }
-
-  const effectiveDuration =
-    sectionA.transition.duration ?? template.global?.transition?.duration ?? DEFAULT_TRANSITION_DURATION;
-  const smaller = Math.min(durationA, durationB);
-
-  if (effectiveDuration < smaller) {
-    return null;
-  }
+  const { effectiveDuration, smaller } = details;
 
   const fitting = fittingTransitionDuration(smaller);
 

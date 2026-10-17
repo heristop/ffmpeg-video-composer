@@ -166,6 +166,19 @@ function inSize(value: number | undefined): value is number {
   return value !== undefined && value >= 1 && value <= MAX_DIMENSION;
 }
 
+function validSpriteParts(
+  kind: SpriteKind | undefined,
+  numbers: Partial<SpriteSpec> | null,
+  words: Partial<SpriteSpec> | null,
+  color: string | undefined
+): { kind: SpriteKind; numbers: Pick<SpriteSpec, 'w' | 'h'>; words: Partial<SpriteSpec> } | null {
+  if (!kind || !KINDS.includes(kind) || !numbers || !words) return null;
+
+  if (color !== undefined && !/^[0-9a-f]{6}$/.test(color)) return null;
+
+  return { kind, numbers: numbers as Pick<SpriteSpec, 'w' | 'h'>, words };
+}
+
 /** Parses a `sprite:` URL back to its spec; null for any other string or an invalid/oversized spec. */
 export function parseSpriteUrl(url: string): SpriteSpec | null {
   if (!url.startsWith(SCHEME)) return null;
@@ -175,15 +188,16 @@ export function parseSpriteUrl(url: string): SpriteSpec | null {
   const numbers = numbersOf(pairs);
   const words = wordsOf(pairs);
   const color = pairs.get('c');
-  const colorOk = color === undefined || /^[0-9a-f]{6}$/.test(color);
+  const valid = validSpriteParts(kind, numbers, words, color);
 
-  if (!kind || !KINDS.includes(kind) || !numbers || !words || !colorOk) return null;
+  if (!valid) return null;
 
-  const { w, h } = numbers;
+  const { kind: validKind, numbers: validNumbers, words: validWords } = valid;
+  const { w, h } = validNumbers;
 
-  if (!inSize(w) || !inSize(h)) return null;
+  if (!(inSize(w) && inSize(h))) return null;
 
-  return { kind, ...numbers, w, h, ...(color ? { color } : {}), ...words };
+  return { kind: validKind, ...validNumbers, w, h, ...(color ? { color } : {}), ...validWords };
 }
 
 /** A deterministic file name for a spec, e.g. `sprite-band-1a2b3c4d.png`. */

@@ -94,15 +94,15 @@ export function planOf(fx: Ctx): RipplePlan | null {
 
   if (!region) return null;
 
+  const timing = rippleTiming(g, tap, dot);
+
   return {
     ...placement(region, ox, oy),
     tap,
     radius: ring.radius,
     side,
     dot: even(2 * dot * ring.radius),
-    start: g.start ?? (tap ? dot : 0.375),
-    rings: g.rings ?? (tap ? 1 : 2),
-    stagger: g.stagger ?? 0.18,
+    ...timing,
     color,
     spec: {
       kind: 'ring',
@@ -122,6 +122,14 @@ function round(value: number): number {
 
 function placement(region: Region, ox: number, oy: number): { cx: number; cy: number } {
   return { cx: Math.round(ox - region.x), cy: Math.round(oy - region.y) };
+}
+
+function rippleTiming(g: Ctx['graphic'], tap: boolean, dot: number): Pick<RipplePlan, 'start' | 'rings' | 'stagger'> {
+  return {
+    start: g.start ?? (tap ? dot : 0.375),
+    rings: g.rings ?? (tap ? 1 : 2),
+    stagger: g.stagger ?? 0.18,
+  };
 }
 
 interface Window {
