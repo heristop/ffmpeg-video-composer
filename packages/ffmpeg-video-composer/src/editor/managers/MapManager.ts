@@ -14,6 +14,8 @@ import { escapeRegExp } from './VariableManager';
 import { isBackgroundInput } from '../utils/background-input';
 import { layerKeyframes } from '../presets/layer-keyframes';
 import { resolveFit } from '../utils/reframe';
+import { evenBox } from '../presets/clip-box';
+import type { ClipBox } from '../../schemas/clip.schemas';
 
 // Section.inputs is typed as Input[] for schema purposes, but at runtime it holds
 // MapAnimationInput objects indexed by string keys (used as a keyed record).
@@ -198,11 +200,66 @@ class MapManager {
 
     // The animation overlays on top of the already-filtered background; no section filters here.
     // `input.filters` is optional in the schema (builder-authored inputs omit it), so default to none.
+    if (input.options.clip) {
+      this.addClippedOverlay(input, [baseStream, animationLeg], overlayValue, videoScale);
+
+      return;
+    }
+
     this.addMap({
       inputs: [baseStream, animationLeg],
       filters: [{ type: 'overlay', value: overlayValue }, ...(input.filters ?? [])],
       outputs: [input.name],
       options: { useSectionFilters: false },
+    });
+  };
+
+  // A layer cut to `options.clip` (presets/clip-box.ts): overlaid on a copy of the frame as usual, the copy
+  // cropped to the box and laid back over the untouched frame, so nothing of the layer shows past the box.
+  private readonly addClippedOverlay = (
+    input: MapAnimationInput,
+    [base, leg]: string[],
+    overlay: string,
+    videoScale: string
+  ): void => {
+    // The frame size bounds the box; unknown (no section scale), the box is taken as authored.
+    const [width, height] = /^\d+:\d+$/.test(videoScale) ? videoScale.split(':').map(Number) : [Infinity, Infinity];
+    const box = evenBox(input.options.clip as ClipBox, width, height);
+    const name = input.name;
+
+    if (!box) {
+      this.addMap({
+        inputs: [base],
+        filters: [{ type: 'null' }, ...(input.filters ?? [])],
+        outputs: [name],
+        options: {},
+      });
+
+      return;
+    }
+
+    const options = { useSectionFilters: false };
+
+    this.addMap({
+      inputs: [base],
+      filters: [{ type: 'split', value: '2' }],
+      outputs: [`${name}_cb`, `${name}_cd`],
+      options,
+    });
+    this.addMap({
+      inputs: [`${name}_cd`, leg],
+      filters: [
+        { type: 'overlay', value: overlay },
+        { type: 'crop', value: `${box.w}:${box.h}:${box.x}:${box.y}` },
+      ],
+      outputs: [`${name}_cc`],
+      options,
+    });
+    this.addMap({
+      inputs: [`${name}_cb`, `${name}_cc`],
+      filters: [{ type: 'overlay', value: `${box.x}:${box.y}` }, ...(input.filters ?? [])],
+      outputs: [name],
+      options,
     });
   };
 
