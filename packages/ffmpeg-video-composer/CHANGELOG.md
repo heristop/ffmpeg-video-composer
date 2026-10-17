@@ -189,6 +189,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fill one, an input name is a plain label (also checked on every pad label at render), a scalar drawtext
   `fontfile` must be a bare font name, and the deny-list refuses a protocol prefix (`file:`, `http:`…) in an
   unescaped option value.
+- Expression fields: an overlay `position`/`scale` (inputs and global animations), a `crop` effect's
+  rectangle and a background layer's box only take FFmpeg expressions (numbers, names, arithmetic and
+  parentheses, `:` between the parts), checked at validation and where the engine writes them into the filter
+  graph, so they can no longer chain filters; an authored `values.textExpr` is refused in every mode, and an
+  unsafe raw `values` entry is reported at validation.
 
 ## [3.1.0] - 2026-10-11
 

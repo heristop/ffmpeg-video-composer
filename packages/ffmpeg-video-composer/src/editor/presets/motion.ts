@@ -2,6 +2,7 @@ import type { Filter } from '@/core/types';
 import type { MotionEffect } from '../../schemas/template.schemas';
 import { fmt } from '@/core/motion/hermite';
 import { exactZoomFilterObjects, ZOOM_TIME, type ZoomMove } from '@/core/motion/zoom-exact';
+import { assertSafeExpression } from '@/core/arg-guard';
 
 // motionToFilters — split out of looks.ts to keep that file under the max-lines budget; re-exported
 // from looks.ts so importers (registry.ts, tests) keep a single `@/editor/presets/looks` entry point.
@@ -85,11 +86,11 @@ function rotateToFilters(effect: RotateEffect): Filter[] {
   return [{ type: 'rotate', value: `${effect.angle}*PI/180:c=black` }];
 }
 
+// Each side lands unquoted in `crop=w:h:x:y`: one expression term each (core/arg-guard.ts).
 function cropToFilters(effect: CropEffect): Filter[] {
-  const x = effect.x ?? '(iw-ow)/2';
-  const y = effect.y ?? '(ih-oh)/2';
+  const sides = [effect.w, effect.h, effect.x ?? '(iw-ow)/2', effect.y ?? '(ih-oh)/2'];
 
-  return [{ type: 'crop', value: `${effect.w}:${effect.h}:${x}:${y}` }];
+  return [{ type: 'crop', value: sides.map((side) => assertSafeExpression(side, 'crop', 1)).join(':') }];
 }
 
 function flipToFilters(effect: FlipEffect): Filter[] {

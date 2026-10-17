@@ -19,6 +19,7 @@ import {
 } from './effects.schemas';
 import { PLATFORM_NAMES } from '../core/platforms';
 import { TemplateFontsSchema } from './template-fonts.schemas';
+import { FilterExpressionPair } from './filter-expression.schemas';
 
 export const TranslationSchema = z
   .record(z.string(), z.string())
@@ -100,8 +101,12 @@ export const GlobalAnimationSchema = z
         'URL or file path of the overlay — an animated single-file format (.apng/.webp/.gif/.webm), stream-looped, ' +
           'or a still raster image (.png/.jpg/.jpeg), held with -loop 1 for the whole video; may use {{ varName }}.'
       ),
-    position: z.string().optional().describe('Overlay position as "x:y" in output pixels (e.g. "0:0" top-left).'),
-    scale: z.string().optional().describe('Scale expression applied to the overlay before compositing, as "w:h".'),
+    position: FilterExpressionPair.optional().describe(
+      'Overlay position as "x:y" in output pixels or FFmpeg expressions (e.g. "0:0" top-left).'
+    ),
+    scale: FilterExpressionPair.optional().describe(
+      'Scale expression applied to the overlay before compositing, as "w:h".'
+    ),
     fit: OverlayFitSchema.optional(),
     opacity: z
       .number()

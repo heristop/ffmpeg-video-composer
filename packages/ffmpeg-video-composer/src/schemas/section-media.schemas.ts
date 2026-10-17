@@ -6,6 +6,7 @@ import { TranslationSchema } from './global.schemas';
 import { HtmlInputShape, htmlInputIssues } from './html-input.schemas';
 import { LayerAnimateSchema, LayerOriginSchema } from './layer-animate.schemas';
 import { ClipBoxSchema } from './clip.schemas';
+import { FilterExpressionPair } from './filter-expression.schemas';
 
 // Input/shape/field media primitives — the animation input options, the editor-only shape recipe, the
 // input schema and the form-field schema — live here to keep `section.schemas` under the max-lines
@@ -16,8 +17,12 @@ import { ClipBoxSchema } from './clip.schemas';
 export const InputOptionsSchema = z
   .object({
     fps: z.number().positive().optional().describe('Frames per second the animation plays at (default 25).'),
-    position: z.string().optional().describe('Overlay position as "x:y" in output pixels (e.g. "0:0" top-left).'),
-    scale: z.string().optional().describe('Scale expression applied to the input before compositing, as "w:h".'),
+    position: FilterExpressionPair.optional().describe(
+      'Overlay position as "x:y" in output pixels or FFmpeg expressions (e.g. "0:0" top-left).'
+    ),
+    scale: FilterExpressionPair.optional().describe(
+      'Scale expression applied to the input before compositing, as "w:h".'
+    ),
     fit: OverlayFitSchema.optional(),
     persistent: z
       .boolean()

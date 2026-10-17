@@ -1,4 +1,4 @@
-import { assertSafeArgToken, assertSafeColorToken } from '@/core/arg-guard';
+import { assertSafeArgToken, assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
 import type { RevealEasing } from '../presets/text';
 import { easedRamp, phaseDuration } from '../presets/eased-ramp';
 import type { BackgroundLayer } from '../../schemas/template.schemas';
@@ -196,7 +196,10 @@ export function buildAnimationLegFilters(options: {
   const rotation = options.rotation ?? 0;
   const legFilters: string[] = [];
 
-  legFilters.push(...fitLegFilters(options.scale, options.fit));
+  // The scale lands unquoted in the leg chain: two expression terms only (core/arg-guard.ts).
+  const scale = options.scale === undefined ? undefined : assertSafeExpression(options.scale, 'overlay scale', 2);
+
+  legFilters.push(...fitLegFilters(scale, options.fit));
 
   legFilters.push(...flipLegFilters(options.flip));
 

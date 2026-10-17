@@ -1,3 +1,5 @@
+import { expressionPattern } from '../schemas/filter-expression.schemas';
+
 // Guard for template-derived values that are interpolated UNQUOTED into the FFmpeg command string.
 // The command is built as a string and then space-split by `parseCommand` into an argv array for
 // `execFile`. Positional values such as a `color=c=<color>` source, a `-i <path/url>` input, or a
@@ -49,4 +51,17 @@ export function assertSafeSegmentName(name: string): string {
   }
 
   return name;
+}
+
+// An expression-typed field (an overlay position or scale, a crop rectangle) that the engine splices into a
+// filtergraph unquoted: the schema grammar (schemas/filter-expression.schemas.ts), checked again where it is
+// interpolated so a descriptor that skipped validation cannot chain filters through it.
+export function assertSafeExpression(value: string | number, field: string, parts = 1): string {
+  const text = String(value);
+
+  if (!expressionPattern(parts).test(text)) {
+    throw new Error(`Unsafe ${field}: "${text}" is not an FFmpeg expression of ${parts} ":"-separated part(s)`);
+  }
+
+  return text;
 }

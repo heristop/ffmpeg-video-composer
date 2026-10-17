@@ -12,7 +12,8 @@
 
 import { nearest } from '../../services/validation/suggest';
 import type { ValidationError } from '../../services/validation/types';
-import { assertBareFontFile, readToken } from './filter-option-guard';
+import { assertBareFontFile, filterValueProblem, readToken } from './filter-option-guard';
+import { engineOnlyFilterIssues } from './engine-only-filters';
 
 export interface FilterRule {
   /** Option names accepted as `key=value` (in `values` or the scalar `value`). */
@@ -256,6 +257,13 @@ function valuesProblem(type: string, values: Record<string, unknown>, rule: Filt
     const font = key === 'fontfile' ? fontProblem(value) : undefined;
 
     if (font) return font;
+
+    // The rest reach FFmpeg as `key=value` (FormatterManager.formatDefaultValue): the render-time guard,
+    // reported here. drawtext text is escaped on its own path.
+    const text = key === 'text' || key === 'fontfile' ? undefined : scalar(value);
+    const raw = text === undefined ? null : filterValueProblem(key, text);
+
+    if (raw) return `has an unsafe option ${raw}`;
   }
 
   return undefined;
@@ -392,12 +400,10 @@ export function authoredFilterIssues(descriptor: unknown): Issue[] {
 
 /**
  * The render-path gate, on the fully resolved descriptor right before lowering: throws the first refused
- * filters unless the caller trusts the template.
+ * filters (engine-internal options in every mode, the allow-list unless the caller trusts the template).
  */
 export function assertRawFiltersAllowed(descriptor: unknown, allowRawFilters: boolean | undefined): void {
-  if (allowRawFilters) return;
-
-  const issues = authoredFilterIssues(descriptor);
+  const issues = [...engineOnlyFilterIssues(descriptor), ...(allowRawFilters ? [] : authoredFilterIssues(descriptor))];
 
   if (issues.length === 0) return;
 

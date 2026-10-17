@@ -11,7 +11,7 @@ import {
 import type FormattersManager from './FormatterManager';
 import type FilterManager from './FilterManager';
 import { escapeRegExp } from './VariableManager';
-import { assertSafeColorToken } from '@/core/arg-guard';
+import { assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
 import { isBackgroundInput } from '../utils/background-input';
 import { layerKeyframes } from '../presets/layer-keyframes';
 import { resolveFit } from '../utils/reframe';
@@ -181,7 +181,8 @@ class MapManager {
   addAnimationOverlay = (input: MapAnimationInput, inputIndex: number, videoScale = ''): void => {
     const videoStream = `${this.getVideoInputIncrement()}:v`;
     const eofAction = input.options.persistent ? 'repeat' : 'pass';
-    const position = input.options.position || '0:0';
+    // The position lands unquoted in `overlay=<x:y>`: two expression terms only (core/arg-guard.ts).
+    const position = assertSafeExpression(input.options.position || '0:0', 'overlay position', 2);
 
     // First animation of the section builds the background (normalize + section filters) on the main
     // video leg; later animations chain off the prior overlay output instead.

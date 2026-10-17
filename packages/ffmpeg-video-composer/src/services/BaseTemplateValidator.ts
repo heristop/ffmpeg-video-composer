@@ -26,6 +26,7 @@ import { validateEachFormat } from './validation/format-validation';
 import { validateWithFields } from './validation/field-validation';
 import { formFieldBudgetErrors } from './validation/form-field-budget';
 import { authoredFilterIssues } from '../editor/utils/filter-allow-list';
+import { engineOnlyFilterIssues } from '../editor/utils/engine-only-filters';
 
 export type { ValidationError } from './template-validation-rules';
 
@@ -161,6 +162,7 @@ export class BaseTemplateValidator {
     // Raw filters are read on the AUTHORED descriptor: bundled partials are engine content.
     const budget = [
       ...formFieldBudgetErrors(expansion.data),
+      ...engineOnlyFilterIssues(templateData),
       ...(options.allowRawFilters ? [] : authoredFilterIssues(templateData)),
     ];
 

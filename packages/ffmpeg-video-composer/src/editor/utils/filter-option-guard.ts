@@ -132,17 +132,22 @@ function optionEscape(value: string): string | null {
   return null;
 }
 
-/** Refuses a file-reading option key or a value that escapes its option; returns the value. */
-export function assertSafeFilterValue(key: string, value: string): string {
-  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) throw new Error(`Unsafe filter value key "${key}": not an option name`);
+/** Why a `values` entry is unsafe (a file-reading key, a value leaving its option, a path or a protocol). */
+export function filterValueProblem(key: string, value: string): string | null {
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) return `key "${key}" is not an option name`;
 
-  if (FILE_OPTION_KEYS.has(key)) {
-    throw new Error(`Unsafe filter value ${key}: the option reads a file, which raw filter values cannot do`);
-  }
+  if (FILE_OPTION_KEYS.has(key)) return `${key} reads a file, which raw filter values cannot do`;
 
   const escape = optionEscape(value) ?? locationProblem(readToken(readToken(value, '[];,').value, ':').value);
 
-  if (escape) throw new Error(`Unsafe filter value ${key}: "${value}" ${escape}`);
+  return escape ? `${key}: "${value}" ${escape}` : null;
+}
+
+/** Refuses a file-reading option key or a value that escapes its option; returns the value. */
+export function assertSafeFilterValue(key: string, value: string): string {
+  const problem = filterValueProblem(key, value);
+
+  if (problem) throw new Error(`Unsafe filter value ${problem}`);
 
   return value;
 }

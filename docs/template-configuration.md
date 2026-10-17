@@ -949,6 +949,8 @@ An animation is **one** single-file animated input. **APNG** and **WebM** (VP9 w
 }
 ```
 
+**Expressions** — `position` (`"x:y"`) and `scale` (`"w:h"`), on inputs and on `global.animations`, plus a `crop` motion effect's `w`/`h`/`x`/`y` and a background layer's `x`/`y`/`w`/`h`, are FFmpeg expressions the engine writes into the filter graph itself: numbers, names such as `W`, `iw` or `PI`, `+ - * / % ^` and parentheses, with `:` only between the two parts of a position or a scale. A `,` `;` `[` `]` `'` `\` `=` or a space is refused at validation and again at render.
+
 **Playback extent** — set exactly one of `loop` (forever), `loops` (a finite play count), or `duration` (seconds); precedence is `duration` > `loops` > `loop`. `start` delays the overlay (`-itsoffset`, default 0). `persistent` maps to `eof_action=repeat` (freeze the last frame once the overlay ends, instead of letting the video show through). `opacity` < 1 fades the leg via `colorchannelmixer=aa`. Reference an input by `@name` from a `maps[]` entry.
 
 **Motion** — `options.motion` gives the overlay an animated entrance, reusing the [Reveal](#reveal) vocabulary (`fade`/`rise`/`slide-left`/`slide-right`, or an object with `delay`/`duration`/`distance`). It compiles to time-expressions on the `overlay` `x`/`y` (and the leg's fade for `fade`), so a logo or animation can slide / rise / fade into place. Available on both `animation` and `image` inputs. To move, scale, turn or fade a layer over time, use [layer keyframes](#layer-keyframes-optionsanimate).
@@ -1240,6 +1242,7 @@ checks the descriptor it is about to lower, after `$format` values, partial `var
 - a scalar `value` may hold at most the positional options listed (in FFmpeg's order), and no `,`-chained
   filter;
 - `drawtext` takes no `textfile`, and its `fontfile` is a bare font name such as `Oswald.ttf`;
+- `values.textExpr` is engine-internal: an authored one is refused in every mode, the opt-in included;
 - `lut3d` is a [LUT look](#looks) by preset name (`"teal-orange"`, `"teal-orange@0.6"`); a `url:` LUT needs
   the opt-in;
 - a `maps[]` pad label is a stream (`0:v`), an `@input` reference or a plain lower-case label, and an
