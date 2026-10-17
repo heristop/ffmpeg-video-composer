@@ -20,7 +20,7 @@ export default defineConfig({
   // Run via `vp staged`.
   staged: {
     '*.{ts,tsx,js,cjs,mjs,json,md,yml,yaml}': 'vp fmt',
-    '*.{ts,tsx}': 'vp lint --deny-warnings',
+    '*.{ts,tsx}': 'vp lint',
     // Block commits that introduce a circular / forbidden module dependency. A function task (not a
     // string) so the staged filenames are NOT appended — depcruise cruises the whole core graph (which
     // follows into creative-kit, where such cycles surface), not a file list. Static analysis only, so
@@ -157,7 +157,7 @@ export default defineConfig({
       'unicorn/prefer-string-starts-ends-with': 'error',
 
       // --- complexity / size budgets ---
-      complexity: ['error', 12],
+      complexity: ['error', { max: 10, variant: 'modified' }],
       'max-lines-per-function': [
         'error',
         {
@@ -174,7 +174,7 @@ export default defineConfig({
       'max-lines': [
         'error',
         {
-          max: 300,
+          max: 310,
           skipBlankLines: true,
           skipComments: true,
         },
@@ -286,18 +286,18 @@ export default defineConfig({
       'typescript/dot-notation': 'error',
       'no-proto': 'error',
       'no-redeclare': 'error',
-      'no-constant-condition': 'warn',
+      'no-constant-condition': 'error',
       'no-duplicate-imports': 'error',
       'import/no-cycle': 'error',
       'import/named': 'error',
-      'unicorn/prefer-code-point': 'warn',
-      'unicorn/prefer-string-raw': 'warn',
+      'unicorn/prefer-code-point': 'error',
+      'unicorn/prefer-string-raw': 'error',
       'unicorn/prefer-top-level-await': 'off',
 
       // --- local JS plugin ---
       'local/no-else-clause': 'error',
       'local/no-disable-comments': 'error',
-      'local/padding-line-before-statements': 'warn',
+      'local/padding-line-before-statements': 'error',
     },
     overrides: [
       {

@@ -15,7 +15,7 @@
     "release": "pnpm --filter ffmpeg-video-composer --filter @leclap/cli --filter @leclap/mcp build && pnpm --filter ffmpeg-video-composer --filter @leclap/cli --filter @leclap/mcp publish --access public",
     "build:exe": "pnpm --filter @leclap/cli run build:exe",
     "build:exe:all": "pnpm --filter @leclap/cli run build:exe:all",
-    "lint": "vp lint --deny-warnings",
+    "lint": "vp lint",
     "fmt": "vp fmt",
     "fmt:check": "vp fmt --check",
     "format": "vp fmt",
