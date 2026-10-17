@@ -29,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   model-loading filters, and file options chained into a filter.
 - The template guard also refuses the LUT, SOFA, mask, OCR, speech and neural-network filters that load files,
   and more file-capable filter options.
+- The template guard also refuses a protocol hidden behind an escaped colon (`'file\:/…'`, `'http\://…'`), and
+  the server warns on stderr at start-up when `--allow-raw-filters` is on.
 
 ## [0.6.0] - 2026-10-11
 

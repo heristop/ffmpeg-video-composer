@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { loadConfig } from '../src/config.js';
+import { loadConfig, startupWarnings } from '../src/config.js';
 
 const ENV_KEYS = [
   'LECLAP_MCP_OUTPUT_DIR',
@@ -67,6 +67,15 @@ describe('loadConfig', () => {
     process.env.LECLAP_MCP_ALLOW_RAW_FILTERS = '1';
     expect(loadConfig([]).allowRawFilters).toBe(true);
     delete process.env.LECLAP_MCP_ALLOW_RAW_FILTERS;
+  });
+
+  it('warns on stderr at startup when raw filters are trusted', () => {
+    expect(startupWarnings(loadConfig([]))).toEqual([]);
+
+    const [warning] = startupWarnings(loadConfig(['--allow-raw-filters']));
+
+    expect(warning).toMatch(/allow-raw-filters/);
+    expect(warning).toMatch(/trusted/);
   });
 
   it('enables Remotion only when explicitly opted in', () => {

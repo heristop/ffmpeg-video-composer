@@ -177,3 +177,13 @@ export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
     ...gapLogConfig(argv),
   };
 }
+
+/** One-line operator warnings printed on stderr at start-up (an opt-in that widens what templates may do). */
+export function startupWarnings(config: Pick<McpConfig, 'allowRawFilters'>): string[] {
+  if (!config.allowRawFilters) return [];
+
+  return [
+    'leclap-mcp: --allow-raw-filters is on: templates are trusted to run any raw FFmpeg filter, which can ' +
+      'write files anywhere this process can and reach the network. Use it with local templates only.',
+  ];
+}

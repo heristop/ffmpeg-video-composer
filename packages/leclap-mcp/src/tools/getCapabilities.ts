@@ -32,7 +32,12 @@ const outputSchema = z.object({
 
 function rawFilters(allowRawFilters: boolean | undefined): { mode: 'allow-list' | 'trusted'; detail: string } {
   if (allowRawFilters) {
-    return { mode: 'trusted', detail: 'Raw filters pass through (operator opt-in); a render-time deny-list stays on.' };
+    return {
+      mode: 'trusted',
+      detail:
+        'Raw filters pass through (operator opt-in); a best-effort render-time deny-list stays on, but a ' +
+        'trusted template can still write files and reach the network.',
+    };
   }
 
   return {

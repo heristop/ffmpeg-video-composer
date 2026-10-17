@@ -121,10 +121,58 @@ function fontfileIsNotBare(fontfile: string): boolean {
   return /[/\\':]/.test(fontfile) || fontfile.includes('..') || path.isAbsolute(fontfile);
 }
 
-function unsafeScalarValueReason(value: string): string | undefined {
-  const unquoted = value.replace(/["'`]/g, '');
+// One FFmpeg tokenizer pass: '…' is literal, \x is x, an unquoted terminator splits.
+function splitUnescaped(input: string, terminators: string): string[] {
+  const parts = [''];
 
-  if (unquoted.includes('://') || PSEUDO_PROTOCOL.test(unquoted)) {
+  for (let index = 0; index < input.length; index++) {
+    const char = input[index];
+
+    if (char === '\\') {
+      parts[parts.length - 1] += input[index + 1] ?? '';
+      index++;
+      continue;
+    }
+
+    if (char === "'") {
+      const close = input.indexOf("'", index + 1);
+      const end = close === -1 ? input.length : close;
+      parts[parts.length - 1] += input.slice(index + 1, end);
+      index = end;
+      continue;
+    }
+
+    if (terminators.includes(char)) {
+      parts.push('');
+      continue;
+    }
+
+    parts[parts.length - 1] += char;
+  }
+
+  return parts;
+}
+
+// A protocol prefix (file:, http:, data:, concat:, subfile:…) on an option's value as FFmpeg reads it,
+// after both its passes (graph, then option): `'file\:/x'` is `file:/x` there. drawtext text is copy.
+const PROTOCOL_PREFIX = /^\s*[A-Za-z][\w+.-]*:/;
+
+function hasProtocolOption(value: string): boolean {
+  return splitUnescaped(value, '[];,')
+    .flatMap((filter) => splitUnescaped(filter, ':'))
+    .some((option) => {
+      const equals = option.indexOf('=');
+
+      if (equals >= 0 && option.slice(0, equals).trim() === 'text') return false;
+
+      return PROTOCOL_PREFIX.test(equals < 0 ? option : option.slice(equals + 1));
+    });
+}
+
+function unsafeScalarValueReason(value: string): string | undefined {
+  const unquoted = value.replace(/["'`\\]/g, '');
+
+  if (unquoted.includes('://') || PSEUDO_PROTOCOL.test(unquoted) || hasProtocolOption(value)) {
     return 'contains a URL/protocol scheme';
   }
 

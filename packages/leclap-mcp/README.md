@@ -190,8 +190,9 @@ fetched. `validate_template` and `compose_video` both fail on a declared font th
 Raw `filters` in agent templates are checked against the engine's
 [raw filter allow-list](../../docs/template-configuration.md#raw-filter-allow-list): a filter outside it is
 the validation error `filter_not_allowed`, and `get_capabilities` reports the mode (`rawFilters`). The raw
-filters opt-in restores the raw pass-through for trusted local templates only; a render-time deny-list
-stays on, but a relative path in a positional file option of an exotic filter still reaches FFmpeg. A
+filters opt-in restores the raw pass-through for trusted local templates only, and the server says so on
+stderr at start-up. A render-time deny-list stays on, but it is best-effort: a trusted template can still
+write files (absolute paths included, through an option the deny-list does not know) and reach the network. A
 drawtext `fontfile` is a bare font name (fonts from the media dir go through `global.fonts`).
 
 Precedence is flag → environment → default. Paths resolve from the server's working directory;

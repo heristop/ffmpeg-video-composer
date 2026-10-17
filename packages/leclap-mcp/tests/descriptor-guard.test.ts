@@ -319,3 +319,26 @@ describe('assertDescriptorSafe: raw filter type and value', () => {
     expect(result.ok, JSON.stringify(filter)).toBe(true);
   });
 });
+
+describe('assertDescriptorSafe: a protocol behind an escaped colon', () => {
+  it.each([
+    { type: 'metadata', value: String.raw`print:a:b:same_str:1:'file\:/tmp/pwned'` },
+    { type: 'metadata', value: String.raw`print:a:b:same_str:1:'http\://127.0.0.1/x'` },
+    { type: 'metadata', value: String.raw`print:a:b:same_str:1:'gopherx\:a'` },
+    { type: 'drawbox', values: { x: String.raw`'subfile\:/etc/passwd'` } },
+  ])('refuses %o', async (filter) => {
+    const result = await assertDescriptorSafe(rawFilterDescriptor(filter), mediaDir);
+
+    expect(result.ok, JSON.stringify(filter)).toBe(false);
+  });
+
+  it.each([
+    { type: 'drawtext', value: String.raw`text='Note\: 10\:30':x=10` },
+    { type: 'drawtext', values: { text: { en: 'Doors open: 10:30' }, x: String.raw`'00\:00\:01'` } },
+    { type: 'fade', value: 'in:0:30' },
+  ])('keeps %o', async (filter) => {
+    const result = await assertDescriptorSafe(rawFilterDescriptor(filter), mediaDir);
+
+    expect(result.ok, JSON.stringify(filter)).toBe(true);
+  });
+});
