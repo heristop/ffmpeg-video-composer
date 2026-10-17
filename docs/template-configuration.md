@@ -1731,6 +1731,7 @@ More in the [gallery](./gallery.md#graphics).
 | Type         | Extra fields                                                                                                                                             | Effect                                                                                                                                                                                                                                                    |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `path`       | `points` + `smooth`/`closed`, `shape`, `d`, `target`, `thickness`, `caps`, `dash`, `from`, `to`, `head`, `exit`, `exitDuration`                          | A line that draws itself along any path, a dot riding its end: see [Paths](#paths-path).                                                                                                                                                                  |
+| `shape`      | `preset` or `d` (+ `viewBox`), `x`, `y`, `width`, `height`, `target`, `gradient`, `fill`, `fillRule`, `stroke`, `animate`, `origin`                      | A filled vector shape, popped in with layer tracks or drawn on: see [Shapes](#shapes-shape).                                                                                                                                                              |
 | `flash`      | `intensity`                                                                                                                                              | A full-frame light hit that decays (white, 0.3 s).                                                                                                                                                                                                        |
 | `bars`       | `aspect` (2.39)                                                                                                                                          | Letterbox bars slide in from the top and bottom.                                                                                                                                                                                                          |
 | `underline`  | `x`, `y`, `width`, `thickness`, `origin`, `caps`, `settle`, `exit`, `exitDuration`                                                                       | A rule that draws itself across.                                                                                                                                                                                                                          |
@@ -1809,6 +1810,39 @@ The stroke is rasterised once at compile time, anti-aliased, at its exact on-scr
   { "type": "path", "at": 0.3, "target": "frame", "shape": { "type": "arc", "cx": 0.5, "cy": 0.5, "r": 0.3, "start": -90, "sweep": 360 }, "to": 0.75, "thickness": 18 },
   // A hand-drawn swash under a title, from an SVG path.
   { "type": "path", "at": 0.8, "d": "M380 470 C520 440 760 500 900 455", "thickness": 7, "exit": "none" }
+]
+```
+
+### Shapes (`shape`)
+
+A `shape` fills a closed outline and can stroke it: a sticker star, a heart, an arrow pointing at a detail, a blob behind a headline, a badge, an icon. It is drawn once at compile time, anti-aliased, then moved with the same keyframe tracks as an image layer, or revealed by drawing its outline on. The outline is exactly one of:
+
+- `preset`: `{ "type": "star", points, inner }` (3–24 tips, inner radius 0.1–0.95 of the outer, default 5 and 0.5), `{ "type": "polygon", sides }` (3–24, default 6), `{ "type": "heart" }`, `{ "type": "arrow", direction, head, shaft }` (`right` by default; head length and shaft thickness as shares of the box), `{ "type": "blob", lobes, wobble, seed }` (3–12 bumps, wobble 0–0.45, the seed defaults to one derived from `global.seed`) or `{ "type": "rect", radius }` (radius as a share of the short side, 0.5 = a pill). Star, polygon, heart and blob keep their proportions in the box (centred in it), so a portrait or square cut never stretches them; arrow and rect fill the box.
+- `d`: an SVG path of `M`, `L`, `H`, `V`, `C`, `Q` and `Z` (the [path](#paths-path) grammar, at most 4000 characters). Open subpaths close for the fill, as in SVG. With `viewBox: [minX, minY, width, height]`, the path is mapped into the box keeping its proportions, so an icon's `"0 0 24 24"` path drops straight in; without one, its coordinates are px, or fractions of `target`.
+
+The box is `x`, `y`, `width`, `height` in px (default: a square of 40 % of the frame's short side, centred), or fractions of `target` (neither width nor height: the whole target). A `height` left out is the same share of the target as `width` (as width).
+
+| Field               | Default                | Notes                                                                                                                                                                |
+| ------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `color`             | `#7C83FD`              | The fill. A colour token: `#RRGGBB`, `@alpha`, a name, `$color.<token>` or `{{ VARIABLE }}`.                                                                         |
+| `gradient`          | none                   | `{ from, to, angle, shape }` across the box: `linear` (CSS angle, default 180 = top to bottom) or `radial` (centre out to the box edge). Overrides `color`.          |
+| `fill`              | `true`                 | `false` draws the outline only (needs a `stroke`).                                                                                                                   |
+| `fillRule`          | `nonzero`              | `evenodd` leaves holes where loops cross (a pentagram's centre).                                                                                                     |
+| `stroke`            | none                   | `{ color, width, draw }`: an outline over the fill (default `#F5F3F7`, 4 px). `draw: true` draws it on over `duration`, then fades the fill in.                      |
+| `animate`, `origin` | a fade over `duration` | The layer tracks (`x`, `y`, `scale`, `scaleX`, `scaleY`, `rotate`, `opacity`) with springs, times in section seconds; `origin` is the pivot. Not with `stroke.draw`. |
+| `duration`          | 0.4 s (draw: 1.2 s)    | The fade-in when there are no tracks, or the outline draw.                                                                                                           |
+
+The image is rasterised at the shape's on-screen size: twice that when a scale track grows it, but never more than 4 MP. A shape that would need more is drawn at a lower resolution, and the render log reports `shape_downsampled` (advisories are logged at compile time; `validate` does not rasterise). A shape more than twice the frame wide or tall is skipped (`shape_too_large`: usually a `d` in the wrong units). A `shape:` spec is also refused, with `shape_too_large` and the shape skipped, past 20,000 flattened outline points, a fill or stroke work budget of 20M, an encoded path of 65,536 characters, or a 4,096 px side / 4 MP raster. It lands on screen through the same on-device filters as a keyframed image layer (`fps`, `scale`, `rotate`, `colorchannelmixer`, `overlay`); a drawn-on outline uses the path graphic's reveal (`lutyuv`, `alphamerge`). Where a segment cannot take the extra image the shape is skipped with `shape_unavailable`; on an engine without `alphamerge`, `shape_draw_unavailable` reports that the outline appears with the fill instead of drawing on. Other advisories: `shape_target` (the target names nothing), `shape_empty`, `shape_color` (a colour it cannot draw, replaced by the default).
+
+```jsonc
+"graphics": [
+  // A star that pops in on a spring and turns upright.
+  { "type": "shape", "at": 0.3, "preset": { "type": "star", "inner": 0.45 }, "x": 490, "y": 210, "width": 300, "height": 300, "color": "#FFF685", "stroke": { "color": "#141416", "width": 6 },
+    "animate": { "scale": [{ "t": 0.3, "v": 0 }, { "t": 0.9, "v": 1, "ease": "spring(300, 14)" }], "rotate": [{ "t": 0.3, "v": -40 }, { "t": 1, "v": 0, "ease": "$expo" }] } },
+  // A heart whose outline draws itself, then fills.
+  { "type": "shape", "at": 0.3, "duration": 1.2, "preset": { "type": "heart" }, "color": "#F96F99", "stroke": { "color": "#FFFFFF", "width": 6, "draw": true } },
+  // An icon from an SVG path, in a 24-unit viewBox.
+  { "type": "shape", "at": 0.9, "d": "M13 2 L4 14 L11 14 L10 22 L19 10 L12 10 Z", "viewBox": [0, 0, 24, 24], "x": 560, "y": 260, "width": 160, "height": 200, "color": "#141416" }
 ]
 ```
 

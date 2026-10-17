@@ -44,6 +44,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   megapixels: `html_motion_too_long`), `html_motion_unmatched` for a name no element carries, and a still in
   its final state (`html_motion_static`) when the frames can't be produced. Sample:
   `examples/motion-design/html-motion.json`.
+- A `shape` graphic: a filled vector shape for a sticker star, a heart, an arrow pointing at a detail, a blob
+  behind a headline or an icon. The outline is a `preset` (`star`, `polygon`, `heart`, `arrow`, `blob` with a
+  seed, `rect` with rounded corners) laid in a box (`x`, `y`, `width`, `height`, px or fractions of a
+  `target`), or an SVG `d` of M/L/H/V/C/Q/Z, mapped into the box by a `viewBox` for icons. Star, polygon,
+  heart and blob keep their proportions in portrait and square. It takes a `color` or a linear / radial
+  `gradient`, `fillRule` (`nonzero`, `evenodd`), and a `stroke` that is either part of the shape or drawn on
+  (`stroke.draw`, the path graphic's reveal, then the fill fades in). It moves with the layer keyframe tracks
+  (`animate`: `x`, `y`, `scale`, `scaleX`, `scaleY`, `rotate`, `opacity`, springs included; `origin` is the
+  pivot), or fades in over `duration`. The shape is rasterised once at compile time (`shape:` images, the same
+  bytes on every platform) at its on-screen size, twice that for a growing scale track, never past 4 MP
+  (the render log reports `shape_downsampled`; advisories are logged at compile time and `validate` does not rasterise). It renders on device with the filters keyframed image layers use. Advisories:
+  `shape_too_large`, `shape_unavailable`, `shape_draw_unavailable`, `shape_target`, `shape_empty`,
+  `shape_color`.
+- Validation: `invalid_keyframes` for a shape's tracks (keys out of order, opacity outside 0..1, scale outside
+  0..10, relative values on scale or opacity).
 - Keyframe tracks on image, animation and html layer inputs: `inputs[].options.animate` takes `x`, `y`,
   `scale`, `scaleX`, `scaleY`, `rotate` and `opacity` tracks, with the same `{ t, v, ease? }` keys, easings,
   springs, tokens and time references as the drawtext tracks. Cards, badges and icons can now pop in with an
