@@ -19,6 +19,8 @@ export interface LayerElement {
     src?: string;
     width?: number;
     height?: number;
+    /** The element's `data-motion` name: what an animated card moves (core/html/element-motion.ts). Never drawn. */
+    motion?: string;
   };
 }
 
@@ -71,7 +73,9 @@ function collapse(text: string): string {
 }
 
 function isAtomic(element: StyledElement): boolean {
-  return element.tag === 'img' || Object.keys(element.style).some((key) => BOX_STYLE.test(key));
+  if (element.tag === 'img' || element.attrs['data-motion'] !== undefined) return true;
+
+  return Object.keys(element.style).some((key) => BOX_STYLE.test(key));
 }
 
 function pixels(value: string | undefined): number | undefined {
@@ -167,7 +171,10 @@ function flow(nodes: StyledNode[], inherited: LayerStyle, items: FlowEntry[]): v
     }
 
     if (isAtomic(node)) {
-      items.push(buildElement(node));
+      // A tagged inline element is built whole, so it keeps the look its tag gives it inside a line.
+      const tagged = node.attrs['data-motion'] !== undefined;
+
+      items.push(buildElement(tagged ? { ...node, style: { ...INLINE_PRESETS[node.tag], ...node.style } } : node));
 
       continue;
     }
@@ -209,8 +216,7 @@ function buildChildren(children: StyledNode[]): LayerChild[] {
   });
 }
 
-/** One styled element as a Satori element (see the layout rules at the top of this file). */
-export function buildElement(element: StyledElement): LayerElement {
+function layoutElement(element: StyledElement): LayerElement {
   if (element.tag === 'img') return buildImage(element);
 
   const children = withListMarkers(element);
@@ -238,6 +244,14 @@ export function buildElement(element: StyledElement): LayerElement {
     : { display: 'flex', flexDirection: 'column', ...element.style };
 
   return { type: element.tag, props: { style, children: buildChildren(children) } };
+}
+
+/** One styled element as a Satori element (see the layout rules at the top of this file), its motion name kept. */
+export function buildElement(element: StyledElement): LayerElement {
+  const built = layoutElement(element);
+  const motion = element.attrs['data-motion'];
+
+  return motion === undefined ? built : { type: built.type, props: { ...built.props, motion } };
 }
 
 /** The layer's root: a flex column the size of the box, in the default font, holding the content. */

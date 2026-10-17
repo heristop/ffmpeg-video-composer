@@ -125,10 +125,14 @@ function report(pass: Pass, message: string): void {
   pass.findings.push({ code: 'html_unsupported_markup', message, source: 'html' });
 }
 
-function attributeMessage(tag: string, name: string): string {
+function attributeMessage(tag: string, name: string, value: string): string {
   if (name.startsWith('on')) return `<${tag} ${name}>: event handler removed (HTML layers run no script)`;
 
   if (name === 'href') return `<${tag} href>: links removed (an HTML layer is a still image)`;
+
+  if (name === 'data-motion') {
+    return `<${tag} data-motion="${value.slice(0, 32)}">: motion name refused (lowercase letters, digits and dashes, 32 at most, starting with a letter)`;
+  }
 
   return `<${tag} ${name}>: attribute removed (allowed: class, style, data-motion; src, alt, width, height on img)`;
 }
@@ -149,7 +153,7 @@ function keptAttributes(element: HtmlElementNode, pass: Pass): Partial<Record<st
       continue;
     }
 
-    report(pass, attributeMessage(element.tag, name));
+    report(pass, attributeMessage(element.tag, name, value ?? ''));
   }
 
   return attrs;
