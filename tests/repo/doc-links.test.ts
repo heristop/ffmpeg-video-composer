@@ -11,6 +11,7 @@ const DOCS = [
   'CONTRIBUTING.md',
   'DESIGN.md',
   'CODE_OF_CONDUCT.md',
+  'docs/comparison.md',
   'docs/effects-configuration.md',
   'docs/engine-configuration.md',
   'docs/template-configuration.md',

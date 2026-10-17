@@ -8,23 +8,24 @@ const readme = readFileSync(join(repoRoot, 'README.md'), 'utf8');
 
 describe('README structure', () => {
   // A reader decides in the first screenful. The demo has to beat the prose to it.
-  it('shows the demo before the feature table', () => {
+  it('shows the demo before the comparison', () => {
     const demo = readme.indexOf('## 🎥 Demo');
-    const features = readme.indexOf('| Highlight');
+    const why = readme.indexOf('## 🤔 Why LeClap?');
     expect(demo, 'demo section missing').toBeGreaterThan(-1);
-    expect(features, 'feature table missing').toBeGreaterThan(-1);
-    expect(demo).toBeLessThan(features);
+    expect(why, 'Why LeClap? section missing').toBeGreaterThan(-1);
+    expect(demo).toBeLessThan(why);
   });
 
-  // Asserting on the prose is vacuous — the positioning paragraph already name-drops
-  // "(Remotion/Shotstack)". Assert on the table itself, so deleting it turns this red.
+  // Asserting on the prose is vacuous: the intro already name-drops the alternatives. Assert on the table
+  // itself, so deleting it turns this red. leclap.dev/compare/remotion links to this section's anchor.
   it('carries a comparison table naming the alternatives people already know', () => {
     const why = readme.indexOf('## 🤔 Why LeClap?');
     expect(why, 'Why LeClap? section missing').toBeGreaterThan(-1);
 
     const lines = readme.slice(why).split('\n');
     const headerIndex = lines.findIndex(
-      (line) => line.startsWith('|') && line.includes('Remotion') && line.includes('Shotstack')
+      (line) =>
+        line.startsWith('|') && line.includes('Remotion') && line.includes('editly') && line.includes('fluent-ffmpeg')
     );
     expect(headerIndex, 'comparison table header row missing').toBeGreaterThan(-1);
 
@@ -46,10 +47,12 @@ describe('README structure', () => {
     expect(rows.length, 'the table has to actually compare something').toBeGreaterThanOrEqual(3);
   });
 
-  // One film, the trailer, as a GitHub attachment on its own line, where GitHub renders its player. npm never
-  // shows this file — every published package ships its own README — so no GIF fallback rides along.
-  it('shows the trailer, and only the trailer', () => {
-    expect(readme.match(/https:\/\/github\.com\/user-attachments\/assets\/[\w-]+/g)).toHaveLength(1);
+  // The film is a poster that links to the page playing it, so a newer cut only swaps one image and one link.
+  // No GIFs anywhere in the README.
+  it('links the film from a poster, with no GIF', () => {
+    const demo = readme.slice(readme.indexOf('## 🎥 Demo'));
+    expect(demo).toMatch(/<a href="https:\/\/leclap\.dev\/[^"]*"><img src="[^"]+\.webp"/);
+    expect(readme).not.toMatch(/\.gif\b/i);
   });
 
   it('spells the brand LeClap everywhere', () => {
