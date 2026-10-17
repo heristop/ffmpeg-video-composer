@@ -47,9 +47,14 @@ check: it reports the exact failing path, so an unknown field is one command awa
 answer rather than a guess.`;
 }
 
+// Flags forwarded to a script. npm strips a bare `--` before the script runs, so it needs one to stop
+// itself consuming the flags; pnpm, yarn and bun hand the `--` through, and the CLI stops parsing flags
+// at it, silently dropping everything after.
+const FORWARD_FLAGS: Record<PackageManagerName, string> = { npm: ' --', pnpm: '', yarn: '', bun: '' };
+
 // The Remotion hand-off, gated on the Remotion scaffold itself. Only reachable through the MCP, so
 // it also states that dependency rather than assuming the reader has it.
-function remotionSection(): string {
+function remotionSection(renderWith: (flags: string) => string): string {
   return `
 
 ## The animated intro
@@ -66,7 +71,7 @@ compose_video { template, userVideoPaths: { intro: "<that path>" } }
 
 The \`intro\` section in \`template.json\` is the \`project_video\` slot it fills — it carries no media of
 its own, so a render that supplies no clip for it fails. Edit \`remotion/Intro.tsx\` to change how it
-looks. From the command line the equivalent is \`--video intro=<path>\`.`;
+looks. From the command line the equivalent is \`${renderWith('--video intro=<path>')}\`.`;
 }
 
 function mcpSection(): string {
@@ -91,6 +96,10 @@ export function starterSkill(projectName: string, opts: SkillOptions = {}): stri
   const run = RUN_SCRIPT[opts.packageManager ?? 'npm'];
   const validate = run('validate');
   const render = run('render');
+
+  function renderWith(flags: string): string {
+    return `${render}${FORWARD_FLAGS[opts.packageManager ?? 'npm']} ${flags}`;
+  }
 
   // A directory name may legally contain `:` or `#`, either of which breaks a plain YAML scalar and
   // silently makes the whole frontmatter unparseable. YAML double-quoted scalars are JSON-compatible.
@@ -165,11 +174,12 @@ Text in the descriptor can hold \`{{ variables }}\`, resolved when it compiles. 
 command line:
 
 \`\`\`bash
-${render} -- --field title="Summer"
+${renderWith('--field title="Summer"')}
 \`\`\`
 
-\`--field\` repeats. \`--orientation landscape|portrait|square\` re-cuts the same descriptor for another
-aspect ratio without editing it.${remotion ? remotionSection() : ''}${mcp ? mcpSection() : ''}
+\`--field\` repeats. \`--set name=value\` fills an entry declared in \`global.fields\` and wins over
+\`--field\`. \`--orientation landscape|portrait|square\` re-cuts the same descriptor for another
+aspect ratio without editing it.${remotion ? remotionSection(renderWith) : ''}${mcp ? mcpSection() : ''}
 `;
 }
 

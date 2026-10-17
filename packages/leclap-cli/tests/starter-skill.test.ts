@@ -77,6 +77,20 @@ describe('starterSkill', () => {
     expect(starterSkill('demo', { remotion: true })).toContain('--video intro=');
   });
 
+  // pnpm forwards a literal `--` to the script, and the CLI then stops parsing flags there: the flag is
+  // dropped without an error. Only npm needs the separator (it eats it before the script sees it).
+  it('separates forwarded flags with `--` only where the package manager needs it', () => {
+    expect(starterSkill('demo', { packageManager: 'npm' })).toContain('npm run render -- --field');
+    expect(starterSkill('demo', { packageManager: 'pnpm' })).toContain('pnpm render --field');
+    expect(starterSkill('demo', { packageManager: 'pnpm' })).not.toContain('pnpm render -- ');
+    expect(starterSkill('demo', { packageManager: 'yarn' })).toContain('yarn render --field');
+    expect(starterSkill('demo', { packageManager: 'bun' })).toContain('bun run render --field');
+  });
+
+  it('names --set for declared fields', () => {
+    expect(skill).toContain('--set');
+  });
+
   // `leclap` is a devDependency, not a global install — a bare `leclap validate` in a scaffolded
   // project is `command not found`. Every command the skill prints must go through the package
   // manager, which puts node_modules/.bin on PATH.
