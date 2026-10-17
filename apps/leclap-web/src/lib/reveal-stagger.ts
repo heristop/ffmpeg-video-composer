@@ -51,6 +51,7 @@ export const createRevealStagger = ({
     const entered = readingOrder(batch);
 
     batch = [];
+
     for (const [slot, { reveal }] of entered.entries()) {
       reveal(staggerDelay(slot, { step, cap }));
     }

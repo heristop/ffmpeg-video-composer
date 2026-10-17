@@ -1,4 +1,5 @@
 import { type RefObject, useEffect, useRef, useState } from 'react';
+import { useObjectUrl } from '@/hooks/useObjectUrl';
 import {
   type VideoEdit,
   type VideoCrop,
@@ -150,14 +151,14 @@ interface UseTimelineEditorParams {
   file: File;
   edit: VideoEdit | undefined;
   onChange: (edit: VideoEdit | undefined) => void;
+  videoRef: RefObject<HTMLVideoElement | null>;
+  containerRef: RefObject<HTMLDivElement | null>;
 }
 
-export function useTimelineEditor({ file, edit, onChange }: UseTimelineEditorParams) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+export function useTimelineEditor({ file, edit, onChange, videoRef, containerRef }: UseTimelineEditorParams) {
   const initialized = useRef(false);
-  const [url, setUrl] = useState('');
   const [mode, setMode] = useState<Mode>('timeline');
+  const url = useObjectUrl(file) ?? '';
   const [duration, setDuration] = useState(0);
   const [srcSize, setSrcSize] = useState<{ w: number; h: number } | null>(null);
   const [segments, setSegments] = useState<ClipSegment[]>([]);
@@ -167,15 +168,6 @@ export function useTimelineEditor({ file, edit, onChange }: UseTimelineEditorPar
   const [future, setFuture] = useState<ClipSegment[][]>([]);
   const containerSize = useElementSize(containerRef);
   const seq = useSequencer(videoRef, segments);
-
-  useEffect(() => {
-    const objectUrl = URL.createObjectURL(file);
-    setUrl(objectUrl);
-
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [file]);
 
   // Apply the segment edit + crop, but report only a meaningful edit upward (an untouched single
   // full-speed segment + no crop → undefined, so the clip skips the ffmpeg pass).
@@ -307,8 +299,6 @@ export function useTimelineEditor({ file, edit, onChange }: UseTimelineEditorPar
 
   return {
     url,
-    videoRef,
-    containerRef,
     mode,
     duration,
     segments,

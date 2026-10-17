@@ -6,7 +6,7 @@
 // samples via imageVisibilityAt (show window + `motion` entrance); background layers get a wrapper
 // sampled via layerVisibilityAt (`reveal`). Animation files play as-is in wrappers sampled via
 // animationVisibilityAt (start / duration / motion), and the engine effects draw live on the program clock.
-import { forwardRef, useImperativeHandle, useRef, type CSSProperties, type RefObject } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, type CSSProperties, type RefObject } from 'react';
 import { flipCssTransform, type ColorVariableMap } from '@leclap/creative-kit/editor';
 import { displayFromTokens } from '@/lib/variableSyntax';
 import { useColorVariables } from '@/presentation/components/ui';
@@ -177,9 +177,11 @@ export const ProgramScene = forwardRef<ProgramSceneHandles, ProgramSceneProps>(
     const overlays: TextOverlay[] = section.overlays;
     const images = sceneImages(section);
     const graphics = sectionGraphics(section);
-    overlayRefs.current.length = overlays.length;
-    imageRefs.current.length = images.length;
-    layerRefs.current.length = sceneLayers(section).length;
+    useEffect(() => {
+      overlayRefs.current.length = overlays.length;
+      imageRefs.current.length = images.length;
+      layerRefs.current.length = sceneLayers(section).length;
+    }, [overlays.length, images.length, section]);
     // Resolve '{{ variable }}' colour tokens so playback matches the compiled colours.
     const { variables: colorVars } = useColorVariables();
 

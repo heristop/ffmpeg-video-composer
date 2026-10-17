@@ -37,6 +37,7 @@ describe('FxParamPanel', () => {
     expect(html).toContain('>Effect<');
     expect(html).toContain('Engine · adjustable');
     expect(html).toContain('Applies to');
+
     for (const label of ['Profile', 'Width', 'Tilt (°)', 'Direction', 'Bloom', 'Intensity', 'Color']) {
       expect(html).toContain(label);
     }

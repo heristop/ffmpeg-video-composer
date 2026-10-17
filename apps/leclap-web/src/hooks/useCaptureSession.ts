@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CaptureMode, TemplateOrientation } from '@leclap/creative-kit';
 import i18n from '@/i18n';
 import { useCameraCapture, pickMimeType } from './useCameraCapture';
+import { useObjectUrl } from './useObjectUrl';
 
 export type CaptureState = 'loading' | 'idle' | 'countdown' | 'recording' | 'preview' | 'error';
 
@@ -76,18 +77,39 @@ interface ScreenCaptureController {
 }
 
 function useScreenCapture(active: boolean): ScreenCaptureController {
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [state, setState] = useState<CaptureState>('idle');
-  const [file, setFile] = useState<File | null>(null);
-  const [elapsed, setElapsed] = useState(0);
-  const [error, setError] = useState('');
+  const [screen, setScreen] = useState({
+    active,
+    stream: null as MediaStream | null,
+    state: 'idle' as CaptureState,
+    file: null as File | null,
+    elapsed: 0,
+    error: '',
+  });
+
+  if (screen.active !== active) {
+    setScreen({ active, stream: null, state: 'idle', file: null, elapsed: 0, error: '' });
+  }
+
+  const { stream, state, file, elapsed, error } = screen;
+  const streamRef = useRef<MediaStream | null>(null);
+  const setStream = (next: MediaStream | null) => {
+    streamRef.current = next;
+    setScreen((current) => ({ ...current, stream: next }));
+  };
+  const setState = (next: CaptureState) => {
+    setScreen((current) => ({ ...current, state: next }));
+  };
+  const setFile = (next: File | null) => {
+    setScreen((current) => ({ ...current, file: next }));
+  };
+  const setElapsed = (next: number | ((current: number) => number)) => {
+    setScreen((current) => ({ ...current, elapsed: typeof next === 'function' ? next(current.elapsed) : next }));
+  };
+  const setError = (next: string) => {
+    setScreen((current) => ({ ...current, error: next }));
+  };
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-
-  // Keep a ref so the cleanup effect can stop tracks without the stream in deps
-  // (adding it would cause a loop: effect sets stream → stream changes → re-run).
-  const streamRef = useRef<MediaStream | null>(null);
-  streamRef.current = stream;
 
   // Tear down when deactivated
   useEffect(() => {
@@ -97,11 +119,6 @@ function useScreenCapture(active: boolean): ScreenCaptureController {
     recorderRef.current = null;
     chunksRef.current = [];
     stopTracks(streamRef.current);
-    setStream(null);
-    setState('idle');
-    setFile(null);
-    setElapsed(0);
-    setError('');
 
     return () => {};
   }, [active]);
@@ -367,21 +384,7 @@ export function useCaptureSession(config: CaptureSessionConfig): CaptureSessionR
   // The clip to show in the preview player. Camera keeps the recorded blob URL in `camera.previewUrl`
   // during the preview state (its `result`/capturedFile is only set on confirm); screen/upload already
   // have the file, so derive a URL from it.
-  const [resultUrl, setResultUrl] = useState<string | null>(null);
-  useEffect(() => {
-    if (isCameraMode || !derived.result) {
-      setResultUrl(null);
-
-      return () => {};
-    }
-
-    const url = URL.createObjectURL(derived.result);
-    setResultUrl(url);
-
-    return () => {
-      URL.revokeObjectURL(url);
-    };
-  }, [isCameraMode, derived.result]);
+  const resultUrl = useObjectUrl(isCameraMode ? undefined : (derived.result ?? undefined));
   const previewUrl = isCameraMode ? camera.previewUrl : resultUrl;
 
   const start = useCallback(() => {

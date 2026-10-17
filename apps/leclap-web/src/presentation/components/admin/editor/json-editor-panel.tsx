@@ -61,15 +61,17 @@ export const JsonEditorPanel = ({ state, onImport }: JsonEditorPanelProps) => {
   const { t } = useTranslation('admin');
   const exported = exportDescriptorJson(state);
   const [snapshot, setSnapshot] = useState(() => createJsonEditorSnapshot(exported));
+  const [syncedExport, setSyncedExport] = useState(exported);
   const [errors, setErrors] = useState<string[] | null>(null);
   const [applied, setApplied] = useState(false);
   const [valid, setValid] = useState(true);
 
   // Two-way sync: refresh the text from the form state only while the panel is clean. While dirty,
   // the snapshot is left untouched and stateChangedUnderneath below surfaces the conflict instead.
-  useEffect(() => {
+  if (exported !== syncedExport) {
+    setSyncedExport(exported);
     setSnapshot((previous) => syncJsonEditorSnapshot(previous, exported));
-  }, [exported]);
+  }
 
   // Debounced live-validity indicator. Re-uses importDescriptorJson (not a fresh schema call) so
   // there is exactly one validation seam in the app; the result here is display-only — Apply is

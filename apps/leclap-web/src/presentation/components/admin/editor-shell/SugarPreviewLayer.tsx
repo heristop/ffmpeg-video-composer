@@ -133,10 +133,14 @@ interface PieceGestures {
 // Shared pointer/keyboard gesture wiring for a sugar piece (a text line or the band): select on
 // press, drag with pointer capture (snap on release), double-click/Enter to edit, Delete/Backspace
 // to clear the block. Modeled on OverlayBox so sugar feels like any other canvas element.
-function usePieceGestures(gestures: PieceGestures, lineIndex: number, resize?: ResizeSupport) {
+function usePieceGestures(
+  gestures: PieceGestures,
+  lineIndex: number,
+  bodyRef: RefObject<HTMLElement | null>,
+  resize?: ResizeSupport
+) {
   const modeRef = useRef<'move' | 'resize' | null>(null);
   const startRef = useRef<{ x: number; y: number; moved: boolean }>({ x: 0, y: 0, moved: false });
-  const bodyRef = useRef<HTMLElement | null>(null);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
     e.stopPropagation();
@@ -225,7 +229,6 @@ function usePieceGestures(gestures: PieceGestures, lineIndex: number, resize?: R
   };
 
   return {
-    bodyRef,
     onPointerDown,
     onPointerMove,
     onPointerUp,
@@ -260,6 +263,7 @@ const SugarLineEditor = ({
   const [value, setValue] = useState(() => displayFromTokens(initial));
   const cancelledRef = useRef(false);
   const ref = useRef<HTMLTextAreaElement | null>(null);
+  const [anchor, setAnchor] = useState<HTMLTextAreaElement | null>(null);
   const pendingCaret = useRef<number | null>(null);
 
   // Restore the caret after a token insert replaced the value programmatically.
@@ -287,7 +291,10 @@ const SugarLineEditor = ({
   return (
     <>
       <textarea
-        ref={ref}
+        ref={(element) => {
+          ref.current = element;
+          setAnchor(element);
+        }}
         autoFocus
         aria-label={ariaLabel}
         value={value}
@@ -333,7 +340,7 @@ const SugarLineEditor = ({
         rows={1}
         className="min-w-[3ch] resize-none bg-transparent outline-none [field-sizing:content] [font:inherit] [color:inherit]"
       />
-      <FloatingVariableSuggestions autocomplete={autocomplete} totalCount={variables.length} anchorRef={ref} />
+      <FloatingVariableSuggestions autocomplete={autocomplete} totalCount={variables.length} anchor={anchor} />
     </>
   );
 };
@@ -376,14 +383,15 @@ interface SugarLineProps {
 // One drawtext line: the real font family/size/colour, plus the drawbox-style background when the
 // line carries a box (caption bar, badge pill). lineHeight 1 approximates drawtext's glyph-box y.
 const SugarLine = ({ line, lineIndex, gestures, editing, effectScale, shift, resize, editor }: SugarLineProps) => {
-  const g = usePieceGestures(gestures, lineIndex, resize);
+  const bodyRef = useRef<HTMLElement | null>(null);
+  const g = usePieceGestures(gestures, lineIndex, bodyRef, resize);
   // Resolve '{{ variable }}' colour tokens so a token-coloured line previews as its current colour.
   const { variables: colorVars } = useColorVariables();
 
   return (
     <span
       ref={(el) => {
-        g.bodyRef.current = el;
+        bodyRef.current = el;
       }}
       role="button"
       tabIndex={0}
@@ -452,11 +460,15 @@ const SugarBandBox = ({
   gestures: PieceGestures;
   shift?: { dx: number; dy: number };
 }) => {
-  const g = usePieceGestures(gestures, 0);
+  const bodyRef = useRef<HTMLElement | null>(null);
+  const g = usePieceGestures(gestures, 0, bodyRef);
   const { variables: colorVars } = useColorVariables();
 
   return (
     <div
+      ref={(element) => {
+        bodyRef.current = element;
+      }}
       role="button"
       tabIndex={0}
       aria-label={gestures.label}

@@ -160,16 +160,13 @@ export const VariableSuggestions = ({ autocomplete, totalCount }: VariableSugges
     );
   }
 
-  let lastScope: VariableOption['scope'] | null = null;
-
   return (
     <ul
       role="listbox"
       className="max-h-56 overflow-auto rounded-lg border border-foreground/10 bg-surface py-1 shadow-xl"
     >
       {options.map((option, index) => {
-        const showHeader = option.scope !== lastScope;
-        lastScope = option.scope;
+        const showHeader = index === 0 || option.scope !== options[index - 1].scope;
 
         return (
           <li key={`${option.scope}:${option.name}`}>
@@ -218,10 +215,8 @@ const FLOATING_MARGIN = 8;
 export const FloatingVariableSuggestions = ({
   autocomplete,
   totalCount,
-  anchorRef,
-}: VariableSuggestionsProps & { anchorRef: RefObject<HTMLElement | null> }) => {
-  const anchor = anchorRef.current;
-
+  anchor,
+}: VariableSuggestionsProps & { anchor: HTMLElement | null }) => {
   if (!autocomplete.query || !anchor) return null;
 
   const rect = anchor.getBoundingClientRect();

@@ -6,37 +6,27 @@ import type { MediaChoice } from '../templateEditorModel';
 // Resolve a MediaChoice to a previewable URL for the placement canvas: library → curated url, pasted
 // url → as-is, upload → a transient object URL read back from IndexedDB (revoked when the choice changes).
 export function useChoicePreviewUrl(choice: MediaChoice | undefined): string {
-  const [url, setUrl] = useState('');
+  let directUrl = '';
+
+  if (choice?.source === 'library') directUrl = findBackground(choice.id)?.url ?? '';
+
+  if (choice?.source === 'url') directUrl = choice.url;
+  const uploadKey = choice?.source === 'upload' ? choice.key : undefined;
+  const [upload, setUpload] = useState<{ key: string; url: string } | null>(null);
 
   useEffect(() => {
-    if (!choice) {
-      setUrl('');
-
-      return () => {};
-    }
-
-    if (choice.source === 'library') {
-      setUrl(findBackground(choice.id)?.url ?? '');
-
-      return () => {};
-    }
-
-    if (choice.source === 'url') {
-      setUrl(choice.url);
-
-      return () => {};
-    }
+    if (!uploadKey) return () => {};
 
     let objectUrl = '';
     let cancelled = false;
 
     browserMediaService
-      .getBytes(choice.key)
+      .getBytes(uploadKey)
       .then((bytes) => {
         if (!bytes || cancelled) return;
 
         objectUrl = URL.createObjectURL(new Blob([new Uint8Array(bytes)]));
-        setUrl(objectUrl);
+        setUpload({ key: uploadKey, url: objectUrl });
       })
       .catch(() => {});
 
@@ -45,7 +35,7 @@ export function useChoicePreviewUrl(choice: MediaChoice | undefined): string {
 
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [choice]);
+  }, [uploadKey]);
 
-  return url;
+  return directUrl || (upload && upload.key === uploadKey ? upload.url : '');
 }

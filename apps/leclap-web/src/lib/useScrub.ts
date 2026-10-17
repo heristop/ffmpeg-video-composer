@@ -81,7 +81,10 @@ export const useScrub = ({ value, onChange, step, min, max, pxPerStep }: UseScru
   const movedRef = useRef(false);
   // Keep the latest callback + range in refs so the once-mounted window listeners never go stale.
   const cfgRef = useRef({ onChange, step, min, max, pxPerStep });
-  cfgRef.current = { onChange, step, min, max, pxPerStep };
+
+  useEffect(() => {
+    cfgRef.current = { onChange, step, min, max, pxPerStep };
+  }, [onChange, step, min, max, pxPerStep]);
 
   useEffect(() => {
     const handleMove = (e: PointerEvent) => {

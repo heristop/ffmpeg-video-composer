@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { createElement, useState, useEffect, useRef } from 'react';
 import {
   CheckCircle2,
   XCircle,
@@ -284,7 +284,6 @@ export const BrowserCompatibility = () => {
   const [browserInfo, setBrowserInfo] = useState<BrowserInfo | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const checksRef = useRef(checks);
-
   useEffect(() => {
     // The checks are instant; the timer only moves the state update out of the effect's own pass.
     const timer = setTimeout(() => {
@@ -373,7 +372,7 @@ export const BrowserCompatibility = () => {
                 variant="neutral"
                 className="hidden sm:inline-flex gap-1.5 text-xs normal-case tracking-normal font-normal text-gray-400 px-3 py-1.5"
               >
-                <BrowserIcon className="w-3.5 h-3.5" />
+                {createElement(BrowserIcon, { className: 'w-3.5 h-3.5' })}
                 {browserInfo.name} {browserInfo.version}
               </Badge>
             )}

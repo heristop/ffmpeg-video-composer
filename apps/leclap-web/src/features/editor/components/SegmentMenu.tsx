@@ -27,7 +27,10 @@ export function SegmentMenu({ x, y, segment, canDelete, onSetSpeed, onSplit, onD
   // The timeline re-renders under an open menu (the playhead moves), handing a fresh onClose each
   // time; reading it through a ref keeps the focus hand-off below to one mount and one unmount.
   const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;

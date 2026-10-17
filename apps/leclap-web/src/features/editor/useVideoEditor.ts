@@ -1,4 +1,5 @@
 import { type RefObject, useEffect, useRef, useState } from 'react';
+import { useObjectUrl } from '@/hooks/useObjectUrl';
 import {
   type VideoEdit,
   type VideoTrim,
@@ -148,7 +149,7 @@ function useEditReporting(
 }
 
 export function useVideoEditor({ file, edit, onChange }: UseVideoEditorParams): UseVideoEditorResult {
-  const [url, setUrl] = useState('');
+  const url = useObjectUrl(file) ?? '';
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -163,18 +164,6 @@ export function useVideoEditor({ file, edit, onChange }: UseVideoEditorParams): 
     duration,
     onChange
   );
-
-  // Create the object URL inside the effect (not useMemo) so each StrictMode mount gets a fresh,
-  // un-revoked URL — otherwise StrictMode's immediate cleanup revokes it before the <video> loads,
-  // leaving a dead blob src that can't play.
-  useEffect(() => {
-    const objectUrl = URL.createObjectURL(file);
-    setUrl(objectUrl);
-
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [file]);
 
   const onLoadedMetadata = () => {
     const video = videoRef.current;

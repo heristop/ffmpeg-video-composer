@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll';
 import { MobileResizeHandle } from './MobileResizeHandle';
@@ -42,11 +42,13 @@ export const ShellChrome = ({
   useLockBodyScroll();
   const { containerRef, monitorHeight, beginResize, resizeBy } = useMobileSplit();
   // Opens on the panel: the monitor has nothing to show until the template has some content in it.
-  const [view, setView] = useState<ShellView>('panel');
+  const [viewState, setViewState] = useState(() => ({ panelFocusKey, view: 'panel' as ShellView }));
 
-  useEffect(() => {
-    setView('panel');
-  }, [panelFocusKey]);
+  if (viewState.panelFocusKey !== panelFocusKey) setViewState({ panelFocusKey, view: 'panel' });
+  const view = viewState.panelFocusKey === panelFocusKey ? viewState.view : 'panel';
+  const setView = (next: ShellView): void => {
+    setViewState({ panelFocusKey, view: next });
+  };
 
   const tabbed = viewTabs !== undefined;
   const onMonitor = tabbed && view === 'monitor';

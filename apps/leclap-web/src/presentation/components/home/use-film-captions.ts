@@ -1,5 +1,9 @@
 import { useEffect, useState, type RefObject } from 'react';
 
+const enableTextTrack = (track: TextTrack): void => {
+  track.mode = 'hidden';
+};
+
 // The film's captions, drawn by the player over its screen (film-player.tsx) rather than by the browser, so they
 // rise clear of the controls: the track stays hidden and its active cue is read out as it changes.
 export function useFilmCaptions(videoRef: RefObject<HTMLVideoElement | null>, mounted: boolean) {
@@ -11,7 +15,7 @@ export function useFilmCaptions(videoRef: RefObject<HTMLVideoElement | null>, mo
 
     if (!track) return () => {};
 
-    track.mode = 'hidden';
+    enableTextTrack(track);
     const onCueChange = () => {
       const active = track.activeCues?.[0];
       setCue(active && 'text' in active ? String(active.text) : '');

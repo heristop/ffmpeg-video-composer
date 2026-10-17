@@ -7,9 +7,12 @@ const REPEAT_MS = 60;
 
 export const useHoldRepeat = (action: () => void) => {
   const actionRef = useRef(action);
-  actionRef.current = action;
   const delayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    actionRef.current = action;
+  }, [action]);
 
   const stop = () => {
     if (delayRef.current) {

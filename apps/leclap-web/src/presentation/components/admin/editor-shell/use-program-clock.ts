@@ -20,7 +20,6 @@ export function useProgramClock(total: number, reduced: boolean): ProgramClock {
   const timeRef = useRef(0);
   const totalRef = useRef(total);
   const subscribers = useRef(new Set<(t: number) => void>());
-  totalRef.current = total;
 
   const broadcast = useCallback(() => {
     for (const fn of subscribers.current) fn(timeRef.current);
@@ -28,6 +27,8 @@ export function useProgramClock(total: number, reduced: boolean): ProgramClock {
 
   // Shrinking the timeline (scene deleted / shortened) pulls the playhead back in range.
   useEffect(() => {
+    totalRef.current = total;
+
     if (timeRef.current <= total) return;
 
     timeRef.current = total;

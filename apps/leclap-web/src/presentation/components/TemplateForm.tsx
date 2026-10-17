@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { useState, useId } from 'react';
+import { createElement, useState, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import {
@@ -171,7 +171,7 @@ const FormFieldItem = ({ field, index, formData, touched, onFieldChange }: FormF
         htmlFor={fieldId}
         className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300"
       >
-        <IconComponent className="w-4 h-4 text-brand-600 dark:text-brand-300" />
+        {createElement(IconComponent as LucideIcon, { className: 'w-4 h-4 text-brand-600 dark:text-brand-300' })}
         <span>{label}</span>
         {required && (
           <span className="text-brand-600 dark:text-brand-300" aria-label={t('form.status.requiredMark')}>

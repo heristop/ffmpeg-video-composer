@@ -8,14 +8,10 @@ import type { MediaChoice } from '../templateEditorModel';
 export function useClipPreviewUrl(choice: MediaChoice | undefined): string | undefined {
   const direct = choice?.source === 'url' ? choice.url : undefined;
   const uploadKey = choice?.source === 'upload' ? choice.key : undefined;
-  const [uploadUrl, setUploadUrl] = useState<string | undefined>();
+  const [upload, setUpload] = useState<{ key: string; url: string } | null>(null);
 
   useEffect(() => {
-    if (!uploadKey) {
-      setUploadUrl(undefined);
-
-      return () => {};
-    }
+    if (!uploadKey) return () => {};
 
     let objectUrl: string | null = null;
     let cancelled = false;
@@ -32,17 +28,16 @@ export function useClipPreviewUrl(choice: MediaChoice | undefined): string | und
         }
 
         objectUrl = url;
-        setUploadUrl(url);
+        setUpload({ key: uploadKey, url });
       })
       .catch(() => {});
 
     return () => {
       cancelled = true;
-      setUploadUrl(undefined);
 
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [uploadKey]);
 
-  return direct ?? uploadUrl;
+  return direct ?? (upload && upload.key === uploadKey ? upload.url : undefined);
 }

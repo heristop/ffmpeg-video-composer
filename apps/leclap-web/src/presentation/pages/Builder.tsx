@@ -561,10 +561,14 @@ const useProjectPersistence = (args: PersistenceArgs) => {
   // The output blob already persisted, so re-renders don't re-save the same finished video.
   const savedOutputRef = useRef<Blob | null>(null);
   const isProcessingRef = useRef(isProcessing);
-  isProcessingRef.current = isProcessing;
   const [hydrating, setHydrating] = useState(Boolean(projectIdParam));
   const hydratingRef = useRef(hydrating);
-  hydratingRef.current = hydrating;
+  useEffect(() => {
+    isProcessingRef.current = isProcessing;
+  }, [isProcessing]);
+  useEffect(() => {
+    hydratingRef.current = hydrating;
+  }, [hydrating]);
   // A completed project's output, materialized from IndexedDB so the result re-opens without a recompile.
   const [hydratedResult, setHydratedResult] = useState<ProcessedVideo | null>(null);
 
@@ -585,9 +589,15 @@ const useProjectPersistence = (args: PersistenceArgs) => {
     }
 
     if (projectIdParam) {
-      setHydrating(true);
+      let resolved = false;
+      const loadingTimer = window.setTimeout(() => {
+        if (!cancelled() && !resolved) setHydrating(true);
+      }, 0);
       loadProject(projectIdParam)
         .then(async (result) => {
+          resolved = true;
+          window.clearTimeout(loadingTimer);
+
           if (cancelled()) return;
 
           if (!result.ok) {
@@ -618,8 +628,16 @@ const useProjectPersistence = (args: PersistenceArgs) => {
           setHydrating(false);
         })
         .catch(() => {
+          resolved = true;
+          window.clearTimeout(loadingTimer);
+
           if (!cancelled()) setHydrating(false);
         });
+
+      return () => {
+        window.clearTimeout(loadingTimer);
+        run.cancelled = true;
+      };
     }
 
     return () => {
@@ -701,9 +719,7 @@ const useTemplatePreselect = ({ setSelectedTemplate, setModel, presetId }: Prese
   const projectIdParam = searchParams.get('projectId');
   // A nav-state template for the current param is already applied, so seed appliedRef and never resolve.
   const appliedRef = useRef<string | null>(presetId && presetId === templateParam ? templateParam : null);
-  const [resolving, setResolving] = useState(
-    Boolean(templateParam) && !projectIdParam && appliedRef.current !== templateParam
-  );
+  const [resolving, setResolving] = useState(Boolean(templateParam) && !projectIdParam && presetId !== templateParam);
 
   useEffect(() => {
     const pending = { cancelled: false };

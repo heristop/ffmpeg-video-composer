@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -97,6 +97,23 @@ const ReadyMeter = ({ done, total, t }: { done: number; total: number; t: TFunct
 // draft/standard/high render quality — an engine-resolved CRF/bitrate bundle (see resolveTier in
 // encoding.ts). Arms the NEXT render; changing it mid-compile has no effect on one already running.
 const QUALITY_TIERS: QualityTier[] = ['draft', 'standard', 'high'];
+
+function useProgramAreaView(sectionName: string | undefined, clipFile: File | undefined) {
+  const [viewState, setViewState] = useState({ sectionName, clipFile, editMode: false });
+
+  if (viewState.sectionName !== sectionName || viewState.clipFile !== clipFile) {
+    setViewState({ sectionName, clipFile, editMode: false });
+  }
+
+  const setEditMode = (next: boolean) => {
+    setViewState((current) => ({ ...current, editMode: next }));
+  };
+
+  return {
+    editMode: viewState.sectionName === sectionName && viewState.clipFile === clipFile ? viewState.editMode : false,
+    setEditMode,
+  };
+}
 
 const QualityTierControl = ({
   value,
@@ -268,12 +285,7 @@ interface ProgramAreaProps {
 
 // Right column: template preview by default; toggle to trim/crop editor when a clip is present.
 const ProgramArea = ({ clipFile, section, editForClip, onEditChange, template, model, t }: ProgramAreaProps) => {
-  const [editMode, setEditMode] = useState(false);
-
-  // Reset to preview whenever the active section changes or the clip is removed.
-  useEffect(() => {
-    setEditMode(false);
-  }, [section?.name, clipFile]);
+  const { editMode, setEditMode } = useProgramAreaView(section?.name, clipFile);
 
   return (
     <div className="flex h-full flex-col overflow-hidden">

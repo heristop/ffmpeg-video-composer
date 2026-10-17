@@ -54,7 +54,10 @@ const handlerFor = (action: EditorShortcutAction, h: EditorShortcutHandlers): ((
 
 export function useEditorShortcuts(handlers: EditorShortcutHandlers): void {
   const ref = useRef(handlers);
-  ref.current = handlers;
+
+  useEffect(() => {
+    ref.current = handlers;
+  }, [handlers]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {

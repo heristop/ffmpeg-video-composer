@@ -2,7 +2,7 @@
 // closure's current entry so React re-renders on every set/undo/redo, while the bounded undo/redo
 // stacks live entirely in the closure. The closure is created once (lazy useState init) and lives
 // for the editor's lifetime.
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { createHistory, type EditorState, type History } from '@/presentation/components/admin/templateEditorModel';
 
 export interface EditorHistory {
@@ -32,10 +32,7 @@ function snapshot(history: History): Mirror {
 }
 
 export function useEditorHistory(initial: EditorState): EditorHistory {
-  const historyRef = useRef<History | null>(null);
-  historyRef.current ??= createHistory(initial);
-
-  const history = historyRef.current;
+  const [history] = useState(() => createHistory(initial));
   const [mirror, setMirror] = useState<Mirror>(() => snapshot(history));
 
   const set = (next: EditorState | ((current: EditorState) => EditorState)): void => {

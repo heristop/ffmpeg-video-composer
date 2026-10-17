@@ -1,7 +1,7 @@
 // State hooks lifted out of TemplateEditorShell to keep the shell component itself thin: the live
 // program monitor (playable timeline + rAF clock + play-mode bookkeeping) and template persistence
 // (guard + projection + save). The shell composes these with the shared editor-state hooks.
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { useReducedMotion } from 'motion/react';
 import { userTemplateService } from '@/services/userTemplateService';
@@ -25,18 +25,11 @@ export function useProgramMonitor(state: EditorState) {
   );
   const playTotal = playTimeline.at(-1)?.end ?? 0;
   const clock = useProgramClock(playTotal, reduced);
-  const [playMode, setPlayMode] = useState(false);
-
-  useEffect(() => {
-    if (clock.playing) setPlayMode(true);
-  }, [clock.playing]);
-
   const exitPlayMode = (): void => {
     clock.pause();
-    setPlayMode(false);
   };
 
-  return { clock, playTimeline, playMode, exitPlayMode };
+  return { clock, playTimeline, playMode: clock.playing, exitPlayMode };
 }
 
 interface PersistenceArgs {

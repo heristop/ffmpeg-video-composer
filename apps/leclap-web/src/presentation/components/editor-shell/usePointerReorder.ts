@@ -117,11 +117,14 @@ export const usePointerReorder = (onReorder: (from: number, to: number) => void)
   const [overIndex, setOverIndex] = useState<number | null>(null);
   const state = useRef<DragState | null>(null);
   const onReorderRef = useRef(onReorder);
-  onReorderRef.current = onReorder;
   const handlers = useRef<{ move: (e: PointerEvent) => void; up: (e: PointerEvent) => void }>({
     move: () => {},
     up: () => {},
   });
+
+  useEffect(() => {
+    onReorderRef.current = onReorder;
+  }, [onReorder]);
 
   const preventScroll = useCallback((event: TouchEvent) => {
     event.preventDefault();
@@ -136,7 +139,7 @@ export const usePointerReorder = (onReorder: (from: number, to: number) => void)
     s.raf = null;
   }, []);
 
-  const tickEdge = useCallback(() => {
+  const tickEdge = useCallback(function tickEdge() {
     const root = containerRef.current;
     const s = state.current;
 
@@ -264,7 +267,9 @@ export const usePointerReorder = (onReorder: (from: number, to: number) => void)
     [cleanup]
   );
 
-  handlers.current = { move: onMove, up: onUp };
+  useEffect(() => {
+    handlers.current = { move: onMove, up: onUp };
+  }, [onMove, onUp]);
 
   const itemPointerDown = useCallback(
     (index: number) => (event: React.PointerEvent) => {

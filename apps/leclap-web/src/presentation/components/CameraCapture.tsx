@@ -546,7 +546,11 @@ export const CameraCapture = ({
 
   // Keep a stable ref so confirming doesn't depend on the parent re-creating onCapture each render.
   const onCaptureRef = useRef(onCapture);
-  onCaptureRef.current = onCapture;
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCaptureRef.current = onCapture;
+    onCloseRef.current = onClose;
+  });
 
   // "Use this video": confirm finalizes the capture, which populates `session.result`. For camera modes
   // the result only appears AFTER confirm (the recorded blob lives in `session.previewUrl` until then);
@@ -554,17 +558,26 @@ export const CameraCapture = ({
   // parent + close once the result lands. Delivery happens on explicit confirm only, so "Retake"
   // discards the take cleanly.
   const [confirmRequested, setConfirmRequested] = useState(false);
+  const deliveredResultRef = useRef<File | null>(null);
   const handleConfirm = () => {
     setConfirmRequested(true);
     session.confirm();
   };
   useEffect(() => {
-    if (!confirmRequested || !session.result) return;
+    if (!confirmRequested || !session.result || deliveredResultRef.current === session.result) return () => {};
 
-    setConfirmRequested(false);
-    onCaptureRef.current(session.result);
-    onClose();
-  }, [confirmRequested, session.result, onClose]);
+    const result = session.result;
+    deliveredResultRef.current = result;
+    const timer = window.setTimeout(() => {
+      onCaptureRef.current(result);
+      onCloseRef.current();
+      setConfirmRequested(false);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [confirmRequested, session.result]);
 
   return createPortal(
     // Fullscreen camera: the stage fills the whole viewport edge-to-edge; the top bar and record

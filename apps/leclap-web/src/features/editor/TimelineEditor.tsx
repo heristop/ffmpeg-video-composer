@@ -34,11 +34,6 @@ const isMac = (): boolean => typeof navigator !== 'undefined' && /Mac|iP(hone|ad
 // ⌘Z / ⌘⇧Z (Ctrl on other platforms) drive the cut history — except while a text field has focus,
 // where the keystroke belongs to the field's own undo.
 const useUndoShortcuts = (undo: () => void, redo: () => void) => {
-  const undoRef = useRef(undo);
-  const redoRef = useRef(redo);
-  undoRef.current = undo;
-  redoRef.current = redo;
-
   useEffect(() => {
     const handleKey = (ev: KeyboardEvent) => {
       const modKey = ev.metaKey || ev.ctrlKey;
@@ -50,12 +45,12 @@ const useUndoShortcuts = (undo: () => void, redo: () => void) => {
       ev.preventDefault();
 
       if (ev.shiftKey) {
-        redoRef.current();
+        redo();
 
         return;
       }
 
-      undoRef.current();
+      undo();
     };
 
     window.addEventListener('keydown', handleKey);
@@ -63,7 +58,7 @@ const useUndoShortcuts = (undo: () => void, redo: () => void) => {
     return () => {
       window.removeEventListener('keydown', handleKey);
     };
-  }, []);
+  }, [undo, redo]);
 };
 
 // The trim/split/speed/crop editor, hosted in the program monitor's place. It fills the area it is
@@ -71,7 +66,9 @@ const useUndoShortcuts = (undo: () => void, redo: () => void) => {
 // — stays on screen instead of below a fixed-height player.
 export function TimelineEditor({ file, label, edit, onChange }: TimelineEditorProps) {
   const { t } = useTranslation('builder');
-  const e = useTimelineEditor({ file, edit, onChange });
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const e = useTimelineEditor({ file, edit, onChange, videoRef, containerRef });
   const canDelete = e.segments.length > 1;
   const { ref: playRef, hoverProps: playHoverProps } = useIconHover();
   const { ref: pauseRef, hoverProps: pauseHoverProps } = useIconHover();
@@ -134,9 +131,9 @@ export function TimelineEditor({ file, label, edit, onChange }: TimelineEditorPr
         )}
       </div>
 
-      <div ref={e.containerRef} className="relative min-h-40 flex-1 overflow-hidden rounded-xl bg-black">
+      <div ref={containerRef} className="relative min-h-40 flex-1 overflow-hidden rounded-xl bg-black">
         <video
-          ref={e.videoRef}
+          ref={videoRef}
           src={e.url || undefined}
           aria-label={t('edit.videoAriaLabel')}
           className="absolute inset-0 h-full w-full object-contain"

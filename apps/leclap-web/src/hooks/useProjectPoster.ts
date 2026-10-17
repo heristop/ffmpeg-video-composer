@@ -14,22 +14,11 @@ const posterCache = new Map<string, string>();
  */
 export function useProjectPoster(project: StoredProject): string | null {
   const blobKey = project.status === 'completed' ? project.output?.blobKey : undefined;
-  const [poster, setPoster] = useState<string | null>(() => (blobKey ? (posterCache.get(blobKey) ?? null) : null));
+  const [poster, setPoster] = useState<{ blobKey: string; dataUrl: string } | null>(null);
+  const cachedPoster = blobKey ? (posterCache.get(blobKey) ?? null) : null;
 
   useEffect(() => {
-    if (!blobKey) {
-      setPoster(null);
-
-      return () => {};
-    }
-
-    const cached = posterCache.get(blobKey);
-
-    if (cached) {
-      setPoster(cached);
-
-      return () => {};
-    }
+    if (!blobKey || posterCache.has(blobKey)) return () => {};
 
     let cancelled = false;
 
@@ -42,7 +31,7 @@ export function useProjectPoster(project: StoredProject): string | null {
         if (!dataUrl || cancelled) return;
 
         posterCache.set(blobKey, dataUrl);
-        setPoster(dataUrl);
+        setPoster({ blobKey, dataUrl });
       })
       .catch((error: unknown) => {
         logger.error('Project poster capture failed:', error);
@@ -53,5 +42,5 @@ export function useProjectPoster(project: StoredProject): string | null {
     };
   }, [blobKey, project]);
 
-  return poster;
+  return cachedPoster ?? (poster && poster.blobKey === blobKey ? poster.dataUrl : null);
 }

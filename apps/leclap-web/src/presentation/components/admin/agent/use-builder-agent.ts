@@ -1,7 +1,7 @@
 // The builder's side of WebMCP: builds the tool layer's BuilderPort (agent-port.ts) over the shell's
 // history, selection, partials, preview dialog and library, and registers the tools with the browser's
 // ModelContext — once per enabled / capability change, never per render: tools read live state through
-// a ref the layout effect keeps current. It also owns the preview render the Preview button shares and the
+// a live source the layout effect keeps current. It also owns the preview render the Preview button shares and the
 // agent drawer, which with the confirmations forms the shell's 'agent' overlay. The tool layer itself is a lazy chunk imported on idle, only when the browser has WebMCP
 // (natively, or the dev polyfill) and the user left the toggle on. Turning it off, or leaving the
 // builder, aborts every registration (the agent sees `toolchange`) and declines pending confirmations.
@@ -16,7 +16,7 @@ import { loadWebMcpPolyfill, POLYFILL_BUILD, polyfillRequested } from '@/infrast
 import { webMcpSettings, type WebMcpSettings } from '@/infrastructure/webmcp/settings-store';
 import type { SelectionAction } from '../editor-shell/useEditorSelection';
 import { usePreviewRender, type PreviewRender } from '../editor/usePreviewRender';
-import { createPort, type AgentModalHost, type AgentSession, type Live } from './agent-port';
+import { createLiveSource, createPort, type AgentModalHost, type AgentSession } from './agent-port';
 import {
   activityReducer,
   ANNOUNCE_DELAY_MS,
@@ -297,7 +297,9 @@ export function useBuilderAgent({
   const settings = useSyncExternalStore(webMcpSettings.subscribe, webMcpSettings.get, webMcpSettings.get);
   const support = useWebMcpSupport(settings.polyfill);
   const preview = usePreviewRender();
-  const live = useRef<Live>({ history, selectedIndex, dispatch, modals, localPartials, settings, preview });
+  const [live] = useState(() =>
+    createLiveSource({ history, selectedIndex, dispatch, modals, localPartials, settings, preview })
+  );
   const feed = useActivityFeed();
   const [highlighted, highlight] = useHighlight();
   const [inFlight, setInFlight] = useState(0);
@@ -313,7 +315,7 @@ export function useBuilderAgent({
   const overlay = useAgentOverlay(modals, queue, session);
 
   useLayoutEffect(() => {
-    live.current = { history, selectedIndex, dispatch, modals, localPartials, settings, preview };
+    live.update({ history, selectedIndex, dispatch, modals, localPartials, settings, preview });
   });
 
   // One overlay at a time: another overlay replacing the confirmation declines it.

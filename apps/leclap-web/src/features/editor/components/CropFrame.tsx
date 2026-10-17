@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Move } from '@/presentation/components/icons';
 import { cn } from '@/lib/utils';
 import type { VideoCrop } from '@/domain/valueObjects/videoEdits';
@@ -67,8 +67,11 @@ export function CropFrame({
   onChange: (next: VideoCrop) => void;
 }) {
   const cropRef = useRef<VideoCrop>(crop);
-  cropRef.current = crop;
   const [dragging, setDragging] = useState<'move' | Corner | null>(null);
+
+  useEffect(() => {
+    cropRef.current = crop;
+  }, [crop]);
 
   const startDrag = (kind: 'move' | Corner) => (e: React.PointerEvent) => {
     e.preventDefault();

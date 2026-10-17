@@ -47,26 +47,25 @@ const Step = ({
 // once the JSON is on the clipboard.
 export const ShareTemplateDialog = ({ template, onClose }: { template: Template | null; onClose: () => void }) => {
   const { t } = useTranslation('admin');
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState(() => ({ template, copied: false }));
+
+  if (copyState.template !== template) setCopyState({ template, copied: false });
+  const copied = copyState.template === template && copyState.copied;
   const returnFocus = useReturnFocus();
   const json = template ? JSON.stringify(template.descriptor, null, 2) : '';
 
   // "Copied" is a brief acknowledgement: it clears after two seconds and whenever another template opens.
   useEffect(() => {
-    setCopied(false);
-  }, [template]);
-
-  useEffect(() => {
     const timer = copied
       ? window.setTimeout(() => {
-          setCopied(false);
+          setCopyState((current) => (current.template === template ? { ...current, copied: false } : current));
         }, 2000)
       : undefined;
 
     return () => {
       window.clearTimeout(timer);
     };
-  }, [copied]);
+  }, [copied, template]);
 
   return (
     <Dialog
@@ -103,7 +102,7 @@ export const ShareTemplateDialog = ({ template, onClose }: { template: Template 
                 navigator.clipboard
                   .writeText(json)
                   .then(() => {
-                    setCopied(true);
+                    setCopyState({ template, copied: true });
                   })
                   .catch(() => {});
               }}

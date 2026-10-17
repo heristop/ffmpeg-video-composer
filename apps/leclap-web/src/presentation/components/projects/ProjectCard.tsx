@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Film, Pencil } from '@/presentation/components/icons';
 import { ClockIcon } from '@/presentation/components/icons/clock';
@@ -33,13 +33,24 @@ const formatDuration = (seconds: number): string => {
 export const ProjectCard = ({ project, onOpen, onEdit, onDuplicate, onDelete, onRename }: ProjectCardProps) => {
   const { t } = useTranslation('projects');
   const completed = project.status === 'completed';
-  const elapsed = relativeTime(project.updatedAt, Date.now());
+  const [now, setNow] = useState(0);
+  const elapsed = relativeTime(project.updatedAt, now || project.updatedAt);
   const clipCount = Object.keys(project.clips).length;
   const poster = useProjectPoster(project);
 
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState(project.name);
   const titleRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setNow(Date.now());
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, []);
 
   // Tag the project title as the View Transition's shared element so it morphs into the builder titlebar
   // when the project opens. Set imperatively right before navigating so the name is on the DOM before the

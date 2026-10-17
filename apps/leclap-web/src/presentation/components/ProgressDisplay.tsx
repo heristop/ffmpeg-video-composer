@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ComponentType } from 'react';
+import { createElement, useEffect, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Hourglass } from 'lucide-react';
 import { CheckCircle2, AlertCircle } from '@/presentation/components/icons';
@@ -177,7 +177,7 @@ const ProgressHeader = ({ stage, percentage }: ProgressHeaderProps) => {
             : 'bg-brand-500/15 text-brand-700 dark:text-brand-300'
         )}
       >
-        <StageIcon className="w-5 h-5" />
+        {createElement(StageIcon as ComponentType<{ className?: string }>, { className: 'w-5 h-5' })}
       </div>
       <h3 className="min-w-0 truncate text-base font-semibold text-foreground sm:text-lg">{t(stageKey(stage))}</h3>
     </div>
@@ -234,14 +234,12 @@ export const ProgressDisplay = ({ progress }: ProgressDisplayProps) => {
 
   // The bar is the single source of truth. Keep it monotonic so a late segment resetting its raw
   // fraction can't rewind it; a fresh run (raw back near 0) drops the floor so the next compile starts over.
-  const maxPctRef = useRef(0);
+  const [maxPct, setMaxPct] = useState(0);
+  const nextMaxPct = rawPercentage <= 1 ? rawPercentage : Math.max(maxPct, rawPercentage);
 
-  if (rawPercentage <= 1) {
-    maxPctRef.current = rawPercentage;
-  }
+  if (nextMaxPct !== maxPct) setMaxPct(nextMaxPct);
 
-  const percentage = Math.max(maxPctRef.current, rawPercentage);
-  maxPctRef.current = percentage;
+  const percentage = Math.max(nextMaxPct, rawPercentage);
 
   // Derive the active dot from the bar so the dots march 1→N in lockstep with progress instead of
   // sitting on a hardcoded step; one past the last when complete so every dot reads done.
@@ -252,29 +250,34 @@ export const ProgressDisplay = ({ progress }: ProgressDisplayProps) => {
 
   // Live elapsed time: the clock starts when this mounts (the compile is what mounts it) and freezes
   // at completion.
-  const startRef = useRef<number | null>(null);
-
-  startRef.current ??= Date.now();
-
+  const [startedAt, setStartedAt] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
 
   useEffect(() => {
+    const startTimer = window.setTimeout(() => {
+      setStartedAt(Date.now());
+    }, 0);
+
+    return () => {
+      window.clearTimeout(startTimer);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (startedAt === null) return () => {};
+
     const tick = () => {
-      setElapsedMs(Date.now() - (startRef.current ?? Date.now()));
+      setElapsedMs(Date.now() - startedAt);
     };
 
     tick();
 
-    if (done) {
-      return () => {};
-    }
-
-    const id = window.setInterval(tick, 500);
+    const id = done ? null : window.setInterval(tick, 500);
 
     return () => {
-      window.clearInterval(id);
+      if (id !== null) window.clearInterval(id);
     };
-  }, [done]);
+  }, [done, startedAt]);
 
   return (
     // The panel itself doesn't breathe — a looping opacity dip on this container fades its own text

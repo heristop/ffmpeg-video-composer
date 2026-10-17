@@ -320,16 +320,23 @@ function usePreRecordCountdown(
 ) {
   const [countdownValue, setCountdownValue] = useState<number | null>(null);
   const startRef = useRef(recorderStart);
-  startRef.current = recorderStart;
+
+  useEffect(() => {
+    startRef.current = recorderStart;
+  });
 
   useEffect(() => {
     if (countdownValue === null) return () => {};
 
     if (countdownValue <= 0) {
-      setCountdownValue(null);
-      startRef.current();
+      const id = window.setTimeout(() => {
+        setCountdownValue(null);
+        startRef.current();
+      }, 0);
 
-      return () => {};
+      return () => {
+        window.clearTimeout(id);
+      };
     }
 
     const id = window.setTimeout(() => {

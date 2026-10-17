@@ -1,5 +1,5 @@
 // The builder's BuilderPort: what the browser-agent tools may read and do, over the shell's live history,
-// selection, partials, preview dialog and library. Every method reads `live.current` (kept fresh by the
+// selection, partials, preview dialog and library. Every method reads the live source (kept fresh by the
 // hook's layout effect), so registering once serves every later state. Consequential actions go through
 // the page's own surfaces: renders open the same preview dialog the Preview button does, saves write the
 // same projection the Save button writes (without leaving the builder).
@@ -41,6 +41,22 @@ export interface Live {
   preview: PreviewRender;
 }
 
+export interface LiveSource {
+  read: () => Live;
+  update: (next: Live) => void;
+}
+
+export function createLiveSource(initial: Live): LiveSource {
+  let current = initial;
+
+  return {
+    read: () => current,
+    update: (next) => {
+      current = next;
+    },
+  };
+}
+
 /** Per-page agent memory: tools the user allowed for this session, and the preview the agent rendered. */
 export interface AgentSession {
   allowed: Set<BuilderToolName>;
@@ -56,8 +72,9 @@ function seconds(ms: number): number {
   return Math.round(ms / 100) / 10;
 }
 
-async function previewRender(live: { current: Live }, session: AgentSession, signal: AbortSignal) {
-  const outcome = await live.current.preview.start(live.current.history.read().state, signal);
+async function previewRender(live: LiveSource, session: AgentSession, signal: AbortSignal) {
+  const current = live.read();
+  const outcome = await current.preview.start(current.history.read().state, signal);
 
   if (outcome.status === 'busy') return { status: 'busy' } satisfies AgentRenderOutcome;
 
@@ -76,8 +93,8 @@ async function previewRender(live: { current: Live }, session: AgentSession, sig
   return { status: 'done', seconds: seconds(outcome.elapsedMs) } satisfies AgentRenderOutcome;
 }
 
-async function frames(live: { current: Live }, session: AgentSession, at: number[], signal: AbortSignal) {
-  const { preview } = live.current;
+async function frames(live: LiveSource, session: AgentSession, at: number[], signal: AbortSignal) {
+  const { preview } = live.read();
   const url = session.previewUrl;
 
   if (!url || !preview.open || preview.result?.url !== url) return { status: 'no_preview' } as AgentFramesOutcome;
@@ -89,8 +106,8 @@ async function frames(live: { current: Live }, session: AgentSession, at: number
   }
 }
 
-function save(live: { current: Live }): AgentSaveOutcome {
-  const state = live.current.history.read().state;
+function save(live: LiveSource): AgentSaveOutcome {
+  const state = live.read().history.read().state;
   const blocker = saveBlockerText(state);
 
   if (blocker) return { saved: false, blocker };
@@ -103,7 +120,7 @@ function save(live: { current: Live }): AgentSaveOutcome {
 }
 
 export function createPort(
-  live: { current: Live },
+  live: LiveSource,
   queue: ConfirmQueue,
   feedback: Feedback,
   session: AgentSession
@@ -111,48 +128,49 @@ export function createPort(
   const selectAndShow = (changed: number[]): void => {
     const first = changed.at(0);
 
-    if (first !== undefined) live.current.dispatch({ type: 'selectScene', index: first });
+    if (first !== undefined) live.read().dispatch({ type: 'selectScene', index: first });
     feedback.highlight(changed);
   };
 
   return {
     // The history closure, not the render mirror: a call right after an edit reads that edit.
-    getState: () => live.current.history.read().state,
+    getState: () => live.read().history.read().state,
     getEditor: () => {
-      const { canUndo, canRedo } = live.current.history.read();
+      const current = live.read();
+      const { canUndo, canRedo } = current.history.read();
 
-      return { selectedIndex: live.current.selectedIndex, canUndo, canRedo };
+      return { selectedIndex: current.selectedIndex, canUndo, canRedo };
     },
     commit: (next, meta) => {
-      live.current.history.set(next);
+      live.read().history.set(next);
       selectAndShow(meta.changed);
     },
     replace: (next, meta) => {
-      live.current.history.reset(next);
+      live.read().history.reset(next);
       selectAndShow(meta.changed);
     },
     undoIfPresent: (state) => {
-      if (live.current.history.read().state !== state) return false;
+      if (live.read().history.read().state !== state) return false;
 
-      live.current.history.undo();
+      live.read().history.undo();
 
       return true;
     },
     selectScene: (position) => {
-      live.current.dispatch({ type: 'selectScene', index: position });
+      live.read().dispatch({ type: 'selectScene', index: position });
     },
     confirm: (request, signal) => {
       if (request.sessionAllowable && session.allowed.has(request.tool)) return Promise.resolve(true);
 
       const answer = queue.request(request, signal);
-      live.current.modals.open('agent');
+      live.read().modals.open('agent');
 
       return answer;
     },
-    localPartials: () => live.current.localPartials,
+    localPartials: () => live.read().localPartials,
     report: feedback.report,
     isDocumentVisible: () => document.visibilityState === 'visible',
-    askBeforeEdit: () => live.current.settings.askBeforeEdit,
+    askBeforeEdit: () => live.read().settings.askBeforeEdit,
     previewRender: (signal) => previewRender(live, session, signal),
     captureFrames: (at, signal) => frames(live, session, at, signal),
     save: () => save(live),

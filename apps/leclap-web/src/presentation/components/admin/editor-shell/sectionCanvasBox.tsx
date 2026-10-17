@@ -4,6 +4,7 @@
 import {
   useLayoutEffect,
   useRef,
+  useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
@@ -178,6 +179,7 @@ function assignEditRef(editRef: React.Ref<HTMLTextAreaElement>, el: HTMLTextArea
 // body portal (the canvas frame clips and transforms its children).
 const BoxContent = ({ overlay, editing, t, variables, editRef, onCommitText, onCaret, onEndEdit }: BoxContentProps) => {
   const localRef = useRef<HTMLTextAreaElement | null>(null);
+  const [anchor, setAnchor] = useState<HTMLTextAreaElement | null>(null);
   const pendingCaret = useRef<number | null>(null);
   const known = new Set(variables);
 
@@ -205,6 +207,7 @@ const BoxContent = ({ overlay, editing, t, variables, editRef, onCommitText, onC
         <textarea
           ref={(el) => {
             localRef.current = el;
+            setAnchor(el);
             assignEditRef(editRef, el);
           }}
           autoFocus
@@ -247,7 +250,7 @@ const BoxContent = ({ overlay, editing, t, variables, editRef, onCommitText, onC
           // wraps the overlay content; min-w keeps the placeholder readable while empty.
           className="min-w-[3ch] resize-none bg-transparent text-center outline-none [field-sizing:content] [font:inherit] [color:inherit] placeholder:opacity-45"
         />
-        <FloatingVariableSuggestions autocomplete={autocomplete} totalCount={variables.length} anchorRef={localRef} />
+        <FloatingVariableSuggestions autocomplete={autocomplete} totalCount={variables.length} anchor={anchor} />
       </>
     );
   }

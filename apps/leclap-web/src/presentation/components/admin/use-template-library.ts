@@ -19,23 +19,26 @@ export function useTemplateLibrary() {
   const { t } = useTranslation('admin');
   const [mine, setMine] = useState(() => recentFirst(userTemplateService.list()));
   const [samples, setSamples] = useState<Template[]>([]);
-  const [status, setStatus] = useState<SamplesStatus>('loading');
+  const [loadState, setLoadState] = useState<{ attempt: number; status: SamplesStatus }>({
+    attempt: 0,
+    status: 'loading',
+  });
   const [attempt, setAttempt] = useState(0);
+  const status = loadState.attempt === attempt ? loadState.status : 'loading';
 
   useEffect(() => {
     let live = true;
-    setStatus('loading');
     templateService
       .getAllTemplates()
       .then((all) => {
         if (!live) return;
         setSamples(all.filter(isSample));
-        setStatus('ready');
+        setLoadState({ attempt, status: 'ready' });
       })
       .catch((error: unknown) => {
         logger.error('Failed to load templates', error);
 
-        if (live) setStatus('error');
+        if (live) setLoadState({ attempt, status: 'error' });
       });
 
     return () => {

@@ -151,7 +151,10 @@ export const ProgramPlayer = ({ state, clock, timeline }: ProgramPlayerProps) =>
 
   // Latest data for the paint closure without re-subscribing per render.
   const dataRef = useRef({ state, timeline, mounted });
-  dataRef.current = { state, timeline, mounted };
+
+  useEffect(() => {
+    dataRef.current = { state, timeline, mounted };
+  }, [state, timeline, mounted]);
 
   const containers = useRef(new Map<number, HTMLDivElement | null>());
   const handles = useRef(new Map<number, ProgramSceneHandles | null>());

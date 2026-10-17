@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export interface BrowserSupportCheck {
   id: 'camera' | 'engine' | 'fileHandling';
@@ -36,11 +36,9 @@ const evaluateSupport = (): BrowserSupportCheck[] => [
 ];
 
 export const useBrowserSupport = () => {
-  const [checks, setChecks] = useState<BrowserSupportCheck[] | null>(null);
-
-  useEffect(() => {
-    setChecks(evaluateSupport());
-  }, []);
+  const [checks] = useState<BrowserSupportCheck[] | null>(() =>
+    typeof navigator === 'undefined' ? null : evaluateSupport()
+  );
 
   return {
     checks,

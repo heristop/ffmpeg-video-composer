@@ -122,6 +122,24 @@ const TriggerSwatch = React.forwardRef<
 });
 TriggerSwatch.displayName = 'TriggerSwatch';
 
+function useSyncedDraft(value: string) {
+  const [state, setState] = React.useState(() => ({ value, draft: colorDraftFromValue(value) }));
+
+  if (state.value !== value) setState({ value, draft: colorDraftFromValue(value) });
+
+  const draft = state.value === value ? state.draft : colorDraftFromValue(value);
+
+  return {
+    draft,
+    update: (next: string) => {
+      setState({ value, draft: next });
+    },
+    reset: () => {
+      setState({ value, draft: colorDraftFromValue(value) });
+    },
+  };
+}
+
 // On-brand color picker: native swatch (OS picker) + validated hex entry + quick-pick swatches.
 // Inside an editor shell (ColorVariablesProvider) the field is also variable-aware: the template's
 // colour variables appear as pickable chips that store a literal '{{ name }}' token, the swatch
@@ -135,12 +153,7 @@ const ColorPicker = React.forwardRef<HTMLInputElement, ColorPickerProps>(
     ref
   ) => {
     const scope = useColorVariables();
-    const [draft, setDraft] = React.useState(() => colorDraftFromValue(value));
-
-    // Keep the text field in sync when the value changes from outside (swatch/native picker/chip).
-    React.useEffect(() => {
-      setDraft(colorDraftFromValue(value));
-    }, [value]);
+    const { draft, update: updateDraft, reset: resetDraft } = useSyncedDraft(value);
 
     const chips = variableChips(scope);
     // Typed names accept ANY in-scope variable (even one whose colour isn't set yet) — the swatch
@@ -159,7 +172,7 @@ const ColorPicker = React.forwardRef<HTMLInputElement, ColorPickerProps>(
         return;
       }
 
-      setDraft(colorDraftFromValue(value)); // revert an invalid entry
+      resetDraft(); // revert an invalid entry
     };
 
     return (
@@ -184,7 +197,7 @@ const ColorPicker = React.forwardRef<HTMLInputElement, ColorPickerProps>(
               aria-label={`${ariaLabel ?? 'Color'} hex value`}
               value={draft}
               onChange={(e) => {
-                setDraft(filterColorDraft(e.target.value));
+                updateDraft(filterColorDraft(e.target.value));
               }}
               onBlur={(e) => {
                 commit(e.target.value);

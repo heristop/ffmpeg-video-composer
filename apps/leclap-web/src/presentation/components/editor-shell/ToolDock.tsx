@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, type ComponentType, type KeyboardEvent } from 'react';
+import React, { useRef, useState, type ComponentType, type KeyboardEvent } from 'react';
 import { cn } from '@/lib/utils';
 import { arrowTarget } from '@/presentation/components/builder/rovingKeys';
 import { useIconHover, type AnimatedIconHandle } from '@/presentation/components/icons/useIconHover';
@@ -78,13 +78,13 @@ const DockButton = ({ icon: Icon, label, active, tabIndex, onSelect, buttonRef, 
 export const ToolDock = <Id extends string>({ items, active, onSelect, ariaLabel }: ToolDockProps<Id>) => {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const activeIndex = items.findIndex((item) => item.id === active);
-  // Track the prior slot so the indicator's stretch can lean toward the direction it's travelling.
-  const prevIndex = useRef(activeIndex);
-  const goingDown = activeIndex >= prevIndex.current;
+  const [travel, setTravel] = useState(() => ({ activeIndex, goingDown: true }));
 
-  useEffect(() => {
-    prevIndex.current = activeIndex;
-  });
+  if (travel.activeIndex !== activeIndex) {
+    setTravel({ activeIndex, goingDown: activeIndex >= travel.activeIndex });
+  }
+
+  const goingDown = travel.activeIndex === activeIndex ? travel.goingDown : activeIndex >= travel.activeIndex;
 
   const move = (event: KeyboardEvent, from: number) => {
     const target = arrowTarget(event.key, from, items.length - 1);
