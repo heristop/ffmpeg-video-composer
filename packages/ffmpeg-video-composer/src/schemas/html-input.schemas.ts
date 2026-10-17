@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { HtmlMotionSchema } from './html-motion.schemas';
 
 // The fields of an HTML layer input (`type: "html"`), spread into InputSchema. The box is bounded by the
 // descriptor rule html_too_large (services/html-validation.ts) rather than here, so the finding names the
@@ -20,9 +21,13 @@ export const HtmlInputShape = {
     .describe('html layer: stylesheet (tag, .class, descendant selectors; flexbox subset); $color.*/$font.* tokens.'),
   width: z.number().int().positive().optional().describe('html layer: box width in output pixels (max 1920).'),
   height: z.number().int().positive().optional().describe('html layer: box height in output pixels (max 1920).'),
+  motion: HtmlMotionSchema.optional().describe(
+    'html layer: per-element keyframes { name: { x, y, scale, rotate, opacity, stagger } } for the elements ' +
+      'tagged data-motion="name".'
+  ),
 };
 
-const HTML_KEYS = ['html', 'css', 'width', 'height'] as const;
+const HTML_KEYS = ['html', 'css', 'width', 'height', 'motion'] as const;
 const REQUIRED = ['html', 'width', 'height'] as const;
 
 type HtmlInputFields = { type?: string; url?: string } & Partial<Record<(typeof HTML_KEYS)[number], unknown>>;
