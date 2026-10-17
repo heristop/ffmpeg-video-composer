@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { finalStates, motionBudget, planMotionFrames, type ElementMotionMap } from '@/core/html/motion-frames';
+import {
+  finalStates,
+  motionBudget,
+  overSpanReason,
+  planMotionFrames,
+  type ElementMotionMap,
+} from '@/core/html/motion-frames';
 import { REST_STATE } from '@/core/html/element-motion';
 
 const fade = {
@@ -18,6 +24,24 @@ function plan(names: string[], motion: ElementMotionMap, fps = 10) {
 }
 
 describe('planMotionFrames', () => {
+  it('names the frame walk, not the span, when a high frame rate makes too many ticks', () => {
+    const motion = {
+      title: {
+        opacity: [
+          { t: 0, v: 0 },
+          { t: 2, v: 1 },
+        ],
+      },
+    };
+    const result = planMotionFrames(['title'], motion, 1000);
+
+    expect(result).toEqual({ kind: 'too-many-ticks', ticks: 2001 });
+    expect(overSpanReason(result as { kind: 'too-many-ticks'; ticks: number })).toBe(
+      'a frame walk over 2001 ticks (frame rate × span; limit 1920)'
+    );
+    expect(overSpanReason({ kind: 'too-long', span: 9 })).toBe('an animated span of 9 s (limit 8 s)');
+  });
+
   it('draws only the animated span: the first state held from the section start, then one frame per tick', () => {
     const p = plan(['title'], { title: fade });
 
@@ -194,7 +218,7 @@ describe('planMotionFrames bounds', () => {
   });
 
   it('refuses an fps that would walk an unbounded number of ticks', () => {
-    expect(planMotionFrames(['a'], { a: late }, 1e9)).toEqual({ kind: 'too-long', span: 1 });
+    expect(planMotionFrames(['a'], { a: late }, 1e9)).toMatchObject({ kind: 'too-many-ticks' });
   });
 
   it('never gives the first frame fewer than one tick when a time is negative', () => {

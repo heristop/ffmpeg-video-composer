@@ -15,11 +15,19 @@ import {
   HTML_LAYER_DENSITY,
   HTML_MOTION_DEADLINE_MS,
   HTML_MOTION_MAX_BYTES,
-  HTML_MOTION_MAX_SPAN,
+  HTML_MOTION_MAX_NAMES,
+  HTML_MOTION_MAX_TARGETS,
   HTML_MOTION_VERSION,
   HTML_SEQUENCE_SCHEME,
 } from '@/core/html/limits';
-import { motionBudget, planMotionFrames, type ElementMotionMap, type MotionFramePlan } from '@/core/html/motion-frames';
+import {
+  motionBudget,
+  overSpanReason,
+  planMotionFrames,
+  type ElementMotionMap,
+  type MotionFramePlan,
+  type MotionPlanResult,
+} from '@/core/html/motion-frames';
 import type AbstractFilesystem from '../../platform/filesystem/AbstractFilesystem';
 import type AbstractLogger from '../../platform/logging/AbstractLogger';
 import { overflowFinding } from '../../services/html-raster/html-layer-findings';
@@ -147,20 +155,45 @@ function joined(frames: ApngFrame[], fps: number): Uint8Array | string {
   }
 }
 
-// The frame plan of an animated card, or null (with a warning when it is not simply a still) to stage the still.
-function planOf(layer: SequenceLayer, ctx: SequenceContext): MotionFramePlan | null {
-  if (!(ctx.fps > 0)) return stillInstead(ctx, layer.name, `the frame rate (${ctx.fps}) is not positive`);
+// The plan, or why it could not be made: a key the validator never saw (an unknown easing, a malformed time).
+function plannedFrames(targets: string[], layer: SequenceLayer, ctx: SequenceContext): MotionPlanResult | string {
+  try {
+    return planMotionFrames(targets, layer.motion, ctx.fps);
+  } catch (error) {
+    return `its motion could not be planned (${messageOf(error)})`;
+  }
+}
 
-  if (!Number.isInteger(ctx.fps)) {
-    return stillInstead(ctx, layer.name, `the frame rate (${ctx.fps}) is not a whole number`);
+// Why a card's frame rate, element count or name count rules out an animation, or null.
+function inputProblem(layer: SequenceLayer, targets: string[], fps: number): string | null {
+  const names = Object.keys(layer.motion).length;
+
+  if (!(fps > 0)) return `the frame rate (${fps}) is not positive`;
+
+  if (!Number.isInteger(fps)) return `the frame rate (${fps}) is not a whole number`;
+
+  if (targets.length > HTML_MOTION_MAX_TARGETS) {
+    return `${targets.length} animated elements (limit ${HTML_MOTION_MAX_TARGETS})`;
   }
 
-  const result = planMotionFrames(motionTargets(layer.element), layer.motion, ctx.fps);
+  return names > HTML_MOTION_MAX_NAMES ? `${names} motion names (limit ${HTML_MOTION_MAX_NAMES})` : null;
+}
+
+// The frame plan of an animated card, or null (with a warning when it is not simply a still) to stage the still.
+function planOf(layer: SequenceLayer, ctx: SequenceContext): MotionFramePlan | null {
+  const targets = motionTargets(layer.element);
+  const refused = inputProblem(layer, targets, ctx.fps);
+
+  if (refused) return stillInstead(ctx, layer.name, refused);
+
+  const result = plannedFrames(targets, layer, ctx);
+
+  if (typeof result === 'string') return stillInstead(ctx, layer.name, result);
 
   if (result.kind === 'none') return null;
 
-  if (result.kind === 'too-long') {
-    return stillInstead(ctx, layer.name, `an animated span of ${result.span} s (limit ${HTML_MOTION_MAX_SPAN} s)`);
+  if (result.kind === 'too-long' || result.kind === 'too-many-ticks') {
+    return stillInstead(ctx, layer.name, overSpanReason(result));
   }
 
   const { plan } = result;

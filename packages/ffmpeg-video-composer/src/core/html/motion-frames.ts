@@ -40,6 +40,7 @@ export interface MotionFramePlan {
 export type MotionPlanResult =
   | { kind: 'none' }
   | { kind: 'too-long'; span: number }
+  | { kind: 'too-many-ticks'; ticks: number }
   | { kind: 'plan'; plan: MotionFramePlan };
 
 interface Bound {
@@ -53,6 +54,15 @@ const EPSILON = 1e-9;
 
 // The most ticks one plan walks (the span limit at a generous 240 fps), so a huge fps is refused before it loops.
 const MAX_TICKS = HTML_MOTION_MAX_SPAN * 240;
+
+/** Why a plan was refused for its length: the span in seconds, or the ticks a high frame rate makes of it. */
+export function overSpanReason(result: Extract<MotionPlanResult, { kind: 'too-long' | 'too-many-ticks' }>): string {
+  if (result.kind === 'too-many-ticks') {
+    return `a frame walk over ${result.ticks} ticks (frame rate × span; limit ${MAX_TICKS})`;
+  }
+
+  return `an animated span of ${result.span} s (limit ${HTML_MOTION_MAX_SPAN} s)`;
+}
 
 function round(value: number, places: number): number {
   const factor = 10 ** places;
@@ -141,7 +151,7 @@ export function planMotionFrames(names: readonly string[], motion: ElementMotion
   const first = Math.max(0, Math.floor(span.start * fps + EPSILON));
   const last = Math.ceil(span.end * fps - EPSILON);
 
-  if (last - first + 1 > MAX_TICKS) return { kind: 'too-long', span: round(span.end - span.start, 2) };
+  if (last - first + 1 > MAX_TICKS) return { kind: 'too-many-ticks', ticks: last - first + 1 };
 
   const frames: MotionFrame[] = [];
 

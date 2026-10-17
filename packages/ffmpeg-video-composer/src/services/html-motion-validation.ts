@@ -9,8 +9,8 @@
 import DefaultConfig from '@/core/default.config';
 import { motionTargets } from '@/core/html/element-motion';
 import { prepareHtmlLayer } from '@/core/html/html-layer';
-import { HTML_MOTION_MAX_SPAN, HTML_MOTION_MAX_TARGETS } from '@/core/html/limits';
-import { motionBudget, planMotionFrames, type ElementMotionMap } from '@/core/html/motion-frames';
+import { HTML_MOTION_MAX_TARGETS } from '@/core/html/limits';
+import { motionBudget, overSpanReason, planMotionFrames, type ElementMotionMap } from '@/core/html/motion-frames';
 import { resolveMotionDescriptor } from '@/core/motion/tokens';
 import { keyTimesError } from '@/core/motion/tracks';
 import { resolveTimeRefs } from '@/core/timing/resolve';
@@ -72,10 +72,8 @@ function layerErrors({ input, path }: HtmlInputUse, fps: number): ValidationErro
 
   const result = planMotionFrames(names, motion, fps);
 
-  if (result.kind === 'too-long') {
-    return [
-      overBudget(path, inputName(input), `an animated span of ${result.span} s (limit ${HTML_MOTION_MAX_SPAN} s)`),
-    ];
+  if (result.kind === 'too-long' || result.kind === 'too-many-ticks') {
+    return [overBudget(path, inputName(input), overSpanReason(result))];
   }
 
   if (result.kind === 'none') return [];

@@ -4,6 +4,7 @@ import { stageHtmlLayer, type HtmlStageContext } from '@/editor/html/stage-html-
 import type { HtmlRasteriser, HtmlRasterRequest } from '@/core/html/html-rasteriser';
 import type { LayerElement } from '@/core/html/html-element';
 import { encodePng } from '@/editor/presets/png-encode';
+import { stageHtmlSequence } from '@/editor/html/stage-html-sequence';
 import { readPngChunks } from '@/editor/html/apng-assemble';
 
 function frame(shade: number): Uint8Array {
@@ -216,5 +217,70 @@ describe('stageHtmlLayer with a motion map', () => {
 
     expect(staged.url).toMatch(/^html:/);
     expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('the frame rate (' + fps + ') is not positive'));
+  });
+
+  it('returns no sequence, saying why, when a key cannot be planned', async () => {
+    const { ctx, rasteriser, logger } = context();
+    const layer = {
+      name: 'list',
+      element: { type: 'div', props: { motion: 'item', style: {} } } as unknown as LayerElement,
+      motion: {
+        item: {
+          x: [
+            { t: 0, v: 0 },
+            { t: 0.3, v: 20, ease: 'no-such-easing' },
+          ],
+        },
+      },
+      width: 300,
+      height: 100,
+      stillKey: 'abc',
+      fonts: async () => [],
+    };
+    const staged = await stageHtmlSequence(layer, {
+      rasteriser,
+      filesystem: ctx.filesystem,
+      logger,
+      dir: '/panels',
+      section: 'intro',
+      fps: 10,
+      now: Date.now,
+    });
+
+    expect(staged).toBeNull();
+    expect(rasteriser.render).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('its motion could not be planned (unknown easing')
+    );
+  });
+
+  it('stages the still past the element and name limits', async () => {
+    const many = `<ul>${'<li data-motion="item">x</li>'.repeat(49)}</ul>`;
+    const first = context();
+    const crowded = await stageHtmlLayer({ ...CARD, html: many }, first.ctx);
+    const names = Object.fromEntries(Array.from({ length: 17 }, (_, i) => [`item${i}`, CARD.motion.item]));
+    const second = context();
+    const named = await stageHtmlLayer({ ...CARD, motion: names }, second.ctx);
+
+    expect(crowded.url).toMatch(/^html:/);
+    expect(first.logger.warn).toHaveBeenCalledWith(expect.stringContaining('49 animated elements (limit 48)'));
+    expect(named.url).toMatch(/^html:/);
+    expect(second.logger.warn).toHaveBeenCalledWith(expect.stringContaining('17 motion names (limit 16)'));
+  });
+
+  it('names the frame walk when a high frame rate makes too many ticks', async () => {
+    const { ctx, logger } = context({ fps: 1000 });
+    const motion = {
+      item: {
+        x: [
+          { t: 0, v: 0 },
+          { t: 2, v: 20 },
+        ],
+      },
+    };
+    const staged = await stageHtmlLayer({ ...CARD, motion }, ctx);
+
+    expect(staged.url).toMatch(/^html:/);
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('a frame walk over 2001 ticks'));
   });
 });
