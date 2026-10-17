@@ -53,7 +53,19 @@ describe('bands: schema and boundary', () => {
     expect(
       TransitionSchema.safeParse({ type: 'bands', colors: ['#FF00AA', '$color.accent2', '#1D1B26@0.8'] }).success
     ).toBe(true);
-    for (const typo of ['red', '#ff00', '#ff00aZ', 'color.accent', '$color.']) {
+    for (const alpha of ['#FF00AA@0.5', '#FF00AA@1', '#FF00AA@0', '$color.accent@1.0']) {
+      expect(TransitionSchema.safeParse({ type: 'bands', colors: [alpha] }).success, alpha).toBe(true);
+    }
+    for (const typo of [
+      'red',
+      '#ff00',
+      '#ff00aZ',
+      'color.accent',
+      '$color.',
+      '#FF00AA@1.2.3',
+      '#FF00AA@2',
+      '#FF00AA@',
+    ]) {
       expect(TransitionSchema.safeParse({ type: 'bands', colors: ['#FF00AA', typo] }).success, typo).toBe(false);
     }
     expect(TransitionSchema.safeParse({ type: 'bands', stagger: 0.8 }).success).toBe(false);

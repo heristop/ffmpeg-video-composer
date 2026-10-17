@@ -45,7 +45,7 @@ const ThroughShapeSchema = z
 export const TransitionColorSchema = z
   .string()
   .regex(
-    /^(#[0-9a-fA-F]{6}|\$color\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$/,
+    /^(#[0-9a-fA-F]{6}|\$color\.[a-zA-Z][a-zA-Z0-9]*)(@(0(\.\d+)?|1(\.0+)?))?$/,
     'a "#rrggbb" colour or a "$color.<name>" theme token'
   );
 
