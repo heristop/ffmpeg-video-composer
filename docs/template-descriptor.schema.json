@@ -30931,7 +30931,7 @@
                     },
                     "wavelength": {
                       "type": "number",
-                      "exclusiveMinimum": 0
+                      "minimum": 0.01
                     },
                     "phase": {
                       "description": "Degrees (default 0: rising).",

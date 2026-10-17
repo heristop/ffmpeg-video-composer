@@ -47,7 +47,7 @@ export const PathShapeSchema = z.discriminatedUnion('type', [
       y: coordinate,
       width: size,
       amplitude: z.number().min(0),
-      wavelength: size,
+      wavelength: z.number().min(0.01, 'A wave wavelength must be at least 0.01 (px, or a fraction with a target)'),
       phase: angle.optional().describe('Degrees (default 0: rising).'),
     })
     .strict()
