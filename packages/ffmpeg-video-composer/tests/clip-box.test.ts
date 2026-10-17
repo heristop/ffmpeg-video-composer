@@ -35,6 +35,16 @@ describe('clip: schema', () => {
     expect(InputOptionsSchema.safeParse({ clip: { x: 0, y: 0, w: 10, h: 10 } }).success).toBe(true);
     expect(InputOptionsSchema.safeParse({ clip: 'block' }).success).toBe(false);
   });
+
+  it('bounds the box like the other px fields', () => {
+    const ok = (clip: unknown) => InputOptionsSchema.safeParse({ clip }).success;
+
+    expect(ok({ x: -20000, y: 20000, w: 20000, h: 20000 })).toBe(true);
+    expect(ok({ x: 20001, y: 0, w: 10, h: 10 })).toBe(false);
+    expect(ok({ x: 0, y: -20001, w: 10, h: 10 })).toBe(false);
+    expect(ok({ x: 0, y: 0, w: 1e9, h: 10 })).toBe(false);
+    expect(ok({ x: 0, y: 0, w: 10, h: 20001 })).toBe(false);
+  });
 });
 
 describe('clip: lowering', () => {

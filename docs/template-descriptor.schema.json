@@ -1839,20 +1839,26 @@
                           "properties": {
                             "x": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Left edge in output px."
                             },
                             "y": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Top edge in output px."
                             },
                             "w": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Width in output px."
                             },
                             "h": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Height in output px."
                             }
                           },
@@ -4846,20 +4852,26 @@
                           "properties": {
                             "x": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Left edge in output px."
                             },
                             "y": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Top edge in output px."
                             },
                             "w": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Width in output px."
                             },
                             "h": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Height in output px."
                             }
                           },
@@ -7896,20 +7908,26 @@
                           "properties": {
                             "x": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Left edge in output px."
                             },
                             "y": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Top edge in output px."
                             },
                             "w": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Width in output px."
                             },
                             "h": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Height in output px."
                             }
                           },
@@ -10670,20 +10688,26 @@
                           "properties": {
                             "x": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Left edge in output px."
                             },
                             "y": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Top edge in output px."
                             },
                             "w": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Width in output px."
                             },
                             "h": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Height in output px."
                             }
                           },
@@ -13424,20 +13448,26 @@
                           "properties": {
                             "x": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Left edge in output px."
                             },
                             "y": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Top edge in output px."
                             },
                             "w": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Width in output px."
                             },
                             "h": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Height in output px."
                             }
                           },
@@ -16649,20 +16679,26 @@
                           "properties": {
                             "x": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Left edge in output px."
                             },
                             "y": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Top edge in output px."
                             },
                             "w": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Width in output px."
                             },
                             "h": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Height in output px."
                             }
                           },
@@ -19403,20 +19439,26 @@
                           "properties": {
                             "x": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Left edge in output px."
                             },
                             "y": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Top edge in output px."
                             },
                             "w": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Width in output px."
                             },
                             "h": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Height in output px."
                             }
                           },
@@ -22157,20 +22199,26 @@
                           "properties": {
                             "x": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Left edge in output px."
                             },
                             "y": {
                               "type": "number",
+                              "minimum": -20000,
+                              "maximum": 20000,
                               "description": "Top edge in output px."
                             },
                             "w": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Width in output px."
                             },
                             "h": {
                               "type": "number",
                               "exclusiveMinimum": 0,
+                              "maximum": 20000,
                               "description": "Height in output px."
                             }
                           },
@@ -25894,20 +25942,26 @@
               "properties": {
                 "x": {
                   "type": "number",
+                  "minimum": -20000,
+                  "maximum": 20000,
                   "description": "Left edge in output px."
                 },
                 "y": {
                   "type": "number",
+                  "minimum": -20000,
+                  "maximum": 20000,
                   "description": "Top edge in output px."
                 },
                 "w": {
                   "type": "number",
                   "exclusiveMinimum": 0,
+                  "maximum": 20000,
                   "description": "Width in output px."
                 },
                 "h": {
                   "type": "number",
                   "exclusiveMinimum": 0,
+                  "maximum": 20000,
                   "description": "Height in output px."
                 }
               },

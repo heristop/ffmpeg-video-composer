@@ -3,12 +3,15 @@ import { z } from 'zod';
 // A clip box: the element only shows inside it, on any background (footage included). Shared by kinetic
 // blocks (`clip`) and image / animation / html layers (`options.clip`); lowered in editor/presets/clip-box.ts.
 
+/** Bound of a box coordinate or size, px, like the other px fields. */
+const MAX_PX = 20000;
+
 export const ClipBoxSchema = z
   .object({
-    x: z.number().describe('Left edge in output px.'),
-    y: z.number().describe('Top edge in output px.'),
-    w: z.number().positive().describe('Width in output px.'),
-    h: z.number().positive().describe('Height in output px.'),
+    x: z.number().min(-MAX_PX).max(MAX_PX).describe('Left edge in output px.'),
+    y: z.number().min(-MAX_PX).max(MAX_PX).describe('Top edge in output px.'),
+    w: z.number().positive().max(MAX_PX).describe('Width in output px.'),
+    h: z.number().positive().max(MAX_PX).describe('Height in output px.'),
   })
   .strict()
   .describe('A box in output pixels; the element is cut to it.');
