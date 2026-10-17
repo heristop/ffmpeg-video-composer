@@ -10,6 +10,16 @@ import { isHtmlSequence } from '../html/html-sequence-source';
 // `-stream_loop` / `-c:v` flags) so SegmentBuilder can push them verbatim into the sources list.
 // The path/pattern token is guarded; the surrounding flags are literals built here.
 
+// `-itsoffset <seconds> ` for a start above 0 (a numeric string counts), nothing when it is absent or not
+// positive; a start that is not a finite number throws (core/arg-guard.ts) rather than reach the command line.
+function itsOffsetFlag(start: unknown): string {
+  if (start === undefined || start === null || start === '') return '';
+
+  const seconds = assertFiniteNumber(Number(start), 'overlay start');
+
+  return seconds > 0 ? `-itsoffset ${seconds} ` : '';
+}
+
 /** Playback bounds for an animation overlay — see buildLoopFlags. */
 type LoopOptions = { loop?: boolean; loops?: number; duration?: number; start?: number };
 
@@ -25,8 +35,7 @@ type LoopOptions = { loop?: boolean; loops?: number; duration?: number; start?: 
  *   - none: play once (no flag).
  */
 export function buildLoopFlags(options: LoopOptions, maxDuration?: number): string {
-  const start = options.start === undefined ? undefined : assertFiniteNumber(options.start, 'overlay start');
-  const offset = start && start > 0 ? `-itsoffset ${start} ` : '';
+  const offset = itsOffsetFlag(options.start);
 
   if (options.duration !== undefined) {
     return `-stream_loop -1 ${offset}-t ${assertFiniteNumber(options.duration, 'overlay duration')} `;
@@ -330,8 +339,7 @@ export function buildHtmlLayerSource(
 ): string {
   if (!isHtmlSequence(input)) return buildSingleFileImageSource(path);
 
-  const start = input.options?.start;
-  const offset = start && start > 0 ? `-itsoffset ${start} ` : '';
+  const offset = itsOffsetFlag(input.options?.start);
 
   return `${offset}-i ${assertSafeArgToken(path, 'html sequence source')}`;
 }
