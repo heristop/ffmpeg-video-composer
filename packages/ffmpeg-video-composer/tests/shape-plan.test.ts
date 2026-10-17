@@ -175,6 +175,16 @@ describe('planShape', () => {
     expect(warnings[0]).toMatch(/^\[shape_too_large\] graphics\[0\] shape: /);
     expect(warnings).toHaveLength(1);
   });
+
+  it('refuses a dense outline before measuring it, even when only its stroke is drawn on', () => {
+    const warnings: string[] = [];
+    const d = `M0 0 ${Array.from({ length: 12 }, (_, i) => `C0 2000 2000 -2000 ${i % 2 ? 0 : 2000} 0`).join(' ')}`;
+    const graphic = { d, fill: false, stroke: { draw: true } };
+
+    expect(planShape(request(graphic, { warnings }))).toBeNull();
+    expect(warnings[0]).toMatch(/^\[shape_too_large\] graphics\[0\] shape: /);
+    expect(warnings).toHaveLength(1);
+  });
 });
 
 describe('peakScale', () => {

@@ -137,6 +137,12 @@ function outlineOf(request: ShapeRequest, frame: Frame): Outline | null {
   const commands = shapeOutline(g, frame, target, request.seed);
   const bounds = commands && shapeBounds(commands, strokeWidth(g));
 
+  if (bounds === 'dense') {
+    warn(request, 'shape_too_large', 'the outline has too many points; skipped');
+
+    return null;
+  }
+
   if (!commands || !bounds) {
     warn(request, 'shape_empty', 'the outline is empty; skipped');
 

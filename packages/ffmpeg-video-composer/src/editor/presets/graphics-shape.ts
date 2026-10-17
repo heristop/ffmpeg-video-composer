@@ -38,7 +38,7 @@ export function shapeSpec(g: ShapeGraphic, frame: Frame, base: Base): Spec {
     ...base,
     duration: g.duration ?? (g.stroke?.draw ? SHAPE_DEFAULTS.drawDuration : SHAPE_DEFAULTS.duration),
     color: g.color ?? BRAND,
-    rects: () => (bounds ? [bounds] : []),
+    rects: () => (bounds && bounds !== 'dense' ? [bounds] : []),
     render: render(g),
   };
 }

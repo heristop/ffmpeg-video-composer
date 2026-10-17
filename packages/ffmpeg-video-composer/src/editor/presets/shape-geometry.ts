@@ -8,8 +8,9 @@
 import { seededRandom } from '@/core/determinism/hash';
 import { mapCommands } from './graphics-path';
 import type { Frame, Of, Rect } from './graphics-spec';
-import { catmullRom, flatten, type PathCommand, type Pt } from './path-geometry';
+import { catmullRom, flattenWithin, type PathCommand, type Pt } from './path-geometry';
 import { parseSvgPath } from './path-svg';
+import { MAX_SHAPE_POINTS } from './shape-raster';
 
 export type ShapeGraphic = Of<'shape'>;
 export type ShapePreset = NonNullable<ShapeGraphic['preset']>;
@@ -218,11 +219,18 @@ export function shapeOutline(
   return mapCommands(parsed, (x, y) => [target.x + x * target.w, target.y + y * target.h]);
 }
 
-/** The outline's box grown by half the stroke, or null when it is empty. Loops, not spreads: d can be long. */
-export function shapeBounds(commands: readonly PathCommand[], strokeWidth: number): Rect | null {
+/**
+ * The outline's box grown by half the stroke, null when it is empty, or 'dense' when it flattens past the
+ * point cap. Loops, not spreads: d can be long.
+ */
+export function shapeBounds(commands: readonly PathCommand[], strokeWidth: number): Rect | 'dense' | null {
+  const lines = flattenWithin(commands, MAX_SHAPE_POINTS);
+
+  if (!lines) return 'dense';
+
   let [minX, minY, maxX, maxY] = [Infinity, Infinity, -Infinity, -Infinity];
 
-  for (const p of flatten(commands).flat()) {
+  for (const p of lines.flat()) {
     minX = Math.min(minX, p.x);
     minY = Math.min(minY, p.y);
     maxX = Math.max(maxX, p.x);
