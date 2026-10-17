@@ -4,6 +4,7 @@ import FormatterManager from '@/editor/managers/FormatterManager';
 import MapManager from '@/editor/managers/MapManager';
 import { templateDescriptorJsonSchema } from '@/schemas/template.schemas';
 import { ChromaKeySchema } from '@/schemas/text-media.schemas';
+import { SubtitlesSchema } from '@/schemas/subtitles.schemas';
 import { TitleCardSchema } from '@/schemas/text.schemas';
 import { BackgroundLayerSchema } from '@/schemas/effects-visual.schemas';
 import { buildGradientSource } from '@/editor/utils/input-sources';
@@ -100,6 +101,21 @@ describe('colour fields: schema', () => {
       expect(ChromaKeySchema.safeParse({ color: '#00FF00', background: color }).success, color).toBe(false);
       expect(TitleCardSchema.safeParse({ headline: { en: 'Hi' }, background: color }).success, color).toBe(false);
     }
+  });
+
+  it('rejects filtergraph and CSS syntax in the subtitle colours of either renderer', () => {
+    const cues = [{ text: 'Hi', at: 0, end: 1 }];
+
+    for (const color of [...HOSTILE, 'red;background-image:url(http://x/y.png)']) {
+      for (const renderer of ['drawbox', 'html']) {
+        expect(SubtitlesSchema.safeParse({ cues, renderer, color }).success, color).toBe(false);
+        expect(SubtitlesSchema.safeParse({ cues, renderer, activeColor: color }).success, color).toBe(false);
+      }
+    }
+
+    expect(
+      SubtitlesSchema.safeParse({ cues, renderer: 'html', color: '#fff', activeColor: '$color.accent' }).success
+    ).toBe(true);
   });
 
   it('keeps hex, names, @alpha, theme tokens and colour variables', () => {
