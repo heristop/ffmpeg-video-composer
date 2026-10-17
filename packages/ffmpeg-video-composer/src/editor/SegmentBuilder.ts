@@ -20,6 +20,7 @@ import {
   createEmojiPlan,
   createExtraInputs,
   HTML_RASTERISER,
+  buildHtmlLayerSource,
   type EmojiPlan,
   type SugarContext,
 } from './presets/registry';
@@ -461,8 +462,12 @@ class SegmentBuilder {
   }): string | undefined => {
     // A still-image overlay takes the same overlay path as an animation (positioned/scaled via
     // addAnimationOverlay), differing only in its `-i` source (held with `-loop 1`, not stream-looped).
-    // An HTML layer is a still image once the asset stage has drawn it (editor/html).
-    if (input.type === 'image' || input.type === 'html') {
+    // An HTML layer is a still image, or an animated PNG when it has element motion (editor/html).
+    if (input.type === 'html') {
+      return buildHtmlLayerSource(input, this.assetManager.fetchCachedMedia(input));
+    }
+
+    if (input.type === 'image') {
       return buildSingleFileImageSource(this.assetManager.fetchCachedMedia(input));
     }
 
