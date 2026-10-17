@@ -33,7 +33,7 @@ const CRC_TABLE = (() => {
   return table;
 })();
 
-function crc32(data: Uint8Array): number {
+export function crc32(data: Uint8Array): number {
   let crc = 0xffffffff;
 
   for (const byte of data) {
@@ -115,7 +115,7 @@ function uint32(out: Uint8Array, at: number, value: number): void {
 }
 
 // Encode one PNG chunk: length (uint32 BE) + type + data + CRC32(type+data) (uint32 BE).
-function chunk(type: string, data: Uint8Array): Uint8Array {
+export function chunk(type: string, data: Uint8Array): Uint8Array {
   const typeAndData = new Uint8Array(4 + data.length);
 
   for (let i = 0; i < 4; i++) {
@@ -131,7 +131,7 @@ function chunk(type: string, data: Uint8Array): Uint8Array {
   return out;
 }
 
-function concat(parts: Uint8Array[]): Uint8Array {
+export function concat(parts: Uint8Array[]): Uint8Array {
   const total = parts.reduce((sum, p) => sum + p.length, 0);
   const out = new Uint8Array(total);
   let pos = 0;
@@ -156,7 +156,7 @@ function scanlines(image: PngImage): Uint8Array {
   return raw;
 }
 
-const PNG_SIGNATURE = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+export const PNG_SIGNATURE = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 
 /** The PNG bytes of a grayscale or RGBA image (straight alpha), 8-bit or 16-bit. Pure and deterministic. */
 export function encodePng(image: PngImage): Uint8Array {
