@@ -95,6 +95,7 @@ For PR or MR evidence: collect a real walkthrough and review focus, author the t
 | `--effect-catalog` | `LECLAP_MCP_EFFECT_CATALOG` | Builtin contracts |
 | `--effect-cache-max-bytes` | `LECLAP_MCP_EFFECT_CACHE_MAX_BYTES` | `536870912` bytes (512 MiB) |
 | `--catalog-gap-log` | `LECLAP_MCP_CATALOG_GAP_LOG` | `catalog-gaps.jsonl` under the output dir |
+| `--allow-raw-filters` | `LECLAP_MCP_ALLOW_RAW_FILTERS` | Off |
 
 The CLI supports repeatable `--video section=path` and `--field key=value`, plus `--assets`, `--build`, `--locale`, `--orientation` and `--output`. Codec, quality and concurrency overrides use the library API. `FVC_RENDER_CONCURRENCY` belongs to the monorepo dev script. Node detects system FFmpeg, then `ffmpeg-static`; it has no pure-Node WASM fallback. Probing requires a separate ffprobe binary on the static path.
 
