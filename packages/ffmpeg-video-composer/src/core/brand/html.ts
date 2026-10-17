@@ -167,15 +167,27 @@ function takeRawText(walk: Walk, name: 'title' | 'style' | 'script'): void {
   walk.pos = stop;
 }
 
+/** Move past the comment opening at `lt`. Returns false when it never closes. */
+function skipComment(walk: Walk, lt: number): boolean {
+  const close = walk.lower.indexOf('-->', lt + 4);
+
+  walk.pos = close + 3;
+
+  return close !== -1;
+}
+
+/** Keep what a tag says: a meta's or link's attributes, the raw text of a title, style or script. */
+function record(walk: Walk, name: string, nameEnd: number, end: number): void {
+  if (name === 'meta') walk.head.metas.push(attributes(walk.html, nameEnd, end));
+
+  if (name === 'link') walk.head.links.push(attributes(walk.html, nameEnd, end));
+
+  if (name === 'title' || name === 'style' || name === 'script') takeRawText(walk, name);
+}
+
 /** Handle the tag opening at `lt`. Returns false when the rest of the head cannot be read. */
 function step(walk: Walk, lt: number): boolean {
-  if (walk.lower.startsWith('<!--', lt)) {
-    const close = walk.lower.indexOf('-->', lt + 4);
-
-    walk.pos = close + 3;
-
-    return close !== -1;
-  }
+  if (walk.lower.startsWith('<!--', lt)) return skipComment(walk, lt);
 
   if (walk.lower.startsWith('</head', lt) || walk.lower.startsWith('<body', lt)) return false;
 
@@ -190,12 +202,7 @@ function step(walk: Walk, lt: number): boolean {
   if (end === -1) return false;
 
   walk.pos = end + 1;
-
-  if (name === 'meta') walk.head.metas.push(attributes(walk.html, nameEnd, end));
-
-  if (name === 'link') walk.head.links.push(attributes(walk.html, nameEnd, end));
-
-  if (name === 'title' || name === 'style' || name === 'script') takeRawText(walk, name);
+  record(walk, name, nameEnd, end);
 
   return true;
 }

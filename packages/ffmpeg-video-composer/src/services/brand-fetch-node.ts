@@ -203,8 +203,8 @@ async function redirectTarget(response: Response, url: URL): Promise<URL> {
   return new URL(location, url);
 }
 
-/** GET over HTTPS from public hosts only, following at most 3 redirects by hand, capped in size and time. */
-async function get({ url, hop, maxBytes }: Hop, options: BrandFetchOptions): Promise<Fetched> {
+/** Refuse a request before it is made: too many hops, an abort, embedded credentials, or a non-public host. */
+async function vet(url: URL, hop: number, options: BrandFetchOptions): Promise<void> {
   if (hop > MAX_REDIRECTS) throw new Error(`Too many redirects (more than ${MAX_REDIRECTS})`);
 
   options.signal?.throwIfAborted();
@@ -212,6 +212,24 @@ async function get({ url, hop, maxBytes }: Hop, options: BrandFetchOptions): Pro
   if (url.username || url.password) throw new Error('URLs that embed credentials are not fetched');
 
   await assertPublic(url, options.lookup ?? defaultLookup);
+}
+
+/** A final (non-redirect) answer: its type and its body, capped; any non-2xx status is an error. */
+async function settle(response: Response, url: URL, maxBytes: number): Promise<Fetched> {
+  if (!response.ok) {
+    await response.body?.cancel();
+
+    throw new Error(`${url.href} answered ${response.status}`);
+  }
+
+  const type = (response.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase();
+
+  return { url: url.href, type, body: await readCapped(response, maxBytes, url.href) };
+}
+
+/** GET over HTTPS from public hosts only, following at most 3 redirects by hand, capped in size and time. */
+async function get({ url, hop, maxBytes }: Hop, options: BrandFetchOptions): Promise<Fetched> {
+  await vet(url, hop, options);
 
   const fetcher = options.fetch ?? fetch;
   const response = await fetcher(url.href, {
@@ -225,15 +243,7 @@ async function get({ url, hop, maxBytes }: Hop, options: BrandFetchOptions): Pro
     return get({ url: await redirectTarget(response, url), hop: hop + 1, maxBytes }, options);
   }
 
-  if (!response.ok) {
-    await response.body?.cancel();
-
-    throw new Error(`${url.href} answered ${response.status}`);
-  }
-
-  const type = (response.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase();
-
-  return { url: url.href, type, body: await readCapped(response, maxBytes, url.href) };
+  return settle(response, url, maxBytes);
 }
 
 /** Always a promise: a bad or credentialed URL rejects instead of throwing before a caller's .catch attaches. */
@@ -310,6 +320,18 @@ async function tryLogo(
   }
 }
 
+/** The downloaded logo, or why there is none (no logo at all is neither). */
+async function logoOutcome(
+  logo: BrandLogo | null,
+  options: BrandFetchOptions
+): Promise<{ download: { file: string; body: Uint8Array } | null; logoError?: string }> {
+  const result = logo ? await tryLogo(logo, options) : null;
+
+  if (result && 'error' in result) return { download: null, logoError: result.error };
+
+  return { download: result };
+}
+
 /** The logo as recorded in brand-kit.json: its URL and type, plus the saved `file` when there is one. */
 function savedLogo(logo: BrandLogo | null, file?: string): BrandLogo | null {
   if (!logo) return null;
@@ -328,9 +350,7 @@ export async function saveBrandKit(
   dir: string,
   options: BrandFetchOptions = {}
 ): Promise<{ kit: BrandKit; json: string; logo: string | null; logoError?: string }> {
-  const result = kit.logo ? await tryLogo(kit.logo, options) : null;
-  const download = result && 'file' in result ? result : null;
-  const logoError = result && 'error' in result ? result.error : undefined;
+  const { download, logoError } = await logoOutcome(kit.logo, options);
   const logo = download ? path.join(dir, download.file) : null;
   const saved: BrandKit = {
     ...bounded(kit),

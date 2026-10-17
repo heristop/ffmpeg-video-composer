@@ -58,8 +58,8 @@ interface VarCall {
   rest: string;
 }
 
-/** `var(--name[, fallback])` at the start of `value`, and what follows it; one pass with a depth counter. */
-function varCall(value: string): VarCall {
+/** Where the first top-level comma and the closing paren of the `var(` at the start of `value` are (-1: none). */
+function varBounds(value: string): { comma: number; close: number } {
   let depth = 1;
   let comma = -1;
 
@@ -72,16 +72,26 @@ function varCall(value: string): VarCall {
 
     if (ch === ')') depth--;
 
-    if (depth === 0) {
-      return {
-        name: value.slice(4, comma === -1 ? i : comma).trim(),
-        fallback: comma === -1 ? null : value.slice(comma + 1, i),
-        rest: value.slice(i + 1).replace(/^[\s,]+/, ''),
-      };
-    }
+    if (depth === 0) return { comma, close: i };
   }
 
-  return { name: value.slice(4, comma === -1 ? value.length : comma).trim(), fallback: null, rest: '' };
+  return { comma, close: -1 };
+}
+
+/** `var(--name[, fallback])` at the start of `value`, and what follows it; one pass with a depth counter. */
+function varCall(value: string): VarCall {
+  const { comma, close } = varBounds(value);
+  const unterminated = close === -1;
+  const end = unterminated ? value.length : close;
+  const name = value.slice(4, comma === -1 ? end : comma).trim();
+
+  if (unterminated) return { name, fallback: null, rest: '' };
+
+  return {
+    name,
+    fallback: comma === -1 ? null : value.slice(comma + 1, close),
+    rest: value.slice(close + 1).replace(/^[\s,]+/, ''),
+  };
 }
 
 /**
@@ -117,14 +127,22 @@ function familyResolver(properties: Map<string, string[]>): (value: string) => s
 
     resolving.add(name);
 
-    for (const value of properties.get(name) ?? []) {
-      family ??= of(value, depth + 1);
-    }
+    family = firstOf(properties.get(name) ?? [], depth + 1);
 
     resolving.delete(name);
     resolved.set(name, { family, depth, complete: family !== null || cuts === before });
 
     return family;
+  }
+
+  function firstOf(values: string[], depth: number): string | null {
+    for (const value of values) {
+      const family = of(value, depth);
+
+      if (family !== null) return family;
+    }
+
+    return null;
   }
 
   function of(value: string, depth: number): string | null {
