@@ -62,6 +62,32 @@ async function grabReference(clip: string, at: number, outDir: string, width: nu
   return { path: out, label: 'reference' };
 }
 
+/** Load every template to compare, labelled for the grid. */
+async function loadVariants(files: readonly string[]) {
+  if (files.length < 2) throw new Error('compare needs at least two templates');
+
+  const labels = variantLabels(files);
+
+  return Promise.all(
+    files.map(async (file, i) => ({ label: labels[i], descriptor: await loadConfig(path.resolve(file)) }))
+  );
+}
+
+/** The `lead` hook grabbing the reference's frame at the compared second; checks the clip before any render. */
+async function referenceLead(arg: string | undefined, outDir: string) {
+  if (arg === undefined) return null;
+
+  const reference = path.resolve(arg);
+
+  if (!existsSync(reference)) throw new Error(`Reference not found: ${arg}`);
+
+  await assertReadableReference(reference);
+
+  // `--at` may be a time reference ("intro.end"): the engine resolves it on the first template and hands
+  // the numeric second to `lead`, so the reference frame is grabbed at the same moment.
+  return (time: number, width: number) => grabReference(reference, time, outDir, width);
+}
+
 export const compare = defineCommand({
   meta: { name: 'compare', description: 'Render several templates and tile the same moment of each in one grid' },
   args: {
@@ -83,27 +109,10 @@ export const compare = defineCommand({
     setEngineLogLevel('silent');
 
     try {
-      const files = [args.template, ...args._.filter((value) => value !== args.template)];
-
-      if (files.length < 2) throw new Error('compare needs at least two templates');
-
-      const labels = variantLabels(files);
-      const variants = await Promise.all(
-        files.map(async (file, i) => ({ label: labels[i], descriptor: await loadConfig(path.resolve(file)) }))
-      );
+      const variants = await loadVariants([args.template, ...args._.filter((value) => value !== args.template)]);
       const cols = args.cols === undefined ? undefined : Number(args.cols);
       const options = { ...renderOptions(args, rawArgs), at: atValues(rawArgs, args.at).at(0) ?? 0 };
-      const reference = args.reference === undefined ? undefined : path.resolve(args.reference);
-
-      if (reference && !existsSync(reference)) throw new Error(`Reference not found: ${args.reference}`);
-
-      if (reference) await assertReadableReference(reference);
-
-      // `--at` may be a time reference ("intro.end"): the engine resolves it on the first template and hands
-      // the numeric second to `lead`, so the reference frame is grabbed at the same moment.
-      const lead = reference
-        ? (time: number, width: number) => grabReference(reference, time, options.outDir, width)
-        : undefined;
+      const lead = await referenceLead(args.reference, options.outDir);
 
       emit(await compareSnapshots(variants, { ...options, ...(cols && { cols }), ...(lead && { lead }) }), args.json);
     } catch (error) {
