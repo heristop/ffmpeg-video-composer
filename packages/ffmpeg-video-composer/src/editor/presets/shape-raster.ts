@@ -202,6 +202,15 @@ function outlineOf(spec: ShapeSpec): { lines: Pt[][] } | { error: string } {
   return { lines };
 }
 
+/** Why a spec could never become a `shape:` URL the asset stage accepts (encoded length, points, work); null when it can. */
+export function shapeSpecProblem(spec: ShapeSpec): string | null {
+  if (spec.path.length > MAX_ENCODED_PATH) return `Shape outline is longer than ${MAX_ENCODED_PATH} characters`;
+
+  const outline = outlineOf(spec);
+
+  return 'error' in outline ? outline.error : null;
+}
+
 /** The RGBA image a spec describes; throws on a raster size outside the limits, before allocating. */
 export function shapeImage(spec: ShapeSpec): PngImage {
   const { w, h } = spec;
