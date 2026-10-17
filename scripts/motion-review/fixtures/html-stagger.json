@@ -1,0 +1,41 @@
+{
+  "label": "Staggered HTML card (per-element motion)",
+  "kind": "html",
+  "window": { "at": 0.3, "duration": 0.9 },
+  "section": {
+    "inputs": [
+      {
+        "name": "card",
+        "type": "html",
+        "html": "<div class=\"card\"><span class=\"tag\" data-motion=\"tag\">New listing</span><h2 data-motion=\"line\">12 rue des Lilas</h2><p data-motion=\"line\">Lyon 3e · 92 m²</p></div>",
+        "css": ".card { display: flex; flex-direction: column; gap: 10px; width: 100%; height: 100%; padding: 24px 28px; border-radius: 24px; background: #f4efe6 } .tag { display: flex; align-self: flex-start; padding: 6px 14px; border-radius: 999px; background: #ff5a36; color: #ffffff; font: 600 18px Rubik } h2 { margin: 0; color: #141416; font: 44px \"Bebas Neue\" } p { margin: 0; color: #55524c; font: 22px Rubik }",
+        "width": 480,
+        "height": 200,
+        "options": { "position": "{{position}}" },
+        "motion": {
+          "tag": {
+            "opacity": [
+              { "t": "{{at}}", "v": 0 },
+              { "t": "+0.25", "v": 1 }
+            ],
+            "x": [
+              { "t": "{{at}}", "v": -24 },
+              { "t": "+0.4", "v": 0, "ease": "ease-out-cubic" }
+            ]
+          },
+          "line": {
+            "opacity": [
+              { "t": 0.45, "v": 0 },
+              { "t": 0.75, "v": 1 }
+            ],
+            "y": [
+              { "t": 0.45, "v": 28 },
+              { "t": 0.95, "v": 0, "ease": "spring(300, 22)" }
+            ],
+            "stagger": 0.18
+          }
+        }
+      }
+    ]
+  }
+}
