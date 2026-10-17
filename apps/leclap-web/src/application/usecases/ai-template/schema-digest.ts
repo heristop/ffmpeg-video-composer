@@ -56,6 +56,9 @@ function cleanNode(node: Json, maxDescription: number): Json {
   const out: { [key: string]: Json } = {};
 
   for (const [key, value] of Object.entries(node)) {
+    // `properties` already says it is an object.
+    if (key === 'type' && value === 'object' && 'properties' in node) continue;
+
     const entry = cleanEntry(key, value, maxDescription);
 
     if (entry) out[entry[0]] = entry[1];
