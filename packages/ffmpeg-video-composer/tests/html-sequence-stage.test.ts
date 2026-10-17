@@ -164,7 +164,7 @@ describe('stageHtmlLayer with a motion map', () => {
   });
 
   it('stages the still when the lead frame is too long for an animated PNG', async () => {
-    const { ctx, logger } = context();
+    const { ctx, logger, rasteriser } = context();
     const motion = {
       item: {
         x: [
@@ -176,6 +176,45 @@ describe('stageHtmlLayer with a motion map', () => {
     const staged = await stageHtmlLayer({ ...CARD, motion }, ctx);
 
     expect(staged.url).toMatch(/^html:/);
-    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('its frames could not be joined (frame 0 lasts'));
+    expect(rasteriser.render).toHaveBeenCalledTimes(1);
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('its first frame lasts'));
+  });
+
+  it('stages the still, with one warning, when the frames pass the byte budget', async () => {
+    const big = new Uint8Array(30 * 1024 * 1024);
+    const rasteriser: HtmlRasteriser = {
+      version: 'test',
+      render: vi.fn(async () => ({ png: big, contentHeight: 10 })),
+    };
+    const { ctx, logger } = context({ rasteriser });
+    const staged = await stageHtmlLayer({ ...CARD }, ctx);
+    const motionWarnings = logger.warn.mock.calls.filter(([m]) => String(m).includes('html_motion_static'));
+
+    expect(staged.url).toMatch(/^html:/);
+    expect(motionWarnings).toHaveLength(1);
+    expect(motionWarnings[0][0]).toContain('over 48 MB');
+  });
+
+  it('warns once, not per frame, when the content overflows the box', async () => {
+    const rasteriser: HtmlRasteriser = {
+      version: 'test',
+      render: vi.fn(async () => ({ png: frame(1), contentHeight: 500 })),
+    };
+    const { ctx, logger } = context({ rasteriser });
+    const staged = await stageHtmlLayer({ ...CARD }, ctx);
+    const overflows = logger.warn.mock.calls.filter(([m]) => String(m).includes('html_overflow'));
+
+    expect(staged.url).toMatch(/^html-seq:/);
+    expect(overflows).toEqual([
+      ['[intro][Html] html_overflow: the content is 500 px tall in a 100 px box, the rest is cut'],
+    ]);
+  });
+
+  it.each([0, -5, Number.NaN])('stages the still, saying so, when the frame rate is %s', async (fps) => {
+    const { ctx, logger } = context({ fps });
+    const staged = await stageHtmlLayer({ ...CARD }, ctx);
+
+    expect(staged.url).toMatch(/^html:/);
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('the frame rate (' + fps + ') is not positive'));
   });
 });

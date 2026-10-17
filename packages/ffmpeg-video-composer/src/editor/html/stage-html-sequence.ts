@@ -22,6 +22,7 @@ import {
 import { motionBudget, planMotionFrames, type ElementMotionMap, type MotionFramePlan } from '@/core/html/motion-frames';
 import type AbstractFilesystem from '../../platform/filesystem/AbstractFilesystem';
 import type AbstractLogger from '../../platform/logging/AbstractLogger';
+import { overflowFinding } from '../../services/html-raster/html-layer-findings';
 import { assembleApng, type ApngFrame } from './apng-assemble';
 import type { StagedHtmlLayer } from './stage-html-layer';
 
@@ -49,6 +50,9 @@ export interface SequenceContext {
 
 const MB = 1024 * 1024;
 
+// An animated PNG stores a frame's delay in 16 bits.
+const MAX_LEAD_TICKS = 0xffff;
+
 function stillInstead(ctx: SequenceContext, name: string, reason: string): null {
   ctx.logger.warn(
     `[${ctx.section}][Html] html_motion_static: input "${name}" shows as a still in its final state: ${reason}`
@@ -72,7 +76,7 @@ async function drawFrame(
   states: ElementState[],
   fonts: RasterFont[],
   ctx: SequenceContext
-): Promise<Uint8Array | string> {
+): Promise<{ png: Uint8Array; contentHeight: number } | string> {
   try {
     const element = applyMotionStates(layer.element, states);
     const raster = await ctx.rasteriser.render({
@@ -83,7 +87,7 @@ async function drawFrame(
       fonts,
     });
 
-    return raster.png;
+    return raster;
   } catch (error) {
     return messageOf(error);
   }
@@ -97,8 +101,14 @@ interface Walk {
   started: number;
 }
 
+interface Drawn {
+  frames: ApngFrame[];
+  /** The tallest content any frame drew, in layer pixels. */
+  tallest: number;
+}
+
 // The frames from `index` on, drawn one after the other (the deadline and the byte budget stop the walk).
-async function drawFrom(walk: Walk, index: number, done: ApngFrame[], bytes: number): Promise<ApngFrame[] | string> {
+async function drawFrom(walk: Walk, index: number, done: Drawn, bytes: number): Promise<Drawn | string> {
   const frame = walk.plan.frames[index] as MotionFramePlan['frames'][number] | undefined;
 
   if (!frame) return done;
@@ -107,23 +117,26 @@ async function drawFrom(walk: Walk, index: number, done: ApngFrame[], bytes: num
     return `drawing took over ${HTML_MOTION_DEADLINE_MS / 1000} s`;
   }
 
-  const png = await drawFrame(walk.layer, frame.states, walk.fonts, walk.ctx);
+  const drawn = await drawFrame(walk.layer, frame.states, walk.fonts, walk.ctx);
 
-  if (typeof png === 'string') return `frame ${index} failed to draw (${png})`;
+  if (typeof drawn === 'string') return `frame ${index} failed to draw (${drawn})`;
+
+  const { png } = drawn;
 
   if (bytes + png.length > HTML_MOTION_MAX_BYTES) return `its frames are over ${HTML_MOTION_MAX_BYTES / MB} MB`;
 
-  return drawFrom(walk, index + 1, [...done, { png, ticks: frame.ticks }], bytes + png.length);
+  const next = {
+    frames: [...done.frames, { png, ticks: frame.ticks }],
+    tallest: Math.max(done.tallest, drawn.contentHeight),
+  };
+
+  return drawFrom(walk, index + 1, next, bytes + png.length);
 }
 
-async function drawFrames(
-  layer: SequenceLayer,
-  plan: MotionFramePlan,
-  ctx: SequenceContext
-): Promise<ApngFrame[] | string> {
+async function drawFrames(layer: SequenceLayer, plan: MotionFramePlan, ctx: SequenceContext): Promise<Drawn | string> {
   const fonts = await layer.fonts();
 
-  return drawFrom({ layer, plan, fonts, ctx, started: ctx.now() }, 0, [], 0);
+  return drawFrom({ layer, plan, fonts, ctx, started: ctx.now() }, 0, { frames: [], tallest: 0 }, 0);
 }
 
 function joined(frames: ApngFrame[], fps: number): Uint8Array | string {
@@ -134,9 +147,11 @@ function joined(frames: ApngFrame[], fps: number): Uint8Array | string {
   }
 }
 
-/** Renders (or reuses) the animated card; null when the card is to be staged as its still. */
-export async function stageHtmlSequence(layer: SequenceLayer, ctx: SequenceContext): Promise<StagedHtmlLayer | null> {
-  if (Number.isFinite(ctx.fps) && !Number.isInteger(ctx.fps)) {
+// The frame plan of an animated card, or null (with a warning when it is not simply a still) to stage the still.
+function planOf(layer: SequenceLayer, ctx: SequenceContext): MotionFramePlan | null {
+  if (!(ctx.fps > 0)) return stillInstead(ctx, layer.name, `the frame rate (${ctx.fps}) is not positive`);
+
+  if (!Number.isInteger(ctx.fps)) {
     return stillInstead(ctx, layer.name, `the frame rate (${ctx.fps}) is not a whole number`);
   }
 
@@ -157,18 +172,40 @@ export async function stageHtmlSequence(layer: SequenceLayer, ctx: SequenceConte
 
   if (problem) return stillInstead(ctx, layer.name, problem);
 
+  if (plan.frames[0].ticks > MAX_LEAD_TICKS) {
+    return stillInstead(
+      ctx,
+      layer.name,
+      `its first frame lasts ${plan.frames[0].ticks} frames (limit ${MAX_LEAD_TICKS})`
+    );
+  }
+
+  return plan;
+}
+
+/** Renders (or reuses) the animated card; null when the card is to be staged as its still. */
+export async function stageHtmlSequence(layer: SequenceLayer, ctx: SequenceContext): Promise<StagedHtmlLayer | null> {
+  const plan = planOf(layer, ctx);
+
+  if (!plan) return null;
+
   const key = sequenceKey(layer.stillKey, plan);
   const staged = { url: `${HTML_SEQUENCE_SCHEME}${key}`, path: `${ctx.dir}/html-${key}.apng` };
 
   if (await ctx.filesystem.stat(staged.path)) return staged;
 
-  const frames = await drawFrames(layer, plan, ctx);
+  const drawn = await drawFrames(layer, plan, ctx);
 
-  if (typeof frames === 'string') return stillInstead(ctx, layer.name, frames);
+  if (typeof drawn === 'string') return stillInstead(ctx, layer.name, drawn);
 
+  const { frames } = drawn;
   const apng = joined(frames, plan.fps);
 
   if (typeof apng === 'string') return stillInstead(ctx, layer.name, apng);
+
+  for (const finding of overflowFinding(drawn.tallest, layer.height)) {
+    ctx.logger.warn(`[${ctx.section}][Html] ${finding.code}: ${finding.message}`);
+  }
 
   await ctx.filesystem.writeFile(staged.path, apng);
   ctx.logger.info(`[${ctx.section}][Html] staged ${layer.name} as html-${key}.apng (${frames.length} frames)`);
