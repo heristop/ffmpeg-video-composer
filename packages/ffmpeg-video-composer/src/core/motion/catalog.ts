@@ -205,6 +205,10 @@ const GRAPHICS: Record<string, string> = {
   path:
     'A line drawing itself along points (+ smooth), a shape (circle|ellipse|arc|wave) or an SVG d: thickness, ' +
     'caps, dash, from/to (to: 0.75 = ring at 75%), head dot, exit fade|retract|none.',
+  shape:
+    'A filled vector shape: a preset (star, polygon, heart, arrow, blob, rect) or a closed SVG d (+ viewBox for ' +
+    'icons), colour or gradient fill, fillRule, stroke; moved with layer tracks (animate, origin) or with its ' +
+    'outline drawn on (stroke.draw).',
   wipe: 'A colour panel sweeping across the frame: covers then uncovers (direction).',
   panel: 'A solid block growing from one edge: a backing plate for text (x, y, width, height, from).',
   glitch:
