@@ -110,8 +110,16 @@ function checkFrames(frames: readonly ApngFrame[], parsed: PngChunk[][], ihdr: U
   }
 }
 
-/** One animated PNG playing `frames` once, each for `ticks / fps` seconds. */
+/**
+ * One animated PNG playing `frames` once, each for `ticks / fps` seconds. `fps` is stored as a 16-bit delay
+ * denominator, so it must be a whole number in 1..65535. Frames must be RGBA or RGB PNGs: palette PNGs are
+ * not supported.
+ */
 export function assembleApng(frames: readonly ApngFrame[], fps: number): Uint8Array {
+  if (!Number.isInteger(fps) || fps < 1 || fps > MAX_TICKS) {
+    throw new RangeError(`frame rate ${fps} is not a whole number in 1..${MAX_TICKS}`);
+  }
+
   if (frames.length === 0) throw new Error('an animated PNG needs at least one frame');
 
   const parsed = frames.map((frame) => readPngChunks(frame.png));

@@ -137,4 +137,8 @@ describe('assembleApng', () => {
 
     fs.rmSync(dir, { recursive: true, force: true });
   });
+
+  it.each([29.97, 0, -1, 65536, Number.NaN, Number.POSITIVE_INFINITY])('refuses a frame rate of %s', (fps) => {
+    expect(() => assembleApng([{ png: RED, ticks: 1 }], fps)).toThrow(/frame rate/);
+  });
 });

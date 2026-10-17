@@ -8,11 +8,15 @@ import { container } from 'tsyringe';
 import type AbstractFilesystem from '../../platform/filesystem/AbstractFilesystem';
 import type AbstractLogger from '../../platform/logging/AbstractLogger';
 import { HTML_LAYER_DENSITY, htmlLayerKey, inlineImages, type PreparedHtmlLayer } from '@/core/html/html-layer';
+import type { LayerElement } from '@/core/html/html-element';
 import { HTML_RASTERISER, type HtmlRasteriser, type RasterFont } from '@/core/html/html-rasteriser';
 import type { LayerFontFace } from '@/core/html/html-fonts';
 import type { TemplateFontFace } from '@/core/html/template-fonts';
 import { overflowFinding, prepareWithFindings } from '../../services/html-raster/html-layer-findings';
+import DefaultConfig from '../../core/default.config';
+import { finalElement, type ElementMotionMap } from '@/core/html/motion-frames';
 import { bytesToBase64 } from './base64';
+import { stageHtmlSequence, type SequenceContext } from './stage-html-sequence';
 
 export interface HtmlLayerInput {
   name: string;
@@ -20,6 +24,8 @@ export interface HtmlLayerInput {
   css?: string;
   width?: number;
   height?: number;
+  /** Per-element tracks, for the elements tagged data-motion (an animated card). */
+  motion?: ElementMotionMap;
 }
 
 export interface HtmlStageContext {
@@ -39,6 +45,10 @@ export interface HtmlStageContext {
   rasteriser: HtmlRasteriser | null;
   /** Rendered layers kept across renders by hash (default: one per process). */
   memory?: Map<string, Uint8Array>;
+  /** The output frame rate an animated card is drawn at (default DefaultConfig.FPS). */
+  fps?: number;
+  /** Milliseconds, for an animated card's drawing deadline (default Date.now). */
+  now?: () => number;
 }
 
 export interface StagedHtmlLayer {
@@ -120,7 +130,26 @@ function fontBytes(face: LayerFontFace, ctx: HtmlStageContext): Promise<Uint8Arr
   return own ? Promise.resolve(own.data) : ctx.loadFont(face.file);
 }
 
-/** Renders (or reuses) the layer's PNG under `ctx.dir`; returns its `html:<hash>` url and staged path. */
+function loadFaces(faces: LayerFontFace[], ctx: HtmlStageContext): Promise<RasterFont[]> {
+  return Promise.all(faces.map(async (face) => ({ ...face, data: await fontBytes(face, ctx) })));
+}
+
+function sequenceContext(ctx: HtmlStageContext, rasteriser: HtmlRasteriser): SequenceContext {
+  return {
+    rasteriser,
+    filesystem: ctx.filesystem,
+    logger: ctx.logger,
+    dir: ctx.dir,
+    section: ctx.section,
+    fps: ctx.fps ?? DefaultConfig.FPS,
+    now: ctx.now ?? Date.now,
+  };
+}
+
+/**
+ * Renders (or reuses) the layer under `ctx.dir`: an animated card (a `motion` map) as `html-seq:<hash>`
+ * (stage-html-sequence.ts), otherwise, or when its frames can't be produced, the still as `html:<hash>`.
+ */
 export async function stageHtmlLayer(input: HtmlLayerInput, ctx: HtmlStageContext): Promise<StagedHtmlLayer> {
   const { rasteriser } = ctx;
 
@@ -135,22 +164,51 @@ export async function stageHtmlLayer(input: HtmlLayerInput, ctx: HtmlStageContex
   const width = input.width ?? 0;
   const height = input.height ?? 0;
   const faces = prepared.faces.map(faceIdentity);
-  const key = htmlLayerKey({ element, fonts: faces, width, height, renderer: rasteriser.version });
+  const loadFonts = loadFaces.bind(null, prepared.faces, ctx);
+  const still = finalElement(element, input.motion);
+  const key = htmlLayerKey({ element: still, fonts: faces, width, height, renderer: rasteriser.version });
+  const animated = input.motion
+    ? await stageHtmlSequence(
+        { name: input.name, element, motion: input.motion, width, height, stillKey: key, fonts: loadFonts },
+        sequenceContext(ctx, rasteriser)
+      )
+    : null;
+
+  return animated ?? stageStill({ name: input.name, element: still, width, height, key, loadFonts }, rasteriser, ctx);
+}
+
+interface StillLayer {
+  name: string;
+  element: LayerElement;
+  width: number;
+  height: number;
+  key: string;
+  loadFonts: () => Promise<RasterFont[]>;
+}
+
+async function stageStill(
+  layer: StillLayer,
+  rasteriser: HtmlRasteriser,
+  ctx: HtmlStageContext
+): Promise<StagedHtmlLayer> {
+  const { key, element: still, width, height, loadFonts } = layer;
   const path = `${ctx.dir}/html-${key}.png`;
   const staged = { url: `html:${key}`, path };
 
   if (await ctx.filesystem.stat(path)) return staged;
 
   const memory = ctx.memory ?? PROCESS_MEMORY;
-  const fonts: RasterFont[] = await Promise.all(
-    prepared.faces.map(async (face) => ({ ...face, data: await fontBytes(face, ctx) }))
-  );
   const png =
-    memory.get(key) ?? (await draw({ element, width, height, density: HTML_LAYER_DENSITY, fonts }, rasteriser, ctx));
+    memory.get(key) ??
+    (await draw(
+      { element: still, width, height, density: HTML_LAYER_DENSITY, fonts: await loadFonts() },
+      rasteriser,
+      ctx
+    ));
 
   remember(memory, key, png);
   await ctx.filesystem.writeFile(path, png);
-  ctx.logger.info(`[${ctx.section}][Html] staged ${input.name} as html-${key}.png`);
+  ctx.logger.info(`[${ctx.section}][Html] staged ${layer.name} as html-${key}.png`);
 
   return staged;
 }
