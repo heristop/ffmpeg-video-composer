@@ -1,6 +1,7 @@
 // packages/ffmpeg-video-composer/tests/shape-schema.test.ts
 import { describe, expect, it } from 'vitest';
 import { GraphicSchema } from '@/schemas/graphics.schemas';
+import { templateDescriptorJsonSchema } from '@/schemas/template.schemas';
 import { motionCatalog } from '@/core/motion/catalog';
 
 // The shape graphic's schema: a preset or a closed SVG d, fill and stroke, layer tracks, and the
@@ -83,5 +84,15 @@ describe('shape graphic: schema', () => {
 
     expect(catalog.graphics.shape.description).toContain('stroke.draw');
     expect(catalog.graphics.shape.verb).toBe('STAMPS');
+  });
+});
+
+describe('shape graphic: d length cap', () => {
+  it('refuses a d past 4000 characters and publishes the cap in the JSON schema', () => {
+    const long = `M0 0 ${'L10 10 '.repeat(600)}Z`;
+
+    expect(long.length).toBeGreaterThan(4000);
+    expect(parse({ d: long }).success).toBe(false);
+    expect(JSON.stringify(templateDescriptorJsonSchema)).toContain('"maxLength":4000');
   });
 });

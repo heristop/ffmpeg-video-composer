@@ -58,7 +58,7 @@
           "width": 300,
           "height": 300,
           "color": "#FFF685",
-          "stroke": { "color": "#141416", "width": 6 },
+          "stroke": { "color": "#F5F3F7", "width": 6 },
           "animate": {
             "scale": [
               { "t": 0.3, "v": 0 },

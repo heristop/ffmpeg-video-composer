@@ -2,7 +2,7 @@
 import { z } from 'zod';
 import { ColorToken } from './color-token.schemas';
 import { FxTargetSchema } from './fx.schemas';
-import { pathGeometryError } from './graphics-path.schemas';
+import { MAX_D, pathGeometryError } from './graphics-path.schemas';
 import { LayerAnimateSchema, LayerOriginSchema } from './layer-animate.schemas';
 
 // ── fields of the shape graphic: a filled, optionally stroked vector shape (editor/presets/shape-*.ts) ──
@@ -92,7 +92,7 @@ export const shapeFields = {
   target: FxTargetSchema.optional().describe(
     'x, y, width, height (and `d` without viewBox) are fractions of this box.'
   ),
-  d: z.string().optional().describe('Closed SVG path of M L H V C Q Z.'),
+  d: z.string().max(MAX_D).optional().describe(`Closed SVG path of M L H V C Q Z, at most ${MAX_D} characters.`),
   viewBox: z
     .tuple([z.number(), z.number(), z.number().positive(), z.number().positive()])
     .optional()
