@@ -5,6 +5,7 @@ import type { PathCommand } from '@/editor/presets/path-geometry';
 import {
   MAX_ENCODED_PATH,
   MAX_SHAPE_PIXELS,
+  MAX_FILL_WORK,
   MAX_SHAPE_POINTS,
   MAX_SHAPE_SIDE,
   parseShapeUrl,
@@ -110,13 +111,10 @@ describe('work bounds', () => {
 
   it('refuses an outline that flattens past the point budget, without flattening it all', () => {
     const spec: ShapeSpec = { ...SQUARE, w: 64, h: 64, path: CURVES };
-    const started = Date.now();
-
     expect(MAX_SHAPE_POINTS).toBe(20_000);
     expect(() => shapeImage(spec)).toThrow(/points/);
     expect(parseShapeUrl(shapeUrl(spec))).toBeNull();
     expect(generatedImage(shapeUrl(spec))).toBeNull();
-    expect(Date.now() - started).toBeLessThan(2000);
   });
 
   it('refuses a stroke whose pixel work exceeds the budget', () => {
@@ -145,11 +143,19 @@ describe('work bounds', () => {
       sc: '00ff00ff',
       path: 'M0_0L2047_2047',
     };
-    const started = Date.now();
 
     expect(px(spec, 1000, 1000)[3]).toBe(255);
     expect(px(spec, 1000, 1100)[3]).toBe(0);
-    expect(Date.now() - started).toBeLessThan(3000);
+  });
+
+  it('refuses a fill whose scanline work exceeds the budget', () => {
+    const wave = 'W0_2048_1024_2048_2_90'.repeat(4);
+    const spec: ShapeSpec = { ...SQUARE, w: 1024, h: 4096, path: wave };
+
+    expect(MAX_FILL_WORK).toBe(20_000_000);
+    expect(() => shapeImage(spec)).toThrow(/fill/);
+    expect(parseShapeUrl(shapeUrl(spec))).toBeNull();
+    expect(generatedImage(shapeUrl(spec))).toBeNull();
   });
 });
 

@@ -8,7 +8,9 @@ import type { Pt } from './path-geometry';
 
 export type FillRule = 'nonzero' | 'evenodd';
 
-const SUB = 4;
+/** Sub-rows per pixel row. */
+export const FILL_SUB = 4;
+const SUB = FILL_SUB;
 
 interface Edge {
   top: number;

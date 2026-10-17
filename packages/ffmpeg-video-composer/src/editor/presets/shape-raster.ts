@@ -12,7 +12,7 @@ import { encodePng, type PngImage } from './png-encode';
 import { flattenWithin, type Pt } from './path-geometry';
 import { urlPairs } from './path-raster';
 import { decodeCommands } from './path-svg';
-import { fillCoverage, type FillRule } from './shape-fill';
+import { FILL_SUB, fillCoverage, type FillRule } from './shape-fill';
 
 export const MAX_SHAPE_SIDE = 4096;
 /** 4 MP: a 16 MB RGBA buffer at most, on the memory-constrained WASM and Hermes targets too. */
@@ -20,8 +20,11 @@ export const MAX_SHAPE_PIXELS = 4_194_304;
 const MAX_STROKE = 640;
 /** Flattened points a spec may hold (a bundled preset or svg outline stays far below it). */
 export const MAX_SHAPE_POINTS = 20_000;
+const FILL_ERROR = 'Shape fill is too costly to paint';
 /** Pixel visits the outline's stroke may cost (the sum over its segments of the band each paints). */
-const MAX_STROKE_WORK = 50_000_000;
+const MAX_STROKE_WORK = 20_000_000;
+/** Edge-sub-rows the fill may cross: the sum over edges of their height in the raster's sub-rows. */
+export const MAX_FILL_WORK = 20_000_000;
 /** Characters of the encoded outline a spec may carry (refused before decoding, so a hostile URL costs nothing). */
 export const MAX_ENCODED_PATH = 65_536;
 const SCHEME = 'shape:';
@@ -102,6 +105,26 @@ function segmentWork(a: Pt, b: Pt, reach: number, spec: ShapeSpec): number {
   return Math.min(area, spec.w * spec.h);
 }
 
+// Sub-rows each edge crosses within the raster (shape-fill.ts walks every edge through every sub-row it spans).
+function fillWork(lines: Pt[][], h: number): number {
+  const limit = h * FILL_SUB;
+  let work = 0;
+
+  for (const points of lines) {
+    for (let i = 0; i < points.length; i++) {
+      const [a, b] = [points[i], points[(i + 1) % points.length]];
+      const [top, bottom] = [
+        Math.max(0, Math.min(a.y, b.y) * FILL_SUB),
+        Math.min(limit, Math.max(a.y, b.y) * FILL_SUB),
+      ];
+
+      work += Math.max(0, bottom - top);
+    }
+  }
+
+  return work;
+}
+
 function strokeWork(lines: Pt[][], spec: ShapeSpec): number {
   const reach = spec.sw / 2 + 1;
 
@@ -171,6 +194,8 @@ function outlineOf(spec: ShapeSpec): { lines: Pt[][] } | { error: string } {
   const lines = commands && flattenWithin(commands, MAX_SHAPE_POINTS);
 
   if (!lines) return { error: `Shape outline exceeds ${MAX_SHAPE_POINTS} points` };
+
+  if (spec.fill !== 'none' && fillWork(lines, spec.h) > MAX_FILL_WORK) return { error: FILL_ERROR };
 
   if (spec.sw > 0 && strokeWork(lines, spec) > MAX_STROKE_WORK) return { error: 'Shape stroke is too costly to paint' };
 
