@@ -737,7 +737,8 @@
             },
             "color": {
               "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
             },
             "shape": {
               "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
@@ -840,7 +841,8 @@
               "maxItems": 8,
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
               }
             },
             "stagger": {
@@ -3010,7 +3012,8 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
                     "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
@@ -3113,7 +3116,8 @@
                     "maxItems": 8,
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                     }
                   },
                   "stagger": {
@@ -6015,7 +6019,8 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
                     "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
@@ -6118,7 +6123,8 @@
                     "maxItems": 8,
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                     }
                   },
                   "stagger": {
@@ -9063,7 +9069,8 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
                     "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
@@ -9166,7 +9173,8 @@
                     "maxItems": 8,
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                     }
                   },
                   "stagger": {
@@ -11835,7 +11843,8 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
                     "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
@@ -11938,7 +11947,8 @@
                     "maxItems": 8,
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                     }
                   },
                   "stagger": {
@@ -14587,7 +14597,8 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
                     "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
@@ -14690,7 +14701,8 @@
                     "maxItems": 8,
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                     }
                   },
                   "stagger": {
@@ -17810,7 +17822,8 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
                     "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
@@ -17913,7 +17926,8 @@
                     "maxItems": 8,
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                     }
                   },
                   "stagger": {
@@ -20562,7 +20576,8 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
                     "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
@@ -20665,7 +20680,8 @@
                     "maxItems": 8,
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                     }
                   },
                   "stagger": {
@@ -23314,7 +23330,8 @@
                   },
                   "color": {
                     "description": "drip: the paint colour (\"#rrggbb\" or \"$color.accent\"; default the theme accent).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                   },
                   "shape": {
                     "description": "iris: the shape that opens (default circle); star, heart and rounded-square open from origin.",
@@ -23417,7 +23434,8 @@
                     "maxItems": 8,
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{6}|\\$color\\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$"
                     }
                   },
                   "stagger": {

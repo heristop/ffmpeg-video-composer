@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { DESIGNED_TRANSITIONS } from '../core/motion/transition-names';
 import { EasingSpecSchema } from './motion.schemas';
 import { GLOBAL_AUDIO_POLISH_FIELDS } from './audio.schemas';
-import { TRANSITION_DESIGN_FIELDS } from './transition-designs.schemas';
+import { TRANSITION_DESIGN_FIELDS, TransitionColorSchema } from './transition-designs.schemas';
 
 // ── overlay fit ────────────────────────────────────────────────────────────────
 
@@ -167,10 +167,9 @@ export const TransitionSchema = z
       .describe(
         "iris: a #RRGGBB outline on the opening circle's edge (default none); the colour of the element it opens from."
       ),
-    color: z
-      .string()
-      .optional()
-      .describe('drip: the paint colour ("#rrggbb" or "$color.accent"; default the theme accent).'),
+    color: TransitionColorSchema.optional().describe(
+      'drip: the paint colour ("#rrggbb" or "$color.accent"; default the theme accent).'
+    ),
     ...TRANSITION_DESIGN_FIELDS,
     duration: z
       .number()

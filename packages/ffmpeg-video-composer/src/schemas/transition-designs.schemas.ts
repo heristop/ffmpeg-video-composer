@@ -41,6 +41,14 @@ const ThroughShapeSchema = z
   .strict()
   .describe('A shaped window at a size and place.');
 
+/** A transition paint: "#rrggbb" (optional @alpha) or a "$color.<name>" theme token, so a typo fails validation. */
+export const TransitionColorSchema = z
+  .string()
+  .regex(
+    /^(#[0-9a-fA-F]{6}|\$color\.[a-zA-Z][a-zA-Z0-9]*)(@[0-9.]+)?$/,
+    'a "#rrggbb" colour or a "$color.<name>" theme token'
+  );
+
 export const TRANSITION_DESIGN_FIELDS = {
   shape: z
     .enum(MATTE_SHAPES)
@@ -61,7 +69,7 @@ export const TRANSITION_DESIGN_FIELDS = {
     .optional()
     .describe('bands: the bands’ angle in degrees, counter-clockwise from horizontal (default 30).'),
   colors: z
-    .array(z.string())
+    .array(TransitionColorSchema)
     .min(1)
     .max(8)
     .optional()
