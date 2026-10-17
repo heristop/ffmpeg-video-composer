@@ -13,7 +13,15 @@ export type Transition = {
   origin?: FramePoint;
   rim?: string;
   color?: string;
+  /** bands. */
+  count?: number;
+  angle?: number;
+  colors?: string[];
+  stagger?: number;
 };
+
+/** The designed fields a boundary carries over to its graph (each only when set). */
+const DESIGNED_FIELDS = ['origin', 'rim', 'color', 'count', 'angle', 'colors', 'stagger'] as const;
 
 /** Per-segment probe result the assembly graph is built from. */
 export type SegmentProbe = { duration: number; hasAudio: boolean };
@@ -96,12 +104,14 @@ function boundaryLink(
   if (frame && isDesignedTransition(transition.type)) {
     const [width, height] = frame.scale.split(':').map(Number);
 
+    const fields = Object.fromEntries(
+      DESIGNED_FIELDS.flatMap((key) => (transition[key] === undefined ? [] : [[key, transition[key]]]))
+    );
+
     return designedTransitionGraph({
       type: transition.type,
       ease: transition.ease,
-      ...(transition.origin ? { origin: transition.origin } : {}),
-      ...(transition.rim ? { rim: transition.rim } : {}),
-      ...(transition.color ? { color: transition.color } : {}),
+      ...fields,
       left: strip(labels.left),
       right: strip(labels.right),
       out: strip(labels.out),

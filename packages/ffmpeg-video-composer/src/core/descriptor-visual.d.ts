@@ -49,3 +49,6 @@ export interface BackgroundLayer {
   h?: number | string;
   gradient?: { from: string; to: string; direction?: 'horizontal' | 'vertical' | 'diagonal'; angle?: number };
 }
+
+/** The bands fields of a designed transition (schemas/transition-designs.schemas.ts). */
+export type { TransitionDesign } from '../schemas/transition-designs.schemas';

@@ -10,8 +10,8 @@
 //
 // Same timeline as xfade (offset + duration), so the audio crossfade and music windows are unchanged.
 // Only standard filters (split, trim, setpts, pad, overlay, crop, scale, format, zoompan, xfade, concat, gblur;
-// the drip adds gradients, color, lutyuv, drawbox, alphamerge and loop: transition-drip.ts), all in the
-// on-device build.
+// the drip adds gradients, color, lutyuv, drawbox, alphamerge and loop: transition-drip.ts; bands add rotate and
+// loop: transition-bands.ts), all in the on-device build.
 
 import { parseEasing, type EasingSpec } from './easing';
 import { easedProgressExpr, fmt } from './hermite';
@@ -27,6 +27,7 @@ export {
 } from './transition-names';
 import { dripGraph, DRIP_FALLBACK_COLOR } from './transition-drip';
 import { fnv1a32 } from '../determinism/hash';
+import { bandsGraph } from './transition-bands';
 
 export const DESIGNED_TRANSITION_DESCRIPTIONS: Record<DesignedTransition, string> = {
   'push-left': 'The next scene pushes the current one out to the left, both moving together.',
@@ -44,6 +45,9 @@ export const DESIGNED_TRANSITION_DESCRIPTIONS: Record<DesignedTransition, string
   drip:
     'Paint runs down in drips of different lengths and covers the frame, then the next scene drips down over it ' +
     '(color: the paint, default the theme accent).',
+  bands:
+    'Parallel colour bands sweep in at an angle, staggered, cover the frame, then sweep on out to uncover the ' +
+    'next scene (count, angle, colors, stagger).',
 };
 
 /** A point of the frame in fractions: 0 = left / top edge, 1 = right / bottom edge. */
@@ -61,6 +65,11 @@ export interface DesignedBoundary {
   rim?: string;
   /** Drip only: the paint colour (hex; default the brand lavender, the director passes the theme accent). */
   color?: string;
+  /** Bands only. */
+  count?: number;
+  angle?: number;
+  colors?: readonly string[];
+  stagger?: number;
   /** Graph labels, without brackets. */
   left: string;
   right: string;
@@ -226,6 +235,8 @@ function drip(b: DesignedBoundary, p: Pads): string {
 
 function compose(b: DesignedBoundary, p: Pads): string {
   if (b.type === 'drip') return drip(b, p);
+
+  if (b.type === 'bands') return bandsGraph({ ...b, ...p });
 
   if (b.type === 'zoom-through') return zoomThrough(b, p);
 

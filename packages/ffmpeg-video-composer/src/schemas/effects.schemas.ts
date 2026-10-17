@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { DESIGNED_TRANSITIONS } from '../core/motion/transition-names';
 import { EasingSpecSchema } from './motion.schemas';
 import { GLOBAL_AUDIO_POLISH_FIELDS } from './audio.schemas';
+import { TRANSITION_DESIGN_FIELDS } from './transition-designs.schemas';
 
 // ── overlay fit ────────────────────────────────────────────────────────────────
 
@@ -148,7 +149,8 @@ export const TransitionSchema = z
         'xfade transition name between this section and the next, "cut" for a hard cut, or ' +
           'a designed transition: push-left/right/up/down, swipe-left/right, zoom-through, iris, ' +
           'whip-left/right/up/down (a push motion-blurred at peak speed), drip (paint drips down over the ' +
-          'frame, then the next scene drips down over the paint).'
+          'frame, then the next scene drips down over the paint), bands (colour bands sweep across at an ' +
+          'angle, then on out).'
       ),
     ease: EasingSpecSchema.optional().describe(
       'Curve of a designed transition (default cubic-bezier(0.65, 0, 0.35, 1)); springs overshoot.'
@@ -169,6 +171,7 @@ export const TransitionSchema = z
       .string()
       .optional()
       .describe('drip: the paint colour ("#rrggbb" or "$color.accent"; default the theme accent).'),
+    ...TRANSITION_DESIGN_FIELDS,
     duration: z
       .number()
       .positive()

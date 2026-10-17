@@ -15,6 +15,7 @@ export const DESIGNED_TRANSITIONS = [
   'whip-up',
   'whip-down',
   'drip',
+  'bands',
 ] as const;
 
 export type DesignedTransition = (typeof DESIGNED_TRANSITIONS)[number];
