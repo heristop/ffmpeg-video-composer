@@ -402,4 +402,24 @@ describe('brand kit', () => {
     expect(built.schemaTruncated).toBe(false);
     expect(built.system.length).toBeLessThanOrEqual(DEFAULT_PROMPT_BUDGET);
   });
+
+  it('keeps the whole schema with a real reference clip and a brand kit together', () => {
+    const { rules } = clipReferenceRules();
+    const brand = [
+      'Brand kit (BINDING: …):',
+      '- Brand: Acme. Write its name exactly so.',
+      `- Set global.theme to exactly: ${JSON.stringify({ extends: 'leclap', colors: { primary: '#3ce6ac', ink: '#101010', surface: '#f4f1ea' } })}`,
+      '- Exact brand fonts, for text fields that take a font object (Node and phone renders): display {"family":"Inter","weight":700}; body {"family":"Inter"}.',
+    ].join('\n');
+    const built = promptFor(
+      '30s product launch for a note-taking app, bold, punchy kinetic type',
+      { orientation: 'portrait', genre: 'product-launch' },
+      [],
+      rules,
+      brand
+    );
+
+    expect(built.schemaTruncated).toBe(false);
+    expect(built.system.length).toBeLessThanOrEqual(DEFAULT_PROMPT_BUDGET);
+  }, 60_000);
 });
