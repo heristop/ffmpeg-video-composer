@@ -221,12 +221,9 @@ class MapManager {
     // The animation overlays on top of the already-filtered background; no section filters here.
     // `input.filters` is optional in the schema (builder-authored inputs omit it), so default to none.
     if (input.options.clip) {
-      this.addClippedOverlay(
-        input,
-        [baseStream, this.registerLeg(input, inputIndex, plan.legFilters)],
-        overlayValue,
-        videoScale
-      );
+      const clipLeg = this.registerLeg(input, inputIndex, plan.legFilters);
+
+      this.addClippedOverlay(input, [baseStream, clipLeg], overlayValue, videoScale);
 
       return;
     }
