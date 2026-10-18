@@ -39,8 +39,11 @@ const STEP = 1.5;
 const MAX_STEPS = 4096;
 const RAD = Math.PI / 180;
 
+// NaN (0 × ∞ from a hostile width or wavelength) counts as no length, never as an empty point list.
 function steps(length: number, min = 1): number {
-  return Math.min(MAX_STEPS, Math.max(min, Math.ceil(length / STEP)));
+  const known = Number.isNaN(length) ? 0 : length;
+
+  return Math.min(MAX_STEPS, Math.max(min, Math.ceil(known / STEP)));
 }
 
 function dist(a: Pt, b: Pt): number {

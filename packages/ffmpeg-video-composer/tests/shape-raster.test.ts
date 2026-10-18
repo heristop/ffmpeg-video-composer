@@ -153,7 +153,7 @@ describe('work bounds', () => {
     const wave = 'W0_2048_1024_2048_2_90'.repeat(4);
     const spec: ShapeSpec = { ...SQUARE, w: 1024, h: 4096, path: wave };
 
-    expect(MAX_FILL_WORK).toBe(20_000_000);
+    expect(MAX_FILL_WORK).toBe(5_000_000);
     expect(() => shapeImage(spec)).toThrow(/fill/);
     expect(parseShapeUrl(shapeUrl(spec))).toBeNull();
     expect(generatedImage(shapeUrl(spec))).toBeNull();

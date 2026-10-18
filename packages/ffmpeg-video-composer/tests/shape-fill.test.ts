@@ -85,3 +85,24 @@ describe('fillCoverage', () => {
     expect(sum(fillCoverage([square(-50, -50, -10, -10)], 10, 10, 'nonzero'))).toBe(0);
   });
 });
+
+describe('fillCoverage with hostile edges', () => {
+  it('skips an edge whose slope overflows instead of sorting NaN crossings', () => {
+    const cover = fillCoverage(
+      [
+        [
+          { x: 0, y: 0.125 },
+          { x: 1e300, y: 0.125 + 1e-300 },
+          { x: 2, y: 8 },
+        ],
+        square(2, 2, 8, 8),
+      ],
+      10,
+      10,
+      'nonzero'
+    );
+
+    expect(cover.every((v) => Number.isFinite(v) && v >= 0 && v <= 1)).toBe(true);
+    expect(at(cover, 10, 5, 5)).toBe(1);
+  });
+});

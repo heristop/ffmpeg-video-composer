@@ -43,7 +43,7 @@ const MAX_THICKNESS = 80;
 /** Flattened points a `trace:` path may hold. */
 const MAX_TRACE_POINTS = 20_000;
 /** Pixel visits the painting of a spec may cost (the sum over its segments of the band each paints). */
-const MAX_TRACE_WORK = 20_000_000;
+const MAX_TRACE_WORK = 5_000_000;
 
 /** The code a position along the path (fraction 0..1) is stored as. */
 export function codeOf(fraction: number): number {

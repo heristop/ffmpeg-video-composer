@@ -231,3 +231,30 @@ describe('path geometry: division by input', () => {
     ).toBe(true);
   });
 });
+
+describe('path geometry: hostile numbers', () => {
+  it('flattens a wave whose step count overflows to NaN without throwing', () => {
+    const commands = decodeCommands('M0_0W0_0_0_1_1e-320_0');
+
+    expect(commands).not.toBeNull();
+
+    const points = flatten(commands ?? []).flat();
+
+    expect(points.length).toBeGreaterThan(1);
+    expect(points.every((p) => Number.isFinite(p.x) && Number.isFinite(p.y))).toBe(true);
+  });
+
+  it.each(['M_', 'M0x10_1', 'M 1_2', 'M1_', 'M1__2', 'M1e_2', 'M+1_2x', 'M1_2\n'])(
+    'refuses the number in %j',
+    (text) => {
+      expect(decodeCommands(text)).toBeNull();
+    }
+  );
+
+  it('keeps accepting what encodeCommands prints, exponents included', () => {
+    expect(decodeCommands('M-1.5_.5L1e+21_2.25')).toEqual([
+      ['M', -1.5, 0.5],
+      ['L', 1e21, 2.25],
+    ]);
+  });
+});

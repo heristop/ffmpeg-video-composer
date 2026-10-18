@@ -151,6 +151,8 @@ describe('lowerShape', () => {
       })
     );
 
+    expect(flat(filters).length).toBeGreaterThan(3);
+
     for (const filter of flat(filters)) {
       expect(() => assertSafeFilterOptions(filter.type, String(filter.value ?? '')), filter.type).not.toThrow();
     }
@@ -191,6 +193,12 @@ describe('lowerShape with values that skipped validation', () => {
   });
 
   it('keeps a non-numeric box or fade out of filter text', () => {
-    expect(lower({ x: "1',movie=x", duration: Number.NaN })).not.toThrow();
+    const warnings: string[] = [];
+    const filters = lowerShape(
+      request({ preset: { type: 'star' }, x: "1',movie=x", duration: Number.NaN }, { warnings })
+    );
+
+    expect(filters).toEqual([]);
+    expect(warnings.some((w) => w.startsWith('[shape_empty]'))).toBe(true);
   });
 });

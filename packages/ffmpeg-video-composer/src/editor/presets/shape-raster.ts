@@ -22,9 +22,9 @@ const MAX_STROKE = 640;
 export const MAX_SHAPE_POINTS = 20_000;
 const FILL_ERROR = 'Shape fill is too costly to paint';
 /** Pixel visits the outline's stroke may cost (the sum over its segments of the band each paints). */
-const MAX_STROKE_WORK = 20_000_000;
+const MAX_STROKE_WORK = 5_000_000;
 /** Edge-sub-rows the fill may cross: the sum over edges of their height in the raster's sub-rows. */
-export const MAX_FILL_WORK = 20_000_000;
+export const MAX_FILL_WORK = 5_000_000;
 /** Characters of the encoded outline a spec may carry (refused before decoding, so a hostile URL costs nothing). */
 export const MAX_ENCODED_PATH = 65_536;
 const SCHEME = 'shape:';
