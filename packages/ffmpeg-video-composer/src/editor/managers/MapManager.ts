@@ -20,6 +20,12 @@ import type { ClipBox } from '../../schemas/clip.schemas';
 import { assertSafePadLabel } from '../utils/filter-option-guard';
 import { isHtmlSequence } from '../html/html-sequence-source';
 
+// A persistent layer holds its last frame; so does an animated html card, which plays its frames once like a
+// still card would stay up.
+function holdsLastFrame(input: MapAnimationInput): boolean {
+  return input.options.persistent || isHtmlSequence(input);
+}
+
 // Section.inputs is typed as Input[] for schema purposes, but at runtime it holds
 // MapAnimationInput objects indexed by string keys (used as a keyed record).
 type SectionInputsCache = Record<string, MapAnimationInput>;
@@ -181,8 +187,7 @@ class MapManager {
 
   addAnimationOverlay = (input: MapAnimationInput, inputIndex: number, videoScale = ''): void => {
     const videoStream = `${this.getVideoInputIncrement()}:v`;
-    // An animated html card plays its frames once, then holds its final frame like a still card.
-    const eofAction = input.options.persistent || isHtmlSequence(input) ? 'repeat' : 'pass';
+    const eofAction = holdsLastFrame(input) ? 'repeat' : 'pass';
     // The position lands unquoted in `overlay=<x:y>`: two expression terms only (core/arg-guard.ts).
     const position = assertSafeExpression(input.options.position || '0:0', 'overlay position', 2);
 
