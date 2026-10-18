@@ -101,6 +101,12 @@ leclap render template.json --output out.mp4 --qc --cache .leclap-cache
 `project_video` clips. It exits 1 on any mismatch and prints the first filtergraph command that
 differs. Use `--json` for machine-readable checks.
 
+Raw `filters` in a template are checked against the engine's
+[raw filter allow-list](../../docs/template-configuration.md#raw-filter-allow-list); a filter outside it
+fails with `filter_not_allowed`. `--allow-raw-filters` (on `render` and `verify --rerender`) trusts the
+template's raw filters instead: only for templates you wrote or reviewed, since some FFmpeg filters read
+or write files anywhere and open URLs, and the render-time deny-list that stays on is best-effort.
+
 Codec, quality tier and segment concurrency are configured through the library's `ProjectConfig`;
 the published CLI has no flags for those fields. MCP server flags belong to `leclap-mcp`, not
 `leclap render`. See [engine configuration](../../docs/engine-configuration.md) for all defaults,

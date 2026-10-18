@@ -127,10 +127,10 @@ Then('the render has a positive duration and non-zero size', function (this: Age
   assert.ok(output.sizeBytes > 0, 'size must be non-zero');
 });
 
-// Filter types reach FFmpeg verbatim, so an unknown one passes validation and the descriptor guard and
-// only fails once the engine renders the segment.
+// An allow-listed filter with an argument only FFmpeg can judge (an unknown pixel format) passes validation
+// and the descriptor guard, and only fails once the engine renders the segment.
 When('the agent composes a template whose filter FFmpeg rejects', async function (this: AgentWorld) {
-  const template = await loadJson('unknown-filter.json');
+  const template = await loadJson('ffmpeg-rejects.json');
   this.lastResult = await this.timed('compose_video:failed', (client) =>
     client.callTool({ name: 'compose_video', arguments: { template, locale: 'en' } })
   );

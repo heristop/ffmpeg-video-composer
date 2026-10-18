@@ -2,7 +2,6 @@ import path from 'node:path';
 
 import type { TemplateDescriptor } from 'ffmpeg-video-composer';
 
-import { assertWithinMediaDir } from './pathGuard.js';
 import { assertMediaRefsLocal } from './media-refs.js';
 
 // compose_video schema-validates the descriptor but then forwards its filter chain to ffmpeg
@@ -39,7 +38,30 @@ const DANGEROUS_FILTERS = new Set([
   'openclsrc',
   'coreimage',
   'coreimagesrc',
+  // Command/network/model loaders: sendcmd reads a command file, zmq/azmq open a listening socket,
+  // arnndn loads a model file.
+  'sendcmd',
+  'asendcmd',
+  'zmq',
+  'azmq',
+  'arnndn',
+  // Filters that read a file or a model given as an option (LUT, SOFA, mask, OCR data, whisper model).
+  'lut1d',
+  'haldclut',
+  'sofalizer',
+  'whisper',
+  'cover_rect',
+  'find_rect',
+  'removelogo',
+  'ocr',
 ]);
+
+// Every dnn_* filter loads a model file.
+function dangerousFilter(type: string): boolean {
+  const name = type.replace(/\\/g, '').trim().toLowerCase();
+
+  return DANGEROUS_FILTERS.has(name) || name.startsWith('dnn_');
+}
 
 // A URL/pseudo-protocol scheme anywhere in a value → SSRF or protocol-based file access.
 const PSEUDO_PROTOCOL =
@@ -47,9 +69,25 @@ const PSEUDO_PROTOCOL =
 // A file-bearing filter OPTION token (curves=psfile=…, drawtext=textfile=…, movie=filename=…, …).
 // Quotes are stripped before matching, so 'psfile'=… and "textfile"=… are caught too.
 const FILE_OPTION =
-  /(^|[\s,:;=])(psfile|filename|textfile|pfile|fontfile|model|model_filename|commands|file|stats_file)\s*=/i;
+  /(^|[\s,:;=])(psfile|filename|textfile|pfile|fontfile|model|model_filename|commands|file|stats_file|m|sofa|cover|object|datapath|dumpfile|log_path|destination)\s*=/i;
 // A value that is itself an absolute path or a traversal.
 const ABSOLUTE_OR_TRAVERSAL = /^\s*(\/|[a-zA-Z]:[\\/])|(^|[\\/])\.\.([\\/]|$)/;
+
+// Filtergraph syntax that opens a resource, as it reads once chained into a graph: a source/plugin
+// filter or a file-bearing option right after a filter separator (`;`, `,`, `]`, `:`, `=`) or at the
+// start of the string, e.g. `red;movie=/etc/passwd` in a colour that lands in a `color=c=…` source.
+// Every string leaf is scanned with these, because a template field the filter scan never reads (a
+// transition colour, a theme value) can still reach a filtergraph. They need the filter-name-then-`=`
+// shape after a separator, so free copy ("Hello; world", "watch the movie, then…", a URL) passes.
+// zmq/azmq run with no options, so they also match bare before a separator or the end. The short
+// generic option names (`f`, `file`) only match in option position, glued to the `=` or `:` before
+// them (`sendcmd=f=…`, `drawtext=…:file=…`); FFmpeg reads no whitespace around an option key.
+// Quotes and backslashes are stripped first: FFmpeg's tokenizer unescapes `mo\vie` to `movie`.
+const CHAINED_FILTER = new RegExp(`(^|[;,\\]])\\s*(${[...DANGEROUS_FILTERS].join('|')})(@\\w*)?\\s*=`, 'i');
+const CHAINED_BARE_FILTER = /(^|[;,\]])\s*a?zmq(@\w*)?\s*($|[;,[])/i;
+const CHAINED_FILE_OPTION = /(^|[;,\]:=])\s*(psfile|filename|textfile|pfile|fontfile|model_filename|stats_file)\s*=/i;
+const OPTION_FILE = /[=:](f|file)=/i;
+const CHAINED_PATTERNS = [CHAINED_FILTER, CHAINED_BARE_FILTER, CHAINED_FILE_OPTION, OPTION_FILE];
 
 export type GuardResult = { ok: true } | { ok: false; message: string };
 
@@ -78,14 +116,63 @@ function* objectNodes(value: unknown): Generator<Record<string, unknown>> {
 
 // A bare bundled font name (e.g. "BebasNeue.ttf") has no path separator and no traversal — those
 // resolve from the engine's font registry and are safe. Anything path-like must be contained.
-function fontfileNeedsContainment(fontfile: string): boolean {
-  return fontfile.includes('/') || fontfile.includes('\\') || fontfile.includes('..') || path.isAbsolute(fontfile);
+// Aligned with the engine (assertBareFontFile): a drawtext fontfile is a bare font name the engine stages.
+function fontfileIsNotBare(fontfile: string): boolean {
+  return /[/\\':]/.test(fontfile) || fontfile.includes('..') || path.isAbsolute(fontfile);
+}
+
+// One FFmpeg tokenizer pass: '…' is literal, \x is x, an unquoted terminator splits.
+function splitUnescaped(input: string, terminators: string): string[] {
+  const parts = [''];
+
+  for (let index = 0; index < input.length; index++) {
+    const char = input[index];
+
+    if (char === '\\') {
+      parts[parts.length - 1] += input[index + 1] ?? '';
+      index++;
+      continue;
+    }
+
+    if (char === "'") {
+      const close = input.indexOf("'", index + 1);
+      const end = close === -1 ? input.length : close;
+      parts[parts.length - 1] += input.slice(index + 1, end);
+      index = end;
+      continue;
+    }
+
+    if (terminators.includes(char)) {
+      parts.push('');
+      continue;
+    }
+
+    parts[parts.length - 1] += char;
+  }
+
+  return parts;
+}
+
+// A protocol prefix (file:, http:, data:, concat:, subfile:…) on an option's value as FFmpeg reads it,
+// after both its passes (graph, then option): `'file\:/x'` is `file:/x` there. drawtext text is copy.
+const PROTOCOL_PREFIX = /^\s*[A-Za-z][\w+.-]*:/;
+
+function hasProtocolOption(value: string): boolean {
+  return splitUnescaped(value, '[];,')
+    .flatMap((filter) => splitUnescaped(filter, ':'))
+    .some((option) => {
+      const equals = option.indexOf('=');
+
+      if (equals >= 0 && option.slice(0, equals).trim() === 'text') return false;
+
+      return PROTOCOL_PREFIX.test(equals < 0 ? option : option.slice(equals + 1));
+    });
 }
 
 function unsafeScalarValueReason(value: string): string | undefined {
-  const unquoted = value.replace(/["'`]/g, '');
+  const unquoted = value.replace(/["'`\\]/g, '');
 
-  if (unquoted.includes('://') || PSEUDO_PROTOCOL.test(unquoted)) {
+  if (unquoted.includes('://') || PSEUDO_PROTOCOL.test(unquoted) || hasProtocolOption(value)) {
     return 'contains a URL/protocol scheme';
   }
 
@@ -102,7 +189,7 @@ function unsafeScalarValueReason(value: string): string | undefined {
 
 // Every string a filter hands to ffmpeg: the scalar `value` plus the structured `values` leaves.
 // Caption text and fontfile are excluded: text is free copy (a URL in a caption is not a fetch) and
-// fontfile has its own realpath containment below.
+// fontfile has its own bare-name rule below.
 function filterStrings(node: Record<string, unknown>): string[] {
   const strings: string[] = [];
 
@@ -150,7 +237,7 @@ function findFilterEscape(descriptor: TemplateDescriptor): string | undefined {
       continue;
     }
 
-    if (DANGEROUS_FILTERS.has(type.trim().toLowerCase())) {
+    if (dangerousFilter(type)) {
       return `Filter "${type.trim()}" is not allowed: it can read arbitrary files or URLs. Supply media via userVideoPaths (checked against the media dir) instead.`;
     }
 
@@ -160,6 +247,44 @@ function findFilterEscape(descriptor: TemplateDescriptor): string | undefined {
       if (reason) {
         return `Filter "${type}" value ${reason}: refusing to forward a path/URL to ffmpeg.`;
       }
+    }
+  }
+
+  return undefined;
+}
+
+// Every string leaf of the descriptor with its path (`sections[0].transition.color`).
+function* stringLeaves(value: unknown, at: string): Generator<[string, string]> {
+  if (typeof value === 'string') {
+    yield [at, value];
+
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    for (const [index, item] of value.entries()) {
+      yield* stringLeaves(item, `${at}[${index}]`);
+    }
+
+    return;
+  }
+
+  if (value === null || typeof value !== 'object') {
+    return;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    yield* stringLeaves(child, at ? `${at}.${key}` : key);
+  }
+}
+
+// A source/plugin filter or a file option chained into ANY string field (see CHAINED_FILTER).
+function findChainedEscape(descriptor: TemplateDescriptor): string | undefined {
+  for (const [at, value] of stringLeaves(descriptor, '')) {
+    const unescaped = value.replace(/["'`\\]/g, '');
+
+    if (CHAINED_PATTERNS.some((pattern) => pattern.test(unescaped))) {
+      return `Field "${at}" contains FFmpeg filter syntax that reads a file or URL: refusing to forward it to ffmpeg.`;
     }
   }
 
@@ -178,33 +303,25 @@ function collectFontfiles(descriptor: TemplateDescriptor): string[] {
   return files;
 }
 
-// Realpath-contain one path-like fontfile; returns an error message on escape, undefined when safe.
-async function containFontfile(fontfile: string, mediaDir: string): Promise<string | undefined> {
-  try {
-    await assertWithinMediaDir(fontfile, mediaDir);
-
-    return undefined;
-  } catch (error) {
-    return `fontfile ${error instanceof Error ? error.message : String(error)}`;
-  }
-}
-
-// Reject dangerous filter types + file/URL-bearing scalar values, confirm every path-like fontfile
-// stays under the media dir, and that every local media path is there (media-refs.ts). Async because
-// containment is realpath-checked (symlink-safe).
+// Reject dangerous filter types, file/URL-bearing scalar values and source/file filter syntax in any
+// string field, a fontfile that is not a bare font name, and any local media path outside the media dir
+// (media-refs.ts, realpath-checked so symlink-safe, hence async).
 export async function assertDescriptorSafe(descriptor: TemplateDescriptor, mediaDir: string): Promise<GuardResult> {
-  const escape = findFilterEscape(descriptor);
+  const escape = findFilterEscape(descriptor) ?? findChainedEscape(descriptor);
 
   if (escape) {
     return { ok: false, message: escape };
   }
 
-  const pathLike = collectFontfiles(descriptor).filter(fontfileNeedsContainment);
-  const checks = await Promise.all(pathLike.map((fontfile) => containFontfile(fontfile, mediaDir)));
-  const failure = checks.find((message) => message !== undefined);
+  const pathLike = collectFontfiles(descriptor).find(fontfileIsNotBare);
 
-  if (failure) {
-    return { ok: false, message: failure };
+  if (pathLike !== undefined) {
+    return {
+      ok: false,
+      message:
+        `fontfile "${pathLike}" must be a bare font name such as "Oswald.ttf"; a font file from the media dir ` +
+        'is declared in global.fonts instead.',
+    };
   }
 
   return assertMediaRefsLocal(descriptor, mediaDir);

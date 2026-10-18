@@ -90,6 +90,13 @@
           "format": "filepath",
           "isRequired": false,
           "isSecret": false
+        },
+        {
+          "name": "LECLAP_MCP_ALLOW_RAW_FILTERS",
+          "description": "Trust templates' raw FFmpeg filters instead of the file-free allow-list. For trusted local templates only. Off by default.",
+          "format": "boolean",
+          "isRequired": false,
+          "isSecret": false
         }
       ]
     }

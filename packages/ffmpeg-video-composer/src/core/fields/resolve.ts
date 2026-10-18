@@ -140,12 +140,15 @@ function hasFiltergraphSyntax(text: string): boolean {
 }
 const NUMERIC_TEXT = /^[+-]?(?:\d+\.?\d*|\.\d+)$/;
 
-// `…filters.<n>.values.<key>` with a key other than drawtext's text: forwarded to FFmpeg as it is written.
+// `…filters.<n>.type`, `…filters.<n>.value` and `…filters.<n>.values.<key>` with a key other than drawtext's
+// text: forwarded to FFmpeg as it is written.
 function isRawFilterValue(path: Path): boolean {
-  const at = path.findIndex(
-    (key, index) => key === 'values' && typeof path[index - 1] === 'number' && path[index - 2] === 'filters'
-  );
-  const key = at < 0 ? undefined : path[at + 1];
+  const at = path.findIndex((key, index) => typeof key === 'number' && path[index - 1] === 'filters');
+  const slot = at < 0 ? undefined : path[at + 1];
+
+  if (slot === 'type' || slot === 'value') return path.length === at + 2;
+
+  const key = slot === 'values' ? path[at + 2] : undefined;
 
   return key !== undefined && key !== 'text' && key !== 'textExpr';
 }

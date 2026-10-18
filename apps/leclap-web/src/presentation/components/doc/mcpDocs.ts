@@ -263,6 +263,14 @@ export const mcpDoc: McpDoc = {
       detail:
         'JSONL file get_motion_catalog appends unmatched queries to, relative to the output dir. Paths that resolve outside the output dir are refused.',
     },
+    {
+      label: 'Raw filters opt-in',
+      flag: '--allow-raw-filters',
+      env: 'LECLAP_MCP_ALLOW_RAW_FILTERS',
+      fallback: 'off',
+      detail:
+        "Trusts templates' raw FFmpeg filters instead of the file-free allow-list. Raw filters can still write files and reach the network, so enable it for trusted local templates only.",
+    },
   ],
   // Mirrors the one-click editor deep-links in docMarkdown.ts, which install via npx. Env values are
   // absolute because they are not tilde-expanded.

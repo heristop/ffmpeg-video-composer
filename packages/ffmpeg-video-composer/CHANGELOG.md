@@ -121,6 +121,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Raw filters are allow-listed by default. A template's `filters`, input filters and map filters may use only
+  file-free filters (text, boxes, fades, geometry, colour, blur, a few audio filters) with their listed option
+  names and positional options; anything else is the validation error `filter_not_allowed` with the nearest
+  allowed filter, and a build that skipped validation stops before any FFmpeg command. Templates that use a
+  filter outside the list now need `ProjectConfig.allowRawFilters` (trusted local templates only). See the raw
+  filter allow-list in the template reference.
+
+### Changed
+
 - Browser entry: the template validator loads on demand, like the compile pipeline. It lowers every overlay
   (text, lower thirds, kinetic type, subtitles, graphics) to find where text lands, so it made up most of what a
   page loaded before its first compile, and every new graphic or effect added to it. The eager load drops from
@@ -144,6 +153,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   turned sprite with `c=none`, which leaves whatever FFmpeg's frame pool last held there, so each piece
   smeared its earlier angles and a paper strip read as a filled square. The corners are now cleared with the
   piece's own colour at alpha 0, which also keeps the scale after the turn from pulling in a dark fringe.
+
+- `drip` transition: `color` now only accepts a `#RRGGBB` colour or a `$color.<name>` theme token, and the
+  render falls back to the default paint for any other value instead of passing it to FFmpeg as is. The
+  same applies to an iris `rim` that is not a hex colour, which is now dropped. A template could otherwise
+  slip FFmpeg filter syntax into the render through these fields.
+- `drip` transition: a section drip without its own `color` now takes the colour of the global drip
+  transition before falling back to the theme accent.
+- Section `backgroundColor`: only a single colour (hex, a name, an `@alpha` suffix, a `$color.<name>` token or
+  a `{{ VARIABLE }}`) is accepted, and the render refuses any other resolved value, so the colour can no
+  longer carry FFmpeg filter syntax into the section's input.
+- Colour fields: every colour that reaches a filter (chroma key, title card fade, text, caption, kinetic,
+  graphics, layout divider, outline and shape colours) accepts a single colour token only, and the render
+  refuses a resolved drawtext/drawbox or chroma key colour that is not one, so a colour can no longer close a
+  quoted option or chain filters.
+- Gradient background layers and the remaining colour fields named otherwise (progress tracks, highlight
+  markers, celebration palettes) take a single colour token too, and the render refuses a gradient stop
+  that is not one.
+- Raw filter values: the render refuses file-reading option keys, a font file that is not a bare font name,
+  and a value that would end its option or its filter, so a raw value can no longer read a file or add
+  options. `fontcolor_expr` is passed as a plain expression value.
+- Raw filters: a filter `type` must be a plain filter name, filters that read files, run commands or load
+  models are refused, a scalar `value` gets the same checks as `values` (including the filters it chains),
+  more file-capable option keys are refused, a dangling escape is refused, and a LUT look takes a bare
+  preset name only.
+- Raw filters: positional options could still reach file options with no key, so authored filters are now
+  checked against an allow-list (see Changed); map pad labels are limited to streams, `@input` references and
+  plain labels, `url:` LUT looks and authored graph blocks need the opt-in, and the render-time deny-list also
+  refuses absolute or `..` paths in any filter option.
+- Transitions: a compile that skips validation now renders an unknown transition `type` as a fade instead of
+  writing the name into the filter graph.
+- Raw filters: the allow-list now also holds on the descriptor the build lowers, after `$format` values,
+  partial variables, declared fields and theme tokens are substituted, so none of them can bring in a refused
+  filter; a `$format` block or a placeholder in a filter `type` or `value` is a validation error, a field cannot
+  fill one, an input name is a plain label (also checked on every pad label at render), a scalar drawtext
+  `fontfile` must be a bare font name, and the deny-list refuses a protocol prefix (`file:`, `http:`…) in an
+  unescaped option value.
+- Expression fields: an overlay `position`/`scale` (inputs and global animations), a `crop` effect's
+  rectangle and a background layer's box only take FFmpeg expressions (numbers, names, arithmetic and
+  parentheses, `:` between the parts), checked at validation and where the engine writes them into the filter
+  graph, so they can no longer chain filters; an authored `values.textExpr` is refused in every mode, and an
+  unsafe raw `values` entry is reported at validation.
+- Grade `curvesPreset`: only FFmpeg's curves preset names are accepted, at validation and where the engine
+  writes `curves=preset=…`, so it can no longer chain a filter.
+- Section names: a name takes letters, digits, `_`, `-` and `.` only (no `..`), at validation and again at
+  render, since it becomes output file names in the FFmpeg command and pad labels in the filter graph; a
+  space, a quote or a filtergraph separator in a name could add an FFmpeg argument or splice in a graph.
+  A name needs at least one letter or digit, effect sections follow the same rule, and a staged `videoUrl`
+  keeps a letters-and-digits extension only (`mp4` otherwise), so none can steer a file out of the build dir.
+- Overlay rotation, opacity, start and duration and layer keyframe values are checked as numbers (or
+  `+n`/`-n`) where the engine writes them, for callers that skip validation; so are a layer's rotation and
+  an overlay's loop `start`, `duration` and `loops`.
 
 ## [3.1.0] - 2026-10-11
 

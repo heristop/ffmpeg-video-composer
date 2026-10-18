@@ -26,6 +26,12 @@ export interface McpConfig {
    * Off by default; opt in with --allow-remotion / LECLAP_MCP_ALLOW_REMOTION for local design-time use.
    */
   allowRemotion: boolean;
+  /**
+   * Trust templates' raw `filters` instead of the engine's allow-list of file-free filters (--allow-raw-filters /
+   * LECLAP_MCP_ALLOW_RAW_FILTERS). Off by default: agent templates are untrusted, and some FFmpeg filters
+   * read or write files. Only for trusted local templates; the render-time deny-list stays on either way.
+   */
+  allowRawFilters?: boolean;
   /** Default Remotion entry (the module that calls registerRoot) for render_remotion_clip; optional. */
   remotionEntry?: string;
   /** Optional host Chromium/Chrome executable for registered effect rendering. */
@@ -154,6 +160,7 @@ export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
   const remotionEntry = readFlag(argv, '--remotion-entry') ?? process.env.LECLAP_MCP_REMOTION_ENTRY;
   const browserExecutable = readFlag(argv, '--remotion-browser') ?? process.env.LECLAP_MCP_REMOTION_BROWSER;
   const allowRemotion = readBoolean(argv, '--allow-remotion', process.env.LECLAP_MCP_ALLOW_REMOTION);
+  const allowRawFilters = readBoolean(argv, '--allow-raw-filters', process.env.LECLAP_MCP_ALLOW_RAW_FILTERS);
 
   return {
     ...directoryConfig(argv),
@@ -163,9 +170,20 @@ export function loadConfig(argv: readonly string[] = process.argv): McpConfig {
       readFlag(argv, '--effect-cache-max-bytes') ?? process.env.LECLAP_MCP_EFFECT_CACHE_MAX_BYTES
     ),
     allowRemotion,
+    allowRawFilters,
     ...catalogPathConfig(argv),
     ...(browserExecutable ? { browserExecutable: path.resolve(browserExecutable) } : {}),
     ...(remotionEntry ? { remotionEntry: path.resolve(remotionEntry) } : {}),
     ...gapLogConfig(argv),
   };
+}
+
+/** One-line operator warnings printed on stderr at start-up (an opt-in that widens what templates may do). */
+export function startupWarnings(config: Pick<McpConfig, 'allowRawFilters'>): string[] {
+  if (!config.allowRawFilters) return [];
+
+  return [
+    'leclap-mcp: --allow-raw-filters is on: templates are trusted to run any raw FFmpeg filter, which can ' +
+      'write files anywhere this process can and reach the network. Use it with local templates only.',
+  ];
 }

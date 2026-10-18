@@ -8,7 +8,7 @@ import 'reflect-metadata';
 import { out } from './stdout-guard-install.js';
 import { StdioServerTransport, serveStdio } from '@modelcontextprotocol/server/stdio';
 
-import { loadConfig } from './config.js';
+import { loadConfig, startupWarnings } from './config.js';
 import { createServer, snapshotEffectConfig } from './server.js';
 
 // The tool surface is authoring-only (get_template_schema, validate_template, compose_video,
@@ -24,6 +24,8 @@ import { createServer, snapshotEffectConfig } from './server.js';
 function main(): void {
   // Fail catalog configuration before stdin/transport starts; the protocol factory is lazy.
   const config = snapshotEffectConfig(loadConfig());
+
+  for (const warning of startupWarnings(config)) console.error(warning);
 
   serveStdio(() => createServer(config), {
     transport: new StdioServerTransport(process.stdin, out),

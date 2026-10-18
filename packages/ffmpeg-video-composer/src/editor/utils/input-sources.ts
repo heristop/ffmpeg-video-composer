@@ -1,4 +1,4 @@
-import { assertSafeArgToken } from '@/core/arg-guard';
+import { assertFiniteNumber, assertSafeArgToken, assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
 import type { RevealEasing } from '../presets/text';
 import { easedRamp, phaseDuration } from '../presets/eased-ramp';
 import type { BackgroundLayer } from '../../schemas/template.schemas';
@@ -24,12 +24,16 @@ type LoopOptions = { loop?: boolean; loops?: number; duration?: number; start?: 
  *   - none: play once (no flag).
  */
 export function buildLoopFlags(options: LoopOptions, maxDuration?: number): string {
-  const offset = options.start && options.start > 0 ? `-itsoffset ${options.start} ` : '';
+  const start = options.start === undefined ? undefined : assertFiniteNumber(options.start, 'overlay start');
+  const offset = start && start > 0 ? `-itsoffset ${start} ` : '';
 
-  if (options.duration !== undefined) return `-stream_loop -1 ${offset}-t ${options.duration} `;
+  if (options.duration !== undefined) {
+    return `-stream_loop -1 ${offset}-t ${assertFiniteNumber(options.duration, 'overlay duration')} `;
+  }
 
   if (options.loops !== undefined) {
-    const repeat = options.loops > 1 ? `-stream_loop ${options.loops - 1} ` : '';
+    const loops = assertFiniteNumber(options.loops, 'overlay loops');
+    const repeat = loops > 1 ? `-stream_loop ${loops - 1} ` : '';
     const ceiling = maxDuration === undefined ? '' : `-t ${maxDuration} `;
 
     return `${repeat}${offset}${ceiling}`;
@@ -192,11 +196,14 @@ export function buildAnimationLegFilters(options: {
   rotation?: number;
   opacity?: number;
 }): string[] {
-  const opacity = options.opacity ?? 1;
-  const rotation = options.rotation ?? 0;
+  const opacity = assertFiniteNumber(options.opacity ?? 1, 'overlay opacity');
+  const rotation = assertFiniteNumber(options.rotation ?? 0, 'overlay rotation');
   const legFilters: string[] = [];
 
-  legFilters.push(...fitLegFilters(options.scale, options.fit));
+  // The scale lands unquoted in the leg chain: two expression terms only (core/arg-guard.ts).
+  const scale = options.scale === undefined ? undefined : assertSafeExpression(options.scale, 'overlay scale', 2);
+
+  legFilters.push(...fitLegFilters(scale, options.fit));
 
   legFilters.push(...flipLegFilters(options.flip));
 
@@ -326,10 +333,12 @@ export function buildSingleFileImageSource(path: string): string {
  * `start`/`duration` values (already in the right timebase) differ.
  */
 export function imageOverlayEnable(options: { start?: number; duration?: number }): string {
-  const start = options.start ?? 0;
+  const start = assertFiniteNumber(options.start ?? 0, 'overlay start');
 
   if (options.duration !== undefined) {
-    return `:enable='between(t,${trimNum(start)},${trimNum(start + options.duration)})'`;
+    const end = start + assertFiniteNumber(options.duration, 'overlay duration');
+
+    return `:enable='between(t,${trimNum(start)},${trimNum(end)})'`;
   }
 
   if (start > 0) {
@@ -436,8 +445,9 @@ export function buildGradientSource(layer: BackgroundLayer, scale: string, durat
   const size = `${w}x${h}`;
   const coords = gradientCoords(gradient.shape, gradient.direction, gradient.angle, w, h);
 
-  const from = assertSafeArgToken(gradient.from, 'gradient from');
-  const to = assertSafeArgToken(gradient.to, 'gradient to');
+  // Both stops land unquoted in the lavfi input graph: one colour token each, not just whitespace-free.
+  const from = assertSafeColorToken(gradient.from, 'gradient from');
+  const to = assertSafeColorToken(gradient.to, 'gradient to');
   // Only emit `type=` when the descriptor sets a shape, so older descriptors keep byte-identical
   // commands; a frozen `speed` is ALWAYS explicit — the source's default 0.01 slowly rotates the
   // gradient over the section, an unexposed side effect a background layer must not have. The value

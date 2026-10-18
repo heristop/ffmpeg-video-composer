@@ -7,6 +7,9 @@ import type { EasingSpec } from '@/core/motion/easing';
 import type { MatteShape } from '@/core/motion/radial-matte';
 import type { ThroughMatte } from '@/core/motion/transition-through';
 import type { ThroughWindow } from '@/core/motion/transition-mattes';
+import { XFADE_TRANSITIONS } from '../../schemas/effects.schemas';
+
+const XFADE_NAMES: ReadonlySet<string> = new Set(XFADE_TRANSITIONS);
 
 /** A boundary transition between two adjacent segments — `type` is an xfade name, `cut` or a designed one. */
 export type Transition = {
@@ -139,7 +142,10 @@ function boundaryLink(
     return `${labels.left}${labels.right}concat=n=2:v=1:a=0${labels.out}`;
   }
 
-  return `${labels.left}${labels.right}xfade=transition=${transition.type}:duration=${timing.duration}:offset=${timing.offset}${labels.out}`;
+  // Only a known xfade name reaches the graph: a compile that skipped the schema falls back to a fade.
+  const name = XFADE_NAMES.has(transition.type) ? transition.type : 'fade';
+
+  return `${labels.left}${labels.right}xfade=transition=${name}:duration=${timing.duration}:offset=${timing.offset}${labels.out}`;
 }
 
 export function buildVideoGraph(

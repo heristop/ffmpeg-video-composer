@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { EasingSpecSchema, MotionRoleSchema } from './motion.schemas';
 import { ElementIdSchema, timeValue } from './time.schemas';
 import { FX_PRIMITIVES, type FxEffectName } from './fx-primitives.schemas';
@@ -91,13 +92,10 @@ const FX_COMMON = {
     .max(30)
     .optional()
     .describe('Seconds from one pass start to the next when repeat > 1 (default: duration + 1.2).'),
-  color: z
-    .string()
-    .optional()
-    .describe(
-      'Light colour: "#rrggbb", a colour name or a theme token ("$color.accent"). Default: a warm white tinted ' +
-        "by the theme's accent. Its @alpha is ignored: use intensity."
-    ),
+  color: ColorToken.optional().describe(
+    'Light colour: "#rrggbb", a colour name or a theme token ("$color.accent"). Default: a warm white tinted ' +
+      "by the theme's accent. Its @alpha is ignored: use intensity."
+  ),
   intensity: z
     .number()
     .min(0)

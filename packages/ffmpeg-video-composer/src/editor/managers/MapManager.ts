@@ -11,11 +11,13 @@ import {
 import type FormattersManager from './FormatterManager';
 import type FilterManager from './FilterManager';
 import { escapeRegExp } from './VariableManager';
+import { assertFiniteNumber, assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
 import { isBackgroundInput } from '../utils/background-input';
 import { layerKeyframes } from '../presets/layer-keyframes';
 import { resolveFit } from '../utils/reframe';
 import { evenBox } from '../presets/clip-box';
 import type { ClipBox } from '../../schemas/clip.schemas';
+import { assertSafePadLabel } from '../utils/filter-option-guard';
 
 // Section.inputs is typed as Input[] for schema purposes, but at runtime it holds
 // MapAnimationInput objects indexed by string keys (used as a keyed record).
@@ -42,12 +44,13 @@ class MapManager {
     let mappedInputs = '';
     let mappedOutputs = '';
 
+    // Labels come from authored maps and input names: each must stay one `[label]`.
     for (const input of map.inputs) {
-      mappedInputs += `[${this.mapInputsVariables(input)}]`;
+      mappedInputs += `[${assertSafePadLabel(this.mapInputsVariables(input))}]`;
     }
 
     for (const output of map.outputs) {
-      mappedOutputs += `[${output}]`;
+      mappedOutputs += `[${assertSafePadLabel(output)}]`;
       this.segment.mapsList.push(output);
     }
 
@@ -99,7 +102,7 @@ class MapManager {
     // source whose ratio differs from the output (e.g. a portrait clip under a 1:1 square template). A
     // letterboxed section keeps the whole frame with bars instead, as it does without overlays.
     if (videoScale) {
-      const normalizedPad = `${name}_norm`;
+      const normalizedPad = assertSafePadLabel(`${name}_norm`);
       const fit =
         resolveFit(this.currentSection.options) === 'letterbox'
           ? `force_original_aspect_ratio=decrease,pad=${videoScale}:(ow-iw)/2:(oh-ih)/2`
@@ -111,7 +114,7 @@ class MapManager {
     // Only build a background map when the section has filters to bake in; otherwise the animation
     // overlays straight onto the (normalized) video leg.
     if ((this.currentSection.filters?.length ?? 0) > 0) {
-      const backgroundPad = `${name}_bg`;
+      const backgroundPad = assertSafePadLabel(`${name}_bg`);
       this.addMap({
         inputs: [baseStream],
         filters: [],
@@ -148,7 +151,7 @@ class MapManager {
       return `${inputIndex}:v`;
     }
 
-    const animationPad = `${input.name}_src`;
+    const animationPad = assertSafePadLabel(`${input.name}_src`);
     this.segment.filtersMapList.unshift(`[${inputIndex}:v]${legFilters.join(',')}[${animationPad}]`);
 
     return animationPad;
@@ -178,7 +181,8 @@ class MapManager {
   addAnimationOverlay = (input: MapAnimationInput, inputIndex: number, videoScale = ''): void => {
     const videoStream = `${this.getVideoInputIncrement()}:v`;
     const eofAction = input.options.persistent ? 'repeat' : 'pass';
-    const position = input.options.position || '0:0';
+    // The position lands unquoted in `overlay=<x:y>`: two expression terms only (core/arg-guard.ts).
+    const position = assertSafeExpression(input.options.position || '0:0', 'overlay position', 2);
 
     // First animation of the section builds the background (normalize + section filters) on the main
     // video leg; later animations chain off the prior overlay output instead.
@@ -227,7 +231,17 @@ class MapManager {
   ): void => {
     // The frame size bounds the box; unknown (no section scale), the box is taken as authored.
     const [width, height] = /^\d+:\d+$/.test(videoScale) ? videoScale.split(':').map(Number) : [Infinity, Infinity];
-    const box = evenBox(input.options.clip as ClipBox, width, height);
+    const clip = input.options.clip as ClipBox;
+    const box = evenBox(
+      {
+        x: assertFiniteNumber(clip.x, 'clip x'),
+        y: assertFiniteNumber(clip.y, 'clip y'),
+        w: assertFiniteNumber(clip.w, 'clip w'),
+        h: assertFiniteNumber(clip.h, 'clip h'),
+      },
+      width,
+      height
+    );
     const name = input.name;
 
     // A box off the frame shows nothing, but the registered leg must still be consumed (an unconnected
@@ -303,7 +317,7 @@ class MapManager {
       return `${gradientIndex}:v`;
     }
 
-    const legPad = `${outputName}_op`;
+    const legPad = assertSafePadLabel(`${outputName}_op`);
     // unshift, not push: the pad must be defined before the overlay map that consumes it,
     // or ffmpeg fails with an undefined stream specifier.
     this.segment.filtersMapList.unshift(`[${gradientIndex}:v]${legFilters.join(',')}[${legPad}]`);
@@ -363,11 +377,15 @@ class MapManager {
     head: string[] = []
   ): void => {
     const videoStream = `${videoInputIndex}:v`;
-    const color = this.formattersManager.formatColor(chromaKey.color);
+    // Both colours land unquoted in the graph (`colorkey=<c>`, `drawbox=…color=<c>`): one colour token each.
+    const color = assertSafeColorToken(this.formattersManager.formatColor(chromaKey.color), 'chromaKey.color');
     const similarity = chromaKey.similarity ?? 0.3;
     const blend = chromaKey.blend ?? 0.1;
-    const background = this.formattersManager.formatColor(
-      chromaKey.background ?? this.currentSection.options?.backgroundColor ?? 'black'
+    const background = assertSafeColorToken(
+      this.formattersManager.formatColor(
+        chromaKey.background ?? this.currentSection.options?.backgroundColor ?? 'black'
+      ),
+      'chromaKey.background'
     );
 
     const scaleChain = videoScale

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { EffectReferenceSchema } from './effect-reference.schema';
 import { PARTIAL_REF_TIMING_FIELDS, TemplatePartialSchema } from './partial.schemas';
 import { FormatsSchema } from './formats.schemas';
@@ -24,6 +25,7 @@ import { TemplateMetaSchema } from './template-meta.schemas';
 export { TemplateMetaSchema } from './template-meta.schemas';
 import { CutawaysSchema, FIT_OPTION_FIELDS, FOOTAGE_OPTION_FIELDS } from './footage.schemas';
 import { BeatDurationSchema } from './time.schemas';
+import { SECTION_NAME } from './section-name.schemas';
 
 export {
   CAPTION_STYLES,
@@ -115,7 +117,7 @@ export const BaseSectionOptionsSchema = z
       .string()
       .optional()
       .describe('URL of a background image or video composited behind the section content.'),
-    backgroundColor: z.string().optional().describe('Solid background colour as a CSS hex string (e.g. "#000000").'),
+    backgroundColor: ColorToken.optional().describe('Solid background colour as a CSS hex string (e.g. "#000000").'),
     pictureUrl: z.string().optional().describe('URL of a picture asset used as the section background or overlay.'),
     forceAspectRatio: z
       .boolean()
@@ -134,7 +136,10 @@ export const BaseSectionOptionsSchema = z
 
 export const BaseSectionSchema = z
   .object({
-    name: z.string().describe('Unique identifier for the section within the template, used in section references.'),
+    name: z
+      .string()
+      .regex(SECTION_NAME, 'A section name is a file and pad name: letters, digits, "_", "-" and "." (no "..")')
+      .describe('Unique identifier for the section within the template, used in section references.'),
     inputs: z
       .array(InputSchema)
       .optional()
@@ -162,7 +167,7 @@ export const BaseSectionSchema = z
     letterbox: z
       .object({
         aspect: z.number().min(1).max(4).describe('Target aspect ratio the bars simulate (e.g. 2.39 for cinemascope).'),
-        color: z.string().optional().describe('Bar colour (default black).'),
+        color: ColorToken.optional().describe('Bar colour (default black).'),
       })
       .strict()
       .optional()
@@ -192,7 +197,10 @@ export const VideoSectionSchema = BaseSectionSchema.extend({
 
 export const EffectSectionSchema = BaseSectionSchema.extend({
   type: z.literal('effect').describe('Section type: a versioned effect rendered to a clip before composition.'),
-  name: z.string().trim().min(1).describe('Unique, nonempty section name used to bind the rendered effect clip.'),
+  name: z
+    .string()
+    .regex(SECTION_NAME, 'A section name is a file and pad name: letters, digits, "_", "-" and "." (no "..")')
+    .describe('Unique, nonempty section name used to bind the rendered effect clip.'),
   effect: EffectReferenceSchema.describe('Versioned effect reference with JSON properties and named assets.'),
   options: BaseSectionOptionsSchema.omit({ useVideoSection: true, videoUrl: true, pictureUrl: true })
     .extend({ duration: z.number().positive().describe('Required effect duration in seconds.') })
@@ -239,7 +247,7 @@ export const ColorBackgroundSectionSchema = BaseSectionSchema.extend({
   type: z.literal('color_background').describe('Section type: renders a solid or layered colour background.'),
   titleCard: TitleCardSchema.optional().describe('Structured title card (kicker/headline/subtitle) for this section.'),
   options: BaseSectionOptionsSchema.extend({
-    backgroundColor: z.string().optional().describe('Primary background colour as a CSS hex string (e.g. "#000000").'),
+    backgroundColor: ColorToken.optional().describe('Primary background colour as a CSS hex string (e.g. "#000000").'),
     layers: z
       .array(BackgroundLayerSchema)
       .optional()

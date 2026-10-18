@@ -4,6 +4,7 @@ import { presetLutValue, urlLutValue } from './lut-spec';
 import type { Grade, BackgroundLayer } from '../../schemas/template.schemas';
 import { revealEnableExpr } from './text';
 import { parseScale, motionToFilters } from './motion';
+import { CURVES_PRESETS } from '../../schemas/effects-visual.schemas';
 
 // motionToFilters lives in ./motion (split out to keep this file under the max-lines budget) and is
 // re-exported here so importers keep a single `@/editor/presets/looks` entry point.
@@ -169,6 +170,16 @@ function buildCbParts(grade: Grade): string[] {
   return parts;
 }
 
+// The preset lands unquoted in `curves=preset=<name>`: one of FFmpeg's names, checked again here so a
+// descriptor that skipped validation cannot chain a filter through it.
+function curvesPreset(name: string): string {
+  if (!(CURVES_PRESETS as readonly string[]).includes(name)) {
+    throw new Error(`Unsafe grade.curvesPreset "${name}": use one of ${CURVES_PRESETS.join(', ')}`);
+  }
+
+  return name;
+}
+
 /**
  * Translates a Grade descriptor object into an ordered array of Filter objects.
  * Emission order: eq, hue, colorbalance, gblur, curves.
@@ -187,11 +198,15 @@ export function gradeToFilters(grade?: Grade): Filter[] {
   addMapped(filters, grade.hue, (hue) => ({ type: 'hue', value: `h=${hue}` }));
   addParts(filters, buildCbParts(grade), 'colorbalance');
   addPositive(filters, grade.blur, (blur) => ({ type: 'gblur', value: `sigma=${blur}` }));
+  // A grain that rounds to strength 0 is a no-op: no noise filter.
   addPositive(filters, grade.grain === undefined ? undefined : Math.round(grade.grain * 20), (strength) => ({
     type: 'noise',
     value: `alls=${strength}:allf=t+u`,
   }));
-  addMapped(filters, grade.curvesPreset, (preset) => ({ type: 'curves', value: `preset=${preset}` }));
+  addMapped(filters, grade.curvesPreset, (preset) => ({
+    type: 'curves',
+    value: `preset=${curvesPreset(preset)}`,
+  }));
 
   return filters;
 }

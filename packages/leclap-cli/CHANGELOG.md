@@ -16,6 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `leclap reference <clip>` prints a reference clip's format as binding rules (`--json`, `--out`);
   `--check template.json` exits 1 on drift. `leclap compare --reference <clip>` adds the reference's frame
   as the first tile.
+- `leclap render --allow-raw-filters` and `leclap verify --rerender --allow-raw-filters` trust a template's
+  raw filters (trusted local templates only). Without it, raw filters are allow-listed by the engine and a
+  template that uses a filter outside the list fails with `filter_not_allowed`.
+
+### Fixed
+
+- `leclap verify --rerender` validates the manifest's template before rendering it again, instead of
+  skipping validation.
 
 ## [0.5.0] - 2026-10-11
 

@@ -11,7 +11,7 @@ import type VariableManager from '../editor/managers/VariableManager';
 import type MapManager from '../editor/managers/MapManager';
 import type FilterManager from '../editor/managers/FilterManager';
 import type FormattersManager from '../editor/managers/FormatterManager';
-import { assertSafeArgToken } from '@/core/arg-guard';
+import { assertSafeArgToken, assertSafeColorToken, assertSafeSegmentName } from '@/core/arg-guard';
 import { SectionError } from '@/core/errors/section-error';
 import {
   compileSugarLayers,
@@ -301,10 +301,11 @@ class SegmentBuilder {
 
     if (opts?.backgroundColor) {
       // Guard the RESOLVED color (variables/colorN already substituted by normalizeBackgroundColor):
-      // it is interpolated unquoted into the `color=` lavfi source, so whitespace would inject argv.
+      // it is interpolated unquoted into the `color=` lavfi source, so whitespace would inject argv and
+      // filtergraph syntax would chain filters into the input graph.
       // The color fills the frame whether or not assets composite over it — an asset-less solid
       // color_background must still use its own color (not a transparent placeholder, which is white).
-      const bgColor = assertSafeArgToken(opts.backgroundColor, 'backgroundColor');
+      const bgColor = assertSafeColorToken(opts.backgroundColor, 'backgroundColor');
       const scale = this.project.config.videoConfig?.scale?.replace(':', 'x') ?? '';
       const duration = opts.duration ?? '';
 
@@ -611,7 +612,8 @@ class SegmentBuilder {
     }
 
     const compiled = overlayFilters.map((filter) => this.filterManager.addFilter(filter)).join(',');
-    const outPad = `${this.section.name}_text`;
+    // The section name grammar is a pad-label subset: the label stays one `[label]`.
+    const outPad = `${assertSafeSegmentName(this.section.name)}_text`;
 
     this.segment.filtersMapList.push(`[${lastPad}]${compiled}[${outPad}]`);
     this.segment.mapsList.push(outPad);

@@ -11,6 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `extract_structure`: a reference clip's format (shots, rhythm, transitions, grounds, layout) as binding
   rules, from at most 480 sampled frames.
+- `--allow-raw-filters` / `LECLAP_MCP_ALLOW_RAW_FILTERS` (off by default) trusts a template's raw filters for
+  trusted local use; `get_capabilities` reports which mode the server runs in, and the template guide says so.
+
+### Changed
+
+- Raw filters in agent templates are allow-listed by the engine: a filter outside the list is a
+  `filter_not_allowed` validation error instead of a render. A drawtext `fontfile` is a bare font name; fonts
+  from the media dir go through `global.fonts`.
+
+### Fixed
+
+- `validate_template`, `compose_video` and `render_preview` refuse a template whose string fields (a
+  transition colour, for instance) carry FFmpeg filter syntax that opens files or URLs, not only the filter
+  `value` and `values`. Ordinary copy with semicolons or commas is unaffected.
+- The template guard also sees through backslash-escaped filter names and refuses the command, socket and
+  model-loading filters, and file options chained into a filter.
+- The template guard also refuses the LUT, SOFA, mask, OCR, speech and neural-network filters that load files,
+  and more file-capable filter options.
+- The template guard also refuses a protocol hidden behind an escaped colon (`'file\:/…'`, `'http\://…'`), and
+  the server warns on stderr at start-up when `--allow-raw-filters` is on.
 
 ## [0.6.0] - 2026-10-11
 

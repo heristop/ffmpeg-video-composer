@@ -228,10 +228,11 @@ describe('validate_template with render: true', () => {
       ],
     };
     const result = await setup()({ template: escaping, render: true });
-    const render = result.structuredContent?.render as { measured: number; unavailable?: string };
+    const codes = (result.structuredContent?.errors as Array<{ code: string }> | undefined)?.map((error) => error.code);
 
-    expect(render.measured).toBe(0);
-    expect(render.unavailable).toMatch(/^not rendered: /);
+    // The raw-filter allow-list refuses it at validation, so it never reaches a render.
+    expect(result.structuredContent?.valid).toBe(false);
+    expect(codes).toContain('filter_not_allowed');
     expect(runGeometryCheckMock).not.toHaveBeenCalled();
   });
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { RevealSchema, TextEffectSchema } from './effects.schemas';
 import { TranslationSchema, FontInputSchema } from './global.schemas';
 import { MotionRoleSchema } from './motion.schemas';
@@ -30,12 +31,12 @@ export const CaptionSchema = z
         'Google Fonts family; overrides the preset font.'
     ),
     fontsize: z.number().positive().optional().describe('Font size in px; overrides the preset size.'),
-    color: z.string().optional().describe('Text colour as a CSS hex string; overrides the preset colour.'),
+    color: ColorToken.optional().describe('Text colour as a CSS hex string; overrides the preset colour.'),
     box: z
       .boolean()
       .optional()
       .describe('When true, draws a background box behind the text (preset default otherwise).'),
-    boxColor: z.string().optional().describe('Box colour as a CSS hex string when the box is on.'),
+    boxColor: ColorToken.optional().describe('Box colour as a CSS hex string when the box is on.'),
     boxOpacity: z.number().min(0).max(1).optional().describe('Box opacity 0..1 when the box is on.'),
     reveal: RevealSchema.optional().describe('Animated entrance for the caption (fade/rise/slide); default none.'),
     effect: TextEffectSchema.optional().describe('Drop shadow / outline for legibility over busy footage.'),
@@ -77,7 +78,7 @@ export const TitleCardLineStyleSchema = z
         'Google Fonts family; overrides the preset font.'
     ),
     fontsize: z.number().positive().optional().describe('Font size in px; overrides the scale-derived size.'),
-    color: z.string().optional().describe('Text colour as a CSS hex string; overrides the preset colour.'),
+    color: ColorToken.optional().describe('Text colour as a CSS hex string; overrides the preset colour.'),
   })
   .strict()
   .describe('Per-line font / size / colour override for a title card line.');
@@ -95,9 +96,9 @@ export const TitleCardSchema = z
     kickerStyle: TitleCardLineStyleSchema.optional().describe('Font / size / colour override for the kicker.'),
     headlineStyle: TitleCardLineStyleSchema.optional().describe('Font / size / colour override for the headline.'),
     subtitleStyle: TitleCardLineStyleSchema.optional().describe('Font / size / colour override for the subtitle.'),
-    accent: z.string().optional().describe('Accent colour: draws an underline bar and tints the kicker.'),
+    accent: ColorToken.optional().describe('Accent colour: draws an underline bar and tints the kicker.'),
     align: z.enum(['left', 'center']).optional().describe('Horizontal alignment of the card (default left).'),
-    background: z.string().optional().describe('Fade colour; defaults to the section background colour.'),
+    background: ColorToken.optional().describe('Fade colour; defaults to the section background colour.'),
     reveal: RevealSchema.optional().describe('Entrance for the lines, staggered top-to-bottom (default "rise").'),
     role: MotionRoleSchema.optional(),
     stagger: z
@@ -207,11 +208,10 @@ export const LowerThirdSchema = z
   .object({
     title: TranslationSchema.optional().describe('Main line of the lower third.'),
     subtitle: TranslationSchema.optional().describe('Supporting line below the title.'),
-    accent: z.string().optional().describe('Accent colour: draws an accent bar and the badge background.'),
-    bandColor: z
-      .string()
-      .optional()
-      .describe('Legibility band colour as a CSS hex string (default near-black #0a0f14).'),
+    accent: ColorToken.optional().describe('Accent colour: draws an accent bar and the badge background.'),
+    bandColor: ColorToken.optional().describe(
+      'Legibility band colour as a CSS hex string (default near-black #0a0f14).'
+    ),
     boxOpacity: z
       .number()
       .min(0)

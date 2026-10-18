@@ -25,6 +25,8 @@ import { usesFormats } from '@/core/formats/resolve';
 import { validateEachFormat } from './validation/format-validation';
 import { validateWithFields } from './validation/field-validation';
 import { formFieldBudgetErrors } from './validation/form-field-budget';
+import { authoredFilterIssues } from '../editor/utils/filter-allow-list';
+import { engineOnlyFilterIssues } from '../editor/utils/engine-only-filters';
 
 export type { ValidationError } from './template-validation-rules';
 
@@ -36,6 +38,8 @@ export type { ValidationError } from './template-validation-rules';
 export interface ValidateOptions {
   format?: string;
   fields?: Readonly<Record<string, unknown>>;
+  /** Trust the template's raw filters (deny-list only) instead of the authored-filter allow-list. */
+  allowRawFilters?: boolean;
 }
 
 export interface ValidationResult {
@@ -155,7 +159,12 @@ export class BaseTemplateValidator {
         : this.validateParsed(resolved)
     );
     // Read on the expanded descriptor, where the field contract still says which form fields are typed.
-    const budget = formFieldBudgetErrors(expansion.data);
+    // Raw filters are read on the AUTHORED descriptor: bundled partials are engine content.
+    const budget = [
+      ...formFieldBudgetErrors(expansion.data),
+      ...engineOnlyFilterIssues(templateData),
+      ...(options.allowRawFilters ? [] : authoredFilterIssues(templateData)),
+    ];
 
     return budget.length > 0 ? { ...result, success: false, errors: [...(result.errors ?? []), ...budget] } : result;
   }
@@ -164,9 +173,13 @@ export class BaseTemplateValidator {
   // none) must fill every required one, each fitting its type (core/fields).
   validateForRender(
     templateData: unknown,
-    config: { format?: string; fields?: Record<string, string> }
+    config: { format?: string; fields?: Record<string, string>; allowRawFilters?: boolean }
   ): ValidationResult {
-    return this.validateTemplate(templateData, { format: config.format, fields: config.fields ?? {} });
+    return this.validateTemplate(templateData, {
+      format: config.format,
+      fields: config.fields ?? {},
+      allowRawFilters: config.allowRawFilters,
+    });
   }
 
   // One story, several formats: each format is validated as the descriptor it renders

@@ -295,6 +295,7 @@ export {
   type PartialExpansion,
 } from './core/partials';
 export type { ProjectConfig, TemplateDescriptor, CompileReporter, MediaTraits } from './core/types';
+export { AUTHORED_FILTERS, authoredFilterIssues, type FilterRule } from './editor/utils/filter-allow-list';
 export {
   TemplateValidator,
   type ValidationResult,

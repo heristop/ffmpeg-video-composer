@@ -27,7 +27,7 @@ export {
   isDesignedTransition,
   type DesignedTransition,
 } from './transition-names';
-import { dripGraph, DRIP_FALLBACK_COLOR } from './transition-drip';
+import { dripGraph, DRIP_FALLBACK_COLOR, hexSource } from './transition-drip';
 import { fnv1a32 } from '../determinism/hash';
 import { bandsGraph } from './transition-bands';
 import { throughGraph, type ThroughMatte } from './transition-through';
@@ -209,9 +209,12 @@ function irisMask(b: DesignedBoundary, p: Pads): string {
     `${maskChain(mask, 'm', `(${radius}-${distance})`)}[${id}mask];[${p.in}]${grid}[${id}ig];` +
     `[${id}ig][${id}mask]alphamerge[${id}ia];[${p.tail}]${grid}[${id}tg];`;
 
-  if (!b.rim) return `${disc}[${id}tg][${id}ia]overlay=0:0[${p.mix}]`;
+  // A rim that is not a hex colour (a template that skipped the schema) is dropped, never interpolated.
+  const rim = hexSource(b.rim);
 
-  const color = `color=c=0x${b.rim.slice(1)}:s=${b.width}x${b.height}:r=${b.fps}:d=${d},settb=AVTB,${grid}`;
+  if (!rim) return `${disc}[${id}tg][${id}ia]overlay=0:0[${p.mix}]`;
+
+  const color = `color=c=${rim}:s=${b.width}x${b.height}:r=${b.fps}:d=${d},settb=AVTB,${grid}`;
 
   return (
     `${disc}${maskChain(mask, 'ring', `(${IRIS_RIM}-abs(${distance}-${radius}))`)}[${id}ringmask];` +

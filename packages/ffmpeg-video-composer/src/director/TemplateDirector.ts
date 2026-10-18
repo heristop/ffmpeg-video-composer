@@ -106,7 +106,8 @@ class TemplateDirector {
   config = (projectConfig: ProjectConfig, templateDescriptor: TemplateDescriptor): this => {
     // The clone the build compiles: partials expanded, then the requested format's composition, before
     // any other pass (prepare-build.ts, core/formats).
-    const expanded = expandForBuild(templateDescriptor, this.logger, projectConfig.format, projectConfig.fields);
+    const { format, fields } = projectConfig;
+    const expanded = expandForBuild(templateDescriptor, this.logger, format, fields);
     this.template.descriptor = expanded;
     this.project.config = projectConfig;
 

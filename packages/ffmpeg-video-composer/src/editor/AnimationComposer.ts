@@ -20,6 +20,7 @@ import type Template from '../core/models/Template';
 import type Project from '../core/models/Project';
 import type VariableManager from './managers/VariableManager';
 import { uniqueTempSuffix } from '../utils/temp-suffix';
+import { assertSafeExpression } from '@/core/arg-guard';
 
 export type StagedAnimation = { path: string; anim: InternalAnimation };
 
@@ -237,10 +238,12 @@ class AnimationComposer {
     legs: string[];
   }): string {
     const { anim, path } = staged;
-    const motion = overlayMotionExpr(anim.motion, anim.position ?? '0:0');
+    // The position lands unquoted in `overlay=<x:y>`: two expression terms only (core/arg-guard.ts).
+    const position = assertSafeExpression(anim.position ?? '0:0', 'animation position', 2);
+    const motion = overlayMotionExpr(anim.motion, position);
     const legRef = this.appendOverlayLeg(anim, firstInputIndex + index, index, legs, motion);
     const out = index === total - 1 ? outLabel : `[${chainPrefix}${index}]`;
-    const placement = motion.x || motion.y ? `x='${motion.x}':y='${motion.y}'` : (anim.position ?? '0:0');
+    const placement = motion.x || motion.y ? `x='${motion.x}':y='${motion.y}'` : position;
     const timeline = isStillAnimation(anim, path)
       ? imageOverlayEnable({ start: anim.start, duration: anim.duration })
       : '';

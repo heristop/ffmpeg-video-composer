@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { EasingSpecSchema, MotionRoleSchema } from './motion.schemas';
 import { ElementIdSchema, timeValue } from './time.schemas';
 import { TranslationSchema } from './global.schemas';
@@ -24,7 +25,7 @@ const timing = {
   until: timeValue(z.number().min(0))
     .optional()
     .describe('When it disappears: seconds or a time reference ("end - 0.3"); default: holds to the cut.'),
-  color: z.string().optional().describe('Colour, "#rrggbb" or "#rrggbb@alpha" (default per type).'),
+  color: ColorToken.optional().describe('Colour, "#rrggbb" or "#rrggbb@alpha" (default per type).'),
   above: z
     .boolean()
     .optional()
@@ -203,7 +204,7 @@ export const GraphicSchema = z
           .describe('Seconds the bar takes to fill (default 3; linear unless `ease` is set).'),
         position: z.enum(['top', 'bottom']).optional().describe('Frame edge the bar sits on (default bottom).'),
         thickness: z.number().positive().max(80).optional().describe('Bar thickness in px (default 8).'),
-        track: z.string().optional().describe('Colour of the unfilled track (default none), e.g. "#FFFFFF@0.2".'),
+        track: ColorToken.optional().describe('Colour of the unfilled track (default none), e.g. "#FFFFFF@0.2".'),
         ...placement,
         width: z.number().positive().optional().describe('Bar length in px (default full frame width).'),
       })
@@ -219,7 +220,7 @@ export const GraphicSchema = z
         height: z.number().positive().max(400).optional().describe('Band height in px (default 7% of the frame).'),
         font: z.string().optional().describe('Bundled font id or .ttf file (default bebas).'),
         size: z.number().positive().max(300).optional().describe('Font size in px (default 60% of the band).'),
-        textColor: z.string().optional().describe('Text colour (default #F5F3F7).'),
+        textColor: ColorToken.optional().describe('Text colour (default #F5F3F7).'),
       })
       .strict()
       .describe(
@@ -241,7 +242,7 @@ export const GraphicSchema = z
         prefix: z.string().max(12).optional().describe('Text before each value, e.g. "$".'),
         suffix: z.string().max(12).optional().describe('Text after each value, e.g. "%".'),
         font: z.string().optional().describe('Bundled font id or .ttf file for labels (default bebas).'),
-        textColor: z.string().optional().describe('Label colour (default #F5F3F7).'),
+        textColor: ColorToken.optional().describe('Label colour (default #F5F3F7).'),
       })
       .strict()
       .describe(

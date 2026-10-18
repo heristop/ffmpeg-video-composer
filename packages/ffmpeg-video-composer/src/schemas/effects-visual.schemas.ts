@@ -1,9 +1,26 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { RevealSchema } from './reveal.schemas';
+import { FilterExpression } from './filter-expression.schemas';
 
 // Section visual effects — the look/grade preset list, colour-grade, motion/geometry and background
 // layer/framing schemas — live here to keep `effects.schemas` under the max-lines budget; all are
 // re-exported from `./effects.schemas` so importers keep a single entry point.
+
+/** FFmpeg's `curves` presets (vf_curves.c), the only values `preset=` takes. */
+export const CURVES_PRESETS = [
+  'none',
+  'color_negative',
+  'cross_process',
+  'darker',
+  'increase_contrast',
+  'lighter',
+  'linear_contrast',
+  'medium_contrast',
+  'negative',
+  'strong_contrast',
+  'vintage',
+] as const;
 
 export const LOOK_PRESETS = [
   'cinematic',
@@ -95,7 +112,10 @@ export const GradeSchema = z
       .max(1)
       .optional()
       .describe('Film-grain strength, 0..1 (default 0; lowered to the FFmpeg noise filter).'),
-    curvesPreset: z.string().optional().describe('Named curves preset key applied on top of other grade settings.'),
+    curvesPreset: z
+      .enum(CURVES_PRESETS)
+      .optional()
+      .describe('FFmpeg curves preset applied on top of other grade settings (e.g. "vintage").'),
     lut: GradeLutSchema.optional().describe(
       'User .cube LUT { url, strength? } applied before the other grade settings (single lut3d, every backend).'
     ),
@@ -125,16 +145,10 @@ export const MotionEffectSchema = z
     }),
     z.object({
       type: z.literal('crop').describe('Crops the video frame to the specified rectangle.'),
-      w: z.union([z.number(), z.string()]).describe('Crop width in pixels or as an FFmpeg expression.'),
-      h: z.union([z.number(), z.string()]).describe('Crop height in pixels or as an FFmpeg expression.'),
-      x: z
-        .union([z.number(), z.string()])
-        .optional()
-        .describe('Crop x offset in pixels or FFmpeg expression (default (iw-ow)/2).'),
-      y: z
-        .union([z.number(), z.string()])
-        .optional()
-        .describe('Crop y offset in pixels or FFmpeg expression (default (ih-oh)/2).'),
+      w: FilterExpression.describe('Crop width in pixels or as an FFmpeg expression.'),
+      h: FilterExpression.describe('Crop height in pixels or as an FFmpeg expression.'),
+      x: FilterExpression.optional().describe('Crop x offset in pixels or FFmpeg expression (default (iw-ow)/2).'),
+      y: FilterExpression.optional().describe('Crop y offset in pixels or FFmpeg expression (default (ih-oh)/2).'),
     }),
     z.object({
       type: z.literal('flip').describe('Flips the video frame along the specified axis.'),
@@ -171,31 +185,26 @@ export const MotionEffectSchema = z
 
 export const BackgroundLayerSchema = z
   .object({
-    color: z
-      .string()
-      .optional()
-      .describe('Solid fill colour as a CSS hex string or FFmpeg colour name (e.g. "#FF0000").'),
+    color: ColorToken.optional().describe(
+      'Solid fill colour as a CSS hex string or FFmpeg colour name (e.g. "#FF0000").'
+    ),
     opacity: z.number().min(0).max(1).optional().describe('Layer opacity, 0..1 (default 1).'),
-    x: z
-      .union([z.number(), z.string()])
-      .optional()
-      .describe('Horizontal offset of the layer in output pixels or FFmpeg expression (default 0).'),
-    y: z
-      .union([z.number(), z.string()])
-      .optional()
-      .describe('Vertical offset of the layer in output pixels or FFmpeg expression (default 0).'),
-    w: z
-      .union([z.number(), z.string()])
-      .optional()
-      .describe('Layer width in output pixels or FFmpeg expression (default: full output width).'),
-    h: z
-      .union([z.number(), z.string()])
-      .optional()
-      .describe('Layer height in output pixels or FFmpeg expression (default: full output height).'),
+    x: FilterExpression.optional().describe(
+      'Horizontal offset of the layer in output pixels or FFmpeg expression (default 0).'
+    ),
+    y: FilterExpression.optional().describe(
+      'Vertical offset of the layer in output pixels or FFmpeg expression (default 0).'
+    ),
+    w: FilterExpression.optional().describe(
+      'Layer width in output pixels or FFmpeg expression (default: full output width).'
+    ),
+    h: FilterExpression.optional().describe(
+      'Layer height in output pixels or FFmpeg expression (default: full output height).'
+    ),
     gradient: z
       .object({
-        from: z.string().describe('Start colour of the gradient as a CSS hex string or FFmpeg colour name.'),
-        to: z.string().describe('End colour of the gradient as a CSS hex string or FFmpeg colour name.'),
+        from: ColorToken.describe('Start colour of the gradient as a CSS hex string or FFmpeg colour name.'),
+        to: ColorToken.describe('End colour of the gradient as a CSS hex string or FFmpeg colour name.'),
         direction: z
           .enum(['horizontal', 'vertical', 'diagonal'])
           .optional()
@@ -217,7 +226,7 @@ export const BackgroundLayerSchema = z
       .describe('Gradient drawn across the layer; overrides the solid color field.'),
     border: z
       .object({
-        color: z.string().describe('Outline colour as a CSS hex string or FFmpeg colour name (e.g. "#FFFFFF").'),
+        color: ColorToken.describe('Outline colour as a CSS hex string or FFmpeg colour name (e.g. "#FFFFFF").'),
         width: z.number().int().min(1).describe('Outline thickness in output pixels.'),
       })
       .optional()

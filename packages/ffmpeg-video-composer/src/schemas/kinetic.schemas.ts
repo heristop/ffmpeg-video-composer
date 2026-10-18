@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { TranslationSchema } from './global.schemas';
 import { TextEffectSchema } from './effects.schemas';
 import { EasingSpecSchema, MotionRoleSchema } from './motion.schemas';
@@ -185,7 +186,7 @@ export const KineticBlockSchema = z
       .optional()
       .describe('Bundled font id or .ttf file (default bebas). Word/glyph units need a bundled font.'),
     size: z.number().positive().max(600).optional().describe('Font size in px (default 11% of the frame height).'),
-    color: z.string().optional().describe('Text colour (default #F5F3F7); the fallback when `fill` cannot render.'),
+    color: ColorToken.optional().describe('Text colour (default #F5F3F7); the fallback when `fill` cannot render.'),
     fill: KineticFillSchema.optional(),
     clip: KineticClipSchema.optional(),
     accent: z
@@ -193,11 +194,10 @@ export const KineticBlockSchema = z
         words: z
           .union([z.array(z.number().int().min(0)).max(64), z.literal('last'), z.literal('first')])
           .describe('Zero-based word indices to accent, or "first" / "last".'),
-        color: z.string().optional().describe('Accent text colour (default #FFF685).'),
-        marker: z
-          .string()
-          .optional()
-          .describe('Highlight marker colour behind accent words (highlight preset; default #7C83FD@0.85).'),
+        color: ColorToken.optional().describe('Accent text colour (default #FFF685).'),
+        marker: ColorToken.optional().describe(
+          'Highlight marker colour behind accent words (highlight preset; default #7C83FD@0.85).'
+        ),
       })
       .strict()
       .optional()

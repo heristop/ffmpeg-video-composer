@@ -72,6 +72,7 @@ export const FilterSchema = z
   .object({
     type: z
       .string()
+      .regex(/^[a-z0-9_]+$/, 'a filter name: lower-case letters, digits and _')
       .describe(
         'Raw FFmpeg filter name passed through verbatim (e.g. drawtext, drawbox, fade); determines which filter is applied.'
       ),

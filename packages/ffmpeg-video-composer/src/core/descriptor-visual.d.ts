@@ -22,7 +22,19 @@ export interface GradeConfig {
   };
   blur?: number;
   grain?: number;
-  curvesPreset?: string;
+  /** One of FFmpeg's curves presets (schemas/effects-visual.schemas.ts CURVES_PRESETS). */
+  curvesPreset?:
+    | 'none'
+    | 'color_negative'
+    | 'cross_process'
+    | 'darker'
+    | 'increase_contrast'
+    | 'lighter'
+    | 'linear_contrast'
+    | 'medium_contrast'
+    | 'negative'
+    | 'strong_contrast'
+    | 'vintage';
   /** User 3D .cube LUT, applied first (presets/lut-spec.ts). */
   lut?: { url: string; strength?: number };
 }

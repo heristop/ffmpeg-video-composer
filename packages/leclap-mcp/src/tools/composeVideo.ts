@@ -156,13 +156,9 @@ export async function resolveVideoPaths(
     return errorResult(failure.error);
   }
 
-  const paths: Record<string, string> = {};
-
-  for (const entry of resolutions) {
-    if ('real' in entry) {
-      paths[entry.section] = entry.real;
-    }
-  }
+  const paths = Object.fromEntries(
+    resolutions.flatMap((entry) => ('real' in entry ? [[entry.section, entry.real]] : []))
+  );
 
   return { ok: true, paths };
 }
@@ -196,6 +192,8 @@ async function buildProjectConfig(
     deterministic: true,
     // ...and checked: the engine probes and decodes the output once and reports findings (`qc`).
     qc: { content: true },
+    // Raw filters: the engine's allow-list unless the operator trusts local templates.
+    ...(config.allowRawFilters ? { allowRawFilters: true } : {}),
   };
 }
 

@@ -1,6 +1,4 @@
-import type { ProjectBuildInfos, ProjectConfig, Section, TemplateDescriptor, VideoConfig } from '@/core/types';
-import { DEFAULT_TRANSITION_DURATION } from '../schemas/effects.schemas';
-import { DRIP_FALLBACK_COLOR } from '@/core/motion/transition-drip';
+import type { ProjectConfig, TemplateDescriptor, VideoConfig } from '@/core/types';
 import { resolveTimeRefs, type TimingOptions } from '@/core/timing/resolve';
 import type AbstractFFmpeg from '../platform/ffmpeg/AbstractFFmpeg';
 import type Project from '../core/models/Project';
@@ -10,19 +8,19 @@ import { resolveDeterministic } from '@/core/determinism/contract';
 import { resolveFps, resolveOrientationScale } from './resolve-video-config';
 import { resolveMotionDescriptor } from '@/core/motion/tokens';
 import { effectiveOrientation } from '@/core/platforms';
-import { resolveTheme, resolveThemeDescriptor } from '@/core/theme/resolve';
-import type { ThemeSpec } from '@/core/theme/themes';
-import { BANDS_FALLBACK_COLORS } from '@/core/motion/transition-bands';
+import { resolveThemeDescriptor } from '@/core/theme/resolve';
 import { expandAutoSfx } from '@/core/audio/auto-sfx';
 import { assertEffectsResolved, expandPartialsSafe } from '@/core/partials';
 import type AbstractLogger from '../platform/logging/AbstractLogger';
 import { analyzeTemplateMusic } from './beats-analysis';
 import { resolveBuildFormat } from '@/core/formats/resolve';
 import { assertFieldsResolved } from '@/core/fields';
+import { assertRawFiltersAllowed } from '../editor/utils/filter-allow-list';
 
 export { discardOutput, publishOutput, resolveOutputPaths } from './output-staging';
 export { qcExpectations } from './qc-expectations';
 export { awaitsBeatsAnalysis } from './beats-analysis';
+export { boundaryTransitions } from './boundary-transitions';
 export type { TimingOptions } from '@/core/timing/resolve';
 
 // Per-build preparation the director runs once per compile, kept out of TemplateDirector for its line
@@ -92,12 +90,13 @@ export function expandForBuild(
 }
 
 /** What the time-reference pass needs from the build: output frame, fps, locale and form fields. */
-export function timingOptions(config: ProjectConfig): TimingOptions {
+export function timingOptions(config: ProjectConfig): TimingOptions & Pick<ProjectConfig, 'allowRawFilters'> {
   return {
     scale: config.videoConfig?.scale,
     fps: config.videoConfig?.fps,
     locale: config.currentLocale,
     fields: config.fields,
+    allowRawFilters: config.allowRawFilters,
   };
 }
 
@@ -108,10 +107,14 @@ export function timingOptions(config: ProjectConfig): TimingOptions {
  * seconds (core/timing/resolve.ts), then `global.audio.sfx: "auto"` expanded into section sound effects
  * (core/audio/auto-sfx.ts). Lowering only ever sees numbers; a reference that cannot be resolved fails the
  * build here, naming the field, rather than rendering a wrong frame.
+ *
+ * Last, the raw filter allow-list on this fully resolved descriptor (formats, partial variables, fields and
+ * theme tokens all substituted), on every entry (Node, browser, device), validated or not: the gate that
+ * holds, since each of those passes rewrites filter text after the authored descriptor was validated.
  */
 export function prepareMotion<T extends { meta?: unknown; global?: unknown; sections?: unknown }>(
   descriptor: T,
-  timing: TimingOptions = {}
+  timing: TimingOptions & Pick<ProjectConfig, 'allowRawFilters'> = {}
 ): T {
   const { descriptor: resolved, issues } = resolveTimeRefs(
     resolveMotionDescriptor(resolveThemeDescriptor(descriptor)),
@@ -122,7 +125,11 @@ export function prepareMotion<T extends { meta?: unknown; global?: unknown; sect
     throw new Error(`Time references: ${issues.map((issue) => `${issue.path}: ${issue.message}`).join('; ')}`);
   }
 
-  return expandAutoSfx(resolved, timing);
+  const prepared = expandAutoSfx(resolved, timing);
+
+  assertRawFiltersAllowed(prepared, timing.allowRawFilters);
+
+  return prepared;
 }
 
 /**
@@ -137,7 +144,7 @@ export async function prepareMeasuredMotion(
 ): Promise<void> {
   const measured = await analyzeTemplateMusic(template.descriptor, project.buildInfos.musicPath);
 
-  template.descriptor = prepareMotion(measured, timing);
+  template.descriptor = prepareMotion(measured, { ...timing, allowRawFilters: project.config.allowRawFilters });
 }
 
 /** Logs which sections the host bound recorded clips to. */
@@ -149,71 +156,4 @@ export function logVideoPaths(config: ProjectConfig, logger: AbstractLogger): vo
       ? `TemplateDirector received userVideoPaths for sections: ${Object.keys(paths).join(', ')}`
       : 'TemplateDirector: No userVideoPaths provided in config'
   );
-}
-
-type BoundaryTransition = ProjectBuildInfos['transitions'][number];
-
-/** The `transition` a section or the descriptor's `global` declares. */
-type DeclaredTransition = Section['transition'];
-
-function transitionOptions(
-  declared: NonNullable<DeclaredTransition>,
-  theme: unknown
-): Pick<BoundaryTransition, 'origin' | 'rim' | 'color'> {
-  const options = {
-    ...(declared.origin ? { origin: declared.origin } : {}),
-    ...(declared.rim ? { rim: declared.rim } : {}),
-  };
-
-  if (declared.type !== 'drip') return options;
-
-  // The drip's paint: the authored colour (theme tokens already resolved), else the theme accent.
-  const accent = resolveTheme(theme as ThemeSpec | undefined)?.colors.accent;
-
-  return { ...options, color: declared.color ?? accent ?? DRIP_FALLBACK_COLOR };
-}
-
-/**
- * The per-boundary transitions of the N rendering sections (N-1 boundaries, in order). Each boundary
- * takes the transition of the EARLIER section or the global default; it is only a non-cut transition
- * when one is declared. Cut boundaries keep type 'cut' (duration 0 in timeline math).
- */
-export function boundaryTransitions(
-  segments: readonly Section[],
-  globalTransition: DeclaredTransition,
-  canCrossfade = true,
-  theme?: unknown
-): BoundaryTransition[] {
-  return segments.slice(0, -1).map((segment) => {
-    const declared = segment.transition ?? globalTransition;
-
-    // An FFmpeg without a working xfade (Node capability probe) cuts instead of failing the assembly.
-    if (!declared || declared.type === 'cut' || !canCrossfade) return { type: 'cut', duration: 0 };
-
-    const duration = declared.duration ?? globalTransition?.duration ?? DEFAULT_TRANSITION_DURATION;
-
-    return {
-      type: declared.type,
-      duration,
-      ease: declared.ease,
-      ...transitionOptions(declared, theme),
-      ...designFields(declared, theme),
-    };
-  });
-}
-
-const DESIGN_KEYS = ['shape', 'through', 'count', 'angle', 'colors', 'stagger'] as const;
-
-// The shape / window / bands fields that are set; bands default their colours to the theme's.
-function designFields(declared: NonNullable<DeclaredTransition>, theme: unknown): Partial<BoundaryTransition> {
-  const fields = Object.fromEntries(
-    DESIGN_KEYS.flatMap((key) => (declared[key] === undefined ? [] : [[key, declared[key]]]))
-  );
-
-  if (declared.type !== 'bands' || declared.colors) return fields;
-
-  const colors = resolveTheme(theme as ThemeSpec | undefined)?.colors;
-  const palette = colors ? [colors.brand, colors.accent, colors.accent2, colors.fg] : [...BANDS_FALLBACK_COLORS];
-
-  return { ...fields, colors: palette };
 }

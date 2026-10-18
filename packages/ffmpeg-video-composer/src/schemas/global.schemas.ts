@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { MAX_SEED } from '../core/determinism/contract';
 import { EMOJI_MODES } from '../core/emoji-assets';
 import { MotionTokensSchema } from './motion.schemas';
@@ -18,6 +19,7 @@ import {
 } from './effects.schemas';
 import { PLATFORM_NAMES } from '../core/platforms';
 import { TemplateFontsSchema } from './template-fonts.schemas';
+import { FilterExpressionPair } from './filter-expression.schemas';
 
 export const TranslationSchema = z
   .record(z.string(), z.string())
@@ -68,7 +70,7 @@ export const GlobalTextOverlaySchema = z
       'Font id, .ttf filename, or { family, weight, style } for any Google Fonts family (default Oswald).'
     ),
     size: z.number().positive().optional().describe('Font size in px; default derived from the output height.'),
-    color: z.string().optional().describe('Text colour as a CSS hex string (default white).'),
+    color: ColorToken.optional().describe('Text colour as a CSS hex string (default white).'),
     opacity: z.number().min(0).max(1).optional().describe('Static text alpha 0..1 when no reveal is set (default 1).'),
     reveal: RevealSchema.optional().describe('Animated entrance for the text (default none).'),
     effect: TextEffectSchema.optional().describe('Drop shadow / outline for legibility over every section.'),
@@ -99,8 +101,12 @@ export const GlobalAnimationSchema = z
         'URL or file path of the overlay — an animated single-file format (.apng/.webp/.gif/.webm), stream-looped, ' +
           'or a still raster image (.png/.jpg/.jpeg), held with -loop 1 for the whole video; may use {{ varName }}.'
       ),
-    position: z.string().optional().describe('Overlay position as "x:y" in output pixels (e.g. "0:0" top-left).'),
-    scale: z.string().optional().describe('Scale expression applied to the overlay before compositing, as "w:h".'),
+    position: FilterExpressionPair.optional().describe(
+      'Overlay position as "x:y" in output pixels or FFmpeg expressions (e.g. "0:0" top-left).'
+    ),
+    scale: FilterExpressionPair.optional().describe(
+      'Scale expression applied to the overlay before compositing, as "w:h".'
+    ),
     fit: OverlayFitSchema.optional(),
     opacity: z
       .number()

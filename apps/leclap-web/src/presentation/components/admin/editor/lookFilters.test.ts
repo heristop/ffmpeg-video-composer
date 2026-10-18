@@ -10,7 +10,7 @@ describe('pruneGrade', () => {
   it('keeps a meaningful colorBalance and curvesPreset', () => {
     const grade = {
       colorBalance: { shadows: { r: 0.2, g: 0, b: -0.1 } },
-      curvesPreset: 'vintage',
+      curvesPreset: 'vintage' as const,
     };
     expect(pruneGrade(grade)).toEqual(grade);
   });
@@ -29,8 +29,10 @@ describe('pruneGrade', () => {
   });
 
   it('drops an empty curvesPreset', () => {
-    expect(pruneGrade({ curvesPreset: '' })).toBeUndefined();
-    expect(pruneGrade({ curvesPreset: '', saturation: 2 })).toEqual({ saturation: 2 });
+    // An older descriptor can still carry the empty string the schema no longer accepts.
+    const legacy = '' as never;
+    expect(pruneGrade({ curvesPreset: legacy })).toBeUndefined();
+    expect(pruneGrade({ curvesPreset: legacy, saturation: 2 })).toEqual({ saturation: 2 });
   });
 });
 

@@ -38,15 +38,19 @@ function defaultVideoFor(manifestFile: string): string {
   return manifestFile.replace(/\.manifest\.json$/, '');
 }
 
-interface RerenderInput {
+export interface RerenderInput {
   manifest: RenderManifest;
   buildDir: string;
   assetsDir: string;
   inputs: Record<string, string>;
+  /** `--allow-raw-filters`: trust the recorded template's raw filters (trusted manifests only). */
+  allowRawFilters?: boolean;
 }
 
-// The recorded config (locale, fields, codec, scale…) with this machine's directories and clips.
-function rerenderConfig(input: RerenderInput): ProjectConfig {
+// The recorded config (locale, fields, codec, scale…) with this machine's directories and clips. The
+// descriptor is validated again: a manifest is a file from anywhere, and the recorded descriptor is the
+// authored one the original render validated (the build works on a clone).
+export function rerenderConfig(input: RerenderInput): ProjectConfig {
   const recorded = input.manifest.config as Partial<ProjectConfig> & { videoCodec?: string | null };
 
   return {
@@ -60,7 +64,7 @@ function rerenderConfig(input: RerenderInput): ProjectConfig {
     ...(recorded.videoCodec && { codecConfig: { videoCodec: recorded.videoCodec } }),
     userVideoPaths: Object.keys(input.inputs).length > 0 ? input.inputs : undefined,
     deterministic: input.manifest.deterministic,
-    skipValidation: true,
+    ...(input.allowRawFilters ? { allowRawFilters: true } : {}),
   };
 }
 
@@ -109,6 +113,11 @@ export const verify = defineCommand({
     assets: { type: 'string', description: 'Assets directory for --rerender (default ./assets)' },
     build: { type: 'string', description: 'Build directory for --rerender (default ./build/verify)' },
     json: { type: 'boolean', description: 'Emit a machine-readable JSON result', default: false },
+    allowRawFilters: {
+      type: 'boolean',
+      description: 'With --rerender: trust the template raw filters (trusted manifests only)',
+      default: false,
+    },
   },
   async run({ args, rawArgs }) {
     setEngineLogLevel('silent');
@@ -125,6 +134,7 @@ export const verify = defineCommand({
           buildDir: path.resolve(args.build ?? 'build/verify'),
           assetsDir: path.resolve(args.assets ?? 'assets'),
           inputs: parseKeyValues(collectRepeated(rawArgs, 'input'), 'input'),
+          allowRawFilters: args.allowRawFilters,
         });
         checks.push(...compareRenders(manifest, fresh));
         diff = firstGraphDifference(manifest, fresh);

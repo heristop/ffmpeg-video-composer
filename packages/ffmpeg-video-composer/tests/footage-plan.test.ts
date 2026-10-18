@@ -179,16 +179,10 @@ describe('reframe', () => {
   });
 
   it('builds the blur fill subgraph from allowlisted filters', () => {
-    const graph = blurFillGraph('1280:720', { dim: 0 }, 30);
+    const names = blurFillGraph('1280:720', { dim: 0 }, 30).flatMap((chain) => chain.filters.map((f) => f.type));
 
-    expect(graph).not.toContain('lutyuv');
-    // Filter names: each `,`/`;`-separated node, labels stripped, up to its `=`.
-    const names = graph
-      .split(/[;,]/)
-      .map((node) => node.replace(/^(\[[a-z_]+\])+/, '').split('=')[0])
-      .filter((name) => /^[a-z]+$/.test(name));
-
-    expect(names).toEqual(['scale', 'crop', 'gblur', 'scale', 'overlay', 'setpts']);
+    expect(names).not.toContain('lutyuv');
+    expect(names).toEqual(['split', 'scale', 'crop', 'gblur', 'scale', 'overlay', 'setpts']);
     expect(reframeFilters({ fit: 'blur' }, { scale: '1280:720', setsar: '1/1', fps: 30 }).map((f) => f.type)).toEqual([
       'setsar',
       'fps',

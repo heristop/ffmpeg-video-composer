@@ -155,3 +155,15 @@ describe('template font dirs', () => {
     expect(buildProjectConfig('/work', {}).fontDirs).toBeUndefined();
   });
 });
+
+describe('--allow-raw-filters', () => {
+  const cwd = path.resolve('/tmp/project');
+
+  it('keeps the authored-filter allow-list by default', () => {
+    expect(buildProjectConfig(cwd, {}).allowRawFilters).toBeUndefined();
+  });
+
+  it('trusts the template raw filters when passed', () => {
+    expect(buildProjectConfig(cwd, { allowRawFilters: true }).allowRawFilters).toBe(true);
+  });
+});

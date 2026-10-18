@@ -63,9 +63,17 @@ export function keyTimesError(keys: readonly TrackKey[]): string | null {
   return null;
 }
 
-// A value as an expression: "+80" is relative to the resting `base`, a number is absolute.
+// A relative key value as the schema writes it ("+80", "-40"); anything else would land in the expression.
+const RELATIVE = /^[+-]\d+(?:\.\d+)?$/;
+
+// A value as an expression: "+80" is relative to the resting `base`, a number is absolute. A caller that
+// skipped validation could pass anything, so both shapes are checked before they reach a filter.
 function valueExpr(value: number | string, base: string | number): string {
-  return typeof value === 'string' ? `(${base})${value}` : fmt(value);
+  if (typeof value === 'string' && RELATIVE.test(value)) return `(${base})${value}`;
+
+  if (typeof value === 'number' && Number.isFinite(value)) return fmt(value);
+
+  throw new Error(`Unsafe keyframe value ${JSON.stringify(value)}: a number, or "+n" / "-n" relative to the rest`);
 }
 
 function stepExpr(from: number | string, to: number | string, base: string | number): string | null {

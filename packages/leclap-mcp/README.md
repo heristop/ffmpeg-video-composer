@@ -175,6 +175,7 @@ keep working — the stdio entry serves both eras from the same tool definitions
 | Media allowlist / assets root | `--media-dir`              | `LECLAP_MCP_MEDIA_DIR`              | `~/.leclap/media`                                 |
 | Template fonts dir            | `--fonts-dir`              | `LECLAP_MCP_FONTS_DIR`              | Unset; `global.fonts` read from the media dir     |
 | Remotion opt-in               | `--allow-remotion`         | `LECLAP_MCP_ALLOW_REMOTION`         | Off                                               |
+| Raw filters opt-in            | `--allow-raw-filters`      | `LECLAP_MCP_ALLOW_RAW_FILTERS`      | Off; raw `filters` are allow-listed               |
 | Stage/worker timeout          | `--render-timeout-ms`      | `LECLAP_MCP_RENDER_TIMEOUT_MS`      | `600000` ms (10 min)                              |
 | Trusted Remotion entry        | `--remotion-entry`         | `LECLAP_MCP_REMOTION_ENTRY`         | Unset                                             |
 | Chrome executable             | `--remotion-browser`       | `LECLAP_MCP_REMOTION_BROWSER`       | Unset; Remotion manages its browser               |
@@ -185,6 +186,14 @@ keep working — the stdio entry serves both eras from the same tool definitions
 The fonts dir is read-only: a template's `global.fonts[].src` resolves there first, then in the media
 dir, and nowhere else (realpath-checked, so a traversal or a symlink out is refused); fonts are never
 fetched. `validate_template` and `compose_video` both fail on a declared font they cannot read.
+
+Raw `filters` in agent templates are checked against the engine's
+[raw filter allow-list](../../docs/template-configuration.md#raw-filter-allow-list): a filter outside it is
+the validation error `filter_not_allowed`, and `get_capabilities` reports the mode (`rawFilters`). The raw
+filters opt-in restores the raw pass-through for trusted local templates only, and the server says so on
+stderr at start-up. A render-time deny-list stays on, but it is best-effort: a trusted template can still
+write files (absolute paths included, through an option the deny-list does not know) and reach the network. A
+drawtext `fontfile` is a bare font name (fonts from the media dir go through `global.fonts`).
 
 Precedence is flag → environment → default. Paths resolve from the server's working directory;
 supplied `~` values are not expanded. A bare `--allow-remotion`, `=true` / `=1`, or environment

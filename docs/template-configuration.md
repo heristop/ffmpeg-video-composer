@@ -16,7 +16,7 @@ This is the template descriptor reference. Upgrading an older template? See [Mig
 A descriptor has two layers, and you can mix them freely:
 
 - **Structured sugar** — the editor-friendly, LLM-clear layer. `transition`, `look`, `grade`, `motion`, `audio`, `layers`, animation `inputs`, and the text sugar (`caption`, `titleCard`, `lowerThird`, `reveal`, and whole-video `global.overlays`/`look`/`grade`) are high-level intents. They compile down to ordinary FFmpeg filters for you (`xfade`/`acrossfade`, `eq`/`colorbalance`/`curves`, `zoompan`/`rotate`/`crop`/`hflip`/`vflip`, `loudnorm`/`sidechaincompress`/`afade`, `drawbox`/`drawtext`/`fade`/gradients). Prefer this layer — it is portable, validated, and on-device-safe. A title card or lower-third replaces ~80 lines of hand-positioned `drawtext` + `alpha` expressions with a few fields.
-- **Raw filters (escape hatch)** — `filters[]`, `inputs[].filters`, and `maps[]` pass FFmpeg filter names and arguments through **verbatim**. This is the power-user layer for anything the sugar doesn't cover.
+- **Raw filters (escape hatch)** — `filters[]`, `inputs[].filters`, and `maps[]` pass FFmpeg filter names and arguments to FFmpeg. This is the power-user layer for anything the sugar doesn't cover. By default they are **allow-listed** (see [Raw filter allow-list](#raw-filter-allow-list)): a template is untrusted input, and some FFmpeg filters read or write files.
 
 Because `filters[]` is a raw pass-through, its `values` keys stay **FFmpeg-native by design** — `x`, `y`, `w`, `h`, `c`, `t`, `fontcolor`, `fontsize`, `fontfile`, `alpha`, `d`, `st`, `color`, `box`, `boxcolor`, `boxborderw`. They are _not_ camelCased. The structured-sugar fields, in contrast, use editor-friendly camelCase names (`sourceVolume`, `musicVolume`, `colorBalance`, `curvesPreset`). Keep the two mental models separate: sugar = friendly keys, raw filters = FFmpeg keys.
 
@@ -949,6 +949,8 @@ An animation is **one** single-file animated input. **APNG** and **WebM** (VP9 w
 }
 ```
 
+**Expressions** — `position` (`"x:y"`) and `scale` (`"w:h"`), on inputs and on `global.animations`, plus a `crop` motion effect's `w`/`h`/`x`/`y` and a background layer's `x`/`y`/`w`/`h`, are FFmpeg expressions the engine writes into the filter graph itself: numbers, names such as `W`, `iw` or `PI`, `+ - * / % ^` and parentheses, with `:` only between the two parts of a position or a scale. A `,` `;` `[` `]` `'` `\` `=` or a space is refused at validation and again at render.
+
 **Playback extent** — set exactly one of `loop` (forever), `loops` (a finite play count), or `duration` (seconds); precedence is `duration` > `loops` > `loop`. `start` delays the overlay (`-itsoffset`, default 0). `persistent` maps to `eof_action=repeat` (freeze the last frame once the overlay ends, instead of letting the video show through). `opacity` < 1 fades the leg via `colorchannelmixer=aa`. Reference an input by `@name` from a `maps[]` entry.
 
 **Motion** — `options.motion` gives the overlay an animated entrance, reusing the [Reveal](#reveal) vocabulary (`fade`/`rise`/`slide-left`/`slide-right`, or an object with `delay`/`duration`/`distance`). It compiles to time-expressions on the `overlay` `x`/`y` (and the leg's fade for `fade`), so a logo or animation can slide / rise / fade into place. Available on both `animation` and `image` inputs. To move, scale, turn or fade a layer over time, use [layer keyframes](#layer-keyframes-optionsanimate).
@@ -1223,6 +1225,55 @@ For a hand-framed scene, a final `{ "type": "scale", "value": "output" }` is a L
 `values` keys (kept FFmpeg-native **by design**): `x`, `y`, `w`, `h`, `c`, `t`, `text` (a `Translation`), `fontcolor`, `fontsize`, `fontfile`, `alpha`, `d`, `st`, `color`, `box`, `boxcolor`, `boxborderw`, `shadowcolor`, `shadowx`, `shadowy`, `bordercolor`, `borderw`, `enable`.
 
 `text`, `title`, `description`, and form-field `label` are `Translation` objects (`{ "en": "…", "fr": "…" }`) for i18n.
+
+### Raw filter allow-list
+
+A template can come from anywhere: an agent, a shared link, a downloaded file. Some FFmpeg filters read or
+write files, and several take a file as a **positional** option with no key (`metadata`'s 6th, `psnr`'s 1st,
+`curves`' 7th), so authored raw filters are checked against an allow-list by default, on every entry
+(validation, `compile()` with or without `skipValidation`, the browser and on-device paths). The render
+checks the descriptor it is about to lower, after `$format` values, partial `variables`, declared
+`fields` and theme tokens are substituted, so none of them can bring in a filter the list refuses:
+
+- the `type` must be one of the file-free filters below, with only the option names listed for it
+  (`enable` is accepted everywhere);
+- `type` and `value` are plain text: a `$format` block or a `{{ placeholder }}` there (or a `$format` block
+  in a `values` entry) is refused at validation, and a declared field cannot fill them;
+- a scalar `value` may hold at most the positional options listed (in FFmpeg's order), and no `,`-chained
+  filter;
+- `drawtext` takes no `textfile`, and its `fontfile` is a bare font name such as `Oswald.ttf`;
+- `values.textExpr` is engine-internal: an authored one is refused in every mode, the opt-in included;
+- `lut3d` is a [LUT look](#looks) by preset name (`"teal-orange"`, `"teal-orange@0.6"`); a `url:` LUT needs
+  the opt-in;
+- a `maps[]` pad label is a stream (`0:v`), an `@input` reference or a plain lower-case label, and an
+  `inputs[].name` (a pad label too) uses letters, digits, `_` and `-` only;
+- an authored filter cannot carry an engine `graph` block.
+
+| Filters                                                                                                        | Notes                                                     |
+| -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `drawtext`, `drawbox`                                                                                          | text and boxes; `drawbox` takes `x:y:w:h:color:thickness` |
+| `fade`, `fadein`, `fadeout`, `setpts`, `fps`                                                                   | time                                                      |
+| `scale` (and `"output"`), `crop`, `pad`, `overlay`, `perspective`, `rotate`, `transpose`, `hflip`, `vflip`     | geometry                                                  |
+| `setsar`, `setdar`, `format`, `null`                                                                           | stream properties                                         |
+| `vignette`, `boxblur`, `gblur`, `hue`, `eq`, `colorchannelmixer`, `colorbalance`, `lutyuv`, `lutrgb`, `negate` | colour and blur                                           |
+| `curves`                                                                                                       | a `preset` only                                           |
+| `lut3d`                                                                                                        | a LUT look preset name only                               |
+| `volume`, `afade`, `atempo`                                                                                    | audio                                                     |
+
+The exact option names per filter are the `AUTHORED_FILTERS` table exported by the engine
+(`packages/ffmpeg-video-composer/src/editor/utils/filter-allow-list.ts`). A filter outside it is the
+validation error `filter_not_allowed`, with the nearest allowed filter as the suggestion; a render that skipped
+validation fails before any FFmpeg command.
+
+**Opting out (trusted local templates only).** `ProjectConfig.allowRawFilters: true`, `leclap render
+--allow-raw-filters` / `leclap verify --rerender --allow-raw-filters`, or the MCP server's
+`--allow-raw-filters` / `LECLAP_MCP_ALLOW_RAW_FILTERS` restore the raw pass-through. A render-time deny-list
+stays on (file- and command-capable filter types, file option keys, filtergraph escapes, absolute or `..`
+paths and protocol prefixes such as `file:` or `http:` in any option, once unescaped), but it is best-effort:
+it cannot know every filter or every way FFmpeg opens a file. A trusted template can still write files
+(relative to the working directory, or wherever an option the deny-list does not recognize points, absolute
+paths included) and reach the network. Only turn it on for templates you wrote or reviewed. Templates that
+use a filter outside the list need this opt-in.
 
 ## Variables & placeholders
 

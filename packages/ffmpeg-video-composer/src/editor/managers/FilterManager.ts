@@ -13,6 +13,7 @@ import { applyAnimation } from '../presets/text';
 import { applyTracks } from '@/core/motion/tracks';
 import { resolvedTimes } from '@/core/timing/seconds';
 import type FormatterManager from './FormatterManager';
+import { assertSafeFilterType } from '../utils/filter-option-guard';
 
 // A drawtext base coordinate may be authored as a number or an expression string; anything else
 // (absent, malformed) falls back to the frame origin.
@@ -111,7 +112,7 @@ class FilterManager {
       return this.formattersManager.formatMultipleTypesValues(filter);
     }
 
-    return filter.type;
+    return assertSafeFilterType(filter.type);
   };
 
   /** The output frame rate, on which per-frame lowerings (layer keyframes) step. */

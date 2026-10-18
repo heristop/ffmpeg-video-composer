@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { TranslationSchema } from './global.schemas';
 import { timeValue } from './time.schemas';
 import { CAPTION_DNA_IDS } from '../core/captions/dna';
@@ -150,8 +151,8 @@ export const SubtitlesSchema = z
           'contained in that cue. Use once per video.'
       ),
     font: z.string().optional().describe('Bundled font id overriding the DNA font (must be bundled for layout).'),
-    color: z.string().optional().describe('Base text colour overriding the DNA (hex or $color.* token).'),
-    activeColor: z.string().optional().describe('Active-word colour overriding the DNA (hex or $color.* token).'),
+    color: ColorToken.optional().describe('Base text colour overriding the DNA (hex or $color.* token).'),
+    activeColor: ColorToken.optional().describe('Active-word colour overriding the DNA (hex or $color.* token).'),
     renderer: z
       .enum(SUBTITLE_RENDERERS)
       .optional()

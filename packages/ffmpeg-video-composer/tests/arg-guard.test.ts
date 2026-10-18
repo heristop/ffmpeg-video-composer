@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { describe, it, expect, vi } from 'vitest';
-import { assertSafeArgToken } from '@/core/arg-guard';
+import { assertSafeArgToken, assertSafeColorToken } from '@/core/arg-guard';
+import { ColorBackgroundSectionSchema, SectionSchema } from '@/schemas/section.schemas';
 import SegmentBuilder from '@/editor/SegmentBuilder';
 import type { Section } from '@/core/types';
 
@@ -92,5 +93,58 @@ describe('SegmentBuilder argv-injection guard (builder level)', () => {
     } as never;
 
     expect(() => builder.buildInputs()).not.toThrow();
+  });
+});
+
+// backgroundColor lands unquoted in a `-f lavfi -i color=c=<colour>` input graph: whitespace is not the
+// only escape, filtergraph syntax (`,` `;` `[` `]` `=` `:` `/`) is too.
+const HOSTILE_COLORS = ['red,nullsink;movie=/x[out0]', 'red:s=2x2', 'black;amovie=/etc/passwd', "red'", 'rgb(1,2,3)'];
+
+describe('assertSafeColorToken', () => {
+  it('returns colours of the engine grammar unchanged', () => {
+    for (const color of ['black', '#141416', '#000', 'red@0.5', '0x112233', 'white@0.0']) {
+      expect(assertSafeColorToken(color, 'backgroundColor')).toBe(color);
+    }
+  });
+
+  it('throws on filtergraph syntax', () => {
+    for (const color of HOSTILE_COLORS) {
+      expect(() => assertSafeColorToken(color, 'backgroundColor'), color).toThrow(/backgroundColor/);
+    }
+  });
+});
+
+describe('backgroundColor schema', () => {
+  const section = (backgroundColor: string) => ({
+    name: 'bg',
+    type: 'color_background',
+    options: { backgroundColor, duration: 3 },
+  });
+
+  it('rejects filtergraph syntax on every section type', () => {
+    for (const color of HOSTILE_COLORS) {
+      expect(ColorBackgroundSectionSchema.safeParse(section(color)).success, color).toBe(false);
+      expect(SectionSchema.safeParse({ ...section(color), type: 'video' }).success, color).toBe(false);
+    }
+  });
+
+  it('accepts names, hex, theme tokens and variables', () => {
+    for (const color of ['black', '#141416', '$color.bg', '{{ color1 }}', '{{ ACCENT }}', 'red@0.5']) {
+      expect(ColorBackgroundSectionSchema.safeParse(section(color)).success, color).toBe(true);
+    }
+  });
+});
+
+describe('SegmentBuilder filtergraph guard on backgroundColor', () => {
+  it('throws when a resolved backgroundColor carries filtergraph syntax', () => {
+    const builder = makeBuilder();
+    builder.hydrate({ name: 'bg', type: 'color_background' });
+    (builder as unknown as { section: Section }).section = {
+      name: 'bg',
+      type: 'color_background',
+      options: { backgroundColor: 'red,nullsink;movie=/x[out0]', duration: 3 },
+    } as never;
+
+    expect(() => builder.buildInputs()).toThrow(/backgroundColor/);
   });
 });

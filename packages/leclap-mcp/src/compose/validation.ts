@@ -98,13 +98,24 @@ export function effectKeyError(raw: unknown): string | undefined {
 
   return unsafeEffectValue(values);
 }
+// Whether this server trusts templates' raw filters (McpConfig.allowRawFilters), set once at start-up like the
+// tool surface. Off: the engine's allow-list reports a filter outside it as filter_not_allowed.
+let rawFiltersTrusted = false;
+
+export function setRawFiltersTrusted(trusted: boolean): void {
+  rawFiltersTrusted = trusted;
+}
+
 // `fields`: a render's own values. Given (even empty), declared global.fields are checked strictly — a
 // missing required value or one that fails its type is an error — and the descriptor comes back filled in.
 export function validateTemplate(raw: unknown, fields?: Record<string, string>): ValidationResult {
   const keyError = effectKeyError(raw);
 
   if (keyError) return { ok: false, message: keyError };
-  const validation = new TemplateValidator().validateTemplate(raw, fields === undefined ? {} : { fields });
+  const validation = new TemplateValidator().validateTemplate(raw, {
+    ...(fields === undefined ? {} : { fields }),
+    allowRawFilters: rawFiltersTrusted,
+  });
 
   if (!validation.success || !validation.data) {
     const errors = validation.errors ?? [];

@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { OverlayFitSchema, OverlayFlipSchema, RevealSchema } from './effects.schemas';
 import { FilterSchema } from './filter.schemas';
 import { TranslationSchema } from './global.schemas';
 import { HtmlInputShape, htmlInputIssues } from './html-input.schemas';
 import { LayerAnimateSchema, LayerOriginSchema } from './layer-animate.schemas';
 import { ClipBoxSchema } from './clip.schemas';
+import { FilterExpressionPair } from './filter-expression.schemas';
 
 // Input/shape/field media primitives — the animation input options, the editor-only shape recipe, the
 // input schema and the form-field schema — live here to keep `section.schemas` under the max-lines
@@ -15,8 +17,12 @@ import { ClipBoxSchema } from './clip.schemas';
 export const InputOptionsSchema = z
   .object({
     fps: z.number().positive().optional().describe('Frames per second the animation plays at (default 25).'),
-    position: z.string().optional().describe('Overlay position as "x:y" in output pixels (e.g. "0:0" top-left).'),
-    scale: z.string().optional().describe('Scale expression applied to the input before compositing, as "w:h".'),
+    position: FilterExpressionPair.optional().describe(
+      'Overlay position as "x:y" in output pixels or FFmpeg expressions (e.g. "0:0" top-left).'
+    ),
+    scale: FilterExpressionPair.optional().describe(
+      'Scale expression applied to the input before compositing, as "w:h".'
+    ),
     fit: OverlayFitSchema.optional(),
     persistent: z
       .boolean()
@@ -60,7 +66,7 @@ export const InputOptionsSchema = z
 export const ShapeSpecSchema = z
   .object({
     kind: z.enum(['rect', 'ellipse']).describe('Shape geometry: an axis-aligned rectangle or an ellipse/circle.'),
-    color: z.string().describe('Fill colour as a hex string (e.g. "#ff4d4d").'),
+    color: ColorToken.describe('Fill colour as a hex string (e.g. "#ff4d4d").'),
     cornerRadius: z
       .number()
       .min(0)
@@ -71,14 +77,17 @@ export const ShapeSpecSchema = z
       .min(0)
       .optional()
       .describe('Outline width in output pixels drawn inside the shape bounds (0/omitted = no outline).'),
-    strokeColor: z.string().optional().describe('Outline colour as a hex string; used when strokeWidth > 0.'),
+    strokeColor: ColorToken.optional().describe('Outline colour as a hex string; used when strokeWidth > 0.'),
   })
   .strict()
   .describe('Editor-only recipe of a pre-rasterized shape overlay; ignored by the engine at compile.');
 
 export const InputSchema = z
   .object({
-    name: z.string().describe('Unique identifier for this input within the section, used as a stream label in maps.'),
+    name: z
+      .string()
+      .regex(/^[A-Za-z0-9_-]+$/, 'An input name is a pad label: letters, digits, "_" or "-"')
+      .describe('Unique identifier for this input within the section, used as a stream label in maps.'),
     url: z
       .string()
       .optional()

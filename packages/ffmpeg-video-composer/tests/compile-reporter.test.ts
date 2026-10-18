@@ -101,7 +101,9 @@ describe('compile() reporter', () => {
   it('hands the reason a render failed inside the director to onError', async () => {
     const errors: Error[] = [];
 
-    const out = await compile(projectConfig(), unknownFilterDescriptor, { onError: (error) => errors.push(error) });
+    // A filter off the allow-list is refused before the director; trusting raw filters reaches FFmpeg.
+    const trusted = { ...projectConfig(), allowRawFilters: true };
+    const out = await compile(trusted, unknownFilterDescriptor, { onError: (error) => errors.push(error) });
 
     expect(out, 'compile() still resolves null on failure').toBeNull();
     expect(errors).toHaveLength(1);

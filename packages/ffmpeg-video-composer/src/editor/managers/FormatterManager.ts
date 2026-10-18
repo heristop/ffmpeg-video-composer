@@ -9,7 +9,14 @@ import type { Filter, FilterValues } from '@/core/types';
 import type VariableManager from './VariableManager';
 import { isFontRef, fontRefSlug, type FontInput } from '@/core/fonts';
 import { escapeDrawtextText } from '@/core/drawtext-text';
-import { lutFileStem } from '../presets/lut-spec';
+import { assertSafeColorToken } from '@/core/arg-guard';
+import {
+  assertBareFontFile,
+  assertSafeFilterOptions,
+  assertSafeFilterType,
+  assertSafeFilterValue,
+} from '../utils/filter-option-guard';
+import { lutFileStem, parseLutValue } from '../presets/lut-spec';
 
 // The whole filtergraph is emitted as one double-quoted `-vf "…"` argv token, and parseCommand
 // toggles its quote state on any inner `"`. So a literal `"` (or a NUL) in a filter type/value would
@@ -39,6 +46,8 @@ class FormatterManager {
   formatMultipleTypesValue = (filter: Filter): string => {
     let result = '';
 
+    assertSafeFilterType(filter.type);
+
     switch (filter.type) {
       case 'setpts':
         result = this.formatSetpts(filter.value);
@@ -64,7 +73,7 @@ class FormatterManager {
         break;
 
       default:
-        result = `${stripFilterUnsafe(filter.type)}=${stripFilterUnsafe(String(filter.value ?? ''))}`;
+        result = `${filter.type}=${assertSafeFilterOptions(filter.type, stripFilterUnsafe(String(filter.value ?? '')))}`;
     }
 
     return result;
@@ -88,7 +97,7 @@ class FormatterManager {
   }
 
   private formatScale(value: Filter['value']): string {
-    if (value !== 'output') return `scale=${stripFilterUnsafe(String(value ?? ''))}`;
+    if (value !== 'output') return `scale=${assertSafeFilterOptions('scale', stripFilterUnsafe(String(value ?? '')))}`;
 
     // Finish a hand-framed scene at the actual project dimensions, preserving its aspect.
     const scale = stripFilterUnsafe(this.project.config.videoConfig?.scale ?? DefaultConfig.SCALE);
@@ -101,6 +110,12 @@ class FormatterManager {
   // reading the staged `.cube` from the build FS; a bare preset name keeps its historical file name.
   private formatLut3d(name: string): string {
     const spec = stripFilterUnsafe(name);
+    const parsed = parseLutValue(spec);
+
+    // A preset name becomes the staged file's stem inside a quoted path: a bare name only.
+    if (parsed.kind === 'preset' && !/^[A-Za-z0-9_-]+$/.test(parsed.name)) {
+      throw new Error(`Unsafe LUT "${spec}": a LUT preset is a bare name such as "teal-orange"`);
+    }
 
     if (!this.segment.tempLuts.includes(spec)) {
       this.segment.tempLuts.push(spec);
@@ -174,11 +189,18 @@ class FormatterManager {
     return typeof colorValue === 'string' ? colorValue : '';
   }
 
+  // The resolved colour sits in a quoted filter option, so it must be one colour token: a quote, a
+  // separator or whitespace would close the option and chain filters.
   private formatColorValue(key: string, values: ExtendedFilterValues): string {
-    return `${stripFilterUnsafe(key)}='${stripFilterUnsafe(this.formatColor(this.resolveColorFromValues(key, values)))}'`;
+    const color = assertSafeColorToken(this.formatColor(this.resolveColorFromValues(key, values)), key);
+
+    return `${stripFilterUnsafe(key)}='${stripFilterUnsafe(color)}'`;
   }
 
+  // An authored font is a bare file name staged under the fonts dir; a font ref (family) is resolved.
   private formatFontValue(values: ExtendedFilterValues): string {
+    if (typeof values.fontfile === 'string') assertBareFontFile(values.fontfile);
+
     return `fontfile='${stripFilterUnsafe(this.formatFont(values.fontfile ?? ''))}'`;
   }
 
@@ -186,10 +208,13 @@ class FormatterManager {
     const val = values[key];
     const stringVal = val === undefined ? '' : String(val);
 
-    return `${stripFilterUnsafe(key)}=${stripFilterUnsafe(stringVal)}`;
+    // Raw values reach FFmpeg as authored: refuse a file-reading key or a value that leaves its option.
+    return `${stripFilterUnsafe(key)}=${assertSafeFilterValue(key, stripFilterUnsafe(stringVal))}`;
   }
 
   formatMultipleTypesValues = (filter: Filter): string => {
+    assertSafeFilterType(filter.type);
+
     const filterValues = filter.values as ExtendedFilterValues | undefined;
 
     if (!filterValues) {
@@ -214,16 +239,9 @@ class FormatterManager {
   }
 
   // drawtext/drawbox keys whose value is a colour token (`#rrggbb[@alpha]` or `{{ colorN }}`) and must
-  // go through formatColor — fontcolor/boxcolor plus the shadow/outline colours.
-  private static readonly COLOR_KEYS = new Set([
-    'boxcolor',
-    'fontcolor',
-    'fontcolor_expr',
-    'shadowcolor',
-    'bordercolor',
-    'color',
-    'c',
-  ]);
+  // go through formatColor — fontcolor/boxcolor plus the shadow/outline colours. fontcolor_expr is an
+  // expression, not a token: it is a plain raw value (formatDefaultValue).
+  private static readonly COLOR_KEYS = new Set(['boxcolor', 'fontcolor', 'shadowcolor', 'bordercolor', 'color', 'c']);
 
   private appendFormattedValue(
     key: string,

@@ -168,7 +168,8 @@ export const GradePanel = ({ grade, onChange }: GradePanelProps) => {
   };
 
   const setCurves = (preset: string) => {
-    onChange(pruneGrade({ ...grade, curvesPreset: preset === CURVES_NONE ? undefined : preset }));
+    // The sentinel matches no preset, so it clears the field.
+    onChange(pruneGrade({ ...grade, curvesPreset: CURVES_PRESETS.find((name) => name === preset) }));
   };
 
   return (

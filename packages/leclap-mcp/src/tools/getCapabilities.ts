@@ -25,11 +25,32 @@ const outputSchema = z.object({
     fribidi: z.boolean(),
   }),
   encoders: z.array(z.string()),
+  rawFilters: z
+    .object({ mode: z.enum(['allow-list', 'trusted']), detail: z.string() })
+    .describe('Whether raw template filters are allow-listed (agent default) or trusted by the operator.'),
 });
+
+function rawFilters(allowRawFilters: boolean | undefined): { mode: 'allow-list' | 'trusted'; detail: string } {
+  if (allowRawFilters) {
+    return {
+      mode: 'trusted',
+      detail:
+        'Raw filters pass through (operator opt-in); a best-effort render-time deny-list stays on, but a ' +
+        'trusted template can still write files and reach the network.',
+    };
+  }
+
+  return {
+    mode: 'allow-list',
+    detail:
+      'Raw filters must be file-free allow-listed filters with listed options; others are filter_not_allowed. ' +
+      'Prefer the structured sugar; the operator can opt in with --allow-raw-filters.',
+  };
+}
 
 // The capability doctor as a tool: what the local FFmpeg really renders (listings plus one-frame probes),
 // the same JSON as `leclap diagnose --json`. Read-only; the probe is cached for the server's lifetime.
-export function registerGetCapabilities(server: McpServer): void {
+export function registerGetCapabilities(server: McpServer, options: { allowRawFilters?: boolean } = {}): void {
   server.registerTool(
     'get_capabilities',
     {
@@ -40,12 +61,13 @@ export function registerGetCapabilities(server: McpServer): void {
         'ebur128, libx264 and its colour params, GPL filters — each usable yes/no/unknown with what the probe ' +
         'saw and a fix — plus font support and encoders. Listings are verified with one-frame renders. ' +
         'validate_template uses the same probe to flag feature_unavailable. Call it when a render fails on a ' +
-        'filter or before relying on text, LUT looks or designed transitions on an unknown machine.',
+        'filter or before relying on text, LUT looks or designed transitions on an unknown machine. ' +
+        '`rawFilters` says whether raw template filters are allow-listed or trusted.',
       outputSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     },
     async () => {
-      const report = await localCapabilities();
+      const report = { ...(await localCapabilities()), rawFilters: rawFilters(options.allowRawFilters) };
 
       return {
         content: [{ type: 'text' as const, text: JSON.stringify(report, null, 2) }],

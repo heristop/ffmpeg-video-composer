@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColorToken } from './color-token.schemas';
 import { FxTargetSchema } from './fx.schemas';
 
 // ── fields of the path graphic: a stroke that draws itself along any path (editor/presets/path-*.ts) ──
@@ -76,7 +77,7 @@ export const pathStrokeFields = {
       z
         .object({
           size: z.number().positive().max(200).optional(),
-          color: z.string().optional(),
+          color: ColorToken.optional(),
         })
         .strict(),
     ])

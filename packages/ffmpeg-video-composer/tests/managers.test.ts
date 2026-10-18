@@ -260,10 +260,10 @@ describe('FormatterManager', () => {
       expect(out).not.toContain('"');
     });
 
-    it('strips a double quote from the filter type', () => {
+    it('refuses a filter type that is not a filter name (a quote, a space, an option)', () => {
       const { manager } = build();
-      expect(manager.formatMultipleTypesValue({ type: 'drawbox" -i /etc/passwd', value: 'x' } as Filter)).not.toContain(
-        '"'
+      expect(() => manager.formatMultipleTypesValue({ type: 'drawbox" -i /etc/passwd', value: 'x' } as Filter)).toThrow(
+        /Unsafe filter type/
       );
     });
 
@@ -388,7 +388,7 @@ describe('FormatterManager', () => {
       expect(manager.formatMultipleTypesValues(filter)).toBe('fade=');
     });
 
-    it('formats color keys (fontcolor, boxcolor, color, c, fontcolor_expr)', () => {
+    it('formats color keys (fontcolor, boxcolor, color, c); fontcolor_expr is a plain raw value', () => {
       const { manager } = build({ section: { name: 's', type: 'video' } });
       const filter = {
         type: 'drawtext',
@@ -399,7 +399,7 @@ describe('FormatterManager', () => {
       expect(result).toContain("boxcolor='#000000'");
       expect(result).toContain("color='red'");
       expect(result).toContain("c='blue'");
-      expect(result).toContain("fontcolor_expr='#ABCABC'");
+      expect(result).toContain('fontcolor_expr=#ABCABC');
     });
 
     it('color value uses black when value is not a string', () => {
@@ -1185,6 +1185,13 @@ describe('MapManager', () => {
       expect(overlay2).toContain('[anim]');
       expect(overlay2).toContain('[anim2_src]');
       expect(segment.mapsList).toContain('anim2');
+    });
+
+    it('refuses a clip box that is not numeric, from a caller that skipped the schema', () => {
+      const { manager } = build({ section: animationSection() });
+      const clip = { x: 0, y: 0, w: '10,metadata=print:a:b', h: 10 } as never;
+
+      expect(() => manager.addAnimationOverlay(makeAnimInput({ clip }), 2, '1280:720')).toThrow(/clip w/);
     });
 
     it('scales the animation leg to the input scale (pre-overlay), not via a post-overlay filter', () => {

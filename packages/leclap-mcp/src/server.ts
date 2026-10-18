@@ -17,6 +17,7 @@ import { registerSamples } from './tools/samples.js';
 import { registerComposeGuide } from './prompts/composeGuide.js';
 import { registerInspectTools } from './tools/inspectTools.js';
 import { registerOpenInBuilder } from './tools/open-in-builder.js';
+import { setRawFiltersTrusted } from './compose/validation.js';
 
 // Each tool group is registered by a small `registerXxx(server, config)` function, called from
 // `createServer`. The surface is authoring-only: samples, schema, validate, edit, compose, inspect and
@@ -57,13 +58,15 @@ function registerTemplateEdits(server: McpServer, config: McpConfig): void {
 }
 
 // Config-free tools: the local FFmpeg capability report and the builder hand-off link.
-function registerStandaloneTools(server: McpServer): void {
-  registerGetCapabilities(server);
+function registerStandaloneTools(server: McpServer, config: McpConfig): void {
+  registerGetCapabilities(server, { allowRawFilters: config.allowRawFilters });
   registerOpenInBuilder(server);
 }
 
 export function createServer(input: McpConfig): McpServer {
   const config = snapshotEffectConfig(input);
+  // Raw filters: the engine's allow-list unless the operator trusts local templates (fixed for the process).
+  setRawFiltersTrusted(Boolean(config.allowRawFilters));
   const server = new McpServer(
     { name: 'leclap', version: SERVER_VERSION },
     {
@@ -88,7 +91,7 @@ export function createServer(input: McpConfig): McpServer {
   }
   registerTemplateEdits(server, config);
   registerMediaAnalysis(server, config);
-  registerStandaloneTools(server);
+  registerStandaloneTools(server, config);
 
   // render_remotion_clip bundles + executes a caller-supplied entry (arbitrary local JS) — an RCE
   // surface. Register it only when the operator explicitly opted in for trusted local design-time use.

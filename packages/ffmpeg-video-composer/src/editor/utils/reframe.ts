@@ -4,7 +4,7 @@
 // subgraph — every filter on the on-device allowlist. Without fit/focus the output is byte-identical to
 // the historical cover / letterbox chains.
 
-import type { Filter, SectionOptions } from '@/core/types';
+import type { Filter, FilterGraphChain, SectionOptions } from '@/core/types';
 import { fmt } from '@/core/motion/hermite';
 import { trackExpr, type TrackKey } from '@/core/motion/tracks';
 import type { FitFill, Focus, FootageFit } from '../../schemas/footage.schemas';
@@ -64,20 +64,40 @@ function even(value: number): number {
 /**
  * The blur fit as one subgraph: the whole picture (contain-scaled) over a cover-scaled, blurred and
  * dimmed copy of itself. Frames are conformed first and restamped after the overlay so the subgraph
- * neither drops the last frame nor drifts.
+ * neither drops the last frame nor drifts. Built as chains of filters, not text, so each filter is
+ * formatted and checked like any other.
  */
-export function blurFillGraph(scale: string, fill: FitFill | undefined, fps: number): string {
+export function blurFillGraph(scale: string, fill: FitFill | undefined, fps: number): FilterGraphChain[] {
   const { blur, dim, zoom } = { ...DEFAULT_FILL, ...fill };
   const [width, height] = scale.split(':').map(Number);
   const backdrop = zoom === 1 ? scale : `${even(width * zoom)}:${even(height * zoom)}`;
-  const dimmed = dim > 0 ? `,lutyuv=y=val*${fmt(1 - dim)}` : '';
+  const dimmed: Filter[] = dim > 0 ? [{ type: 'lutyuv', value: `y=val*${fmt(1 - dim)}` }] : [];
 
-  return (
-    `2[fit_bg][fit_fg];` +
-    `[fit_bg]scale=${backdrop}:force_original_aspect_ratio=increase,crop=${scale},gblur=sigma=${fmt(blur)}${dimmed}[fit_blur];` +
-    `[fit_fg]scale=${scale}:force_original_aspect_ratio=decrease:force_divisible_by=2[fit_pic];` +
-    `[fit_blur][fit_pic]overlay=(W-w)/2:(H-h)/2,setpts=N/(${fps}*TB)`
-  );
+  return [
+    { filters: [{ type: 'split', value: '2' }], outputs: ['fit_bg', 'fit_fg'] },
+    {
+      inputs: ['fit_bg'],
+      filters: [
+        { type: 'scale', value: `${backdrop}:force_original_aspect_ratio=increase` },
+        { type: 'crop', value: scale },
+        { type: 'gblur', value: `sigma=${fmt(blur)}` },
+        ...dimmed,
+      ],
+      outputs: ['fit_blur'],
+    },
+    {
+      inputs: ['fit_fg'],
+      filters: [{ type: 'scale', value: `${scale}:force_original_aspect_ratio=decrease:force_divisible_by=2` }],
+      outputs: ['fit_pic'],
+    },
+    {
+      inputs: ['fit_blur', 'fit_pic'],
+      filters: [
+        { type: 'overlay', value: '(W-w)/2:(H-h)/2' },
+        { type: 'setpts', value: `N/(${fps}*TB)` },
+      ],
+    },
+  ];
 }
 
 function scaleFilter(fit: FootageFit, options: SectionOptions | undefined, ctx: ReframeContext): Filter {
@@ -105,7 +125,7 @@ export function reframeFilters(options: SectionOptions | undefined, ctx: Reframe
     return [
       setsar,
       { type: 'fps', value: ctx.fps },
-      { type: 'split', value: blurFillGraph(ctx.scale, options?.fill, ctx.fps) },
+      { type: 'split', graph: blurFillGraph(ctx.scale, options?.fill, ctx.fps) },
     ];
   }
 

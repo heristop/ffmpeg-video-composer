@@ -17,8 +17,7 @@ export type {
 import type { Reveal, RevealEasing, TextEffect, TitleCard, LowerThird, ChromaKey, Caption } from './descriptor-text';
 import type { FontInput } from './fonts';
 import type { PlatformName } from './platforms';
-import type { RenderManifest } from './determinism/manifest';
-import type { QcOption, QcReport } from './qc/types';
+import type { QcOption } from './qc/types';
 import type { MotionTokens } from '../schemas/motion.schemas';
 import type { Theme } from '../schemas/theme.schemas';
 import type { KineticBlock } from '../schemas/kinetic.schemas';
@@ -72,26 +71,8 @@ import type { GlobalTextOverlay, GlobalAnimation, TemplateMeta, Watermark } from
 
 export type LogParams = Record<string, unknown>;
 
-// Optional progress/log sink a host (e.g. the `leclap` CLI) can pass to the Node `compile()` so it can
-// render live progress and capture the engine's per-segment/ffmpeg logs, mirroring `compileBrowser`'s
-// `onProgress`. `onProgress` receives the 0..1 compilation fraction; `onLog` receives every engine log
-// line (all levels) regardless of the Pino stdout level, so the host can tee detail to a file.
-export type CompileReporter = {
-  onProgress?: (fraction: number) => void;
-  onLog?: (line: { level: 'debug' | 'info' | 'warn' | 'error'; message: string }) => void;
-  // Called once with the cause when compile() resolves null — e.g. a SectionError naming the section.
-  onError?: (error: Error) => void;
-  // Node only. When set, compile() builds the render manifest (template/graph/asset/output digests, see
-  // core/determinism/manifest.ts) after a successful render and hands it here. Hashing costs one read of
-  // the output and inputs, so it only runs when a host asks for it.
-  onManifest?: (manifest: RenderManifest) => void;
-  // Node only. Called with the output QC report (core/qc) after a successful render when
-  // `ProjectConfig.qc` is set; the same report is also recorded in the manifest's `qc` field.
-  onQc?: (report: QcReport) => void;
-  // Node only. Aborting it cancels the build, as the `task-cancelled` event does: the transcription pass
-  // kills its whisper run and no further segment renders; compile() then resolves null.
-  signal?: AbortSignal;
-};
+// The compile() progress/log/manifest sink lives in a sibling for the max-lines budget.
+export type { CompileReporter } from './compile-reporter';
 export type ProjectConfig = {
   buildDir?: string;
   assetsDir?: string;
@@ -113,6 +94,10 @@ export type ProjectConfig = {
   // Skip descriptor validation before compiling (trusted callers only; validation is on by default).
   // Applies to the Node `compile()` path only — the browser and React Native paths always validate.
   skipValidation?: boolean;
+  // Trust the template's raw `filters` (trusted local authors only). Off by default: authored filters are
+  // checked against an allow-list of file-free types and options (editor/utils/filter-allow-list.ts) on
+  // every path, validated or not. The render-time deny-list stays on either way.
+  allowRawFilters?: boolean;
   // Named render-quality tier resolved by core/encoding.ts (default 'standard'). Encoder numbers
   // (crf/preset/bitrate) stay an app concern — templates never carry them.
   qualityTier?: 'draft' | 'standard' | 'high';

@@ -30,6 +30,8 @@ export interface RenderFlags {
   cache?: string;
   /** Repeatable `--fonts <dir>`: directories `global.fonts[].src` may resolve in, after the template's own. */
   fonts?: string[];
+  /** `--allow-raw-filters`: trust the template's raw filters instead of the engine's allow-list. */
+  allowRawFilters?: boolean;
 }
 
 /**
@@ -106,6 +108,7 @@ export function buildProjectConfig(
     buildDir,
     assetsDir,
     fields: { ...parseKeyValues(flags.field, 'field'), ...parseKeyValues(flags.set, 'set') },
+    ...(flags.allowRawFilters ? { allowRawFilters: true } : {}),
   };
   const fontDirs = fontDirsFor(cwd, templatePath, flags.fonts);
 
@@ -125,6 +128,13 @@ export function buildProjectConfig(
     config.currentLocale = flags.locale;
   }
 
+  applyOutputFlags(config, cwd, flags);
+
+  return config;
+}
+
+// The output-side flags (determinism, QC, cache, format), set only when passed.
+function applyOutputFlags(config: ProjectConfig, cwd: string, flags: RenderFlags): void {
   if (flags.deterministic !== undefined) {
     config.deterministic = flags.deterministic;
   }
@@ -140,8 +150,6 @@ export function buildProjectConfig(
   if (flags.format) {
     config.format = parseFormatFlag(flags.format);
   }
-
-  return config;
 }
 
 /**

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { describe, expect, it } from 'vitest';
 
-import { effectKeyError, validateTemplate } from '../src/compose/validation.js';
+import { effectKeyError, setRawFiltersTrusted, validateTemplate } from '../src/compose/validation.js';
 
 describe('validateTemplate', () => {
   it('accepts a structurally valid descriptor', () => {
@@ -112,5 +112,38 @@ describe('validateTemplate', () => {
     const partial: { type: string; sections: unknown[] } = { type: 'partial', sections: [] };
     partial.sections.push(partial);
     expect(effectKeyError({ sections: [partial] })).toContain('traversal bounds');
+  });
+});
+
+describe('validateTemplate: raw filter allow-list', () => {
+  const hostile = {
+    sections: [
+      {
+        name: 'card',
+        type: 'color_background',
+        options: { backgroundColor: '#000000', duration: 2 },
+        filters: [{ type: 'metadata', value: 'print:k:v:same_str:1:/tmp/pwned' }],
+      },
+    ],
+  };
+
+  it('refuses a filter off the allow-list as filter_not_allowed by default', () => {
+    const result = validateTemplate(hostile);
+
+    expect(result.ok).toBe(false);
+    expect(!result.ok && result.errors?.map((error) => error.code)).toContain('filter_not_allowed');
+  });
+
+  it('trusts raw filters when the server opted in', () => {
+    setRawFiltersTrusted(true);
+
+    try {
+      const result = validateTemplate(hostile);
+      const codes = result.ok ? [] : (result.errors ?? []).map((error) => error.code);
+
+      expect(codes).not.toContain('filter_not_allowed');
+    } finally {
+      setRawFiltersTrusted(false);
+    }
   });
 });
