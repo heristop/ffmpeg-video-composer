@@ -68,14 +68,32 @@ export function mergeSpans(spans: readonly Span[], max = MAX_SPANS): Span[] {
     joined.push({ ...span });
   }
 
-  while (joined.length > limit) {
-    const gaps = joined.slice(1).map((span, i) => span.first - joined[i].last);
-    const i = gaps.indexOf(Math.min(...gaps));
+  return joined.length > limit ? closeNearestGaps(joined, joined.length - limit) : joined;
+}
 
-    joined.splice(i, 2, { first: joined[i].first, last: joined[i + 1].last });
+// Joins across the `count` smallest gaps (earliest first on ties) in one pass: gaps do not change as others close.
+function closeNearestGaps(joined: readonly Span[], count: number): Span[] {
+  const gaps = joined.slice(1).map((span, i) => ({ i, size: span.first - joined[i].last }));
+  const closed = new Set(
+    gaps
+      .toSorted((a, b) => a.size - b.size || a.i - b.i)
+      .slice(0, count)
+      .map((gap) => gap.i)
+  );
+  let tail: Span = { ...joined[0] };
+  const result: Span[] = [tail];
+
+  for (const [i, span] of joined.slice(1).entries()) {
+    if (closed.has(i)) {
+      tail.last = span.last;
+      continue;
+    }
+
+    tail = { ...span };
+    result.push(tail);
   }
 
-  return joined;
+  return result;
 }
 
 /** The spans where a layer's position, scale or rotation changes. */

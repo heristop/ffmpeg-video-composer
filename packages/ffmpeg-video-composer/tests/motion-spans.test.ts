@@ -92,6 +92,15 @@ describe('mergeSpans', () => {
     ]);
   });
 
+  it('handles tens of thousands of disjoint spans', () => {
+    const spans = Array.from({ length: 50_000 }, (_, i) => ({ first: i * 10, last: i * 10 + 2 }));
+    const merged = mergeSpans(spans);
+
+    expect(merged).toHaveLength(4);
+    expect(merged[0].first).toBe(0);
+    expect(merged[3].last).toBe(499_992);
+  });
+
   it('drops non-finite spans and terminates', () => {
     const spans = [
       { first: Number.NaN, last: 3 },
