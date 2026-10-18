@@ -328,6 +328,23 @@ function strokeWidthOk(sw: number | null | undefined): boolean {
   return sw !== undefined && sw !== null && sw >= 0 && sw <= MAX_STROKE;
 }
 
+// The path text, valid and within the encoded limit; null otherwise.
+function pathOf(pairs: Map<string, string>): string | null {
+  const path = pairs.get('d') ?? '';
+
+  return path.length > MAX_ENCODED_PATH || decodeCommands(path) === null ? null : path;
+}
+
+// The fill rule and stroke width; null when either is invalid.
+function strokeOf(pairs: Map<string, string>): Pick<ShapeSpec, 'rule' | 'sw'> | null {
+  const rule = pairs.get('rule');
+  const sw = decimal(pairs, 'sw');
+
+  if ((rule !== 'nonzero' && rule !== 'evenodd') || !strokeWidthOk(sw)) return null;
+
+  return { rule, sw: sw as number };
+}
+
 /** Parses a `shape:` URL back to its spec; null for any other string or an invalid, oversized or too costly spec. */
 export function parseShapeUrl(url: string): ShapeSpec | null {
   if (!url.startsWith(SCHEME) || url.length > MAX_ENCODED_PATH + 512) return null;
@@ -335,15 +352,12 @@ export function parseShapeUrl(url: string): ShapeSpec | null {
   const pairs = urlPairs(url, SCHEME);
   const size = sizeOf(pairs);
   const paint = paintOf(pairs);
-  const rule = pairs.get('rule');
-  const sw = decimal(pairs, 'sw');
-  const path = pairs.get('d') ?? '';
+  const stroke = strokeOf(pairs);
+  const path = pathOf(pairs);
 
-  if (!size || !paint || (rule !== 'nonzero' && rule !== 'evenodd')) return null;
+  if (!size || !paint || !stroke || path === null) return null;
 
-  if (!strokeWidthOk(sw) || path.length > MAX_ENCODED_PATH || decodeCommands(path) === null) return null;
-
-  const spec: ShapeSpec = { w: size[0], h: size[1], rule, ...paint, sw: sw as number, path };
+  const spec: ShapeSpec = { w: size[0], h: size[1], ...stroke, ...paint, path };
 
   return 'error' in outlineOf(spec) ? null : spec;
 }

@@ -55,29 +55,33 @@ const ARROW_TURNS: Record<'right' | 'left' | 'up' | 'down', Turn> = {
   down: (u, v) => [1 - v, u],
 };
 
-/** The box the shape is laid in: px, or fractions of the target; what is not placed is centred. */
-export function placementBox(
-  g: Pick<ShapeGraphic, 'x' | 'y' | 'width' | 'height'>,
-  frame: Frame,
-  target: Rect | null
-): Rect {
-  if (target) {
-    const w = (g.width ?? 1) * target.w;
-    const h = (g.height ?? g.width ?? 1) * target.h;
+type Placement = Pick<ShapeGraphic, 'x' | 'y' | 'width' | 'height'>;
 
-    return {
-      x: target.x + (g.x === undefined ? (target.w - w) / 2 : g.x * target.w),
-      y: target.y + (g.y === undefined ? (target.h - h) / 2 : g.y * target.h),
-      w,
-      h,
-    };
-  }
+// Fractions of the target; what is not placed is centred in it.
+function targetBox(g: Placement, target: Rect): Rect {
+  const w = (g.width ?? 1) * target.w;
+  const h = (g.height ?? g.width ?? 1) * target.h;
 
+  return {
+    x: target.x + (g.x === undefined ? (target.w - w) / 2 : g.x * target.w),
+    y: target.y + (g.y === undefined ? (target.h - h) / 2 : g.y * target.h),
+    w,
+    h,
+  };
+}
+
+// Px; what is not placed is centred in the frame.
+function frameBox(g: Placement, frame: Frame): Rect {
   const side = SHAPE_DEFAULTS.box * Math.min(frame.width, frame.height);
   const w = g.width ?? side;
   const h = g.height ?? g.width ?? side;
 
   return { x: g.x ?? (frame.width - w) / 2, y: g.y ?? (frame.height - h) / 2, w, h };
+}
+
+/** The box the shape is laid in: px, or fractions of the target; what is not placed is centred. */
+export function placementBox(g: Placement, frame: Frame, target: Rect | null): Rect {
+  return target ? targetBox(g, target) : frameBox(g, frame);
 }
 
 function closedPolyline(points: Pt[]): PathCommand[] {

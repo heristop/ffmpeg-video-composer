@@ -300,23 +300,24 @@ function kindsOf(pairs: Map<string, string>): Pick<TraceSpec, 'mode' | 'caps'> |
   return (mode === 'cover' || mode === 'code') && (caps === 'round' || caps === 'butt') ? { mode, caps } : null;
 }
 
+// The box and thickness, or null when one is missing or out of range.
+function boxOf(pairs: Map<string, string>): Pick<TraceSpec, 'x' | 'y' | 'w' | 'h' | 'thickness'> | null {
+  const [x, y, w, h, thickness] = ['x', 'y', 'w', 'h', 't'].map((key) => finite(pairs.get(key)));
+
+  if (x === null || y === null || !sized(w) || !sized(h) || thickness === null) return null;
+
+  return thickness > 0 && thickness <= MAX_THICKNESS ? { x, y, w, h, thickness } : null;
+}
+
 // The geometry fields (mode, box, thickness, caps, path), or null when one is missing or out of range.
 function coreOf(pairs: Map<string, string>): Omit<TraceSpec, 'dash' | 'color' | 'lo' | 'hi'> | null {
   const kinds = kindsOf(pairs);
+  const box = boxOf(pairs);
   const path = pairs.get('d') ?? '';
-  const [x, y, w, h, thickness] = ['x', 'y', 'w', 'h', 't'].map((key) => finite(pairs.get(key)));
-  const placed =
-    x !== null &&
-    y !== null &&
-    sized(w) &&
-    sized(h) &&
-    thickness !== null &&
-    thickness > 0 &&
-    thickness <= MAX_THICKNESS;
 
-  if (!kinds || !placed || decodeCommands(path) === null) return null;
+  if (!kinds || !box || decodeCommands(path) === null) return null;
 
-  return { ...kinds, x, y, w, h, thickness, path };
+  return { ...kinds, ...box, path };
 }
 
 // The optional fields; null when one is present but invalid.

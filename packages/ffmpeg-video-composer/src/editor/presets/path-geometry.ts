@@ -175,6 +175,37 @@ export function flatten(commands: readonly PathCommand[]): Pt[][] {
   return flattenWithin(commands, Infinity) as Pt[][];
 }
 
+// How each command moves the pen.
+const PEN_MOVES: Record<string, (pen: Pen, c: number[]) => void> = {
+  M: (pen, c) => {
+    pen.moveTo({ x: c[0], y: c[1] });
+  },
+  L: (pen, c) => {
+    pen.lineTo([{ x: c[0], y: c[1] }]);
+  },
+  C: (pen, c) => {
+    pen.lineTo(cubic(pen.last(), c));
+  },
+  Q: (pen, c) => {
+    pen.lineTo(quadratic(pen.last(), c));
+  },
+  E: (pen, c) => {
+    pen.shape(ellipse(c));
+  },
+  W: (pen, c) => {
+    pen.shape(wave(c));
+  },
+  Z: (pen) => {
+    pen.close();
+  },
+};
+
+function applyCommand(pen: Pen, command: PathCommand): void {
+  const [kind, ...c] = command as [string, ...number[]];
+
+  PEN_MOVES[kind]?.(pen, c);
+}
+
 /** `flatten`, but null as soon as the polylines pass `maxPoints` points, so untrusted paths never grow past it. */
 export function flattenWithin(commands: readonly PathCommand[], maxPoints: number): Pt[][] | null {
   const pen = new Pen();
@@ -182,21 +213,7 @@ export function flattenWithin(commands: readonly PathCommand[], maxPoints: numbe
   for (const command of commands) {
     if (pen.count > maxPoints) return null;
 
-    const [kind, ...c] = command as [string, ...number[]];
-
-    if (kind === 'M') pen.moveTo({ x: c[0], y: c[1] });
-
-    if (kind === 'L') pen.lineTo([{ x: c[0], y: c[1] }]);
-
-    if (kind === 'C') pen.lineTo(cubic(pen.last(), c));
-
-    if (kind === 'Q') pen.lineTo(quadratic(pen.last(), c));
-
-    if (kind === 'E') pen.shape(ellipse(c));
-
-    if (kind === 'W') pen.shape(wave(c));
-
-    if (kind === 'Z') pen.close();
+    applyCommand(pen, command);
   }
 
   pen.flush();

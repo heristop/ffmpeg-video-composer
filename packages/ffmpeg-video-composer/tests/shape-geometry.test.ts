@@ -75,10 +75,14 @@ describe('presetCommands', () => {
   it('fits the heart in the centred square of the box', () => {
     const bounds = shapeBounds(presetCommands({ type: 'heart' }, { x: 0, y: 0, w: 300, h: 200 }, 0), 0);
 
-    expect(bounds?.x).toBeCloseTo(50, 6);
-    expect(bounds?.y).toBeCloseTo(0, 6);
-    expect(bounds?.w).toBeCloseTo(200, 6);
-    expect(bounds?.h).toBeCloseTo(200, 6);
+    expect(bounds).toEqual(expect.objectContaining({ x: expect.any(Number), w: expect.any(Number) }));
+
+    const { x, y, w, h } = bounds as { x: number; y: number; w: number; h: number };
+
+    expect(x).toBeCloseTo(50, 6);
+    expect(y).toBeCloseTo(0, 6);
+    expect(w).toBeCloseTo(200, 6);
+    expect(h).toBeCloseTo(200, 6);
   });
 
   it('points an arrow where asked, filling the box', () => {
