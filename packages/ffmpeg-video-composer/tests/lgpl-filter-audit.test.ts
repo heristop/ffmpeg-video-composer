@@ -534,4 +534,29 @@ describe('LGPL device filter audit: clip boxes, bands, iris shapes, zoom-through
       expect(ENGINE_EMITTED_FILTERS as readonly string[], name).toContain(name);
     }
   });
+
+  // KINETIC_BLUR_AUDIT: a motion-blurred kinetic block lowers to device filters only.
+  it('kinetic motion blur lowers to device-safe filters', () => {
+    const block = KineticBlockSchema.parse({ text: { en: 'Shine' }, preset: 'slide', motionBlur: true });
+    const lowered = kineticToFilters(block, {
+      width: 640,
+      height: 360,
+      fps: 25,
+      duration: 2,
+      seed: 1,
+      energy: 1,
+      text: 'Shine',
+      blur: { has: (filter) => DEVICE_FILTERS.has(filter), warn: () => undefined, prefix: 'kmb0_' },
+    });
+    const types = (filters: Filter[]): string[] =>
+      filters.flatMap((f) => (f.graph ? f.graph.flatMap((chain) => types(chain.filters)) : [f.type]));
+    const emitted = new Set(types(lowered));
+
+    expect(emitted).toContain('tmix');
+
+    for (const type of emitted) {
+      expect(DEVICE_FILTERS.has(type), `kinetic blur emits "${type}"`).toBe(true);
+      expect(ENGINE_EMITTED_FILTERS as readonly string[], type).toContain(type);
+    }
+  });
 });
