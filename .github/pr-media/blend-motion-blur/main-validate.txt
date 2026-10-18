@@ -1,0 +1,12 @@
+
+▌ LeClap
+▌ ffmpeg video composer
+✗ Template is invalid (4 problems)
+  › ✗ sections[0].inputs[1].options.blend — Unknown key "blend" in sections.0.inputs.1.options
+      → Remove "blend" (allowed keys: "fps", "position", "scale", "fit", "persistent", "loop", "loops", "duration", "start", "opacity", "rotation", "flip", … (+3 more)).
+  › ✗ sections[0].inputs[2].options.blend — Unknown key "blend" in sections.0.inputs.2.options
+      → Remove "blend" (allowed keys: "fps", "position", "scale", "fit", "persistent", "loop", "loops", "duration", "start", "opacity", "rotation", "flip", … (+3 more)).
+  › ✗ sections[1].inputs[0].options.motionBlur — Unknown key "motionBlur" in sections.1.inputs.0.options
+      → Remove "motionBlur" (allowed keys: "fps", "position", "scale", "fit", "persistent", "loop", "loops", "duration", "start", "opacity", "rotation", "flip", … (+3 more)).
+  › ✗ sections[1].kinetic[0].motionBlur — Unknown key "motionBlur" in sections.1.kinetic.0
+      → Remove "motionBlur" (allowed keys: "text", "preset", "unit", "order", "id", "delay", "stagger", "duration", "ease", "role", "distance", "direction", … (+19 more)).

@@ -1,0 +1,36 @@
+{
+  "ticket": "PR #133",
+  "summary": "Layers blend into the picture and moves smear like a real shutter",
+  "clipSeconds": 5.5,
+  "freeze": { "at": 1.4, "hold": 3 },
+  "intro": { "headline": "BLEND MODES AND MOTION BLUR" },
+  "outro": { "headline": "REVIEW THE SHUTTER SEAMS", "subtitle": "Late spans first, then blend plus blur memory" },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.mp4",
+      "trim": 0,
+      "highlight": { "x": 340, "y": 200, "w": 600, "h": 320 },
+      "callout": "Opaque, no mixing",
+      "chip": "Rejected, or flat and sharp",
+      "pane": {
+        "title": "Blend keys refused",
+        "desc": "Validation rejects blend and motionBlur. Stripped of them, the glow and bands sit opaque and every move is razor sharp."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.mp4",
+      "trim": 0,
+      "highlight": { "x": 340, "y": 200, "w": 600, "h": 320 },
+      "callout": "Multiply and screen mix",
+      "chip": "Mixed layers, shutter blur",
+      "pane": {
+        "title": "Layers mix, moves blur",
+        "desc": "Bands multiply into the card, the glow screens over them, and the whip and title smear at a 180 degree shutter."
+      }
+    }
+  ]
+}
