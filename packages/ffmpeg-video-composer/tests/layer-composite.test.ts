@@ -56,9 +56,15 @@ describe('layerComposite', () => {
       "[card_cl1]fps=30,trim=start=0.45:end=1.05,fps=240:round=down,settb=1/86400,setpts='STARTPTS+(floor(N/8)+mod(N,8)*0.0625)/30/TB'[card_lb0]"
     );
     expect(chains).toContain('[card_bg]split=2[card_cb0][card_cb1]');
+    expect(chains).toContain('[card_cb1]split=2[card_cp0][card_cq0]');
     expect(chains).toContain("[card_cb0][card_src]overlay=x='100+300*(t-0.5)':y='50':eof_action=pass[card_sharp]");
-    expect(chains).toContain("[card_bc0]tmix=frames=8,setpts='STARTPTS+floor(N/8)/30/TB',fps=30[card_bt0]");
-    expect(chains).toContain('[card_sharp][card_bt0]overlay=0:0:eof_action=pass[card_mg0]');
+    expect(chains).toContain(
+      "[card_bc0]tmix=frames=8,setpts='STARTPTS+floor(N/8)/30/TB',fps=30,setpts=PTS-STARTPTS[card_bq0]"
+    );
+    expect(chains).toContain('[card_pp0][card_bq0]concat=n=2:v=1:a=0[card_bt0]');
+    expect(chains).toContain(
+      "[card_sharp][card_bt0]overlay=0:0:eof_action=pass:enable='between(t,0.45,1.05)'[card_mg0]"
+    );
     expect(chains.at(-1)).toBe('[card_mg0]null[card]');
   });
 
@@ -188,5 +194,51 @@ describe('compositeLayer', () => {
     expect(compositeLayer(args)).toBe(false);
     expect(segment.mapsList).toEqual(['card_bg']);
     expect(segment.filtersMapList).toHaveLength(1);
+  });
+});
+
+describe('layerComposite late spans', () => {
+  const late = {
+    ...base,
+    legFilters: [],
+    overlay: "x='100+300*(t-18)':y='50':eof_action=pass",
+    motionBlur: { shutter: 180, samples: 8 },
+    animate: {
+      x: [
+        { t: 18, v: '+0' },
+        { t: 19, v: '+300' },
+      ],
+    },
+  } as LayerCompositeRequest;
+
+  // The closing overlay waits for the blurred branch's first frame. A branch that only starts at the span
+  // would make ffmpeg queue every earlier base frame: it must reach the overlay from t=0 and be gated.
+  it('lets the blurred branch reach the closing overlay from t=0, padded with the frames before the span', () => {
+    const chains = (layerComposite(late) as string).split(';');
+
+    expect(chains).toContain('[card_cb1]split=2[card_cp0][card_cq0]');
+    expect(chains).toContain('[card_cp0]trim=end=17.95,setpts=PTS-STARTPTS[card_pp0]');
+    expect(chains).toContain(
+      "[card_bc0]tmix=frames=8,setpts='STARTPTS+floor(N/8)/30/TB',fps=30,setpts=PTS-STARTPTS[card_bq0]"
+    );
+    expect(chains).toContain('[card_pp0][card_bq0]concat=n=2:v=1:a=0[card_bt0]');
+    expect(chains).toContain(
+      "[card_sharp][card_bt0]overlay=0:0:eof_action=pass:enable='between(t,17.95,19.05)'[card_mg0]"
+    );
+  });
+
+  it('adds no pad to a span that starts on the first frame', () => {
+    const graph = layerComposite({
+      ...late,
+      animate: {
+        x: [
+          { t: 0, v: '+0' },
+          { t: 1, v: '+300' },
+        ],
+      },
+    }) as string;
+
+    expect(graph).not.toContain('concat');
+    expect(graph).toContain("overlay=0:0:eof_action=pass:enable='between(t,0,1.05)'");
   });
 });

@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
-import { asFilter, blurHead, blurTail, planBlur } from '@/editor/presets/motion-blur';
+import { asFilter, blurGate, blurHead, blurPad, blurTail, planBlur } from '@/editor/presets/motion-blur';
 
 const W = 200;
 const H = 8;
@@ -151,5 +151,19 @@ describe('guards on numbers written into filter text', () => {
     expect(() => planBlur([{ first: 0, last: 3 }], { shutter: 180, samples: 99 }, 30, env)).toThrow();
     expect(() => planBlur([{ first: 0, last: 3 }], { shutter: 180, samples: 8 }, Number.NaN, env)).toThrow();
     expect(() => planBlur([{ first: -2, last: 3 }], { shutter: 180, samples: 8 }, 30, env)).not.toThrow();
+  });
+
+  it('pads the frames before a late span and gates the overlay to its edges', () => {
+    const clock = { fps: 30, samples: 8, shutter: 180 };
+
+    expect(blurPad({ first: 540, last: 570 }, clock)).toEqual(['trim=end=17.983333', 'setpts=PTS-STARTPTS']);
+    expect(blurGate({ first: 540, last: 570 }, clock)).toBe("enable='between(t,17.983333,19.016667)'");
+    expect(blurPad({ first: 0, last: 30 }, clock)).toEqual([]);
+    expect(blurGate({ first: 0, last: 30 }, clock)).toBe("enable='between(t,0,1.016667)'");
+  });
+
+  it('refuses an unsafe span or clock in the pad and the gate', () => {
+    expect(() => blurPad({ first: 1, last: Number.NaN }, { fps: 30, samples: 8, shutter: 180 })).toThrow();
+    expect(() => blurGate({ first: 1, last: 5 }, { fps: 30, samples: 8, shutter: '1;x' as never })).toThrow();
   });
 });

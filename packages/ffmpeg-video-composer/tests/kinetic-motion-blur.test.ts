@@ -33,7 +33,9 @@ describe('kinetic motion blur', () => {
     expect(warnings).toEqual([]);
     expect(graph[0]).toEqual({ filters: [{ type: 'split', value: '2' }], outputs: ['kmb0_s', 'kmb0_b0'] });
     expect(graph[1].filters).toEqual(sharp({ preset: 'slide' }));
-    expect(graph[2].filters.map((f) => f.type)).toEqual([
+    const draw = graph.find((chain) => chain.inputs?.[0] === 'kmb0_q0');
+
+    expect(draw?.filters.map((f) => f.type)).toEqual([
       'trim',
       'fps',
       'settb',
@@ -42,10 +44,13 @@ describe('kinetic motion blur', () => {
       'tmix',
       'setpts',
       'fps',
+      'setpts',
     ]);
     expect(graph.at(-1)).toEqual({
       inputs: ['kmb0_o', 'kmb0_t0'],
-      filters: [{ type: 'overlay', value: '0:0:eof_action=pass' }],
+      filters: [
+        { type: 'overlay', value: expect.stringMatching(/^0:0:eof_action=pass:enable='between\(t,[\d.]+,[\d.]+\)'$/) },
+      ],
     });
   });
 
@@ -68,5 +73,26 @@ describe('kinetic motion blur', () => {
     expect(tmix).toBeDefined();
     expect(Number(String(tmix?.value).replace('frames=', ''))).toBeLessThan(16);
     expect(warnings[0]).toMatch(/^\[motion_blur_capped\]/);
+  });
+
+  // The closing overlay waits for the blurred branch's first frame: an exit span late in the section would
+  // make ffmpeg queue every earlier base frame unless the branch is padded back to t=0 and the overlay gated.
+  it('pads a late exit span back to t=0 and gates the closing overlay to it', () => {
+    const { filters } = lowered(
+      { preset: 'slide', exit: { preset: 'slide', at: 8, duration: 0.8 }, motionBlur: { shutter: 180, samples: 4 } },
+      { duration: 10, fps: 30 }
+    );
+    const graph = filters[0].graph ?? [];
+    const last = graph.length - 1;
+    const concat = graph.filter((chain) => chain.filters.some((f) => f.type === 'concat'));
+    const over = graph[last].filters[0];
+
+    expect(concat.length).toBeGreaterThan(0);
+    for (const chain of concat) {
+      expect(chain.filters).toEqual([{ type: 'concat', value: 'n=2:v=1:a=0' }]);
+      expect(chain.inputs).toHaveLength(2);
+    }
+    expect(over.type).toBe('overlay');
+    expect(String(over.value)).toMatch(/^0:0:eof_action=pass:enable='between\(t,[\d.]+,[\d.]+\)'$/);
   });
 });

@@ -12,7 +12,7 @@ import type { LayerAnimate } from '../../schemas/layer-animate.schemas';
 import { resolveMotionBlur, type BlendMode, type ResolvedMotionBlur } from '../../schemas/layer-composite.schemas';
 import { assertSafePadLabel } from '../utils/filter-option-guard';
 import { BLEND_FILTER_MODES, BLEND_UNAVAILABLE_WARNING, blendOver } from './layer-blend';
-import { blurHead, blurTail, planBlur, type BlurPlan } from './motion-blur';
+import { blurGate, blurHead, blurPad, blurRebase, blurTail, planBlur, type BlurPlan } from './motion-blur';
 import { layerSpans } from './motion-spans';
 
 export interface LayerCompositeRequest {
@@ -78,22 +78,53 @@ function legChains(request: LayerCompositeRequest, blur: BlurPlan | null): strin
   ];
 }
 
+// The base copy of span k, ahead of its blurred branch: split off the frames before the span when it starts
+// late (see blurPad), joined back in front of the averaged frames.
+function spanLead(request: LayerCompositeRequest, blur: BlurPlan, k: number): { pre: string[]; head: string } {
+  const p = request.name;
+  const pad = blurPad(blur.spans[k], blur.shutter);
+
+  if (pad.length === 0) return { pre: [], head: `${p}_cb${k + 1}` };
+
+  return {
+    pre: [`[${p}_cb${k + 1}]split=2[${p}_cp${k}][${p}_cq${k}]`, `[${p}_cp${k}]${pad.join(',')}[${p}_pp${k}]`],
+    head: `${p}_cq${k}`,
+  };
+}
+
+function spanTail(request: LayerCompositeRequest, blur: BlurPlan, k: number, padded: boolean): string[] {
+  const p = request.name;
+  const tail = blurTail(blur.shutter);
+
+  if (!padded) return [`[${p}_bc${k}]${tail.join(',')}[${p}_bt${k}]`];
+
+  return [
+    `[${p}_bc${k}]${[...tail, blurRebase].join(',')}[${p}_bq${k}]`,
+    `[${p}_pp${k}][${p}_bq${k}]concat=n=2:v=1:a=0[${p}_bt${k}]`,
+  ];
+}
+
 function blurChains(request: LayerCompositeRequest, blur: BlurPlan, mode: BlendMode): string[] {
   const p = request.name;
 
-  return blur.spans.flatMap((span, k) => [
-    `[${p}_cb${k + 1}]${blurHead(span, blur.shutter).join(',')}[${p}_bh${k}]`,
-    ...blendOver({
-      base: `${p}_bh${k}`,
-      leg: `${p}_lb${k}`,
-      overlay: request.overlay,
-      mode,
-      prefix: `${p}_m${k}`,
-      out: `${p}_bc${k}`,
-    }),
-    `[${p}_bc${k}]${blurTail(blur.shutter).join(',')}[${p}_bt${k}]`,
-    `[${k === 0 ? `${p}_sharp` : `${p}_mg${k - 1}`}][${p}_bt${k}]overlay=0:0:eof_action=pass[${p}_mg${k}]`,
-  ]);
+  return blur.spans.flatMap((span, k) => {
+    const lead = spanLead(request, blur, k);
+
+    return [
+      ...lead.pre,
+      `[${lead.head}]${blurHead(span, blur.shutter).join(',')}[${p}_bh${k}]`,
+      ...blendOver({
+        base: `${p}_bh${k}`,
+        leg: `${p}_lb${k}`,
+        overlay: request.overlay,
+        mode,
+        prefix: `${p}_m${k}`,
+        out: `${p}_bc${k}`,
+      }),
+      ...spanTail(request, blur, k, lead.pre.length > 0),
+      `[${k === 0 ? `${p}_sharp` : `${p}_mg${k - 1}`}][${p}_bt${k}]overlay=0:0:eof_action=pass:${blurGate(span, blur.shutter)}[${p}_mg${k}]`,
+    ];
+  });
 }
 
 function sharpChains(request: LayerCompositeRequest, count: number, mode: BlendMode): string[] {

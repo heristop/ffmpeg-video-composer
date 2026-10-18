@@ -513,7 +513,7 @@ describe('LGPL device filter audit: clip boxes, bands, iris shapes, zoom-through
           motionBlur,
           animate: {
             x: [
-              { t: 0, v: 0 },
+              { t: 0.5, v: 0 },
               { t: 1, v: 100 },
             ],
           },
@@ -528,6 +528,8 @@ describe('LGPL device filter audit: clip boxes, bands, iris shapes, zoom-through
 
     expect(emitted).toContain('blend');
     expect(emitted).toContain('tmix');
+    // The late span's lead-in pad: trim + concat, both already built into the engine.
+    expect(emitted).toContain('concat');
 
     for (const name of emitted) {
       expect(DEVICE_FILTERS.has(name), `layer composite emits "${name}"`).toBe(true);
@@ -553,6 +555,7 @@ describe('LGPL device filter audit: clip boxes, bands, iris shapes, zoom-through
     const emitted = new Set(types(lowered));
 
     expect(emitted).toContain('tmix');
+    expect(emitted).toContain('concat');
 
     for (const type of emitted) {
       expect(DEVICE_FILTERS.has(type), `kinetic blur emits "${type}"`).toBe(true);

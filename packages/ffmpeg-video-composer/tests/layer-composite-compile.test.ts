@@ -98,8 +98,11 @@ describe('layer composite filtergraph', () => {
       expect(graph).toContain('blend=c0_mode=screen');
       expect(graph).toContain('settb=1/86400');
       expect(graph).toContain('trim=start=0.45:end=1.05');
-      expect(graph).toContain("tmix=frames=8,setpts='STARTPTS+floor(N/8)/30/TB',fps=30[whip_bt0]");
-      expect(graph).toContain('[whip_sharp][whip_bt0]overlay=0:0:eof_action=pass[whip_mg0]');
+      expect(graph).toContain("tmix=frames=8,setpts='STARTPTS+floor(N/8)/30/TB',fps=30,setpts=PTS-STARTPTS[whip_bq0]");
+      expect(graph).toContain('[whip_pp0][whip_bq0]concat=n=2:v=1:a=0[whip_bt0]');
+      expect(graph).toContain(
+        "[whip_sharp][whip_bt0]overlay=0:0:eof_action=pass:enable='between(t,0.45,1.05)'[whip_mg0]"
+      );
       await expect(graph).toMatchFileSnapshot(`__goldens__/layer-composite/${profile}.txt`);
     }, 120000);
   }

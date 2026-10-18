@@ -135,6 +135,61 @@ describe('layer blend and motion blur real render', () => {
   }, 180000);
 });
 
+describe('motion blur on a span at the end of its section', () => {
+  // A span that starts late used to make ffmpeg queue every earlier base frame (the closing overlay waits for
+  // the blurred branch): the branch is now padded back to t=0 and the overlay gated, and the picture around
+  // the span must be unchanged.
+  const lateDescriptor = {
+    global: { orientation: 'landscape', fps: 30, musicEnabled: false },
+    sections: [
+      {
+        name: 'stage',
+        type: 'color_background',
+        options: { backgroundColor: '#404040', duration: 3 },
+        inputs: [
+          {
+            name: 'box',
+            type: 'html',
+            html: '<div class="b"></div>',
+            css: '.b { width: 40px; height: 40px; background: #FFFFFF; }',
+            width: 40,
+            height: 40,
+            options: {
+              position: '100:240',
+              motionBlur: { shutter: 180, samples: 8 },
+              animate: {
+                x: [
+                  { t: 2.4, v: '+0' },
+                  { t: 2.9, v: '+300' },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  } as unknown as TemplateDescriptor;
+
+  it('renders the late span blurred and everything else sharp', async () => {
+    const dir = path.join(buildDir, 'late');
+    const output = (await compile(configFor(dir), lateDescriptor)) as string;
+
+    expect(output).not.toBeNull();
+
+    const before = boxRow(output, 30);
+    const moving = boxRow(output, 77);
+    const after = boxRow(output, 89);
+
+    expect(before.last - before.first + 1).toBeGreaterThanOrEqual(39);
+    expect(before.last - before.first + 1).toBeLessThanOrEqual(41);
+    expect(before.partial).toBeLessThanOrEqual(4);
+    expect(moving.last - moving.first + 1).toBeGreaterThanOrEqual(46);
+    expect(moving.partial).toBeGreaterThanOrEqual(8);
+    expect(Math.abs((after.first + after.last) / 2 - 420)).toBeLessThanOrEqual(2);
+    expect(after.partial).toBeLessThanOrEqual(4);
+  }, 180000);
+});
+
 describe('motion blur over a video base at another frame rate', () => {
   const rates = [
     { source: 25, section: 30 },

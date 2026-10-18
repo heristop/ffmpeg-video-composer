@@ -102,6 +102,37 @@ export function blurHead(range: Span, clock: Shutter): string[] {
   ];
 }
 
+function spanEdges(range: Span, clock: Shutter): { from: number; to: number } {
+  const { fps } = checkedShutter(clock);
+  const span = checkedSpan(range);
+
+  return { from: Math.max(0, (span.first - 0.5) / fps), to: (span.last + 0.5) / fps };
+}
+
+/** Restarts a branch at t=0 so it can follow the pad in a concat. */
+export const blurRebase = 'setpts=PTS-STARTPTS';
+
+/**
+ * The frames before a span, on their own branch of the same base copy. The closing overlay needs a frame from
+ * the blurred branch before it emits anything, and until it gets one ffmpeg queues every base frame: a span
+ * late in the section would hold them all. Concatenating these in front (see blurRebase) lets the overlay
+ * advance with the base from t=0. Empty for a span that starts on the first frame.
+ */
+export function blurPad(range: Span, clock: Shutter): string[] {
+  const { from } = spanEdges(range, clock);
+
+  if (from === 0) return [];
+
+  return [`trim=end=${fmt(from)}`, blurRebase];
+}
+
+/** The overlay option that lets the blurred frames replace the sharp ones over the span only. */
+export function blurGate(range: Span, clock: Shutter): string {
+  const { from, to } = spanEdges(range, clock);
+
+  return `enable='between(t,${fmt(from)},${fmt(to)})'`;
+}
+
 /** The tail: average each frame's samples and land the full average back on the frame grid. */
 export function blurTail(clock: Shutter): string[] {
   const { fps, samples } = checkedShutter(clock);
