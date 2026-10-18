@@ -5,11 +5,13 @@
 //   build can't reorder right-to-left lines (no libfribidi) or can't draw kinetic fills (no alphamerge);
 // - caption_html_unavailable (only when the caller says the host has no HTML rasteriser): subtitles asking
 //   for the html renderer are drawn with drawbox there.
+// Blend/motion-blur advisories (composite-lint.ts) are appended here too.
 // Render-free and never errors, like the pacing lint.
 
 import { expandPartialsSafe } from '@/core/partials';
 import { hasRtl, textValues } from '@/core/text-scripts';
 import { coarsenedForScript } from '@/core/kinetic/resolve';
+import { collectCompositeWarnings } from './composite-lint';
 import type { KineticBlock } from '../schemas/kinetic.schemas';
 import type { MotionWarning } from './motion-lint';
 
@@ -21,6 +23,10 @@ export interface ScriptLintCapabilities {
   masks: boolean;
   /** An HTML rasteriser on the host (HTML layers, subtitles.renderer "html"). Unset = assumed present. */
   htmlLayers?: boolean;
+  /** blend (layer blend modes); unknown when omitted. */
+  blend?: boolean;
+  /** tmix (motion blur); unknown when omitted. */
+  tmix?: boolean;
 }
 
 interface BlockSite {
@@ -111,5 +117,6 @@ export function collectScriptWarnings(template: unknown, caps?: ScriptLintCapabi
       ...(caps ? capabilityWarnings(site, caps) : []),
     ]),
     ...htmlCaptionWarnings(expansion.data, caps),
+    ...collectCompositeWarnings(expansion.data, caps),
   ];
 }

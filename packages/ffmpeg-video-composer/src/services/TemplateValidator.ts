@@ -159,7 +159,9 @@ export class TemplateValidator extends BaseTemplateValidator {
   // that shows pacing feedback shows them. Per format when the template declares several, plus the
   // whole-template format advisories (format_crop_only, format_story_diverges: core/formats/advisories.ts).
   // Script/mask advisories ride along too (services/script-lint.ts); pass the target build's
-  // capabilities to also hear what it can't draw (rtl_unshaped, mask_unavailable).
+  // capabilities to also hear what it can't draw (rtl_unshaped, mask_unavailable). Blend/motion-blur advisories ride
+  // along through it (services/composite-lint.ts): motion_blur_static, motion_blur_ignored, and with capabilities
+  // blend_unavailable, motion_blur_unavailable.
   getMotionWarnings(authored: unknown, capabilities?: ScriptLintCapabilities): MotionWarning[] {
     const template = withFieldDefaults(authored);
     const perFormat = adviseEachFormatSync(template, (resolved) => [
