@@ -21,7 +21,8 @@ export const motionWarningsSchema = z
       'starts_at_zero, transition_monotony, exit_before_transition, dead_air, tempo_flat), the theme accent ' +
       'advisory (accent_overuse), the sameness lint (fx_untuned, effect_repeated, library_animation_sample, ' +
       'effect_off_theme, decor_overload: stock motion to recompose with the engine), blend and motion blur ' +
-      'advisories (motion_blur_static, motion_blur_ignored, blend_unavailable, motion_blur_unavailable), a partial ref squeezed under ' +
+      'advisories (motion_blur_static, motion_blur_ignored; blend_unavailable and motion_blur_unavailable are ' +
+      'render-time fallbacks, not reported here), a partial ref squeezed under ' +
       'its fixed intro/outro (partial_compressed), the typed field contract (field_undefined, field_unused, ' +
       'field_type_mismatch, field_missing_required) and assertions that ' +
       'could not be checked render-free (assertion_skipped), each with a hint — present only when there is ' +
