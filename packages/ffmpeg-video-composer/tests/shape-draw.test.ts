@@ -156,3 +156,41 @@ describe('lowerShape', () => {
     }
   });
 });
+
+describe('lowerShape with values that skipped validation', () => {
+  const lower = (graphic: Record<string, unknown>) => () =>
+    lowerShape(request({ preset: { type: 'star' }, ...graphic }));
+
+  it('refuses a track value that would chain a filter', () => {
+    expect(lower({ animate: { x: [{ v: "1',movie=/etc/passwd,'" }, { t: 1, v: 2 }] } })).toThrow();
+    expect(lower({ animate: { rotate: [{ v: 0 }, { t: 1, v: 'sin(t);movie=x' }] } })).toThrow();
+  });
+
+  it('never writes a hostile colour into the image spec or a filter', () => {
+    const inputs = new Map<string, string>();
+    const warnings: string[] = [];
+    const filters = lowerShape(
+      request(
+        { preset: { type: 'star' }, color: "red,movie=/etc/passwd'", stroke: { width: 2, color: 'blue;x=1' } },
+        { inputs, warnings }
+      )
+    );
+
+    expect(inputs.get('sh0_fill')).not.toMatch(/movie|[;']/);
+    expect(JSON.stringify(filters)).not.toMatch(/movie|passwd/);
+    expect(warnings.some((w) => w.startsWith('[shape_color]'))).toBe(true);
+  });
+
+  it('reduces a drawn-on outline colour to parsed hex, so a hostile one never reaches a trace input', () => {
+    const inputs = new Map<string, string>();
+    const filters = lowerShape(
+      request({ preset: { type: 'star' }, stroke: { draw: true, width: 2, color: "red',movie=x" } }, { inputs })
+    );
+
+    expect(JSON.stringify([filters, [...inputs.values()]])).not.toMatch(/movie|[;']x/);
+  });
+
+  it('keeps a non-numeric box or fade out of filter text', () => {
+    expect(lower({ x: "1',movie=x", duration: Number.NaN })).not.toThrow();
+  });
+});
