@@ -4,7 +4,7 @@
 import { artDirection, COMPOSE_MOTION, LAZY_DEFAULTS, STORY_SPINE } from './art-direction';
 import type { EngineCatalog } from './engine-catalog';
 import { PLAN_CONCEPTS, PLAN_MAX_BEATS, type PlanVocabulary } from './plan';
-import { referenceBlock, type GenerationHints } from './system-prompt';
+import { brandBlock, referenceBlock, type GenerationHints } from './system-prompt';
 
 const PLAN_CONTRACT = [
   'You are the creative director planning a LeClap video template. Do not write the template yet.',
@@ -57,7 +57,12 @@ function vocabularyBlock(catalog: EngineCatalog, genre: string | undefined): str
   ].join('\n');
 }
 
-export function buildPlanPrompt(catalog: EngineCatalog, hints: GenerationHints, referenceStyle?: string): string {
+export function buildPlanPrompt(
+  catalog: EngineCatalog,
+  hints: GenerationHints,
+  referenceStyle?: string,
+  brand?: string
+): string {
   return [
     PLAN_CONTRACT,
     artDirection(hints),
@@ -66,7 +71,9 @@ export function buildPlanPrompt(catalog: EngineCatalog, hints: GenerationHints, 
     LAZY_DEFAULTS,
     `Vocabulary:\n${vocabularyBlock(catalog, hints.genre)}`,
     // An attached reference fixes the theme: the plan's "theme" stays "none" and its pacing follows it.
-    ...referenceBlock(referenceStyle),
+    // A brand kit fixes the theme the same way, and wins on colours and fonts when both are attached.
+    ...referenceBlock(referenceStyle, brand),
+    ...brandBlock(brand, referenceStyle),
   ].join('\n\n');
 }
 

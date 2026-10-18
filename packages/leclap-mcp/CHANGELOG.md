@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   rules, from at most 480 sampled frames.
 - `--allow-raw-filters` / `LECLAP_MCP_ALLOW_RAW_FILTERS` (off by default) trusts a template's raw filters for
   trusted local use; `get_capabilities` reports which mode the server runs in, and the template guide says so.
+- `extract_brand` (behind `--allow-network` / `LECLAP_MCP_ALLOW_NETWORK`): a website's brand kit as a theme and binding rules, saved under the media dir.
 
 ### Changed
 

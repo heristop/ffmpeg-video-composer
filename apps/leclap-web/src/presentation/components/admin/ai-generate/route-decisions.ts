@@ -92,3 +92,19 @@ export function withoutThemeHint(hints: GenerationHints, referenceStyle: string 
 
   return rest;
 }
+
+// The binding rules a run carries: a reference's style guide and an imported brand kit, each only when set.
+export function bindingArgs(
+  referenceStyle: string | null,
+  brand: { rules: string } | null
+): { referenceStyle?: string; brand?: string } {
+  return {
+    ...(referenceStyle ? { referenceStyle } : {}),
+    ...(brand ? { brand: brand.rules } : {}),
+  };
+}
+
+// Either one fixes the theme, so the routed theme hint is dropped when one is attached.
+export function themeOwner(referenceStyle: string | null, brand: { rules: string } | null): string | null {
+  return referenceStyle ?? brand?.rules ?? null;
+}

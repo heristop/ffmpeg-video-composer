@@ -1,0 +1,42 @@
+{
+  "_note": "Captures from record.mjs (Generate with AI, 1024x768, dark). trim is a start offset: both runs open on the dialog's optional group; the after side imports the Stripe brand-kit.json at second 2.2; the freeze holds at 4.5.",
+  "ticket": "brand-kit",
+  "summary": "Generate with AI imports a brand kit: your colours, fonts and name",
+  "clipSeconds": 6,
+  "freeze": { "at": 4.5, "hold": 4 },
+  "intro": {
+    "headline": "BRING YOUR BRAND"
+  },
+  "outro": {
+    "headline": "REVIEW THE BRAND IMPORT",
+    "subtitle": "Your brand, then the themed render"
+  },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.webm",
+      "trim": 5.8,
+      "highlight": { "x": 548, "y": 230, "w": 447, "h": 110 },
+      "callout": "No brand to import",
+      "chip": "No way to bring a brand",
+      "pane": {
+        "title": "No brand section",
+        "desc": "The dialog offers a reference clip and a provider. A brand has to be typed into the brief."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.webm",
+      "trim": 8.8,
+      "highlight": { "x": 548, "y": 208, "w": 447, "h": 160 },
+      "callout": "Brand: Stripe",
+      "chip": "Import a brand-kit.json",
+      "pane": {
+        "title": "Your brand, imported",
+        "desc": "The kit from leclap brand https://stripe.com attaches its colours, fonts and name."
+      }
+    }
+  ]
+}

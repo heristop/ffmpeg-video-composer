@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `leclap render --allow-raw-filters` and `leclap verify --rerender --allow-raw-filters` trust a template's
   raw filters (trusted local templates only). Without it, raw filters are allow-listed by the engine and a
   template that uses a filter outside the list fails with `filter_not_allowed`.
+- `leclap brand <url>` writes a brand kit, a theme and binding rules.
 
 ### Fixed
 

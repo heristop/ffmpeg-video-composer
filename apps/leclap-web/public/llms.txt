@@ -67,7 +67,7 @@ Add the MCP server to any MCP-capable client:
 { "mcpServers": { "leclap": { "command": "npx", "args": ["-y", "@leclap/mcp"] } } }
 ```
 
-Fifteen tools are always registered: `get_samples`, `get_template_schema`, `get_motion_catalog`, `validate_template`, `edit_template`, `compose_video`, `render_frames`, `probe_media`, `extract_style`, `extract_structure`, `analyze_music`, `analyze_sound`, `transcribe_media`, `get_capabilities`, `open_in_builder`. Opting into Remotion adds `get_effect_schema`, `render_preview` and `render_remotion_clip`. No LLM sits in the output path: the agent authors JSON and the engine renders it.
+Fifteen tools are always registered: `get_samples`, `get_template_schema`, `get_motion_catalog`, `validate_template`, `edit_template`, `compose_video`, `render_frames`, `probe_media`, `extract_style`, `extract_structure`, `analyze_music`, `analyze_sound`, `transcribe_media`, `get_capabilities`, `open_in_builder`. Opting into Remotion adds `get_effect_schema`, `render_preview` and `render_remotion_clip`; `--allow-network` adds `extract_brand`. No LLM sits in the output path: the agent authors JSON and the engine renders it.
 
 `validate_template` also returns the resolved descriptor for given fields (`include: ["resolved"]`) and the whole-video timeline (`include: ["timeline"]`); `edit_template` takes JSON Patch `operations` and registered `effectProps`.
 
@@ -89,6 +89,7 @@ For PR or MR evidence: collect a real walkthrough and review focus, author the t
 | `--media-dir` | `LECLAP_MCP_MEDIA_DIR` | `~/.leclap/media` |
 | `--fonts-dir` | `LECLAP_MCP_FONTS_DIR` | Unset; `global.fonts` read from the media dir |
 | `--render-timeout-ms` | `LECLAP_MCP_RENDER_TIMEOUT_MS` | `600000` ms |
+| `--allow-network` | `LECLAP_MCP_ALLOW_NETWORK` | Off |
 | `--allow-remotion` | `LECLAP_MCP_ALLOW_REMOTION` | Off |
 | `--remotion-entry` | `LECLAP_MCP_REMOTION_ENTRY` | Unset |
 | `--remotion-browser` | `LECLAP_MCP_REMOTION_BROWSER` | Remotion-managed browser |

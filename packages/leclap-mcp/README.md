@@ -25,6 +25,7 @@ video models, which sample rather than render.
 | `probe_media`          | Inspect a local media file → codecs, duration, sample rate, size, and HDR / colour / bit depth / VFR / rotation traits                                                                                                                                                                                             |
 | `extract_style`        | Reference image/clip under the media dir → `{ theme, styleGuide, confidence }`: palette roles + WCAG contrast, grain, pacing (palette and pacing only)                                                                                                                                                             |
 | `extract_structure`    | A reference clip's format (shots, rhythm, transitions, grounds, layout) as binding rules for a template. Format only; samples every 0.25 s for up to 2 minutes.                                                                                                                                                    |
+| `extract_brand`        | A website's brand kit (name, colours, fonts, logo) as a theme and binding rules, saved under `<media-dir>/brand-kits/<host>/`. Needs `--allow-network`.                                                                                                                                                            |
 | `analyze_music`        | Measure a local music file → `{ bpm, offset, beatsPerBar, confidence, usable, cues, globalBeats }` for `global.beats` and `cue:drop`                                                                                                                                                                               |
 | `analyze_sound`        | Render an `sfx[].sound` (composed, or a preset with variations) → length, peak/RMS dBFS, centroid, high/low energy shares, attack, advisories + spectrogram and waveform PNGs                                                                                                                                      |
 | `transcribe_media`     | Transcribe a local audio/video file's speech with whisper.cpp, locally → `{ words, srt, language, confidence, advice }` to pin into `subtitles.words`                                                                                                                                                              |
@@ -176,12 +177,17 @@ keep working — the stdio entry serves both eras from the same tool definitions
 | Template fonts dir            | `--fonts-dir`              | `LECLAP_MCP_FONTS_DIR`              | Unset; `global.fonts` read from the media dir     |
 | Remotion opt-in               | `--allow-remotion`         | `LECLAP_MCP_ALLOW_REMOTION`         | Off                                               |
 | Raw filters opt-in            | `--allow-raw-filters`      | `LECLAP_MCP_ALLOW_RAW_FILTERS`      | Off; raw `filters` are allow-listed               |
+| Network opt-in                | `--allow-network`          | `LECLAP_MCP_ALLOW_NETWORK`          | Off                                               |
 | Stage/worker timeout          | `--render-timeout-ms`      | `LECLAP_MCP_RENDER_TIMEOUT_MS`      | `600000` ms (10 min)                              |
 | Trusted Remotion entry        | `--remotion-entry`         | `LECLAP_MCP_REMOTION_ENTRY`         | Unset                                             |
 | Chrome executable             | `--remotion-browser`       | `LECLAP_MCP_REMOTION_BROWSER`       | Unset; Remotion manages its browser               |
 | Operator effect catalog       | `--effect-catalog`         | `LECLAP_MCP_EFFECT_CATALOG`         | Unset; builtin contracts only                     |
 | Effect cache bytes            | `--effect-cache-max-bytes` | `LECLAP_MCP_EFFECT_CACHE_MAX_BYTES` | `536870912` (512 MiB); `0` disables caching       |
 | Catalog gap log               | `--catalog-gap-log`        | `LECLAP_MCP_CATALOG_GAP_LOG`        | `catalog-gaps.jsonl`, always under the output dir |
+
+`--allow-network` lets `extract_brand` fetch websites over HTTPS from public hosts only (private, loopback and
+link-local addresses, credentials in the URL and non-HTTPS redirects are refused; size and time are capped). Off
+by default, and the tool is not registered without it.
 
 The fonts dir is read-only: a template's `global.fonts[].src` resolves there first, then in the media
 dir, and nowhere else (realpath-checked, so a traversal or a symlink out is refused); fonts are never
@@ -225,7 +231,7 @@ and four layout recipes under `html`.
 Fifteen tools are always registered: `get_samples`, `get_template_schema`, `get_motion_catalog`,
 `validate_template`, `edit_template`, `compose_video`, `render_frames`, `probe_media`, `extract_style`,
 `extract_structure`, `analyze_music`, `analyze_sound`, `transcribe_media`, `get_capabilities` and `open_in_builder`. Opt-in adds
-`get_effect_schema`, `render_preview` and `render_remotion_clip`. Effect-prop edits do not bypass
+`get_effect_schema`, `render_preview` and `render_remotion_clip`; `--allow-network` adds `extract_brand`. Effect-prop edits do not bypass
 effect-backend validation. Every tool's name and description is sent to the agent on each turn, so the
 surface stays small: 0.5.0 folded `patch_template` into `edit_template`, `list_samples` and `get_sample`
 into `get_samples`, and dropped `ping` (MCP has a protocol ping); see the [CHANGELOG](./CHANGELOG.md)

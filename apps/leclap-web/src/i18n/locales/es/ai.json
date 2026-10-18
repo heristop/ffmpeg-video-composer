@@ -192,5 +192,14 @@
     "detach": "Quitar guía de estilo",
     "summaryNone": "Opcional",
     "summaryAttached": "Adjunta"
+  },
+  "brand": {
+    "label": "Tu marca",
+    "hint": "Importa un brand-kit.json de `leclap brand <tu web>`: el vídeo usa tus colores, fuentes y nombre. Añade tu logo con la subida de marca de agua.",
+    "attached": "Marca: {{name}}",
+    "detach": "Quitar la marca",
+    "summaryNone": "Opcional",
+    "summaryAttached": "Adjunta",
+    "tooLarge": "Este archivo es demasiado grande para ser un brand-kit.json."
   }
 }

@@ -90,6 +90,7 @@ reached from the browser, generation still works without it.
 - Keys are never sent to LeClap, never put in a URL and never logged.
 - **Forget key** removes one provider's key; **Forget all keys** removes every key.
 - Usage is billed to your provider account.
+- The builder never fetches a website. A brand kit is a file you make with the CLI (or your agent with the MCP server) and import under **Your brand**; nothing about it is sent anywhere but to the AI provider you chose, inside the prompt.
 
 ## Or drive the builder from your browser agent
 

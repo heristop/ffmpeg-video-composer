@@ -8,7 +8,7 @@ export interface McpToolDoc {
   args: string;
   purpose: string;
   when: string;
-  /** Registered only behind `--allow-remotion`; rendered with an opt-in marker. */
+  /** Registered only behind an opt-in flag (`--allow-remotion`, `--allow-network`); rendered with an opt-in marker. */
   optIn?: boolean;
 }
 
@@ -176,6 +176,14 @@ export const mcpDoc: McpDoc = {
       when: 'Use to hand a validated template to a person. baseUrl targets a locale (https://leclap.dev/fr) or a local dev server.',
     },
     {
+      name: 'extract_brand',
+      args: 'url',
+      purpose:
+        'Reads a website (https only) into a brand kit: its name, colours with roles and WCAG contrast, fonts mapped to bundled ids with the exact families as font objects, and the logo, saved under the media dir. Returns a global.theme and binding rules.',
+      when: 'Use when the video is for a brand with a website: set the returned theme, write the name exactly, show the logo unaltered. It fetches over HTTPS from public hosts only, with size and time caps, so the operator must start the server with --allow-network.',
+      optIn: true,
+    },
+    {
       name: 'render_remotion_clip',
       args: 'compositionId, entry?, serveUrl?, inputProps?, outputName?',
       purpose:
@@ -207,6 +215,14 @@ export const mcpDoc: McpDoc = {
       fallback: 'Unset; the media dir only',
       detail:
         "A read-only directory a template's global.fonts files resolve in, before the media dir. Nothing outside the two is read, and fonts are never fetched.",
+    },
+    {
+      label: 'Network opt-in',
+      flag: '--allow-network',
+      env: 'LECLAP_MCP_ALLOW_NETWORK',
+      fallback: 'off',
+      detail:
+        'Registers extract_brand, which fetches a website over HTTPS from public hosts only (private, loopback and link-local addresses are refused on every redirect), with size and time caps.',
     },
     {
       label: 'Remotion opt-in',

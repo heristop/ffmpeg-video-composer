@@ -29,6 +29,7 @@ leclap samples export <id> # raw descriptor JSON to stdout (or --output <new-fil
 leclap verify <manifest>  # check a video against its render manifest (--rerender to re-render and compare)
 leclap style <reference>  # derive a theme + style guide from an image or clip (--json, --out style-guide.md)
 leclap reference <clip>   # a reference clip's format (shots, rhythm, layout) as binding rules (--json, --out, --check)
+leclap brand <url>        # read a website's brand (name, colours, fonts, logo) into brand-kit.json, a global.theme and binding rules for an agent or the builder (-o brand-kit, --json); HTTPS and public hosts only
 leclap beats <audio>      # tempo, beat grid, confidence and drop/build cues for global.beats (--json)
 leclap transcribe <t|media> # speech → word-timed captions with whisper.cpp, pinned into the template (--srt, --json)
 leclap snapshot <template> # render and save still frames (PNG) of chosen moments, contact sheets
@@ -206,6 +207,25 @@ leclap snapshot template.json --format portrait       # one format of a template
 caption block or the action buttons is obvious. `--cache <dir>` names the section cache (default: a
 shared temp directory); `--json` prints every frame's path, time, section and size. Frames land in
 `./frames` unless `--out` says otherwise.
+
+## `brand` — read a website's brand
+
+```bash
+leclap brand https://example.com                 # summary; writes ./brand-kit/
+leclap brand https://example.com -o acme --json  # the kit, theme, font refs and any logoError as JSON
+```
+
+Writes `brand-kit.json`, `brand.theme.json` (`{ global: { theme } }`), `brand-rules.txt` (binding rules for an
+agent) and, when it can be downloaded, `logo.<png|svg|jpg|webp|ico>` (the extension follows the image type the
+site returns). A logo that is missing, not an image or over 2 MB is not an error: the kit is still written and
+the summary says `logo: not saved (<reason>)`. Only `https://` URLs on public hosts are fetched.
+
+`brand-rules.txt` points the logo at `/assets/brand/<file>`, a served path. Copy the logo to `assets/brand/` so
+it resolves: `leclap render` reads relative asset paths from `<cwd>/assets`, so keep `assets/` next to your
+template (the web builder serves its own `/assets/`, where you upload the logo instead). If your template lives
+elsewhere, change that path in the rules to wherever your assets resolve. A raster icon is preferred over an SVG
+one; an SVG or ICO logo is kept, but an image layer reads SVG only where FFmpeg has librsvg (not in the browser
+or on the phone) and never reads ICO, so the rules ask for a PNG conversion first.
 
 ## `style` — match a reference look
 

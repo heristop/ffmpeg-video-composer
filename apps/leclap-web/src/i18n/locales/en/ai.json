@@ -192,5 +192,14 @@
     "detach": "Detach style guide",
     "summaryNone": "Optional",
     "summaryAttached": "Attached"
+  },
+  "brand": {
+    "label": "Your brand",
+    "hint": "Import a brand-kit.json from `leclap brand <your site>`: the video uses your colours, fonts and name. Add your logo with the watermark upload.",
+    "attached": "Brand: {{name}}",
+    "detach": "Remove brand",
+    "summaryNone": "Optional",
+    "summaryAttached": "Attached",
+    "tooLarge": "This file is too large to be a brand-kit.json."
   }
 }

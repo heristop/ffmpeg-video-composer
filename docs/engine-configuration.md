@@ -181,6 +181,7 @@ The MCP registered-effect backend requires Node, optional Remotion peers, and a 
 | Output root                  | `--output-dir`             | `LECLAP_MCP_OUTPUT_DIR`             | `~/.leclap/renders`                                                          |
 | Media/asset root             | `--media-dir`              | `LECLAP_MCP_MEDIA_DIR`              | `~/.leclap/media`                                                            |
 | Worker/stage timeout         | `--render-timeout-ms`      | `LECLAP_MCP_RENDER_TIMEOUT_MS`      | `600000` ms                                                                  |
+| Network opt-in               | `--allow-network`          | `LECLAP_MCP_ALLOW_NETWORK`          | Off                                                                          |
 | Remotion opt-in              | `--allow-remotion`         | `LECLAP_MCP_ALLOW_REMOTION`         | Off                                                                          |
 | Trusted entry                | `--remotion-entry`         | `LECLAP_MCP_REMOTION_ENTRY`         | Unset                                                                        |
 | Chrome executable            | `--remotion-browser`       | `LECLAP_MCP_REMOTION_BROWSER`       | Unset; Remotion manages its browser                                          |

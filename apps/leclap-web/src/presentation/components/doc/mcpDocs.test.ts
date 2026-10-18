@@ -69,10 +69,10 @@ describe('mcpDoc', () => {
     expect(edit?.args).toContain('effectProps?');
   });
 
-  it('marks the three Remotion tools as opt-in', () => {
+  it('marks the Remotion tools and extract_brand as opt-in', () => {
     const optIn = mcpDoc.tools.filter((tool) => tool.optIn).map((tool) => tool.name);
 
-    expect(optIn.sort()).toEqual(['get_effect_schema', 'render_preview', 'render_remotion_clip']);
+    expect(optIn.sort()).toEqual(['extract_brand', 'get_effect_schema', 'render_preview', 'render_remotion_clip']);
   });
 
   it('names each tool arguments so an agent knows what to pass', () => {
