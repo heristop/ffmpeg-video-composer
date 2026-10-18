@@ -6,6 +6,7 @@ import { TranslationSchema } from './global.schemas';
 import { HtmlInputShape, htmlInputIssues } from './html-input.schemas';
 import { LayerAnimateSchema, LayerOriginSchema } from './layer-animate.schemas';
 import { ClipBoxSchema } from './clip.schemas';
+import { BlendModeSchema, MotionBlurSchema, layerCompositeIssues } from './layer-composite.schemas';
 import { FilterExpressionPair } from './filter-expression.schemas';
 
 // Input/shape/field media primitives — the animation input options, the editor-only shape recipe, the
@@ -51,6 +52,8 @@ export const InputOptionsSchema = z
     ),
     animate: LayerAnimateSchema.optional(),
     origin: LayerOriginSchema.optional(),
+    blend: BlendModeSchema.optional(),
+    motionBlur: MotionBlurSchema.optional(),
     clip: ClipBoxSchema.optional().describe(
       'Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; ' +
         'works over footage.'
@@ -107,6 +110,7 @@ export const InputSchema = z
     filters: z.array(FilterSchema).optional().describe('Filter chain applied to this input stream before compositing.'),
   })
   .superRefine(htmlInputIssues)
+  .superRefine(layerCompositeIssues)
   .describe('An external asset (animation, still image or HTML layer) composited into the section video.');
 
 // ── section options ────────────────────────────────────────────────────────────

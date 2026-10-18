@@ -5,6 +5,7 @@ import type { Reveal, TimedReveal, TimedExit } from './descriptor-text';
 import type { FontRef } from './fonts';
 import type { Animate, MotionRole } from '../schemas/motion.schemas';
 import type { LayerAnimate, LayerOrigin } from '../schemas/layer-animate.schemas';
+import type { BlendMode, MotionBlur } from '../schemas/layer-composite.schemas';
 
 /** How an overlay maps into its "w:h" scale box: free stretch, letterbox inside, or fill + centre-crop. */
 export type OverlayFit = 'stretch' | 'contain' | 'cover';
@@ -78,6 +79,8 @@ interface InputOptions {
   animate?: LayerAnimate;
   /** Pivot of the animate scale/rotate tracks within the layer box (default center). */
   origin?: LayerOrigin;
+  blend?: BlendMode;
+  motionBlur?: MotionBlur;
 }
 
 export interface Map {

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MotionBlurSchema } from './layer-composite.schemas';
 import { ColorToken } from './color-token.schemas';
 import { TranslationSchema } from './global.schemas';
 import { TextEffectSchema } from './effects.schemas';
@@ -252,6 +253,7 @@ export const KineticBlockSchema = z
       .describe(
         'Echo trail (motion smear): each unit leaves fading copies of itself a few frames behind while it travels; the echoes collapse into it once it rests. Not applied to counter.'
       ),
+    motionBlur: MotionBlurSchema.optional(),
     exit: z
       .union([z.enum(KINETIC_EXIT_PRESETS), KineticExitSchema])
       .optional()
