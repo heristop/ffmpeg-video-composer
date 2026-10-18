@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { affordableSamples, layerSpans, mergeSpans, unitSpans } from '@/editor/presets/motion-spans';
+import { affordableSamples, clipSpans, layerSpans, mergeSpans, unitSpans } from '@/editor/presets/motion-spans';
 
 describe('layerSpans', () => {
   it('covers a moving x window, one frame early and one frame late', () => {
@@ -162,5 +162,18 @@ describe('affordableSamples', () => {
   it('drops the blur for non-finite requests or spans', () => {
     expect(affordableSamples([{ first: 0, last: 10 }], Number.NaN)).toEqual({ samples: 0, capped: true });
     expect(affordableSamples([{ first: 0, last: Infinity }], 8)).toEqual({ samples: 0, capped: true });
+  });
+});
+
+describe('clipSpans', () => {
+  it('cuts spans to the section frames and drops those past its end', () => {
+    expect(clipSpans([{ first: 0, last: 361 }], 180)).toEqual([{ first: 0, last: 179 }]);
+    expect(clipSpans([{ first: 10, last: 40 }], 180)).toEqual([{ first: 10, last: 40 }]);
+    expect(clipSpans([{ first: 200, last: 300 }], 180)).toEqual([]);
+  });
+
+  it('leaves spans alone when the section length is unknown', () => {
+    expect(clipSpans([{ first: 0, last: 361 }], 0)).toEqual([{ first: 0, last: 361 }]);
+    expect(clipSpans([{ first: 0, last: 361 }], Number.NaN)).toEqual([{ first: 0, last: 361 }]);
   });
 });

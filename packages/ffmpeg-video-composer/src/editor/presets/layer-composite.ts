@@ -13,7 +13,7 @@ import { resolveMotionBlur, type BlendMode, type ResolvedMotionBlur } from '../.
 import { assertSafePadLabel } from '../utils/filter-option-guard';
 import { BLEND_FILTER_MODES, BLEND_UNAVAILABLE_WARNING, blendOver } from './layer-blend';
 import { blurGate, blurHead, blurPad, blurRebase, blurTail, planBlur, type BlurPlan } from './motion-blur';
-import { layerSpans } from './motion-spans';
+import { clipSpans, layerSpans } from './motion-spans';
 
 export interface LayerCompositeRequest {
   /** The input name: pad prefix and the output pad. */
@@ -29,6 +29,8 @@ export interface LayerCompositeRequest {
   motionBlur: ResolvedMotionBlur | null;
   animate: LayerAnimate | undefined;
   fps: number;
+  /** The section's length in seconds, when known: motion keyed past it is not budgeted. */
+  duration?: number;
   /** The input's own filters, rendered, after the composite. */
   tail: string[];
   has: (filter: string) => boolean;
@@ -56,7 +58,9 @@ function modeOf(request: LayerCompositeRequest): BlendMode {
 function blurOf(request: LayerCompositeRequest): BlurPlan | null {
   if (request.motionBlur === null) return null;
 
-  return planBlur(layerSpans(request.animate, request.fps), request.motionBlur, request.fps, request);
+  const spans = clipSpans(layerSpans(request.animate, request.fps), Math.ceil((request.duration ?? 0) * request.fps));
+
+  return planBlur(spans, request.motionBlur, request.fps, request);
 }
 
 function legChains(request: LayerCompositeRequest, blur: BlurPlan | null): string[] {
@@ -169,6 +173,8 @@ export interface CompositeContext {
   segment: Pick<Segment, 'filtersMapList' | 'mapsList'>;
   filters: {
     frameRate: () => number;
+    /** The section's length in seconds, when known. */
+    sectionDuration?: () => number;
     supports: (filter: string) => boolean;
     advise: (message: string) => void;
     addFilter: (filter: Filter) => string;
@@ -194,6 +200,7 @@ export function compositeLayer(context: CompositeContext): boolean {
     motionBlur,
     animate: input.options.animate,
     fps: filters.frameRate(),
+    duration: filters.sectionDuration?.(),
     tail: (input.filters ?? []).map((filter) => filters.addFilter(filter)),
     has: filters.supports,
     warn: filters.advise,

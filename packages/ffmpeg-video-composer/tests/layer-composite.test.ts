@@ -242,3 +242,50 @@ describe('layerComposite late spans', () => {
     expect(graph).toContain("overlay=0:0:eof_action=pass:enable='between(t,0,1.05)'");
   });
 });
+
+describe('layerComposite section length', () => {
+  const drift = {
+    ...base,
+    legFilters: [],
+    motionBlur: { shutter: 180, samples: 8 },
+    animate: {
+      x: [
+        { t: 0, v: '+0' },
+        { t: 12, v: '+300' },
+      ],
+    },
+  } as LayerCompositeRequest;
+
+  it('budgets only the frames the section renders, so a key past the end does not cap the blur', () => {
+    const warnings: string[] = [];
+    const graph = layerComposite({ ...drift, duration: 6, warn: (m) => warnings.push(m) }) as string;
+
+    expect(warnings).toEqual([]);
+    expect(graph).toContain('tmix=frames=8');
+    expect(graph).toMatch(/trim=start=0:end=5\.98/);
+  });
+
+  it('still caps when the visible motion alone exceeds the budget', () => {
+    const warnings: string[] = [];
+
+    layerComposite({ ...drift, duration: 12, warn: (m) => warnings.push(m) });
+
+    expect(warnings).toEqual([expect.stringMatching(/^\[motion_blur_capped\]/)]);
+  });
+
+  it('draws sharp with no capped warning when the motion starts after the section ends', () => {
+    const warnings: string[] = [];
+    const late = {
+      ...drift,
+      animate: {
+        x: [
+          { t: 8, v: '+0' },
+          { t: 9, v: '+300' },
+        ],
+      },
+    } as LayerCompositeRequest;
+
+    expect(layerComposite({ ...late, duration: 6, warn: (m) => warnings.push(m) })).toBeNull();
+    expect(warnings).toEqual([]);
+  });
+});

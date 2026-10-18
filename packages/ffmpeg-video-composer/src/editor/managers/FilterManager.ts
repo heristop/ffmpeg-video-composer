@@ -118,6 +118,9 @@ class FilterManager {
   /** The output frame rate, on which per-frame lowerings (layer keyframes) step. */
   frameRate = (): number => this.project.config.videoConfig?.fps ?? DefaultConfig.FPS;
 
+  /** The current section's length in seconds (0 when unknown). */
+  sectionDuration = (): number => this.fontSizeTiming().duration;
+
   /** True when the active FFmpeg build has the filter (device allow-list, host probe). */
   supports = (filter: string): boolean =>
     hasFilter(engineCapabilities(this.project.config, this.project.engineFeatures), filter);

@@ -119,6 +119,18 @@ export function unitSpans(timings: readonly UnitTiming[], fps: number, until: nu
   return spansOf(windows, fps);
 }
 
+/**
+ * Spans cut to a section's frames: motion keyed past the cut is never rendered, so it must not spend the
+ * budget. An unknown length (not above 0) keeps the spans as they are.
+ */
+export function clipSpans(spans: readonly Span[], frames: number): Span[] {
+  if (!Number.isFinite(frames) || frames <= 0) return [...spans];
+
+  return spans
+    .filter((span) => span.first < frames)
+    .map((span) => ({ first: span.first, last: Math.min(span.last, frames - 1) }));
+}
+
 /** The samples an element can afford over its spans; 0 = no blur. `capped` when fewer than requested. */
 export function affordableSamples(spans: readonly Span[], requested: number): { samples: number; capped: boolean } {
   const frames = spans.reduce((sum, span) => sum + span.last - span.first + 1, 0);
