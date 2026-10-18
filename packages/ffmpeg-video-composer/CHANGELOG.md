@@ -199,6 +199,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A `setpts` filter with an explicit expression (the fx time shift `PTS+<at>/TB` of the sheen, leak, bloom and goo
   effects, the first-frame hold of the ambient ones) is no longer rewritten to the section speed. Only `PTS` and
   `<n>*PTS` still take `options.speed`; the shift was silently lost and those effects ran from section start.
+<<<<<<< HEAD
 
 - `trace:` and `shape:` image URLs: a wave of zero width and a denormal wavelength threw a `TypeError` while
   flattening (its step count was NaN), and numbers were read with `Number()`, so blanks, empty fields and hex
@@ -206,6 +207,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   count, and the paint work budgets of `trace:` and `shape:` images drop from 20M to 5M (a hostile 60 KB URL
   cost several seconds; bundled shapes use a small fraction of it).
 
+=======
+>>>>>>> 131fb5ce (docs(changelog): tidy blank lines in the 3.2.0 fixed list)
 - Browser entry: validating a template with a `global` block overflowed the stack. The build rewrote every
   `global` in the code to `globalThis`, locals and object keys included, so resolving a theme walked
   `globalThis`; only the free identifier is rewritten now. Error messages no longer read `globalThis.beats`.
@@ -213,7 +216,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   turned sprite with `c=none`, which leaves whatever FFmpeg's frame pool last held there, so each piece
   smeared its earlier angles and a paper strip read as a filled square. The corners are now cleared with the
   piece's own colour at alpha 0, which also keeps the scale after the turn from pulling in a dark fringe.
-
 - `drip` transition: `color` now only accepts a `#RRGGBB` colour or a `$color.<name>` theme token, and the
   render falls back to the default paint for any other value instead of passing it to FFmpeg as is. The
   same applies to an iris `rim` that is not a hex colour, which is now dropped. A template could otherwise
