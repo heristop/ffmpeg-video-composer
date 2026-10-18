@@ -43,6 +43,15 @@ export const HTML_MOTION_MAX_PIXELS = 500_000_000;
 /** Bytes of one card's drawn frames: past it the card is staged as a still. */
 export const HTML_MOTION_MAX_BYTES = 48 * 1024 * 1024;
 
+/** Frames the first (lead) frame of a card may last: an animated PNG stores a frame's delay in 16 bits. */
+export const HTML_MOTION_MAX_LEAD_TICKS = 0xffff;
+
+/** The furthest an element may be offset, in output pixels, either way. */
+export const HTML_MOTION_MAX_OFFSET = 20_000;
+
+/** The furthest an element may be turned, in degrees, either way. */
+export const HTML_MOTION_MAX_TURN = 36_000;
+
 /** Milliseconds one card's frames may take to draw before it is staged as a still. */
 export const HTML_MOTION_DEADLINE_MS = 120_000;
 

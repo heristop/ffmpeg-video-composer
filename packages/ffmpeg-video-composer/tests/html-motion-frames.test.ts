@@ -233,4 +233,35 @@ describe('planMotionFrames bounds', () => {
     expect(p.frames.every((frame) => frame.ticks >= 1)).toBe(true);
     expect(p.frames[0].ticks).toBe(1);
   });
+
+  it('names a first frame that outlasts the 16-bit delay, as the stager does', () => {
+    const late = plan(
+      ['a'],
+      {
+        a: {
+          x: [
+            { t: 7000, v: 0 },
+            { t: 7000.3, v: 20 },
+          ],
+        },
+      },
+      10
+    );
+
+    expect(motionBudget(late, 200, 100).problem).toBe('its first frame lasts 70001 frames (limit 65535)');
+  });
+});
+
+describe('stateAt bounds', () => {
+  it('keeps offsets and turns within a sane range so the rasteriser never sees an exponent', () => {
+    const [state] = finalStates(['a'], {
+      a: {
+        x: [{ v: 1e21 }],
+        y: [{ v: -1e21 }],
+        rotate: [{ v: 1e300 }],
+      },
+    });
+
+    expect(state).toEqual({ x: 20_000, y: -20_000, scale: 1, rotate: 36_000, opacity: 1 });
+  });
 });

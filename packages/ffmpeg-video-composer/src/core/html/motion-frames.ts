@@ -12,6 +12,9 @@ import {
   ELEMENT_MOTION_TRACKS,
   HTML_LAYER_DENSITY,
   HTML_MOTION_MAX_FRAMES,
+  HTML_MOTION_MAX_LEAD_TICKS,
+  HTML_MOTION_MAX_OFFSET,
+  HTML_MOTION_MAX_TURN,
   HTML_MOTION_MAX_PIXELS,
   HTML_MOTION_MAX_SPAN,
 } from './limits';
@@ -99,10 +102,10 @@ function clamp(value: number, min: number, max: number): number {
 
 function stateAt(spec: ElementMotionSpec, time: number): ElementState {
   return {
-    x: trackAt(spec, 'x', time, 0, 2),
-    y: trackAt(spec, 'y', time, 0, 2),
+    x: clamp(trackAt(spec, 'x', time, 0, 2), -HTML_MOTION_MAX_OFFSET, HTML_MOTION_MAX_OFFSET),
+    y: clamp(trackAt(spec, 'y', time, 0, 2), -HTML_MOTION_MAX_OFFSET, HTML_MOTION_MAX_OFFSET),
     scale: clamp(trackAt(spec, 'scale', time, 1, 4), 0, 10),
-    rotate: trackAt(spec, 'rotate', time, 0, 2),
+    rotate: clamp(trackAt(spec, 'rotate', time, 0, 2), -HTML_MOTION_MAX_TURN, HTML_MOTION_MAX_TURN),
     opacity: clamp(trackAt(spec, 'opacity', time, 1, 4), 0, 1),
   };
 }
@@ -193,6 +196,7 @@ export function motionBudget(
   height: number
 ): { frames: number; pixels: number; problem: string | null } {
   const frames = plan.frames.length;
+  const lead = plan.frames[0].ticks;
   const pixels = frames * width * HTML_LAYER_DENSITY * height * HTML_LAYER_DENSITY;
 
   if (frames > HTML_MOTION_MAX_FRAMES) {
@@ -203,6 +207,10 @@ export function motionBudget(
     const megapixels = Math.round(pixels / 1e6);
 
     return { frames, pixels, problem: `${megapixels} megapixels of frames (limit ${HTML_MOTION_MAX_PIXELS / 1e6})` };
+  }
+
+  if (frames > 1 && lead > HTML_MOTION_MAX_LEAD_TICKS) {
+    return { frames, pixels, problem: `its first frame lasts ${lead} frames (limit ${HTML_MOTION_MAX_LEAD_TICKS})` };
   }
 
   return { frames, pixels, problem: null };

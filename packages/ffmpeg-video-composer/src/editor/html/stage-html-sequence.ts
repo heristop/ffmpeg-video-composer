@@ -63,9 +63,6 @@ export interface SequenceContext {
 
 const MB = 1024 * 1024;
 
-// An animated PNG stores a frame's delay in 16 bits.
-const MAX_LEAD_TICKS = 0xffff;
-
 function stillInstead(ctx: SequenceContext, name: string, reason: string): null {
   ctx.logger.warn(
     `[${ctx.section}][Html] html_motion_static: input "${name}" shows as a still in its final state: ${reason}`
@@ -209,14 +206,6 @@ function planOf(layer: SequenceLayer, ctx: SequenceContext): MotionFramePlan | n
   const problem = motionBudget(plan, layer.width, layer.height).problem;
 
   if (problem) return stillInstead(ctx, layer.name, problem);
-
-  if (plan.frames[0].ticks > MAX_LEAD_TICKS) {
-    return stillInstead(
-      ctx,
-      layer.name,
-      `its first frame lasts ${plan.frames[0].ticks} frames (limit ${MAX_LEAD_TICKS})`
-    );
-  }
 
   return plan;
 }
