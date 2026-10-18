@@ -41,15 +41,18 @@ const NUM = String.raw`-?[0-9]+(?:\.[0-9]+)?(?:e-?[0-9]+)?`;
 const OPTION = new RegExp(
   `^(?:eof_action=(?:pass|repeat|endall)|enable='(?:between\\(t,${NUM},${NUM}\\)|gte\\(t,${NUM}\\))')$`
 );
-// A motion position: x='<expr>':y='<expr>', each quoted so its commas stay inside; no quote, `;`, `[`, `]`,
-// `:` or backslash can end the quoting or the option.
-const QUOTED_XY = /^x='[^'\\;:[\]]+':y='[^'\\;:[\]]+'/;
+// A motion position: x='<expr>':y='<expr>', each quoted so its commas stay inside. Only the characters the
+// engine's motion and keyframe expressions use (names, numbers, + - * / % ^ ( ) and `,`).
+const QUOTED_XY = /^x='[A-Za-z0-9_.+\-*/%^(),]+':y='[A-Za-z0-9_.+\-*/%^(),]+'/;
 
 // The overlay options are built by the engine but spliced unquoted into the graph: the position goes
 // through the expression guard (or the quoted motion form), each further option must be a known form.
 function guardOverlay(overlay: string): string {
   const xy = QUOTED_XY.exec(overlay)?.[0];
   const rest = xy === undefined ? overlay : overlay.slice(xy.length);
+
+  if (xy !== undefined && rest !== '' && !rest.startsWith(':')) throw new Error(`Unsafe overlay option "${rest}"`);
+
   const parts = rest.split(':');
   const position = xy ?? assertSafeExpression(parts.slice(0, 2).join(':'), 'overlay position', 2);
   const options = xy === undefined ? parts.slice(2) : parts.slice(1);

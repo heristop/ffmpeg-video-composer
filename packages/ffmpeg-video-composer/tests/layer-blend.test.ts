@@ -89,6 +89,12 @@ describe('blendOver guards (templates that skipped validation)', () => {
       '10:20:eof_action=pass;[x]',
       "x='1':y='2];[x'",
       "x='1':y='2':eof_action=pass,hflip",
+      "x='1':y='2'junk,hflip",
+      "x='1':y='2'hflip",
+      "x='a b':y='2'",
+      "x='a\"b':y='2'",
+      "x='$a':y='2'",
+      "x='a=b':y='2'",
     ]) {
       expect(() => blendOver({ ...ok, overlay }), overlay).toThrow(/Unsafe overlay/);
     }
