@@ -1,4 +1,3 @@
-import '../../packages/ffmpeg-video-composer/node_modules/reflect-metadata';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { effectJobs, loadFixtures } from '../../scripts/motion-review/lib/fixtures';
@@ -7,12 +6,18 @@ import { TemplateValidator } from '../../packages/ffmpeg-video-composer/src/serv
 
 // The blend and motion-blur fixtures expand into valid descriptors on every background and format.
 const dir = resolve(import.meta.dirname, '../../scripts/motion-review/fixtures');
-const options = {
+const options: ReviewOptions = {
+  out: '',
+  label: 'test',
   assets: resolve(import.meta.dirname, '../../apps/leclap-web/public/assets'),
+  effects: true,
+  templates: false,
+  only: [],
   formats: FORMATS,
   backgrounds: BACKGROUNDS,
-  only: [],
-} as unknown as ReviewOptions;
+  jobs: 1,
+  build: false,
+};
 
 describe('motion-review composite fixtures', () => {
   it('validates layer-blend and motion-blur on every stage', () => {
