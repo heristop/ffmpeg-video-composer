@@ -32,7 +32,12 @@ import type AbstractFilesystem from '../../platform/filesystem/AbstractFilesyste
 import type AbstractLogger from '../../platform/logging/AbstractLogger';
 import { overflowFinding } from '../../services/html-raster/html-layer-findings';
 import { assembleApng, type ApngFrame } from './apng-assemble';
-import type { StagedHtmlLayer } from './stage-html-layer';
+
+/** A layer staged on disk: the `html:`/`html-seq:` url written on the input and the file behind it. */
+export interface StagedHtmlLayer {
+  url: string;
+  path: string;
+}
 
 export interface SequenceLayer {
   name: string;

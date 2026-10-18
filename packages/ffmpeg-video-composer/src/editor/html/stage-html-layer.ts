@@ -16,7 +16,7 @@ import { overflowFinding, prepareWithFindings } from '../../services/html-raster
 import DefaultConfig from '../../core/default.config';
 import { finalElement, type ElementMotionMap } from '@/core/html/motion-frames';
 import { bytesToBase64 } from './base64';
-import { stageHtmlSequence, type SequenceContext } from './stage-html-sequence';
+import { stageHtmlSequence, type SequenceContext, type StagedHtmlLayer } from './stage-html-sequence';
 
 export interface HtmlLayerInput {
   name: string;
@@ -51,10 +51,7 @@ export interface HtmlStageContext {
   now?: () => number;
 }
 
-export interface StagedHtmlLayer {
-  url: string;
-  path: string;
-}
+export type { StagedHtmlLayer };
 
 /** Layers rendered by this process, by hash: a long-lived host (the MCP server) re-renders none. */
 const PROCESS_MEMORY = new Map<string, Uint8Array>();
