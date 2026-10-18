@@ -1,0 +1,140 @@
+{
+  "meta": {
+    "name": "Blend modes and motion blur",
+    "description": "Layers that mix into the picture (multiply bands, a screen glow, an overlay wash) and moves that smear like a real shutter: a card whip and a slide-in title with motion blur.",
+    "creativeDirection": "Audience: motion designers checking blend modes and motion blur. Direction: an ink ground with a lavender card; first beat, three bands multiply into it while a rose glow screens across; second beat, a card whips right and the title slides in, both blurred at a 180° shutter. Review: transparent corners never darken the ground, the glow never greys it, resting frames are sharp."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "blend",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1A2E",
+        "duration": 3
+      },
+      "inputs": [
+        {
+          "name": "card",
+          "type": "html",
+          "html": "<div class=\"c\"></div>",
+          "css": ".c { width: 760px; height: 400px; border-radius: 48px; background: #C9CBFF; }",
+          "width": 760,
+          "height": 400,
+          "options": {
+            "position": "260:160"
+          }
+        },
+        {
+          "name": "bands",
+          "type": "html",
+          "html": "<div class=\"b\"><div class=\"d\"></div><div class=\"m\"></div><div class=\"l\"></div></div>",
+          "css": ".b { display: flex; width: 600px; height: 240px; border-radius: 32px; } .d { flex: 1; background: #3A2A5C; } .m { flex: 1; background: #9298FB; } .l { flex: 1; background: #FFE9C7; }",
+          "width": 600,
+          "height": 240,
+          "options": {
+            "position": "340:240",
+            "blend": "multiply",
+            "motion": "fade"
+          }
+        },
+        {
+          "name": "glow",
+          "type": "html",
+          "html": "<div class=\"g\"></div>",
+          "css": ".g { width: 300px; height: 300px; border-radius: 150px; background: #FF8AAE; }",
+          "width": 300,
+          "height": 300,
+          "options": {
+            "position": "120:210",
+            "blend": "screen",
+            "animate": {
+              "x": [
+                {
+                  "t": 0.4,
+                  "v": "+0"
+                },
+                {
+                  "t": 2.6,
+                  "v": "+760",
+                  "ease": "ease-in-out-sine"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "label",
+          "text": {
+            "en": "MULTIPLY · SCREEN"
+          },
+          "preset": "fade",
+          "size": 44,
+          "y": "top",
+          "color": "#F5F3F7"
+        }
+      ]
+    },
+    {
+      "name": "blur",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1A2E",
+        "duration": 2.5
+      },
+      "inputs": [
+        {
+          "name": "whip",
+          "type": "html",
+          "html": "<div class=\"c\"></div>",
+          "css": ".c { width: 260px; height: 160px; border-radius: 28px; background: #9298FB; }",
+          "width": 260,
+          "height": 160,
+          "options": {
+            "position": "80:180",
+            "motionBlur": {
+              "shutter": 180,
+              "samples": 8
+            },
+            "animate": {
+              "x": [
+                {
+                  "t": 0.3,
+                  "v": "+0"
+                },
+                {
+                  "t": 0.8,
+                  "v": "+860",
+                  "ease": "ease-out-cubic"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "kinetic": [
+        {
+          "id": "title",
+          "text": {
+            "en": "MOTION BLUR"
+          },
+          "preset": "slide",
+          "delay": 0.9,
+          "size": 120,
+          "y": "bottom",
+          "color": "#F5F3F7",
+          "motionBlur": true
+        }
+      ]
+    }
+  ]
+}

@@ -363,6 +363,13 @@
       "description": "Cards and shapes animated over time with keyframe tracks: a pop-in with overshoot, squash and stretch, a two-face flip, a needle that swings past its mark and settles, and three-depth parallax.",
       "category": "effects",
       "source": "examples/motion-design/layer-keyframes.json"
+    },
+    {
+      "id": "blend-motion-blur",
+      "title": "Blend modes and motion blur",
+      "description": "Layers that multiply and screen into the picture, and a card whip and a slide-in title smeared by a 180° shutter, sharp at rest.",
+      "category": "effects",
+      "source": "examples/motion-design/blend-motion-blur.json"
     }
   ]
 }

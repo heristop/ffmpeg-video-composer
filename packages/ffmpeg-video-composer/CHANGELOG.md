@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Layer blend modes: `inputs[].options.blend` (`normal`, `multiply`, `screen`, `overlay`, `add`, `darken`,
+  `lighten`, `difference`) mixes an image, animation or html layer into the picture inside its own alpha,
+  with CSS mix-blend-mode formulas in RGB: transparent areas leave the picture untouched and half-transparent
+  edges mix by their alpha. Lowered to `blend` over a transparent copy of the frame.
+- Motion blur: `motionBlur` (`true` or `{ shutter 0-360, samples 2-16 }`) on layers with position, scale or
+  rotate tracks and on travelling kinetic blocks. Only the moving frames are supersampled on a sub-frame
+  shutter clock and averaged with `tmix`; resting frames and the background stay sharp. Bounded per element
+  (`motion_blur_capped`).
+- The on-device engine adds `blend` and `tmix` (LGPL); a build without them composites normally or draws
+  sharp, with `blend_unavailable` / `motion_blur_unavailable` warnings and validation advisories, plus
+  `motion_blur_static` and `motion_blur_ignored`.
+- Sample `blend-motion-blur` and motion-review fixtures `layer-blend` and `motion-blur`.
 - Clip boxes: a kinetic block takes `clip` (`"block"`, its own resting box; `"line"`, one box per line; or
   `{ x, y, w, h }` in px) and an image, animation or html layer takes `options.clip` (a box). The element only
   shows inside the box, so a `rise` reveals out of an invisible slot above an underline, on any background,

@@ -623,6 +623,18 @@
       "templateSha256": "15f4e355e82edaed3beb0cd9d995da24505fecb64a86080ce9fe54104016ce90",
       "media": "Bundled catalog / demo app fixtures",
       "bytes": 91790
+    },
+    {
+      "id": "blend-motion-blur",
+      "source": "examples/motion-design/blend-motion-blur.json",
+      "duration": 5.541016,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "ddcfa352df5820e093e0ff18fe3a17aa0f4fc92efd8e7350bde7cbc316442c10",
+      "templateSha256": "c8c29e92aee522e08687eb2df3e7481faadbaa795018d7f38fe96c8ef8f97dda",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 44048
     }
   ]
 }
