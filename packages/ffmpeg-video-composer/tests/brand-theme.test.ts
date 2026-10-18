@@ -5,6 +5,8 @@ import { withThemeColor } from '@/core/brand/css';
 import { brandPromptRules, brandTheme, nearestBundledFont, sanitizeBrandName } from '@/core/brand/theme';
 import type { BrandKit } from '@/core/brand/types';
 import { ThemeObjectSchema } from '@/schemas/theme.schemas';
+import { ColorToken } from '@/schemas/color-token.schemas';
+import { assertSafeColorToken } from '@/core/arg-guard';
 
 const kit: BrandKit = {
   url: 'https://acme.test/',
@@ -39,6 +41,17 @@ describe('brandTheme', () => {
     expect(
       contrastRatio(hexToRgb(brand.theme.colors?.fg ?? ''), hexToRgb(brand.theme.colors?.bg ?? ''))
     ).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('emits only colour tokens the filtergraph guards accept', () => {
+    const colors = Object.values(brand.theme.colors ?? {});
+
+    expect(colors.length).toBeGreaterThan(0);
+    for (const value of colors) {
+      expect(ColorToken.safeParse(value).success).toBe(true);
+      expect(() => assertSafeColorToken(value, 'theme colour')).not.toThrow();
+      expect(value).toMatch(/^#[0-9a-f]{6}$/);
+    }
   });
 
   it('keeps the brand colour exactly on a dark background', () => {
