@@ -368,7 +368,7 @@ class MapManager {
    * mapped pad; the section's own scale chain is folded in so the clip is sized to the output first.
    *
    * `videoInputIndex` is the segment's authoritative clip stream (VideoSegment shifts it to 1 when it
-   * prepends blank audio) — NOT getVideoInputIncrement, which disagrees for video+videoUrl sections.
+   * prepends blank audio); getVideoInputIncrement derives the same index from the shared rule.
    * `head` (already formatted footage edits: clip range / ramp / freeze) retimes the clip first.
    */
   addChromakeyComposite = (
