@@ -56,8 +56,9 @@ function integerIn(value: unknown, field: string, min: number, max: number): num
 function checkedShutter({ fps, samples, shutter }: Shutter): Shutter {
   const rate = assertFiniteNumber(fps, 'motion blur fps');
 
-  if (rate <= 0 || rate > MAX_FPS)
+  if (rate <= 0 || rate > MAX_FPS) {
     throw new Error(`Unsafe motion blur fps: ${rate} is not above 0 and up to ${MAX_FPS}`);
+  }
 
   return {
     fps: rate,
@@ -74,6 +75,17 @@ function checkedSpan(span: Span): Span {
   if (last < first) throw new Error(`Unsafe motion blur span: ends at frame ${last}, before it starts at ${first}`);
 
   return { first, last };
+}
+
+/** A planned span cut to [0, MAX_FRAME] (a valid template may key far past the end), or null once empty. */
+function clampedSpan(span: Span): Span | null {
+  const first = assertFiniteNumber(span.first, 'motion blur span start');
+  const last = assertFiniteNumber(span.last, 'motion blur span end');
+  const cut = { first: Math.min(MAX_FRAME, Math.max(0, first)), last: Math.min(MAX_FRAME, last) };
+
+  if (cut.first > cut.last) return null;
+
+  return checkedSpan(cut);
 }
 
 /** The head of a supersampled branch over `span`: cut, repeat, retime onto the shutter clock. */
@@ -127,7 +139,10 @@ export function planBlur(
   }
 
   const shutter = checkedShutter({ fps, samples: blur.samples, shutter: blur.shutter });
-  const clamped = spans.map(checkedSpan);
+  const clamped = spans.flatMap((span) => clampedSpan(span) ?? []);
+
+  if (clamped.length === 0) return null;
+
   const budget = affordableSamples(clamped, shutter.samples);
 
   if (budget.capped) env.warn(motionBlurCappedWarning(shutter.samples, budget.samples));

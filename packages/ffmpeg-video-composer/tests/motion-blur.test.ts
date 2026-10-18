@@ -136,6 +136,16 @@ describe('guards on numbers written into filter text', () => {
     expect(blurHead({ first: -5, last: 3 }, clock)[0]).toBe('trim=start=0:end=0.116667');
   });
 
+  it('plans or drops a span keyed far past the end instead of throwing', () => {
+    const blur = { shutter: 180, samples: 8 };
+
+    expect(() => planBlur([{ first: 5, last: 3e9 }], blur, 30, env)).not.toThrow();
+    expect(planBlur([{ first: 3e9, last: 4e9 }], blur, 30, env)?.spans ?? []).toSatisfy((spans: { last: number }[]) =>
+      spans.every((s) => s.last <= 10_000_000)
+    );
+    expect(planBlur([{ first: -9, last: -3 }], blur, 30, env)).toBeNull();
+  });
+
   it('guards planBlur input before any filter is planned', () => {
     expect(() => planBlur([{ first: 0, last: 3 }], { shutter: 500, samples: 8 }, 30, env)).toThrow();
     expect(() => planBlur([{ first: 0, last: 3 }], { shutter: 180, samples: 99 }, 30, env)).toThrow();
