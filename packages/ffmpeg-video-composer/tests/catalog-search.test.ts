@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { motionCatalog } from '@/core/motion/catalog';
+import { BLEND_MODES } from '@/schemas/layer-composite.schemas';
 import { CATALOG_KINDS, searchMotionCatalog, searchTokens } from '@/core/motion/catalog-search';
 
 describe('searchTokens', () => {
@@ -89,5 +91,23 @@ describe('engine primitives rank above library samples', () => {
       composeWith: expect.any(String),
     });
     expect(searchMotionCatalog('sheen', { kind: 'fx' }).matches[0]).toMatchObject({ kind: 'fx', name: 'sheen' });
+  });
+});
+
+describe('compositing catalog: blend modes and motion blur', () => {
+  it('describes every blend mode and the motion blur fields', () => {
+    const { compositing, rules } = motionCatalog();
+
+    expect(Object.keys(compositing.blendModes)).toEqual([...BLEND_MODES]);
+    expect(Object.keys(compositing.motionBlur)).toEqual(['motionBlur', 'shutter', 'samples']);
+    expect(rules.some((rule) => rule.includes('options.blend') && rule.includes('motionBlur'))).toBe(true);
+    expect(rules.some((rule) => rule.includes('options.clip'))).toBe(true);
+  });
+
+  it('finds them by need', () => {
+    expect(searchMotionCatalog('multiply ink', { kind: 'compositing' }).matches[0]?.name).toBe('multiply');
+    expect(searchMotionCatalog('motion blur', { kind: 'compositing' }).matches.map((m) => m.name)).toContain(
+      'motionBlur'
+    );
   });
 });

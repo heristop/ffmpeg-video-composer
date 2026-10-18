@@ -52,4 +52,14 @@ describe('get_template_schema guide', () => {
     expect(text).toContain('html_motion_too_long');
     expect(text).toContain('staggeredList');
   });
+
+  it('teaches layer blend modes and motion blur with their advisories', () => {
+    const text = guideText();
+
+    expect(text).toContain('options.blend');
+    expect(text).toContain('motionBlur');
+    expect(text).toContain('blend_unavailable');
+    expect(text).toContain('motion_blur_static');
+    expect(text).toContain('options.clip');
+  });
 });

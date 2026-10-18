@@ -62,7 +62,12 @@ const GUIDE = [
     'shimmer `sweep`; Arabic/Hebrew/Indic copy animates per line (bundled fonts noto-arabic, noto-hebrew). A ' +
     'section `layout` composes several media in one frame: { type: "split", sources: [...] } panes or ' +
     '{ type: "before-after", before, after, wipe }; a source is a section name (its colour, picture, video or ' +
-    'clip), a media URL or a #colour.',
+    'clip), a media URL or a #colour. Layers (image, animation, html) take options.blend (normal, multiply, ' +
+    'screen, overlay, add, darken, lighten, difference) and options.motionBlur (true or { shutter 0..360, ' +
+    'samples 2..16 }) on layers moved by animate tracks; kinetic blocks take motionBlur on travelling presets. ' +
+    'options.clip cannot combine with a non-normal blend or motionBlur (schema error); clipped or filled kinetic ' +
+    'blocks and entrance presets are not blurred. validate_template advises motion_blur_static, ' +
+    'motion_blur_ignored, blend_unavailable and motion_blur_unavailable.',
   'Word-timed captions: section `subtitles` takes speech-to-text `words` [{text,start,end}] (grouped into phrases ' +
     'by `group`: pauses, sentence ends, maxWords, maxSeconds), authored `cues` [{at,end,text,words?}] or an inline ' +
     '`srt`. A caption DNA `style` (clean, loud, keynote, documentary, boxed, neon) sets font, colours, case, ' +

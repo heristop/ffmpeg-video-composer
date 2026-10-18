@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `get_template_schema` and `get_motion_catalog` teach layer blend modes (`options.blend`) and motion blur
+  (`motionBlur` on layers and kinetic blocks); `validate_template` returns their advisories
+  (`motion_blur_static`, `motion_blur_ignored`, `blend_unavailable`, `motion_blur_unavailable`).
 - `extract_structure`: a reference clip's format (shots, rhythm, transitions, grounds, layout) as binding
   rules, from at most 480 sampled frames.
 - `get_template_schema` and `get_motion_catalog` teach animated HTML cards: `data-motion` names, the input's
