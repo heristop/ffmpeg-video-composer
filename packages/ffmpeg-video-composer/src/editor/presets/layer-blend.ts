@@ -36,14 +36,23 @@ export interface BlendOver {
   out: string;
 }
 
-const OPTION = /^[A-Za-z_]+=[A-Za-z0-9_.+\-*/%^()]+$/;
+const NUM = String.raw`-?[0-9]+(?:\.[0-9]+)?(?:e-?[0-9]+)?`;
+// The options MapManager.overlayValue and imageOverlayEnable emit after the position.
+const OPTION = new RegExp(
+  `^(?:eof_action=(?:pass|repeat|endall)|enable='(?:between\\(t,${NUM},${NUM}\\)|gte\\(t,${NUM}\\))')$`
+);
+// A motion position: x='<expr>':y='<expr>', each quoted so its commas stay inside; no quote, `;`, `[`, `]`,
+// `:` or backslash can end the quoting or the option.
+const QUOTED_XY = /^x='[^'\\;:[\]]+':y='[^'\\;:[\]]+'/;
 
-// The overlay options are built by the engine but spliced unquoted into the graph: the "x:y" position goes
-// through the expression guard, each further option must be a plain key=value.
+// The overlay options are built by the engine but spliced unquoted into the graph: the position goes
+// through the expression guard (or the quoted motion form), each further option must be a known form.
 function guardOverlay(overlay: string): string {
-  const parts = overlay.split(':');
-  const position = assertSafeExpression(parts.slice(0, 2).join(':'), 'overlay position', 2);
-  const options = parts.slice(2);
+  const xy = QUOTED_XY.exec(overlay)?.[0];
+  const rest = xy === undefined ? overlay : overlay.slice(xy.length);
+  const parts = rest.split(':');
+  const position = xy ?? assertSafeExpression(parts.slice(0, 2).join(':'), 'overlay position', 2);
+  const options = xy === undefined ? parts.slice(2) : parts.slice(1);
 
   for (const option of options) {
     if (!OPTION.test(option)) throw new Error(`Unsafe overlay option "${option}"`);

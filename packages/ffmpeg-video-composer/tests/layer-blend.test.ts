@@ -68,6 +68,32 @@ describe('blendOver guards (templates that skipped validation)', () => {
     expect(() => blendOver({ ...ok, overlay: '10' })).toThrow(/Unsafe overlay/);
   });
 
+  it('accepts the option forms MapManager emits', () => {
+    for (const overlay of [
+      '10:20:eof_action=pass',
+      "0:0:eof_action=repeat:enable='between(t,1.5,4)'",
+      "(W-w)/2:H-h:eof_action=pass:enable='gte(t,2)'",
+      "x='W/2+sin(t*2)*10':y='H/2':eof_action=pass:enable='between(t,0,-1e-7)'",
+    ]) {
+      expect(blendOver({ ...ok, overlay }).join(';')).toContain(`overlay=${overlay}:format=gbrp`);
+    }
+  });
+
+  it('refuses anything else among the options', () => {
+    for (const overlay of [
+      "10:20:enable='1);evil'",
+      "10:20:enable='between(t,1,2)',hflip",
+      "10:20:enable='between(t,1,2);x'",
+      "10:20:enable='between(t,[a],2)'",
+      '10:20:eof_action=pass,hflip',
+      '10:20:eof_action=pass;[x]',
+      "x='1':y='2];[x'",
+      "x='1':y='2':eof_action=pass,hflip",
+    ]) {
+      expect(() => blendOver({ ...ok, overlay }), overlay).toThrow(/Unsafe overlay/);
+    }
+  });
+
   it('refuses an unknown blend mode', () => {
     expect(() => blendOver({ ...ok, mode: 'constructor' as BlendMode })).toThrow(/Unknown blend mode/);
   });
