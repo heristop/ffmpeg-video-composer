@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 import { compositeLayer, layerComposite, type LayerCompositeRequest } from '@/editor/presets/layer-composite';
 import type { MapAnimationInput } from '@/core/types';
@@ -288,4 +289,55 @@ describe('layerComposite section length', () => {
     expect(layerComposite({ ...late, duration: 6, warn: (m) => warnings.push(m) })).toBeNull();
     expect(warnings).toEqual([]);
   });
+});
+
+describe('layerComposite seam frames', () => {
+  // Outside the layer's box the output must equal the base, frame for frame, whether or not a span starts
+  // right after the first frames (testsrc2 differs on every frame, so a one-frame slip changes the hashes).
+  function md5s(graph: string, crop: string): string[] {
+    const args = ['-v', 'error', '-f', 'lavfi', '-i', 'testsrc2=s=160x90:r=30:d=0.7', '-f', 'lavfi', '-i'];
+    const out = execFileSync(
+      'ffmpeg',
+      [...args, 'color=white:s=20x20:r=30:d=0.7', '-filter_complex', graph, '-map', '[o]', '-f', 'framemd5', '-'],
+      { encoding: 'utf8' }
+    );
+
+    return out
+      .split('\n')
+      .filter((line) => line && !line.startsWith('#'))
+      .map((line) => line.split(',').at(-1) as string)
+      .map((hash) => `${crop}:${hash}`);
+  }
+
+  it.each([
+    { name: 'frame 1', t: 0.0833 },
+    { name: 'frame 2', t: 0.1167 },
+    { name: 'frame 0', t: 0 },
+  ])(
+    'keeps the base on its own frames when the span starts at $name',
+    ({ t }) => {
+      const graph = layerComposite({
+        ...base,
+        name: 'card',
+        base: 'card_bg',
+        raw: '1:v',
+        legFilters: [],
+        overlay: "x='120+100*(t-0)':y='60':eof_action=pass",
+        motionBlur: { shutter: 180, samples: 4 },
+        animate: {
+          x: [
+            { t, v: '+0' },
+            { t: t + 0.3, v: '+30' },
+          ],
+        },
+      }) as string;
+      const cropped = (label: string) => `[${label}]crop=100:50:0:0[c]`;
+      const blurred = md5s(`[0:v]null[card_bg];${graph};${cropped('card')}`.replace('[c]', '[o]'), 'x');
+      const sharp = md5s(`[0:v]crop=100:50:0:0[o]`, 'x');
+
+      expect(blurred).toHaveLength(sharp.length);
+      expect(blurred).toEqual(sharp);
+    },
+    60000
+  );
 });

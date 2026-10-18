@@ -166,4 +166,14 @@ describe('guards on numbers written into filter text', () => {
     expect(() => blurPad({ first: 1, last: Number.NaN }, { fps: 30, samples: 8, shutter: 180 })).toThrow();
     expect(() => blurGate({ first: 1, last: 5 }, { fps: 30, samples: 8, shutter: '1;x' as never })).toThrow();
   });
+
+  // concat times the frames after a pad from the pad's mean frame spacing, which needs two frames: a one-frame
+  // pad would start the blurred frames a frame early. A span on frame 1 runs unpadded (gated) instead.
+  it('emits no pad for a span starting on frame 0 or 1, and pads from frame 2', () => {
+    const clock = { fps: 30, samples: 8, shutter: 180 };
+
+    expect(blurPad({ first: 0, last: 9 }, clock)).toEqual([]);
+    expect(blurPad({ first: 1, last: 9 }, clock)).toEqual([]);
+    expect(blurPad({ first: 2, last: 9 }, clock)).toEqual(['trim=end=0.05', 'setpts=PTS-STARTPTS']);
+  });
 });

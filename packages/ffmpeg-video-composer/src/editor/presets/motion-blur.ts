@@ -116,12 +116,14 @@ export const blurRebase = 'setpts=PTS-STARTPTS';
  * The frames before a span, on their own branch of the same base copy. The closing overlay needs a frame from
  * the blurred branch before it emits anything, and until it gets one ffmpeg queues every base frame: a span
  * late in the section would hold them all. Concatenating these in front (see blurRebase) lets the overlay
- * advance with the base from t=0. Empty for a span that starts on the first frame.
+ * advance with the base from t=0. Empty for a span that starts on frame 0 or 1.
  */
 export function blurPad(range: Span, clock: Shutter): string[] {
   const { from } = spanEdges(range, clock);
 
-  if (from === 0) return [];
+  // concat times what follows a pad from the pad's mean frame spacing, which a single frame cannot give: the
+  // blurred frames would start a frame early. A span on frame 1 runs unpadded (still gated, and exact).
+  if (checkedSpan(range).first < 2) return [];
 
   return [`trim=end=${fmt(from)}`, blurRebase];
 }
