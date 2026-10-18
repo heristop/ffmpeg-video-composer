@@ -939,9 +939,38 @@ describe('MapManager', () => {
       expect(manager.getVideoInputIncrement()).toBe(1);
     });
 
-    it('returns 0 for a fresh video section (no reuse)', () => {
-      const { manager } = build({ section: { name: 's', type: 'video' } });
+    // VideoSegment prepends the anullsrc input at -i 0 whenever the section is muted (the default),
+    // so the clip sits at input 1 whatever its source (own clip, videoUrl or useVideoSection).
+    it('returns 1 for a default (muted) video section, whatever its source', () => {
+      const sections = [
+        { name: 's', type: 'video' },
+        { name: 's', type: 'video', options: { videoUrl: '/a.mp4' } },
+        { name: 's', type: 'video', options: { videoUrl: '/a.mp4', muteSection: true } },
+      ];
+
+      for (const section of sections) {
+        const { manager } = build({ section: section as Section });
+        expect(manager.getVideoInputIncrement()).toBe(1);
+      }
+    });
+
+    it('returns 0 for an unmuted video section with a videoUrl', () => {
+      const { manager } = build({
+        section: { name: 's', type: 'video', options: { videoUrl: '/a.mp4', muteSection: false } },
+      });
       expect(manager.getVideoInputIncrement()).toBe(0);
+    });
+
+    it('maps a muted video+videoUrl overlay base to the clip, not the anullsrc input', () => {
+      const section = {
+        name: 's',
+        type: 'video',
+        options: { videoUrl: '/a.mp4' },
+        inputs: [{ name: 'card', type: 'html', html: '<p>x</p>' }],
+      } as unknown as Section;
+      const { manager } = build({ section });
+      expect(manager.mapInputsVariables('@video')).toBe('1:v');
+      expect(manager.mapInputsVariables('@card')).toBe('2:v');
     });
 
     it('returns 0 for reused video section that is explicitly not muted', () => {
@@ -977,8 +1006,8 @@ describe('MapManager', () => {
         inputs: { 0: { name: 'logo', type: 'image', options: {} } },
       } as unknown as Section;
       const { manager } = build({ section });
-      // @video resolves to 0:v (video increment for fresh video section)
-      expect(manager.mapInputsVariables('@video')).toBe('0:v');
+      // @video resolves to 1:v: the muted clip follows the blank-audio input at 0
+      expect(manager.mapInputsVariables('@video')).toBe('1:v');
     });
 
     it('replaces an animation input reference with its overlay pad label', () => {
@@ -1106,7 +1135,8 @@ describe('MapManager', () => {
       expect(segment.filtersMapList[0]).toBe('[2:v]scale=100:100,setsar=1[anim_src]');
       // the overlay map composites the main video leg with the scaled animation pad
       const overlay = segment.filtersMapList.at(-1) ?? '';
-      expect(overlay).toContain('[0:v]');
+      expect(overlay).toContain('[1:v]');
+      expect(overlay).not.toContain('[0:v]');
       expect(overlay).toContain('[anim_src]');
       expect(segment.mapsList).toContain('anim');
     });
@@ -1117,7 +1147,7 @@ describe('MapManager', () => {
       // the raw video leg is COVER-scaled (fill + crop, aspect-preserving) on its own chain so a clip
       // whose ratio differs from the output isn't stretched, before the overlay composites onto it
       expect(segment.filtersMapList).toContain(
-        '[0:v]scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,setsar=1[anim_norm]'
+        '[1:v]scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,setsar=1[anim_norm]'
       );
       // the overlay composites the normalized base + the scaled animation, not the raw streams
       const overlay = segment.filtersMapList.at(-1) ?? '';
