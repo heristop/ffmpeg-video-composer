@@ -23,6 +23,7 @@ import { lowerShape } from '@/editor/presets/shape-draw';
 import { lowerStroke } from '@/editor/presets/stroke-graphics';
 import { FX_DOCS } from '@/schemas/fx-docs';
 import { layerKeyframes } from '@/editor/presets/layer-keyframes';
+import { layerComposite } from '@/editor/presets/layer-composite';
 import { DESIGNED_TRANSITIONS, designedTransitionGraph } from '@/core/motion/transitions';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -472,5 +473,65 @@ describe('LGPL device filter audit: clip boxes, bands, iris shapes, zoom-through
     expect(graphFilters(graphs[2])).toEqual(expect.arrayContaining(['zoompan', 'alphamerge']));
     // The transition assembly is not a section filter chain (no compat pass): on the build list is enough.
     for (const type of graphs.flatMap(graphFilters)) expect(DEVICE_FILTERS.has(type), `emits "${type}"`).toBe(true);
+  });
+
+  // LAYER_COMPOSITE_AUDIT: every blend mode, with and without motion blur, lowers to device filters only.
+  it('layer blend modes and motion blur lower to device-safe filters', () => {
+    const names = (graph: string): string[] =>
+      graph.split(';').flatMap((chain) => {
+        const body = chain.replace(/^(\[[^\]]+\])+/, '').replace(/(\[[^\]]+\])+$/, '');
+        const found: string[] = [];
+        let [quoted, depth, start] = [false, 0, 0];
+
+        for (let i = 0; i <= body.length; i++) {
+          const c = body[i];
+
+          if (c === "'") quoted = !quoted;
+
+          if (!quoted && c === '(') depth++;
+
+          if (!quoted && c === ')') depth--;
+
+          if (i === body.length || (!quoted && depth === 0 && c === ',')) {
+            found.push(body.slice(start, i).split('=')[0]);
+            start = i + 1;
+          }
+        }
+
+        return found;
+      });
+    const modes = ['multiply', 'screen', 'overlay', 'add', 'darken', 'lighten', 'difference'] as const;
+    const graphs = modes.flatMap((blend) =>
+      [null, { shutter: 180, samples: 8 }].map((motionBlur) =>
+        layerComposite({
+          name: 'l',
+          base: 'b',
+          raw: '2:v',
+          legFilters: ['fps=25', 'format=rgba', 'colorchannelmixer=aa=0.5'],
+          overlay: "x='10+t':y='0':eof_action=pass",
+          blend,
+          motionBlur,
+          animate: {
+            x: [
+              { t: 0, v: 0 },
+              { t: 1, v: 100 },
+            ],
+          },
+          fps: 25,
+          tail: [],
+          has: (filter) => DEVICE_FILTERS.has(filter),
+          warn: () => undefined,
+        })
+      )
+    );
+    const emitted = new Set(graphs.flatMap((graph) => names(graph as string)));
+
+    expect(emitted).toContain('blend');
+    expect(emitted).toContain('tmix');
+
+    for (const name of emitted) {
+      expect(DEVICE_FILTERS.has(name), `layer composite emits "${name}"`).toBe(true);
+      expect(ENGINE_EMITTED_FILTERS as readonly string[], name).toContain(name);
+    }
   });
 });

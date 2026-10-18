@@ -172,6 +172,8 @@ type MapAnimationOptions = {
   motion?: Reveal;
   animate?: LayerAnimate;
   origin?: LayerOrigin;
+  blend?: BlendMode;
+  motionBlur?: MotionBlur;
   /** Cut to a box, output px (editor/presets/clip-box.ts). */
   clip?: { x: number; y: number; w: number; h: number };
 };
