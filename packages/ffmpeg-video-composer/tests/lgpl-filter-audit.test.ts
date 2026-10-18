@@ -414,6 +414,16 @@ describe('LGPL device filter audit', () => {
       expect(ENGINE_EMITTED_FILTERS as readonly string[], type).toContain(type);
     }
   });
+
+  // BLEND_BLUR_BUILD: layer blend modes (blend) and motion blur (tmix) are LGPL (vf_blend.c, vf_mix.c, no
+  // configure deps) and must be in the device build the engine reads its allow-list from.
+  it('builds blend and tmix on device for layer blend modes and motion blur', () => {
+    expect(enabled.has('blend')).toBe(true);
+    expect(enabled.has('tmix')).toBe(true);
+    expect(DEVICE_FILTERS.has('blend')).toBe(true);
+    expect(DEVICE_FILTERS.has('tmix')).toBe(true);
+    expect(ENGINE_EMITTED_FILTERS as readonly string[]).toEqual(expect.arrayContaining(['blend', 'tmix']));
+  });
 });
 
 // Masks and transitions: clip boxes, the bands transition, shaped irises and zoom-through windows lower to
