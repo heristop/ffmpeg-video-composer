@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   shutter clock and averaged with `tmix`; resting frames and the background stay sharp. Bounded per element
   (`motion_blur_capped`).
 - The on-device engine adds `blend` and `tmix` (LGPL); a build without them composites normally or draws
-  sharp, with `blend_unavailable` / `motion_blur_unavailable` warnings and validation advisories, plus
+  sharp, with a `blend_unavailable` / `motion_blur_unavailable` compile warning (validation reports them only
+  when `getMotionWarnings` is given the target build's capabilities). Validation also advises
   `motion_blur_static` and `motion_blur_ignored`.
 - Sample `blend-motion-blur` and motion-review fixtures `layer-blend` and `motion-blur`.
 - Clip boxes: a kinetic block takes `clip` (`"block"`, its own resting box; `"line"`, one box per line; or

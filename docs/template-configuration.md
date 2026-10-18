@@ -1238,11 +1238,11 @@ The formulas are CSS `mix-blend-mode`'s, computed in RGB (`overlay` is the desig
 }
 ```
 
-- **Only where it moves.** Only the frames where the element moves are supersampled. Resting frames stay sharp and cost nothing extra, and the background is never smeared.
+- **Only where it moves.** Only the frames where the element moves are supersampled. Resting frames stay sharp, and the background is never smeared. The blurred copy is padded back to the section start so ffmpeg never queues the frames before a late span.
 - **Cost.** At most four spans and 1440 supersampled frames per element (3 s of motion at 30 fps x 16 samples). Longer motion lowers the samples, or drops the blur, with a `[motion_blur_capped]` warning.
 - **On device.** Blend modes use `blend`, and motion blur uses `tmix`, `trim`, `fps`, `settb` and `setpts`, all in the on-device LGPL build. Without `blend` a layer composites normally (`[blend_unavailable]`); without `tmix` it draws sharp (`[motion_blur_unavailable]`).
 
-Validation advises `motion_blur_static` (motion blur on a layer or preset that never moves), `motion_blur_ignored` (a filled kinetic block, drawn sharp), and, given the target build's capabilities, `blend_unavailable` and `motion_blur_unavailable`.
+Validation advises `motion_blur_static` (motion blur on a layer or preset that never moves), `motion_blur_ignored` (a filled or clipped kinetic block, or a clipped layer, drawn sharp), and, given the target build's capabilities, `blend_unavailable` and `motion_blur_unavailable`.
 
 ## Whole-video animations
 
