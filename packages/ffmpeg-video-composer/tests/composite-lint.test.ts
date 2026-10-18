@@ -84,4 +84,12 @@ describe('composite lint', () => {
 
     expect(warnings.find((w) => w.code === 'motion_blur_static')?.hint).toMatch(/slide|rise|drop/);
   });
+
+  it('treats a null, array or string motionBlur as absent instead of throwing', () => {
+    for (const motionBlur of [null, [], 'yes', 0]) {
+      expect(() => collectCompositeWarnings(layer({ motionBlur, animate: moving }))).not.toThrow();
+      expect(codes(layer({ motionBlur, animate: moving }))).toEqual([]);
+      expect(codes(kinetic({ preset: 'fade', motionBlur }))).toEqual([]);
+    }
+  });
 });

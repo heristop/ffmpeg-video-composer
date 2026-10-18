@@ -65,9 +65,12 @@ export interface ResolvedMotionBlur {
   samples: number;
 }
 
-/** The blur settings with defaults, or null when there is none (absent, or a closed shutter). */
-export function resolveMotionBlur(value: MotionBlur | undefined): ResolvedMotionBlur | null {
-  if (value === undefined) return null;
+/**
+ * The blur settings with defaults, or null when there is none: absent, a closed shutter, or a value that is
+ * neither true nor an object (an unvalidated template can carry null, an array or a string).
+ */
+export function resolveMotionBlur(value: MotionBlur | null | undefined): ResolvedMotionBlur | null {
+  if (value !== true && (typeof value !== 'object' || value === null || Array.isArray(value))) return null;
 
   const settings = value === true ? {} : value;
   const shutter = settings.shutter ?? MOTION_BLUR_DEFAULTS.shutter;

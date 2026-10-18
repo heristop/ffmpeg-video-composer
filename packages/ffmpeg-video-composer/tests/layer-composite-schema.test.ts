@@ -55,6 +55,9 @@ describe('motion blur schema', () => {
 
   it('resolves defaults; a closed shutter or no value is off', () => {
     expect(resolveMotionBlur(undefined)).toBeNull();
+    expect(resolveMotionBlur(null as never)).toBeNull();
+    expect(resolveMotionBlur([] as never)).toBeNull();
+    expect(resolveMotionBlur('yes' as never)).toBeNull();
     expect(resolveMotionBlur(true)).toEqual({ shutter: 180, samples: 8 });
     expect(resolveMotionBlur({ samples: 4 })).toEqual({ shutter: 180, samples: 4 });
     expect(resolveMotionBlur({ shutter: 0, samples: 16 })).toBeNull();
