@@ -133,19 +133,30 @@
         "framingGuide": {
           "type": "silhouette",
           "position": "center"
-        }
-      },
-      "lowerThird": {
-        "title": {
-          "en": "{{ form_1_firstname }}"
         },
-        "badge": {
-          "en": "ON-DEVICE"
-        },
-        "accent": "#7C83FD",
-        "reveal": "rise",
-        "effect": {
-          "shadow": true
+        "mask": {
+          "shape": {
+            "type": "ellipse",
+            "cx": 640,
+            "cy": 340,
+            "rx": 960,
+            "ry": 640
+          },
+          "feather": 70,
+          "animate": {
+            "scale": [
+              {
+                "t": 0.3,
+                "v": 0
+              },
+              {
+                "t": 1.5,
+                "v": 1.04,
+                "ease": "$smooth"
+              }
+            ]
+          },
+          "background": "#0d1b2a"
         }
       },
       "graphics": [
@@ -184,6 +195,86 @@
           "color": "#7C83FD",
           "intensity": 0.7
         }
+      ],
+      "inputs": [
+        {
+          "name": "name_card",
+          "type": "html",
+          "html": "<div class=\"wrap\"><div class=\"plate\"><div class=\"mark\" data-motion=\"mark\"></div><div class=\"txt\"><b data-motion=\"kicker\">ON-DEVICE</b><h2 data-motion=\"name\">{{ form_1_firstname }}</h2></div></div></div>",
+          "css": ".wrap { display: flex; align-items: flex-end; width: 100%; height: 100% } .plate { display: flex; border-radius: 0 16px 16px 0; background: rgba(13, 27, 42, 0.84); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) } .mark { width: 8px; background: #7C83FD } .txt { display: flex; flex-direction: column; padding: 12px 32px 14px 22px } b { color: #7C83FD; font: 600 18px $font.body; letter-spacing: 4px } h2 { margin: 2px 0 0; color: #ffffff; font: 54px $font.display; line-height: 1.1 }",
+          "width": 640,
+          "height": 130,
+          "options": {
+            "position": "0:556",
+            "start": 1.5,
+            "motion": {
+              "type": "fade",
+              "delay": 1.5,
+              "duration": 0.3,
+              "easing": "ease-out"
+            }
+          },
+          "motion": {
+            "mark": {
+              "opacity": [
+                {
+                  "t": 0,
+                  "v": 0
+                },
+                {
+                  "t": 0.2,
+                  "v": 1
+                }
+              ],
+              "x": [
+                {
+                  "t": 0,
+                  "v": -12
+                },
+                {
+                  "t": 0.44,
+                  "v": 0,
+                  "ease": "$snappy"
+                }
+              ]
+            },
+            "kicker": {
+              "opacity": [
+                {
+                  "t": 0.14,
+                  "v": 0
+                },
+                {
+                  "t": 0.4,
+                  "v": 1
+                }
+              ]
+            },
+            "name": {
+              "opacity": [
+                {
+                  "t": 0.2,
+                  "v": 0
+                },
+                {
+                  "t": 0.5,
+                  "v": 1
+                }
+              ],
+              "y": [
+                {
+                  "t": 0.2,
+                  "v": 14
+                },
+                {
+                  "t": 0.66,
+                  "v": 0,
+                  "ease": "$smooth"
+                }
+              ]
+            }
+          }
+        }
       ]
     },
     {
@@ -216,7 +307,97 @@
                 }
               }
             }
-          }
+          },
+          "options": {
+            "mask": {
+              "shape": {
+                "cx": 360,
+                "cy": 600,
+                "rx": 620,
+                "ry": 1000
+              }
+            }
+          },
+          "inputs": [
+            {
+              "name": "name_card",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"plate\"><div class=\"mark\" data-motion=\"mark\"></div><div class=\"txt\"><b data-motion=\"kicker\">ON-DEVICE</b><h2 data-motion=\"name\">{{ form_1_firstname }}</h2></div></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-end; width: 100%; height: 100% } .plate { display: flex; border-radius: 0 16px 16px 0; background: rgba(13, 27, 42, 0.84); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) } .mark { width: 8px; background: #7C83FD } .txt { display: flex; flex-direction: column; padding: 12px 32px 14px 22px } b { color: #7C83FD; font: 600 18px $font.body; letter-spacing: 4px } h2 { margin: 2px 0 0; color: #ffffff; font: 54px $font.display; line-height: 1.1 }",
+              "width": 600,
+              "height": 130,
+              "options": {
+                "position": "0:1090",
+                "start": 1.5,
+                "motion": {
+                  "type": "fade",
+                  "delay": 1.5,
+                  "duration": 0.3,
+                  "easing": "ease-out"
+                }
+              },
+              "motion": {
+                "mark": {
+                  "opacity": [
+                    {
+                      "t": 0,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.2,
+                      "v": 1
+                    }
+                  ],
+                  "x": [
+                    {
+                      "t": 0,
+                      "v": -12
+                    },
+                    {
+                      "t": 0.44,
+                      "v": 0,
+                      "ease": "$snappy"
+                    }
+                  ]
+                },
+                "kicker": {
+                  "opacity": [
+                    {
+                      "t": 0.14,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.4,
+                      "v": 1
+                    }
+                  ]
+                },
+                "name": {
+                  "opacity": [
+                    {
+                      "t": 0.2,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.5,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.2,
+                      "v": 14
+                    },
+                    {
+                      "t": 0.66,
+                      "v": 0,
+                      "ease": "$smooth"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
         },
         "logo_bumper": {
           "options": {

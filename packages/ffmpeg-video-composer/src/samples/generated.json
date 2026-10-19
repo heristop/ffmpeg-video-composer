@@ -116,13 +116,17 @@
         {
           "name": "watermark",
           "default": "pictures/logo.png",
-          "placeholders": ["{{ watermark }}"],
+          "placeholders": [
+            "{{ watermark }}"
+          ],
           "source": "global"
         },
         {
           "name": "videoOutro",
           "default": "videos/outro.mp4",
-          "placeholders": ["{{ videoOutro }}"],
+          "placeholders": [
+            "{{ videoOutro }}"
+          ],
           "source": "global"
         },
         {
@@ -133,76 +137,103 @@
         },
         {
           "name": "colorsList",
-          "default": ["rgb(41 37 36)", "rgb(250 250 249)"],
+          "default": [
+            "rgb(41 37 36)",
+            "rgb(250 250 249)"
+          ],
           "placeholders": [],
           "source": "global"
         },
         {
           "name": "form_1_firstname",
           "default": "Emily",
-          "placeholders": ["{{ form_1_firstname }}"],
+          "placeholders": [
+            "{{ form_1_firstname }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_lastname",
           "default": "Parker",
-          "placeholders": ["{{ form_1_lastname }}"],
+          "placeholders": [
+            "{{ form_1_lastname }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_job",
           "default": "Fullstack Developer",
-          "placeholders": ["{{ form_1_job }}"],
+          "placeholders": [
+            "{{ form_1_job }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_2_keyword1",
           "default": "Javascript",
-          "placeholders": ["{{ form_2_keyword1 }}"],
+          "placeholders": [
+            "{{ form_2_keyword1 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_2_keyword2",
           "default": "Typescript",
-          "placeholders": ["{{ form_2_keyword2 }}"],
+          "placeholders": [
+            "{{ form_2_keyword2 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_2_keyword3",
           "default": "Rust",
-          "placeholders": ["{{ form_2_keyword3 }}"],
+          "placeholders": [
+            "{{ form_2_keyword3 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_2_keyword4",
           "default": "Caffeine",
-          "placeholders": ["{{ form_2_keyword4 }}"],
+          "placeholders": [
+            "{{ form_2_keyword4 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_3_keyword1",
           "default": "Coffee Shop",
-          "placeholders": ["{{ form_3_keyword1 }}"],
+          "placeholders": [
+            "{{ form_3_keyword1 }}"
+          ],
           "source": "global"
         },
         {
           "name": "color1",
-          "placeholders": ["{{ color1 }}"],
+          "placeholders": [
+            "{{ color1 }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "color2",
-          "placeholders": ["{{ color2 }}"],
+          "placeholders": [
+            "{{ color2 }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "transitionDuration",
-          "placeholders": ["{{ transitionDuration }}"],
+          "placeholders": [
+            "{{ transitionDuration }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "transitionStartTime",
-          "placeholders": ["{{ transitionStartTime }}"],
+          "placeholders": [
+            "{{ transitionStartTime }}"
+          ],
           "source": "runtime"
         }
       ],
@@ -501,7 +532,10 @@
           "watermark": "pictures/logo.png",
           "videoOutro": "videos/outro.mp4",
           "animatedIcon": "animations/animation_icons.apng",
-          "colorsList": ["rgb(41 37 36)", "rgb(250 250 249)"],
+          "colorsList": [
+            "rgb(41 37 36)",
+            "rgb(250 250 249)"
+          ],
           "form_1_firstname": "Emily",
           "form_1_lastname": "Parker",
           "form_1_job": "Fullstack Developer",
@@ -568,7 +602,9 @@
           ],
           "maps": [
             {
-              "inputs": ["@watermark"],
+              "inputs": [
+                "@watermark"
+              ],
               "filters": [
                 {
                   "type": "scale",
@@ -578,24 +614,35 @@
                   }
                 }
               ],
-              "outputs": ["scaled_logo"]
+              "outputs": [
+                "scaled_logo"
+              ]
             },
             {
-              "inputs": ["@video"],
+              "inputs": [
+                "@video"
+              ],
               "options": {
                 "useSectionFilters": true
               },
-              "outputs": ["video"]
+              "outputs": [
+                "video"
+              ]
             },
             {
-              "inputs": ["video", "scaled_logo"],
+              "inputs": [
+                "video",
+                "scaled_logo"
+              ],
               "filters": [
                 {
                   "type": "overlay",
                   "value": "80:72"
                 }
               ],
-              "outputs": ["final"]
+              "outputs": [
+                "final"
+              ]
             }
           ],
           "filters": [
@@ -757,24 +804,35 @@
           ],
           "maps": [
             {
-              "inputs": ["0:v"],
-              "outputs": ["base"],
+              "inputs": [
+                "0:v"
+              ],
+              "outputs": [
+                "base"
+              ],
               "options": {
                 "useSectionFilters": true
               }
             },
             {
-              "inputs": ["base", "1:v"],
+              "inputs": [
+                "base",
+                "1:v"
+              ],
               "filters": [
                 {
                   "type": "overlay",
                   "value": "x=40:y='if(lt(t,5.3),460+(1-(if(lt(t,0.12),0,if(lt(t,0.5),(t-0.12)/0.38,1))))*70,460+(if(lt(t,5.9),(t-5.3)/0.6,1))*280)'"
                 }
               ],
-              "outputs": ["carded"]
+              "outputs": [
+                "carded"
+              ]
             },
             {
-              "inputs": ["carded"],
+              "inputs": [
+                "carded"
+              ],
               "filters": [
                 {
                   "type": "drawtext",
@@ -811,7 +869,9 @@
                   }
                 }
               ],
-              "outputs": ["final"]
+              "outputs": [
+                "final"
+              ]
             }
           ],
           "filters": [
@@ -936,24 +996,35 @@
           ],
           "maps": [
             {
-              "inputs": ["0:v"],
-              "outputs": ["base"],
+              "inputs": [
+                "0:v"
+              ],
+              "outputs": [
+                "base"
+              ],
               "options": {
                 "useSectionFilters": true
               }
             },
             {
-              "inputs": ["base", "1:v"],
+              "inputs": [
+                "base",
+                "1:v"
+              ],
               "filters": [
                 {
                   "type": "overlay",
                   "value": "x=48:y='150+(1-(if(lt(t,0.12),0,if(lt(t,0.5),(t-0.12)/0.38,1))))*70'"
                 }
               ],
-              "outputs": ["carded"]
+              "outputs": [
+                "carded"
+              ]
             },
             {
-              "inputs": ["carded"],
+              "inputs": [
+                "carded"
+              ],
               "filters": [
                 {
                   "type": "drawtext",
@@ -1043,7 +1114,9 @@
                   }
                 }
               ],
-              "outputs": ["final"]
+              "outputs": [
+                "final"
+              ]
             }
           ],
           "filters": [
@@ -1101,30 +1174,41 @@
           ],
           "maps": [
             {
-              "inputs": ["1:v"],
+              "inputs": [
+                "1:v"
+              ],
               "filters": [
                 {
                   "type": "setpts",
                   "value": "0.25*PTS"
                 }
               ],
-              "outputs": ["sped"],
+              "outputs": [
+                "sped"
+              ],
               "options": {
                 "useSectionFilters": true
               }
             },
             {
-              "inputs": ["sped", "2:v"],
+              "inputs": [
+                "sped",
+                "2:v"
+              ],
               "filters": [
                 {
                   "type": "overlay",
                   "value": "x=48:y='474+(1-(if(lt(t,0.12),0,if(lt(t,0.5),(t-0.12)/0.38,1))))*70'"
                 }
               ],
-              "outputs": ["carded"]
+              "outputs": [
+                "carded"
+              ]
             },
             {
-              "inputs": ["carded"],
+              "inputs": [
+                "carded"
+              ],
               "filters": [
                 {
                   "type": "drawtext",
@@ -1161,7 +1245,9 @@
                   }
                 }
               ],
-              "outputs": ["final"]
+              "outputs": [
+                "final"
+              ]
             }
           ],
           "filters": [
@@ -1301,139 +1387,185 @@
         {
           "name": "leclap_mark",
           "default": "pictures/leclap-mark.png",
-          "placeholders": ["{{ leclap_mark }}"],
+          "placeholders": [
+            "{{ leclap_mark }}"
+          ],
           "source": "global"
         },
         {
           "name": "opening_wall",
           "default": "videos/effects-tour/opening-wall.mp4",
-          "placeholders": ["{{ opening_wall }}"],
+          "placeholders": [
+            "{{ opening_wall }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_01",
           "default": "videos/effects-tour/01-type.mp4",
-          "placeholders": ["{{ chapter_01 }}"],
+          "placeholders": [
+            "{{ chapter_01 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_02",
           "default": "videos/effects-tour/02-camera-graphics.mp4",
-          "placeholders": ["{{ chapter_02 }}"],
+          "placeholders": [
+            "{{ chapter_02 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_03",
           "default": "videos/effects-tour/03-transitions.mp4",
-          "placeholders": ["{{ chapter_03 }}"],
+          "placeholders": [
+            "{{ chapter_03 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_04",
           "default": "videos/effects-tour/04-captions.mp4",
-          "placeholders": ["{{ chapter_04 }}"],
+          "placeholders": [
+            "{{ chapter_04 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_05",
           "default": "videos/effects-tour/05-compositing.mp4",
-          "placeholders": ["{{ chapter_05 }}"],
+          "placeholders": [
+            "{{ chapter_05 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_leclap",
           "default": "videos/effects-tour/06-theme-a-leclap.mp4",
-          "placeholders": ["{{ chapter_06_leclap }}"],
+          "placeholders": [
+            "{{ chapter_06_leclap }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_midnight",
           "default": "videos/effects-tour/06-theme-b-midnight.mp4",
-          "placeholders": ["{{ chapter_06_midnight }}"],
+          "placeholders": [
+            "{{ chapter_06_midnight }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_editorial",
           "default": "videos/effects-tour/06-theme-c-editorial.mp4",
-          "placeholders": ["{{ chapter_06_editorial }}"],
+          "placeholders": [
+            "{{ chapter_06_editorial }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_bold",
           "default": "videos/effects-tour/06-theme-d-bold.mp4",
-          "placeholders": ["{{ chapter_06_bold }}"],
+          "placeholders": [
+            "{{ chapter_06_bold }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_neon",
           "default": "videos/effects-tour/06-theme-e-neon.mp4",
-          "placeholders": ["{{ chapter_06_neon }}"],
+          "placeholders": [
+            "{{ chapter_06_neon }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_paper",
           "default": "videos/effects-tour/06-theme-f-paper.mp4",
-          "placeholders": ["{{ chapter_06_paper }}"],
+          "placeholders": [
+            "{{ chapter_06_paper }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_sunset",
           "default": "videos/effects-tour/06-theme-g-sunset.mp4",
-          "placeholders": ["{{ chapter_06_sunset }}"],
+          "placeholders": [
+            "{{ chapter_06_sunset }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_ocean",
           "default": "videos/effects-tour/06-theme-h-ocean.mp4",
-          "placeholders": ["{{ chapter_06_ocean }}"],
+          "placeholders": [
+            "{{ chapter_06_ocean }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_mono",
           "default": "videos/effects-tour/06-theme-i-mono.mp4",
-          "placeholders": ["{{ chapter_06_mono }}"],
+          "placeholders": [
+            "{{ chapter_06_mono }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_candy",
           "default": "videos/effects-tour/06-theme-j-candy.mp4",
-          "placeholders": ["{{ chapter_06_candy }}"],
+          "placeholders": [
+            "{{ chapter_06_candy }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_retro",
           "default": "videos/effects-tour/06-theme-k-retro.mp4",
-          "placeholders": ["{{ chapter_06_retro }}"],
+          "placeholders": [
+            "{{ chapter_06_retro }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_06_corporate",
           "default": "videos/effects-tour/06-theme-l-corporate.mp4",
-          "placeholders": ["{{ chapter_06_corporate }}"],
+          "placeholders": [
+            "{{ chapter_06_corporate }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_07",
           "default": "videos/effects-tour/07-looks.mp4",
-          "placeholders": ["{{ chapter_07 }}"],
+          "placeholders": [
+            "{{ chapter_07 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_08",
           "default": "videos/effects-tour/08-footage.mp4",
-          "placeholders": ["{{ chapter_08 }}"],
+          "placeholders": [
+            "{{ chapter_08 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_09",
           "default": "videos/effects-tour/09-sound.mp4",
-          "placeholders": ["{{ chapter_09 }}"],
+          "placeholders": [
+            "{{ chapter_09 }}"
+          ],
           "source": "global"
         },
         {
           "name": "chapter_10",
           "default": "videos/effects-tour/10-music.mp4",
-          "placeholders": ["{{ chapter_10 }}"],
+          "placeholders": [
+            "{{ chapter_10 }}"
+          ],
           "source": "global"
         }
       ],
@@ -1801,7 +1933,11 @@
               "color": "#F5F3F7",
               "fill": {
                 "gradient": {
-                  "stops": ["#7C83FD", "#C9CBFF", "#7C83FD"],
+                  "stops": [
+                    "#7C83FD",
+                    "#C9CBFF",
+                    "#7C83FD"
+                  ],
                   "angle": 90
                 },
                 "sweep": {
@@ -3295,7 +3431,10 @@
             "en": "Upload a landscape screen recording. A shallow perspective reveal settles into a readable screen, with a subtle forward drift and a caption outside the capture."
           },
           "captureMode": "screen",
-          "allowedCaptureModes": ["screen", "upload"],
+          "allowedCaptureModes": [
+            "screen",
+            "upload"
+          ],
           "forceAspectRatio": false,
           "forceOriginalAspectRatio": false
         }
@@ -3337,22 +3476,30 @@
       "variables": [
         {
           "name": "form_1_app",
-          "placeholders": ["{{ form_1_app }}"],
+          "placeholders": [
+            "{{ form_1_app }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_promise",
-          "placeholders": ["{{ form_1_promise }}"],
+          "placeholders": [
+            "{{ form_1_promise }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_feature",
-          "placeholders": ["{{ form_1_feature }}"],
+          "placeholders": [
+            "{{ form_1_feature }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_cta",
-          "placeholders": ["{{ form_1_cta }}"],
+          "placeholders": [
+            "{{ form_1_cta }}"
+          ],
           "source": "form"
         }
       ],
@@ -3407,7 +3554,11 @@
         "music": {
           "name": "lofi-study.mp3"
         },
-        "allowedMusic": ["the-builder", "lofi-study", "lofi-chill"],
+        "allowedMusic": [
+          "the-builder",
+          "lofi-study",
+          "lofi-chill"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "cut"
@@ -3602,7 +3753,10 @@
             "countdownDuration": 2,
             "forceOriginalAspectRatio": false,
             "captureMode": "screen",
-            "allowedCaptureModes": ["screen", "upload"]
+            "allowedCaptureModes": [
+              "screen",
+              "upload"
+            ]
           },
           "camera": {
             "preset": "push-in",
@@ -3849,17 +4003,23 @@
         {
           "name": "brand",
           "default": "YOUR LOGO",
-          "placeholders": ["{{ brand }}"],
+          "placeholders": [
+            "{{ brand }}"
+          ],
           "source": "global"
         },
         {
           "name": "form_1_headline",
-          "placeholders": ["{{ form_1_headline }}"],
+          "placeholders": [
+            "{{ form_1_headline }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_subtitle",
-          "placeholders": ["{{ form_1_subtitle }}"],
+          "placeholders": [
+            "{{ form_1_subtitle }}"
+          ],
           "source": "form"
         }
       ],
@@ -3935,7 +4095,13 @@
         "music": {
           "name": "lofi-study.mp3"
         },
-        "allowedMusic": ["lofi-study", "chill-hip-hop", "party-dance", "lofi-hip-hop", "indie-rock-dreamy"],
+        "allowedMusic": [
+          "lofi-study",
+          "chill-hip-hop",
+          "party-dance",
+          "lofi-hip-hop",
+          "indie-rock-dreamy"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "cut"
@@ -3969,7 +4135,9 @@
               "distance": 24,
               "easing": "ease-out"
             },
-            "sections": ["video_1"]
+            "sections": [
+              "video_1"
+            ]
           }
         ]
       },
@@ -4294,7 +4462,7 @@
     "source": "packages/leclap-creative-kit/src/templates/product-launch.json",
     "orientation": "portrait",
     "backend": "native",
-    "creativeDirection": "Audience: shoppers seeing one product for the first time. Direction: a minimal vertical reveal with the product as the hero, rather than a miniature web-app presentation. Use near-black surfaces, large centered condensed type and a clean full-frame product shot. Move quickly into the footage; make the closing offer and approved price easy to scan. Use one low-opacity specular sheen on the product reveal and let the price count up and settle exactly on the approved value; use staggered entrances sparingly and leave a readable hold. Avoid dense feature lists, fake discounts, covering the product and screen-recording chrome. Review product crop, longest name and price, type settling and the closing invitation. Motion: push up from the intro into the product, a slow specular sheen crosses the shot as it lands, then the price counts up and settles while a round-capped rule draws under it on a slow push-in.",
+    "creativeDirection": "Audience: shoppers seeing one product for the first time. Direction: a minimal vertical reveal with the product as the hero, rather than a miniature web-app presentation. Use near-black surfaces, large centered condensed type and a clean full-frame product shot. Move quickly into the footage; make the closing offer and approved price easy to scan. Use one low-opacity specular sheen on the product reveal and let the price count up and settle exactly on the approved value; use staggered entrances sparingly and leave a readable hold. Avoid dense feature lists, fake discounts, covering the product and screen-recording chrome. Review product crop, longest name and price, type settling and the closing invitation. Motion: push up from the intro into the product, a slow specular sheen crosses the shot as it lands, then a dark gradient seal turns upright behind the price as it counts up and settles, a round-capped rule draws under it, and the offer card staggers in beneath on a slow push-in.",
     "showcasePath": "/showcase?sample=product-launch",
     "preview": {
       "video": "/videos/showcase/product-launch.mp4",
@@ -4350,17 +4518,23 @@
         },
         {
           "name": "form_1_name",
-          "placeholders": ["{{ form_1_name }}"],
+          "placeholders": [
+            "{{ form_1_name }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_tagline",
-          "placeholders": ["{{ form_1_tagline }}"],
+          "placeholders": [
+            "{{ form_1_tagline }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_price",
-          "placeholders": ["{{ form_1_price }}"],
+          "placeholders": [
+            "{{ form_1_price }}"
+          ],
           "source": "form"
         }
       ],
@@ -4409,7 +4583,7 @@
       "meta": {
         "name": "Product Launch",
         "description": "A minimal vertical reveal: large centred product typography, a clean full-frame shot, and an offer-led closing with fast, staggered motion.",
-        "creativeDirection": "Audience: shoppers seeing one product for the first time. Direction: a minimal vertical reveal with the product as the hero, rather than a miniature web-app presentation. Use near-black surfaces, large centered condensed type and a clean full-frame product shot. Move quickly into the footage; make the closing offer and approved price easy to scan. Use one low-opacity specular sheen on the product reveal and let the price count up and settle exactly on the approved value; use staggered entrances sparingly and leave a readable hold. Avoid dense feature lists, fake discounts, covering the product and screen-recording chrome. Review product crop, longest name and price, type settling and the closing invitation. Motion: push up from the intro into the product, a slow specular sheen crosses the shot as it lands, then the price counts up and settles while a round-capped rule draws under it on a slow push-in."
+        "creativeDirection": "Audience: shoppers seeing one product for the first time. Direction: a minimal vertical reveal with the product as the hero, rather than a miniature web-app presentation. Use near-black surfaces, large centered condensed type and a clean full-frame product shot. Move quickly into the footage; make the closing offer and approved price easy to scan. Use one low-opacity specular sheen on the product reveal and let the price count up and settle exactly on the approved value; use staggered entrances sparingly and leave a readable hold. Avoid dense feature lists, fake discounts, covering the product and screen-recording chrome. Review product crop, longest name and price, type settling and the closing invitation. Motion: push up from the intro into the product, a slow specular sheen crosses the shot as it lands, then a dark gradient seal turns upright behind the price as it counts up and settles, a round-capped rule draws under it, and the offer card staggers in beneath on a slow push-in."
       },
       "global": {
         "orientation": "portrait",
@@ -4420,7 +4594,13 @@
         "music": {
           "name": "lofi-study.mp3"
         },
-        "allowedMusic": ["lofi-study", "chill-hip-hop", "the-builder", "indie-rock-dreamy", "once-in-paris"],
+        "allowedMusic": [
+          "lofi-study",
+          "chill-hip-hop",
+          "the-builder",
+          "indie-rock-dreamy",
+          "once-in-paris"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "cut"
@@ -4637,9 +4817,66 @@
           "filters": [],
           "graphics": [
             {
+              "type": "shape",
+              "at": 0.05,
+              "preset": {
+                "type": "star",
+                "points": 14,
+                "inner": 0.88
+              },
+              "x": 130,
+              "y": 420,
+              "width": 460,
+              "height": 460,
+              "gradient": {
+                "from": "$color.surface",
+                "to": "$color.bg",
+                "angle": 150
+              },
+              "stroke": {
+                "color": "$color.accent",
+                "width": 4
+              },
+              "animate": {
+                "scale": [
+                  {
+                    "t": 0.05,
+                    "v": 0.55
+                  },
+                  {
+                    "t": 0.75,
+                    "v": 1,
+                    "ease": "spring(260, 16)"
+                  }
+                ],
+                "rotate": [
+                  {
+                    "t": 0.05,
+                    "v": -24
+                  },
+                  {
+                    "t": 0.9,
+                    "v": 0,
+                    "ease": "$smooth"
+                  }
+                ],
+                "opacity": [
+                  {
+                    "t": 0.05,
+                    "v": 0
+                  },
+                  {
+                    "t": 0.3,
+                    "v": 1
+                  }
+                ]
+              },
+              "ease": "$smooth"
+            },
+            {
               "type": "underline",
               "x": 230,
-              "y": 548,
+              "y": 706,
               "width": 260,
               "thickness": 6,
               "origin": "center",
@@ -4670,26 +4907,101 @@
               "font": "BebasNeue.ttf",
               "size": 88,
               "color": "#c8bc9c",
-              "y": 440
+              "y": 598
             }
           ],
           "inputs": [
             {
               "name": "offer_card",
               "type": "html",
-              "html": "<div><b>THE OFFER</b><p><span>{{ form_1_name }}</span>{{ form_1_tagline }}</p><em>MAKE IT YOURS</em></div>",
-              "css": "div{display:flex;flex-direction:column;align-items:center;color:$color.brand;font:300 26px $font.body}b{padding:8px 20px;border:2px solid $color.brand;border-radius:8px 99px 99px 8px;font:500 22px $font.body;letter-spacing:4px}p{display:flex;align-items:center;margin:172px 0 0;padding:14px 24px;border:1px solid $color.brand@0.35;border-radius:14px;background:$color.surface}span{margin-right:16px;color:$color.fg;font:48px $font.display}em{margin-top:62px;padding:12px 34px;border-radius:99px;background:$color.brand;color:$color.bg;font:600 28px $font.body;letter-spacing:3px}",
+              "html": "<div><b data-motion=\"tag\">THE OFFER</b><p data-motion=\"plate\"><span>{{ form_1_name }}</span>{{ form_1_tagline }}</p><em data-motion=\"cta\">MAKE IT YOURS</em></div>",
+              "css": "div{display:flex;flex-direction:column;align-items:center;color:$color.brand;font:300 26px $font.body}b{padding:8px 20px;border:2px solid $color.brand;border-radius:8px 99px 99px 8px;font:500 22px $font.body;letter-spacing:4px}p{display:flex;align-items:center;margin:522px 0 0;padding:14px 24px;border:1px solid $color.brand@0.35;border-radius:14px;background:$color.surface}span{margin-right:16px;color:$color.fg;font:48px $font.display}em{margin-top:62px;padding:12px 34px;border-radius:99px;background:$color.brand;color:$color.bg;font:600 28px $font.body;letter-spacing:3px}",
               "width": 720,
-              "height": 500,
+              "height": 790,
               "options": {
                 "position": "0:352",
-                "start": 0.14,
-                "motion": {
-                  "type": "rise",
-                  "delay": 0.14,
-                  "duration": 0.32,
-                  "distance": 22,
-                  "easing": "ease-out"
+                "start": 0.14
+              },
+              "motion": {
+                "tag": {
+                  "opacity": [
+                    {
+                      "t": 0,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.24,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0,
+                      "v": -14
+                    },
+                    {
+                      "t": 0.4,
+                      "v": 0,
+                      "ease": "$smooth"
+                    }
+                  ]
+                },
+                "plate": {
+                  "opacity": [
+                    {
+                      "t": 0.7,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.98,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.7,
+                      "v": 22
+                    },
+                    {
+                      "t": 1.18,
+                      "v": 0,
+                      "ease": "$smooth"
+                    }
+                  ]
+                },
+                "cta": {
+                  "opacity": [
+                    {
+                      "t": 0.9,
+                      "v": 0
+                    },
+                    {
+                      "t": 1.14,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.9,
+                      "v": 22
+                    },
+                    {
+                      "t": 1.34,
+                      "v": 0,
+                      "ease": "$smooth"
+                    }
+                  ],
+                  "scale": [
+                    {
+                      "t": 0.9,
+                      "v": 0.94
+                    },
+                    {
+                      "t": 1.34,
+                      "v": 1,
+                      "ease": "$snappy"
+                    }
+                  ]
                 }
               }
             }
@@ -4749,12 +5061,16 @@
       "variables": [
         {
           "name": "form_1_topic",
-          "placeholders": ["{{ form_1_topic }}"],
+          "placeholders": [
+            "{{ form_1_topic }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_step",
-          "placeholders": ["{{ form_1_step }}"],
+          "placeholders": [
+            "{{ form_1_step }}"
+          ],
           "source": "form"
         }
       ],
@@ -4804,7 +5120,13 @@
         "music": {
           "name": "the-builder.mp3"
         },
-        "allowedMusic": ["the-builder", "lofi-hip-hop", "point-being", "lofi-study", "lofi-chill"],
+        "allowedMusic": [
+          "the-builder",
+          "lofi-hip-hop",
+          "point-being",
+          "lofi-study",
+          "lofi-chill"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "cut"
@@ -5198,17 +5520,23 @@
       "variables": [
         {
           "name": "form_1_scene1",
-          "placeholders": ["{{ form_1_scene1 }}"],
+          "placeholders": [
+            "{{ form_1_scene1 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_scene2",
-          "placeholders": ["{{ form_1_scene2 }}"],
+          "placeholders": [
+            "{{ form_1_scene2 }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_scene3",
-          "placeholders": ["{{ form_1_scene3 }}"],
+          "placeholders": [
+            "{{ form_1_scene3 }}"
+          ],
           "source": "form"
         }
       ],
@@ -5238,7 +5566,13 @@
         "music": {
           "name": "indie-rock-dreamy.mp3"
         },
-        "allowedMusic": ["indie-rock-dreamy", "lofi-chill", "lofi-hip-hop", "cafe-jazz", "dreamy-fall-people"],
+        "allowedMusic": [
+          "indie-rock-dreamy",
+          "lofi-chill",
+          "lofi-hip-hop",
+          "cafe-jazz",
+          "dreamy-fall-people"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "cut"
@@ -5340,7 +5674,7 @@
             {
               "name": "chapter_1_card",
               "type": "html",
-              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span class=\"seg on\"></span><span class=\"seg\"></span><span class=\"seg\"></span><b>01 / 03</b></div><p>{{ form_1_scene1 }}</p></div></div>",
+              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span data-motion=\"pip\" class=\"seg on\"></span><span data-motion=\"pip\" class=\"seg\"></span><span data-motion=\"pip\" class=\"seg\"></span><b data-motion=\"count\">01 / 03</b></div><p data-motion=\"line\">{{ form_1_scene1 }}</p></div></div>",
               "css": ".wrap { display: flex; width: 100%; height: 100%; align-items: flex-end; justify-content: flex-start } .card { display: flex; flex-direction: column; max-width: 536px; padding: 14px 24px 12px; border-radius: 16px; background: $color.bg@0.74; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) } .top { display: flex; align-items: center; gap: 6px } .seg { width: 30px; height: 5px; border-radius: 3px; background: $color.fg@0.3 } .seg.on { background: $color.fg } b { margin-left: 10px; color: $color.fg@0.8; font: 500 20px $font.body; letter-spacing: 3px } p { margin: 6px 0 0; color: $color.fg; font: 46px $font.display; line-height: 1.05; letter-spacing: 1px }",
               "width": 584,
               "height": 180,
@@ -5353,6 +5687,78 @@
                   "duration": 0.34,
                   "distance": 40,
                   "easing": "ease-out-back"
+                }
+              },
+              "motion": {
+                "pip": {
+                  "opacity": [
+                    {
+                      "t": 0.12,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.3,
+                      "v": 1
+                    }
+                  ],
+                  "scale": [
+                    {
+                      "t": 0.12,
+                      "v": 0.4
+                    },
+                    {
+                      "t": 0.46,
+                      "v": 1,
+                      "ease": "$snappy"
+                    }
+                  ],
+                  "stagger": 0.07
+                },
+                "count": {
+                  "opacity": [
+                    {
+                      "t": 0.3,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.55,
+                      "v": 1
+                    }
+                  ],
+                  "x": [
+                    {
+                      "t": 0.3,
+                      "v": -10
+                    },
+                    {
+                      "t": 0.74,
+                      "v": 0,
+                      "ease": "$snappy"
+                    }
+                  ]
+                },
+                "line": {
+                  "opacity": [
+                    {
+                      "t": 0.38,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.62,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.38,
+                      "v": 10
+                    },
+                    {
+                      "t": 0.84,
+                      "v": 0,
+                      "ease": "$smooth"
+                    }
+                  ]
                 }
               }
             }
@@ -5415,7 +5821,7 @@
             {
               "name": "chapter_2_card",
               "type": "html",
-              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span class=\"seg on\"></span><span class=\"seg on\"></span><span class=\"seg\"></span><b>02 / 03</b></div><p>{{ form_1_scene2 }}</p></div></div>",
+              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span data-motion=\"pip\" class=\"seg on\"></span><span data-motion=\"pip\" class=\"seg on\"></span><span data-motion=\"pip\" class=\"seg\"></span><b data-motion=\"count\">02 / 03</b></div><p data-motion=\"line\">{{ form_1_scene2 }}</p></div></div>",
               "css": ".wrap { display: flex; width: 100%; height: 100%; align-items: flex-start; justify-content: flex-end } .card { display: flex; flex-direction: column; max-width: 536px; padding: 14px 24px 12px; border-radius: 16px; background: $color.bg@0.74; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) } .top { display: flex; align-items: center; gap: 6px } .seg { width: 30px; height: 5px; border-radius: 3px; background: $color.fg@0.3 } .seg.on { background: $color.fg } b { margin-left: 10px; color: $color.fg@0.8; font: 500 20px $font.body; letter-spacing: 3px } p { margin: 6px 0 0; color: $color.fg; font: 46px $font.display; line-height: 1.05; letter-spacing: 1px }",
               "width": 584,
               "height": 180,
@@ -5428,6 +5834,78 @@
                   "duration": 0.34,
                   "distance": 40,
                   "easing": "ease-out-back"
+                }
+              },
+              "motion": {
+                "pip": {
+                  "opacity": [
+                    {
+                      "t": 0.12,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.3,
+                      "v": 1
+                    }
+                  ],
+                  "scale": [
+                    {
+                      "t": 0.12,
+                      "v": 0.4
+                    },
+                    {
+                      "t": 0.46,
+                      "v": 1,
+                      "ease": "$snappy"
+                    }
+                  ],
+                  "stagger": 0.07
+                },
+                "count": {
+                  "opacity": [
+                    {
+                      "t": 0.3,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.55,
+                      "v": 1
+                    }
+                  ],
+                  "x": [
+                    {
+                      "t": 0.3,
+                      "v": -10
+                    },
+                    {
+                      "t": 0.74,
+                      "v": 0,
+                      "ease": "$snappy"
+                    }
+                  ]
+                },
+                "line": {
+                  "opacity": [
+                    {
+                      "t": 0.38,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.62,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.38,
+                      "v": 10
+                    },
+                    {
+                      "t": 0.84,
+                      "v": 0,
+                      "ease": "$smooth"
+                    }
+                  ]
                 }
               }
             }
@@ -5486,7 +5964,7 @@
             {
               "name": "chapter_3_card",
               "type": "html",
-              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span class=\"seg on\"></span><span class=\"seg on\"></span><span class=\"seg on\"></span><b>03 / 03</b></div><p>{{ form_1_scene3 }}</p></div></div>",
+              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><span data-motion=\"pip\" class=\"seg on\"></span><span data-motion=\"pip\" class=\"seg on\"></span><span data-motion=\"pip\" class=\"seg on\"></span><b data-motion=\"count\">03 / 03</b></div><p data-motion=\"line\">{{ form_1_scene3 }}</p></div></div>",
               "css": ".wrap { display: flex; width: 100%; height: 100%; align-items: flex-end; justify-content: center } .card { display: flex; flex-direction: column; max-width: 518px; padding: 14px 24px 12px; border-radius: 16px; background: $color.bg@0.74; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) } .top { display: flex; align-items: center; gap: 6px } .seg { width: 30px; height: 5px; border-radius: 3px; background: $color.fg@0.3 } .seg.on { background: $color.fg } b { margin-left: 10px; color: $color.fg@0.8; font: 500 20px $font.body; letter-spacing: 3px } p { margin: 6px 0 0; color: $color.fg; font: 46px $font.display; line-height: 1.05; letter-spacing: 1px }",
               "width": 518,
               "height": 180,
@@ -5499,6 +5977,78 @@
                   "duration": 0.34,
                   "distance": 32,
                   "easing": "ease-out-back"
+                }
+              },
+              "motion": {
+                "pip": {
+                  "opacity": [
+                    {
+                      "t": 0.12,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.3,
+                      "v": 1
+                    }
+                  ],
+                  "scale": [
+                    {
+                      "t": 0.12,
+                      "v": 0.4
+                    },
+                    {
+                      "t": 0.46,
+                      "v": 1,
+                      "ease": "$snappy"
+                    }
+                  ],
+                  "stagger": 0.07
+                },
+                "count": {
+                  "opacity": [
+                    {
+                      "t": 0.3,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.55,
+                      "v": 1
+                    }
+                  ],
+                  "x": [
+                    {
+                      "t": 0.3,
+                      "v": -10
+                    },
+                    {
+                      "t": 0.74,
+                      "v": 0,
+                      "ease": "$snappy"
+                    }
+                  ]
+                },
+                "line": {
+                  "opacity": [
+                    {
+                      "t": 0.38,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.62,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.38,
+                      "v": 10
+                    },
+                    {
+                      "t": 0.84,
+                      "v": 0,
+                      "ease": "$smooth"
+                    }
+                  ]
                 }
               }
             }
@@ -5571,42 +6121,56 @@
         {
           "name": "optionA1",
           "default": "Tea",
-          "placeholders": ["{{ optionA1 }}"],
+          "placeholders": [
+            "{{ optionA1 }}"
+          ],
           "source": "global"
         },
         {
           "name": "optionB1",
           "default": "Coffee",
-          "placeholders": ["{{ optionB1 }}"],
+          "placeholders": [
+            "{{ optionB1 }}"
+          ],
           "source": "global"
         },
         {
           "name": "optionA2",
           "default": "Beach",
-          "placeholders": ["{{ optionA2 }}"],
+          "placeholders": [
+            "{{ optionA2 }}"
+          ],
           "source": "global"
         },
         {
           "name": "optionB2",
           "default": "Mountains",
-          "placeholders": ["{{ optionB2 }}"],
+          "placeholders": [
+            "{{ optionB2 }}"
+          ],
           "source": "global"
         },
         {
           "name": "optionA3",
           "default": "Cats",
-          "placeholders": ["{{ optionA3 }}"],
+          "placeholders": [
+            "{{ optionA3 }}"
+          ],
           "source": "global"
         },
         {
           "name": "optionB3",
           "default": "Dogs",
-          "placeholders": ["{{ optionB3 }}"],
+          "placeholders": [
+            "{{ optionB3 }}"
+          ],
           "source": "global"
         },
         {
           "name": "form_1_firstname",
-          "placeholders": ["{{ form_1_firstname }}"],
+          "placeholders": [
+            "{{ form_1_firstname }}"
+          ],
           "source": "form"
         }
       ],
@@ -5769,7 +6333,13 @@
         "music": {
           "name": "chill-hip-hop.mp3"
         },
-        "allowedMusic": ["chill-hip-hop", "lofi-study", "lofi-hip-hop", "party-dance", "indie-rock-dreamy"],
+        "allowedMusic": [
+          "chill-hip-hop",
+          "lofi-study",
+          "lofi-hip-hop",
+          "party-dance",
+          "indie-rock-dreamy"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "push-left",
@@ -6173,7 +6743,10 @@
               "offset": 0.4
             }
           ],
-          "jobs": ["compare", "ask"],
+          "jobs": [
+            "compare",
+            "ask"
+          ],
           "useWhen": "A this-or-that question, poll or A/B choice that should feel loud and playful.",
           "avoidWhen": "Calm, premium or accessibility-sensitive pacing: the colour swap strobes every 0.4 s.",
           "sections": [
@@ -6333,7 +6906,10 @@
               "offset": 0.5
             }
           ],
-          "jobs": ["brand", "close"],
+          "jobs": [
+            "brand",
+            "close"
+          ],
           "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
           "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
           "sections": [
@@ -6448,27 +7024,37 @@
       "variables": [
         {
           "name": "form_1_name",
-          "placeholders": ["{{ form_1_name }}"],
+          "placeholders": [
+            "{{ form_1_name }}"
+          ],
           "source": "form"
         },
         {
           "name": "form_1_title",
-          "placeholders": ["{{ form_1_title }}"],
+          "placeholders": [
+            "{{ form_1_title }}"
+          ],
           "source": "form"
         },
         {
           "name": "transitionDuration",
-          "placeholders": ["{{ transitionDuration }}"],
+          "placeholders": [
+            "{{ transitionDuration }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "transitionStartTime",
-          "placeholders": ["{{ transitionStartTime }}"],
+          "placeholders": [
+            "{{ transitionStartTime }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "form_1_question",
-          "placeholders": ["{{ form_1_question }}"],
+          "placeholders": [
+            "{{ form_1_question }}"
+          ],
           "source": "form"
         }
       ],
@@ -6546,7 +7132,13 @@
         "music": {
           "name": "lofi-sentimental-jazz.mp3"
         },
-        "allowedMusic": ["lofi-sentimental-jazz", "cafe-jazz", "lofi-chill", "lofi-cafe", "dreamy-fall-people"],
+        "allowedMusic": [
+          "lofi-sentimental-jazz",
+          "cafe-jazz",
+          "lofi-chill",
+          "lofi-cafe",
+          "dreamy-fall-people"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "fade",
@@ -6849,8 +7441,8 @@
             {
               "name": "name_card",
               "type": "html",
-              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><h2>{{ form_1_name }}</h2><span class=\"badge\">On the record</span></div><p>{{ form_1_title }}</p></div></div>",
-              "css": ".wrap { display: flex; align-items: flex-end; height: 100%; padding: 0 16px 16px 0 } .card { display: flex; flex-direction: column; padding: 16px 28px 18px 24px; border-left: 8px solid $color.brand; border-radius: 0 14px 14px 0; background: $color.bg@0.9; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) } .top { display: flex; align-items: center; gap: 16px } h2 { margin: 0; color: $color.fg; font: 500 50px $font.body; line-height: 1.1 } .badge { padding: 6px 14px; border-radius: 999px; background: $color.brand; color: $color.bg; font: 600 17px $font.body; text-transform: uppercase; letter-spacing: 2px } p { margin: 2px 0 0; color: $color.muted; font: 400 26px $font.body }",
+              "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"bar\" data-motion=\"bar\"></div><div class=\"body\"><div class=\"top\"><h2 data-motion=\"name\">{{ form_1_name }}</h2><span class=\"badge\" data-motion=\"badge\">On the record</span></div><p data-motion=\"role\">{{ form_1_title }}</p></div></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-end; height: 100%; padding: 0 16px 16px 0 } .card { display: flex; border-radius: 0 14px 14px 0; background: $color.bg@0.9; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) } .bar { width: 8px; background: $color.brand } .body { display: flex; flex-direction: column; padding: 16px 28px 18px 24px } .top { display: flex; align-items: center; gap: 16px } h2 { margin: 0; color: $color.fg; font: 500 50px $font.body; line-height: 1.1 } .badge { padding: 6px 14px; border-radius: 999px; background: $color.brand; color: $color.bg; font: 600 17px $font.body; text-transform: uppercase; letter-spacing: 2px } p { margin: 2px 0 0; color: $color.muted; font: 400 26px $font.body }",
               "width": 860,
               "height": 150,
               "options": {
@@ -6859,9 +7451,103 @@
                 "motion": {
                   "type": "slide-right",
                   "delay": 0.6,
-                  "duration": 0.6,
-                  "distance": 80,
+                  "duration": 0.45,
+                  "distance": 40,
                   "easing": "ease-out"
+                }
+              },
+              "motion": {
+                "bar": {
+                  "opacity": [
+                    {
+                      "t": 0,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.2,
+                      "v": 1
+                    }
+                  ],
+                  "x": [
+                    {
+                      "t": 0,
+                      "v": -14
+                    },
+                    {
+                      "t": 0.46,
+                      "v": 0,
+                      "ease": "$snappy"
+                    }
+                  ]
+                },
+                "name": {
+                  "opacity": [
+                    {
+                      "t": 0.14,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.42,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.14,
+                      "v": 12
+                    },
+                    {
+                      "t": 0.56,
+                      "v": 0,
+                      "ease": "$smooth"
+                    }
+                  ]
+                },
+                "badge": {
+                  "opacity": [
+                    {
+                      "t": 0.3,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.46,
+                      "v": 1
+                    }
+                  ],
+                  "scale": [
+                    {
+                      "t": 0.3,
+                      "v": 0.7
+                    },
+                    {
+                      "t": 0.74,
+                      "v": 1,
+                      "ease": "$snappy"
+                    }
+                  ]
+                },
+                "role": {
+                  "opacity": [
+                    {
+                      "t": 0.4,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.68,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.4,
+                      "v": 8
+                    },
+                    {
+                      "t": 0.84,
+                      "v": 0,
+                      "ease": "$smooth"
+                    }
+                  ]
                 }
               }
             }
@@ -6886,7 +7572,10 @@
               "offset": 0.5
             }
           ],
-          "jobs": ["brand", "close"],
+          "jobs": [
+            "brand",
+            "close"
+          ],
           "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
           "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
           "sections": [
@@ -6989,22 +7678,30 @@
       "variables": [
         {
           "name": "form_1_quote",
-          "placeholders": ["{{ form_1_quote }}"],
+          "placeholders": [
+            "{{ form_1_quote }}"
+          ],
           "source": "form"
         },
         {
           "name": "transitionDuration",
-          "placeholders": ["{{ transitionDuration }}"],
+          "placeholders": [
+            "{{ transitionDuration }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "transitionStartTime",
-          "placeholders": ["{{ transitionStartTime }}"],
+          "placeholders": [
+            "{{ transitionStartTime }}"
+          ],
           "source": "runtime"
         },
         {
           "name": "form_1_name",
-          "placeholders": ["{{ form_1_name }}"],
+          "placeholders": [
+            "{{ form_1_name }}"
+          ],
           "source": "form"
         }
       ],
@@ -7055,7 +7752,13 @@
         "music": {
           "name": "dreamy-fall-people.mp3"
         },
-        "allowedMusic": ["dreamy-fall-people", "lofi-cafe", "lofi-sentimental-jazz", "cafe-jazz", "lofi-chill"],
+        "allowedMusic": [
+          "dreamy-fall-people",
+          "lofi-cafe",
+          "lofi-sentimental-jazz",
+          "cafe-jazz",
+          "lofi-chill"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "dissolve",
@@ -7271,7 +7974,10 @@
               "offset": 0.5
             }
           ],
-          "jobs": ["brand", "close"],
+          "jobs": [
+            "brand",
+            "close"
+          ],
           "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
           "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
           "sections": [
@@ -7370,7 +8076,9 @@
       "variables": [
         {
           "name": "form_1_firstname",
-          "placeholders": ["{{ form_1_firstname }}"],
+          "placeholders": [
+            "{{ form_1_firstname }}"
+          ],
           "source": "form"
         }
       ],
@@ -7402,18 +8110,6 @@
           "reference": "Oswald.ttf",
           "path": "sections[1].titleCard.filters[3].values.fontfile",
           "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[2].lowerThird.filters[2].values.fontfile",
-          "source": "preset"
-        },
-        {
-          "kind": "font",
-          "reference": "Anton.ttf",
-          "path": "sections[2].lowerThird.filters[3].values.fontfile",
-          "source": "preset"
         }
       ],
       "effects": [],
@@ -7435,7 +8131,13 @@
         "music": {
           "name": "party-dance.mp3"
         },
-        "allowedMusic": ["party-dance", "chill-hip-hop", "lofi-study", "indie-rock-dreamy", "cafe-jazz"],
+        "allowedMusic": [
+          "party-dance",
+          "chill-hip-hop",
+          "lofi-study",
+          "indie-rock-dreamy",
+          "cafe-jazz"
+        ],
         "allowUploadMusic": true,
         "transition": {
           "type": "fade",
@@ -7559,19 +8261,30 @@
             "framingGuide": {
               "type": "silhouette",
               "position": "center"
-            }
-          },
-          "lowerThird": {
-            "title": {
-              "en": "{{ form_1_firstname }}"
             },
-            "badge": {
-              "en": "ON-DEVICE"
-            },
-            "accent": "#7C83FD",
-            "reveal": "rise",
-            "effect": {
-              "shadow": true
+            "mask": {
+              "shape": {
+                "type": "ellipse",
+                "cx": 640,
+                "cy": 340,
+                "rx": 960,
+                "ry": 640
+              },
+              "feather": 70,
+              "animate": {
+                "scale": [
+                  {
+                    "t": 0.3,
+                    "v": 0
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 1.04,
+                    "ease": "$smooth"
+                  }
+                ]
+              },
+              "background": "#0d1b2a"
             }
           },
           "graphics": [
@@ -7610,6 +8323,86 @@
               "color": "#7C83FD",
               "intensity": 0.7
             }
+          ],
+          "inputs": [
+            {
+              "name": "name_card",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"plate\"><div class=\"mark\" data-motion=\"mark\"></div><div class=\"txt\"><b data-motion=\"kicker\">ON-DEVICE</b><h2 data-motion=\"name\">{{ form_1_firstname }}</h2></div></div></div>",
+              "css": ".wrap { display: flex; align-items: flex-end; width: 100%; height: 100% } .plate { display: flex; border-radius: 0 16px 16px 0; background: rgba(13, 27, 42, 0.84); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) } .mark { width: 8px; background: #7C83FD } .txt { display: flex; flex-direction: column; padding: 12px 32px 14px 22px } b { color: #7C83FD; font: 600 18px $font.body; letter-spacing: 4px } h2 { margin: 2px 0 0; color: #ffffff; font: 54px $font.display; line-height: 1.1 }",
+              "width": 640,
+              "height": 130,
+              "options": {
+                "position": "0:556",
+                "start": 1.5,
+                "motion": {
+                  "type": "fade",
+                  "delay": 1.5,
+                  "duration": 0.3,
+                  "easing": "ease-out"
+                }
+              },
+              "motion": {
+                "mark": {
+                  "opacity": [
+                    {
+                      "t": 0,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.2,
+                      "v": 1
+                    }
+                  ],
+                  "x": [
+                    {
+                      "t": 0,
+                      "v": -12
+                    },
+                    {
+                      "t": 0.44,
+                      "v": 0,
+                      "ease": "$snappy"
+                    }
+                  ]
+                },
+                "kicker": {
+                  "opacity": [
+                    {
+                      "t": 0.14,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.4,
+                      "v": 1
+                    }
+                  ]
+                },
+                "name": {
+                  "opacity": [
+                    {
+                      "t": 0.2,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.5,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.2,
+                      "v": 14
+                    },
+                    {
+                      "t": 0.66,
+                      "v": 0,
+                      "ease": "$smooth"
+                    }
+                  ]
+                }
+              }
+            }
           ]
         },
         {
@@ -7642,7 +8435,97 @@
                     }
                   }
                 }
-              }
+              },
+              "options": {
+                "mask": {
+                  "shape": {
+                    "cx": 360,
+                    "cy": 600,
+                    "rx": 620,
+                    "ry": 1000
+                  }
+                }
+              },
+              "inputs": [
+                {
+                  "name": "name_card",
+                  "type": "html",
+                  "html": "<div class=\"wrap\"><div class=\"plate\"><div class=\"mark\" data-motion=\"mark\"></div><div class=\"txt\"><b data-motion=\"kicker\">ON-DEVICE</b><h2 data-motion=\"name\">{{ form_1_firstname }}</h2></div></div></div>",
+                  "css": ".wrap { display: flex; align-items: flex-end; width: 100%; height: 100% } .plate { display: flex; border-radius: 0 16px 16px 0; background: rgba(13, 27, 42, 0.84); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) } .mark { width: 8px; background: #7C83FD } .txt { display: flex; flex-direction: column; padding: 12px 32px 14px 22px } b { color: #7C83FD; font: 600 18px $font.body; letter-spacing: 4px } h2 { margin: 2px 0 0; color: #ffffff; font: 54px $font.display; line-height: 1.1 }",
+                  "width": 600,
+                  "height": 130,
+                  "options": {
+                    "position": "0:1090",
+                    "start": 1.5,
+                    "motion": {
+                      "type": "fade",
+                      "delay": 1.5,
+                      "duration": 0.3,
+                      "easing": "ease-out"
+                    }
+                  },
+                  "motion": {
+                    "mark": {
+                      "opacity": [
+                        {
+                          "t": 0,
+                          "v": 0
+                        },
+                        {
+                          "t": 0.2,
+                          "v": 1
+                        }
+                      ],
+                      "x": [
+                        {
+                          "t": 0,
+                          "v": -12
+                        },
+                        {
+                          "t": 0.44,
+                          "v": 0,
+                          "ease": "$snappy"
+                        }
+                      ]
+                    },
+                    "kicker": {
+                      "opacity": [
+                        {
+                          "t": 0.14,
+                          "v": 0
+                        },
+                        {
+                          "t": 0.4,
+                          "v": 1
+                        }
+                      ]
+                    },
+                    "name": {
+                      "opacity": [
+                        {
+                          "t": 0.2,
+                          "v": 0
+                        },
+                        {
+                          "t": 0.5,
+                          "v": 1
+                        }
+                      ],
+                      "y": [
+                        {
+                          "t": 0.2,
+                          "v": 14
+                        },
+                        {
+                          "t": 0.66,
+                          "v": 0,
+                          "ease": "$smooth"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
             },
             "logo_bumper": {
               "options": {
@@ -7702,7 +8585,10 @@
               "offset": 0.5
             }
           ],
-          "jobs": ["brand", "close"],
+          "jobs": [
+            "brand",
+            "close"
+          ],
           "useWhen": "Open or sign off a video with the LeClap identity, ideally with the logo landing on a downbeat.",
           "avoidWhen": "Mid-video: a bumper reads as a beginning or an ending, never as a transition.",
           "sections": [
@@ -7780,7 +8666,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -7850,7 +8738,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -7920,7 +8810,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -7990,7 +8882,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -8060,7 +8954,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -8130,7 +9026,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -8200,7 +9098,9 @@
         {
           "id": "studio.editorial-type",
           "version": "1.0.0",
-          "sections": ["editorial"],
+          "sections": [
+            "editorial"
+          ],
           "customCatalog": true
         }
       ],
@@ -9344,7 +10244,9 @@
         {
           "id": "leclap.title-reveal",
           "version": "1.0.0",
-          "sections": ["intro"],
+          "sections": [
+            "intro"
+          ],
           "customCatalog": false
         }
       ],
@@ -9439,7 +10341,9 @@
         {
           "id": "leclap.web-app-promo",
           "version": "1.0.0",
-          "sections": ["promo"],
+          "sections": [
+            "promo"
+          ],
           "customCatalog": false
         }
       ],
@@ -9473,7 +10377,11 @@
               "subheadline": "Turn your product into a story worth watching.",
               "cta": "Start creating",
               "displayUrl": "leclap.dev",
-              "features": ["Design with intent", "Move with precision", "Ship something remarkable"],
+              "features": [
+                "Design with intent",
+                "Move with precision",
+                "Ship something remarkable"
+              ],
               "accent": "#B9A2FF",
               "backgroundColor": "#111120",
               "textColor": "#FFFFFF",
@@ -9521,7 +10429,9 @@
         {
           "id": "studio.product-reveal",
           "version": "1.0.0",
-          "sections": ["product"],
+          "sections": [
+            "product"
+          ],
           "customCatalog": true
         }
       ],
@@ -10378,25 +11288,33 @@
         {
           "name": "project",
           "default": "Example project",
-          "placeholders": ["{{ project }}"],
+          "placeholders": [
+            "{{ project }}"
+          ],
           "source": "global"
         },
         {
           "name": "ticket",
           "default": "PR #123",
-          "placeholders": ["{{ ticket }}"],
+          "placeholders": [
+            "{{ ticket }}"
+          ],
           "source": "global"
         },
         {
           "name": "change",
           "default": "Keyboard navigation",
-          "placeholders": ["{{ change }}"],
+          "placeholders": [
+            "{{ change }}"
+          ],
           "source": "global"
         },
         {
           "name": "reviewFocus",
           "default": "Focus order and visible focus states",
-          "placeholders": ["{{ reviewFocus }}"],
+          "placeholders": [
+            "{{ reviewFocus }}"
+          ],
           "source": "global"
         }
       ],
@@ -10536,7 +11454,11 @@
               "color": "#f7f7f8",
               "fill": {
                 "gradient": {
-                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "stops": [
+                    "#aeb2fb",
+                    "#ffa8bf",
+                    "#fff685"
+                  ],
                   "angle": 90
                 }
               },
@@ -10712,7 +11634,11 @@
               "color": "#f7f7f8",
               "fill": {
                 "gradient": {
-                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "stops": [
+                    "#aeb2fb",
+                    "#ffa8bf",
+                    "#fff685"
+                  ],
                   "angle": 90
                 }
               },
@@ -10836,7 +11762,11 @@
               "color": "#f7f7f8",
               "fill": {
                 "gradient": {
-                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "stops": [
+                    "#aeb2fb",
+                    "#ffa8bf",
+                    "#fff685"
+                  ],
                   "angle": 90
                 }
               },
@@ -10949,37 +11879,49 @@
         {
           "name": "project",
           "default": "Example project",
-          "placeholders": ["{{ project }}"],
+          "placeholders": [
+            "{{ project }}"
+          ],
           "source": "global"
         },
         {
           "name": "ticket",
           "default": "PR #123",
-          "placeholders": ["{{ ticket }}"],
+          "placeholders": [
+            "{{ ticket }}"
+          ],
           "source": "global"
         },
         {
           "name": "change",
           "default": "Describe the change",
-          "placeholders": ["{{ change }}"],
+          "placeholders": [
+            "{{ change }}"
+          ],
           "source": "global"
         },
         {
           "name": "beforeCaption",
           "default": "What was wrong",
-          "placeholders": ["{{ beforeCaption }}"],
+          "placeholders": [
+            "{{ beforeCaption }}"
+          ],
           "source": "global"
         },
         {
           "name": "afterCaption",
           "default": "What changed",
-          "placeholders": ["{{ afterCaption }}"],
+          "placeholders": [
+            "{{ afterCaption }}"
+          ],
           "source": "global"
         },
         {
           "name": "reviewFocus",
           "default": "What the reviewer should check",
-          "placeholders": ["{{ reviewFocus }}"],
+          "placeholders": [
+            "{{ reviewFocus }}"
+          ],
           "source": "global"
         }
       ],
@@ -11140,7 +12082,11 @@
               "color": "#f7f7f8",
               "fill": {
                 "gradient": {
-                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "stops": [
+                    "#aeb2fb",
+                    "#ffa8bf",
+                    "#fff685"
+                  ],
                   "angle": 90
                 }
               },
@@ -11355,7 +12301,11 @@
               "color": "#f7f7f8",
               "fill": {
                 "gradient": {
-                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "stops": [
+                    "#aeb2fb",
+                    "#ffa8bf",
+                    "#fff685"
+                  ],
                   "angle": 90
                 }
               },
@@ -11589,7 +12539,10 @@
         },
         {
           "name": "geom.canvas",
-          "default": ["1280", "720"],
+          "default": [
+            "1280",
+            "720"
+          ],
           "placeholders": [],
           "source": "global"
         },
@@ -11613,13 +12566,19 @@
         },
         {
           "name": "geom.pane",
-          "default": ["592", "444"],
+          "default": [
+            "592",
+            "444"
+          ],
           "placeholders": [],
           "source": "global"
         },
         {
           "name": "geom.paneX",
-          "default": ["32", "656"],
+          "default": [
+            "32",
+            "656"
+          ],
           "placeholders": [],
           "source": "global"
         },
@@ -11655,7 +12614,10 @@
         },
         {
           "name": "geom.descBaselines",
-          "default": ["632", "660"],
+          "default": [
+            "632",
+            "660"
+          ],
           "placeholders": [],
           "source": "global"
         },
@@ -11667,7 +12629,11 @@
         },
         {
           "name": "geom.calloutMark",
-          "default": ["12", "2", "8"],
+          "default": [
+            "12",
+            "2",
+            "8"
+          ],
           "placeholders": [],
           "source": "global"
         },
@@ -11685,7 +12651,11 @@
         },
         {
           "name": "geom.highlight",
-          "default": ["8", "8", "4"],
+          "default": [
+            "8",
+            "8",
+            "4"
+          ],
           "placeholders": [],
           "source": "global"
         },
@@ -11709,58 +12679,83 @@
         },
         {
           "name": "limit.badgeVocabulary",
-          "default": ["BEFORE", "AFTER", "AVANT", "APRÈS"],
+          "default": [
+            "BEFORE",
+            "AFTER",
+            "AVANT",
+            "APRÈS"
+          ],
           "placeholders": [],
           "source": "global"
         },
         {
           "name": "summary",
-          "placeholders": ["{{ summary }}"],
+          "placeholders": [
+            "{{ summary }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "beforeBadge",
-          "placeholders": ["{{ beforeBadge }}"],
+          "placeholders": [
+            "{{ beforeBadge }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "beforeChip",
-          "placeholders": ["{{ beforeChip }}"],
+          "placeholders": [
+            "{{ beforeChip }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "afterBadge",
-          "placeholders": ["{{ afterBadge }}"],
+          "placeholders": [
+            "{{ afterBadge }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "afterChip",
-          "placeholders": ["{{ afterChip }}"],
+          "placeholders": [
+            "{{ afterChip }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "headline",
-          "placeholders": ["{{ headline }}"],
+          "placeholders": [
+            "{{ headline }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "ticket",
-          "placeholders": ["{{ ticket }}"],
+          "placeholders": [
+            "{{ ticket }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "clipSeconds",
-          "placeholders": ["{{ clipSeconds }}"],
+          "placeholders": [
+            "{{ clipSeconds }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "outroSubtitle",
-          "placeholders": ["{{ outroSubtitle }}"],
+          "placeholders": [
+            "{{ outroSubtitle }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "outroHeadline",
-          "placeholders": ["{{ outroHeadline }}"],
+          "placeholders": [
+            "{{ outroHeadline }}"
+          ],
           "source": "placeholder"
         }
       ],
@@ -11895,27 +12890,52 @@
           "size.headline": "64",
           "size.summary": "24",
           "size.chip": "20",
-          "geom.canvas": ["1280", "720"],
+          "geom.canvas": [
+            "1280",
+            "720"
+          ],
           "geom.margin": "32",
           "geom.headerBaseline": "54",
           "geom.markSize": "32",
-          "geom.pane": ["592", "444"],
-          "geom.paneX": ["32", "656"],
+          "geom.pane": [
+            "592",
+            "444"
+          ],
+          "geom.paneX": [
+            "32",
+            "656"
+          ],
           "geom.paneY": "152",
           "geom.labelGap": "16",
           "geom.chipWidth": "96",
           "geom.chipHeight": "36",
           "geom.chipGap": "16",
-          "geom.descBaselines": ["632", "660"],
+          "geom.descBaselines": [
+            "632",
+            "660"
+          ],
           "geom.calloutGap": "24",
-          "geom.calloutMark": ["12", "2", "8"],
+          "geom.calloutMark": [
+            "12",
+            "2",
+            "8"
+          ],
           "geom.slateMeasure": "864",
           "geom.slateHeader": "272",
-          "geom.highlight": ["8", "8", "4"],
+          "geom.highlight": [
+            "8",
+            "8",
+            "4"
+          ],
           "motion.calloutDelay": "0.15",
           "motion.calloutFade": "0.2",
           "limit.descLines": "2",
-          "limit.badgeVocabulary": ["BEFORE", "AFTER", "AVANT", "APRÈS"]
+          "limit.badgeVocabulary": [
+            "BEFORE",
+            "AFTER",
+            "AVANT",
+            "APRÈS"
+          ]
         }
       },
       "sections": [
@@ -12043,7 +13063,11 @@
               "color": "#f7f7f8",
               "fill": {
                 "gradient": {
-                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "stops": [
+                    "#aeb2fb",
+                    "#ffa8bf",
+                    "#fff685"
+                  ],
                   "angle": 90
                 }
               },
@@ -12233,7 +13257,11 @@
               "color": "#f7f7f8",
               "fill": {
                 "gradient": {
-                  "stops": ["#aeb2fb", "#ffa8bf", "#fff685"],
+                  "stops": [
+                    "#aeb2fb",
+                    "#ffa8bf",
+                    "#fff685"
+                  ],
                   "angle": 90
                 }
               },
@@ -12431,7 +13459,9 @@
             "duration": 1.8
           },
           "camera": {
-            "hits": [0.35]
+            "hits": [
+              0.35
+            ]
           },
           "graphics": [
             {
@@ -12539,8 +13569,18 @@
             {
               "type": "bars-chart",
               "at": 0.3,
-              "values": [12, 28, 19, 42],
-              "labels": ["Q1", "Q2", "Q3", "Q4"],
+              "values": [
+                12,
+                28,
+                19,
+                42
+              ],
+              "labels": [
+                "Q1",
+                "Q2",
+                "Q3",
+                "Q4"
+              ],
               "x": 300,
               "y": 140,
               "width": 680,
@@ -12885,7 +13925,9 @@
           "camera": {
             "preset": "push-in",
             "amount": 0.06,
-            "hits": [0.6]
+            "hits": [
+              0.6
+            ]
           },
           "graphics": [
             {
@@ -13318,7 +14360,11 @@
               "color": "#9EA3FF",
               "fill": {
                 "gradient": {
-                  "stops": ["#7C83FD", "#C9CBFF", "#7C83FD"],
+                  "stops": [
+                    "#7C83FD",
+                    "#C9CBFF",
+                    "#7C83FD"
+                  ],
                   "angle": 90
                 },
                 "sweep": {
@@ -13387,7 +14433,11 @@
           },
           "layout": {
             "type": "split",
-            "sources": ["backgrounds/rocky-coast.jpg", "backgrounds/forest-sea.jpg", "backgrounds/green-forest.jpg"],
+            "sources": [
+              "backgrounds/rocky-coast.jpg",
+              "backgrounds/forest-sea.jpg",
+              "backgrounds/green-forest.jpg"
+            ],
             "gap": 12
           },
           "graphics": [
@@ -13431,7 +14481,10 @@
           "layout": {
             "type": "split",
             "direction": "vertical",
-            "sources": ["backgrounds/laptop-desk.jpg", "backgrounds/desk-flatlay.jpg"],
+            "sources": [
+              "backgrounds/laptop-desk.jpg",
+              "backgrounds/desk-flatlay.jpg"
+            ],
             "divider": {
               "color": "#FFF685",
               "width": 6
@@ -13810,7 +14863,9 @@
             "duration": 2.8
           },
           "camera": {
-            "hits": [0.75]
+            "hits": [
+              0.75
+            ]
           },
           "kinetic": [
             {
@@ -14127,7 +15182,16 @@
             }
           },
           "camera": {
-            "hits": ["beat:9", "beat:10", "beat:11", "beat:12", "beat:13", "beat:14", "beat:15", "beat:16"]
+            "hits": [
+              "beat:9",
+              "beat:10",
+              "beat:11",
+              "beat:12",
+              "beat:13",
+              "beat:14",
+              "beat:15",
+              "beat:16"
+            ]
           },
           "graphics": [
             {
@@ -14486,13 +15550,17 @@
         {
           "name": "broll",
           "default": "videos/video_2.mp4",
-          "placeholders": ["{{ broll }}"],
+          "placeholders": [
+            "{{ broll }}"
+          ],
           "source": "global"
         },
         {
           "name": "lut",
           "default": "luts/warm-print.cube",
-          "placeholders": ["{{ lut }}"],
+          "placeholders": [
+            "{{ lut }}"
+          ],
           "source": "global"
         }
       ],
@@ -14934,7 +16002,9 @@
           "camera": {
             "preset": "push-in",
             "amount": 0.1,
-            "hits": ["cue:drop"]
+            "hits": [
+              "cue:drop"
+            ]
           },
           "graphics": [
             {
@@ -15037,52 +16107,72 @@
       "variables": [
         {
           "name": "address",
-          "placeholders": ["{{ address }}"],
+          "placeholders": [
+            "{{ address }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "city",
-          "placeholders": ["{{ city }}"],
+          "placeholders": [
+            "{{ city }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "price",
-          "placeholders": ["{{ price }}"],
+          "placeholders": [
+            "{{ price }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "rooms",
-          "placeholders": ["{{ rooms }}"],
+          "placeholders": [
+            "{{ rooms }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "area",
-          "placeholders": ["{{ area }}"],
+          "placeholders": [
+            "{{ area }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "floor",
-          "placeholders": ["{{ floor }}"],
+          "placeholders": [
+            "{{ floor }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "visit",
-          "placeholders": ["{{ visit }}"],
+          "placeholders": [
+            "{{ visit }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "agent",
-          "placeholders": ["{{ agent }}"],
+          "placeholders": [
+            "{{ agent }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "agency",
-          "placeholders": ["{{ agency }}"],
+          "placeholders": [
+            "{{ agency }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "phone",
-          "placeholders": ["{{ phone }}"],
+          "placeholders": [
+            "{{ phone }}"
+          ],
           "source": "placeholder"
         }
       ],
@@ -15406,47 +16496,65 @@
       "variables": [
         {
           "name": "quote_lead",
-          "placeholders": ["{{ quote_lead }}"],
+          "placeholders": [
+            "{{ quote_lead }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "quote_highlight",
-          "placeholders": ["{{ quote_highlight }}"],
+          "placeholders": [
+            "{{ quote_highlight }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "quote_tail",
-          "placeholders": ["{{ quote_tail }}"],
+          "placeholders": [
+            "{{ quote_tail }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "customer",
-          "placeholders": ["{{ customer }}"],
+          "placeholders": [
+            "{{ customer }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "customer_role",
-          "placeholders": ["{{ customer_role }}"],
+          "placeholders": [
+            "{{ customer_role }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "rating",
-          "placeholders": ["{{ rating }}"],
+          "placeholders": [
+            "{{ rating }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "shop",
-          "placeholders": ["{{ shop }}"],
+          "placeholders": [
+            "{{ shop }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "offer",
-          "placeholders": ["{{ offer }}"],
+          "placeholders": [
+            "{{ offer }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "cta",
-          "placeholders": ["{{ cta }}"],
+          "placeholders": [
+            "{{ cta }}"
+          ],
           "source": "placeholder"
         }
       ],
@@ -15717,52 +16825,72 @@
       "variables": [
         {
           "name": "event_first",
-          "placeholders": ["{{ event_first }}"],
+          "placeholders": [
+            "{{ event_first }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "event_second",
-          "placeholders": ["{{ event_second }}"],
+          "placeholders": [
+            "{{ event_second }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "event_date",
-          "placeholders": ["{{ event_date }}"],
+          "placeholders": [
+            "{{ event_date }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "event_venue",
-          "placeholders": ["{{ event_venue }}"],
+          "placeholders": [
+            "{{ event_venue }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "speaker",
-          "placeholders": ["{{ speaker }}"],
+          "placeholders": [
+            "{{ speaker }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "speaker_role",
-          "placeholders": ["{{ speaker_role }}"],
+          "placeholders": [
+            "{{ speaker_role }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "talk_title",
-          "placeholders": ["{{ talk_title }}"],
+          "placeholders": [
+            "{{ talk_title }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "talk_time",
-          "placeholders": ["{{ talk_time }}"],
+          "placeholders": [
+            "{{ talk_time }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "talk_room",
-          "placeholders": ["{{ talk_room }}"],
+          "placeholders": [
+            "{{ talk_room }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "talk_track",
-          "placeholders": ["{{ talk_track }}"],
+          "placeholders": [
+            "{{ talk_track }}"
+          ],
           "source": "placeholder"
         }
       ],
@@ -16059,37 +17187,51 @@
       "variables": [
         {
           "name": "product",
-          "placeholders": ["{{ product }}"],
+          "placeholders": [
+            "{{ product }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "release",
-          "placeholders": ["{{ release }}"],
+          "placeholders": [
+            "{{ release }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "samples",
-          "placeholders": ["{{ samples }}"],
+          "placeholders": [
+            "{{ samples }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "tools",
-          "placeholders": ["{{ tools }}"],
+          "placeholders": [
+            "{{ tools }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "platforms",
-          "placeholders": ["{{ platforms }}"],
+          "placeholders": [
+            "{{ platforms }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "fonts",
-          "placeholders": ["{{ fonts }}"],
+          "placeholders": [
+            "{{ fonts }}"
+          ],
           "source": "placeholder"
         },
         {
           "name": "claim",
-          "placeholders": ["{{ claim }}"],
+          "placeholders": [
+            "{{ claim }}"
+          ],
           "source": "placeholder"
         }
       ],
@@ -17108,7 +18250,9 @@
         {
           "name": "footage",
           "default": "videos/video_1.mp4",
-          "placeholders": ["{{ footage }}"],
+          "placeholders": [
+            "{{ footage }}"
+          ],
           "source": "global"
         }
       ],

@@ -2,7 +2,7 @@
   "meta": {
     "name": "Product Launch",
     "description": "A minimal vertical reveal: large centred product typography, a clean full-frame shot, and an offer-led closing with fast, staggered motion.",
-    "creativeDirection": "Audience: shoppers seeing one product for the first time. Direction: a minimal vertical reveal with the product as the hero, rather than a miniature web-app presentation. Use near-black surfaces, large centered condensed type and a clean full-frame product shot. Move quickly into the footage; make the closing offer and approved price easy to scan. Use one low-opacity specular sheen on the product reveal and let the price count up and settle exactly on the approved value; use staggered entrances sparingly and leave a readable hold. Avoid dense feature lists, fake discounts, covering the product and screen-recording chrome. Review product crop, longest name and price, type settling and the closing invitation. Motion: push up from the intro into the product, a slow specular sheen crosses the shot as it lands, then the price counts up and settles while a round-capped rule draws under it on a slow push-in."
+    "creativeDirection": "Audience: shoppers seeing one product for the first time. Direction: a minimal vertical reveal with the product as the hero, rather than a miniature web-app presentation. Use near-black surfaces, large centered condensed type and a clean full-frame product shot. Move quickly into the footage; make the closing offer and approved price easy to scan. Use one low-opacity specular sheen on the product reveal and let the price count up and settle exactly on the approved value; use staggered entrances sparingly and leave a readable hold. Avoid dense feature lists, fake discounts, covering the product and screen-recording chrome. Review product crop, longest name and price, type settling and the closing invitation. Motion: push up from the intro into the product, a slow specular sheen crosses the shot as it lands, then a dark gradient seal turns upright behind the price as it counts up and settles, a round-capped rule draws under it, and the offer card staggers in beneath on a slow push-in."
   },
   "global": {
     "orientation": "portrait",
@@ -230,9 +230,66 @@
       "filters": [],
       "graphics": [
         {
+          "type": "shape",
+          "at": 0.05,
+          "preset": {
+            "type": "star",
+            "points": 14,
+            "inner": 0.88
+          },
+          "x": 130,
+          "y": 420,
+          "width": 460,
+          "height": 460,
+          "gradient": {
+            "from": "$color.surface",
+            "to": "$color.bg",
+            "angle": 150
+          },
+          "stroke": {
+            "color": "$color.accent",
+            "width": 4
+          },
+          "animate": {
+            "scale": [
+              {
+                "t": 0.05,
+                "v": 0.55
+              },
+              {
+                "t": 0.75,
+                "v": 1,
+                "ease": "spring(260, 16)"
+              }
+            ],
+            "rotate": [
+              {
+                "t": 0.05,
+                "v": -24
+              },
+              {
+                "t": 0.9,
+                "v": 0,
+                "ease": "$smooth"
+              }
+            ],
+            "opacity": [
+              {
+                "t": 0.05,
+                "v": 0
+              },
+              {
+                "t": 0.3,
+                "v": 1
+              }
+            ]
+          },
+          "ease": "$smooth"
+        },
+        {
           "type": "underline",
           "x": 230,
-          "y": 548,
+          "y": 706,
           "width": 260,
           "thickness": 6,
           "origin": "center",
@@ -263,26 +320,101 @@
           "font": "BebasNeue.ttf",
           "size": 88,
           "color": "#c8bc9c",
-          "y": 440
+          "y": 598
         }
       ],
       "inputs": [
         {
           "name": "offer_card",
           "type": "html",
-          "html": "<div><b>THE OFFER</b><p><span>{{ form_1_name }}</span>{{ form_1_tagline }}</p><em>MAKE IT YOURS</em></div>",
-          "css": "div{display:flex;flex-direction:column;align-items:center;color:$color.brand;font:300 26px $font.body}b{padding:8px 20px;border:2px solid $color.brand;border-radius:8px 99px 99px 8px;font:500 22px $font.body;letter-spacing:4px}p{display:flex;align-items:center;margin:172px 0 0;padding:14px 24px;border:1px solid $color.brand@0.35;border-radius:14px;background:$color.surface}span{margin-right:16px;color:$color.fg;font:48px $font.display}em{margin-top:62px;padding:12px 34px;border-radius:99px;background:$color.brand;color:$color.bg;font:600 28px $font.body;letter-spacing:3px}",
+          "html": "<div><b data-motion=\"tag\">THE OFFER</b><p data-motion=\"plate\"><span>{{ form_1_name }}</span>{{ form_1_tagline }}</p><em data-motion=\"cta\">MAKE IT YOURS</em></div>",
+          "css": "div{display:flex;flex-direction:column;align-items:center;color:$color.brand;font:300 26px $font.body}b{padding:8px 20px;border:2px solid $color.brand;border-radius:8px 99px 99px 8px;font:500 22px $font.body;letter-spacing:4px}p{display:flex;align-items:center;margin:522px 0 0;padding:14px 24px;border:1px solid $color.brand@0.35;border-radius:14px;background:$color.surface}span{margin-right:16px;color:$color.fg;font:48px $font.display}em{margin-top:62px;padding:12px 34px;border-radius:99px;background:$color.brand;color:$color.bg;font:600 28px $font.body;letter-spacing:3px}",
           "width": 720,
-          "height": 500,
+          "height": 790,
           "options": {
             "position": "0:352",
-            "start": 0.14,
-            "motion": {
-              "type": "rise",
-              "delay": 0.14,
-              "duration": 0.32,
-              "distance": 22,
-              "easing": "ease-out"
+            "start": 0.14
+          },
+          "motion": {
+            "tag": {
+              "opacity": [
+                {
+                  "t": 0,
+                  "v": 0
+                },
+                {
+                  "t": 0.24,
+                  "v": 1
+                }
+              ],
+              "y": [
+                {
+                  "t": 0,
+                  "v": -14
+                },
+                {
+                  "t": 0.4,
+                  "v": 0,
+                  "ease": "$smooth"
+                }
+              ]
+            },
+            "plate": {
+              "opacity": [
+                {
+                  "t": 0.7,
+                  "v": 0
+                },
+                {
+                  "t": 0.98,
+                  "v": 1
+                }
+              ],
+              "y": [
+                {
+                  "t": 0.7,
+                  "v": 22
+                },
+                {
+                  "t": 1.18,
+                  "v": 0,
+                  "ease": "$smooth"
+                }
+              ]
+            },
+            "cta": {
+              "opacity": [
+                {
+                  "t": 0.9,
+                  "v": 0
+                },
+                {
+                  "t": 1.14,
+                  "v": 1
+                }
+              ],
+              "y": [
+                {
+                  "t": 0.9,
+                  "v": 22
+                },
+                {
+                  "t": 1.34,
+                  "v": 0,
+                  "ease": "$smooth"
+                }
+              ],
+              "scale": [
+                {
+                  "t": 0.9,
+                  "v": 0.94
+                },
+                {
+                  "t": 1.34,
+                  "v": 1,
+                  "ease": "$snappy"
+                }
+              ]
             }
           }
         }

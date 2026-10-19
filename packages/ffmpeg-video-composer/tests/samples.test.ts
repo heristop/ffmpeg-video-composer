@@ -175,7 +175,11 @@ describe('packaged sample catalog', () => {
     const presetFonts = getSample('present-yourself').requirements.assets.filter((asset) => asset.source === 'preset');
     expect([...new Set(presetFonts.map(({ reference }) => reference))].sort()).toEqual(['Anton.ttf', 'Oswald.ttf']);
     expect(presetFonts.some(({ path }) => path.includes('.titleCard.'))).toBe(true);
-    expect(presetFonts.some(({ path }) => path.includes('.lowerThird.'))).toBe(true);
+
+    const lowerThirdFonts = getSample('footage-edit').requirements.assets.filter(
+      (asset) => asset.source === 'preset' && asset.path.includes('.lowerThird.')
+    );
+    expect(lowerThirdFonts.length).toBeGreaterThan(0);
   });
 
   it('uses real preset defaults and overrides while preserving descriptors and placeholders', () => {

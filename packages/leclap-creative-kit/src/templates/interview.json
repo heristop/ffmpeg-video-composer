@@ -312,8 +312,8 @@
         {
           "name": "name_card",
           "type": "html",
-          "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"top\"><h2>{{ form_1_name }}</h2><span class=\"badge\">On the record</span></div><p>{{ form_1_title }}</p></div></div>",
-          "css": ".wrap { display: flex; align-items: flex-end; height: 100%; padding: 0 16px 16px 0 } .card { display: flex; flex-direction: column; padding: 16px 28px 18px 24px; border-left: 8px solid $color.brand; border-radius: 0 14px 14px 0; background: $color.bg@0.9; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) } .top { display: flex; align-items: center; gap: 16px } h2 { margin: 0; color: $color.fg; font: 500 50px $font.body; line-height: 1.1 } .badge { padding: 6px 14px; border-radius: 999px; background: $color.brand; color: $color.bg; font: 600 17px $font.body; text-transform: uppercase; letter-spacing: 2px } p { margin: 2px 0 0; color: $color.muted; font: 400 26px $font.body }",
+          "html": "<div class=\"wrap\"><div class=\"card\"><div class=\"bar\" data-motion=\"bar\"></div><div class=\"body\"><div class=\"top\"><h2 data-motion=\"name\">{{ form_1_name }}</h2><span class=\"badge\" data-motion=\"badge\">On the record</span></div><p data-motion=\"role\">{{ form_1_title }}</p></div></div></div>",
+          "css": ".wrap { display: flex; align-items: flex-end; height: 100%; padding: 0 16px 16px 0 } .card { display: flex; border-radius: 0 14px 14px 0; background: $color.bg@0.9; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) } .bar { width: 8px; background: $color.brand } .body { display: flex; flex-direction: column; padding: 16px 28px 18px 24px } .top { display: flex; align-items: center; gap: 16px } h2 { margin: 0; color: $color.fg; font: 500 50px $font.body; line-height: 1.1 } .badge { padding: 6px 14px; border-radius: 999px; background: $color.brand; color: $color.bg; font: 600 17px $font.body; text-transform: uppercase; letter-spacing: 2px } p { margin: 2px 0 0; color: $color.muted; font: 400 26px $font.body }",
           "width": 860,
           "height": 150,
           "options": {
@@ -322,9 +322,103 @@
             "motion": {
               "type": "slide-right",
               "delay": 0.6,
-              "duration": 0.6,
-              "distance": 80,
+              "duration": 0.45,
+              "distance": 40,
               "easing": "ease-out"
+            }
+          },
+          "motion": {
+            "bar": {
+              "opacity": [
+                {
+                  "t": 0,
+                  "v": 0
+                },
+                {
+                  "t": 0.2,
+                  "v": 1
+                }
+              ],
+              "x": [
+                {
+                  "t": 0,
+                  "v": -14
+                },
+                {
+                  "t": 0.46,
+                  "v": 0,
+                  "ease": "$snappy"
+                }
+              ]
+            },
+            "name": {
+              "opacity": [
+                {
+                  "t": 0.14,
+                  "v": 0
+                },
+                {
+                  "t": 0.42,
+                  "v": 1
+                }
+              ],
+              "y": [
+                {
+                  "t": 0.14,
+                  "v": 12
+                },
+                {
+                  "t": 0.56,
+                  "v": 0,
+                  "ease": "$smooth"
+                }
+              ]
+            },
+            "badge": {
+              "opacity": [
+                {
+                  "t": 0.3,
+                  "v": 0
+                },
+                {
+                  "t": 0.46,
+                  "v": 1
+                }
+              ],
+              "scale": [
+                {
+                  "t": 0.3,
+                  "v": 0.7
+                },
+                {
+                  "t": 0.74,
+                  "v": 1,
+                  "ease": "$snappy"
+                }
+              ]
+            },
+            "role": {
+              "opacity": [
+                {
+                  "t": 0.4,
+                  "v": 0
+                },
+                {
+                  "t": 0.68,
+                  "v": 1
+                }
+              ],
+              "y": [
+                {
+                  "t": 0.4,
+                  "v": 8
+                },
+                {
+                  "t": 0.84,
+                  "v": 0,
+                  "ease": "$smooth"
+                }
+              ]
             }
           }
         }
