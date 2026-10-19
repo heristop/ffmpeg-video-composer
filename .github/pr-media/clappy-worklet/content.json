@@ -1,0 +1,36 @@
+{
+  "ticket": "PR CLAPPY",
+  "summary": "Clappy no longer crashes the app at launch on iOS",
+  "clipSeconds": 6,
+  "freeze": { "at": 2, "hold": 3 },
+  "intro": { "headline": "STOP THE LAUNCH CRASH" },
+  "outro": { "headline": "REVIEW THE CLAPPY WORKLET", "subtitle": "Stop arrays now computed on the JS side" },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.mp4",
+      "trim": 0,
+      "highlight": { "x": 335, "y": 130, "w": 353, "h": 90 },
+      "callout": "Red screen at launch",
+      "chip": "A red error at launch",
+      "pane": {
+        "title": "Crash on launch",
+        "desc": "A worklet calls clappyTranslateX on the UI runtime and the app dies before any screen shows."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.mp4",
+      "trim": 0,
+      "highlight": { "x": 335, "y": 59, "w": 353, "h": 152 },
+      "callout": "Scenarios opens",
+      "chip": "Scenarios opens, 9 of 9 render",
+      "pane": {
+        "title": "Opens, renders 9 of 9",
+        "desc": "The worklet captures precomputed arrays. The all-templates device test then passes, 9 of 9."
+      }
+    }
+  ]
+}
