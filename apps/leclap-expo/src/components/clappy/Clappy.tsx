@@ -58,6 +58,10 @@ function useClappyAnimatedStyle(
   moving: boolean,
   reaction: ReturnType<typeof useSharedValue<number>>
 ) {
+  // Plain JS helpers can't run on the UI runtime: resolve the stop values here and let the worklet capture them.
+  const translateX = clappyTranslateX(state, size);
+  const scale = clappyScale(state);
+
   return useAnimatedStyle(() => {
     const phase = moving ? reaction.get() : 1;
     const stops = [0, 0.35, 0.65, 1];
@@ -66,10 +70,10 @@ function useClappyAnimatedStyle(
 
     return {
       transform: [
-        { translateX: interpolate(phase, stops, clappyTranslateX(state, size)) },
+        { translateX: interpolate(phase, stops, translateX) },
         { translateY: interpolate(phase, stops, [0, lift, lift * 0.3, 0]) },
         { rotate: `${interpolate(phase, stops, rotation)}deg` },
-        { scale: interpolate(phase, stops, clappyScale(state)) },
+        { scale: interpolate(phase, stops, scale) },
       ],
     };
   });
