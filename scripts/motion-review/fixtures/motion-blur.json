@@ -1,0 +1,39 @@
+{
+  "label": "Motion blur: a card whip and a slide-in title",
+  "kind": "layer",
+  "window": { "at": 0.4, "duration": 0.6 },
+  "section": {
+    "inputs": [
+      {
+        "name": "card",
+        "type": "html",
+        "html": "<div class=\"c\"></div>",
+        "css": ".c { width: 160px; height: 100px; border-radius: 20px; background: #9298FB; }",
+        "width": 160,
+        "height": 100,
+        "options": {
+          "position": "{{position}}",
+          "motionBlur": { "shutter": 180, "samples": 8 },
+          "animate": {
+            "x": [
+              { "t": "{{at}}", "v": "+0" },
+              { "t": "{{end}}", "v": "+420", "ease": "ease-out-cubic" }
+            ]
+          }
+        }
+      }
+    ],
+    "kinetic": [
+      {
+        "id": "title",
+        "text": { "en": "WHOOSH" },
+        "preset": "slide",
+        "delay": "{{at}}",
+        "size": 120,
+        "y": "bottom",
+        "color": "#F5F3F7",
+        "motionBlur": true
+      }
+    ]
+  }
+}

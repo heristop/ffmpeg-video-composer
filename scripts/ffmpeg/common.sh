@@ -41,6 +41,10 @@ DIST_DIR="$REPO_ROOT/scripts/ffmpeg/dist"
 # Audio polish: `acompressor`/`agate`/`alimiter`/`equalizer` (voice clean-up presets) and `adelay` (sound-
 # effect placement) are LGPL (no `_deps` in configure; af_sidechaincompress.c, af_agate.c, af_alimiter.c,
 # af_biquads.c, af_adelay.c).
+# `blend` (layer blend modes: multiply/screen/overlay... computed in gbrap on a transparent copy of the frame)
+# and `tmix` (motion blur: averages the supersampled frames of a moving span) are LGPL (vf_blend.c,
+# vf_mix.c; no `_deps` in configure). The engine gates both via engineCapabilities: without them a layer
+# composites normally / is drawn sharp, with a [blend_unavailable] / [motion_blur_unavailable] warning.
 FF_COMMON="--enable-static --disable-shared --enable-pic --enable-version3 --disable-gpl \
  --disable-ffplay --disable-doc --disable-autodetect \
  --enable-zlib \
@@ -53,7 +57,7 @@ FF_COMMON="--enable-static --disable-shared --enable-pic --enable-version3 --dis
  --enable-decoder=h264,hevc,aac,mp3,pcm_s16le,mpeg4,png,mjpeg,apng,gif,webp,vp9,libvpx_vp9 \
  --enable-encoder=aac,mpeg4,libopenh264 \
  --enable-filter=scale,crop,pad,setsar,setdar,format,fps,trim,setpts,settb,fade,drawtext,overlay,concat,xfade,loop,tile,\
-alphamerge,\
+alphamerge,blend,tmix,\
 drawbox,gblur,noise,hue,vignette,hflip,vflip,rotate,transpose,negate,colorchannelmixer,colorbalance,curves,zoompan,lutyuv,\
 lut3d,colorkey,split,setparams,null,rgbashift,edgedetect,\
 atrim,asetpts,aresample,aformat,amix,afade,acrossfade,afftdn,sidechaincompress,volume,anull,anullsrc,aevalsrc,color,sine,gradients,\

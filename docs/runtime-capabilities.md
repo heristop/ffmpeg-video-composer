@@ -23,6 +23,7 @@
 | `asplit`            | yes               | yes                       | yes                        |
 | `atempo`            | yes               | yes                       | yes                        |
 | `atrim`             | yes               | yes                       | yes                        |
+| `blend`             | yes               | yes                       | yes                        |
 | `color`             | yes               | yes                       | yes                        |
 | `colorbalance`      | yes               | yes                       | yes                        |
 | `colorchannelmixer` | yes               | yes                       | yes                        |
@@ -64,6 +65,7 @@
 | `settb`             | yes               | yes                       | yes                        |
 | `sidechaincompress` | yes               | yes                       | yes                        |
 | `split`             | yes               | yes                       | yes                        |
+| `tmix`              | yes               | yes                       | yes                        |
 | `trim`              | yes               | yes                       | yes                        |
 | `trim`              | yes               | yes                       | yes                        |
 | `vflip`             | yes               | yes                       | yes                        |
@@ -72,4 +74,4 @@
 | `xfade`             | yes               | yes                       | yes                        |
 | `zoompan`           | yes               | yes                       | yes                        |
 
-Device allowlist size: 68 filters. The on-device engine binary must be rebuilt (`scripts/ffmpeg/build-engine.sh`) whenever the allowlist changes; until then, older installed engines lack newly added filters and affected renders can fail. Expo compilation stays local; there is no server fallback.
+Device allowlist size: 70 filters. The on-device engine binary must be rebuilt (`scripts/ffmpeg/build-engine.sh`) whenever the allowlist changes; until then, older installed engines lack newly added filters and affected renders can fail. Expo compilation stays local; there is no server fallback.

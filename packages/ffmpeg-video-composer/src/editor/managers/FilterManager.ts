@@ -4,7 +4,7 @@ import type Segment from '../../core/models/Segment';
 import type Project from '../../core/models/Project';
 import type { Filter } from '@/core/types';
 import type AbstractLogger from '../../platform/logging/AbstractLogger';
-import { applyFilterCompat, engineCapabilities } from '../utils/filter-compat';
+import { applyFilterCompat, engineCapabilities, hasFilter } from '../utils/filter-compat';
 import { renderFilterGraph } from '../utils/filter-graph';
 import { withTextShaping } from '../utils/text-shaping';
 import { steppedFontSize, type FontSizeTiming } from '../utils/stepped-fontsize';
@@ -117,6 +117,18 @@ class FilterManager {
 
   /** The output frame rate, on which per-frame lowerings (layer keyframes) step. */
   frameRate = (): number => this.project.config.videoConfig?.fps ?? DefaultConfig.FPS;
+
+  /** The current section's length in seconds (0 when unknown). */
+  sectionDuration = (): number => this.fontSizeTiming().duration;
+
+  /** True when the active FFmpeg build has the filter (device allow-list, host probe). */
+  supports = (filter: string): boolean =>
+    hasFilter(engineCapabilities(this.project.config, this.project.engineFeatures), filter);
+
+  /** A compile-time advisory, tagged with the current section. */
+  advise = (message: string): void => {
+    this.logger.warn(`[${this.segment.currentSection?.name}]${message}`);
+  };
 
   // The section's frame rate and length, over which an animated drawtext size is sampled.
   private readonly fontSizeTiming = (): FontSizeTiming => {

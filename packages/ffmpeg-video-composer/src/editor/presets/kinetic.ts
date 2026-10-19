@@ -20,6 +20,7 @@ import { trailEchoes } from './kinetic-trail';
 import { pieceFilter, type PieceDraw, type PieceStyle } from './kinetic-piece';
 import { fillGraph, type FillBox, type FillEnv } from './kinetic-fill';
 import type { SugarContext } from './sugar-context';
+import { withMotionBlur, type KineticBlurEnv } from './kinetic-motion-blur';
 import { clipParts, type ClipPart } from './clip-box';
 
 export { MAX_KINETIC_UNITS } from '@/core/kinetic/fit';
@@ -34,6 +35,8 @@ export interface KineticContext extends KineticFrame {
   fill?: FillEnv;
   /** The block's index in the section (pad-name prefix of a `clip`). */
   index?: number;
+  /** Motion blur services (compile path only); absent = drawn sharp. */
+  blur?: KineticBlurEnv;
 }
 
 function accentWords(block: KineticBlock, layout: Layout): Set<number> {
@@ -185,7 +188,15 @@ export function kineticToFilters(block: KineticBlock, ctx: KineticContext): Filt
 
   if (filled) return filled;
 
-  return [...drawnUnits(block, plan, draws), ...extras(block, plan, ctx.seed)];
+  const frame = { fps: ctx.fps, duration: ctx.duration, energy: ctx.energy, wave: plan.settings.preset === 'wave' };
+
+  return withMotionBlur(
+    block,
+    [...drawnUnits(block, plan, draws), ...extras(block, plan, ctx.seed)],
+    draws,
+    frame,
+    ctx.blur
+  );
 }
 
 function drawnUnits(block: KineticBlock, plan: Choreography, draws: PieceDraw[]): Filter[] {
@@ -242,6 +253,15 @@ function clippedBlock(
   return [...loose, ...clipParts(parts, frame, prefix)];
 }
 
+// The motion blur services for block `index`, or undefined (validation path: no capability check).
+function blurEnv(index: number, ctx: SugarContext): KineticBlurEnv | undefined {
+  const masks = ctx.masks;
+
+  if (!masks?.has) return undefined;
+
+  return { has: masks.has, warn: masks.warn, prefix: `kmb${index}_` };
+}
+
 export const MASK_UNAVAILABLE_WARNING =
   '[mask_unavailable] kinetic fill needs the alphamerge filter, absent from this FFmpeg build: the block is ' +
   'drawn in its solid colour';
@@ -293,6 +313,7 @@ export function kineticBlocksToFilters(blocks: KineticBlock[] | undefined, ctx: 
       text,
       fill: fillEnv(block, index, ctx),
       index,
+      blur: blurEnv(index, ctx),
     });
   });
 }

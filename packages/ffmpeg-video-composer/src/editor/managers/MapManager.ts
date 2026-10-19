@@ -15,6 +15,7 @@ import { assertFiniteNumber, assertSafeColorToken, assertSafeExpression } from '
 import { isBackgroundInput } from '../utils/background-input';
 import { layerKeyframes } from '../presets/layer-keyframes';
 import { resolveFit } from '../utils/reframe';
+import { compositeLayer } from '../presets/layer-composite';
 import { evenBox } from '../presets/clip-box';
 import type { ClipBox } from '../../schemas/clip.schemas';
 import { videoClipInputIndex } from '../utils/video-clip-input';
@@ -181,10 +182,22 @@ class MapManager {
     return { legFilters: this.animationLegFilters(input, motion), x: motion.x, y: motion.y };
   };
 
-  private readonly overlayValue = (plan: OverlayPlan, position: string, eofAction: string, timeline: string): string =>
-    plan.x || plan.y
-      ? `x='${plan.x}':y='${plan.y}':eof_action=${eofAction}${timeline}`
-      : `${position}:eof_action=${eofAction}${timeline}`;
+  // Still images ignore the -itsoffset/-t source flags animations get (their source is a bare `-loop 1`), so a
+  // timed image lowers its start/duration to the overlay's timeline `enable` instead; animations keep the
+  // source-flag path (gating them here would double-apply the delay). Moving entrances use the named,
+  // single-quoted form so the comma-bearing time expressions are not mis-parsed as extra filter options.
+  private readonly overlayValue = (
+    input: MapAnimationInput,
+    plan: OverlayPlan,
+    position: string,
+    eof: string
+  ): string => {
+    const timeline = input.type === 'image' || input.type === 'html' ? imageOverlayEnable(input.options) : '';
+
+    return plan.x || plan.y
+      ? `x='${plan.x}':y='${plan.y}':eof_action=${eof}${timeline}`
+      : `${position}:eof_action=${eof}${timeline}`;
+  };
 
   addAnimationOverlay = (input: MapAnimationInput, inputIndex: number, videoScale = ''): void => {
     const videoStream = `${this.getVideoInputIncrement()}:v`;
@@ -200,26 +213,28 @@ class MapManager {
       : (this.segment.mapsList.at(-1) ?? videoStream);
 
     const plan = this.overlayPlan(input, position);
-    const animationLeg = this.registerLeg(input, inputIndex, plan.legFilters);
 
     this.segment.inputsMapCount++;
 
-    // Still images ignore the -itsoffset/-t source flags animations get (their source is a bare
-    // `-loop 1`), so a timed image lowers its start/duration to the overlay's timeline `enable`
-    // instead; animations keep the source-flag path (gating them here would double-apply the delay).
-    const timeline = input.type === 'image' || input.type === 'html' ? imageOverlayEnable(input.options) : '';
-
-    // Moving entrances use the named, single-quoted overlay form so the comma-bearing time expressions
-    // are not mis-parsed as extra filter options; otherwise the static positional "x:y" form.
-    const overlayValue = this.overlayValue(plan, position, eofAction, timeline);
+    const overlayValue = this.overlayValue(input, plan, position, eofAction);
 
     // The animation overlays on top of the already-filtered background; no section filters here.
     // `input.filters` is optional in the schema (builder-authored inputs omit it), so default to none.
     if (input.options.clip) {
-      this.addClippedOverlay(input, [baseStream, animationLeg], overlayValue, videoScale);
+      const clipLeg = this.registerLeg(input, inputIndex, plan.legFilters);
+
+      this.addClippedOverlay(input, [baseStream, clipLeg], overlayValue, videoScale);
 
       return;
     }
+
+    // A blend mode or motion blur: one spliced graph that owns the leg (presets/layer-composite.ts).
+    const { legFilters } = plan;
+    const composite = { input, inputIndex, base: baseStream, legFilters, overlay: overlayValue };
+
+    if (compositeLayer({ ...composite, filters: this.filterManager, segment: this.segment })) return;
+
+    const animationLeg = this.registerLeg(input, inputIndex, legFilters);
 
     this.addMap({
       inputs: [baseStream, animationLeg],

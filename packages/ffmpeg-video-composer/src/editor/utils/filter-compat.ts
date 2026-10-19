@@ -171,6 +171,10 @@ export const ENGINE_EMITTED_FILTERS = [
   // masks (kinetic-fill.ts): a drawtext mask's luma copied into a gradient/texture fill's alpha; the
   // mask is stretched to full range with lutyuv (listed above) and sized with pad/crop for wipes
   'alphamerge',
+  // layer blend modes (presets/layer-blend.ts: a gbrap blend over a transparent copy of the frame) and
+  // motion blur (presets/motion-blur.ts: trim/fps/settb/setpts listed elsewhere, then tmix)
+  'blend',
+  'tmix',
   'colorkey',
   'gradients',
   'setpts',

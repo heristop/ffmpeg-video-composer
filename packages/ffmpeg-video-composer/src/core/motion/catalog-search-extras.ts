@@ -81,7 +81,14 @@ function styleEntries(catalog: MotionCatalog): Array<SearchEntry<ExtraCatalogKin
     ...Object.entries(catalog.roles.defaults).map(([name, role]) =>
       entry('role' as const, name, `motion role ${role.useFor}`, role, role.avoid)
     ),
-    ...described('compositing', { ...catalog.compositing.kineticFill, ...catalog.compositing.layouts }),
+    ...described('compositing', {
+      ...catalog.compositing.kineticFill,
+      ...catalog.compositing.layouts,
+      ...Object.fromEntries(
+        Object.entries(catalog.compositing.blendModes).map(([mode, text]) => [mode, `blend ${text}`])
+      ),
+      ...catalog.compositing.motionBlur,
+    }),
     ...catalog.formats.formats.map((name) =>
       entry('format' as const, name, `format orientation ${catalog.formats.artDirection}`, { format: name })
     ),
