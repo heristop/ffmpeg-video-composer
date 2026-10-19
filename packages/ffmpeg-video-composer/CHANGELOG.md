@@ -142,6 +142,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A `video` section with a clip and an overlay layer (HTML, image or animation) no longer fails in FFmpeg with
+  "Stream specifier ':v' matches no streams". Overlays now sit on the clip instead of the silent audio track
+  that muted sections (the default) add.
+
 - A `setpts` filter with an explicit expression (the fx time shift `PTS+<at>/TB` of the sheen, leak, bloom and goo
   effects, the first-frame hold of the ambient ones) is no longer rewritten to the section speed. Only `PTS` and
   `<n>*PTS` still take `options.speed`; the shift was silently lost and those effects ran from section start.

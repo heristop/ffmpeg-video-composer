@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { describe, it, expect } from 'vitest';
 import Video from '@/editor/segments/VideoSegment';
+import MapManager from '@/editor/managers/MapManager';
 import type { SectionOptions } from '@/core/types';
 
 // Build a Video segment in isolation (bypassing the DI container) with just the
@@ -51,5 +52,23 @@ describe('VideoSegment command assembly', () => {
     // complete command: an input (-i <source>) AND an output file (destination).
     expect(command).toContain('-i /tmp/video_1.mp4');
     expect(command).toContain('/tmp/out.mp4');
+  });
+
+  // MapManager.getVideoInputIncrement must name the same stream VideoSegment encodes, for every source.
+  it.each([
+    ['uploaded clip', { duration: 5 }],
+    ['videoUrl', { duration: 5, videoUrl: '/a.mp4' }],
+    ['useVideoSection', { duration: 5, useVideoSection: 'main' }],
+    ['unmuted videoUrl', { duration: 5, videoUrl: '/a.mp4', muteSection: false }],
+  ])('keeps the clip index and the blank-audio input in step (%s)', (_label, options) => {
+    const seg = buildVideoSegment(options as SectionOptions);
+
+    seg.configure();
+    const blank = seg.getCommand().includes('anullsrc') ? 1 : 0;
+
+    expect(seg.videoInputIndex()).toBe(blank);
+    const maps = new MapManager({} as never, {} as never, { currentSection: seg.section } as never);
+
+    expect(maps.getVideoInputIncrement()).toBe(blank);
   });
 });

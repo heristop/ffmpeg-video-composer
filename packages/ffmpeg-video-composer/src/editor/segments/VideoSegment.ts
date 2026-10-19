@@ -11,6 +11,7 @@ import {
 import type { ProjectConfig } from '@/core/types';
 import { buildAudioFadeArg, buildAudioFadeChain } from '../utils/audio-fade';
 import { footageArgs, footagePlan, keepAwareRetime, type FootageHost } from '../footage/section-footage';
+import { videoClipInputIndex } from '../utils/video-clip-input';
 import { footageAudio } from '../utils/footage-section';
 
 // Encoder args for a re-encoded video segment (bumper / videoUrl / useVideoSection). Routes through
@@ -46,7 +47,7 @@ class Video extends SegmentBuilder {
   // A blank-audio input is prepended (shifting the video to input 1) unless the section is explicitly
   // unmuted (`muteSection === false`), which drops the blank audio and leaves the video at input 0.
   protected override videoInputIndex(): number {
-    return this.section.options?.muteSection === false ? 0 : 1;
+    return videoClipInputIndex(this.section.options);
   }
 
   // The clip's audio for footage edits: input 0 is the blank track (muted, the default) or the clip
@@ -92,7 +93,7 @@ class Video extends SegmentBuilder {
   // Ahead of the sources: the blank audio (unless explicitly unmuted), then the clip itself unless it
   // comes from videoUrl (staged as the first section input, i.e. among the sources).
   protected override leadingInputCount(): number {
-    const blank = this.section.options?.muteSection === false ? 0 : 1;
+    const blank = videoClipInputIndex(this.section.options);
 
     return blank + (this.section.options?.videoUrl ? 0 : 1);
   }

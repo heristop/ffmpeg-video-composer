@@ -17,6 +17,7 @@ import { layerKeyframes } from '../presets/layer-keyframes';
 import { resolveFit } from '../utils/reframe';
 import { evenBox } from '../presets/clip-box';
 import type { ClipBox } from '../../schemas/clip.schemas';
+import { videoClipInputIndex } from '../utils/video-clip-input';
 import { assertSafePadLabel } from '../utils/filter-option-guard';
 
 // Section.inputs is typed as Input[] for schema purposes, but at runtime it holds
@@ -367,7 +368,7 @@ class MapManager {
    * mapped pad; the section's own scale chain is folded in so the clip is sized to the output first.
    *
    * `videoInputIndex` is the segment's authoritative clip stream (VideoSegment shifts it to 1 when it
-   * prepends blank audio) — NOT getVideoInputIncrement, which disagrees for video+videoUrl sections.
+   * prepends blank audio); getVideoInputIncrement derives the same index from the shared rule.
    * `head` (already formatted footage edits: clip range / ramp / freeze) retimes the clip first.
    */
   addChromakeyComposite = (
@@ -412,13 +413,10 @@ class MapManager {
         // A muted clip is preceded by the blank-audio input (ProjectVideoSegment.videoInputIndex).
         increment = this.currentSection.options?.muteSection === true ? 1 : 0;
         break;
-      case 'video': {
-        // 0 is used by fake audio when a video section is reused and not muted
-        const sectionOptions = this.currentSection.options;
-
-        increment = !sectionOptions?.useVideoSection || sectionOptions.muteSection === false ? 0 : 1;
+      case 'video':
+        // The blank-audio input VideoSegment prepends shifts a muted clip to 1.
+        increment = videoClipInputIndex(this.currentSection.options);
         break;
-      }
       default:
         increment = 1;
     }
