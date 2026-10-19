@@ -31076,7 +31076,14 @@
             },
             "role": {
               "type": "string",
-              "enum": ["micro", "panel", "camera", "headline", "accent", "mascot"],
+              "enum": [
+                "micro",
+                "panel",
+                "camera",
+                "headline",
+                "accent",
+                "mascot"
+              ],
               "description": "Motion role of this element (global.motion.roles): micro (small UI bits, quick, no overshoot), panel (plates/cards, controlled settle), camera (smooth, near-invisible), headline (strong entrance, stable hold), accent (snappy emphasis), mascot (playful overshoot). Supplies ease (and duration when the ease comes from the role) to an element that sets none; an explicit ease/duration always wins."
             },
             "until": {
@@ -31151,7 +31158,9 @@
                       "maximum": 0.95
                     }
                   },
-                  "required": ["type"],
+                  "required": [
+                    "type"
+                  ],
                   "additionalProperties": false
                 },
                 {
@@ -31168,7 +31177,9 @@
                       "maximum": 24
                     }
                   },
-                  "required": ["type"],
+                  "required": [
+                    "type"
+                  ],
                   "additionalProperties": false
                 },
                 {
@@ -31179,7 +31190,9 @@
                       "const": "heart"
                     }
                   },
-                  "required": ["type"],
+                  "required": [
+                    "type"
+                  ],
                   "additionalProperties": false
                 },
                 {
@@ -31192,7 +31205,12 @@
                     "direction": {
                       "description": "Pointing (right).",
                       "type": "string",
-                      "enum": ["right", "left", "up", "down"]
+                      "enum": [
+                        "right",
+                        "left",
+                        "up",
+                        "down"
+                      ]
                     },
                     "head": {
                       "description": "Head length share (0.4).",
@@ -31207,7 +31225,9 @@
                       "maximum": 0.9
                     }
                   },
-                  "required": ["type"],
+                  "required": [
+                    "type"
+                  ],
                   "additionalProperties": false
                 },
                 {
@@ -31236,7 +31256,9 @@
                       "maximum": 2147483647
                     }
                   },
-                  "required": ["type"],
+                  "required": [
+                    "type"
+                  ],
                   "additionalProperties": false
                 },
                 {
@@ -31253,7 +31275,9 @@
                       "maximum": 0.5
                     }
                   },
-                  "required": ["type"],
+                  "required": [
+                    "type"
+                  ],
                   "additionalProperties": false
                 }
               ],
@@ -31307,17 +31331,26 @@
                 "shape": {
                   "description": "linear (default) or radial (centre out).",
                   "type": "string",
-                  "enum": ["linear", "radial"]
+                  "enum": [
+                    "linear",
+                    "radial"
+                  ]
                 }
               },
-              "required": ["from", "to"],
+              "required": [
+                "from",
+                "to"
+              ],
               "additionalProperties": false,
               "description": "Overrides `color`."
             },
             "fillRule": {
               "description": "nonzero (default) or evenodd.",
               "type": "string",
-              "enum": ["nonzero", "evenodd"]
+              "enum": [
+                "nonzero",
+                "evenodd"
+              ]
             },
             "stroke": {
               "type": "object",
@@ -31358,7 +31391,9 @@
               "$ref": "#/$defs/LayerAnimate"
             }
           },
-          "required": ["type"],
+          "required": [
+            "type"
+          ],
           "additionalProperties": false,
           "description": "A filled vector shape (preset or closed SVG d) with an optional outline: rasterised once, animated with the layer tracks (animate, origin) or with its outline drawn on (stroke.draw). `color` is the fill."
         },
