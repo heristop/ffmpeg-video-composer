@@ -58,8 +58,9 @@ export interface BuiltPrompt {
 // characters) can ride on top of both: that brief then needs 163,145 (163,144 truncates). The animated html card
 // guide and the `motion` map's schema (data-motion, element tracks, their budget) lift it to 171,971 (171,970
 // truncates). The shape graphic's schema and catalog text then bring it to 171,981 (171,980 drops the second
-// sample); 173,000 leaves about 1,000 for longer shot lines.
-export const DEFAULT_PROMPT_BUDGET = 173_000;
+// sample). The blend and motion blur schema and catalog text lift it to 172,988 (172,987 drops the second
+// sample); 174,000 leaves about 1,000 for longer shot lines.
+export const DEFAULT_PROMPT_BUDGET = 174_000;
 // The schema never takes more than this, even with room to spare: past it the model reads noise.
 const SCHEMA_CAP = 96_000;
 const MIN_SCHEMA = 12_000;
