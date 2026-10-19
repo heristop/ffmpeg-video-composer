@@ -1,0 +1,36 @@
+{
+  "ticket": "TEMPLATES",
+  "summary": "Four bundled templates gain masks, shapes and staggered cards",
+  "clipSeconds": 9.4,
+  "intro": {
+    "headline": "TEMPLATES, NOW WITH MOTION"
+  },
+  "outro": {
+    "headline": "REVIEW THE FOUR TEMPLATES",
+    "subtitle": "Story reel, interview, spotlight, offer seal"
+  },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.mp4",
+      "trim": 0,
+      "chip": "Cards appear in one piece",
+      "pane": {
+        "title": "Flat entrances",
+        "desc": "Each card, name plate and offer slides or fades in as a single block."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.mp4",
+      "trim": 0,
+      "chip": "Parts stagger, an iris opens",
+      "pane": {
+        "title": "Composed motion",
+        "desc": "Pips, names and offers stagger in, an ellipse opens on the clip, a seal turns up."
+      }
+    }
+  ]
+}
