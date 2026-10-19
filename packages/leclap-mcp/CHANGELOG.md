@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-19
+
 ### Added
 
 - `get_template_schema` and `get_motion_catalog` teach layer blend modes (`options.blend`) and motion blur
@@ -26,12 +28,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--allow-raw-filters` / `LECLAP_MCP_ALLOW_RAW_FILTERS` (off by default) trusts a template's raw filters for
   trusted local use; `get_capabilities` reports which mode the server runs in, and the template guide says so.
 - `extract_brand` (behind `--allow-network` / `LECLAP_MCP_ALLOW_NETWORK`): a website's brand kit as a theme and binding rules, saved under the media dir.
+- `get_template_schema`'s guide describes layer keyframe tracks (`options.animate` with x/y/scale/scaleX/
+  scaleY/rotate/opacity and `options.origin` on image, animation and html inputs), the `path` graphic and the
+  `drip` and `bands` transitions, clip boxes, shaped iris and `zoom-through` windows. `get_motion_catalog` lists the `burst` and `goo` fx and the art-direction rules for the
+  new effects; `validate_template` and `compose_video` accept everything `ffmpeg-video-composer` 3.2.0 adds.
 
 ### Changed
 
 - Raw filters in agent templates are allow-listed by the engine: a filter outside the list is a
   `filter_not_allowed` validation error instead of a render. A drawtext `fontfile` is a bare font name; fonts
   from the media dir go through `global.fonts`.
+- Requires `ffmpeg-video-composer` ^3.2.0.
 
 ### Fixed
 

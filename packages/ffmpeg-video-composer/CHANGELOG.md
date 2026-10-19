@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-10-19
+
 ### Added
 
 - Layer blend modes: `inputs[].options.blend` (`normal`, `multiply`, `screen`, `overlay`, `add`, `darken`,
@@ -97,33 +99,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runs on the layer's own frame and is in the on-device build (`fps`, `scale`, `rotate`, `colorchannelmixer`,
   `overlay`); a property without a track adds nothing, and templates without `animate` compile to the same
   commands as before.
-- Validation: `invalid_keyframes` for layer tracks out of order, an opacity outside 0..1 or a scale outside
-  0..10, relative values on scale or opacity, a scale or rotate track on a layer whose size is unknown, and
-  tracks on an input that is not a layer; an unknown track name is an `unknown_key` with the nearest name.
-- Layer tracks appear on the motion timeline as `animate` events, so the pacing lint no longer reports dead
-  air over a section whose layers are moving.
+  - Validation: `invalid_keyframes` for layer tracks out of order, an opacity outside 0..1 or a scale outside
+    0..10, relative values on scale or opacity, a scale or rotate track on a layer whose size is unknown, and
+    tracks on an input that is not a layer; an unknown track name is an `unknown_key` with the nearest name.
+  - Layer tracks appear on the motion timeline as `animate` events, so the pacing lint no longer reports dead
+    air over a section whose layers are moving.
+  - A new packaged sample, `layer-keyframes` (`examples/motion-design/layer-keyframes.json`): a pop-in with
+    overshoot, squash and stretch, a two-face flip, a needle that settles and three-depth parallax.
+- A `path` graphic: a line that draws itself along any path, for a chart line with a dot riding its end, a
+  circle drawn around a detail, a hand-drawn swash or a progress ring. The path is `points` (optionally
+  `smooth` through them and `closed`), a `shape` (`circle`, `ellipse`, `arc`, `wave`) or an SVG `d` limited to
+  M/L/H/V/C/Q/Z, in px or fractions of a `target`. It takes `thickness`, round or butt `caps`, `dash`,
+  `from`/`to` (stop a ring at 75 %, or undraw), a `head` dot, and an `exit` that fades or retracts in drawing
+  order. The drawing end moves by arc length, so a linear ease runs at constant speed on any shape. The stroke
+  and a map of each pixel's position along the path are rasterised once at compile time (`trace:` images,
+  same bytes on every platform); one `lutyuv` per output frame thresholds the map, so the reveal is
+  anti-aliased and smooth on every frame with the on-device filters (`lutyuv`, `alphamerge`, `overlay`,
+  `crop`, `trim`, `split`, `fps`, `fade`). Once drawn, a still of the stroke replaces the reveal. Example:
+  `examples/motion-design/line-draw.json`.
 - fx `burst` (marks): a one-shot radial burst from a point, the impact lines of a like-button pop or a
   "BAM!". Thin rays shoot out from `origin`, grow then shrink between an inner and an outer radius as they
   fade, with optional `dots` between them. `rays` (4–24), `radius` ([inner, outer]; by default each ray starts
   just outside the target's edge along its own direction, so a burst around a pill or a badge clears it),
   `thickness`, `length`, `spread` (180 = a half burst), `rotation` and a seeded `jitter` (each ray starts
-  0–30 ms late and is ±20 % long at the default, so no burst looks stamped). It snaps: 0.4 s by default on
-  an expo-out, every ray and dot gone by 70 % of the duration so nothing faint lingers, and `dots: true`
-  puts few, larger dots in every other gap. Each ray is a
-  compile-time sprite already turned to its angle (opposite rays share one), moved and scaled by per-frame
-  expressions: no `rotate`, only on-device filters (`scale`, `fade`, `colorchannelmixer`, `overlay`). Reduced
-  motion: the rays rest at mid travel and fade in and out. It is in the motion catalog, the JSON schema, the
-  builder's animation library (with a live canvas preview) and `examples/motion-design/fx-burst.json`.
+  0–30 ms late and is ±20 % long at the default, so no burst looks stamped). It snaps: 0.4 s by default on an
+  expo-out, every ray and dot gone by 70 % of the duration so nothing faint lingers, and `dots: true` puts
+  few, larger dots in every other gap. Each ray is a compile-time sprite already turned to its angle
+  (opposite rays share one), moved and scaled by per-frame expressions: no `rotate`, only on-device filters
+  (`scale`, `fade`, `colorchannelmixer`, `overlay`). Reduced motion: the rays rest at mid travel and fade in
+  and out. It is in the motion catalog, the JSON schema, the builder's animation library (with a live canvas
+  preview) and `examples/motion-design/fx-burst.json`.
+- fx `goo` (a fifth family, liquid): blobs that stretch, split into droplets and merge back with smooth
+  gooey necks, as a solid shape in one colour (default the theme accent). Without `blobs`, a seeded
+  choreography plays: the blob pops in, 1–4 droplets (`droplets`) stretch out along `angle` over `spread`,
+  bounce apart, drift, run back to merge on the same frame, then the blob shrinks away (`pop: false` keeps it
+  whole at both ends). `blobs` places up to eight blobs and keyframes their `x`, `y` and `r` with the layer
+  tracks' `{ t, v, ease }` keys; `goo` (0–1) sets how far apart blobs still fuse. Each blob is a gaussian
+  sprite placed per frame; they are united on a canvas the size of their bounding box and cut by one `lutyuv`
+  threshold with a one-pixel ramp, then used as the alpha of the fill. On device; about 3.4 ms per frame for
+  three droplets at 720p on one laptop thread. Reduced motion: one still blob that fades in and out. The
+  builder lists it under Celebrate, with a thumbnail and a live canvas preview.
+- `drip` designed transition: a wall of paint runs down over the outgoing scene in drips of seeded lengths
+  with rounded ends, covers the frame at the midpoint, then the incoming scene runs down over the paint.
+  `color` sets the paint (default the theme accent) and `ease` each half. The drip shape is drawn once as a
+  still silhouette and scaled per frame, so it runs on device (about 13 ms per transition frame at 720p on
+  one laptop thread). Every other transition lowers to the same commands as before. `goo` and `drip` are
+  shown in `examples/motion-design/fx-liquid.json`.
 - Glitch row tearing: `graphics[].tear` (2–24, off by default) on a `glitch` cuts the frame into that many
   horizontal bands of seeded heights and shifts each one sideways, up to 12 % of the width at intensity 1, on
   top of the RGB split and colour slices. The tear comes in 2–3 seeded bursts, nearly still between them, and
-  each band holds its offset for `hold` frames (default 2, sometimes one more) before it jumps, so it reads
-  as a torn signal rather than per-frame noise. 16–24 bands slice a title into thin displaced rows. It lowers to one `split`/`crop`/`overlay` sub-graph that is off outside
-  the hit, and an untorn glitch compiles to the same filters as before.
-- Iris origin and ease: a designed `iris` transition takes `origin` (`{ x, y }` in frame fractions) to open
-  the circle from a point of the frame, such as the icon the next scene grows out of, and now honours `ease`
-  (default `linear`). The circle grows to the frame corner farthest from the origin. The mask is drawn per
-  pixel at a quarter of the frame size (an `xfade` custom expression), scaled up and applied with
+  each band holds its offset for `hold` frames (default 2, sometimes one more) before it jumps, so it reads as
+  a torn signal rather than per-frame noise. 16–24 bands slice a title into thin displaced rows. It lowers to
+  one `split`/`crop`/`overlay` sub-graph that is off outside the hit, and an untorn glitch compiles to the
+  same filters as before.
+- Iris origin, ease and rim: a designed `iris` transition takes `origin` (`{ x, y }` in frame fractions) to
+  open the circle from a point of the frame, such as the icon the next scene grows out of, and now honours
+  `ease` (default `linear`). The circle grows to the frame corner farthest from the origin. The mask is drawn
+  per pixel at a quarter of the frame size (an `xfade` custom expression), scaled up and applied with
   `alphamerge`, which costs about 1/16 of a full-size per-pixel transition and stays on the on-device build.
   A `rim` (`"#RRGGBB"`, off by default) outlines the opening circle in the colour of the element it opens
   from, so the circle grows out of it. An iris without `origin`, `ease` or `rim` is still the built-in
@@ -134,33 +166,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   warns about it. The other profiles render as before.
 - `examples/motion-design/fx-glitch-iris-sheen.json`: a torn title, an iris from a sun icon that grows into
   it, and a glossed premium pill with a glint.
-
-- A `path` graphic: a line that draws itself along any path, for a chart line with a dot riding its end, a
-  circle drawn around a detail, a hand-drawn swash or a progress ring. The path is `points` (optionally
-  `smooth` through them and `closed`), a `shape` (`circle`, `ellipse`, `arc`, `wave`) or an SVG `d` limited to
-  M/L/H/V/C/Q/Z, in px or fractions of a `target`. It takes `thickness`, round or butt `caps`, `dash`,
-  `from`/`to` (stop a ring at 75 %, or undraw), a `head` dot, and an `exit` that fades or retracts in drawing
-  order. The drawing end moves by arc length, so a linear ease runs at constant speed on any shape. The stroke
-  and a map of each pixel's position along the path are rasterised once at compile time (`trace:` images,
-  same bytes on every platform); one `lutyuv` per output frame thresholds the map, so the reveal is
-  anti-aliased and smooth on every frame with the on-device filters (`lutyuv`, `alphamerge`, `overlay`,
-  `crop`, `trim`, `split`, `fps`, `fade`). Once drawn, a still of the stroke replaces the reveal.
-
-- `goo` fx primitive (a fifth family, liquid): blobs that stretch, split into droplets and merge back with
-  smooth gooey necks, as a solid shape in one colour (default the theme accent). Without `blobs`, a seeded
-  choreography plays: the blob pops in, 1–4 droplets (`droplets`) stretch out along `angle` over `spread`,
-  bounce apart, drift, run back to merge on the same frame, then the blob shrinks away (`pop: false` keeps
-  it whole at both ends). `blobs` places up to eight blobs and keyframes their `x`, `y` and `r` with the layer
-  tracks' `{ t, v, ease }` keys; `goo` (0–1) sets how far apart blobs still fuse. Each blob is a gaussian
-  sprite placed per frame; they are united on a canvas the size of their bounding box and cut by one
-  `lutyuv` threshold with a one-pixel ramp, then used as the alpha of the fill. On device; about 3.4 ms per
-  frame for three droplets at 720p on one laptop thread. Reduced motion: one still blob that fades in and
-  out. The builder lists it under Celebrate, with a thumbnail and a live canvas preview.
-- `drip` designed transition: a wall of paint runs down over the outgoing scene in drips of seeded lengths
-  with rounded ends, covers the frame at the midpoint, then the incoming scene runs down over the paint.
-  `color` sets the paint (default the theme accent) and `ease` each half. The drip shape is drawn once as a
-  still silhouette and scaled per frame, so it runs on device (about 13 ms per transition frame at 720p on
-  one laptop thread). Every other transition lowers to the same commands as before.
+- The motion catalog's art-direction rules cover the new layer tracks, the `path` graphic, glitch `tear`,
+  iris `origin` and `rim`, and the `drip` transition.
 
 ### Changed
 
@@ -168,18 +175,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the pass duration, so a star no longer sits almost still on its spot for half a second; `duration` only
   has to cover the stagger. Repeated passes start at least 1.5 s apart, whatever `every` asks. The glint
   picker thumbnail and the fx gallery sheet are regenerated.
-
-### Changed
-
 - Raw filters are allow-listed by default. A template's `filters`, input filters and map filters may use only
   file-free filters (text, boxes, fades, geometry, colour, blur, a few audio filters) with their listed option
   names and positional options; anything else is the validation error `filter_not_allowed` with the nearest
   allowed filter, and a build that skipped validation stops before any FFmpeg command. Templates that use a
   filter outside the list now need `ProjectConfig.allowRawFilters` (trusted local templates only). See the raw
   filter allow-list in the template reference.
-
-### Changed
-
 - Browser entry: the template validator loads on demand, like the compile pipeline. It lowers every overlay
   (text, lower thirds, kinetic type, subtitles, graphics) to find where text lands, so it made up most of what a
   page loaded before its first compile, and every new graphic or effect added to it. The eager load drops from
@@ -194,26 +195,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A `video` section with a clip and an overlay layer (HTML, image or animation) no longer fails in FFmpeg with
   "Stream specifier ':v' matches no streams". Overlays now sit on the clip instead of the silent audio track
   that muted sections (the default) add.
-
 - A `setpts` filter with an explicit expression (the fx time shift `PTS+<at>/TB` of the sheen, leak, bloom and goo
   effects, the first-frame hold of the ambient ones) is no longer rewritten to the section speed. Only `PTS` and
   `<n>*PTS` still take `options.speed`; the shift was silently lost and those effects ran from section start.
-
 - `trace:` and `shape:` image URLs: a wave of zero width and a denormal wavelength threw a `TypeError` while
   flattening (its step count was NaN), and numbers were read with `Number()`, so blanks, empty fields and hex
   such as `M0x10_1` were accepted. Numbers are now read strictly, a NaN length flattens to the minimum step
   count, and the paint work budgets of `trace:` and `shape:` images drop from 20M to 5M (a hostile 60 KB URL
   cost several seconds; bundled shapes use a small fraction of it).
-
 - Browser entry: validating a template with a `global` block overflowed the stack. The build rewrote every
   `global` in the code to `globalThis`, locals and object keys included, so resolving a theme walked
   `globalThis`; only the free identifier is rewritten now. Error messages no longer read `globalThis.beats`.
-
 - fx `confetti` and `glint`: a turning piece no longer leaves trails. Their `rotate` filled the corners of the
   turned sprite with `c=none`, which leaves whatever FFmpeg's frame pool last held there, so each piece
   smeared its earlier angles and a paper strip read as a filled square. The corners are now cleared with the
   piece's own colour at alpha 0, which also keeps the scale after the turn from pulling in a dark fringe.
-
 - `drip` transition: `color` now only accepts a `#RRGGBB` colour or a `$color.<name>` theme token, and the
   render falls back to the default paint for any other value instead of passing it to FFmpeg as is. The
   same applies to an iris `rim` that is not a hex colour, which is now dropped. A template could otherwise

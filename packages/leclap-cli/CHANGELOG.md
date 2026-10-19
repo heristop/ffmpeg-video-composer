@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-19
+
 ### Added
 
 - `leclap init` writes agent guidance: an `AGENTS.md` pointer (imported by a one-line `CLAUDE.md`) and `.agents/skills/authoring-leclap-videos/SKILL.md`,
@@ -20,6 +22,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   raw filters (trusted local templates only). Without it, raw filters are allow-listed by the engine and a
   template that uses a filter outside the list fails with `filter_not_allowed`.
 - `leclap brand <url>` writes a brand kit, a theme and binding rules.
+- `leclap samples` lists 53 samples: `layer-keyframes` animates cards and shapes with layer keyframe tracks
+  (pop-in, squash and stretch, flip, needle, parallax), `blend-motion-blur` mixes layers with blend modes and
+  blurs their motion, and `masks` cuts layers and a video section with shape masks and track mattes.
+- `leclap render` and `leclap validate` take everything `ffmpeg-video-composer` 3.2.0 adds: layer keyframe
+  tracks (`options.animate`, `options.origin`), the `path` and `shape` graphics, animated html cards
+  (`data-motion` with the input's `motion` map), layer blend modes (`options.blend`) and `motionBlur`, masks and
+  track mattes (`options.mask`), the `burst` and `goo` fx, the `drip` and `bands` transitions, clip boxes
+  (`clip`, `options.clip`), shaped iris, `zoom-through` windows, glitch `tear`, iris `origin`/`ease`/`rim` and
+  sheen `profile: "gloss"`.
+
+### Changed
+
+- Requires `ffmpeg-video-composer` ^3.2.0.
 
 ### Fixed
 
