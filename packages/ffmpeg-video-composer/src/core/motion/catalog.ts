@@ -67,7 +67,9 @@ const ART_DIRECTION = [
   'Graphics: corners or frame for focus, underline under a headline, panel as a backing plate, bars for cinema, ' +
     'wipe as an in-scene page turn, flash for impact (at most 3 per second), glitch for a hook hit, focus to rack ' +
     'into a beat, progress / ticker / bars-chart for data and broadcast, path to draw a line on (chart, ' +
-    'circled point, swash, ring).',
+    'circled point, swash, ring), shape to fill a star, heart, arrow, blob, badge or icon (preset, or an SVG d ' +
+    'with viewBox) and pop it in with animate tracks (scale 0 → 1 on a spring, origin as pivot) or reveal it ' +
+    'with stroke.draw. Two shapes moving per beat at most.',
   'Layers: cards, badges and icons (image, animation and html inputs) take options.animate keyframe tracks ' +
     '(x, y, scale, scaleX, scaleY, rotate, opacity; options.origin is the pivot). Pop-in with overshoot: scale ' +
     '0 → 1.15 → 1. Squash and stretch: scaleX and scaleY in opposition on the landing. Flip: scaleX 1 → 0 → 1 ' +
@@ -205,6 +207,10 @@ const GRAPHICS: Record<string, string> = {
   path:
     'A line drawing itself along points (+ smooth), a shape (circle|ellipse|arc|wave) or an SVG d: thickness, ' +
     'caps, dash, from/to (to: 0.75 = ring at 75%), head dot, exit fade|retract|none.',
+  shape:
+    'A filled vector shape: a preset (star, polygon, heart, arrow, blob, rect) or a closed SVG d (+ viewBox for ' +
+    'icons), colour or gradient fill, fillRule, stroke; moved with layer tracks (animate, origin) or with its ' +
+    'outline drawn on (stroke.draw).',
   wipe: 'A colour panel sweeping across the frame: covers then uncovers (direction).',
   panel: 'A solid block growing from one edge: a backing plate for text (x, y, width, height, from).',
   glitch:

@@ -6,6 +6,7 @@ import { TranslationSchema } from './global.schemas';
 import { FxGraphicSchema } from './fx.schemas';
 import { cornerStrokeFields, frameStrokeFields, underlineStrokeFields } from './graphics-stroke.schemas';
 import { pathGeometryError, pathStrokeFields } from './graphics-path.schemas';
+import { shapeFields, shapeGraphicError } from './graphics-shape.schemas';
 
 // ── animated graphics (docs/plans/motion-system.md §4.4) ──────────────────────
 //
@@ -124,6 +125,22 @@ export const GraphicSchema = z
         if (message) ctx.addIssue({ code: 'custom', message, path: g.d === undefined ? [] : ['d'] });
       })
       .describe('A line drawing itself along points, a shape or an SVG path, with an optional head dot.'),
+    z
+      .object({
+        type: z.literal('shape'),
+        ...timing,
+        ...shapeFields,
+      })
+      .strict()
+      .superRefine((g, ctx) => {
+        const issue = shapeGraphicError(g);
+
+        if (issue) ctx.addIssue({ code: 'custom', message: issue.message, path: issue.path });
+      })
+      .describe(
+        'A filled vector shape (preset or closed SVG d) with an optional outline: rasterised once, animated with ' +
+          'the layer tracks (animate, origin) or with its outline drawn on (stroke.draw). `color` is the fill.'
+      ),
     z
       .object({
         type: z.literal('wipe'),
@@ -256,7 +273,7 @@ export const GraphicsSchema = z
   .array(GraphicSchema)
   .max(24)
   .describe(
-    'Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ' +
+    'Animated graphics: flash, bars, underline, frame, corners, path, shape, wipe, panel, glitch, focus, progress, ' +
       'ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters).'
   );
 

@@ -39,8 +39,11 @@ const STEP = 1.5;
 const MAX_STEPS = 4096;
 const RAD = Math.PI / 180;
 
+// NaN (0 × ∞ from a hostile width or wavelength) counts as no length, never as an empty point list.
 function steps(length: number, min = 1): number {
-  return Math.min(MAX_STEPS, Math.max(min, Math.ceil(length / STEP)));
+  const known = Number.isNaN(length) ? 0 : length;
+
+  return Math.min(MAX_STEPS, Math.max(min, Math.ceil(known / STEP)));
 }
 
 function dist(a: Pt, b: Pt): number {
@@ -117,6 +120,13 @@ class Pen {
   current: Pt[] = [];
   start: Pt = { x: 0, y: 0 };
 
+  private flushed = 0;
+
+  /** Points held so far (finished subpaths plus the open one). */
+  get count(): number {
+    return this.flushed + this.current.length;
+  }
+
   last(): Pt {
     return this.current.at(-1) ?? this.start;
   }
@@ -152,7 +162,10 @@ class Pen {
   }
 
   flush(): void {
-    if (this.current.length > 1) this.done.push(this.current);
+    if (this.current.length > 1) {
+      this.done.push(this.current);
+      this.flushed += this.current.length;
+    }
 
     if (this.current.length > 0) this.start = this.current[0];
 
@@ -162,29 +175,53 @@ class Pen {
 
 /** The commands as polylines (one per subpath, ≥ 2 points each). */
 export function flatten(commands: readonly PathCommand[]): Pt[][] {
+  return flattenWithin(commands, Infinity) as Pt[][];
+}
+
+// How each command moves the pen.
+const PEN_MOVES: Record<string, (pen: Pen, c: number[]) => void> = {
+  M: (pen, c) => {
+    pen.moveTo({ x: c[0], y: c[1] });
+  },
+  L: (pen, c) => {
+    pen.lineTo([{ x: c[0], y: c[1] }]);
+  },
+  C: (pen, c) => {
+    pen.lineTo(cubic(pen.last(), c));
+  },
+  Q: (pen, c) => {
+    pen.lineTo(quadratic(pen.last(), c));
+  },
+  E: (pen, c) => {
+    pen.shape(ellipse(c));
+  },
+  W: (pen, c) => {
+    pen.shape(wave(c));
+  },
+  Z: (pen) => {
+    pen.close();
+  },
+};
+
+function applyCommand(pen: Pen, command: PathCommand): void {
+  const [kind, ...c] = command as [string, ...number[]];
+
+  PEN_MOVES[kind]?.(pen, c);
+}
+
+/** `flatten`, but null as soon as the polylines pass `maxPoints` points, so untrusted paths never grow past it. */
+export function flattenWithin(commands: readonly PathCommand[], maxPoints: number): Pt[][] | null {
   const pen = new Pen();
 
   for (const command of commands) {
-    const [kind, ...c] = command as [string, ...number[]];
+    if (pen.count > maxPoints) return null;
 
-    if (kind === 'M') pen.moveTo({ x: c[0], y: c[1] });
-
-    if (kind === 'L') pen.lineTo([{ x: c[0], y: c[1] }]);
-
-    if (kind === 'C') pen.lineTo(cubic(pen.last(), c));
-
-    if (kind === 'Q') pen.lineTo(quadratic(pen.last(), c));
-
-    if (kind === 'E') pen.shape(ellipse(c));
-
-    if (kind === 'W') pen.shape(wave(c));
-
-    if (kind === 'Z') pen.close();
+    applyCommand(pen, command);
   }
 
   pen.flush();
 
-  return pen.done;
+  return pen.count > maxPoints ? null : pen.done;
 }
 
 // ── arc length ─────────────────────────────────────────────────────────────────

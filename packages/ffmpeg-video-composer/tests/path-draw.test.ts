@@ -71,6 +71,15 @@ const LINE = {
 describe('path graphic: schema', () => {
   const parse = (g: Record<string, unknown>) => GraphicSchema.safeParse({ type: 'path', ...g }).success;
 
+  it('refuses a wave too short to encode', () => {
+    const wave = (wavelength: number) => ({ type: 'wave', x: 0, y: 100, width: 300, amplitude: 20, wavelength });
+    const result = GraphicSchema.safeParse({ type: 'path', shape: wave(0.0004) });
+
+    expect(parse({ shape: wave(0.01) })).toBe(true);
+    expect(parse({ shape: wave(0.009) })).toBe(false);
+    expect(JSON.stringify(result.error?.issues)).toContain('wavelength must be at least 0.01');
+  });
+
   it('accepts points, shapes and an SVG d', () => {
     expect(
       parse({

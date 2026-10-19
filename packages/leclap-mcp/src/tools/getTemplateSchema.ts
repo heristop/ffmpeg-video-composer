@@ -36,7 +36,12 @@ const GUIDE = [
     'global.motion holds tokens and the energy dial; global.seed makes every random-looking choice repeatable. ' +
     'Kinetic `trail` adds echo smears; section `graphics` add hits (flash, glitch, focus), shapes and data / ' +
     'broadcast graphics (progress, ticker, bars-chart), `path` lines that draw themselves (points, circle, arc, ' +
-    'wave or SVG d, with a head dot); `type: "fx"` graphics are procedural light primitives ' +
+    'wave or SVG d, with a head dot), `shape` fills a preset (star, polygon, heart, arrow, blob, rect) or a closed ' +
+    'SVG d (viewBox maps an icon path into x/y/width/height) with color or gradient and an optional stroke, ' +
+    'moved by the layer tracks (animate, origin) or with its outline drawn on (stroke.draw); a shape the segment ' +
+    'cannot take is reported at render as shape_unavailable, and the render log also reports shape_downsampled, ' +
+    'shape_too_large, shape_color and shape_draw_unavailable (outline up to 20,000 points; oversized shapes are ' +
+    'skipped with shape_too_large); `type: "fx"` graphics are procedural light primitives ' +
     `and marks on a \`target\` (a card rect, pane, layer or kinetic block), effect one of: ${FX_EFFECTS}. ` +
     'Compose them by ' +
     "tuning each one's parameters (shape, colour, intensity, timing, repeat, seed) for the template instead " +

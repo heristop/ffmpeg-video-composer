@@ -3993,7 +3993,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, shape, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -7411,7 +7411,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, shape, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -10891,7 +10891,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, shape, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -14047,7 +14047,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, shape, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -17174,7 +17174,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, shape, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -20855,7 +20855,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, shape, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -23982,7 +23982,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, shape, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -27108,7 +27108,7 @@
                 "items": {
                   "$ref": "#/$defs/Graphic"
                 },
-                "description": "Animated graphics: flash, bars, underline, frame, corners, path, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
+                "description": "Animated graphics: flash, bars, underline, frame, corners, path, shape, wipe, panel, glitch, focus, progress, ticker, bars-chart, and fx (procedural light primitives such as sheen: clipped to a target, tuned by parameters)."
               },
               "assert": {
                 "maxItems": 16,
@@ -30931,7 +30931,7 @@
                     },
                     "wavelength": {
                       "type": "number",
-                      "exclusiveMinimum": 0
+                      "minimum": 0.01
                     },
                     "phase": {
                       "description": "Degrees (default 0: rising).",
@@ -31038,6 +31038,364 @@
           ],
           "additionalProperties": false,
           "description": "A line drawing itself along points, a shape or an SVG path, with an optional head dot."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "shape"
+            },
+            "id": {
+              "type": "string",
+              "maxLength": 40,
+              "pattern": "^[A-Za-z]\\w*(?:-[A-Za-z]\\w*)*$",
+              "description": "Id other time fields in this section reference as \"<id>.start\" / \"<id>.end\". Unique within the section."
+            },
+            "at": {
+              "description": "When it animates in: seconds from the section start (default 0) or a time reference (\"beat:8\").",
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "$ref": "#/$defs/TimeRef"
+                }
+              ]
+            },
+            "duration": {
+              "description": "Seconds the animation takes (default per type).",
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 3
+            },
+            "ease": {
+              "description": "Curve of the animation (default per type, e.g. $expo).",
+              "$ref": "#/$defs/EasingSpec"
+            },
+            "role": {
+              "type": "string",
+              "enum": [
+                "micro",
+                "panel",
+                "camera",
+                "headline",
+                "accent",
+                "mascot"
+              ],
+              "description": "Motion role of this element (global.motion.roles): micro (small UI bits, quick, no overshoot), panel (plates/cards, controlled settle), camera (smooth, near-invisible), headline (strong entrance, stable hold), accent (snappy emphasis), mascot (playful overshoot). Supplies ease (and duration when the ease comes from the role) to an element that sets none; an explicit ease/duration always wins."
+            },
+            "until": {
+              "description": "When it disappears: seconds or a time reference (\"end - 0.3\"); default: holds to the cut.",
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "$ref": "#/$defs/TimeRef"
+                }
+              ]
+            },
+            "color": {
+              "description": "Colour, \"#rrggbb\" or \"#rrggbb@alpha\" (default per type).",
+              "type": "string",
+              "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
+            },
+            "above": {
+              "description": "Draw above text (default: true for flash, wipe, glitch, focus and underline; false otherwise).",
+              "type": "boolean"
+            },
+            "target": {
+              "description": "x, y, width, height (and `d` without viewBox) are fractions of this box.",
+              "$ref": "#/$defs/FxTarget"
+            },
+            "d": {
+              "description": "Closed SVG path of M L H V C Q Z, at most 4000 characters.",
+              "type": "string",
+              "maxLength": 4000
+            },
+            "viewBox": {
+              "description": "[minX, minY, w, h] of `d`: fits it into the box (icons).",
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              ]
+            },
+            "preset": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "star"
+                    },
+                    "points": {
+                      "description": "Tips (5).",
+                      "type": "integer",
+                      "minimum": 3,
+                      "maximum": 24
+                    },
+                    "inner": {
+                      "description": "Inner/outer radius (0.5).",
+                      "type": "number",
+                      "minimum": 0.1,
+                      "maximum": 0.95
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "polygon"
+                    },
+                    "sides": {
+                      "description": "Sides (6).",
+                      "type": "integer",
+                      "minimum": 3,
+                      "maximum": 24
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "heart"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "arrow"
+                    },
+                    "direction": {
+                      "description": "Pointing (right).",
+                      "type": "string",
+                      "enum": [
+                        "right",
+                        "left",
+                        "up",
+                        "down"
+                      ]
+                    },
+                    "head": {
+                      "description": "Head length share (0.4).",
+                      "type": "number",
+                      "minimum": 0.15,
+                      "maximum": 0.8
+                    },
+                    "shaft": {
+                      "description": "Shaft thickness share (0.4).",
+                      "type": "number",
+                      "minimum": 0.1,
+                      "maximum": 0.9
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "blob"
+                    },
+                    "lobes": {
+                      "description": "Bumps (6).",
+                      "type": "integer",
+                      "minimum": 3,
+                      "maximum": 12
+                    },
+                    "wobble": {
+                      "description": "Inward dip (0.25).",
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 0.45
+                    },
+                    "seed": {
+                      "description": "Default: from global.seed.",
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "rect"
+                    },
+                    "radius": {
+                      "description": "Corner radius share of the short side (0.15).",
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 0.5
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false
+                }
+              ],
+              "description": "Built-in outline in the box (rect radius 0.5: pill)."
+            },
+            "x": {
+              "description": "Box left, px (centred).",
+              "type": "number",
+              "minimum": -20000,
+              "maximum": 20000
+            },
+            "y": {
+              "description": "Box top, px (centred).",
+              "type": "number",
+              "minimum": -20000,
+              "maximum": 20000
+            },
+            "width": {
+              "description": "Box width, px (40% of the short side; target: 1).",
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 20000
+            },
+            "height": {
+              "description": "Box height, px (= width).",
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 20000
+            },
+            "fill": {
+              "description": "false: outline only.",
+              "type": "boolean"
+            },
+            "gradient": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
+                },
+                "to": {
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
+                },
+                "angle": {
+                  "description": "Linear only: 0 bottom→top, 90 left→right, 180 top→bottom (180).",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 360
+                },
+                "shape": {
+                  "description": "linear (default) or radial (centre out).",
+                  "type": "string",
+                  "enum": [
+                    "linear",
+                    "radial"
+                  ]
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ],
+              "additionalProperties": false,
+              "description": "Overrides `color`."
+            },
+            "fillRule": {
+              "description": "nonzero (default) or evenodd.",
+              "type": "string",
+              "enum": [
+                "nonzero",
+                "evenodd"
+              ]
+            },
+            "stroke": {
+              "type": "object",
+              "properties": {
+                "color": {
+                  "type": "string",
+                  "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
+                },
+                "width": {
+                  "description": "px (4).",
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 80
+                },
+                "draw": {
+                  "description": "Draw the outline on over `duration` (1.2 s), then fade the fill in; not with `animate`.",
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "center",
+                "top-left",
+                "top",
+                "top-right",
+                "left",
+                "right",
+                "bottom-left",
+                "bottom",
+                "bottom-right"
+              ],
+              "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+            },
+            "animate": {
+              "$ref": "#/$defs/LayerAnimate"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false,
+          "description": "A filled vector shape (preset or closed SVG d) with an optional outline: rasterised once, animated with the layer tracks (animate, origin) or with its outline drawn on (stroke.draw). `color` is the fill."
         },
         {
           "type": "object",

@@ -155,6 +155,12 @@ export const GRAPHIC_GUIDES: Record<string, MotionGuide> = {
     'counter',
     'bars-chart',
   ]),
+  shape: guide(
+    'STAMPS',
+    'a badge, a sticker, an icon or a burst shape popping in on a spring, a blob behind a headline',
+    'a backing plate for body copy, or more than two shapes moving in one beat',
+    ['pop', 'counter']
+  ),
   wipe: guide('WIPES', 'an in-scene page turn between two ideas', 'a beat that already ends on a transition', [
     'slide',
     'swipe',

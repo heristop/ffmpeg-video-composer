@@ -147,6 +147,7 @@ function collectSlots(section: Bag, accept: Accept): RawSlot[] {
     ...list(section.graphics).flatMap((g, i) => [
       ...slot(accept, g, 'at', `graphics[${i}]`, idOf(g)),
       ...slot(accept, g, 'until', `graphics[${i}]`),
+      ...(g.type === 'shape' ? trackSlots(accept, bag(g.animate), LAYER_TRACKS, `graphics[${i}].animate`) : []),
     ]),
     ...cameraSlots(accept, bag(section.camera)),
     ...list(section.filters).flatMap((filter, i) => filterSlots(accept, filter, `filters[${i}]`)),

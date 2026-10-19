@@ -246,6 +246,24 @@ describe('resolving time references', () => {
     ]);
   });
 
+  it('resolves the time references of a shape graphic track', () => {
+    const { sections, issues } = resolved([
+      card({
+        graphics: [
+          {
+            type: 'shape',
+            preset: { type: 'star' },
+            animate: { scale: [{ v: 0 }, { t: 'end - 1', v: 1 }] },
+          },
+        ],
+      }),
+    ]);
+    const animate = (sections[0].graphics as Section[])[0].animate as Section;
+
+    expect(issues).toEqual([]);
+    expect(animate.scale).toEqual([{ v: 0 }, { t: 3, v: 1 }]);
+  });
+
   it('leaves sections without references untouched', () => {
     const section = card({ graphics: [{ type: 'flash', at: 1 }] });
 

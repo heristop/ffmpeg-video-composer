@@ -117,3 +117,24 @@ describe('path raster: the arc-length code mask', () => {
     expect(tracePng(circle)).toEqual(tracePng(circle));
   });
 });
+
+describe('path raster: trace: work budget', () => {
+  const head = 'trace:mode=cover,cap=round,x=0,y=0,w=1024,h=1024';
+
+  it('refuses a thickness past what the path schema allows', () => {
+    expect(parseTraceUrl(`${head},t=80,d=M0_0L100_100`)).not.toBeNull();
+    expect(parseTraceUrl(`${head},t=81,d=M0_0L100_100`)).toBeNull();
+    expect(parseTraceUrl(`${head},t=100000,d=M0_0L100_100`)).toBeNull();
+  });
+
+  it('refuses a path whose segments together cost too much to paint', () => {
+    const d = 'M0_0' + 'L1000_0L0_0'.repeat(4);
+
+    expect(parseTraceUrl(`${head},t=80,d=${d}`)).not.toBeNull();
+    expect(parseTraceUrl(`${head},t=80,d=${'M0_0' + 'L1000_1000L0_0'.repeat(4000)}`)).toBeNull();
+  });
+
+  it('refuses points that are not finite', () => {
+    expect(parseTraceUrl(`${head},t=6,d=M0_0W0_0_1_1_1e-310_0`)).toBeNull();
+  });
+});

@@ -11,7 +11,7 @@ import { FxTargetSchema } from './fx.schemas';
 export const PATH_EXITS = ['none', 'fade', 'retract'] as const;
 export const PATH_CAPS = ['round', 'butt'] as const;
 /** SVG path commands the `d` field accepts (upper case absolute, lower case relative). */
-const MAX_D = 4000;
+export const MAX_D = 4000;
 export const SVG_PATH = /^[\s,]*[Mm][\s,MmLlHhVvCcQqZz\d.eE+-]*$/;
 
 const coordinate = z.number();
@@ -47,7 +47,7 @@ export const PathShapeSchema = z.discriminatedUnion('type', [
       y: coordinate,
       width: size,
       amplitude: z.number().min(0),
-      wavelength: size,
+      wavelength: z.number().min(0.01, 'A wave wavelength must be at least 0.01 (px, or a fraction with a target)'),
       phase: angle.optional().describe('Degrees (default 0: rising).'),
     })
     .strict()

@@ -8,6 +8,8 @@ const SVG_TOKEN = /\s*,?\s*(?:([MmLlHhVvCcQqZz])|([-+]?(?:\d+\.?\d*|\.\d+)(?:[eE
 const SVG_ARITY: Partial<Record<string, number>> = { M: 2, L: 2, H: 1, V: 1, C: 6, Q: 4, Z: 0 };
 /** A moveto's extra pairs are linetos. */
 const AFTER_MOVE: Partial<Record<string, string>> = { M: 'L', m: 'l' };
+/** What encodeCommands prints: no blanks, hex, empty or bare-sign numbers. */
+const ENCODED_NUMBER = /^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/;
 const ARITY: Partial<Record<string, number>> = { M: 2, L: 2, C: 6, Q: 4, E: 6, W: 6, Z: 0 };
 
 type Token = string | number;
@@ -134,9 +136,16 @@ export function encodeCommands(commands: readonly PathCommand[]): string {
 function decodePart(part: string): PathCommand | null {
   const kind = part[0];
   const arity = ARITY[kind];
-  const args = part.length > 1 ? part.slice(1).split('_').map(Number) : [];
+  const texts = part.length > 1 ? part.slice(1).split('_') : [];
 
-  if (arity === undefined || args.length !== arity || args.some((v) => !Number.isFinite(v))) return null;
+  if (arity === undefined || texts.length !== arity || !texts.every((t) => ENCODED_NUMBER.test(t))) return null;
+
+  const args = texts.map(Number);
+
+  if (args.some((v) => !Number.isFinite(v))) return null;
+
+  // A wave divides by its wavelength.
+  if (kind === 'W' && args[4] === 0) return null;
 
   return [kind, ...args] as PathCommand;
 }

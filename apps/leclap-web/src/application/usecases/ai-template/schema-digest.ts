@@ -1,7 +1,7 @@
 // Shrinks the engine's template JSON Schema to fit a prompt. The raw schema is ~570 KB minified,
-// mostly because every section variant repeats the same option/filter subtrees. Three lossless-ish
+// mostly because every section variant repeats the same option/filter subtrees. Four lossless-ish
 // passes bring it under a quarter of that: descriptions are clipped (they stay, shortened, because they
-// carry units and ranges), `additionalProperties: false` is dropped (every object is closed: the prompt
+// carry units and ranges), `additionalProperties: false` and the redundant `type: "object"` are dropped (every object is closed: the prompt
 // states it once, CLOSED_OBJECTS), the fields every variant of a union repeats are stated once (factorUnions), and
 // every repeated subtree is hoisted once into `$defs` and referenced. If the result is still over budget,
 // descriptions are clipped harder, then dropped.
@@ -36,8 +36,22 @@ function cleanNameMap(node: Json, maxDescription: number): Json {
   return Object.fromEntries(Object.entries(node).map(([name, child]) => [name, cleanNode(child, maxDescription)]));
 }
 
-function cleanEntry(key: string, value: Json, maxDescription: number): [string, Json] | null {
-  if (DROPPED_KEYS.has(key) || (key === 'additionalProperties' && value === false)) return null;
+// Keys the digest drops: noise, a closed-object flag, and an object type that `properties` already says.
+function isRedundant(node: { [key: string]: Json }, key: string, value: Json): boolean {
+  if (DROPPED_KEYS.has(key)) return true;
+
+  if (key === 'additionalProperties') return value === false;
+
+  return key === 'type' && value === 'object' && 'properties' in node;
+}
+
+function cleanEntry(
+  node: { [key: string]: Json },
+  key: string,
+  value: Json,
+  maxDescription: number
+): [string, Json] | null {
+  if (isRedundant(node, key, value)) return null;
 
   if (key === 'description') {
     const clipped = clipDescription(value, maxDescription);
@@ -56,7 +70,7 @@ function cleanNode(node: Json, maxDescription: number): Json {
   const out: { [key: string]: Json } = {};
 
   for (const [key, value] of Object.entries(node)) {
-    const entry = cleanEntry(key, value, maxDescription);
+    const entry = cleanEntry(node, key, value, maxDescription);
 
     if (entry) out[entry[0]] = entry[1];
   }

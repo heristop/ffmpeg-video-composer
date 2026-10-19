@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "name": "Vector shapes",
+    "description": "The shape graphic: a star that pops in on a spring, a heart whose outline draws itself before it fills, an arrow sliding in, and a lightning icon from an SVG path over a seeded gradient blob.",
+    "creativeDirection": "Audience: motion designers checking what the shape graphic can do. Direction: one move per beat on a dark ink ground, yellow, rose and lavender fills, a small uppercase label naming the move. The star lands upright with one overshoot, the heart's outline closes before its fill comes in, the arrow settles on a spring, the blob squashes from its base. Review: no jitter on the springs, the outline closes exactly, no dark fringe on any edge."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "transition": { "type": "cut" }
+  },
+  "sections": [
+    {
+      "name": "pop",
+      "type": "color_background",
+      "purpose": "A yellow star pops in on a spring and turns upright, a lavender hexagon outline behind it.",
+      "options": { "backgroundColor": "#141416", "duration": 2.6 },
+      "kinetic": [
+        {
+          "text": { "en": "01 · POP" },
+          "preset": "fade",
+          "size": 28,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#9298fb"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "shape",
+          "at": 0.5,
+          "preset": { "type": "polygon", "sides": 6 },
+          "x": 440,
+          "y": 160,
+          "width": 400,
+          "height": 400,
+          "fill": false,
+          "stroke": { "color": "#9298fb", "width": 4 },
+          "animate": {
+            "scale": [
+              { "t": 0.5, "v": 0.6 },
+              { "t": 1.1, "v": 1, "ease": "spring(300, 14)" }
+            ],
+            "opacity": [
+              { "t": 0.5, "v": 0 },
+              { "t": 0.8, "v": 1 }
+            ]
+          }
+        },
+        {
+          "type": "shape",
+          "at": 0.3,
+          "preset": { "type": "star", "points": 5, "inner": 0.45 },
+          "x": 490,
+          "y": 210,
+          "width": 300,
+          "height": 300,
+          "color": "#FFF685",
+          "stroke": { "color": "#F5F3F7", "width": 6 },
+          "animate": {
+            "scale": [
+              { "t": 0.3, "v": 0 },
+              { "t": 0.9, "v": 1, "ease": "spring(300, 14)" }
+            ],
+            "rotate": [
+              { "t": 0.3, "v": -40 },
+              { "t": 1.0, "v": 0, "ease": "$expo" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "draw",
+      "type": "color_background",
+      "purpose": "A heart's white outline draws itself, its rose fill fades in, then an arrow slides in to point at it.",
+      "options": { "backgroundColor": "#141416", "duration": 3.2 },
+      "kinetic": [
+        {
+          "text": { "en": "02 · DRAW ON" },
+          "preset": "fade",
+          "size": 28,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#9298fb"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "shape",
+          "at": 0.3,
+          "duration": 1.2,
+          "preset": { "type": "heart" },
+          "x": 540,
+          "y": 190,
+          "width": 340,
+          "height": 340,
+          "color": "#F96F99",
+          "stroke": { "color": "#FFFFFF", "width": 6, "draw": true }
+        },
+        {
+          "type": "shape",
+          "at": 1.6,
+          "preset": { "type": "arrow", "direction": "right", "head": 0.35, "shaft": 0.35 },
+          "x": 260,
+          "y": 330,
+          "width": 220,
+          "height": 64,
+          "color": "#F5F3F7",
+          "animate": {
+            "x": [
+              { "t": 1.6, "v": "-320" },
+              { "t": 2.2, "v": "+0", "ease": "spring(300, 14)" }
+            ],
+            "opacity": [
+              { "t": 1.6, "v": 0 },
+              { "t": 1.8, "v": 1 }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "icon",
+      "type": "color_background",
+      "purpose": "A seeded gradient blob squashes in from its base, then a lightning icon from an SVG path pops onto it.",
+      "options": { "backgroundColor": "#141416", "duration": 2.8 },
+      "kinetic": [
+        {
+          "text": { "en": "03 · ICON + BLOB" },
+          "preset": "fade",
+          "size": 28,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#9298fb"
+        }
+      ],
+      "graphics": [
+        {
+          "type": "shape",
+          "at": 0.2,
+          "preset": { "type": "blob", "lobes": 7, "wobble": 0.3, "seed": 5 },
+          "x": 400,
+          "y": 140,
+          "width": 480,
+          "height": 440,
+          "gradient": { "from": "#9298fb", "to": "#f96f99@0.85", "shape": "radial" },
+          "origin": "bottom",
+          "animate": {
+            "opacity": [
+              { "t": 0.2, "v": 0 },
+              { "t": 0.5, "v": 1 }
+            ],
+            "scaleX": [
+              { "t": 0.2, "v": 1.25 },
+              { "t": 1.0, "v": 1, "ease": "spring(300, 14)" }
+            ],
+            "scaleY": [
+              { "t": 0.2, "v": 0.7 },
+              { "t": 1.0, "v": 1, "ease": "spring(300, 14)" }
+            ]
+          }
+        },
+        {
+          "type": "shape",
+          "at": 0.9,
+          "d": "M13 2 L4 14 L11 14 L10 22 L19 10 L12 10 Z",
+          "viewBox": [0, 0, 24, 24],
+          "x": 560,
+          "y": 260,
+          "width": 160,
+          "height": 200,
+          "color": "#141416",
+          "animate": {
+            "scale": [
+              { "t": 0.9, "v": 0 },
+              { "t": 1.4, "v": 1, "ease": "spring(300, 14)" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
