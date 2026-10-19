@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.2.0] - 2026-10-15
+## [3.2.0] - 2026-10-19
 
 ### Added
 
@@ -195,20 +195,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A `video` section with a clip and an overlay layer (HTML, image or animation) no longer fails in FFmpeg with
   "Stream specifier ':v' matches no streams". Overlays now sit on the clip instead of the silent audio track
   that muted sections (the default) add.
-
 - A `setpts` filter with an explicit expression (the fx time shift `PTS+<at>/TB` of the sheen, leak, bloom and goo
   effects, the first-frame hold of the ambient ones) is no longer rewritten to the section speed. Only `PTS` and
   `<n>*PTS` still take `options.speed`; the shift was silently lost and those effects ran from section start.
-<<<<<<< HEAD
-
 - `trace:` and `shape:` image URLs: a wave of zero width and a denormal wavelength threw a `TypeError` while
   flattening (its step count was NaN), and numbers were read with `Number()`, so blanks, empty fields and hex
   such as `M0x10_1` were accepted. Numbers are now read strictly, a NaN length flattens to the minimum step
   count, and the paint work budgets of `trace:` and `shape:` images drop from 20M to 5M (a hostile 60 KB URL
   cost several seconds; bundled shapes use a small fraction of it).
-
-=======
->>>>>>> 131fb5ce (docs(changelog): tidy blank lines in the 3.2.0 fixed list)
 - Browser entry: validating a template with a `global` block overflowed the stack. The build rewrote every
   `global` in the code to `globalThis`, locals and object keys included, so resolving a theme walked
   `globalThis`; only the free identifier is rewritten now. Error messages no longer read `globalThis.beats`.
