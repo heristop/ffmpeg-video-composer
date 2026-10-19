@@ -111,3 +111,18 @@ describe('compositing catalog: blend modes and motion blur', () => {
     );
   });
 });
+
+describe('masks in the motion catalog', () => {
+  it('lists every mask field and finds the track matte by meaning', () => {
+    expect(Object.keys(motionCatalog().compositing.masks)).toEqual([
+      'mask.shape',
+      'mask.layer',
+      'mask.invert',
+      'mask.feather',
+      'mask.animate',
+      'mask.background',
+    ]);
+    expect(searchMotionCatalog('track matte luma', { kind: 'compositing' }).matches[0]?.name).toBe('mask.layer');
+    expect(motionCatalog().rules.some((rule) => rule.includes('options.mask'))).toBe(true);
+  });
+});

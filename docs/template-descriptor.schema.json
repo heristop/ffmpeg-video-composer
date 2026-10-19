@@ -2125,6 +2125,9 @@
                             "h"
                           ],
                           "additionalProperties": false
+                        },
+                        "mask": {
+                          "$ref": "#/$defs/LayerMask"
                         }
                       },
                       "additionalProperties": false
@@ -5193,6 +5196,9 @@
                       "description": "One kept window [from, to] of the source clip, in source seconds."
                     },
                     "description": "Source windows to keep, ascending and non-overlapping, e.g. [[0.4, 3.2], [4.1, 9.8]]: the clip is cut to these pieces back to back (trim/atrim + concat, every backend). The explicit form of trimSilence."
+                  },
+                  "mask": {
+                    "$ref": "#/$defs/SectionMask"
                   }
                 },
                 "additionalProperties": false
@@ -5560,6 +5566,9 @@
                             "h"
                           ],
                           "additionalProperties": false
+                        },
+                        "mask": {
+                          "$ref": "#/$defs/LayerMask"
                         }
                       },
                       "additionalProperties": false
@@ -8690,6 +8699,9 @@
                       "description": "One kept window [from, to] of the source clip, in source seconds."
                     },
                     "description": "Source windows to keep, ascending and non-overlapping, e.g. [[0.4, 3.2], [4.1, 9.8]]: the clip is cut to these pieces back to back (trim/atrim + concat, every backend). The explicit form of trimSilence."
+                  },
+                  "mask": {
+                    "$ref": "#/$defs/SectionMask"
                   }
                 },
                 "additionalProperties": false
@@ -9057,6 +9069,9 @@
                             "h"
                           ],
                           "additionalProperties": false
+                        },
+                        "mask": {
+                          "$ref": "#/$defs/LayerMask"
                         }
                       },
                       "additionalProperties": false
@@ -12230,6 +12245,9 @@
                             "h"
                           ],
                           "additionalProperties": false
+                        },
+                        "mask": {
+                          "$ref": "#/$defs/LayerMask"
                         }
                       },
                       "additionalProperties": false
@@ -15374,6 +15392,9 @@
                             "h"
                           ],
                           "additionalProperties": false
+                        },
+                        "mask": {
+                          "$ref": "#/$defs/LayerMask"
                         }
                       },
                       "additionalProperties": false
@@ -19072,6 +19093,9 @@
                             "h"
                           ],
                           "additionalProperties": false
+                        },
+                        "mask": {
+                          "$ref": "#/$defs/LayerMask"
                         }
                       },
                       "additionalProperties": false
@@ -22216,6 +22240,9 @@
                             "h"
                           ],
                           "additionalProperties": false
+                        },
+                        "mask": {
+                          "$ref": "#/$defs/LayerMask"
                         }
                       },
                       "additionalProperties": false
@@ -25359,6 +25386,9 @@
                             "h"
                           ],
                           "additionalProperties": false
+                        },
+                        "mask": {
+                          "$ref": "#/$defs/LayerMask"
                         }
                       },
                       "additionalProperties": false
@@ -29299,6 +29329,201 @@
         }
       ],
       "description": "Motion blur while the element moves: true, or { shutter, samples }. Resting frames stay sharp. Needs the tmix filter: without it the element draws sharp."
+    },
+    "LayerMask": {
+      "type": "object",
+      "properties": {
+        "shape": {
+          "$ref": "#/$defs/MaskShape"
+        },
+        "layer": {
+          "description": "Track matte: the name of another image, animation or html input of this section. That layer is not drawn; its position, timing and motion move the matte.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "mode": {
+          "description": "With layer: alpha (default, its opacity) or luma (its brightness: white shows, black hides).",
+          "type": "string",
+          "enum": [
+            "alpha",
+            "luma"
+          ]
+        },
+        "invert": {
+          "description": "Show outside the mask instead of inside.",
+          "type": "boolean"
+        },
+        "feather": {
+          "description": "Soft edge width in px (default 0).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 200
+        },
+        "animate": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "description": "Horizontal offset track in px from where the shape sits (\"+80\", \"-40\" or 80).",
+              "$ref": "#/$defs/KeyframeTrack"
+            },
+            "y": {
+              "description": "Vertical offset track in px from where the shape sits.",
+              "$ref": "#/$defs/KeyframeTrack"
+            },
+            "scale": {
+              "description": "Uniform scale track (0..10) about `origin`: 0 → 1.2 opens an iris.",
+              "$ref": "#/$defs/KeyframeTrack"
+            },
+            "scaleX": {
+              "description": "Horizontal scale track (0..10), multiplied with scale.",
+              "$ref": "#/$defs/KeyframeTrack"
+            },
+            "scaleY": {
+              "description": "Vertical scale track (0..10), multiplied with scale.",
+              "$ref": "#/$defs/KeyframeTrack"
+            },
+            "rotate": {
+              "description": "Rotation track in degrees, clockwise, about `origin`.",
+              "$ref": "#/$defs/KeyframeTrack"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Keyframe tracks moving a shape mask, times in section seconds; each key eases into the next."
+        },
+        "origin": {
+          "description": "The point of the shape its scale and rotate tracks pivot about.",
+          "type": "string",
+          "enum": [
+            "center",
+            "top-left",
+            "top",
+            "top-right",
+            "left",
+            "right",
+            "bottom-left",
+            "bottom",
+            "bottom-right"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Show the layer only inside a shape or through another layer (track matte), with invert, feather and keyframed shape motion. Needs alphamerge: without it a shape falls back to its resting box and a track matte draws both layers (mask_unavailable)."
+    },
+    "MaskShape": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "rect"
+            },
+            "x": {
+              "type": "number",
+              "minimum": -20000,
+              "maximum": 20000,
+              "description": "Output px."
+            },
+            "y": {
+              "type": "number",
+              "minimum": -20000,
+              "maximum": 20000,
+              "description": "Output px."
+            },
+            "w": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 20000,
+              "description": "Output px."
+            },
+            "h": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 20000,
+              "description": "Output px."
+            },
+            "radius": {
+              "description": "Corner radius in px, capped at half the shorter side (default 0).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 20000
+            }
+          },
+          "required": [
+            "type",
+            "x",
+            "y",
+            "w",
+            "h"
+          ],
+          "additionalProperties": false,
+          "description": "A rectangle, optionally with rounded corners."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "ellipse"
+            },
+            "cx": {
+              "type": "number",
+              "minimum": -20000,
+              "maximum": 20000,
+              "description": "Output px."
+            },
+            "cy": {
+              "type": "number",
+              "minimum": -20000,
+              "maximum": 20000,
+              "description": "Output px."
+            },
+            "rx": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 20000,
+              "description": "Output px."
+            },
+            "ry": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 20000,
+              "description": "Output px."
+            }
+          },
+          "required": [
+            "type",
+            "cx",
+            "cy",
+            "rx",
+            "ry"
+          ],
+          "additionalProperties": false,
+          "description": "An ellipse; rx = ry draws a circle."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "path"
+            },
+            "d": {
+              "type": "string",
+              "maxLength": 4000,
+              "pattern": "^[\\s,]*[Mm][\\s,MmLlHhVvCcQqZz\\d.eE+-]*$",
+              "description": "SVG path in output px (M, L, H, V, C, Q, Z, absolute or relative; at most 4000 characters). Each subpath is closed and filled (non-zero rule)."
+            }
+          },
+          "required": [
+            "type",
+            "d"
+          ],
+          "additionalProperties": false,
+          "description": "Any closed outline: a star, a blob, a logo silhouette."
+        }
+      ],
+      "description": "The mask shape, in output px."
     },
     "Animate": {
       "type": "object",
@@ -35405,6 +35630,90 @@
         }
       ],
       "description": "A section length counted on the beat grid: { beats: 8 } or { bars: 2 }. Needs global.beats with a bpm (or { analyze: \"music\" } on Node); resolved to seconds before any time reference."
+    },
+    "SectionMask": {
+      "type": "object",
+      "properties": {
+        "shape": {
+          "$ref": "#/$defs/MaskShape"
+        },
+        "layer": {
+          "description": "Track matte: the name of another image, animation or html input of this section. That layer is not drawn; its position, timing and motion move the matte.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "mode": {
+          "description": "With layer: alpha (default, its opacity) or luma (its brightness: white shows, black hides).",
+          "type": "string",
+          "enum": [
+            "alpha",
+            "luma"
+          ]
+        },
+        "invert": {
+          "description": "Show outside the mask instead of inside.",
+          "type": "boolean"
+        },
+        "feather": {
+          "description": "Soft edge width in px (default 0).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 200
+        },
+        "animate": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "description": "Horizontal offset track in px from where the shape sits (\"+80\", \"-40\" or 80).",
+              "$ref": "#/$defs/KeyframeTrack"
+            },
+            "y": {
+              "description": "Vertical offset track in px from where the shape sits.",
+              "$ref": "#/$defs/KeyframeTrack"
+            },
+            "scale": {
+              "description": "Uniform scale track (0..10) about `origin`: 0 → 1.2 opens an iris.",
+              "$ref": "#/$defs/KeyframeTrack"
+            },
+            "scaleX": {
+              "description": "Horizontal scale track (0..10), multiplied with scale.",
+              "$ref": "#/$defs/KeyframeTrack"
+            },
+            "scaleY": {
+              "description": "Vertical scale track (0..10), multiplied with scale.",
+              "$ref": "#/$defs/KeyframeTrack"
+            },
+            "rotate": {
+              "description": "Rotation track in degrees, clockwise, about `origin`.",
+              "$ref": "#/$defs/KeyframeTrack"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Keyframe tracks moving a shape mask, times in section seconds; each key eases into the next."
+        },
+        "origin": {
+          "description": "The point of the shape its scale and rotate tracks pivot about.",
+          "type": "string",
+          "enum": [
+            "center",
+            "top-left",
+            "top",
+            "top-right",
+            "left",
+            "right",
+            "bottom-left",
+            "bottom",
+            "bottom-right"
+          ]
+        },
+        "background": {
+          "description": "Colour outside the mask: #RRGGBB, a name, $color.<token> or {{ VARIABLE }} (default black).",
+          "type": "string",
+          "pattern": "^(?:[#$A-Za-z0-9@._]+|\\{\\{ ?[A-Za-z_][A-Za-z0-9_]* ?\\}\\}(?:@[0-9.]+)?)$"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Show the clip only inside a shape or through one of the section's layers (track matte), `background` outside. Layers and text draw on top, unmasked."
     },
     "__schema0": {
       "anyOf": [

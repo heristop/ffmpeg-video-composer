@@ -20,7 +20,12 @@ import {
   createEmojiPlan,
   createExtraInputs,
   HTML_RASTERISER,
+  matteModes,
+  matteReaders,
+  SECTION_READER,
+  stageLayerMasks,
   type EmojiPlan,
+  type MatteLeg,
   type SugarContext,
 } from './presets/registry';
 import {
@@ -77,6 +82,7 @@ container.register<SegmentManagersBag>('SegmentManagersBag', {
 
 // Runtime-typed view of segment.inputsAsset used as a string-keyed store.
 type InputsAssetMap = Record<string, string>;
+type PendingAnimation = { input: MapAnimationInput; index: number };
 // What a sugar lowering asks to stage as an extra input (presets/sugar-context.ts ExtraInputSource).
 type ExtraInputSource = Parameters<NonNullable<SugarContext['masks']>['input']>[1];
 
@@ -355,11 +361,69 @@ class SegmentBuilder {
     // leg is normalized to the output scale before compositing so full-frame animations fill the frame.
     this.registerEmojiInputs(this.buildGradientLayers(inputIndex, inputsAsset), inputsAsset);
 
-    for (const animation of pendingAnimations) {
-      this.mapManager.addAnimationOverlay(animation.input, animation.index, videoScale);
-    }
+    this.addOverlays(pendingAnimations, videoScale);
 
     this.extras.append(inputsAsset);
+  };
+
+  // Layers in section order. A layer a mask names as its track matte is not drawn: its grey leg is registered
+  // first and handed to the one mask that reads it (presets/layer-masks.ts). Without alphamerge there are no
+  // mattes, and every layer draws plainly; a reader left without one (plain-media matte, shared matte) says so.
+  private readonly addOverlays = (pending: PendingAnimation[], videoScale: string): void => {
+    const available = this.filterManager.supports('alphamerge');
+    const drawn = new Set(pending.map(({ input }) => input.name));
+    const modes = matteModes(this.section, available, drawn);
+    const readers = matteReaders(this.section, drawn);
+    const mattes = new Map(
+      pending
+        .filter(({ input }) => modes.has(input.name))
+        .map(
+          ({ input, index }) =>
+            [input.name, this.mapManager.registerMatte(input, index, modes.get(input.name))] as const
+        )
+    );
+
+    this.addSectionMask(readers, mattes, videoScale, available);
+
+    for (const { input, index } of pending) {
+      if (modes.has(input.name)) continue;
+
+      const layer = input.options.mask?.layer ?? '';
+      const matte = readers.get(layer) === input.name ? mattes.get(layer) : undefined;
+
+      if (layer && available && !matte) this.warnMatte(this.authoredLabel(input.name), layer, 'it draws unmasked');
+
+      this.mapManager.addAnimationOverlay(input, index, videoScale, matte);
+    }
+  };
+
+  // The section's own track matte composites first, so every layer draws on the masked clip.
+  private readonly addSectionMask = (
+    readers: Map<string, string>,
+    mattes: Map<string, MatteLeg>,
+    videoScale: string,
+    available: boolean
+  ): void => {
+    const layer = this.section.options?.mask?.layer ?? '';
+    const matte = readers.get(layer) === SECTION_READER ? mattes.get(layer) : undefined;
+
+    if (matte) this.mapManager.addSectionMatte(matte, videoScale);
+
+    if (layer && available && !matte) this.warnMatte('options.mask', layer, 'the clip draws unmasked');
+  };
+
+  // `inputs[i] "name"` with i the authored index: the prepended section background is not one of the author's.
+  private readonly authoredLabel = (name: string): string => {
+    const inputs = this.section.inputs ?? [];
+    const leading = inputs.filter((input) => this.assetManager.isBackgroundInput(input)).length;
+
+    return `inputs[${inputs.findIndex((input) => input.name === name) - leading}] "${name}"`;
+  };
+
+  private readonly warnMatte = (where: string, layer: string, outcome: string): void => {
+    this.logger.warn(
+      `[${this.section.name}][mask_unavailable] ${where}: track matte "${layer}" cannot be used (it is not a layer drawn on its own, another mask already reads it, or it is itself masked); ${outcome}`
+    );
   };
 
   // Stage every input as one `-i` in section order (stable stream indices), returning the animation
@@ -727,6 +791,8 @@ class SegmentBuilder {
     // framed camera, so it stays steady).
     this.backgroundSugarCount = this.section.filters.length - authored.chain.length + authored.textAt;
     this.stageEmoji(ctx);
+    // Layer mask images become extra inputs here, before prepareStagedMedia stages them (presets/layer-masks.ts).
+    stageLayerMasks(this.section, ctx);
   };
 
   // Pulls colour emoji out of every drawtext (sugar and authored); they come back as image overlays.

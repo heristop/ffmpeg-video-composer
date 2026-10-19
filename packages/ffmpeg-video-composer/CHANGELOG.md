@@ -22,6 +22,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   when `getMotionWarnings` is given the target build's capabilities). Validation also advises
   `motion_blur_static` and `motion_blur_ignored`.
 - Sample `blend-motion-blur` and motion-review fixtures `layer-blend` and `motion-blur`.
+- Masks and track mattes: an image, animation or html layer takes `options.mask`, and a video or project_video
+  section takes `options.mask`. A mask is a `shape` (`rect` with `radius`, `ellipse`, or a `path` `d` of
+  M/L/H/V/C/Q/Z, 4000 characters at most) drawn once at compile time into a grey image, or a `layer`, another
+  layer of the section read as a track matte (`mode` `alpha` or `luma`; the matte layer is not drawn). `invert`
+  shows outside the mask, `feather` softens its edge (px), and `animate` moves a shape with the layer tracks
+  (`x`/`y` offsets, `scale`, `scaleX`, `scaleY`, `rotate` about `origin`). A section mask shows `background` (a
+  colour token) outside; layers and text draw on top. The element is drawn on a copy of the frame as before,
+  the copy takes the mask as its alpha and goes back over the frame, so a layer keeps its own transparency
+  (`split`, `format`, `lutyuv`, `overlay`, `alphamerge`, `colorchannelmixer`, `gblur`, all on device). Without
+  `alphamerge` a shape falls back to its resting box and a track matte draws both layers (`mask_unavailable`).
+  New validation codes: `mask_layer_unknown`, `mask_layer_self`, `mask_layer_shared`, `mask_layer_chained`,
+  `mask_not_layer`, `mask_with_clip`, `mask_with_composite` (a mask next to a non-normal `blend` or a
+  `motionBlur`), `mask_path_invalid`, `mask_too_large`.
 - Clip boxes: a kinetic block takes `clip` (`"block"`, its own resting box; `"line"`, one box per line; or
   `{ x, y, w, h }` in px) and an image, animation or html layer takes `options.clip` (a box). The element only
   shows inside the box, so a `rise` reveals out of an invisible slot above an underline, on any background,

@@ -23,6 +23,7 @@ import type { Theme } from '../schemas/theme.schemas';
 import type { KineticBlock } from '../schemas/kinetic.schemas';
 import type { SectionLayout } from '../schemas/layout.schemas';
 import type { Camera } from '../schemas/camera.schemas';
+import type { SectionMask } from '../schemas/mask.schemas';
 import type { Graphic } from '../schemas/graphics.schemas';
 // What an fx graphic lives on (frame, rect, pane, layer, kinetic text).
 export type { FxTarget, FxRectTarget } from '../schemas/fx.schemas';
@@ -361,6 +362,8 @@ export interface SectionOptions extends TakeOptions {
   speedRamp?: SpeedRamp;
   rampAudio?: 'stretch' | 'mute';
   freeze?: Freeze[];
+  // video / project_video mask (editor/presets/section-mask.ts, MapManager.addSectionMatte).
+  mask?: SectionMask;
   // color_background extension
   layers?: BackgroundLayer[];
   // project_video extension

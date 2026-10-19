@@ -9,11 +9,22 @@
 
 import type { Filter, FilterGraphChain } from '@/core/types';
 import type { ClipBox } from '../../schemas/clip.schemas';
+import { assertFiniteNumber } from '@/core/arg-guard';
 
 export interface ClipPart {
   box: ClipBox;
   /** The element's filters drawn inside this box (graph filters allowed). */
   filters: Filter[];
+}
+
+/** The authored clip box, every number coerced (library callers skip validation). */
+export function finiteBox(clip: ClipBox): ClipBox {
+  return {
+    x: assertFiniteNumber(clip.x, 'clip x'),
+    y: assertFiniteNumber(clip.y, 'clip y'),
+    w: assertFiniteNumber(clip.w, 'clip w'),
+    h: assertFiniteNumber(clip.h, 'clip h'),
+  };
 }
 
 /** The box snapped outwards to even pixels and clamped to the frame; null when nothing of it is on screen. */
@@ -110,4 +121,61 @@ export function clipParts(parts: ClipPart[], frame: { width: number; height: num
   }
 
   return [{ type: 'graph', graph: chains }];
+}
+
+/** One overlay map MapManager emits (inputs → filters → outputs), never with the section filters. */
+export interface MapStep {
+  inputs: string[];
+  filters: Filter[];
+  outputs: string[];
+}
+
+/** A layer about to be cut: the base it composites onto, its leg, its overlay options, its pad and filters. */
+export interface CutIO {
+  base: string;
+  leg: string;
+  overlay: string;
+  name: string;
+  filters: Filter[];
+}
+
+/** The frame size a "W:H" scale names; unknown (no section scale): unbounded, the box is taken as authored. */
+export function frameSize(videoScale: string): [number, number] {
+  return /^\d+:\d+$/.test(videoScale) ? (videoScale.split(':').map(Number) as [number, number]) : [Infinity, Infinity];
+}
+
+/**
+ * A layer cut to a box as maps: overlaid on a copy of the frame as usual, the copy cropped to the box and laid
+ * back over the untouched frame. A box off the frame (null) shows nothing, but the registered leg must still be
+ * consumed (an unconnected output aborts the graph): an overlay that never enables passes the frame through.
+ */
+export function clipBoxSteps(io: CutIO, box: ClipBox | null): MapStep[] {
+  if (!box) {
+    return [
+      {
+        inputs: [io.base, io.leg],
+        filters: [{ type: 'overlay', value: '0:0:enable=0' }, ...io.filters],
+        outputs: [io.name],
+      },
+    ];
+  }
+
+  const crop = `${box.w}:${box.h}:${box.x}:${box.y}`;
+
+  return [
+    { inputs: [io.base], filters: [{ type: 'split', value: '2' }], outputs: [`${io.name}_cb`, `${io.name}_cd`] },
+    {
+      inputs: [`${io.name}_cd`, io.leg],
+      filters: [
+        { type: 'overlay', value: io.overlay },
+        { type: 'crop', value: crop },
+      ],
+      outputs: [`${io.name}_cc`],
+    },
+    {
+      inputs: [`${io.name}_cb`, `${io.name}_cc`],
+      filters: [{ type: 'overlay', value: `${box.x}:${box.y}` }, ...io.filters],
+      outputs: [io.name],
+    },
+  ];
 }

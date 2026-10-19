@@ -1,0 +1,36 @@
+{
+  "ticket": "PR #134",
+  "summary": "Masks and track mattes on layers and sections",
+  "clipSeconds": 6.3,
+  "freeze": { "at": 5.8, "hold": 2.4 },
+  "intro": { "headline": "CLIP ANY LAYER WITH A MASK" },
+  "outro": { "headline": "REVIEW THE MASK LOWERING", "subtitle": "Schema first, then the alphamerge fallbacks" },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.mp4",
+      "trim": 0,
+      "highlight": { "x": 30, "y": 120, "w": 780, "h": 300 },
+      "callout": "Mask is refused",
+      "chip": "Unknown key mask",
+      "pane": {
+        "title": "No mask, no matte",
+        "desc": "A template with options.mask fails validation on main, so agents fall back to raw filters."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.mp4",
+      "trim": 0,
+      "highlight": { "x": 20, "y": 180, "w": 920, "h": 180 },
+      "callout": "Footage in type",
+      "chip": "Clipped card, type, star",
+      "pane": {
+        "title": "Masks on layers and sections",
+        "desc": "The card clips to its box, footage plays through LECLAP, a star mask turns."
+      }
+    }
+  ]
+}

@@ -17085,5 +17085,286 @@
         }
       ]
     }
+  },
+  {
+    "id": "masks",
+    "title": "Masks and track mattes",
+    "description": "A product card opening out of a feathered iris while its price tag wipes in, footage seen through the letters of LECLAP, and the clip inside a star that grows and turns: shape masks, keyframed shapes and a luma track matte.",
+    "category": "effects",
+    "source": "examples/motion-design/masks.json",
+    "orientation": "landscape",
+    "backend": "native",
+    "creativeDirection": "Audience: motion designers and agents learning LeClap masks. Direction: one mask idea per beat on the house palette (ink, lavender, rose), eases near critical, soft edges only where a shape opens. The card opens from its centre through a soft circle and settles; its price tag wipes in from the left behind a hard edge. The word fills the frame and the footage plays inside its letters on ink while the word pushes in slowly. The star opens from a point, turns into place and holds, footage inside, surface outside, the label drawn on top. Review: nothing of a masked card outside its shape at any frame, the card's rounded corners stay rounded inside the iris, the letters read at every frame, the star stays centred while it turns.",
+    "showcasePath": "/showcase?sample=masks",
+    "preview": {
+      "video": "/videos/showcase/masks.mp4",
+      "poster": "/videos/showcase/masks.webp",
+      "template": "/videos/showcase/masks.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [
+        {
+          "name": "footage",
+          "default": "videos/video_1.mp4",
+          "placeholders": ["{{ footage }}"],
+          "source": "global"
+        }
+      ],
+      "assets": [
+        {
+          "kind": "asset",
+          "reference": "videos/video_1.mp4",
+          "path": "global.variables.footage"
+        },
+        {
+          "kind": "video",
+          "reference": "{{ footage }}",
+          "path": "sections[1].options.videoUrl",
+          "default": "videos/video_1.mp4"
+        },
+        {
+          "kind": "video",
+          "reference": "{{ footage }}",
+          "path": "sections[2].options.videoUrl",
+          "default": "videos/video_1.mp4"
+        }
+      ],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Preview media is not included. Supply or replace the listed authored asset references; relative references remain unchanged and must resolve in your configured assets/media directory.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Masks and track mattes",
+        "description": "Three mask moves from engine primitives: a product card that opens out of a feathered iris while its price tag wipes in, footage seen through the letters of LECLAP (a luma track matte), and the clip inside a star that grows and turns.",
+        "creativeDirection": "Audience: motion designers and agents learning LeClap masks. Direction: one mask idea per beat on the house palette (ink, lavender, rose), eases near critical, soft edges only where a shape opens. The card opens from its centre through a soft circle and settles; its price tag wipes in from the left behind a hard edge. The word fills the frame and the footage plays inside its letters on ink while the word pushes in slowly. The star opens from a point, turns into place and holds, footage inside, surface outside, the label drawn on top. Review: nothing of a masked card outside its shape at any frame, the card's rounded corners stay rounded inside the iris, the letters read at every frame, the star stays centred while it turns."
+      },
+      "global": {
+        "orientation": "landscape",
+        "fps": 30,
+        "musicEnabled": false,
+        "seed": 17,
+        "theme": {
+          "extends": "leclap",
+          "colors": {
+            "bg": "#141416",
+            "fg": "#F5F3F7",
+            "surface": "#1E1E24",
+            "brand": "#9298fb",
+            "accent": "#f96f99",
+            "accent2": "#ffd27a"
+          },
+          "fonts": {
+            "display": "archivo-black",
+            "body": "bebas"
+          }
+        },
+        "variables": {
+          "footage": "videos/video_1.mp4"
+        },
+        "transition": {
+          "type": "fade",
+          "duration": 0.4
+        }
+      },
+      "sections": [
+        {
+          "name": "iris",
+          "type": "color_background",
+          "purpose": "A product card opens out of a feathered circle; its price tag wipes in from the left.",
+          "options": {
+            "backgroundColor": "$color.bg",
+            "duration": 3
+          },
+          "inputs": [
+            {
+              "name": "card",
+              "type": "html",
+              "html": "<div class=\"card\"><span class=\"tag\">New</span><h2>Moo Mug</h2><p>Stoneware, 350 ml</p></div>",
+              "css": ".card { display: flex; flex-direction: column; gap: 12px; padding: 48px 56px; height: 360px; border-radius: 32px; background: $color.surface } .tag { color: $color.accent; font: 600 28px $font.body; text-transform: uppercase; letter-spacing: 3px } h2 { margin: 0; color: $color.fg; font: 96px $font.display } p { margin: 0; color: $color.brand; font: 36px $font.body }",
+              "width": 640,
+              "height": 360,
+              "options": {
+                "position": "320:180",
+                "mask": {
+                  "shape": {
+                    "type": "ellipse",
+                    "cx": 640,
+                    "cy": 360,
+                    "rx": 370,
+                    "ry": 370
+                  },
+                  "feather": 40,
+                  "animate": {
+                    "scale": [
+                      {
+                        "t": 0.2,
+                        "v": 0
+                      },
+                      {
+                        "t": 1.1,
+                        "v": 1.05,
+                        "ease": "$snappy"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "name": "price",
+              "type": "html",
+              "html": "<div class=\"price\">€24</div>",
+              "css": ".price { padding: 16px 28px; border-radius: 20px; background: $color.accent; color: $color.bg; font: 56px $font.display }",
+              "width": 220,
+              "height": 100,
+              "options": {
+                "position": "860:470",
+                "mask": {
+                  "shape": {
+                    "type": "rect",
+                    "x": 860,
+                    "y": 470,
+                    "w": 220,
+                    "h": 100,
+                    "radius": 20
+                  },
+                  "animate": {
+                    "x": [
+                      {
+                        "t": 1,
+                        "v": -240
+                      },
+                      {
+                        "t": 1.6,
+                        "v": 0,
+                        "ease": "$snappy"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "through-text",
+          "type": "video",
+          "purpose": "The footage plays inside the letters of LECLAP on ink while the word pushes in.",
+          "options": {
+            "videoUrl": "{{ footage }}",
+            "duration": 3.4,
+            "mask": {
+              "layer": "word",
+              "mode": "luma",
+              "background": "$color.bg"
+            }
+          },
+          "inputs": [
+            {
+              "name": "word",
+              "type": "html",
+              "html": "<div class=\"w\"><h1>LECLAP</h1></div>",
+              "css": ".w { display: flex; align-items: center; justify-content: center; height: 720px } h1 { margin: 0; color: #FFFFFF; font: 280px $font.display }",
+              "width": 1280,
+              "height": 720,
+              "options": {
+                "position": "0:0",
+                "animate": {
+                  "scale": [
+                    {
+                      "t": 0,
+                      "v": 1
+                    },
+                    {
+                      "t": 3.4,
+                      "v": 1.06
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "label",
+              "type": "html",
+              "html": "<p>Footage through type</p>",
+              "css": "p { margin: 0; color: $color.fg; font: 40px $font.body; letter-spacing: 2px }",
+              "width": 520,
+              "height": 60,
+              "options": {
+                "position": "64:620",
+                "motion": {
+                  "type": "rise",
+                  "duration": 0.6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "star",
+          "type": "video",
+          "purpose": "The clip opens inside a star that grows from a point and turns into place.",
+          "options": {
+            "videoUrl": "{{ footage }}",
+            "duration": 3,
+            "mask": {
+              "shape": {
+                "type": "path",
+                "d": "M640 360 m0 -240 l70 170 l180 10 l-140 120 l50 180 l-160 -100 l-160 100 l50 -180 l-140 -120 l180 -10 z"
+              },
+              "feather": 6,
+              "background": "$color.surface",
+              "animate": {
+                "scale": [
+                  {
+                    "t": 0.1,
+                    "v": 0.05
+                  },
+                  {
+                    "t": 1,
+                    "v": 1,
+                    "ease": "$snappy"
+                  }
+                ],
+                "rotate": [
+                  {
+                    "t": 0.1,
+                    "v": -36
+                  },
+                  {
+                    "t": 1.4,
+                    "v": 0,
+                    "ease": "ease-out-cubic"
+                  }
+                ]
+              }
+            }
+          },
+          "inputs": [
+            {
+              "name": "label",
+              "type": "html",
+              "html": "<p>Shape masks grow and turn</p>",
+              "css": "p { margin: 0; color: $color.fg; font: 40px $font.body; letter-spacing: 2px }",
+              "width": 600,
+              "height": 60,
+              "options": {
+                "position": "64:620",
+                "motion": {
+                  "type": "rise",
+                  "duration": 0.6
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
   }
 ]

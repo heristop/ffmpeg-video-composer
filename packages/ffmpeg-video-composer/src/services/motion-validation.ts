@@ -20,8 +20,10 @@ import { resolveTimeRefs } from '@/core/timing/resolve';
 import { motionRoleErrors } from './motion-roles-validation';
 import {
   LAYER_ANIMATE_PATH,
+  MASK_ANIMATE_PATH,
   SHAPE_ANIMATE_PATH,
   layerAnimateErrors,
+  maskAnimateErrors,
   shapeAnimateErrors,
 } from './layer-animate-validation';
 import { withEasingHint } from './validation/easing-hint';
@@ -210,6 +212,11 @@ function animateUseErrors(use: Use, tokens: ResolvedTokens, template: TemplateDe
   const input = layerInput(use.path, template);
 
   if (input) return layerAnimateErrors(use.path, tracks, input, (keys) => keyTimingError(keys, tokens));
+
+  // A shape mask's tracks (editor/presets/mask-source.ts): key timing and the scale ranges.
+  if (MASK_ANIMATE_PATH.test(use.path)) {
+    return maskAnimateErrors(use.path, tracks, (keys) => keyTimingError(keys, tokens));
+  }
 
   // A goo blob's x / y / r tracks (fx-goo.ts): key timing only, the schema bounds the rest.
   if (GOO_BLOB_ANIMATE_PATH.test(use.path)) return blobTrackErrors(use.path, tracks, tokens);

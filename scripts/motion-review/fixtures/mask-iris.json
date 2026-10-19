@@ -1,0 +1,31 @@
+{
+  "label": "Mask: iris opening on a card (ellipse, scale track, feather)",
+  "kind": "mask",
+  "window": { "at": 0.3, "duration": 0.9 },
+  "backgrounds": ["footage", "dark"],
+  "section": {
+    "inputs": [
+      {
+        "name": "card",
+        "type": "html",
+        "html": "<div class=\"card\"><h2>LeClap</h2></div>",
+        "css": ".card { display: flex; align-items: center; justify-content: center; height: {{h}}px; border-radius: 32px; background: #9298FB } h2 { margin: 0; color: #141416; font: 96px $font.display }",
+        "width": "{{w}}",
+        "height": "{{h}}",
+        "options": {
+          "position": "{{position}}",
+          "mask": {
+            "shape": { "type": "ellipse", "cx": "{{cx}}", "cy": "{{cy}}", "rx": "{{short}}", "ry": "{{short}}" },
+            "feather": 24,
+            "animate": {
+              "scale": [
+                { "t": "{{at}}", "v": 0 },
+                { "t": "{{end}}", "v": 1.2, "ease": "ease-out-cubic" }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

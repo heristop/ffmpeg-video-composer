@@ -1,0 +1,28 @@
+{
+  "label": "Mask: footage through a word (section track matte, luma)",
+  "kind": "mask",
+  "window": { "at": 0.2, "duration": 1.6 },
+  "backgrounds": ["footage"],
+  "section": {
+    "options": { "mask": { "layer": "word", "mode": "luma", "background": "#121826" } },
+    "inputs": [
+      {
+        "name": "word",
+        "type": "html",
+        "html": "<div class=\"w\"><h1>CLAP</h1></div>",
+        "css": ".w { display: flex; align-items: center; justify-content: center; height: {{H}}px } h1 { margin: 0; color: #FFFFFF; font: 240px $font.display }",
+        "width": "{{W}}",
+        "height": "{{H}}",
+        "options": {
+          "position": "0:0",
+          "animate": {
+            "scale": [
+              { "t": "{{at}}", "v": 0.9 },
+              { "t": "{{end}}", "v": 1.05, "ease": "ease-in-out-sine" }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

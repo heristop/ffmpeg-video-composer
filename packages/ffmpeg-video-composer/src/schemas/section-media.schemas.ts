@@ -7,6 +7,7 @@ import { HtmlInputShape, htmlInputIssues } from './html-input.schemas';
 import { LayerAnimateSchema, LayerOriginSchema } from './layer-animate.schemas';
 import { ClipBoxSchema } from './clip.schemas';
 import { BlendModeSchema, MotionBlurSchema, layerCompositeIssues } from './layer-composite.schemas';
+import { LayerMaskSchema } from './mask.schemas';
 import { FilterExpressionPair } from './filter-expression.schemas';
 
 // Input/shape/field media primitives — the animation input options, the editor-only shape recipe, the
@@ -58,6 +59,7 @@ export const InputOptionsSchema = z
       'Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; ' +
         'works over footage.'
     ),
+    mask: LayerMaskSchema.optional(),
   })
   .strict()
   .describe('Playback and compositing options for an animation input.');
@@ -85,7 +87,7 @@ export const ShapeSpecSchema = z
   .strict()
   .describe('Editor-only recipe of a pre-rasterized shape overlay; ignored by the engine at compile.');
 
-export const InputSchema = z
+const InputObjectSchema = z
   .object({
     name: z
       .string()
@@ -112,6 +114,16 @@ export const InputSchema = z
   .superRefine(htmlInputIssues)
   .superRefine(layerCompositeIssues)
   .describe('An external asset (animation, still image or HTML layer) composited into the section video.');
+
+type InputObjectSchemaType = typeof InputObjectSchema;
+
+/**
+ * The input schema under a name: declaration emit then references it instead of inlining it into every section
+ * type, which would exceed the length the compiler serializes (TS7056).
+ */
+export interface InputSchemaType extends InputObjectSchemaType {}
+
+export const InputSchema: InputSchemaType = InputObjectSchema;
 
 // ── section options ────────────────────────────────────────────────────────────
 

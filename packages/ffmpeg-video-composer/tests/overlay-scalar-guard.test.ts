@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildAnimationLegFilters, buildLoopFlags, imageOverlayEnable } from '@/editor/utils/input-sources';
 import { layerKeyframes } from '@/editor/presets/layer-keyframes';
 import { trackExpr } from '@/core/motion/tracks';
+import { shapeMaskPlan } from '@/editor/presets/mask-source';
 
 // Library callers that skip validation can hand the lowering any JSON value where the schema wants a
 // number or a relative "+80": each must stay a number before it is written into a filter.
@@ -59,5 +60,16 @@ describe('skipValidation callers', () => {
     expect(() =>
       layerKeyframes({ rotation: HOSTILE, animate: { rotate: [{ v: 0 }, { t: 1, v: 5 }] } } as never, 30)
     ).toThrow(/rotation/);
+  });
+});
+
+describe('mask shape numbers', () => {
+  it('refuses a shape number or feather that is not a finite number', () => {
+    const rect = { type: 'rect', x: HOSTILE, y: 0, w: 10, h: 10 } as never;
+
+    expect(() => shapeMaskPlan({ shape: rect }, 'mask0', 25)).toThrow(/mask x/);
+    expect(() =>
+      shapeMaskPlan({ shape: { type: 'rect', x: 0, y: 0, w: 10, h: 10 }, feather: HOSTILE as never }, 'mask0', 25)
+    ).toThrow(/feather/);
   });
 });

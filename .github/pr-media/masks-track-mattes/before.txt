@@ -1,0 +1,12 @@
+$ leclap validate masks.json     (main, 7165eb08)
+
+error  sections.0.inputs.0.options.mask
+       Unknown key "mask" in sections.0.inputs.0.options
+error  sections.0.inputs.1.options.mask
+       Unknown key "mask" in sections.0.inputs.1.options
+error  sections.1.options.mask
+       Unknown key "mask" in sections.1.options
+error  sections.2.options.mask
+       Unknown key "mask" in sections.2.options
+
+Template validation failed with 4 error(s)

@@ -37,12 +37,15 @@ function makeManagers(logger = makeLogger(), filesystem = makeFilesystem()) {
       segment: undefined,
       addMap: vi.fn(),
       addAnimationOverlay: vi.fn(),
+      addSectionMatte: vi.fn(),
+      registerMatte: vi.fn(() => ({ pad: 'm', overlay: '0:0' })),
       addGradientOverlay: vi.fn(),
       getVideoInputIncrement: vi.fn(() => 1),
     },
     filterManager: {
       segment: undefined,
       addFilter: vi.fn((f: { type: string; value?: string | number }) => `${f.type}=${String(f.value ?? '')}`),
+      supports: vi.fn(() => true),
     },
     formattersManager: {
       segment: undefined,
@@ -249,7 +252,8 @@ describe('SegmentBuilder.buildMaps', () => {
     expect(managers.mapManager.addAnimationOverlay).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'logo', type: 'image' }),
       expect.any(Number),
-      '1280:720'
+      '1280:720',
+      undefined
     );
   });
 
@@ -276,7 +280,8 @@ describe('SegmentBuilder.buildMaps', () => {
     expect(managers.mapManager.addAnimationOverlay).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'shine' }),
       2,
-      '1280:720'
+      '1280:720',
+      undefined
     );
   });
 
@@ -298,7 +303,8 @@ describe('SegmentBuilder.buildMaps', () => {
     expect(managers.mapManager.addAnimationOverlay).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'badge' }),
       2,
-      '1280:720'
+      '1280:720',
+      undefined
     );
   });
 
@@ -321,7 +327,8 @@ describe('SegmentBuilder.buildMaps', () => {
     expect(managers.mapManager.addAnimationOverlay).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'badge', type: 'image' }),
       2,
-      '1280:720'
+      '1280:720',
+      undefined
     );
   });
 
@@ -349,6 +356,52 @@ describe('SegmentBuilder.buildMaps', () => {
     const gradientOrder = managers.mapManager.addGradientOverlay.mock.invocationCallOrder[0];
     const animationOrder = managers.mapManager.addAnimationOverlay.mock.invocationCallOrder[0];
     expect(gradientOrder).toBeLessThan(animationOrder);
+  });
+
+  // A mask reader whose matte is plain media (an .mp4 animation) draws unmasked and says so, by authored index.
+  it('warns with the authored index when a track matte is plain media, and draws the reader unmasked', async () => {
+    const segment = makeSegment();
+    const { builder, managers } = makeBuilder({ segment });
+    builder.hydrate({ name: 'clip', type: 'video' });
+    (builder as unknown as { section: Section }).section = {
+      name: 'clip',
+      type: 'video',
+      inputs: [
+        { name: 'card', url: 'card.apng', type: 'animation', options: { mask: { layer: 'hole' } } },
+        { name: 'hole', url: 'hole.mp4', type: 'animation', options: {} },
+      ],
+    } as never;
+
+    await builder.buildMaps();
+
+    expect(managers.logger.warn).toHaveBeenCalledWith(
+      expect.stringMatching(/^\[clip\]\[mask_unavailable\] inputs\[0\] "card": track matte "hole" cannot be used/)
+    );
+    expect(managers.mapManager.addAnimationOverlay).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'card' }),
+      expect.any(Number),
+      expect.any(String),
+      undefined
+    );
+  });
+
+  // The prepended section background is not one of the author's inputs: the label counts from the authored ones.
+  it('subtracts the prepended section background from the authored index in the warning', async () => {
+    const { builder, managers } = makeBuilder();
+    builder.hydrate({ name: 'clip', type: 'video' });
+    (builder as unknown as { section: Section }).section = {
+      name: 'clip',
+      type: 'video',
+      inputs: [
+        markBackgroundInput({ name: 'clip', url: 'bg.png', type: 'image', options: {} }),
+        { name: 'card', url: 'card.apng', type: 'animation', options: { mask: { layer: 'hole' } } },
+        { name: 'hole', url: 'hole.mp4', type: 'animation', options: {} },
+      ],
+    } as never;
+
+    await builder.buildMaps();
+
+    expect(managers.logger.warn).toHaveBeenCalledWith(expect.stringContaining('inputs[0] "card"'));
   });
 
   it('treats a non-animation .png input as plain cached media (no overlay map)', async () => {

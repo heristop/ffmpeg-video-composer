@@ -168,8 +168,9 @@ export const ENGINE_EMITTED_FILTERS = [
   // (FormatterManager's setpts, authored via section.filters)
   'overlay',
   'split',
-  // masks (kinetic-fill.ts): a drawtext mask's luma copied into a gradient/texture fill's alpha; the
-  // mask is stretched to full range with lutyuv (listed above) and sized with pad/crop for wipes
+  // masks (kinetic-fill.ts, and layer / section masks: mask-composite.ts, mask-source.ts): a mask's grey copied
+  // into an alpha. kinetic-fill: a drawtext mask's luma into a gradient/texture fill; the mask is stretched
+  // to full range with lutyuv (listed above) and sized with pad/crop for wipes
   'alphamerge',
   // layer blend modes (presets/layer-blend.ts: a gbrap blend over a transparent copy of the frame) and
   // motion blur (presets/motion-blur.ts: trim/fps/settb/setpts listed elsewhere, then tmix)
