@@ -34,6 +34,7 @@ describe('motionForPrompt', () => {
     expect(html.layout).toBe(motion.html.layout);
     expect(html).not.toHaveProperty('recipes');
     expect(html).not.toHaveProperty('tags');
-    expect(JSON.stringify(html).length).toBeLessThan(1_500);
+    // The rules include the per-element motion map (data-motion, its budget) beside the shape and subset rules.
+    expect(JSON.stringify(html).length).toBeLessThan(2_600);
   });
 });

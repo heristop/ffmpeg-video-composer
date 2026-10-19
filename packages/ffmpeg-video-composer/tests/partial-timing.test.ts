@@ -135,6 +135,57 @@ describe('partial envelope (ref duration)', () => {
   });
 });
 
+describe('partial envelope and html layers', () => {
+  function card(start: number | undefined, extra: Bag = {}): Bag {
+    return bumper({
+      sections: [
+        {
+          name: 'card',
+          type: 'color_background',
+          options: { duration: 4, backgroundColor: '#000000' },
+          inputs: [
+            {
+              name: 'html',
+              type: 'html',
+              html: '<p data-motion="item">A</p>',
+              width: 300,
+              height: 100,
+              options: { ...(start === undefined ? {} : { start }), ...extra },
+              motion: { item: { y: [{ t: 0.5, v: 0 }] } },
+            },
+          ],
+        },
+      ],
+    });
+  }
+
+  it('grow: moves the layer start and lands element keys where the envelope maps them', () => {
+    const [section] = expand([card(3, { duration: 1 })], [{ type: 'partial', ref: 'bumper', duration: 6 }]);
+    const input = section.inputs[0];
+
+    // H = 3.2: the layer starts before the outro (stays at 3), its key at 3.5 sits inside it (5.5).
+    expect(input.options.start).toBe(3);
+    expect(input.motion.item.y[0].t).toBe(2.5);
+    expect(input.options.duration).toBe(3);
+  });
+
+  it('compress: scales the layer start and the element key times', () => {
+    const [section] = expand([card(0.5)], [{ type: 'partial', ref: 'bumper', duration: 0.9 }]);
+    const input = section.inputs[0];
+
+    // Factor 0.5: the layer starts at 0.25 and its key (section 1.0, the end of IN) lands at 0.5.
+    expect(input.options.start).toBeCloseTo(0.25, 6);
+    expect(input.motion.item.y[0].t).toBeCloseTo(0.25, 6);
+  });
+
+  it('start 0 keeps the section-time mapping', () => {
+    const [section] = expand([card(undefined)], [{ type: 'partial', ref: 'bumper', duration: 6 }]);
+
+    expect(section.inputs[0].options.start).toBeUndefined();
+    expect(section.inputs[0].motion.item.y[0].t).toBe(0.5);
+  });
+});
+
 describe('partial sync points', () => {
   it('exports each sync point as a cue of the section it falls in', () => {
     const [card] = expand([bumper()], [{ type: 'partial', ref: 'bumper' }]);

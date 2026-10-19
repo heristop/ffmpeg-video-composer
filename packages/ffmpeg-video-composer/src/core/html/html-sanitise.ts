@@ -2,6 +2,7 @@
 // on images); anything that could run code, fetch, submit or embed is dropped with its content; any other
 // tag is unwrapped (its content kept). Every removal is reported, so nothing disappears silently.
 
+import { isMotionName } from './limits';
 import type { HtmlElementNode, HtmlNode } from './html-parse';
 
 export type HtmlFindingCode = 'html_unsupported_markup' | 'html_unsupported_css';
@@ -124,15 +125,21 @@ function report(pass: Pass, message: string): void {
   pass.findings.push({ code: 'html_unsupported_markup', message, source: 'html' });
 }
 
-function attributeMessage(tag: string, name: string): string {
+function attributeMessage(tag: string, name: string, value: string): string {
   if (name.startsWith('on')) return `<${tag} ${name}>: event handler removed (HTML layers run no script)`;
 
   if (name === 'href') return `<${tag} href>: links removed (an HTML layer is a still image)`;
 
-  return `<${tag} ${name}>: attribute removed (allowed: class, style; src, alt, width, height on img)`;
+  if (name === 'data-motion') {
+    return `<${tag} data-motion="${value.slice(0, 32)}">: motion name refused (lowercase letters, digits and dashes, 32 at most, starting with a letter)`;
+  }
+
+  return `<${tag} ${name}>: attribute removed (allowed: class, style, data-motion; src, alt, width, height on img)`;
 }
 
-function allowedAttribute(tag: string, name: string): boolean {
+function allowedAttribute(tag: string, name: string, value: string): boolean {
+  if (name === 'data-motion') return isMotionName(value);
+
   return GLOBAL_ATTRIBUTES.has(name) || (tag === 'img' && IMAGE_ATTRIBUTES.has(name));
 }
 
@@ -140,13 +147,13 @@ function keptAttributes(element: HtmlElementNode, pass: Pass): Partial<Record<st
   const attrs: Partial<Record<string, string>> = {};
 
   for (const [name, value] of Object.entries(element.attrs)) {
-    if (allowedAttribute(element.tag, name)) {
+    if (allowedAttribute(element.tag, name, value ?? '')) {
       attrs[name] = value;
 
       continue;
     }
 
-    report(pass, attributeMessage(element.tag, name));
+    report(pass, attributeMessage(element.tag, name, value ?? ''));
   }
 
   return attrs;

@@ -1001,9 +1001,65 @@ An `inputs[]` entry of `type: "html"` lays out a card, a badge, a price tag or a
 - **Theme** — `$color.*` (with `@alpha`, as `rgba()`) and `$font.*` tokens work in `css` and `html`, and the [theme](#themes) checks them like any other token.
 - **Fonts** — `font-family` takes the families the template declares in [`global.fonts`](#template-fonts-globalfonts), the [registry](#fonts) families and the generic families (`sans-serif` and `system-ui` use the theme body font, `serif` Playfair Display, `monospace` Roboto Mono, `cursive` Pacifico). A declared family wins over a registry family of the same name. Any other family falls back to the theme's body font and is reported as `html_font_unknown`. Variable fonts (Rubik, Oswald, Playfair, Roboto Mono, or a declared variable face) are pinned to the static weights the layer uses. CSS `@font-face` is not supported: declare the face in `global.fonts`.
 - **Images** — `<img src>` and CSS `url()` take a template asset (a relative path or `/assets/…`) or a PNG/JPEG data URI. Remote URLs and absolute paths are refused.
-- **Markup** — the allowed tags keep `class` and `style` (`<img>` also keeps `src`, `alt`, `width` and `height`). `<script>`, `<iframe>`, `<form>`, `<svg>` and similar are dropped with their content, other unknown tags are unwrapped and keep their text, and event handlers and `href` are removed. Each removal is reported as `html_unsupported_markup`.
+- **Markup** — the allowed tags keep `class`, `style` and `data-motion` (`<img>` also keeps `src`, `alt`, `width` and `height`). `<script>`, `<iframe>`, `<form>`, `<svg>` and similar are dropped with their content, other unknown tags are unwrapped and keep their text, and event handlers and `href` are removed. Each removal is reported as `html_unsupported_markup`.
 - **CSS** — a flexbox subset. Selectors are tag, `.class`, `tag.class` and descendants, applied by specificity; `#id`, pseudo-classes, `>` `+` `~` and `@` rules are not supported. Properties cover flex layout, `position: relative | absolute`, box sizes, margins, padding and gaps, borders and radii, text (font, `text-align`, `text-transform`, `letter-spacing`, `line-height`, `text-shadow`, `line-clamp`, `white-space`…), backgrounds and gradients, `box-shadow`, `opacity`, `transform`, `filter`, `clip-path`, masks and custom properties. Grid, floats, `z-index`, animations, transitions and `calc()` are not. Each dropped declaration is reported as `html_unsupported_css`. `get_motion_catalog` (MCP) lists the full subset under `html`, with four layout recipes.
 - **Overflow** — validation lays the layer out and reports `html_overflow` when the content is larger than the box.
+
+#### Animated cards (`motion`)
+
+Tag elements inside a card with `data-motion="name"` and give the input a `motion` map: each name takes the
+tracks of [layer keyframes](#layer-keyframes-optionsanimate) — `x` and `y` (pixels from where the element is
+laid out), `scale`, `rotate` (degrees, about the element's centre) and `opacity` — and a `stagger`, the seconds
+each further element with that name starts after the previous one, in document order. Key times are seconds from the
+layer's start (a card with `start` begins its motion when it appears) and take duration tokens and springs like
+any track. A time reference still names a section moment: `"end - 2"` is the section's 2-seconds-before-the-end
+mark whatever the card's `start`, converted to layer time by subtracting `start` (a reference before the card
+appears clamps to 0). Names are lowercase letters, digits and dashes, and can't be `ease`, `easing` or
+`animate`.
+
+```jsonc
+{
+  "name": "features",
+  "type": "html",
+  "html": "<ul class=\"list\"><li data-motion=\"item\">Open-plan kitchen</li><li data-motion=\"item\">South-facing balcony</li><li data-motion=\"item\">Metro 4 min away</li></ul>",
+  "css": ".list { display: flex; flex-direction: column; gap: 12px; padding: 24px 28px; border-radius: 20px; background: $color.surface } li { color: $color.fg; font: 32px $font.body }",
+  "width": 560,
+  "height": 220,
+  "options": { "position": "64:440" },
+  "motion": {
+    "item": {
+      "opacity": [
+        { "t": 0.3, "v": 0 },
+        { "t": 0.6, "v": 1 },
+      ],
+      "x": [
+        { "t": 0.3, "v": -32 },
+        { "t": 0.8, "v": 0, "ease": "$snappy" },
+      ],
+      "stagger": 0.15, // the second item starts at 0.45 s, the third at 0.6 s
+    },
+  },
+}
+```
+
+- **How it renders** — the card is drawn frame by frame at the output frame rate, over the animated span only
+  (first key to last, staggers included); frames where nothing moves are drawn once and held. The frames are
+  joined into one animated PNG and composited like the still card: the first state shows from the layer's
+  start (when it appears) and the last frame holds to the section end. `options.motion`, `options.animate`, `start`, `duration`
+  and `opacity` still move the card as a whole.
+- **Bounds** — 16 names and 48 tagged elements per card; an animated span of 8 s (first key to last, staggers
+  included), 240 distinct frames and 500 megapixels of frames (box × 2 for the drawing density × frames) at
+  most. Over them validation fails with `html_motion_too_long` or `html_motion_too_many_targets`. A name no
+  element carries is reported as `html_motion_unmatched`.
+- **Fallback** — anything over budget, or a frame that can't be produced at render time (it fails to draw, the
+  frames pass 48 MB, or drawing takes over 120 s), renders as a still in its final state and the render log says
+  `html_motion_static` with the reason. A frame rate that isn't a whole number renders the still too. Otherwise
+  the same template gives the same frames on Node, in the browser and on the phone.
+- **Box** — an element moved past the card's box is cut at its edge: leave room in the box for the travel.
+  Tagged inline elements (`<strong data-motion="price">`) are laid out whole, not word by word. The builder's
+  live preview shows the card as laid out, before any motion.
+
+See [`html-motion.json`](../examples/motion-design/html-motion.json).
 
 #### Template fonts (`global.fonts`)
 
@@ -1029,7 +1085,7 @@ A template can bring its own font files, for a brand typeface the registry does 
 
 Validation reports a `src` that is WOFF2 (`font_woff2_unsupported`) or names no font format (`font_format`), and warns about a declared family no HTML layer selects (`font_unused`). `leclap validate` and the MCP `validate_template` also open each file the way a render would, and fail on one that is missing or outside the font dirs (`font_not_found`), damaged (`font_unreadable`), not a font (`font_format`) or over the limit (`font_too_large`). See [`html-brand-font.json`](../examples/motion-design/html-brand-font.json) (render it with `--fonts packages/leclap-creative-kit/src/library/fonts`).
 
-A layer is a still: give it an entrance with `options.motion`, or animate it over time with [`options.animate`](#layer-keyframes-optionsanimate). `rise` and `slide-*` only move the layer, so set `start` to the same time as the motion `delay` when the layer should not be visible before it moves in. Inline text and inline elements in one paragraph are laid out word by word on flexbox, so the browser's exact line breaks are not guaranteed.
+A layer moves as a whole with an entrance (`options.motion`) or [keyframe tracks](#layer-keyframes-optionsanimate) (`options.animate`); the elements inside it move with [`motion`](#animated-cards-motion). `rise` and `slide-*` only move the layer, so set `start` to the same time as the motion `delay` when the layer should not be visible before it moves in. Inline text and inline elements in one paragraph are laid out word by word on flexbox, so the browser's exact line breaks are not guaranteed.
 
 The PNG is named by a hash of everything that changes the drawing (resolved HTML and CSS, images, fonts, box, density and renderer versions), so an unchanged layer is rendered once per process. See [`html-card.json`](../examples/motion-design/html-card.json) (cards, a stat row, chips), [`html-testimonial.json`](../examples/motion-design/html-testimonial.json) (mixed weights in a sentence, a round portrait, `clip-path` stars), [`html-speaker.json`](../examples/motion-design/html-speaker.json) (a lower third with wrapped title and badges) and [`html-stats.json`](../examples/motion-design/html-stats.json) (stat tiles and an aligned spec list). Five bundled app templates use them for their cards: the lower third in [`interview.json`](../packages/leclap-creative-kit/src/templates/interview.json), the offer tag and spec card in [`product-launch.json`](../packages/leclap-creative-kit/src/templates/product-launch.json), the feature chips in [`web-app-promo.json`](../packages/leclap-creative-kit/src/templates/web-app-promo.json), the step badges in [`app-tutorial.json`](../packages/leclap-creative-kit/src/templates/app-tutorial.json) and the chapter cards in [`story-reel.json`](../packages/leclap-creative-kit/src/templates/story-reel.json).
 

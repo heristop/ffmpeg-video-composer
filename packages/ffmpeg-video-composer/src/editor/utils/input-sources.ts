@@ -3,11 +3,22 @@ import type { RevealEasing } from '../presets/text';
 import { easedRamp, phaseDuration } from '../presets/eased-ramp';
 import type { BackgroundLayer } from '../../schemas/template.schemas';
 import type { GlobalAnimation } from '@/core/types';
+import { isHtmlSequence } from '../html/html-sequence-source';
 
 // Pure builders for the `-i` source fragments of composited inputs (animations and gradient layers).
 // They return fully-formed fragment strings (already containing `-i`, plus any `-framerate` /
 // `-stream_loop` / `-c:v` flags) so SegmentBuilder can push them verbatim into the sources list.
 // The path/pattern token is guarded; the surrounding flags are literals built here.
+
+// `-itsoffset <seconds> ` for a start above 0 (a numeric string counts), nothing when it is absent or not
+// positive; a start that is not a finite number throws (core/arg-guard.ts) rather than reach the command line.
+function itsOffsetFlag(start: unknown): string {
+  if (start === undefined || start === null || start === '') return '';
+
+  const seconds = assertFiniteNumber(Number(start), 'overlay start');
+
+  return seconds > 0 ? `-itsoffset ${seconds} ` : '';
+}
 
 /** Playback bounds for an animation overlay — see buildLoopFlags. */
 type LoopOptions = { loop?: boolean; loops?: number; duration?: number; start?: number };
@@ -24,8 +35,7 @@ type LoopOptions = { loop?: boolean; loops?: number; duration?: number; start?: 
  *   - none: play once (no flag).
  */
 export function buildLoopFlags(options: LoopOptions, maxDuration?: number): string {
-  const start = options.start === undefined ? undefined : assertFiniteNumber(options.start, 'overlay start');
-  const offset = start && start > 0 ? `-itsoffset ${start} ` : '';
+  const offset = itsOffsetFlag(options.start);
 
   if (options.duration !== undefined) {
     return `-stream_loop -1 ${offset}-t ${assertFiniteNumber(options.duration, 'overlay duration')} `;
@@ -315,6 +325,23 @@ export function overlayMotionExpr(motion: OverlayMotionInput | undefined, positi
  */
 export function buildSingleFileImageSource(path: string): string {
   return `-loop 1 -i ${assertSafeArgToken(path, 'image source')}`;
+}
+
+/**
+ * The `-i` source of a staged html layer at `path`. A still card is held like an image. An animated card is
+ * an animated PNG opened with a plain `-i`, played once; its motion keys are relative to the layer's start,
+ * so `-itsoffset <start>` begins the sequence when the layer appears (the overlay's `enable` gate alone
+ * would play it hidden), and the overlay repeats its last frame (MapManager).
+ */
+export function buildHtmlLayerSource(
+  input: { type?: string; url?: string; options?: { start?: number } },
+  path: string
+): string {
+  if (!isHtmlSequence(input)) return buildSingleFileImageSource(path);
+
+  const offset = itsOffsetFlag(input.options?.start);
+
+  return `${offset}-i ${assertSafeArgToken(path, 'html sequence source')}`;
 }
 
 /**

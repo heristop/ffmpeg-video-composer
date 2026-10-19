@@ -30,6 +30,22 @@ interface Use {
   owner: Record<string, unknown>;
 }
 
+// Each entry of an html input's motion map is a set of layer-like tracks; its stagger is not a track.
+function elementMotionUses(key: string, motion: unknown, path: string, owner: Record<string, unknown>): Use[] {
+  if (key !== 'motion' || owner.type !== 'html') return [];
+
+  if (motion === null || typeof motion !== 'object' || Array.isArray(motion)) return [];
+
+  return Object.entries(motion as Record<string, unknown>).map(([name, spec]) => ({
+    path: `${path}.${name}`,
+    kind: 'animate' as const,
+    value: Object.fromEntries(
+      Object.entries((spec ?? {}) as Record<string, unknown>).filter(([key]) => key !== 'stagger')
+    ),
+    owner,
+  }));
+}
+
 function collectRecord(record: Record<string, unknown>, path: string, uses: Use[]): void {
   for (const [key, child] of Object.entries(record)) {
     const childPath = `${path}.${key}`;
@@ -37,6 +53,8 @@ function collectRecord(record: Record<string, unknown>, path: string, uses: Use[
     if (key === 'easing' || key === 'ease') uses.push({ path: childPath, kind: 'easing', value: child, owner: record });
 
     if (key === 'animate') uses.push({ path: childPath, kind: 'animate', value: child, owner: record });
+
+    uses.push(...elementMotionUses(key, child, childPath, record));
 
     if (key !== 'motion' || path !== 'global') collect(child, childPath, uses);
   }
@@ -171,6 +189,9 @@ function layerInput(path: string, template: TemplateDescriptor): Record<string, 
 /** `animate` on a goo blob: sections[i].graphics[j].blobs[k].animate. */
 const GOO_BLOB_ANIMATE_PATH = /^sections\[\d+\]\.graphics\[\d+\]\.blobs\[\d+\]\.animate$/;
 
+/** An html input's element tracks: sections[i].inputs[j].motion.<name> (budget: html-motion-validation.ts). */
+const HTML_MOTION_PATH = /^sections\[\d+\]\.inputs\[\d+\]\.motion\.[a-z][a-z0-9-]*$/;
+
 function blobTrackErrors(path: string, tracks: Record<string, TrackKey[]>, tokens: ResolvedTokens): ValidationError[] {
   return Object.entries(tracks).flatMap(([axis, keys]) => {
     const message = keyTimingError(keys, tokens);
@@ -187,6 +208,10 @@ function animateUseErrors(use: Use, tokens: ResolvedTokens, template: TemplateDe
 
   // A goo blob's x / y / r tracks (fx-goo.ts): key timing only, the schema bounds the rest.
   if (GOO_BLOB_ANIMATE_PATH.test(use.path)) return blobTrackErrors(use.path, tracks, tokens);
+
+  if (HTML_MOTION_PATH.test(use.path)) {
+    return layerAnimateErrors(use.path, tracks, { type: 'html' }, (keys) => keyTimingError(keys, tokens));
+  }
 
   if (use.owner.type !== 'drawtext') {
     return [{ path: use.path, message: 'animate tracks apply to drawtext filters', code: 'invalid_keyframes' }];

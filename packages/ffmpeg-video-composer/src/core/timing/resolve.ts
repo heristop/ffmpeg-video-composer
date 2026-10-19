@@ -199,7 +199,7 @@ function resolveSlot(slot: TimeSlot, clock: Clock, prefix: string): TimeIssue | 
   try {
     const seconds = slotTime(slot, ref, clock);
 
-    slot.write(seconds);
+    slot.write(slot.clockStart === undefined ? seconds : Math.max(0, round(seconds - slot.clockStart)));
 
     return seconds < 0
       ? {

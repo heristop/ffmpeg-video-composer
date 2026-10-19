@@ -385,6 +385,14 @@ describe('Build Output', () => {
       expect(code).not.toMatch(/["']satori["']|@resvg\/resvg-wasm|harfbuzzjs/);
     });
 
+    // Animated cards are planned and joined at compile time: that code rides the compile chunk only.
+    it('browser entry eager load carries no animated-card planner or assembler', async () => {
+      const code = [...(await browserEagerFiles()).values()].join('\n');
+
+      expect(code).not.toMatch(/["']fdAT["']/);
+      expect(code).not.toMatch(/function planMotionFrames\(/);
+    });
+
     // Satori is bundled into the lazy chunks (its `harfbuzzjs` import resolved to the shim that waits for the
     // host's bytes); resvg stays a dependency the host's bundler resolves.
     it('browser entry loads the HTML layer rasteriser on demand, Satori with its HarfBuzz shim from there', async () => {

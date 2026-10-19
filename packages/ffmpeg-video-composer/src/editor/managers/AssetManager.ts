@@ -166,6 +166,9 @@ class AssetManager {
     valueOf: this.variableManager.valueOf,
     stageFont: (request) => this.stageFont(request),
     cache: this.inputsCache,
+    // global.fps wins over the host's videoConfig.fps (director/resolve-video-config.ts). A host fps the
+    // template does not set only changes how densely the card is sampled: frame delays are in seconds.
+    fps: this.template.descriptor.global?.fps,
   });
 
   fetchFonts = async (): Promise<void> => {

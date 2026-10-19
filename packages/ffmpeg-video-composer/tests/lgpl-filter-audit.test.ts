@@ -62,6 +62,17 @@ describe('LGPL device filter audit', () => {
     enabled = parseEnabledFilters(commonSh);
   });
 
+  // Animated HTML cards enter FFmpeg as one animated PNG overlaid like any layer: no new filter, but the
+  // apng demuxer and decoder must be in the device build.
+  it('animated html cards decode on device', () => {
+    const listed = (kind: string) =>
+      new Set((new RegExp(`--enable-${kind}=([^\\s\\\\]+)`).exec(commonSh)?.[1] ?? '').split(','));
+
+    expect(listed('demuxer').has('apng')).toBe(true);
+    expect(listed('decoder').has('apng')).toBe(true);
+    expect(enabled.has('overlay')).toBe(true);
+  });
+
   it('every look preset lowers to device-safe filters', () => {
     for (const look of LOOK_PRESETS) {
       for (const filter of lookToFilters(look)) {

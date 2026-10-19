@@ -2,6 +2,7 @@
 // section object; the slots write back in place, so callers walk a clone.
 
 import { LAYER_TRACKS } from '../../schemas/layer-animate.schemas';
+import { ELEMENT_MOTION_TRACKS } from '../html/limits';
 
 type Bag = Record<string, unknown>;
 
@@ -11,6 +12,8 @@ export interface TimeSlot {
   value: string;
   /** Id of the element this field starts, so a self-reference reads as a cycle. */
   owner?: string;
+  /** Seconds the field's own clock starts after the section (an html layer's `options.start`): a resolved reference is section time, written back relative to it. */
+  clockStart?: number;
   write: (seconds: number) => void;
 }
 
@@ -37,13 +40,15 @@ function list(value: unknown): Bag[] {
 export interface SecondsSlot {
   path: string;
   value: number;
+  /** Seconds the field's own clock starts after the section (an html layer's `options.start`). */
+  clockStart?: number;
   write: (seconds: number) => void;
 }
 
 // One walk serves both slot kinds: `accept` picks which raw values count (reference strings, or plain
 // numbers), so the list of time fields lives in one place.
 type Accept = (value: unknown) => boolean;
-type RawSlot = { path: string; value: unknown; owner?: string; write: (seconds: number) => void };
+type RawSlot = { path: string; value: unknown; owner?: string; clockStart?: number; write: (seconds: number) => void };
 
 function slot(accept: Accept, owner: Bag | undefined, key: string, path: string, id?: string): RawSlot[] {
   const value = owner?.[key];
@@ -120,6 +125,18 @@ function cueSlots(accept: Accept, section: Bag): RawSlot[] {
   ];
 }
 
+// An html input's element tracks (inputs[i].motion.<name>.<track>[k].t) run on the layer's clock, which
+// starts at options.start; a reference still names a section moment, so its slot carries that start.
+function elementMotionSlots(accept: Accept, input: Bag, i: number): RawSlot[] {
+  const motion = input.type === 'html' ? bag(input.motion) : undefined;
+  const start = Number(bag(input.options)?.start);
+  const clockStart = Number.isFinite(start) && start > 0 ? start : 0;
+
+  return Object.entries(motion ?? {})
+    .flatMap(([name, spec]) => trackSlots(accept, bag(spec), ELEMENT_MOTION_TRACKS, `inputs[${i}].motion.${name}`))
+    .map((found) => ({ ...found, clockStart }));
+}
+
 function collectSlots(section: Bag, accept: Accept): RawSlot[] {
   return [
     ...footageSlots(accept, bag(section.options)),
@@ -133,9 +150,10 @@ function collectSlots(section: Bag, accept: Accept): RawSlot[] {
     ]),
     ...cameraSlots(accept, bag(section.camera)),
     ...list(section.filters).flatMap((filter, i) => filterSlots(accept, filter, `filters[${i}]`)),
-    ...list(section.inputs).flatMap((input, i) =>
-      trackSlots(accept, bag(bag(input.options)?.animate), LAYER_TRACKS, `inputs[${i}].options.animate`)
-    ),
+    ...list(section.inputs).flatMap((input, i) => [
+      ...trackSlots(accept, bag(bag(input.options)?.animate), LAYER_TRACKS, `inputs[${i}].options.animate`),
+      ...elementMotionSlots(accept, input, i),
+    ]),
     ...cueSlots(accept, section),
   ];
 }
@@ -162,7 +180,12 @@ export function secondsSlots(section: Bag): SecondsSlot[] {
     slot(isSeconds, bag(entry.visibleBy), 'at', `assert[${i}].visibleBy`)
   );
 
-  return [...collectSlots(section, isSeconds), ...asserts] as SecondsSlot[];
+  // A layer's own start is a section moment, so it remaps like any other.
+  const layerStarts = list(section.inputs).flatMap((input, i) =>
+    slot(isSeconds, bag(input.options), 'start', `inputs[${i}].options`)
+  );
+
+  return [...collectSlots(section, isSeconds), ...asserts, ...layerStarts] as SecondsSlot[];
 }
 
 /** Every element of the section that carries an id, in document order. */

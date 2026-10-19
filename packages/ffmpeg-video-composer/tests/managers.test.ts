@@ -1206,6 +1206,15 @@ describe('MapManager', () => {
       );
     });
 
+    it('holds the last frame of an animated html card to the end of the section', () => {
+      const card = build({ section: animationSection() });
+
+      card.manager.addAnimationOverlay({ ...makeAnimInput(), type: 'html', url: 'html-seq:0123456789abcdef' }, 2);
+      expect(card.filterManager.addFilter).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'overlay', value: '0:0:eof_action=repeat' })
+      );
+    });
+
     it('chains a later animation off the previous overlay output', () => {
       const { manager, segment } = build({ section: animationSection() });
       manager.addAnimationOverlay(makeAnimInput({}), 2);

@@ -55,9 +55,10 @@ export interface BuiltPrompt {
 // Then a reference clip joined it: the real block for a 30 s, 40-shot clip (style rules 1,089 characters, format
 // 2,688) makes that brief need 161,593 (161,592 truncates). The colour-token, expression and raw-filter
 // guidance brings it to 162,800 (162,799 truncates). A brand kit block (theme, name, fonts: about 345
-// characters) can ride on top of both: that brief then needs 163,145 (163,144 truncates); 164,200 leaves about
-// 1,000 for longer shot lines.
-export const DEFAULT_PROMPT_BUDGET = 164_200;
+// characters) can ride on top of both: that brief then needs 163,145 (163,144 truncates). The animated html card
+// guide and the `motion` map's schema (data-motion, element tracks, their budget) lift it to 171,971 (171,970
+// truncates); 173,000 leaves about 1,000 for longer shot lines.
+export const DEFAULT_PROMPT_BUDGET = 173_000;
 // The schema never takes more than this, even with room to spare: past it the model reads noise.
 const SCHEMA_CAP = 96_000;
 const MIN_SCHEMA = 12_000;

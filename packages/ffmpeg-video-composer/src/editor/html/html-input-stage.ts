@@ -28,6 +28,8 @@ export interface HtmlAssetDeps {
   stageFont: (request: FontRequest) => Promise<void>;
   /** The template's staged-media cache (url → path). */
   cache: Record<string, string>;
+  /** The template's output fps (global.fps), the rate an animated card is drawn at; default DefaultConfig.FPS. */
+  fps?: number;
 }
 
 export type HtmlInputItem = MapAnimationInput & HtmlLayerInput;
@@ -78,6 +80,7 @@ async function stageContext(deps: HtmlAssetDeps): Promise<HtmlStageContext> {
     },
     templateFonts: await templateFonts(deps),
     rasteriser: registeredHtmlRasteriser(),
+    fps: deps.fps,
   };
 }
 

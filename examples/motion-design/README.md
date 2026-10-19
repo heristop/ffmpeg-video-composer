@@ -159,6 +159,7 @@ HTML and CSS (`inputs[].type: "html"`) lay out what positioned `drawtext` can't:
 | [`html-testimonial.json`](./html-testimonial.json) | portrait  | A Reels quote with bold accent words inside one sentence, a round portrait, star chips cut with `clip-path`                                                                              |
 | [`html-speaker.json`](./html-speaker.json)         | landscape | A conference opener and lower third: a text wordmark, a talk title that wraps in its box, time and room badges                                                                           |
 | [`html-stats.json`](./html-stats.json)             | square    | Stat tiles that land in reading order and a spec list with values aligned right; a landscape cut via `$format`                                                                           |
+| [`html-motion.json`](./html-motion.json)           | landscape | Animated cards (`motion` + `data-motion`): a listing card whose tag, lines and chips come in one after another, stat tiles that spring up left to right                                  |
 | [`layer-keyframes.json`](./layer-keyframes.json)   | landscape | Keyframe tracks on layers (`options.animate`): a pop-in with overshoot, squash and stretch, a card flip, a needle swinging past its target, a three-depth parallax                       |
 
 Images inside a layer (`<img src>`, CSS `url()`) name bundled backgrounds by their `/assets/backgrounds/…` path, like the sections' `pictureUrl`, so the CLI, the web app and the phone all stage them.

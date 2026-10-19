@@ -34,4 +34,12 @@ describe('get_template_schema guide', () => {
     expect(text).toContain('filter_not_allowed');
     expect(text).toContain('--allow-raw-filters');
   });
+
+  it('teaches per-element motion in HTML layers', () => {
+    const text = guideText();
+
+    expect(text).toContain('data-motion');
+    expect(text).toContain('html_motion_too_long');
+    expect(text).toContain('staggeredList');
+  });
 });

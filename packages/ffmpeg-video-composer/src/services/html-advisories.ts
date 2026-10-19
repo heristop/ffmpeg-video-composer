@@ -4,8 +4,11 @@
 //   html_unsupported_css     a property, value, selector or at-rule outside the supported subset;
 //   html_font_unknown        a font-family neither global.fonts nor the registry knows (the default family is used);
 //   html_missing_field       a {{ placeholder }} no field, variable or form field fills;
+//   html_motion_unmatched    a motion name no element carries (its tracks move nothing);
 //   font_unused              a global.fonts family no layer selects (template-fonts-validation.ts).
 
+import { motionTargets } from '@/core/html/element-motion';
+import type { LayerElement } from '@/core/html/html-element';
 import { defaultHtmlFamily } from '@/core/html/html-fonts';
 import { prepareHtmlLayer } from '@/core/html/html-layer';
 import { declaredFontFaces, templateFontSpecs, type CustomFontFace } from '@/core/html/template-fonts';
@@ -56,6 +59,23 @@ function missingFields(use: HtmlInputUse, html: string, fillable: Set<string>): 
   );
 }
 
+function unmatchedMotion(use: HtmlInputUse, element: LayerElement): MotionWarning[] {
+  const tagged = [...new Set(motionTargets(element))];
+
+  return Object.keys(bag(use.input.motion))
+    .filter((name) => !tagged.includes(name))
+    .map((name) =>
+      warn(
+        `${use.path}.motion.${name}`,
+        'html_motion_unmatched',
+        `html layer: no element carries data-motion="${name}", its tracks move nothing`,
+        tagged.length > 0
+          ? `Tag the elements to move with data-motion="${name}" (tagged here: ${tagged.join(', ')}).`
+          : `Tag the elements to move with data-motion="${name}" in the html.`
+      )
+    );
+}
+
 function layerWarnings(
   use: HtmlInputUse,
   family: string,
@@ -85,7 +105,7 @@ function layerWarnings(
     )
   );
 
-  return [...dropped, ...fonts, ...missingFields(use, html, fillable)];
+  return [...dropped, ...fonts, ...missingFields(use, html, fillable), ...unmatchedMotion(use, prepared.element)];
 }
 
 /** Every HTML layer advisory of a (field-resolved) descriptor. */
