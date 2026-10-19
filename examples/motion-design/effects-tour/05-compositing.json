@@ -326,7 +326,7 @@
       "kinetic": [
         {
           "text": {
-            "en": "compositing · blend · multiply and screen"
+            "en": "compositing · blend modes"
           },
           "preset": "fade",
           "font": "mono",
