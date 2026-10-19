@@ -14,7 +14,7 @@ describe('packaged sample catalog', () => {
   it('matches every canonical entry and preserves its authored descriptor', async () => {
     const catalog = await readJson('examples/showcase/catalog.json');
     expect(listSamples().map(({ id }) => id)).toEqual(catalog.samples.map(({ id }: { id: string }) => id));
-    expect(listSamples()).toHaveLength(53);
+    expect(listSamples()).toHaveLength(59);
     for (const sample of catalog.samples) {
       const detail = getSample(sample.id);
       const authored = await readJson(sample.source);
@@ -50,7 +50,7 @@ describe('packaged sample catalog', () => {
   it('filters categories, backends and case-insensitive search together', () => {
     expect(SAMPLE_CATEGORIES).toContain('evidence');
     expect(SAMPLE_BACKENDS).toEqual(['native', 'remotion']);
-    expect(listSamples({ backend: 'native' })).toHaveLength(43);
+    expect(listSamples({ backend: 'native' })).toHaveLength(49);
     expect(listSamples({ backend: 'remotion' })).toHaveLength(10);
     expect(listSamples({ category: 'evidence' }).map(({ id }) => id)).toEqual([
       'pr-evidence',
@@ -84,6 +84,12 @@ describe('packaged sample catalog', () => {
       'layer-keyframes',
       'blend-motion-blur',
       'masks',
+      'html-motion',
+      'vector-shapes',
+      'line-draw',
+      'fx-burst',
+      'fx-liquid',
+      'fx-glitch-iris-sheen',
     ]);
     expect(listSamples({ category: 'effects', backend: 'remotion' })).toEqual([]);
     expect(listSamples({ query: 'WoRd StAgGeR' }).map(({ id }) => id)).toEqual(['editorial-word-stagger']);

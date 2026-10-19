@@ -1,7 +1,8 @@
 {
   "meta": {
     "name": "Animated HTML cards",
-    "description": "A listing card and stat tiles whose elements come in one after another (motion + data-motion)."
+    "description": "A listing card and stat tiles whose elements come in one after another (motion + data-motion).",
+    "creativeDirection": "Audience: estate agents who post listings as short videos. Direction: one HTML layer per scene, its elements timed inside it. The listing tag slides in first, the address and detail lines rise a beat apart on a gentle spring, then the feature chips pop in with a small overshoot. The stat tiles in scene two lift into place in reading order, each a hair after the last. Copy comes from the fields, so the same template lists any property. Review: every element hidden until its entrance, text crisp at 720p, nothing cut at a card's edge, the chips settle before the scene ends."
   },
   "global": {
     "orientation": "landscape",

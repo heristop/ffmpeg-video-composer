@@ -277,6 +277,444 @@
       }
     },
     {
+      "name": "blend-modes",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/golden-hour.jpg",
+        "duration": 2.8
+      },
+      "inputs": [
+        {
+          "name": "grade",
+          "type": "html",
+          "html": "<div class=\"g\"></div>",
+          "css": ".g { width: 1280px; height: 720px; background: linear-gradient(115deg, #3A2A5C 0%, #9298FB 55%, #FFE9C7 100%) }",
+          "width": 1280,
+          "height": 720,
+          "options": {
+            "position": "0:0",
+            "blend": "multiply",
+            "motion": "fade"
+          }
+        },
+        {
+          "name": "glow",
+          "type": "html",
+          "html": "<div class=\"o\"></div>",
+          "css": ".o { width: 340px; height: 340px; border-radius: 170px; background: #FF8AAE }",
+          "width": 340,
+          "height": 340,
+          "options": {
+            "position": "140:190",
+            "blend": "screen",
+            "animate": {
+              "x": [
+                {
+                  "t": 0.4,
+                  "v": "+0"
+                },
+                {
+                  "t": 2.4,
+                  "v": "+660",
+                  "ease": "ease-in-out-sine"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "compositing · blend modes"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Colour that mixes"
+          },
+          "preset": "rise",
+          "size": 72,
+          "y": 590,
+          "delay": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "mask-iris",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 3
+      },
+      "inputs": [
+        {
+          "name": "card",
+          "type": "html",
+          "html": "<div class=\"c\"><span class=\"t\">New listing</span><h2>12 rue des Lilas</h2><p>Lyon 3e · 92 m² · 4th floor</p></div>",
+          "css": ".c { display: flex; flex-direction: column; gap: 10px; padding: 44px 52px; width: 100%; height: 100%; border-radius: 32px; background: #F4EFE6 } .t { color: #F96F99; font: 600 26px $font.body; text-transform: uppercase; letter-spacing: 3px } h2 { margin: 0; color: #141416; font: 92px $font.display } p { margin: 0; color: #4A4658; font: 34px $font.body }",
+          "width": 720,
+          "height": 330,
+          "options": {
+            "position": "280:165",
+            "mask": {
+              "shape": {
+                "type": "ellipse",
+                "cx": 640,
+                "cy": 330,
+                "rx": 420,
+                "ry": 420
+              },
+              "feather": 36,
+              "animate": {
+                "scale": [
+                  {
+                    "t": 0.2,
+                    "v": 0
+                  },
+                  {
+                    "t": 1.1,
+                    "v": 1.05,
+                    "ease": "$snappy"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "name": "price",
+          "type": "html",
+          "html": "<div class=\"p\">420 k€</div>",
+          "css": ".p { padding: 14px 26px; border-radius: 20px; background: #F96F99; color: #141416; font: 56px $font.display }",
+          "width": 200,
+          "height": 100,
+          "options": {
+            "position": "860:420",
+            "mask": {
+              "shape": {
+                "type": "rect",
+                "x": 860,
+                "y": 420,
+                "w": 200,
+                "h": 100,
+                "radius": 20
+              },
+              "animate": {
+                "x": [
+                  {
+                    "t": 1.0,
+                    "v": -220
+                  },
+                  {
+                    "t": 1.6,
+                    "v": 0,
+                    "ease": "$snappy"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "compositing · mask · iris and wipe"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Out of a shape"
+          },
+          "preset": "rise",
+          "size": 64,
+          "y": 600,
+          "delay": 0.3,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "shape-pop",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.8
+      },
+      "graphics": [
+        {
+          "type": "shape",
+          "ease": "$smooth",
+          "at": 0.5,
+          "preset": {
+            "type": "polygon",
+            "sides": 6
+          },
+          "x": 330,
+          "y": 150,
+          "width": 360,
+          "height": 360,
+          "fill": false,
+          "stroke": {
+            "color": "#9298fb",
+            "width": 4
+          },
+          "animate": {
+            "scale": [
+              {
+                "t": 0.5,
+                "v": 0.6
+              },
+              {
+                "t": 1.1,
+                "v": 1,
+                "ease": "spring(300, 14)"
+              }
+            ],
+            "opacity": [
+              {
+                "t": 0.5,
+                "v": 0
+              },
+              {
+                "t": 0.8,
+                "v": 1
+              }
+            ]
+          }
+        },
+        {
+          "type": "shape",
+          "at": 0.3,
+          "preset": {
+            "type": "star",
+            "points": 5,
+            "inner": 0.45
+          },
+          "x": 360,
+          "y": 180,
+          "width": 300,
+          "height": 300,
+          "color": "#FFF685",
+          "stroke": {
+            "color": "#F5F3F7",
+            "width": 6
+          },
+          "animate": {
+            "scale": [
+              {
+                "t": 0.3,
+                "v": 0
+              },
+              {
+                "t": 0.9,
+                "v": 1,
+                "ease": "spring(300, 14)"
+              }
+            ],
+            "rotate": [
+              {
+                "t": 0.3,
+                "v": -40
+              },
+              {
+                "t": 1.0,
+                "v": 0,
+                "ease": "$expo"
+              }
+            ]
+          }
+        },
+        {
+          "type": "shape",
+          "ease": "$snappy",
+          "at": 0.8,
+          "preset": {
+            "type": "heart"
+          },
+          "x": 780,
+          "y": 210,
+          "width": 260,
+          "height": 240,
+          "color": "#f96f99",
+          "animate": {
+            "scale": [
+              {
+                "t": 0.8,
+                "v": 0
+              },
+              {
+                "t": 1.4,
+                "v": 1,
+                "ease": "spring(300, 14)"
+              }
+            ]
+          }
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "compositing · shape · preset"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "Vectors, drawn live"
+          },
+          "preset": "rise",
+          "ease": "$smooth",
+          "size": 72,
+          "y": 590,
+          "delay": 0.4,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "motion-blur",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1A2E",
+        "duration": 2.8
+      },
+      "inputs": [
+        {
+          "name": "whip",
+          "type": "html",
+          "html": "<div class=\"c\"></div>",
+          "css": ".c { width: 260px; height: 160px; border-radius: 28px; background: #9298FB }",
+          "width": 260,
+          "height": 160,
+          "options": {
+            "position": "90:210",
+            "motionBlur": {
+              "shutter": 180,
+              "samples": 8
+            },
+            "animate": {
+              "x": [
+                {
+                  "t": 0.3,
+                  "v": "+0"
+                },
+                {
+                  "t": 0.85,
+                  "v": "+850",
+                  "ease": "ease-out-cubic"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "kinetic": [
+        {
+          "text": {
+            "en": "compositing · motion blur · 180° shutter"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "MOTION BLUR"
+          },
+          "preset": "rise",
+          "size": 130,
+          "y": 430,
+          "delay": 0.9,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          },
+          "color": "#FFF685",
+          "motionBlur": true
+        }
+      ]
+    },
+    {
       "name": "fx-sheen",
       "type": "color_background",
       "options": {

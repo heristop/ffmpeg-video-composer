@@ -17,7 +17,13 @@ export const SHOWCASE_SAMPLES = catalog.samples as ShowcaseSample[];
 
 // The HTML-layer samples, listed together right after Type impact. The catalog keeps its own order, which the
 // CLI and the MCP list too; only the library here moves them up.
-export const HTML_SAMPLE_IDS: readonly string[] = ['html-card', 'html-testimonial', 'html-speaker', 'html-stats'];
+export const HTML_SAMPLE_IDS: readonly string[] = [
+  'html-card',
+  'html-testimonial',
+  'html-speaker',
+  'html-stats',
+  'html-motion',
+];
 export const HTML_SAMPLES_AFTER = 'type-impact';
 
 // `ids`, in their listed order, moved to just after `anchor`; every other sample keeps catalog order. Missing

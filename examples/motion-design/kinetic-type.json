@@ -21,6 +21,7 @@
         {
           "text": { "en": "Make every word land." },
           "preset": "cascade",
+          "motionBlur": true,
           "size": 104,
           "y": 230,
           "accent": { "words": "last" },
@@ -82,7 +83,7 @@
       "type": "color_background",
       "options": { "backgroundColor": "#141416", "duration": 3.2 },
       "kinetic": [
-        { "text": { "en": "BIG." }, "preset": "impact", "size": 220, "y": 90, "color": "#FF8AAE" },
+        { "text": { "en": "BIG." }, "preset": "impact", "size": 220, "y": 90, "color": "#FF8AAE", "motionBlur": true },
         { "text": { "en": "Springy." }, "preset": "pop", "size": 120, "y": 340, "delay": 0.5 },
         { "text": { "en": "DECODED" }, "preset": "scramble", "font": "mono", "size": 60, "y": 500, "delay": 0.9 },
         { "text": { "en": "and alive" }, "preset": "wave", "size": 64, "y": 600, "delay": 1.4 }
@@ -97,6 +98,7 @@
         {
           "text": { "en": "Everywhere." },
           "preset": "drop",
+          "motionBlur": true,
           "size": 96,
           "y": 380,
           "delay": 0.7,
