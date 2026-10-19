@@ -51,7 +51,7 @@ Three templates from this repo and what they render to. Click a frame to play th
 | [`before-after.json`](examples/agentic-pr-video/before-after.json)<br/>a PR review clip        | <a href="https://leclap.dev/videos/showcase/before-after.mp4"><img src="apps/leclap-web/public/videos/showcase/before-after.webp" alt="Before/after PR evidence render" width="260" /></a> | The video an agent attaches to a pull request: the change named, the old behaviour, a wipe to the new one, what to check.                        |
 | [`effects-tour.json`](examples/motion-design/effects-tour.json)<br/>ten chapters, one template | <a href="https://leclap.dev/videos/showcase/effects-tour.mp4"><img src="apps/leclap-web/public/videos/showcase/effects-tour.webp" alt="The effects tour render" width="260" /></a>         | Seven minutes of kinetic type, camera moves, transitions, captions, light effects, looks, footage edits, sound and music.                        |
 
-All 50 samples, with their templates, are on the [showcase](https://leclap.dev/showcase). Each effect, one frame at a
+All 52 samples, with their templates, are on the [showcase](https://leclap.dev/showcase). Each effect, one frame at a
 time, in the [gallery](docs/gallery.md).
 
 ## 🤔 Why LeClap?

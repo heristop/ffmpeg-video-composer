@@ -2072,6 +2072,23 @@
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         },
+                        "blend": {
+                          "type": "string",
+                          "enum": [
+                            "normal",
+                            "multiply",
+                            "screen",
+                            "overlay",
+                            "add",
+                            "darken",
+                            "lighten",
+                            "difference"
+                          ],
+                          "description": "How the layer mixes with the picture beneath, inside its own alpha (default normal). multiply darkens, screen lightens (glows, flares), overlay adds contrast, add sums light (sparks, fire), darken / lighten keep the darker / lighter, difference inverts where the layer is light. Needs the blend filter: without it the layer composites normally with a warning."
+                        },
+                        "motionBlur": {
+                          "$ref": "#/$defs/MotionBlur"
+                        },
                         "clip": {
                           "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
                           "type": "object",
@@ -5489,6 +5506,23 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "blend": {
+                          "type": "string",
+                          "enum": [
+                            "normal",
+                            "multiply",
+                            "screen",
+                            "overlay",
+                            "add",
+                            "darken",
+                            "lighten",
+                            "difference"
+                          ],
+                          "description": "How the layer mixes with the picture beneath, inside its own alpha (default normal). multiply darkens, screen lightens (glows, flares), overlay adds contrast, add sums light (sparks, fire), darken / lighten keep the darker / lighter, difference inverts where the layer is light. Needs the blend filter: without it the layer composites normally with a warning."
+                        },
+                        "motionBlur": {
+                          "$ref": "#/$defs/MotionBlur"
                         },
                         "clip": {
                           "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
@@ -8970,6 +9004,23 @@
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         },
+                        "blend": {
+                          "type": "string",
+                          "enum": [
+                            "normal",
+                            "multiply",
+                            "screen",
+                            "overlay",
+                            "add",
+                            "darken",
+                            "lighten",
+                            "difference"
+                          ],
+                          "description": "How the layer mixes with the picture beneath, inside its own alpha (default normal). multiply darkens, screen lightens (glows, flares), overlay adds contrast, add sums light (sparks, fire), darken / lighten keep the darker / lighter, difference inverts where the layer is light. Needs the blend filter: without it the layer composites normally with a warning."
+                        },
+                        "motionBlur": {
+                          "$ref": "#/$defs/MotionBlur"
+                        },
                         "clip": {
                           "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
                           "type": "object",
@@ -12126,6 +12177,23 @@
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         },
+                        "blend": {
+                          "type": "string",
+                          "enum": [
+                            "normal",
+                            "multiply",
+                            "screen",
+                            "overlay",
+                            "add",
+                            "darken",
+                            "lighten",
+                            "difference"
+                          ],
+                          "description": "How the layer mixes with the picture beneath, inside its own alpha (default normal). multiply darkens, screen lightens (glows, flares), overlay adds contrast, add sums light (sparks, fire), darken / lighten keep the darker / lighter, difference inverts where the layer is light. Needs the blend filter: without it the layer composites normally with a warning."
+                        },
+                        "motionBlur": {
+                          "$ref": "#/$defs/MotionBlur"
+                        },
                         "clip": {
                           "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
                           "type": "object",
@@ -15252,6 +15320,23 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "blend": {
+                          "type": "string",
+                          "enum": [
+                            "normal",
+                            "multiply",
+                            "screen",
+                            "overlay",
+                            "add",
+                            "darken",
+                            "lighten",
+                            "difference"
+                          ],
+                          "description": "How the layer mixes with the picture beneath, inside its own alpha (default normal). multiply darkens, screen lightens (glows, flares), overlay adds contrast, add sums light (sparks, fire), darken / lighten keep the darker / lighter, difference inverts where the layer is light. Needs the blend filter: without it the layer composites normally with a warning."
+                        },
+                        "motionBlur": {
+                          "$ref": "#/$defs/MotionBlur"
                         },
                         "clip": {
                           "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
@@ -18934,6 +19019,23 @@
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         },
+                        "blend": {
+                          "type": "string",
+                          "enum": [
+                            "normal",
+                            "multiply",
+                            "screen",
+                            "overlay",
+                            "add",
+                            "darken",
+                            "lighten",
+                            "difference"
+                          ],
+                          "description": "How the layer mixes with the picture beneath, inside its own alpha (default normal). multiply darkens, screen lightens (glows, flares), overlay adds contrast, add sums light (sparks, fire), darken / lighten keep the darker / lighter, difference inverts where the layer is light. Needs the blend filter: without it the layer composites normally with a warning."
+                        },
+                        "motionBlur": {
+                          "$ref": "#/$defs/MotionBlur"
+                        },
                         "clip": {
                           "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
                           "type": "object",
@@ -22061,6 +22163,23 @@
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
                         },
+                        "blend": {
+                          "type": "string",
+                          "enum": [
+                            "normal",
+                            "multiply",
+                            "screen",
+                            "overlay",
+                            "add",
+                            "darken",
+                            "lighten",
+                            "difference"
+                          ],
+                          "description": "How the layer mixes with the picture beneath, inside its own alpha (default normal). multiply darkens, screen lightens (glows, flares), overlay adds contrast, add sums light (sparks, fire), darken / lighten keep the darker / lighter, difference inverts where the layer is light. Needs the blend filter: without it the layer composites normally with a warning."
+                        },
+                        "motionBlur": {
+                          "$ref": "#/$defs/MotionBlur"
+                        },
                         "clip": {
                           "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
                           "type": "object",
@@ -25186,6 +25305,23 @@
                             "bottom-right"
                           ],
                           "description": "The point of the layer box that animate scale and rotate tracks pivot about (default center); it stays put while the layer scales or turns."
+                        },
+                        "blend": {
+                          "type": "string",
+                          "enum": [
+                            "normal",
+                            "multiply",
+                            "screen",
+                            "overlay",
+                            "add",
+                            "darken",
+                            "lighten",
+                            "difference"
+                          ],
+                          "description": "How the layer mixes with the picture beneath, inside its own alpha (default normal). multiply darkens, screen lightens (glows, flares), overlay adds contrast, add sums light (sparks, fire), darken / lighten keep the darker / lighter, difference inverts where the layer is light. Needs the blend filter: without it the layer composites normally with a warning."
+                        },
+                        "motionBlur": {
+                          "$ref": "#/$defs/MotionBlur"
                         },
                         "clip": {
                           "description": "Cut the layer to a box (px) so it reveals from behind an invisible edge, e.g. sliding up out of a slot; works over footage.",
@@ -29137,6 +29273,33 @@
       "additionalProperties": false,
       "description": "Keyframe tracks for the layer, times in section seconds. Each key eases into the next. A track overrides the same property of options.motion (x/y over a rise or slide, opacity over a fade). scale/scaleX/scaleY/rotate need the layer box: an html layer, or options.scale as \"W:H\" pixels."
     },
+    "MotionBlur": {
+      "anyOf": [
+        {
+          "type": "boolean",
+          "const": true
+        },
+        {
+          "type": "object",
+          "properties": {
+            "shutter": {
+              "description": "Shutter angle in degrees, 0..360 (default 180, the film look); 0 is off.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 360
+            },
+            "samples": {
+              "description": "Sub-frame samples averaged per frame, 2..16 (default 8); smoother and costlier as it grows.",
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 16
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "description": "Motion blur while the element moves: true, or { shutter, samples }. Resting frames stay sharp. Needs the tmix filter: without it the element draws sharp."
+    },
     "Animate": {
       "type": "object",
       "properties": {
@@ -29710,6 +29873,9 @@
             "echoes"
           ],
           "additionalProperties": false
+        },
+        "motionBlur": {
+          "$ref": "#/$defs/MotionBlur"
         },
         "exit": {
           "description": "How the block leaves: a preset name or an object (default none: holds to the cut).",
