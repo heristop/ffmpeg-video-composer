@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest';
 import type { Filter } from '@/core/types';
 import { designedTransitionGraph } from '@/core/motion/transitions';
 import { lowerFx } from '@/editor/presets/fx';
+import { kineticToFilters } from '@/editor/presets/kinetic';
+import { layerComposite } from '@/editor/presets/layer-composite';
 import { graphicToFilters } from '@/editor/presets/graphics';
 import { DEVICE_FILTERS } from '@/editor/utils/device-filters.generated';
 import { ENGINE_EMITTED_FILTERS } from '@/editor/utils/filter-compat';
 import { GraphicSchema } from '@/schemas/graphics.schemas';
+import { KineticBlockSchema } from '@/schemas/kinetic.schemas';
 
 // The LGPL device audit (lgpl-filter-audit.test.ts) continued for the motion options that add filters to
 // existing graphics and transitions: DEVICE_FILTERS is checked against scripts/ffmpeg/common.sh there.
@@ -73,5 +76,95 @@ describe('LGPL device filter audit: glitch tear, iris origin, sheen gloss', () =
     }
     // The transition assembly is not a section filter chain (no compat pass): on the build list is enough.
     for (const type of irisFilters) expect(DEVICE_FILTERS.has(type), `iris emits "${type}"`).toBe(true);
+  });
+});
+
+describe('LGPL device filter audit: blend modes and motion blur', () => {
+  // LAYER_COMPOSITE_AUDIT: every blend mode, with and without motion blur, lowers to device filters only.
+  it('layer blend modes and motion blur lower to device-safe filters', () => {
+    const names = (graph: string): string[] =>
+      graph.split(';').flatMap((chain) => {
+        const body = chain.replace(/^(\[[^\]]+\])+/, '').replace(/(\[[^\]]+\])+$/, '');
+        const found: string[] = [];
+        let [quoted, depth, start] = [false, 0, 0];
+
+        for (let i = 0; i <= body.length; i++) {
+          const c = body[i];
+
+          if (c === "'") quoted = !quoted;
+
+          if (!quoted && c === '(') depth++;
+
+          if (!quoted && c === ')') depth--;
+
+          if (i === body.length || (!quoted && depth === 0 && c === ',')) {
+            found.push(body.slice(start, i).split('=')[0]);
+            start = i + 1;
+          }
+        }
+
+        return found;
+      });
+    const modes = ['multiply', 'screen', 'overlay', 'add', 'darken', 'lighten', 'difference'] as const;
+    const graphs = modes.flatMap((blend) =>
+      [null, { shutter: 180, samples: 8 }].map((motionBlur) =>
+        layerComposite({
+          name: 'l',
+          base: 'b',
+          raw: '2:v',
+          legFilters: ['fps=25', 'format=rgba', 'colorchannelmixer=aa=0.5'],
+          overlay: "x='10+t':y='0':eof_action=pass",
+          blend,
+          motionBlur,
+          animate: {
+            x: [
+              { t: 0.5, v: 0 },
+              { t: 1, v: 100 },
+            ],
+          },
+          fps: 25,
+          tail: [],
+          has: (filter) => DEVICE_FILTERS.has(filter),
+          warn: () => undefined,
+        })
+      )
+    );
+    const emitted = new Set(graphs.flatMap((graph) => names(graph as string)));
+
+    expect(emitted).toContain('blend');
+    expect(emitted).toContain('tmix');
+    // The late span's lead-in pad: trim + concat, both already built into the engine.
+    expect(emitted).toContain('concat');
+
+    for (const name of emitted) {
+      expect(DEVICE_FILTERS.has(name), `layer composite emits "${name}"`).toBe(true);
+      expect(ENGINE_EMITTED_FILTERS as readonly string[], name).toContain(name);
+    }
+  });
+
+  // KINETIC_BLUR_AUDIT: a motion-blurred kinetic block lowers to device filters only.
+  it('kinetic motion blur lowers to device-safe filters', () => {
+    const block = KineticBlockSchema.parse({ text: { en: 'Shine' }, preset: 'slide', motionBlur: true });
+    const lowered = kineticToFilters(block, {
+      width: 640,
+      height: 360,
+      fps: 25,
+      duration: 2,
+      seed: 1,
+      energy: 1,
+      text: 'Shine',
+      blur: { has: (filter) => DEVICE_FILTERS.has(filter), warn: () => undefined, prefix: 'kmb0_' },
+    });
+    const types = (filters: Filter[]): string[] =>
+      filters.flatMap((f) => (f.graph ? f.graph.flatMap((chain) => types(chain.filters)) : [f.type]));
+    const emitted = new Set(types(lowered));
+
+    expect(emitted).toContain('tmix');
+    expect(emitted).toContain('concat');
+
+    for (const type of emitted) {
+      expect(DEVICE_FILTERS.has(type), `kinetic blur emits "${type}"`).toBe(true);
+      expect(ENGINE_EMITTED_FILTERS as readonly string[], type).toContain(type);
+    }
   });
 });
