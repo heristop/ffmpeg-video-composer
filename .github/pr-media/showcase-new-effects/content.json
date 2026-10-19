@@ -1,0 +1,36 @@
+{
+  "ticket": "PR #136",
+  "summary": "Motion blur on the fast layers of the Layer keyframes sample",
+  "clipSeconds": 3.2,
+  "freeze": { "at": 0.75, "hold": 2.4 },
+  "intro": { "headline": "SHOW THE 3.2.0 EFFECTS" },
+  "outro": { "headline": "REVIEW THE NEW SAMPLES", "subtitle": "Six listed samples, bands and irises in the tour" },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.mp4",
+      "trim": 1.5,
+      "highlight": { "x": 400, "y": 130, "w": 160, "h": 190 },
+      "callout": "A hard edge",
+      "chip": "Every frame is razor sharp",
+      "pane": {
+        "title": "Fast, but sharp",
+        "desc": "The disc drops 460 px in half a second and every frame is crisp, so the speed reads as stutter."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.mp4",
+      "trim": 1.5,
+      "highlight": { "x": 400, "y": 130, "w": 160, "h": 190 },
+      "callout": "Smeared in flight",
+      "chip": "Blurred in flight, sharp at rest",
+      "pane": {
+        "title": "Motion blur on the fall",
+        "desc": "The same drop is smeared by a camera shutter while it moves and lands sharp. The needle swing gets it too."
+      }
+    }
+  ]
+}
