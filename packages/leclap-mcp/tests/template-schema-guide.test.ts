@@ -62,4 +62,13 @@ describe('get_template_schema guide', () => {
     expect(text).toContain('motion_blur_static');
     expect(text).toContain('options.clip');
   });
+
+  it('teaches masks and track mattes', () => {
+    const text = guideText();
+
+    expect(text).toContain('options.mask');
+    expect(text).toContain('track matte');
+    expect(text).toContain('mask_layer_unknown');
+    expect(text).toContain('mask_unavailable');
+  });
 });

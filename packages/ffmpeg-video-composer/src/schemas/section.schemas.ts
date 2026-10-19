@@ -23,6 +23,7 @@ import { CLIP_AUDIO_OPTION_FIELDS } from './audio.schemas';
 import { SECTION_INTENT_FIELDS } from './section-intent.schemas';
 import { TemplateMetaSchema } from './template-meta.schemas';
 export { TemplateMetaSchema } from './template-meta.schemas';
+import { SECTION_MASK_FIELDS } from './mask.schemas';
 import { CutawaysSchema, FIT_OPTION_FIELDS, FOOTAGE_OPTION_FIELDS } from './footage.schemas';
 import { BeatDurationSchema } from './time.schemas';
 import { SECTION_NAME } from './section-name.schemas';
@@ -189,6 +190,7 @@ export const VideoSectionSchema = BaseSectionSchema.extend({
   type: z.literal('video').describe('Section type: renders a pre-recorded or asset-backed video clip.'),
   options: BaseSectionOptionsSchema.extend(CLIP_AUDIO_OPTION_FIELDS)
     .extend(FOOTAGE_OPTION_FIELDS)
+    .extend(SECTION_MASK_FIELDS)
     .strict()
     .optional()
     .describe('Playback, footage editing and compositing options for the video section.'),
@@ -226,6 +228,7 @@ export const ProjectVideoSectionSchema = BaseSectionSchema.extend({
       .optional()
       .describe('Modes available to the user; omit for all four. A single element locks to one mode.'),
     ...FOOTAGE_OPTION_FIELDS,
+    ...SECTION_MASK_FIELDS,
   })
     .strict()
     .optional()

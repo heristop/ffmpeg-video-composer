@@ -55,7 +55,7 @@ an undrawn region of the clip (like a video rect).
 ```jsonc
 {
   "label": "Shine sweep (legacy APNG)", // row title in the index
-  "kind": "legacy", // legacy | graphic | kinetic | fx (shown in the index)
+  "kind": "legacy", // legacy | graphic | kinetic | fx | mask (shown in the index)
   "window": { "at": 0.3, "duration": 2.0 }, // the effect's life, in section seconds
   "section": {
     // merged into the stage section
@@ -156,6 +156,13 @@ The procedural effects of the motion polish plan (`sheen`, `leak`, `edge-glow`, 
   error; in a `--before <older ref>` run that is the expected "before" state.
 
 The legacy APNG fixtures (`legacy-*.json`) stay as the "before" side of each rebuilt effect: keep them.
+
+### Fixtures for masks
+
+`mask-*.json` review `options.mask` on layers and sections: `mask-iris` (an ellipse opening on a scale track,
+feathered), `mask-star-hole` (an inverted SVG path turning on a rotate track) and `mask-text-matte` (the footage
+through a word, a section luma track matte; footage only, since only video sections take a mask). Path masks use
+relative commands after `M{{cx}} {{cy}}` so the shape is centred on the subject in every format.
 
 ## Templates
 

@@ -3,6 +3,7 @@
 
 import { LAYER_TRACKS } from '../../schemas/layer-animate.schemas';
 import { ELEMENT_MOTION_TRACKS } from '../html/limits';
+import { MASK_TRACKS } from '../../schemas/mask.schemas';
 
 type Bag = Record<string, unknown>;
 
@@ -137,6 +138,11 @@ function elementMotionSlots(accept: Accept, input: Bag, i: number): RawSlot[] {
     .map((found) => ({ ...found, clockStart }));
 }
 
+// A shape mask's keyframed transforms (editor/presets/mask-source.ts), in section time.
+function maskSlots(accept: Accept, options: Bag | undefined, path: string): RawSlot[] {
+  return trackSlots(accept, bag(bag(options?.mask)?.animate), MASK_TRACKS, `${path}.mask.animate`);
+}
+
 function collectSlots(section: Bag, accept: Accept): RawSlot[] {
   return [
     ...footageSlots(accept, bag(section.options)),
@@ -154,7 +160,9 @@ function collectSlots(section: Bag, accept: Accept): RawSlot[] {
     ...list(section.inputs).flatMap((input, i) => [
       ...trackSlots(accept, bag(bag(input.options)?.animate), LAYER_TRACKS, `inputs[${i}].options.animate`),
       ...elementMotionSlots(accept, input, i),
+      ...maskSlots(accept, bag(input.options), `inputs[${i}].options`),
     ]),
+    ...maskSlots(accept, bag(section.options), 'options'),
     ...cueSlots(accept, section),
   ];
 }

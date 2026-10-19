@@ -635,6 +635,18 @@
       "templateSha256": "c8c29e92aee522e08687eb2df3e7481faadbaa795018d7f38fe96c8ef8f97dda",
       "media": "Bundled catalog / demo app fixtures",
       "bytes": 44048
+    },
+    {
+      "id": "masks",
+      "source": "examples/motion-design/masks.json",
+      "duration": 8.660998,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "f5122e7e41de43176c948822264edd65bcbdbb3c2deb16451be49221c72bcea1",
+      "templateSha256": "851d83fe8477802333c4abf6080625d73e16ed1fbd435badc2e589d713ff3e39",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 154720
     }
   ]
 }

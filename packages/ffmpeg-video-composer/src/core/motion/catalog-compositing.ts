@@ -9,7 +9,10 @@ export const COMPOSITING_RULES = [
   'Compare with sections[].layout: { type: "split", sources: [...] } for side-by-side panes, or ' +
     '{ type: "before-after", before, after, wipe: { at, duration, direction, ease } } for a reveal wipe.',
   'Blend with options.blend, not opacity (multiply ink, screen glows, add sparks); give fast moves motionBlur. ' +
-    'options.clip excludes both; clipped or filled kinetic and entrance presets are not blurred.',
+    'options.clip and options.mask exclude both; clipped or filled kinetic and entrance presets are not blurred.',
+  'Mask a layer or video section (options.mask) instead of hiding part of it behind a background-coloured panel: ' +
+    'a shape or another layer as a track matte (alpha or luma). Animate it for irises and wipes; feather, invert. ' +
+    'Without alphamerge a shape mask falls back to its box; a track matte draws both layers.',
 ];
 
 export const KINETIC_FILL: Record<string, string> = {
@@ -44,6 +47,16 @@ export const MOTION_BLUR_GUIDE: Record<string, string> = {
   samples: '2..16, 8.',
 };
 
+export const MASKS: Record<string, string> = {
+  'mask.shape': 'rect { x, y, w, h, radius? } | ellipse { cx, cy, rx, ry } | path { d }: shows inside it, output px.',
+  'mask.layer':
+    'Track matte: another image / animation / html input read as alpha (default) or luma (mode); not drawn.',
+  'mask.invert': 'Show outside the mask: a hole.',
+  'mask.feather': 'Soft edge in px (0–200).',
+  'mask.animate': 'Shape tracks: x, y, scale (0 → 1.2 opens an iris), scaleX, scaleY, rotate.',
+  'mask.background': 'Sections only: colour outside the mask (default black); html word + luma = clip inside letters.',
+};
+
 export interface CompositingCatalog {
   /** `kinetic[].fill` shapes: gradient / texture / sweep. */
   kineticFill: Record<string, string>;
@@ -53,6 +66,8 @@ export interface CompositingCatalog {
   blendModes: Record<BlendMode, string>;
   /** `motionBlur` on layers and kinetic blocks, and its fields. */
   motionBlur: Record<string, string>;
+  /** `options.mask` fields on layers and video sections. */
+  masks: Record<string, string>;
 }
 
 export const COMPOSITING: CompositingCatalog = {
@@ -60,6 +75,7 @@ export const COMPOSITING: CompositingCatalog = {
   layouts: LAYOUTS,
   blendModes: BLEND_MODE_GUIDE,
   motionBlur: MOTION_BLUR_GUIDE,
+  masks: MASKS,
 };
 
 // HTML layers composite over the frame like images; their catalog entry lives with the layout code.

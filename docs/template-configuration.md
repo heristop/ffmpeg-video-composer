@@ -1226,7 +1226,7 @@ Limits: a layer is a raster. An `html` layer is drawn once at 2× and scaled per
 | `lighten`    | Keeps the lighter of the two, per channel.                               | Masks on dark grounds.        |
 | `difference` | Inverts the picture where the layer is light.                            | Glitchy accents.              |
 
-The formulas are CSS `mix-blend-mode`'s, computed in RGB (`overlay` is the design-tool overlay, conditioned on the picture). A layer `opacity` or a half-transparent edge weights the mix. `options.clip` can't combine with a non-normal blend or with `motionBlur`.
+The formulas are CSS `mix-blend-mode`'s, computed in RGB (`overlay` is the design-tool overlay, conditioned on the picture). A layer `opacity` or a half-transparent edge weights the mix. `options.clip` and `options.mask` can't combine with a non-normal blend or with `motionBlur`.
 
 `motionBlur` smears an element while it moves, the way a camera shutter does. It takes `true`, or `{ "shutter": 0-360, "samples": 2-16 }` (defaults 180 and 8). It applies to a layer with `x`, `y`, `scale`, `scaleX`, `scaleY` or `rotate` tracks, and to a kinetic block whose preset travels (`slide`, `rise`, `drop`, `impact`, `cascade`...). It isn't applied to clipped or filled kinetic blocks, or to entrance presets.
 
@@ -1243,6 +1243,49 @@ The formulas are CSS `mix-blend-mode`'s, computed in RGB (`overlay` is the desig
 - **On device.** Blend modes use `blend`, and motion blur uses `tmix`, `trim`, `fps`, `settb` and `setpts`, all in the on-device LGPL build. Without `blend` a layer composites normally (`[blend_unavailable]`); without `tmix` it draws sharp (`[motion_blur_unavailable]`).
 
 Validation advises `motion_blur_static` (motion blur on a layer or preset that never moves), `motion_blur_ignored` (a filled or clipped kinetic block, or a clipped layer, drawn sharp), and, given the target build's capabilities, `blend_unavailable` and `motion_blur_unavailable`.
+
+### Masks and track mattes (`options.mask`)
+
+An image, animation or html layer takes `options.mask`, and a `video` or `project_video` section takes
+`options.mask` too. The element shows only inside the mask. A mask has exactly one source:
+
+| Field        | Value                                                                                                                                                                                         |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shape`      | `{ "type": "rect", x, y, w, h, radius? }`, `{ "type": "ellipse", cx, cy, rx, ry }` or `{ "type": "path", d }` (M, L, H, V, C, Q, Z, absolute or relative, 4000 characters at most), output px |
+| `layer`      | Track matte: the name of another image, animation or html input of the same section. That layer is not drawn; its position, timing and motion move the matte                                  |
+| `mode`       | With `layer`: `alpha` (default, the layer's opacity) or `luma` (its brightness: white shows, black hides)                                                                                     |
+| `invert`     | Show outside the mask instead                                                                                                                                                                 |
+| `feather`    | Soft edge width in px, 0–200 (default 0)                                                                                                                                                      |
+| `animate`    | Shapes only: `x` / `y` offsets from where the shape sits, `scale`, `scaleX`, `scaleY` (0..10) and `rotate` (degrees) [keyframe tracks](#keyframe-tracks-animate), about `origin`              |
+| `origin`     | Shapes only: the pivot of `scale` and `rotate` (default `center`)                                                                                                                             |
+| `background` | Sections only: the colour outside the mask, a colour token (default black)                                                                                                                    |
+
+```jsonc
+// A card opening out of a feathered circle.
+"options": { "position": "320:180", "mask": { "shape": { "type": "ellipse", "cx": 640, "cy": 360, "rx": 370, "ry": 370 }, "feather": 40, "animate": { "scale": [{ "t": 0.2, "v": 0 }, { "t": 1.1, "v": 1.05, "ease": "$snappy" }] } } }
+// The footage through the letters of an html word (the word is the matte, not drawn).
+"options": { "videoUrl": "{{ footage }}", "mask": { "layer": "word", "mode": "luma", "background": "$color.bg" } }
+```
+
+A shape is drawn once at compile time into a grey image just large enough for it and its feather, and the
+tracks move that image every frame. The frame is split: the element is drawn on one copy exactly as without a
+mask, the mask is laid on a black copy, and the drawn copy takes it as its alpha before going back over the
+frame (`split`, `format`, `lutyuv`, `overlay`, `alphamerge`, plus `colorchannelmixer` for an alpha matte and
+`gblur` for a feathered one, all on device). The element keeps its own transparency inside the mask, and
+nothing outside the mask changes. A section mask shows `background` outside; the section's layers and text
+draw on top, unmasked. Each mask costs one full-frame merge per frame.
+
+A matte layer serves one mask and has no mask of its own. `options.clip` and `options.mask` don't combine (a
+rect mask is a clip box with a radius and a feather), nor do a mask and a non-normal `blend` or a `motionBlur`
+on the same layer. Shape coordinates are frame px: a mask does not follow
+its layer's tracks, so give it the same `x` / `y` keys to move them together.
+
+Without `alphamerge` (a local FFmpeg build that lacks it), a shape mask is cut to its resting box, and an
+inverted mask or a track matte draws unmasked (the matte layer too). The render logs `mask_unavailable`, and
+`validate_template` reports it when the target build is known. Validation codes: `mask_layer_unknown` (with the
+nearest layer name), `mask_layer_self`, `mask_layer_shared`, `mask_layer_chained`, `mask_not_layer`,
+`mask_with_clip`, `mask_with_composite`, `mask_path_invalid`, `mask_too_large`. See
+[`examples/motion-design/masks.json`](../examples/motion-design/masks.json).
 
 ## Whole-video animations
 

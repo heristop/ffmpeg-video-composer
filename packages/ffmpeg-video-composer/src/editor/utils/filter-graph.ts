@@ -11,10 +11,20 @@
 import type { Filter, FilterGraphChain } from '@/core/types';
 
 const PAD = /^[A-Za-z0-9_]+$/;
+// The engine's own sub-graphs (engineGraph) may also use a "." in a label: a namespace no authored name can reach.
+const ENGINE_PAD = /^[A-Za-z0-9_.]+$/;
+const ENGINE_GRAPHS = new WeakSet<readonly FilterGraphChain[]>();
+
+/** Marks chains the engine built itself, so their labels may use the "." namespace; authored graphs never are. */
+export function engineGraph(chains: FilterGraphChain[]): FilterGraphChain[] {
+  ENGINE_GRAPHS.add(chains);
+
+  return chains;
+}
 const INPUT = /^input:([A-Za-z0-9_]+)$/;
 
 /** Resolves a chain label to its filtergraph pad: `input:<key>` → `<index>:v`, else the pad name. */
-function padFor(label: string, inputIndex: (key: string) => number | undefined): string {
+function padFor(label: string, inputIndex: (key: string) => number | undefined, engine: boolean): string {
   const input = INPUT.exec(label);
 
   if (input) {
@@ -25,7 +35,7 @@ function padFor(label: string, inputIndex: (key: string) => number | undefined):
     return `${index}:v`;
   }
 
-  if (!PAD.test(label)) throw new Error(`[FilterGraph] invalid pad label "${label}"`);
+  if (!(engine ? ENGINE_PAD : PAD).test(label)) throw new Error(`[FilterGraph] invalid pad label "${label}"`);
 
   return label;
 }
@@ -41,10 +51,12 @@ export function renderFilterGraph(
   renderFilter: (filter: Filter) => string,
   inputIndex: (key: string) => number | undefined
 ): string {
+  const engine = ENGINE_GRAPHS.has(chains);
+
   return chains
     .map((chain) => {
-      const inputs = (chain.inputs ?? []).map((label) => `[${padFor(label, inputIndex)}]`).join('');
-      const outputs = (chain.outputs ?? []).map((label) => `[${padFor(label, inputIndex)}]`).join('');
+      const inputs = (chain.inputs ?? []).map((label) => `[${padFor(label, inputIndex, engine)}]`).join('');
+      const outputs = (chain.outputs ?? []).map((label) => `[${padFor(label, inputIndex, engine)}]`).join('');
 
       return `${inputs}${chain.filters.map(renderFilter).join(',')}${outputs}`;
     })

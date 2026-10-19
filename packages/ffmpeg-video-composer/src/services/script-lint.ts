@@ -2,7 +2,7 @@
 // - kinetic_unit_coarsened (always): a word/glyph kinetic block whose copy joins or runs right-to-left
 //   is drawn a line at a time, so its per-unit choreography collapses to one unit per line;
 // - rtl_unshaped / mask_unavailable (only when the caller names the target build's capabilities): the
-//   build can't reorder right-to-left lines (no libfribidi) or can't draw kinetic fills (no alphamerge);
+//   build can't reorder right-to-left lines (no libfribidi) or can't draw kinetic fills, masks or track mattes (no alphamerge);
 // - caption_html_unavailable (only when the caller says the host has no HTML rasteriser): subtitles asking
 //   for the html renderer are drawn with drawbox there.
 // Blend/motion-blur advisories (composite-lint.ts) are appended here too.
@@ -14,12 +14,13 @@ import { coarsenedForScript } from '@/core/kinetic/resolve';
 import { collectCompositeWarnings } from './composite-lint';
 import type { KineticBlock } from '../schemas/kinetic.schemas';
 import type { MotionWarning } from './motion-lint';
+import { maskAdvisories } from './mask-advisories';
 
 /** What the target FFmpeg build can do, for the capability-dependent advisories. */
 export interface ScriptLintCapabilities {
   /** drawtext text_shaping (libfribidi). */
   textShaping: boolean;
-  /** alphamerge (kinetic fills). */
+  /** alphamerge (kinetic fills, masks and track mattes). */
   masks: boolean;
   /** An HTML rasteriser on the host (HTML layers, subtitles.renderer "html"). Unset = assumed present. */
   htmlLayers?: boolean;
@@ -118,5 +119,6 @@ export function collectScriptWarnings(template: unknown, caps?: ScriptLintCapabi
     ]),
     ...htmlCaptionWarnings(expansion.data, caps),
     ...collectCompositeWarnings(expansion.data, caps),
+    ...(caps ? maskAdvisories(expansion.data, caps) : []),
   ];
 }

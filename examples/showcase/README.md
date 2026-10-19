@@ -1,6 +1,6 @@
 # Motion showcase
 
-The web app’s public `/showcase` page brings together every shared app template and the runnable example compositions. The effects tour is the default selected film, listed second after Drink & Code. Its 52 samples include native JSON typography, effects and editing demos, registered Remotion effects, overlays, app demos and review evidence. Search or filter the library, watch a sample, then open **Direction & source** to read its authored creative direction or download the JSON. Shared app templates also open directly in Studio.
+The web app’s public `/showcase` page brings together every shared app template and the runnable example compositions. The effects tour is the default selected film, listed second after Drink & Code. Its 53 samples include native JSON typography, effects and editing demos, registered Remotion effects, overlays, app demos and review evidence. Search or filter the library, watch a sample, then open **Direction & source** to read its authored creative direction or download the JSON. Shared app templates also open directly in Studio.
 
 The showcase uses the same FilmPlayer and sound/volume controls as the home page. Sound starts muted and can be enabled; narration captions appear only when the film supplies a caption track. Only one film plays at a time. Playback starts on request and pauses when the player leaves the viewport or the tab is hidden. Posters load lazily; previews are 960×540 H.264 at 24 fps with AAC sound when the source has audio, with portrait and square compositions letterboxed. They illustrate the effect with bundled media, synthetic fixtures or the recorded LeClap canvas demo; they are not footage uploaded by a user.
 
@@ -32,6 +32,7 @@ The **Effects & editing** category (`effects`) demonstrates the native motion, c
 | `html-testimonial` | A portrait Reels quote card: mixed weights in one sentence, a round portrait, star rating chips                   |
 | `html-speaker`     | A conference opener and speaker lower third: text wordmark, wrapped talk title, time and room badges              |
 | `html-stats`       | A square stat dashboard and aligned spec list, with a landscape cut composed by `$format`                         |
+| `masks`            | Shape masks and track mattes: a feathered iris on a card, a wiped price tag, footage through type, a growing star |
 
 `footage-edit` and `sound-design` record their scenes with clips that [`synthetic-media.ts`](./synthetic-media.ts) generates on the fly: the bundled background photographs set in motion by FFmpeg (a slow drift, a push-in, a running clock that makes speed ramps and freezes readable, a waveform over a voice-like test tone). The LUT and B-roll fixtures replace the descriptor's `{{ lut }}` and `{{ broll }}` variables for the preview only; the downloaded JSON keeps its defaults. Those previews illustrate the controls, not real footage.
 

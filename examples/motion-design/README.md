@@ -105,6 +105,8 @@ Each phrase is fitted to at most two balanced lines, held for at least a second,
 
 [`fx-masks.json`](./fx-masks.json) shows four mask and transition moves: a greeting that rises out of an invisible slot above an underline over café footage (kinetic `clip: "line"`, opaque while the slot edge reveals it), diagonal colour bands that sweep across the cut (`bands`), an iris that opens out of a sun icon as a circle and out of a star icon as a star (`shape: "star"`), and a fly-through the O of ZOOM into the next scene (`zoom-through` with `through`). Needs the library footage (`--assets`).
 
+[`masks.json`](./masks.json) shows three mask moves: a product card opening out of a feathered circle while its price tag wipes in behind a hard edge (`options.mask` shapes with `animate`), the footage playing inside the letters of LECLAP (a section `mask` whose `layer` is an html word, `mode: "luma"`), and the clip inside a star that grows and turns (a section path mask). Needs the library footage (`--assets`).
+
 ## Vector shapes
 
 [`vector-shapes.json`](./vector-shapes.json) shows the `shape` graphic in three beats: a yellow star pops in on a spring and turns upright over a lavender hexagon outline; a heart's outline draws itself before its rose fill fades in, then an arrow slides in on a spring to point at it; a seeded gradient blob squashes in from its base and a lightning icon (an SVG `d` with a `viewBox`) pops onto it. Asset-free; see [Shapes](../../docs/template-configuration.md#shapes-shape).

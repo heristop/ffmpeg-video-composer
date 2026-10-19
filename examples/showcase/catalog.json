@@ -370,6 +370,13 @@
       "description": "Layers that multiply and screen into the picture, and a card whip and a slide-in title smeared by a 180° shutter, sharp at rest.",
       "category": "effects",
       "source": "examples/motion-design/blend-motion-blur.json"
+    },
+    {
+      "id": "masks",
+      "title": "Masks and track mattes",
+      "description": "A product card opening out of a feathered iris while its price tag wipes in, footage seen through the letters of LECLAP, and the clip inside a star that grows and turns: shape masks, keyframed shapes and a luma track matte.",
+      "category": "effects",
+      "source": "examples/motion-design/masks.json"
     }
   ]
 }

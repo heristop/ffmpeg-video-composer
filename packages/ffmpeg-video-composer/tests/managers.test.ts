@@ -840,6 +840,8 @@ describe('MapManager', () => {
     };
     const filterManager = {
       addFilter: vi.fn((f: Filter) => `F(${f.type})`),
+      frameRate: vi.fn(() => 25),
+      supports: vi.fn((_filter: string) => true),
     };
     const manager = new MapManager(formatters as any, filterManager as any, segment as any);
 
@@ -1231,6 +1233,92 @@ describe('MapManager', () => {
       const clip = { x: 0, y: 0, w: '10,metadata=print:a:b', h: 10 } as never;
 
       expect(() => manager.addAnimationOverlay(makeAnimInput({ clip }), 2, '1280:720')).toThrow(/clip w/);
+    });
+
+    describe('shape masks', () => {
+      const MASK = { shape: { type: 'rect', x: 100, y: 50, w: 200, h: 100 } } as const;
+      const maskedSection = (): Section =>
+        ({
+          name: 's',
+          type: 'video',
+          filters: [],
+          options: { duration: 10 },
+          inputs: [{ name: 'anim', type: 'image', url: 'a.png', options: {} }],
+        }) as unknown as Section;
+      const filterTypes = (filterManager: { addFilter: ReturnType<typeof vi.fn> }): string[] =>
+        filterManager.addFilter.mock.calls.map((call) => (call[0] as Filter).type);
+
+      it('composites a masked layer through alphamerge, naming its pads apart from the layer', () => {
+        const { manager, segment, filterManager } = build({ section: maskedSection() });
+        (segment as unknown as { extraInputs: Record<string, number> }).extraInputs = { mask0: 7 };
+        manager.addAnimationOverlay(makeAnimInput({ mask: MASK }), 2, '640:360');
+
+        expect(filterTypes(filterManager)).toContain('alphamerge');
+        expect(segment.filtersMapList.some((chain) => chain.includes('[anim.mk_o]'))).toBe(true);
+        expect(segment.mapsList).toContain('anim');
+      });
+
+      it("cuts the layer to the shape's resting box, with no alphamerge in any chain, when the build lacks alphamerge", () => {
+        const { manager, segment, filterManager } = build({ section: maskedSection() });
+        (segment as unknown as { extraInputs: Record<string, number> }).extraInputs = { mask0: 7 };
+        filterManager.supports.mockImplementation((filter: string) => filter !== 'alphamerge');
+        manager.addAnimationOverlay(makeAnimInput({ mask: MASK }), 2, '640:360');
+
+        expect(filterTypes(filterManager)).not.toContain('alphamerge');
+        expect(segment.filtersMapList.join('\n')).not.toContain('.mk_');
+        expect(segment.mapsList).toContain('anim');
+        expect(filterManager.addFilter.mock.calls.map((call) => call[0] as Filter)).toContainEqual({
+          type: 'crop',
+          value: '204:104:98:48',
+        });
+      });
+
+      it('registers a track matte leg without drawing it, and refuses a hostile position', () => {
+        const { manager, segment } = build({ section: maskedSection() });
+        const matte = manager.registerMatte(makeAnimInput({ position: '270:130' }), 3, 'luma');
+
+        expect(matte).toEqual({ pad: 'anim.mt_src', overlay: '270:130:eof_action=pass' });
+        expect(segment.mapsList).toEqual([]);
+        expect(() => manager.registerMatte(makeAnimInput({ position: '1:2,drawtext=x' }), 3)).toThrow();
+      });
+    });
+
+    describe('section track matte', () => {
+      const matteSection = (background?: string): Section =>
+        ({
+          name: 's',
+          type: 'video',
+          filters: [],
+          options: { duration: 10, mask: { layer: 'hole', background } },
+          inputs: [{ name: 'hole', type: 'image', url: 'h.png', options: {} }],
+        }) as unknown as Section;
+      const MATTE = { pad: 'hole.mt_src', overlay: '0:0:eof_action=pass' };
+
+      it('builds the clip background first, then composites the clip through the matte into sm.s.mk_out', () => {
+        const { manager, segment } = build({ section: matteSection('#202020') });
+        manager.addSectionMatte(MATTE, '640:360');
+
+        expect(segment.filtersMapList.some((chain) => chain.includes('sm.s.mk_norm'))).toBe(true);
+        expect(segment.filtersMapList.some((chain) => chain.includes('hole.mt_src'))).toBe(true);
+        expect(segment.mapsList.at(-1)).toBe('sm.s.mk_out');
+        expect(segment.inputsMapCount).toBe(1);
+      });
+
+      it('draws on the running composite when layers were already drawn, never rebuilding the background', () => {
+        const { manager, segment } = build({ section: matteSection() });
+        segment.inputsMapCount = 1;
+        segment.mapsList.push('gradient_layer_0');
+        manager.addSectionMatte(MATTE, '640:360');
+
+        expect(segment.filtersMapList.some((chain) => chain.includes('sm.s.mk_norm'))).toBe(false);
+        expect(segment.filtersMapList[0]).toMatch(/^\[gradient_layer_0\]/);
+      });
+
+      it('refuses a background colour that would leave the filter option', () => {
+        const { manager } = build({ section: matteSection('red:t=fill,x') });
+
+        expect(() => manager.addSectionMatte(MATTE, '640:360')).toThrow();
+      });
     });
 
     it('scales the animation leg to the input scale (pre-overlay), not via a post-overlay filter', () => {

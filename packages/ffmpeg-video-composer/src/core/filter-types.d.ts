@@ -6,6 +6,7 @@ import type { FontRef } from './fonts';
 import type { Animate, MotionRole } from '../schemas/motion.schemas';
 import type { LayerAnimate, LayerOrigin } from '../schemas/layer-animate.schemas';
 import type { BlendMode, MotionBlur } from '../schemas/layer-composite.schemas';
+import type { LayerMask } from '../schemas/mask.schemas';
 
 /** How an overlay maps into its "w:h" scale box: free stretch, letterbox inside, or fill + centre-crop. */
 export type OverlayFit = 'stretch' | 'contain' | 'cover';
@@ -54,6 +55,8 @@ export interface Input {
 }
 
 interface InputOptions {
+  /** Shape mask or track matte (schemas/mask.schemas.ts, editor/presets/layer-masks.ts). */
+  mask?: LayerMask;
   fps?: number;
   position?: string;
   scale?: string;
@@ -156,6 +159,8 @@ export interface FilterValues {
 }
 
 type MapAnimationOptions = {
+  /** Shape mask or track matte (schemas/mask.schemas.ts, editor/presets/layer-masks.ts). */
+  mask?: LayerMask;
   fps: number;
   position: string;
   scale: string;

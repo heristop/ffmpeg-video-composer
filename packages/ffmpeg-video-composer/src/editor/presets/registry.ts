@@ -2,6 +2,7 @@ import type { Filter, Section, TemplateDescriptorGlobal } from '@/core/types';
 import { layersToFilters, motionToFilters, gradeToFilters, lookToFilters, letterboxToFilters } from './looks';
 import { globalTextOverlayToFilters } from './text-blocks';
 import { sectionLayoutFilters } from './layout';
+import { sectionMaskFilters } from './section-mask';
 import { cameraBackground } from './camera';
 import { OVERLAY_SUGAR_COMPILERS, type SugarCompiler, type SugarLayer } from './overlay-sugars';
 
@@ -12,6 +13,9 @@ export { compositingContext, createExtraInputs, HTML_RASTERISER } from './compos
 // stages both from one place.
 export { createEmojiPlan, type EmojiPlan } from '../emoji/EmojiPlan';
 import type { SugarContext } from './sugar-context';
+// Layer masks stage their images with the background sugar (presets/layer-masks.ts).
+export type { MatteLeg } from './layer-masks';
+export { matteModes, matteReaders, SECTION_READER, stageLayerMasks } from './layer-masks';
 
 // The background sugars bake into the video before overlays. The overlay sugars (caption onward) live in
 // overlay-sugars.ts so validation can lower them without loading these.
@@ -58,6 +62,14 @@ const BACKGROUND_SUGAR_COMPILERS: SugarCompiler[] = [
     order: 45,
     layer: 'background',
     compile: (section, ctx) => letterboxToFilters(section.letterbox, ctx),
+  },
+  {
+    // A video section's shape mask (presets/section-mask.ts): last of the background, so layers and text
+    // draw on top of the masked clip.
+    key: 'mask',
+    order: 50,
+    layer: 'background',
+    compile: (section, ctx) => sectionMaskFilters(section, ctx),
   },
 ];
 

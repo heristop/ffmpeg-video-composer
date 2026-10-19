@@ -2,36 +2,27 @@ import { inject, injectable } from 'tsyringe';
 import type Segment from '../../core/models/Segment';
 import type { Section, Map, MapAnimationInput, ChromaKey } from '@/core/types';
 import type { BackgroundLayer } from '../../schemas/template.schemas';
-import {
-  buildAnimationLegFilters,
-  imageOverlayEnable,
-  overlayMotionExpr,
-  type OverlayMotion,
-} from '../utils/input-sources';
+import { buildAnimationLegFilters, overlayMotionExpr, type OverlayMotion } from '../utils/input-sources';
 import type FormattersManager from './FormatterManager';
 import type FilterManager from './FilterManager';
 import { escapeRegExp } from './VariableManager';
-import { assertFiniteNumber, assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
+import { assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
 import { isBackgroundInput } from '../utils/background-input';
 import { layerKeyframes } from '../presets/layer-keyframes';
 import { resolveFit } from '../utils/reframe';
 import { compositeLayer } from '../presets/layer-composite';
-import { evenBox } from '../presets/clip-box';
-import type { ClipBox } from '../../schemas/clip.schemas';
 import { videoClipInputIndex } from '../utils/video-clip-input';
+import { clipBoxSteps, evenBox, finiteBox, frameSize, type CutIO, type MapStep } from '../presets/clip-box';
+import { overlayOptions, type OverlayPlan } from '../presets/overlay-options';
+import type { LayerMask, MaskMode } from '../../schemas/mask.schemas';
+import { layerMaskPlan, type MatteLeg } from '../presets/layer-masks';
+import { matteLegFilters } from '../presets/mask-source';
+import { sectionMatteSteps } from '../presets/section-mask';
 import { assertSafePadLabel } from '../utils/filter-option-guard';
-import { isHtmlSequence } from '../html/html-sequence-source';
-
-// A persistent layer holds its last frame; so does an animated html card, which plays its frames once like a
-// still card would stay up.
-function holdsLastFrame(input: MapAnimationInput): boolean {
-  return input.options.persistent || isHtmlSequence(input);
-}
 
 // Section.inputs is typed as Input[] for schema purposes, but at runtime it holds
 // MapAnimationInput objects indexed by string keys (used as a keyed record).
 type SectionInputsCache = Record<string, MapAnimationInput>;
-type OverlayPlan = { legFilters: string[]; x?: string; y?: string };
 
 @injectable()
 class MapManager {
@@ -136,6 +127,12 @@ class MapManager {
     return baseStream;
   };
 
+  // The first overlay of a section builds the background; later ones chain off the previous overlay output.
+  private readonly overlayBase = (name: string, videoStream: string, videoScale: string): string =>
+    this.segment.inputsMapCount === 0
+      ? this.buildAnimationBackground(name, videoStream, videoScale)
+      : (this.segment.mapsList.at(-1) ?? videoStream);
+
   // Prepares the animation leg before the overlay: scale it to its declared size and fade it when
   // opacity < 1 (shared with the whole-video AnimationComposer so both composite identically). A
   // `motion` fade appends its alpha fade-in on an rgba frame.
@@ -169,10 +166,7 @@ class MapManager {
   // The leg and the overlay position. `options.animate` keyframe tracks own both (presets/layer-keyframes);
   // otherwise an optional `motion` animates the entrance: slide/rise emit overlay x/y time-expressions,
   // fade adds an alpha fade-in to the overlay leg.
-  private readonly overlayPlan = (
-    input: MapAnimationInput,
-    position: string
-  ): { legFilters: string[]; x?: string; y?: string } => {
+  private readonly overlayPlan = (input: MapAnimationInput, position: string): OverlayPlan => {
     if (input.options.animate) {
       return layerKeyframes(input.options, this.filterManager.frameRate());
     }
@@ -182,127 +176,111 @@ class MapManager {
     return { legFilters: this.animationLegFilters(input, motion), x: motion.x, y: motion.y };
   };
 
-  // Still images ignore the -itsoffset/-t source flags animations get (their source is a bare `-loop 1`), so a
-  // timed image lowers its start/duration to the overlay's timeline `enable` instead; animations keep the
-  // source-flag path (gating them here would double-apply the delay). Moving entrances use the named,
-  // single-quoted form so the comma-bearing time expressions are not mis-parsed as extra filter options.
-  private readonly overlayValue = (
-    input: MapAnimationInput,
-    plan: OverlayPlan,
-    position: string,
-    eof: string
-  ): string => {
-    const timeline = input.type === 'image' || input.type === 'html' ? imageOverlayEnable(input.options) : '';
-
-    return plan.x || plan.y
-      ? `x='${plan.x}':y='${plan.y}':eof_action=${eof}${timeline}`
-      : `${position}:eof_action=${eof}${timeline}`;
-  };
-
-  addAnimationOverlay = (input: MapAnimationInput, inputIndex: number, videoScale = ''): void => {
+  addAnimationOverlay = (input: MapAnimationInput, inputIndex: number, videoScale = '', matte?: MatteLeg): void => {
     const videoStream = `${this.getVideoInputIncrement()}:v`;
-    const eofAction = holdsLastFrame(input) ? 'repeat' : 'pass';
     // The position lands unquoted in `overlay=<x:y>`: two expression terms only (core/arg-guard.ts).
     const position = assertSafeExpression(input.options.position || '0:0', 'overlay position', 2);
 
     // First animation of the section builds the background (normalize + section filters) on the main
     // video leg; later animations chain off the prior overlay output instead.
-    const isFirstOverlay = this.segment.inputsMapCount === 0;
-    const baseStream = isFirstOverlay
-      ? this.buildAnimationBackground(input.name, videoStream, videoScale)
-      : (this.segment.mapsList.at(-1) ?? videoStream);
+    const baseStream = this.overlayBase(input.name, videoStream, videoScale);
 
     const plan = this.overlayPlan(input, position);
+    const overlay = overlayOptions(input, plan, position);
 
     this.segment.inputsMapCount++;
 
-    const overlayValue = this.overlayValue(input, plan, position, eofAction);
+    // A blend mode or motion blur: one spliced graph that owns the leg (presets/layer-composite.ts). A clipped
+    // or masked layer cuts through its own maps instead (validation refuses the pairing).
+    const composite = { input, inputIndex, base: baseStream, legFilters: plan.legFilters, overlay };
+
+    if (
+      !this.cutsLayer(input) &&
+      compositeLayer({ ...composite, filters: this.filterManager, segment: this.segment })
+    ) {
+      return;
+    }
 
     // The animation overlays on top of the already-filtered background; no section filters here.
     // `input.filters` is optional in the schema (builder-authored inputs omit it), so default to none.
-    if (input.options.clip) {
-      const clipLeg = this.registerLeg(input, inputIndex, plan.legFilters);
+    const leg = this.registerLeg(input, inputIndex, plan.legFilters);
+    const io: CutIO = { base: baseStream, leg, overlay, name: input.name, filters: input.filters ?? [] };
 
-      this.addClippedOverlay(input, [baseStream, clipLeg], overlayValue, videoScale);
+    if (input.options.mask) {
+      this.addMasked(input.options.mask, input, io, videoScale, matte);
 
       return;
     }
 
-    // A blend mode or motion blur: one spliced graph that owns the leg (presets/layer-composite.ts).
-    const { legFilters } = plan;
-    const composite = { input, inputIndex, base: baseStream, legFilters, overlay: overlayValue };
+    if (input.options.clip) {
+      this.addSteps(clipBoxSteps(io, evenBox(finiteBox(input.options.clip), ...frameSize(videoScale))));
 
-    if (compositeLayer({ ...composite, filters: this.filterManager, segment: this.segment })) return;
-
-    const animationLeg = this.registerLeg(input, inputIndex, legFilters);
+      return;
+    }
 
     this.addMap({
-      inputs: [baseStream, animationLeg],
-      filters: [{ type: 'overlay', value: overlayValue }, ...(input.filters ?? [])],
+      inputs: [baseStream, leg],
+      filters: [{ type: 'overlay', value: overlay }, ...io.filters],
       outputs: [input.name],
       options: { useSectionFilters: false },
     });
   };
 
-  // A layer cut to `options.clip` (presets/clip-box.ts): overlaid on a copy of the frame as usual, the copy
-  // cropped to the box and laid back over the untouched frame, so nothing of the layer shows past the box.
-  private readonly addClippedOverlay = (
+  private readonly cutsLayer = (input: MapAnimationInput): boolean =>
+    input.options.mask !== undefined || input.options.clip !== undefined;
+
+  // A layer cut by options.mask (presets/layer-masks.ts): its source leg chains first, then the composite maps.
+  private readonly addMasked = (
+    mask: LayerMask,
     input: MapAnimationInput,
-    [base, leg]: string[],
-    overlay: string,
-    videoScale: string
+    io: CutIO,
+    videoScale: string,
+    matte?: MatteLeg
   ): void => {
-    // The frame size bounds the box; unknown (no section scale), the box is taken as authored.
-    const [width, height] = /^\d+:\d+$/.test(videoScale) ? videoScale.split(':').map(Number) : [Infinity, Infinity];
-    const clip = input.options.clip as ClipBox;
-    const box = evenBox(
-      {
-        x: assertFiniteNumber(clip.x, 'clip x'),
-        y: assertFiniteNumber(clip.y, 'clip y'),
-        w: assertFiniteNumber(clip.w, 'clip w'),
-        h: assertFiniteNumber(clip.h, 'clip h'),
-      },
-      width,
-      height
+    const plan = layerMaskPlan(mask, {
+      io,
+      position: (this.currentSection.inputs ?? []).findIndex((candidate) => candidate.name === input.name),
+      fps: this.filterManager.frameRate(),
+      frame: frameSize(videoScale),
+      available: this.filterManager.supports('alphamerge'),
+      extraInput: (key) => this.segment.extraInputs[key],
+      matte,
+    });
+
+    this.segment.filtersMapList.unshift(...plan.chains);
+    this.addSteps(plan.steps);
+  };
+
+  /** Registers a track matte layer's grey leg (presets/mask-source.ts) without drawing it. */
+  registerMatte = (input: MapAnimationInput, inputIndex: number, mode?: MaskMode): MatteLeg => {
+    const position = assertSafeExpression(input.options.position || '0:0', 'overlay position', 2);
+    const plan = this.overlayPlan(input, position);
+    const pad = this.registerLeg(
+      { ...input, name: `${input.name}.mt` },
+      inputIndex,
+      matteLegFilters(mode, plan.legFilters)
     );
-    const name = input.name;
 
-    // A box off the frame shows nothing, but the registered leg must still be consumed (an unconnected
-    // output aborts the graph): an overlay that never enables passes the frame through.
-    if (!box) {
-      this.addMap({
-        inputs: [base, leg],
-        filters: [{ type: 'overlay', value: '0:0:enable=0' }, ...(input.filters ?? [])],
-        outputs: [name],
-        options: { useSectionFilters: false },
-      });
+    return { pad, overlay: overlayOptions(input, plan, position) };
+  };
 
-      return;
-    }
+  /** The section clip through its track matte (options.mask.layer): the base every later layer draws on. */
+  addSectionMatte = (matte: MatteLeg, videoScale: string): void => {
+    const mask = this.currentSection.options?.mask;
+    const videoStream = `${this.getVideoInputIncrement()}:v`;
+    // Gradient layers already drawn are the base, not rebuilt: the clip's own background only comes first.
+    const base = this.overlayBase('sm.s.mk', videoStream, videoScale);
+    const color = this.formattersManager.formatColor(mask?.background ?? 'black');
 
-    const options = { useSectionFilters: false };
+    this.segment.inputsMapCount++;
+    this.addSteps(
+      sectionMatteSteps({ mask: mask ?? {}, matte, base, background: assertSafeColorToken(color, 'mask.background') })
+    );
+  };
 
-    this.addMap({
-      inputs: [base],
-      filters: [{ type: 'split', value: '2' }],
-      outputs: [`${name}_cb`, `${name}_cd`],
-      options,
-    });
-    this.addMap({
-      inputs: [`${name}_cd`, leg],
-      filters: [
-        { type: 'overlay', value: overlay },
-        { type: 'crop', value: `${box.w}:${box.h}:${box.x}:${box.y}` },
-      ],
-      outputs: [`${name}_cc`],
-      options,
-    });
-    this.addMap({
-      inputs: [`${name}_cb`, `${name}_cc`],
-      filters: [{ type: 'overlay', value: `${box.x}:${box.y}` }, ...(input.filters ?? [])],
-      outputs: [name],
-      options,
-    });
+  // Overlay maps built by a preset (clip boxes, masks): each its own map, never with the section filters.
+  private readonly addSteps = (steps: MapStep[]): void => {
+    for (const step of steps) this.addMap({ ...step, options: { useSectionFilters: false } });
   };
 
   /**

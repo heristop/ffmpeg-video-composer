@@ -52,6 +52,22 @@ function boxError(axis: string, input: Bag): ValidationError | null {
   };
 }
 
+/** Where a shape mask's tracks sit: a layer's `options.mask.animate`, or a section's. */
+export const MASK_ANIMATE_PATH = /^sections\[\d+\]\.(?:inputs\[\d+\]\.)?options\.mask\.animate$/;
+
+/** The findings of a shape mask's tracks: plain-number scales within range, keys in time order. */
+export function maskAnimateErrors(
+  path: string,
+  animate: Record<string, TrackKey[]>,
+  timingError: (keys: TrackKey[]) => string | null
+): ValidationError[] {
+  return Object.entries(animate).flatMap(([axis, keys]) => {
+    const message = valueError(axis, keys) ?? timingError(keys);
+
+    return message ? [{ path: `${path}.${axis}`, message, code: 'invalid_keyframes' }] : [];
+  });
+}
+
 /**
  * The findings of one layer input's `animate`. `timingError` checks a track's key times (shared with the
  * drawtext tracks) and returns null when they are in order.

@@ -68,7 +68,14 @@ const GUIDE = [
     'options.clip cannot combine with a non-normal blend or motionBlur (schema error); clipped or filled kinetic ' +
     'blocks and entrance presets are not blurred. validate_template advises motion_blur_static and ' +
     'motion_blur_ignored; a build without blend or tmix falls back at render time (blend_unavailable, ' +
-    'motion_blur_unavailable in the compile log).',
+    'motion_blur_unavailable in the compile log).' +
+    ' Masks: an image, animation or html input takes options.mask and a video / project_video section takes ' +
+    'options.mask: a shape { type: "rect" | "ellipse" | "path", … } in px, or a track matte `layer` (another input ' +
+    'of the section, read as alpha or luma, not drawn itself), with invert, feather (px) and animate tracks (x, y, ' +
+    'scale, scaleX, scaleY, rotate) on shapes; a section mask shows `background` outside and layers draw on top. ' +
+    'validate_template reports mask_layer_unknown, mask_layer_shared, mask_with_composite (a mask next to a ' +
+    'non-normal blend or motionBlur), mask_path_invalid, mask_too_large and, for a ' +
+    'build without alphamerge, mask_unavailable; get_motion_catalog compositing.masks lists the fields.',
   'Word-timed captions: section `subtitles` takes speech-to-text `words` [{text,start,end}] (grouped into phrases ' +
     'by `group`: pauses, sentence ends, maxWords, maxSeconds), authored `cues` [{at,end,text,words?}] or an inline ' +
     '`srt`. A caption DNA `style` (clean, loud, keynote, documentary, boxed, neon) sets font, colours, case, ' +
