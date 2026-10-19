@@ -717,6 +717,120 @@
       }
     },
     {
+      "name": "named-iris-star",
+      "type": "color_background",
+      "options": {
+        "backgroundColor": "#1B1830",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "transition · designed · iris shape"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "STAR"
+          },
+          "preset": "rise",
+          "size": 150,
+          "y": "center",
+          "delay": 0.6,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          },
+          "color": "#FFF685"
+        }
+      ],
+      "transition": {
+        "type": "iris",
+        "shape": "star",
+        "duration": 0.8,
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "ease": "ease-out-cubic"
+      }
+    },
+    {
+      "name": "named-iris-heart",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/pink-sunset.jpg",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "transition · designed · iris shape"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "HEART"
+          },
+          "preset": "rise",
+          "size": 150,
+          "y": "center",
+          "delay": 0.6,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          },
+          "color": "#FFF685"
+        }
+      ],
+      "transition": {
+        "type": "iris",
+        "shape": "heart",
+        "duration": 0.8,
+        "origin": {
+          "x": 0.5,
+          "y": 0.55
+        },
+        "ease": "ease-out-cubic"
+      }
+    },
+    {
       "name": "named-whip-left",
       "type": "color_background",
       "options": {
@@ -949,6 +1063,60 @@
       }
     },
     {
+      "name": "named-bands",
+      "type": "image_background",
+      "options": {
+        "pictureUrl": "backgrounds/turquoise-sea.jpg",
+        "duration": 2.4
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "transition · designed"
+          },
+          "preset": "fade",
+          "font": "mono",
+          "size": 32,
+          "align": "left",
+          "x": 64,
+          "y": 40,
+          "color": "#B9B7C6",
+          "delay": 0.1,
+          "effect": {
+            "shadow": true
+          }
+        },
+        {
+          "text": {
+            "en": "BANDS"
+          },
+          "preset": "rise",
+          "size": 150,
+          "y": "center",
+          "delay": 0.7,
+          "effect": {
+            "shadow": {
+              "color": "#000000@0.75",
+              "dx": 3,
+              "dy": 4
+            },
+            "outline": {
+              "color": "#000000@0.5",
+              "width": 2
+            }
+          },
+          "color": "#FFF685"
+        }
+      ],
+      "transition": {
+        "type": "bands",
+        "duration": 1,
+        "count": 4,
+        "angle": 28,
+        "stagger": 0.07
+      }
+    },
+    {
       "name": "named-circleopen",
       "type": "color_background",
       "options": {
@@ -1090,7 +1258,7 @@
         },
         {
           "text": {
-            "en": "18 WAYS OUT"
+            "en": "21 WAYS OUT"
           },
           "preset": "rise",
           "size": 150,

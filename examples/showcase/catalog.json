@@ -377,6 +377,48 @@
       "description": "A product card opening out of a feathered iris while its price tag wipes in, footage seen through the letters of LECLAP, and the clip inside a star that grows and turns: shape masks, keyframed shapes and a luma track matte.",
       "category": "effects",
       "source": "examples/motion-design/masks.json"
+    },
+    {
+      "id": "html-motion",
+      "title": "HTML layers: animated cards",
+      "description": "A listing card and a stat board whose elements arrive one after another: the tag, address lines and chips stagger in on the card, then the tiles spring up in reading order, all authored in HTML with motion attributes.",
+      "category": "effects",
+      "source": "examples/motion-design/html-motion.json"
+    },
+    {
+      "id": "vector-shapes",
+      "title": "Vector shapes",
+      "description": "The shape graphic: a star that lands on a spring, a heart whose outline draws itself before it fills, an arrow sliding in, and a lightning icon from an SVG path over a seeded gradient blob.",
+      "category": "effects",
+      "source": "examples/motion-design/vector-shapes.json"
+    },
+    {
+      "id": "line-draw",
+      "title": "Line draw",
+      "description": "The path graphic: a chart line drawing on with a dot riding its end, a ring closing around one point, a hand-drawn swash under a title and a progress ring filling to 75 %.",
+      "category": "effects",
+      "source": "examples/motion-design/line-draw.json"
+    },
+    {
+      "id": "fx-burst",
+      "title": "Burst fx",
+      "description": "The burst primitive fired on the frame each element hits: a heart pop with a rose burst, a SALE badge slam with impact lines, and a lavender half burst fanning over a title.",
+      "category": "effects",
+      "source": "examples/motion-design/fx-burst.json"
+    },
+    {
+      "id": "fx-liquid",
+      "title": "Liquid motion and drip",
+      "description": "A lavender blob that stretches, splits into three droplets and merges back (the goo fx on keyframed blobs), then a rose paint drip into a title (the drip transition). Asset-free.",
+      "category": "effects",
+      "source": "examples/motion-design/fx-liquid.json"
+    },
+    {
+      "id": "fx-glitch-iris-sheen",
+      "title": "Glitch, iris and gloss",
+      "description": "A title torn into rows by the glitch tear, an iris that opens from the sun icon into the next scene, and a premium pill polished by a gloss sweep with a glint on its corner. Asset-free.",
+      "category": "effects",
+      "source": "examples/motion-design/fx-glitch-iris-sheen.json"
     }
   ]
 }

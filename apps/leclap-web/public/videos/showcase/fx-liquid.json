@@ -1,0 +1,312 @@
+{
+  "meta": {
+    "name": "Liquid motion and drip",
+    "description": "Two cheat-sheet moves from engine primitives: a lavender blob that stretches, splits into three droplets that bounce apart and merges back (the goo fx, keyframed blobs), then a rose paint drip into a title (the drip transition). Asset-free.",
+    "creativeDirection": "Audience: motion designers comparing LeClap with a motion-design cheat sheet. Direction: one liquid idea per beat on the house palette (ink ground, lavender and rose). A lavender blob pops in at the centre, holds a breath, stretches sideways and pinches into three droplets that bounce apart once, drift, then run back so all three merge on the same frame. A beat later rose paint drips down over the scene, covers it, and the title scene drips down over the paint; the title rises as the last drip clears. Review: the overshoots stay under 8 % and settle at once, the necks between blob and droplets are smooth, the merge lands on one frame, the drips have different lengths and rounded ends, and the paint covers the whole frame for a beat at the midpoint."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 7,
+    "theme": {
+      "colors": {
+        "bg": "#141416",
+        "fg": "#FFFFFF",
+        "accent": "#9298fb",
+        "accent2": "#f96f99"
+      }
+    },
+    "transition": {
+      "type": "cut"
+    }
+  },
+  "sections": [
+    {
+      "name": "goo",
+      "type": "color_background",
+      "purpose": "A lavender blob pops in, splits into three droplets that bounce apart, then merges back on one frame.",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 3.6
+      },
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "goo",
+          "at": 0,
+          "duration": 3.6,
+          "color": "$color.accent",
+          "goo": 0.55,
+          "blobs": [
+            {
+              "x": 0.5,
+              "y": 0.5,
+              "r": 0,
+              "animate": {
+                "r": [
+                  {
+                    "t": 0.15,
+                    "v": 0
+                  },
+                  {
+                    "t": 0.5,
+                    "v": 0.16,
+                    "ease": "cubic-bezier(0.3, 1.45, 0.55, 1)"
+                  },
+                  {
+                    "t": 0.9,
+                    "v": 0.16
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 0.13,
+                    "ease": "cubic-bezier(0.45, 0, 0.2, 1)"
+                  },
+                  {
+                    "t": 2.05,
+                    "v": 0.13
+                  },
+                  {
+                    "t": 2.45,
+                    "v": 0.16,
+                    "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                  }
+                ]
+              }
+            },
+            {
+              "x": 0.5,
+              "y": 0.5,
+              "r": 0,
+              "animate": {
+                "x": [
+                  {
+                    "t": 0.9,
+                    "v": 0.5
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 0.69,
+                    "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                  },
+                  {
+                    "t": 2.05,
+                    "v": 0.7,
+                    "ease": "cubic-bezier(0.4, 0, 0.6, 1)"
+                  },
+                  {
+                    "t": 2.45,
+                    "v": 0.5,
+                    "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                  }
+                ],
+                "y": [
+                  {
+                    "t": 0.9,
+                    "v": 0.5
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 0.46,
+                    "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                  },
+                  {
+                    "t": 2.45,
+                    "v": 0.5,
+                    "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                  }
+                ],
+                "r": [
+                  {
+                    "t": 0.5,
+                    "v": 0
+                  },
+                  {
+                    "t": 0.6,
+                    "v": 0.07
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 0.095,
+                    "ease": "cubic-bezier(0.45, 0, 0.2, 1)"
+                  },
+                  {
+                    "t": 2.05,
+                    "v": 0.095
+                  },
+                  {
+                    "t": 2.45,
+                    "v": 0.06,
+                    "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                  }
+                ]
+              }
+            },
+            {
+              "x": 0.5,
+              "y": 0.5,
+              "r": 0,
+              "animate": {
+                "x": [
+                  {
+                    "t": 0.95,
+                    "v": 0.5
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 0.83,
+                    "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                  },
+                  {
+                    "t": 2,
+                    "v": 0.845,
+                    "ease": "cubic-bezier(0.4, 0, 0.6, 1)"
+                  },
+                  {
+                    "t": 2.45,
+                    "v": 0.5,
+                    "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                  }
+                ],
+                "y": [
+                  {
+                    "t": 0.95,
+                    "v": 0.5
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 0.55,
+                    "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                  },
+                  {
+                    "t": 2.45,
+                    "v": 0.5,
+                    "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                  }
+                ],
+                "r": [
+                  {
+                    "t": 0.5,
+                    "v": 0
+                  },
+                  {
+                    "t": 0.6,
+                    "v": 0.05
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 0.07,
+                    "ease": "cubic-bezier(0.45, 0, 0.2, 1)"
+                  },
+                  {
+                    "t": 2,
+                    "v": 0.07
+                  },
+                  {
+                    "t": 2.45,
+                    "v": 0.045,
+                    "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                  }
+                ]
+              }
+            },
+            {
+              "x": 0.5,
+              "y": 0.5,
+              "r": 0,
+              "animate": {
+                "x": [
+                  {
+                    "t": 1,
+                    "v": 0.5
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 0.32,
+                    "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                  },
+                  {
+                    "t": 2.1,
+                    "v": 0.31,
+                    "ease": "cubic-bezier(0.4, 0, 0.6, 1)"
+                  },
+                  {
+                    "t": 2.45,
+                    "v": 0.5,
+                    "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                  }
+                ],
+                "y": [
+                  {
+                    "t": 1,
+                    "v": 0.5
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 0.53,
+                    "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                  },
+                  {
+                    "t": 2.45,
+                    "v": 0.5,
+                    "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                  }
+                ],
+                "r": [
+                  {
+                    "t": 0.5,
+                    "v": 0
+                  },
+                  {
+                    "t": 0.6,
+                    "v": 0.055
+                  },
+                  {
+                    "t": 1.5,
+                    "v": 0.08,
+                    "ease": "cubic-bezier(0.45, 0, 0.2, 1)"
+                  },
+                  {
+                    "t": 2.1,
+                    "v": 0.08
+                  },
+                  {
+                    "t": 2.45,
+                    "v": 0.05,
+                    "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "transition": {
+        "type": "drip",
+        "duration": 1,
+        "color": "$color.accent2"
+      }
+    },
+    {
+      "name": "title",
+      "type": "color_background",
+      "purpose": "The title scene drips down over the paint; the word rises as the last drip clears.",
+      "options": {
+        "backgroundColor": "$color.bg",
+        "duration": 2.6
+      },
+      "kinetic": [
+        {
+          "text": {
+            "en": "LIQUID"
+          },
+          "preset": "rise",
+          "size": 200,
+          "color": "$color.fg",
+          "delay": 0.85
+        }
+      ]
+    }
+  ]
+}

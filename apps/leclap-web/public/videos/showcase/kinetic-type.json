@@ -30,6 +30,7 @@
             "en": "Make every word land."
           },
           "preset": "cascade",
+          "motionBlur": true,
           "size": 104,
           "y": 230,
           "accent": {
@@ -130,7 +131,8 @@
           "preset": "impact",
           "size": 220,
           "y": 90,
-          "color": "#FF8AAE"
+          "color": "#FF8AAE",
+          "motionBlur": true
         },
         {
           "text": {
@@ -183,6 +185,7 @@
             "en": "Everywhere."
           },
           "preset": "drop",
+          "motionBlur": true,
           "size": 96,
           "y": 380,
           "delay": 0.7,

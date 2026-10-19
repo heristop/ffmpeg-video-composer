@@ -49,7 +49,7 @@ describe('showcase catalog', () => {
 
   it('lists the HTML-layer samples right after Type impact, then keeps the catalog order', () => {
     const ids = filterSamples('all', '').map((sample) => sample.id);
-    expect(ids.slice(0, 7)).toEqual([
+    expect(ids.slice(0, 8)).toEqual([
       'drink-and-code',
       'effects-tour',
       'type-impact',
@@ -57,8 +57,9 @@ describe('showcase catalog', () => {
       'html-testimonial',
       'html-speaker',
       'html-stats',
+      'html-motion',
     ]);
-    expect(ids.slice(7)).toEqual(
+    expect(ids.slice(8)).toEqual(
       SHOWCASE_SAMPLES.map((sample) => sample.id).filter(
         (id) => !HTML_SAMPLE_IDS.includes(id) && !['drink-and-code', 'effects-tour', 'type-impact'].includes(id)
       )

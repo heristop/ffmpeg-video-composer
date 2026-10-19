@@ -125,6 +125,7 @@
           "options": {
             "position": "550:376",
             "origin": "bottom",
+            "motionBlur": true,
             "animate": {
               "y": [
                 {
@@ -305,6 +306,7 @@
           "options": {
             "position": "632:220",
             "origin": "bottom",
+            "motionBlur": true,
             "animate": {
               "rotate": [
                 {

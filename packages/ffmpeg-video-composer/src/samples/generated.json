@@ -2086,7 +2086,7 @@
             },
             {
               "text": {
-                "en": "Basic, designed and xfade"
+                "en": "Bands, shaped irises, designed and xfade"
               },
               "preset": "rise",
               "font": "oswald",
@@ -2112,7 +2112,7 @@
           "purpose": "Play the rendered transitions chapter.",
           "options": {
             "videoUrl": "{{ chapter_03 }}",
-            "duration": 30
+            "duration": 34.85
           },
           "transition": {
             "type": "whip-down",
@@ -2259,7 +2259,7 @@
             },
             {
               "text": {
-                "en": "Splits, a wipe and every fx primitive"
+                "en": "Splits, blends, masks, shapes and every fx"
               },
               "preset": "rise",
               "font": "oswald",
@@ -2284,7 +2284,7 @@
           "purpose": "Play the rendered compositing and light chapter.",
           "options": {
             "videoUrl": "{{ chapter_05 }}",
-            "duration": 40.9
+            "duration": 52.3
           },
           "transition": {
             "type": "push-up",
@@ -8617,6 +8617,7 @@
                 "en": "Make every word land."
               },
               "preset": "cascade",
+              "motionBlur": true,
               "size": 104,
               "y": 230,
               "accent": {
@@ -8717,7 +8718,8 @@
               "preset": "impact",
               "size": 220,
               "y": 90,
-              "color": "#FF8AAE"
+              "color": "#FF8AAE",
+              "motionBlur": true
             },
             {
               "text": {
@@ -8770,6 +8772,7 @@
                 "en": "Everywhere."
               },
               "preset": "drop",
+              "motionBlur": true,
               "size": 96,
               "y": 380,
               "delay": 0.7,
@@ -16612,6 +16615,7 @@
               "options": {
                 "position": "550:376",
                 "origin": "bottom",
+                "motionBlur": true,
                 "animate": {
                   "y": [
                     {
@@ -16792,6 +16796,7 @@
               "options": {
                 "position": "632:220",
                 "origin": "bottom",
+                "motionBlur": true,
                 "animate": {
                   "rotate": [
                     {
@@ -17361,6 +17366,1767 @@
                   "duration": 0.6
                 }
               }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "html-motion",
+    "title": "HTML layers: animated cards",
+    "description": "A listing card and a stat board whose elements arrive one after another: the tag, address lines and chips stagger in on the card, then the tiles spring up in reading order, all authored in HTML with motion attributes.",
+    "category": "effects",
+    "source": "examples/motion-design/html-motion.json",
+    "orientation": "landscape",
+    "backend": "native",
+    "creativeDirection": "Audience: estate agents who post listings as short videos. Direction: one HTML layer per scene, its elements timed inside it. The listing tag slides in first, the address and detail lines rise a beat apart on a gentle spring, then the feature chips pop in with a small overshoot. The stat tiles in scene two lift into place in reading order, each a hair after the last. Copy comes from the fields, so the same template lists any property. Review: every element hidden until its entrance, text crisp at 720p, nothing cut at a card's edge, the chips settle before the scene ends.",
+    "showcasePath": "/showcase?sample=html-motion",
+    "preview": {
+      "video": "/videos/showcase/html-motion.mp4",
+      "poster": "/videos/showcase/html-motion.webp",
+      "template": "/videos/showcase/html-motion.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [
+        {
+          "name": "status",
+          "placeholders": ["{{ status }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "address",
+          "placeholders": ["{{ address }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "details",
+          "placeholders": ["{{ details }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "rooms",
+          "placeholders": ["{{ rooms }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "area",
+          "placeholders": ["{{ area }}"],
+          "source": "placeholder"
+        },
+        {
+          "name": "price",
+          "placeholders": ["{{ price }}"],
+          "source": "placeholder"
+        }
+      ],
+      "assets": [],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Animated HTML cards",
+        "description": "A listing card and stat tiles whose elements come in one after another (motion + data-motion).",
+        "creativeDirection": "Audience: estate agents who post listings as short videos. Direction: one HTML layer per scene, its elements timed inside it. The listing tag slides in first, the address and detail lines rise a beat apart on a gentle spring, then the feature chips pop in with a small overshoot. The stat tiles in scene two lift into place in reading order, each a hair after the last. Copy comes from the fields, so the same template lists any property. Review: every element hidden until its entrance, text crisp at 720p, nothing cut at a card's edge, the chips settle before the scene ends."
+      },
+      "global": {
+        "orientation": "landscape",
+        "musicEnabled": false,
+        "fields": {
+          "status": {
+            "type": "text",
+            "default": "New listing",
+            "maxLength": 24
+          },
+          "address": {
+            "type": "text",
+            "default": "12 rue des Lilas",
+            "maxLength": 40
+          },
+          "details": {
+            "type": "text",
+            "default": "Lyon 3e · 92 m² · 4th floor",
+            "maxLength": 48
+          },
+          "rooms": {
+            "type": "text",
+            "default": "4",
+            "maxLength": 6
+          },
+          "area": {
+            "type": "text",
+            "default": "92 m²",
+            "maxLength": 12
+          },
+          "price": {
+            "type": "text",
+            "default": "420 k€",
+            "maxLength": 12
+          }
+        }
+      },
+      "sections": [
+        {
+          "name": "listing",
+          "type": "color_background",
+          "options": {
+            "backgroundColor": "#101418",
+            "duration": 5
+          },
+          "inputs": [
+            {
+              "name": "listing_card",
+              "type": "html",
+              "html": "<div class=\"card\"><span class=\"tag\" data-motion=\"tag\">{{ status }}</span><h2 data-motion=\"line\">{{ address }}</h2><p data-motion=\"line\">{{ details }}</p><div class=\"chips\"><span class=\"chip\" data-motion=\"chip\">3 rooms</span><span class=\"chip\" data-motion=\"chip\">Balcony</span><span class=\"chip\" data-motion=\"chip\">Metro 4 min</span></div></div>",
+              "css": ".card { display: flex; flex-direction: column; gap: 14px; width: 100%; height: 100%; padding: 32px 36px; border-radius: 28px; background: #f4efe6 } .tag { display: flex; align-self: flex-start; padding: 6px 16px; border-radius: 999px; background: #ff5a36; color: #ffffff; font: 600 22px Rubik; text-transform: uppercase; letter-spacing: 2px } h2 { margin: 0; color: #141416; font: 56px \"Bebas Neue\" } p { margin: 0; color: #55524c; font: 26px Rubik } .chips { display: flex; gap: 10px } .chip { padding: 8px 16px; border-radius: 12px; background: #141416; color: #f4efe6; font: 500 20px Rubik }",
+              "width": 640,
+              "height": 300,
+              "options": {
+                "position": "96:300",
+                "motion": {
+                  "type": "fade",
+                  "duration": 0.3
+                }
+              },
+              "motion": {
+                "tag": {
+                  "opacity": [
+                    {
+                      "t": 0.3,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.55,
+                      "v": 1
+                    }
+                  ],
+                  "x": [
+                    {
+                      "t": 0.3,
+                      "v": -24
+                    },
+                    {
+                      "t": 0.7,
+                      "v": 0,
+                      "ease": "ease-out-cubic"
+                    }
+                  ]
+                },
+                "line": {
+                  "opacity": [
+                    {
+                      "t": 0.5,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.8,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.5,
+                      "v": 28
+                    },
+                    {
+                      "t": 1.1,
+                      "v": 0,
+                      "ease": "$gentle"
+                    }
+                  ],
+                  "stagger": 0.15
+                },
+                "chip": {
+                  "opacity": [
+                    {
+                      "t": 1,
+                      "v": 0
+                    },
+                    {
+                      "t": 1.2,
+                      "v": 1
+                    }
+                  ],
+                  "scale": [
+                    {
+                      "t": 1,
+                      "v": 0.6
+                    },
+                    {
+                      "t": 1.4,
+                      "v": 1,
+                      "ease": "spring(300, 14)"
+                    }
+                  ],
+                  "stagger": 0.12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "stats",
+          "type": "color_background",
+          "options": {
+            "backgroundColor": "#0d1b2a",
+            "duration": 4
+          },
+          "inputs": [
+            {
+              "name": "stat_tiles",
+              "type": "html",
+              "html": "<div class=\"row\"><div class=\"stat\" data-motion=\"stat\"><strong>{{ rooms }}</strong><span>rooms</span></div><div class=\"stat\" data-motion=\"stat\"><strong>{{ area }}</strong><span>living area</span></div><div class=\"stat\" data-motion=\"stat\"><strong>{{ price }}</strong><span>asking</span></div></div>",
+              "css": ".row { display: flex; gap: 20px; width: 100%; height: 100% } .stat { display: flex; flex-direction: column; justify-content: center; flex-grow: 1; padding: 24px; border-radius: 20px; background: #1b263b } strong { color: #ffffff; font: 72px \"Bebas Neue\" } span { color: #9fb3c8; font: 24px Rubik }",
+              "width": 960,
+              "height": 220,
+              "options": {
+                "position": "160:250"
+              },
+              "motion": {
+                "stat": {
+                  "opacity": [
+                    {
+                      "t": 0.2,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.45,
+                      "v": 1
+                    }
+                  ],
+                  "y": [
+                    {
+                      "t": 0.2,
+                      "v": 40
+                    },
+                    {
+                      "t": 0.8,
+                      "v": 0,
+                      "ease": "spring(260, 20)"
+                    }
+                  ],
+                  "rotate": [
+                    {
+                      "t": 0.2,
+                      "v": -4
+                    },
+                    {
+                      "t": 0.8,
+                      "v": 0,
+                      "ease": "ease-out-cubic"
+                    }
+                  ],
+                  "stagger": 0.14
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "vector-shapes",
+    "title": "Vector shapes",
+    "description": "The shape graphic: a star that lands on a spring, a heart whose outline draws itself before it fills, an arrow sliding in, and a lightning icon from an SVG path over a seeded gradient blob.",
+    "category": "effects",
+    "source": "examples/motion-design/vector-shapes.json",
+    "orientation": "landscape",
+    "backend": "native",
+    "creativeDirection": "Audience: motion designers checking what the shape graphic can do. Direction: one move per beat on a dark ink ground, yellow, rose and lavender fills, a small uppercase label naming the move. The star lands upright with one overshoot, the heart's outline closes before its fill comes in, the arrow settles on a spring, the blob squashes from its base. Review: no jitter on the springs, the outline closes exactly, no dark fringe on any edge.",
+    "showcasePath": "/showcase?sample=vector-shapes",
+    "preview": {
+      "video": "/videos/showcase/vector-shapes.mp4",
+      "poster": "/videos/showcase/vector-shapes.webp",
+      "template": "/videos/showcase/vector-shapes.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [],
+      "assets": [],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Vector shapes",
+        "description": "The shape graphic: a star that pops in on a spring, a heart whose outline draws itself before it fills, an arrow sliding in, and a lightning icon from an SVG path over a seeded gradient blob.",
+        "creativeDirection": "Audience: motion designers checking what the shape graphic can do. Direction: one move per beat on a dark ink ground, yellow, rose and lavender fills, a small uppercase label naming the move. The star lands upright with one overshoot, the heart's outline closes before its fill comes in, the arrow settles on a spring, the blob squashes from its base. Review: no jitter on the springs, the outline closes exactly, no dark fringe on any edge."
+      },
+      "global": {
+        "orientation": "landscape",
+        "fps": 30,
+        "musicEnabled": false,
+        "transition": {
+          "type": "cut"
+        }
+      },
+      "sections": [
+        {
+          "name": "pop",
+          "type": "color_background",
+          "purpose": "A yellow star pops in on a spring and turns upright, a lavender hexagon outline behind it.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2.6
+          },
+          "kinetic": [
+            {
+              "text": {
+                "en": "01 · POP"
+              },
+              "preset": "fade",
+              "size": 28,
+              "align": "left",
+              "x": 64,
+              "y": 40,
+              "color": "#9298fb"
+            }
+          ],
+          "graphics": [
+            {
+              "type": "shape",
+              "at": 0.5,
+              "preset": {
+                "type": "polygon",
+                "sides": 6
+              },
+              "x": 440,
+              "y": 160,
+              "width": 400,
+              "height": 400,
+              "fill": false,
+              "stroke": {
+                "color": "#9298fb",
+                "width": 4
+              },
+              "animate": {
+                "scale": [
+                  {
+                    "t": 0.5,
+                    "v": 0.6
+                  },
+                  {
+                    "t": 1.1,
+                    "v": 1,
+                    "ease": "spring(300, 14)"
+                  }
+                ],
+                "opacity": [
+                  {
+                    "t": 0.5,
+                    "v": 0
+                  },
+                  {
+                    "t": 0.8,
+                    "v": 1
+                  }
+                ]
+              }
+            },
+            {
+              "type": "shape",
+              "at": 0.3,
+              "preset": {
+                "type": "star",
+                "points": 5,
+                "inner": 0.45
+              },
+              "x": 490,
+              "y": 210,
+              "width": 300,
+              "height": 300,
+              "color": "#FFF685",
+              "stroke": {
+                "color": "#F5F3F7",
+                "width": 6
+              },
+              "animate": {
+                "scale": [
+                  {
+                    "t": 0.3,
+                    "v": 0
+                  },
+                  {
+                    "t": 0.9,
+                    "v": 1,
+                    "ease": "spring(300, 14)"
+                  }
+                ],
+                "rotate": [
+                  {
+                    "t": 0.3,
+                    "v": -40
+                  },
+                  {
+                    "t": 1,
+                    "v": 0,
+                    "ease": "$expo"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "draw",
+          "type": "color_background",
+          "purpose": "A heart's white outline draws itself, its rose fill fades in, then an arrow slides in to point at it.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 3.2
+          },
+          "kinetic": [
+            {
+              "text": {
+                "en": "02 · DRAW ON"
+              },
+              "preset": "fade",
+              "size": 28,
+              "align": "left",
+              "x": 64,
+              "y": 40,
+              "color": "#9298fb"
+            }
+          ],
+          "graphics": [
+            {
+              "type": "shape",
+              "at": 0.3,
+              "duration": 1.2,
+              "preset": {
+                "type": "heart"
+              },
+              "x": 540,
+              "y": 190,
+              "width": 340,
+              "height": 340,
+              "color": "#F96F99",
+              "stroke": {
+                "color": "#FFFFFF",
+                "width": 6,
+                "draw": true
+              }
+            },
+            {
+              "type": "shape",
+              "at": 1.6,
+              "preset": {
+                "type": "arrow",
+                "direction": "right",
+                "head": 0.35,
+                "shaft": 0.35
+              },
+              "x": 260,
+              "y": 330,
+              "width": 220,
+              "height": 64,
+              "color": "#F5F3F7",
+              "animate": {
+                "x": [
+                  {
+                    "t": 1.6,
+                    "v": "-320"
+                  },
+                  {
+                    "t": 2.2,
+                    "v": "+0",
+                    "ease": "spring(300, 14)"
+                  }
+                ],
+                "opacity": [
+                  {
+                    "t": 1.6,
+                    "v": 0
+                  },
+                  {
+                    "t": 1.8,
+                    "v": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "icon",
+          "type": "color_background",
+          "purpose": "A seeded gradient blob squashes in from its base, then a lightning icon from an SVG path pops onto it.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2.8
+          },
+          "kinetic": [
+            {
+              "text": {
+                "en": "03 · ICON + BLOB"
+              },
+              "preset": "fade",
+              "size": 28,
+              "align": "left",
+              "x": 64,
+              "y": 40,
+              "color": "#9298fb"
+            }
+          ],
+          "graphics": [
+            {
+              "type": "shape",
+              "at": 0.2,
+              "preset": {
+                "type": "blob",
+                "lobes": 7,
+                "wobble": 0.3,
+                "seed": 5
+              },
+              "x": 400,
+              "y": 140,
+              "width": 480,
+              "height": 440,
+              "gradient": {
+                "from": "#9298fb",
+                "to": "#f96f99@0.85",
+                "shape": "radial"
+              },
+              "origin": "bottom",
+              "animate": {
+                "opacity": [
+                  {
+                    "t": 0.2,
+                    "v": 0
+                  },
+                  {
+                    "t": 0.5,
+                    "v": 1
+                  }
+                ],
+                "scaleX": [
+                  {
+                    "t": 0.2,
+                    "v": 1.25
+                  },
+                  {
+                    "t": 1,
+                    "v": 1,
+                    "ease": "spring(300, 14)"
+                  }
+                ],
+                "scaleY": [
+                  {
+                    "t": 0.2,
+                    "v": 0.7
+                  },
+                  {
+                    "t": 1,
+                    "v": 1,
+                    "ease": "spring(300, 14)"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "shape",
+              "at": 0.9,
+              "d": "M13 2 L4 14 L11 14 L10 22 L19 10 L12 10 Z",
+              "viewBox": [0, 0, 24, 24],
+              "x": 560,
+              "y": 260,
+              "width": 160,
+              "height": 200,
+              "color": "#141416",
+              "animate": {
+                "scale": [
+                  {
+                    "t": 0.9,
+                    "v": 0
+                  },
+                  {
+                    "t": 1.4,
+                    "v": 1,
+                    "ease": "spring(300, 14)"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "line-draw",
+    "title": "Line draw",
+    "description": "The path graphic: a chart line drawing on with a dot riding its end, a ring closing around one point, a hand-drawn swash under a title and a progress ring filling to 75 %.",
+    "category": "effects",
+    "source": "examples/motion-design/line-draw.json",
+    "orientation": "landscape",
+    "backend": "native",
+    "creativeDirection": "Audience: motion designers checking what the path graphic can do. Direction: one draw per beat on a dark ink ground, light and lavender strokes, rose for the accent, a small uppercase label naming the move. The chart line runs at constant speed along its curve with the dot locked to its end, the ring closes on the point the line passed, then everything retracts in drawing order. Review: no stepping on the stroke, the dot never leaves the line's end, the ring closes exactly, the swash lands under the title, the ring stops at three quarters.",
+    "showcasePath": "/showcase?sample=line-draw",
+    "preview": {
+      "video": "/videos/showcase/line-draw.mp4",
+      "poster": "/videos/showcase/line-draw.webp",
+      "template": "/videos/showcase/line-draw.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [],
+      "assets": [],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Line draw",
+        "description": "The path graphic: a chart line drawing on with a dot riding its end, a ring drawn around one point, a hand-drawn swash under a title and a progress ring filling to 75 %.",
+        "creativeDirection": "Audience: motion designers checking what the path graphic can do. Direction: one draw per beat on a dark ink ground, light and lavender strokes, rose for the accent, a small uppercase label naming the move. The chart line runs at constant speed along its curve with the dot locked to its end, the ring closes on the point the line passed, then everything retracts in drawing order. Review: no stepping on the stroke, the dot never leaves the line's end, the ring closes exactly, the swash lands under the title, the ring stops at three quarters."
+      },
+      "global": {
+        "orientation": "landscape",
+        "fps": 30,
+        "musicEnabled": false,
+        "transition": {
+          "type": "cut"
+        }
+      },
+      "sections": [
+        {
+          "name": "chart_line",
+          "type": "color_background",
+          "purpose": "A smoothed chart line draws on with a lavender dot on its end, a rose ring circles one point, then it all retracts.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 4.6
+          },
+          "kinetic": [
+            {
+              "text": {
+                "en": "01 · CHART LINE"
+              },
+              "preset": "fade",
+              "size": 28,
+              "align": "left",
+              "x": 64,
+              "y": 40,
+              "color": "#9298fb"
+            }
+          ],
+          "graphics": [
+            {
+              "type": "path",
+              "at": 0.1,
+              "duration": 0.6,
+              "points": [
+                [180, 150],
+                [180, 600],
+                [1120, 600]
+              ],
+              "thickness": 4,
+              "color": "#9298fb@0.45",
+              "caps": "round",
+              "exit": "retract",
+              "exitDuration": 0.5
+            },
+            {
+              "type": "path",
+              "at": 0.4,
+              "duration": 1.6,
+              "ease": "cubic-bezier(0.45, 0, 0.25, 1)",
+              "points": [
+                [220, 540],
+                [330, 460],
+                [450, 520],
+                [580, 390],
+                [700, 450],
+                [830, 300],
+                [950, 350],
+                [1080, 190]
+              ],
+              "smooth": true,
+              "thickness": 9,
+              "color": "#f5f3f7",
+              "head": {
+                "size": 26,
+                "color": "#9298fb"
+              },
+              "exit": "retract",
+              "exitDuration": 0.8
+            },
+            {
+              "type": "path",
+              "at": 2.2,
+              "duration": 0.7,
+              "ease": "cubic-bezier(0.16, 1, 0.3, 1)",
+              "shape": {
+                "type": "circle",
+                "cx": 580,
+                "cy": 390,
+                "r": 48
+              },
+              "thickness": 6,
+              "color": "#f96f99",
+              "exit": "retract",
+              "exitDuration": 0.5
+            }
+          ]
+        },
+        {
+          "name": "swash",
+          "type": "color_background",
+          "purpose": "A title lands, then a hand-drawn swash draws itself under it.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2.8
+          },
+          "kinetic": [
+            {
+              "text": {
+                "en": "02 · SWASH"
+              },
+              "preset": "fade",
+              "size": 28,
+              "align": "left",
+              "x": 64,
+              "y": 40,
+              "color": "#9298fb"
+            },
+            {
+              "text": {
+                "en": "Draw the eye"
+              },
+              "preset": "rise",
+              "size": 120,
+              "y": 260,
+              "delay": 0.1,
+              "color": "#f5f3f7"
+            }
+          ],
+          "graphics": [
+            {
+              "type": "path",
+              "at": 0.7,
+              "duration": 0.6,
+              "ease": "cubic-bezier(0.33, 0, 0.2, 1)",
+              "d": "M390 438 C540 400 720 460 900 404",
+              "thickness": 9,
+              "color": "#f96f99",
+              "above": true,
+              "exit": "fade"
+            }
+          ]
+        },
+        {
+          "name": "progress_ring",
+          "type": "color_background",
+          "purpose": "A progress ring fills to three quarters while its value counts up.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 3
+          },
+          "kinetic": [
+            {
+              "text": {
+                "en": "03 · PROGRESS RING"
+              },
+              "preset": "fade",
+              "size": 28,
+              "align": "left",
+              "x": 64,
+              "y": 40,
+              "color": "#9298fb"
+            },
+            {
+              "text": {
+                "en": ""
+              },
+              "preset": "counter",
+              "size": 96,
+              "y": "center",
+              "delay": 0.3,
+              "duration": 1.4,
+              "ease": "cubic-bezier(0.33, 0, 0.15, 1)",
+              "counter": {
+                "from": 0,
+                "to": 75,
+                "suffix": "%"
+              },
+              "color": "#f5f3f7"
+            }
+          ],
+          "graphics": [
+            {
+              "type": "path",
+              "at": 0,
+              "duration": 0.4,
+              "shape": {
+                "type": "circle",
+                "cx": 640,
+                "cy": 360,
+                "r": 170
+              },
+              "thickness": 18,
+              "color": "#9298fb@0.18",
+              "from": 1,
+              "exit": "fade"
+            },
+            {
+              "type": "path",
+              "at": 0.3,
+              "duration": 1.4,
+              "ease": "cubic-bezier(0.33, 0, 0.15, 1)",
+              "shape": {
+                "type": "circle",
+                "cx": 640,
+                "cy": 360,
+                "r": 170
+              },
+              "to": 0.75,
+              "thickness": 18,
+              "color": "#9298fb",
+              "exit": "fade"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fx-burst",
+    "title": "Burst fx",
+    "description": "The burst primitive fired on the frame each element hits: a heart pop with a rose burst, a SALE badge slam with impact lines, and a lavender half burst fanning over a title.",
+    "category": "effects",
+    "source": "examples/motion-design/fx-burst.json",
+    "orientation": "landscape",
+    "backend": "native",
+    "creativeDirection": "Audience: motion designers checking the burst primitive. Direction: one accent per beat on a dark ink ground (#141416), lavender (#9298fb) and rose (#f96f99) shapes, a small uppercase label naming the beat. Each burst fires on the frame its element hits: one frame before the top of the heart's spring pop (the heart squashes 0.92 x 1.06 for 2 frames on the hit), on the badge's floor contact (it stretches as it falls, squashes, rebounds into a short stretch, then rests), and as the title settles. Springs are near-critical, overshooting 5 % at most. Review: rays clear the element they burst from, the half burst fans only upward, and every burst is gone by 70 % of its duration: nothing faint lingers.",
+    "showcasePath": "/showcase?sample=fx-burst",
+    "preview": {
+      "video": "/videos/showcase/fx-burst.mp4",
+      "poster": "/videos/showcase/fx-burst.webp",
+      "template": "/videos/showcase/fx-burst.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [],
+      "assets": [],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "fx burst",
+        "description": "The burst fx primitive: a heart pop with a rose burst and dots, a SALE badge slam with impact lines, and a lavender half burst under a title.",
+        "creativeDirection": "Audience: motion designers checking the burst primitive. Direction: one accent per beat on a dark ink ground (#141416), lavender (#9298fb) and rose (#f96f99) shapes, a small uppercase label naming the beat. Each burst fires on the frame its element hits: one frame before the top of the heart's spring pop (the heart squashes 0.92 x 1.06 for 2 frames on the hit), on the badge's floor contact (it stretches as it falls, squashes, rebounds into a short stretch, then rests), and as the title settles. Springs are near-critical, overshooting 5 % at most. Review: rays clear the element they burst from, the half burst fans only upward, and every burst is gone by 70 % of its duration: nothing faint lingers."
+      },
+      "global": {
+        "orientation": "landscape",
+        "fps": 30,
+        "musicEnabled": false,
+        "seed": 21,
+        "transition": {
+          "type": "cut"
+        },
+        "theme": {
+          "extends": "leclap",
+          "colors": {
+            "bg": "#141416",
+            "fg": "#f5f3f7",
+            "accent": "#f96f99",
+            "accent2": "#9298fb"
+          }
+        }
+      },
+      "sections": [
+        {
+          "name": "heart_pop",
+          "type": "color_background",
+          "purpose": "A heart springs in and a rose burst fires from it one frame before the top of the pop, with a few dots between the rays; the heart squashes on the hit.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2
+          },
+          "inputs": [
+            {
+              "name": "label_1",
+              "type": "html",
+              "html": "<div class=\"label\"><span>01 · Heart pop</span></div>",
+              "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+              "width": 520,
+              "height": 48,
+              "options": {
+                "position": "64:48",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "heart",
+              "type": "html",
+              "html": "<div class=\"heart\"><div class=\"lobe left\"></div><div class=\"lobe right\"></div><div class=\"tip\"></div></div>",
+              "css": ".heart { display: flex; position: relative; width: 160px; height: 160px } .tip { position: absolute; left: 35px; top: 45px; width: 90px; height: 90px; background: #f96f99; transform: rotate(45deg) } .lobe { position: absolute; top: 13px; width: 90px; height: 90px; border-radius: 45px; background: #f96f99 } .left { left: 3px } .right { left: 67px }",
+              "width": 160,
+              "height": 160,
+              "options": {
+                "position": "560:280",
+                "animate": {
+                  "scale": [
+                    {
+                      "t": 0.25,
+                      "v": 0
+                    },
+                    {
+                      "v": 1,
+                      "ease": "spring(300, 24)"
+                    }
+                  ],
+                  "scaleX": [
+                    {
+                      "t": 0.4667,
+                      "v": 1
+                    },
+                    {
+                      "t": 0.5,
+                      "v": 0.92,
+                      "ease": "ease-out"
+                    },
+                    {
+                      "t": 0.5333,
+                      "v": 0.92
+                    },
+                    {
+                      "t": 0.6333,
+                      "v": 1,
+                      "ease": "ease-in-out"
+                    }
+                  ],
+                  "scaleY": [
+                    {
+                      "t": 0.4667,
+                      "v": 1
+                    },
+                    {
+                      "t": 0.5,
+                      "v": 1.06,
+                      "ease": "ease-out"
+                    },
+                    {
+                      "t": 0.5333,
+                      "v": 1.06
+                    },
+                    {
+                      "t": 0.6333,
+                      "v": 1,
+                      "ease": "ease-in-out"
+                    }
+                  ],
+                  "opacity": [
+                    {
+                      "t": 0.25,
+                      "v": 0
+                    },
+                    {
+                      "t": "+0.08",
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "graphics": [
+            {
+              "type": "fx",
+              "effect": "burst",
+              "id": "heart_burst",
+              "target": {
+                "x": 560,
+                "y": 280,
+                "w": 160,
+                "h": 160
+              },
+              "at": 0.4333,
+              "rays": 8,
+              "thickness": 8,
+              "length": 0.55,
+              "dots": true,
+              "jitter": 0.15,
+              "color": "$color.accent",
+              "seed": 3
+            }
+          ]
+        },
+        {
+          "name": "sale_drop",
+          "type": "color_background",
+          "purpose": "A SALE badge drops, stretching as it speeds up, slams on the floor with a squash, rebounds into a short stretch and rests; impact lines fire from it on the frame it lands.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2.4
+          },
+          "inputs": [
+            {
+              "name": "label_2",
+              "type": "html",
+              "html": "<div class=\"label\"><span>02 · Impact</span></div>",
+              "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+              "width": 520,
+              "height": 48,
+              "options": {
+                "position": "64:48",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "floor",
+              "type": "html",
+              "html": "<div class=\"floor\"></div>",
+              "css": ".floor { width: 560px; height: 6px; border-radius: 3px; background: #2a2a33 }",
+              "width": 560,
+              "height": 6,
+              "options": {
+                "position": "360:446"
+              }
+            },
+            {
+              "name": "badge",
+              "type": "html",
+              "html": "<div class=\"badge\"><strong>SALE</strong><span>−40%</span></div>",
+              "css": ".badge { display: flex; align-items: center; justify-content: center; gap: 18px; width: 340px; height: 132px; border-radius: 66px; background: #9298fb } strong { color: #141416; font: 700 60px Rubik; letter-spacing: 2px } span { color: #141416; font: 500 40px Rubik }",
+              "width": 340,
+              "height": 132,
+              "options": {
+                "position": "470:314",
+                "origin": "bottom",
+                "animate": {
+                  "y": [
+                    {
+                      "t": 0.15,
+                      "v": "-460"
+                    },
+                    {
+                      "t": 0.6,
+                      "v": "+0",
+                      "ease": "ease-in"
+                    }
+                  ],
+                  "scaleX": [
+                    {
+                      "t": 0.15,
+                      "v": 1
+                    },
+                    {
+                      "t": 0.6,
+                      "v": 0.95,
+                      "ease": "ease-in"
+                    },
+                    {
+                      "t": 0.6667,
+                      "v": 1.16,
+                      "ease": "ease-out"
+                    },
+                    {
+                      "t": 0.7667,
+                      "v": 0.96,
+                      "ease": "ease-in-out"
+                    },
+                    {
+                      "v": 1,
+                      "ease": "spring(170, 18)"
+                    }
+                  ],
+                  "scaleY": [
+                    {
+                      "t": 0.15,
+                      "v": 1
+                    },
+                    {
+                      "t": 0.6,
+                      "v": 1.07,
+                      "ease": "ease-in"
+                    },
+                    {
+                      "t": 0.6667,
+                      "v": 0.78,
+                      "ease": "ease-out"
+                    },
+                    {
+                      "t": 0.7667,
+                      "v": 1.04,
+                      "ease": "ease-in-out"
+                    },
+                    {
+                      "v": 1,
+                      "ease": "spring(170, 18)"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "graphics": [
+            {
+              "type": "fx",
+              "effect": "burst",
+              "target": {
+                "x": 470,
+                "y": 314,
+                "w": 340,
+                "h": 132
+              },
+              "at": 0.6,
+              "rays": 10,
+              "spread": 200,
+              "thickness": 6,
+              "length": 0.4,
+              "jitter": 0.35,
+              "duration": 0.3,
+              "color": "$color.fg",
+              "seed": 8
+            }
+          ]
+        },
+        {
+          "name": "half_title",
+          "type": "color_background",
+          "purpose": "A title rises into place and a lavender half burst fans up from beneath it, like a sunrise behind the words.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2.4
+          },
+          "inputs": [
+            {
+              "name": "label_3",
+              "type": "html",
+              "html": "<div class=\"label\"><span>03 · Half burst</span></div>",
+              "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+              "width": 520,
+              "height": 48,
+              "options": {
+                "position": "64:48",
+                "motion": {
+                  "type": "fade",
+                  "delay": 0,
+                  "duration": 0.3
+                }
+              }
+            },
+            {
+              "name": "title",
+              "type": "html",
+              "html": "<div class=\"title\"><strong>Launch day</strong></div>",
+              "css": ".title { display: flex; align-items: center; justify-content: center; width: 600px; height: 120px } strong { color: #f5f3f7; font: 700 76px Rubik }",
+              "width": 600,
+              "height": 120,
+              "options": {
+                "position": "340:300",
+                "animate": {
+                  "y": [
+                    {
+                      "t": 0.15,
+                      "v": "+40"
+                    },
+                    {
+                      "t": 0.55,
+                      "v": "+0",
+                      "ease": "ease-out-cubic"
+                    }
+                  ],
+                  "opacity": [
+                    {
+                      "t": 0.15,
+                      "v": 0
+                    },
+                    {
+                      "t": 0.4,
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "graphics": [
+            {
+              "type": "fx",
+              "effect": "burst",
+              "target": {
+                "x": 450,
+                "y": 300,
+                "w": 380,
+                "h": 120
+              },
+              "origin": {
+                "x": 0.5,
+                "y": 1
+              },
+              "at": 0.5,
+              "spread": 180,
+              "rays": 9,
+              "thickness": 6,
+              "length": 0.5,
+              "dots": 4,
+              "jitter": 0.1,
+              "duration": 0.6,
+              "color": "$color.accent2",
+              "seed": 5
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fx-liquid",
+    "title": "Liquid motion and drip",
+    "description": "A lavender blob that stretches, splits into three droplets and merges back (the goo fx on keyframed blobs), then a rose paint drip into a title (the drip transition). Asset-free.",
+    "category": "effects",
+    "source": "examples/motion-design/fx-liquid.json",
+    "orientation": "landscape",
+    "backend": "native",
+    "creativeDirection": "Audience: motion designers comparing LeClap with a motion-design cheat sheet. Direction: one liquid idea per beat on the house palette (ink ground, lavender and rose). A lavender blob pops in at the centre, holds a breath, stretches sideways and pinches into three droplets that bounce apart once, drift, then run back so all three merge on the same frame. A beat later rose paint drips down over the scene, covers it, and the title scene drips down over the paint; the title rises as the last drip clears. Review: the overshoots stay under 8 % and settle at once, the necks between blob and droplets are smooth, the merge lands on one frame, the drips have different lengths and rounded ends, and the paint covers the whole frame for a beat at the midpoint.",
+    "showcasePath": "/showcase?sample=fx-liquid",
+    "preview": {
+      "video": "/videos/showcase/fx-liquid.mp4",
+      "poster": "/videos/showcase/fx-liquid.webp",
+      "template": "/videos/showcase/fx-liquid.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [],
+      "assets": [],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Liquid motion and drip",
+        "description": "Two cheat-sheet moves from engine primitives: a lavender blob that stretches, splits into three droplets that bounce apart and merges back (the goo fx, keyframed blobs), then a rose paint drip into a title (the drip transition). Asset-free.",
+        "creativeDirection": "Audience: motion designers comparing LeClap with a motion-design cheat sheet. Direction: one liquid idea per beat on the house palette (ink ground, lavender and rose). A lavender blob pops in at the centre, holds a breath, stretches sideways and pinches into three droplets that bounce apart once, drift, then run back so all three merge on the same frame. A beat later rose paint drips down over the scene, covers it, and the title scene drips down over the paint; the title rises as the last drip clears. Review: the overshoots stay under 8 % and settle at once, the necks between blob and droplets are smooth, the merge lands on one frame, the drips have different lengths and rounded ends, and the paint covers the whole frame for a beat at the midpoint."
+      },
+      "global": {
+        "orientation": "landscape",
+        "fps": 30,
+        "musicEnabled": false,
+        "seed": 7,
+        "theme": {
+          "colors": {
+            "bg": "#141416",
+            "fg": "#FFFFFF",
+            "accent": "#9298fb",
+            "accent2": "#f96f99"
+          }
+        },
+        "transition": {
+          "type": "cut"
+        }
+      },
+      "sections": [
+        {
+          "name": "goo",
+          "type": "color_background",
+          "purpose": "A lavender blob pops in, splits into three droplets that bounce apart, then merges back on one frame.",
+          "options": {
+            "backgroundColor": "$color.bg",
+            "duration": 3.6
+          },
+          "graphics": [
+            {
+              "type": "fx",
+              "effect": "goo",
+              "at": 0,
+              "duration": 3.6,
+              "color": "$color.accent",
+              "goo": 0.55,
+              "blobs": [
+                {
+                  "x": 0.5,
+                  "y": 0.5,
+                  "r": 0,
+                  "animate": {
+                    "r": [
+                      {
+                        "t": 0.15,
+                        "v": 0
+                      },
+                      {
+                        "t": 0.5,
+                        "v": 0.16,
+                        "ease": "cubic-bezier(0.3, 1.45, 0.55, 1)"
+                      },
+                      {
+                        "t": 0.9,
+                        "v": 0.16
+                      },
+                      {
+                        "t": 1.5,
+                        "v": 0.13,
+                        "ease": "cubic-bezier(0.45, 0, 0.2, 1)"
+                      },
+                      {
+                        "t": 2.05,
+                        "v": 0.13
+                      },
+                      {
+                        "t": 2.45,
+                        "v": 0.16,
+                        "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "x": 0.5,
+                  "y": 0.5,
+                  "r": 0,
+                  "animate": {
+                    "x": [
+                      {
+                        "t": 0.9,
+                        "v": 0.5
+                      },
+                      {
+                        "t": 1.5,
+                        "v": 0.69,
+                        "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                      },
+                      {
+                        "t": 2.05,
+                        "v": 0.7,
+                        "ease": "cubic-bezier(0.4, 0, 0.6, 1)"
+                      },
+                      {
+                        "t": 2.45,
+                        "v": 0.5,
+                        "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                      }
+                    ],
+                    "y": [
+                      {
+                        "t": 0.9,
+                        "v": 0.5
+                      },
+                      {
+                        "t": 1.5,
+                        "v": 0.46,
+                        "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                      },
+                      {
+                        "t": 2.45,
+                        "v": 0.5,
+                        "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                      }
+                    ],
+                    "r": [
+                      {
+                        "t": 0.5,
+                        "v": 0
+                      },
+                      {
+                        "t": 0.6,
+                        "v": 0.07
+                      },
+                      {
+                        "t": 1.5,
+                        "v": 0.095,
+                        "ease": "cubic-bezier(0.45, 0, 0.2, 1)"
+                      },
+                      {
+                        "t": 2.05,
+                        "v": 0.095
+                      },
+                      {
+                        "t": 2.45,
+                        "v": 0.06,
+                        "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "x": 0.5,
+                  "y": 0.5,
+                  "r": 0,
+                  "animate": {
+                    "x": [
+                      {
+                        "t": 0.95,
+                        "v": 0.5
+                      },
+                      {
+                        "t": 1.5,
+                        "v": 0.83,
+                        "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                      },
+                      {
+                        "t": 2,
+                        "v": 0.845,
+                        "ease": "cubic-bezier(0.4, 0, 0.6, 1)"
+                      },
+                      {
+                        "t": 2.45,
+                        "v": 0.5,
+                        "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                      }
+                    ],
+                    "y": [
+                      {
+                        "t": 0.95,
+                        "v": 0.5
+                      },
+                      {
+                        "t": 1.5,
+                        "v": 0.55,
+                        "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                      },
+                      {
+                        "t": 2.45,
+                        "v": 0.5,
+                        "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                      }
+                    ],
+                    "r": [
+                      {
+                        "t": 0.5,
+                        "v": 0
+                      },
+                      {
+                        "t": 0.6,
+                        "v": 0.05
+                      },
+                      {
+                        "t": 1.5,
+                        "v": 0.07,
+                        "ease": "cubic-bezier(0.45, 0, 0.2, 1)"
+                      },
+                      {
+                        "t": 2,
+                        "v": 0.07
+                      },
+                      {
+                        "t": 2.45,
+                        "v": 0.045,
+                        "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "x": 0.5,
+                  "y": 0.5,
+                  "r": 0,
+                  "animate": {
+                    "x": [
+                      {
+                        "t": 1,
+                        "v": 0.5
+                      },
+                      {
+                        "t": 1.5,
+                        "v": 0.32,
+                        "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                      },
+                      {
+                        "t": 2.1,
+                        "v": 0.31,
+                        "ease": "cubic-bezier(0.4, 0, 0.6, 1)"
+                      },
+                      {
+                        "t": 2.45,
+                        "v": 0.5,
+                        "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                      }
+                    ],
+                    "y": [
+                      {
+                        "t": 1,
+                        "v": 0.5
+                      },
+                      {
+                        "t": 1.5,
+                        "v": 0.53,
+                        "ease": "cubic-bezier(0.45, 0, 0.2, 1.3)"
+                      },
+                      {
+                        "t": 2.45,
+                        "v": 0.5,
+                        "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                      }
+                    ],
+                    "r": [
+                      {
+                        "t": 0.5,
+                        "v": 0
+                      },
+                      {
+                        "t": 0.6,
+                        "v": 0.055
+                      },
+                      {
+                        "t": 1.5,
+                        "v": 0.08,
+                        "ease": "cubic-bezier(0.45, 0, 0.2, 1)"
+                      },
+                      {
+                        "t": 2.1,
+                        "v": 0.08
+                      },
+                      {
+                        "t": 2.45,
+                        "v": 0.05,
+                        "ease": "cubic-bezier(0.55, 0, 0.3, 1)"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          "transition": {
+            "type": "drip",
+            "duration": 1,
+            "color": "$color.accent2"
+          }
+        },
+        {
+          "name": "title",
+          "type": "color_background",
+          "purpose": "The title scene drips down over the paint; the word rises as the last drip clears.",
+          "options": {
+            "backgroundColor": "$color.bg",
+            "duration": 2.6
+          },
+          "kinetic": [
+            {
+              "text": {
+                "en": "LIQUID"
+              },
+              "preset": "rise",
+              "size": 200,
+              "color": "$color.fg",
+              "delay": 0.85
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fx-glitch-iris-sheen",
+    "title": "Glitch, iris and gloss",
+    "description": "A title torn into rows by the glitch tear, an iris that opens from the sun icon into the next scene, and a premium pill polished by a gloss sweep with a glint on its corner. Asset-free.",
+    "category": "effects",
+    "source": "examples/motion-design/fx-glitch-iris-sheen.json",
+    "orientation": "landscape",
+    "backend": "native",
+    "creativeDirection": "Audience: motion designers comparing LeClap with a motion-design cheat sheet. Direction: one move per beat on the house palette (ink ground, lavender and rose). The title holds, then tears for a beat: rows of the word displaced left and right with the RGB split and colour slices on top, then it settles. The next beat shows a sun in the top-left corner; the following scene opens out of that sun in a circle on an in-out curve, the sun swelling to 1.3x over 6 frames as the circle leaves it and a rose rim tracing the circle's edge, so the sun becomes the opening (a shared-element move, not a hole punched in it). The close is a pill badge that a broad, bright gloss sweeps once, then a star glints on its corner: one 12–14 frame twinkle. Review: the tear lasts under a second and the word reads before and after it, the iris circle is centred on the sun and grows out of it, the gloss stays inside the pill and never greys it.",
+    "showcasePath": "/showcase?sample=fx-glitch-iris-sheen",
+    "preview": {
+      "video": "/videos/showcase/fx-glitch-iris-sheen.mp4",
+      "poster": "/videos/showcase/fx-glitch-iris-sheen.webp",
+      "template": "/videos/showcase/fx-glitch-iris-sheen.json"
+    },
+    "requirements": {
+      "projectVideos": [],
+      "formFields": [],
+      "variables": [],
+      "assets": [],
+      "effects": [],
+      "setup": [
+        "Supply project_video clips by section name (userVideoPaths), customize form fields (fields) and global.variables, then validate the descriptor before rendering.",
+        "Render with an available FFmpeg backend: Node/system FFmpeg, browser/WASM, or the on-device engine. Provide the fonts and media used by the descriptor."
+      ]
+    },
+    "template": {
+      "meta": {
+        "name": "Glitch, iris and gloss",
+        "description": "Three cheat-sheet moves from engine primitives: a title torn into rows by the glitch's tear, an iris that opens from the sun icon into the next scene, and a premium pill polished by the sheen's gloss profile with a glint at its corner. Asset-free.",
+        "creativeDirection": "Audience: motion designers comparing LeClap with a motion-design cheat sheet. Direction: one move per beat on the house palette (ink ground, lavender and rose). The title holds, then tears for a beat: rows of the word displaced left and right with the RGB split and colour slices on top, then it settles. The next beat shows a sun in the top-left corner; the following scene opens out of that sun in a circle on an in-out curve, the sun swelling to 1.3x over 6 frames as the circle leaves it and a rose rim tracing the circle's edge, so the sun becomes the opening (a shared-element move, not a hole punched in it). The close is a pill badge that a broad, bright gloss sweeps once, then a star glints on its corner: one 12–14 frame twinkle. Review: the tear lasts under a second and the word reads before and after it, the iris circle is centred on the sun and grows out of it, the gloss stays inside the pill and never greys it."
+      },
+      "global": {
+        "orientation": "landscape",
+        "fps": 30,
+        "musicEnabled": false,
+        "seed": 7,
+        "transition": {
+          "type": "cut"
+        }
+      },
+      "sections": [
+        {
+          "name": "glitch",
+          "type": "color_background",
+          "purpose": "The title holds, tears into displaced rows for 0.9 s, then settles.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 2.4
+          },
+          "kinetic": [
+            {
+              "text": {
+                "en": "GLITCH"
+              },
+              "preset": "impact",
+              "size": 230,
+              "color": "#FFFFFF",
+              "delay": 0.1
+            }
+          ],
+          "graphics": [
+            {
+              "type": "glitch",
+              "at": 0.8,
+              "duration": 0.9,
+              "intensity": 0.8,
+              "tear": 20,
+              "color": "#f96f99"
+            }
+          ]
+        },
+        {
+          "name": "day",
+          "type": "color_background",
+          "purpose": "A sun sits in the top-left corner: it swells as the next scene opens out of it, the circle's rim in the sun's rose.",
+          "options": {
+            "backgroundColor": "#9298fb",
+            "duration": 1.5
+          },
+          "inputs": [
+            {
+              "name": "sun",
+              "type": "html",
+              "html": "<div class=\"wrap\"><div class=\"sun\"></div></div>",
+              "css": ".wrap { display: flex; align-items: center; justify-content: center; width: 190px; height: 190px } .sun { width: 150px; height: 150px; border-radius: 75px; background: #f96f99; box-shadow: 0 0 0 18px rgba(255, 255, 255, 0.35) }",
+              "width": 190,
+              "height": 190,
+              "options": {
+                "position": "95:65",
+                "animate": {
+                  "scale": [
+                    {
+                      "t": 0.83,
+                      "v": 1
+                    },
+                    {
+                      "t": 1.03,
+                      "v": 1.3,
+                      "ease": "ease-out-cubic"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "kinetic": [
+            {
+              "text": {
+                "en": "DAY"
+              },
+              "preset": "rise",
+              "size": 180,
+              "color": "#141416",
+              "delay": 0.1
+            }
+          ],
+          "transition": {
+            "type": "iris",
+            "duration": 0.8,
+            "ease": "cubic-bezier(0.65, 0, 0.35, 1)",
+            "origin": {
+              "x": 0.148,
+              "y": 0.222
+            },
+            "rim": "#f96f99"
+          }
+        },
+        {
+          "name": "premium",
+          "type": "color_background",
+          "purpose": "A pill badge: a broad gloss sweeps it once, then a star glints on its corner.",
+          "options": {
+            "backgroundColor": "#141416",
+            "duration": 3
+          },
+          "inputs": [
+            {
+              "name": "pill",
+              "type": "html",
+              "html": "<div class=\"pill\"><div class=\"star\"></div><strong>PREMIUM</strong></div>",
+              "css": ".pill { display: flex; align-items: center; justify-content: center; gap: 22px; width: 520px; height: 140px; border-radius: 70px; background: #9298fb } .star { width: 56px; height: 56px; background: #f96f99; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%) } strong { color: #141416; font: 700 62px Rubik; letter-spacing: 3px }",
+              "width": 520,
+              "height": 140,
+              "options": {
+                "position": "380:290"
+              }
+            }
+          ],
+          "graphics": [
+            {
+              "type": "fx",
+              "effect": "sheen",
+              "target": {
+                "x": 380,
+                "y": 290,
+                "w": 520,
+                "h": 140,
+                "radius": 70
+              },
+              "profile": "gloss",
+              "width": 0.45,
+              "tilt": 22,
+              "intensity": 1,
+              "color": "#FFFFFF",
+              "at": 0.5,
+              "duration": 0.9
+            },
+            {
+              "type": "fx",
+              "effect": "glint",
+              "target": {
+                "x": 380,
+                "y": 290,
+                "w": 520,
+                "h": 140,
+                "radius": 70
+              },
+              "points": [
+                {
+                  "x": 0.93,
+                  "y": 0.12
+                }
+              ],
+              "size": 96,
+              "intensity": 1,
+              "color": "#FFFFFF",
+              "at": 1.4
             }
           ]
         }

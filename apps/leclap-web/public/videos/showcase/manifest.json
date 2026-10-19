@@ -18,14 +18,14 @@
     {
       "id": "effects-tour",
       "source": "examples/motion-design/effects-tour.json",
-      "duration": 419.909002,
+      "duration": 436.14,
       "hasAudio": true,
       "orientation": "landscape",
       "backend": "native",
-      "sha256": "54c21e83be4af63b04c81a45f0a5aa0df921dd4464c83742dcf1466a1ef6bb1d",
-      "templateSha256": "805c0c9aead83ebca6a24e55dca8d952aa1272d7716eb7ed26c0ab9f4b937564",
+      "sha256": "8a8c54452316ec07612846ce3ca92a4c6e57f699a863d95607312da3c340a606",
+      "templateSha256": "9ad7f22e806054a4fbcf8f5b04dc77968c248c7fa797b00bf99823f888ddc223",
       "media": "Synthetic clips from bundled photos (FFmpeg) and lavfi audio",
-      "bytes": 23708267
+      "bytes": 23720374
     },
     {
       "id": "type-impact",
@@ -253,10 +253,10 @@
       "hasAudio": true,
       "orientation": "landscape",
       "backend": "native",
-      "sha256": "cfe13d1d4fecbaf94951dbbed2f5cb53365110bc1bd4be045b29b2d674fcc86d",
-      "templateSha256": "941152ddeb08d8f26f8526319e417b3169c003c0721b552d16b605a19131cc5d",
+      "sha256": "79e87debd9563fc9fc79052448500bf701fcadc3adb73cf094ea98da2928f79d",
+      "templateSha256": "0a37dd05ed63271082beb3e4de6c4135e94eee5c4c3bfac0300bc3fc95908936",
       "media": "Bundled catalog / demo app fixtures",
-      "bytes": 135607
+      "bytes": 136009
     },
     {
       "id": "spring-kinetics",
@@ -619,10 +619,10 @@
       "hasAudio": true,
       "orientation": "landscape",
       "backend": "native",
-      "sha256": "3b979905ee0dcb6a278040d3af7612afda9d5602f767dc4e98bbe32e7643d7ab",
-      "templateSha256": "15f4e355e82edaed3beb0cd9d995da24505fecb64a86080ce9fe54104016ce90",
+      "sha256": "ba3527ed0faeb3e1bf63ff5eba90cac0e2820a298668930da3a3aef119b26cfe",
+      "templateSha256": "7e30814fbe5e01e25b4d3b4f700ce40739caa0ebd01a027b811af9d33f3e4511",
       "media": "Bundled catalog / demo app fixtures",
-      "bytes": 91790
+      "bytes": 91517
     },
     {
       "id": "blend-motion-blur",
@@ -647,6 +647,78 @@
       "templateSha256": "851d83fe8477802333c4abf6080625d73e16ed1fbd435badc2e589d713ff3e39",
       "media": "Bundled catalog / demo app fixtures",
       "bytes": 154720
+    },
+    {
+      "id": "html-motion",
+      "source": "examples/motion-design/html-motion.json",
+      "duration": 9.041016,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "65aa8f02e5c8403a3c6fabc68225f9453e423d988db0776999d2d4a47044cfab",
+      "templateSha256": "319bc847e14978bfb485a761f7683d721af7a1e7ef16107f2691360d6a1fc27d",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 53218
+    },
+    {
+      "id": "vector-shapes",
+      "source": "examples/motion-design/vector-shapes.json",
+      "duration": 8.632993,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "0002bc5b4004e202becbb6e9e29bce1baeabf397809d9450935eab3a0f8a1117",
+      "templateSha256": "beccc2ca3dfa24e85942997de70510947339a811215cba161722be7f3509b921",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 56664
+    },
+    {
+      "id": "line-draw",
+      "source": "examples/motion-design/line-draw.json",
+      "duration": 10.441995,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "bb32fbf57f7eede14edad78c74e86863f5a63046f8e049105d2f5b32062af13c",
+      "templateSha256": "c7c4f0485972c03a3feaf0d4ba2213ab325c22c026c9ac22904b16e22cd153e6",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 55164
+    },
+    {
+      "id": "fx-burst",
+      "source": "examples/motion-design/fx-burst.json",
+      "duration": 6.838005,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "508624ea8d9dcd9ebb49d78da4981b5871b88a8fae03a032fec7463d2a1180f0",
+      "templateSha256": "edf091a50f48b07ddf5aaea0d53cebbbe2f9c3b8e3c2d6601d38e0bc8826f860",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 42044
+    },
+    {
+      "id": "fx-liquid",
+      "source": "examples/motion-design/fx-liquid.json",
+      "duration": 5.223991,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "780d2e1db5db051e57b1d71acd8419227f63fe7d05b6b9afe77574e6ea15fe74",
+      "templateSha256": "61035d14f2d36d1828eb2c77317f1411e47515d114004338e462ec8a7056daed",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 46455
+    },
+    {
+      "id": "fx-glitch-iris-sheen",
+      "source": "examples/motion-design/fx-glitch-iris-sheen.json",
+      "duration": 6.199002,
+      "hasAudio": true,
+      "orientation": "landscape",
+      "backend": "native",
+      "sha256": "de861775ff9218d966d11f0b9223c1a90346b26457a4af51af537db45ee83795",
+      "templateSha256": "70e06865d170005892f39fa919ef36abbcb5db623ec5c346965cec6595a11e80",
+      "media": "Bundled catalog / demo app fixtures",
+      "bytes": 396531
     }
   ]
 }

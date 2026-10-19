@@ -380,7 +380,7 @@
         },
         {
           "text": {
-            "en": "Basic, designed and xfade"
+            "en": "Bands, shaped irises, designed and xfade"
           },
           "preset": "rise",
           "font": "oswald",
@@ -406,7 +406,7 @@
       "purpose": "Play the rendered transitions chapter.",
       "options": {
         "videoUrl": "{{ chapter_03 }}",
-        "duration": 30
+        "duration": 34.85
       },
       "transition": {
         "type": "whip-down",
@@ -553,7 +553,7 @@
         },
         {
           "text": {
-            "en": "Splits, a wipe and every fx primitive"
+            "en": "Splits, blends, masks, shapes and every fx"
           },
           "preset": "rise",
           "font": "oswald",
@@ -578,7 +578,7 @@
       "purpose": "Play the rendered compositing and light chapter.",
       "options": {
         "videoUrl": "{{ chapter_05 }}",
-        "duration": 40.9
+        "duration": 52.3
       },
       "transition": {
         "type": "push-up",

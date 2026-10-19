@@ -1,0 +1,369 @@
+{
+  "meta": {
+    "name": "fx burst",
+    "description": "The burst fx primitive: a heart pop with a rose burst and dots, a SALE badge slam with impact lines, and a lavender half burst under a title.",
+    "creativeDirection": "Audience: motion designers checking the burst primitive. Direction: one accent per beat on a dark ink ground (#141416), lavender (#9298fb) and rose (#f96f99) shapes, a small uppercase label naming the beat. Each burst fires on the frame its element hits: one frame before the top of the heart's spring pop (the heart squashes 0.92 x 1.06 for 2 frames on the hit), on the badge's floor contact (it stretches as it falls, squashes, rebounds into a short stretch, then rests), and as the title settles. Springs are near-critical, overshooting 5 % at most. Review: rays clear the element they burst from, the half burst fans only upward, and every burst is gone by 70 % of its duration: nothing faint lingers."
+  },
+  "global": {
+    "orientation": "landscape",
+    "fps": 30,
+    "musicEnabled": false,
+    "seed": 21,
+    "transition": {
+      "type": "cut"
+    },
+    "theme": {
+      "extends": "leclap",
+      "colors": {
+        "bg": "#141416",
+        "fg": "#f5f3f7",
+        "accent": "#f96f99",
+        "accent2": "#9298fb"
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "heart_pop",
+      "type": "color_background",
+      "purpose": "A heart springs in and a rose burst fires from it one frame before the top of the pop, with a few dots between the rays; the heart squashes on the hit.",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2
+      },
+      "inputs": [
+        {
+          "name": "label_1",
+          "type": "html",
+          "html": "<div class=\"label\"><span>01 · Heart pop</span></div>",
+          "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+          "width": 520,
+          "height": 48,
+          "options": {
+            "position": "64:48",
+            "motion": {
+              "type": "fade",
+              "delay": 0,
+              "duration": 0.3
+            }
+          }
+        },
+        {
+          "name": "heart",
+          "type": "html",
+          "html": "<div class=\"heart\"><div class=\"lobe left\"></div><div class=\"lobe right\"></div><div class=\"tip\"></div></div>",
+          "css": ".heart { display: flex; position: relative; width: 160px; height: 160px } .tip { position: absolute; left: 35px; top: 45px; width: 90px; height: 90px; background: #f96f99; transform: rotate(45deg) } .lobe { position: absolute; top: 13px; width: 90px; height: 90px; border-radius: 45px; background: #f96f99 } .left { left: 3px } .right { left: 67px }",
+          "width": 160,
+          "height": 160,
+          "options": {
+            "position": "560:280",
+            "animate": {
+              "scale": [
+                {
+                  "t": 0.25,
+                  "v": 0
+                },
+                {
+                  "v": 1,
+                  "ease": "spring(300, 24)"
+                }
+              ],
+              "scaleX": [
+                {
+                  "t": 0.4667,
+                  "v": 1
+                },
+                {
+                  "t": 0.5,
+                  "v": 0.92,
+                  "ease": "ease-out"
+                },
+                {
+                  "t": 0.5333,
+                  "v": 0.92
+                },
+                {
+                  "t": 0.6333,
+                  "v": 1,
+                  "ease": "ease-in-out"
+                }
+              ],
+              "scaleY": [
+                {
+                  "t": 0.4667,
+                  "v": 1
+                },
+                {
+                  "t": 0.5,
+                  "v": 1.06,
+                  "ease": "ease-out"
+                },
+                {
+                  "t": 0.5333,
+                  "v": 1.06
+                },
+                {
+                  "t": 0.6333,
+                  "v": 1,
+                  "ease": "ease-in-out"
+                }
+              ],
+              "opacity": [
+                {
+                  "t": 0.25,
+                  "v": 0
+                },
+                {
+                  "t": "+0.08",
+                  "v": 1
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "burst",
+          "id": "heart_burst",
+          "target": {
+            "x": 560,
+            "y": 280,
+            "w": 160,
+            "h": 160
+          },
+          "at": 0.4333,
+          "rays": 8,
+          "thickness": 8,
+          "length": 0.55,
+          "dots": true,
+          "jitter": 0.15,
+          "color": "$color.accent",
+          "seed": 3
+        }
+      ]
+    },
+    {
+      "name": "sale_drop",
+      "type": "color_background",
+      "purpose": "A SALE badge drops, stretching as it speeds up, slams on the floor with a squash, rebounds into a short stretch and rests; impact lines fire from it on the frame it lands.",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "inputs": [
+        {
+          "name": "label_2",
+          "type": "html",
+          "html": "<div class=\"label\"><span>02 · Impact</span></div>",
+          "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+          "width": 520,
+          "height": 48,
+          "options": {
+            "position": "64:48",
+            "motion": {
+              "type": "fade",
+              "delay": 0,
+              "duration": 0.3
+            }
+          }
+        },
+        {
+          "name": "floor",
+          "type": "html",
+          "html": "<div class=\"floor\"></div>",
+          "css": ".floor { width: 560px; height: 6px; border-radius: 3px; background: #2a2a33 }",
+          "width": 560,
+          "height": 6,
+          "options": {
+            "position": "360:446"
+          }
+        },
+        {
+          "name": "badge",
+          "type": "html",
+          "html": "<div class=\"badge\"><strong>SALE</strong><span>−40%</span></div>",
+          "css": ".badge { display: flex; align-items: center; justify-content: center; gap: 18px; width: 340px; height: 132px; border-radius: 66px; background: #9298fb } strong { color: #141416; font: 700 60px Rubik; letter-spacing: 2px } span { color: #141416; font: 500 40px Rubik }",
+          "width": 340,
+          "height": 132,
+          "options": {
+            "position": "470:314",
+            "origin": "bottom",
+            "animate": {
+              "y": [
+                {
+                  "t": 0.15,
+                  "v": "-460"
+                },
+                {
+                  "t": 0.6,
+                  "v": "+0",
+                  "ease": "ease-in"
+                }
+              ],
+              "scaleX": [
+                {
+                  "t": 0.15,
+                  "v": 1
+                },
+                {
+                  "t": 0.6,
+                  "v": 0.95,
+                  "ease": "ease-in"
+                },
+                {
+                  "t": 0.6667,
+                  "v": 1.16,
+                  "ease": "ease-out"
+                },
+                {
+                  "t": 0.7667,
+                  "v": 0.96,
+                  "ease": "ease-in-out"
+                },
+                {
+                  "v": 1,
+                  "ease": "spring(170, 18)"
+                }
+              ],
+              "scaleY": [
+                {
+                  "t": 0.15,
+                  "v": 1
+                },
+                {
+                  "t": 0.6,
+                  "v": 1.07,
+                  "ease": "ease-in"
+                },
+                {
+                  "t": 0.6667,
+                  "v": 0.78,
+                  "ease": "ease-out"
+                },
+                {
+                  "t": 0.7667,
+                  "v": 1.04,
+                  "ease": "ease-in-out"
+                },
+                {
+                  "v": 1,
+                  "ease": "spring(170, 18)"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "burst",
+          "target": {
+            "x": 470,
+            "y": 314,
+            "w": 340,
+            "h": 132
+          },
+          "at": 0.6,
+          "rays": 10,
+          "spread": 200,
+          "thickness": 6,
+          "length": 0.4,
+          "jitter": 0.35,
+          "duration": 0.3,
+          "color": "$color.fg",
+          "seed": 8
+        }
+      ]
+    },
+    {
+      "name": "half_title",
+      "type": "color_background",
+      "purpose": "A title rises into place and a lavender half burst fans up from beneath it, like a sunrise behind the words.",
+      "options": {
+        "backgroundColor": "#141416",
+        "duration": 2.4
+      },
+      "inputs": [
+        {
+          "name": "label_3",
+          "type": "html",
+          "html": "<div class=\"label\"><span>03 · Half burst</span></div>",
+          "css": ".label { display: flex; align-items: center; gap: 14px } span { color: #9298fb; font: 600 26px Rubik; text-transform: uppercase; letter-spacing: 4px }",
+          "width": 520,
+          "height": 48,
+          "options": {
+            "position": "64:48",
+            "motion": {
+              "type": "fade",
+              "delay": 0,
+              "duration": 0.3
+            }
+          }
+        },
+        {
+          "name": "title",
+          "type": "html",
+          "html": "<div class=\"title\"><strong>Launch day</strong></div>",
+          "css": ".title { display: flex; align-items: center; justify-content: center; width: 600px; height: 120px } strong { color: #f5f3f7; font: 700 76px Rubik }",
+          "width": 600,
+          "height": 120,
+          "options": {
+            "position": "340:300",
+            "animate": {
+              "y": [
+                {
+                  "t": 0.15,
+                  "v": "+40"
+                },
+                {
+                  "t": 0.55,
+                  "v": "+0",
+                  "ease": "ease-out-cubic"
+                }
+              ],
+              "opacity": [
+                {
+                  "t": 0.15,
+                  "v": 0
+                },
+                {
+                  "t": 0.4,
+                  "v": 1
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "graphics": [
+        {
+          "type": "fx",
+          "effect": "burst",
+          "target": {
+            "x": 450,
+            "y": 300,
+            "w": 380,
+            "h": 120
+          },
+          "origin": {
+            "x": 0.5,
+            "y": 1
+          },
+          "at": 0.5,
+          "spread": 180,
+          "rays": 9,
+          "thickness": 6,
+          "length": 0.5,
+          "dots": 4,
+          "jitter": 0.1,
+          "duration": 0.6,
+          "color": "$color.accent2",
+          "seed": 5
+        }
+      ]
+    }
+  ]
+}

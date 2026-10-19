@@ -113,7 +113,7 @@ done
 # The opening's backdrop: a dimmed 3x3 wall of chapter moments, so the very first frame already shows
 # what the tour is about instead of a bare card. Built from whichever chapter renders are staged.
 wall=(02-camera-graphics:14 02-camera-graphics:6 05-compositing:0.3 07-looks:0.3 06-theme-e-neon:1.5 02-camera-graphics:2
-  01-type:33.6 05-compositing:29.3 05-compositing:15.4)
+  01-type:33.6 05-compositing:40.7 05-compositing:26.8)
 wall_inputs=() wall_tiles="" wall_stack=""
 for index in "${!wall[@]}"; do
   name=${wall[$index]%%:*}
