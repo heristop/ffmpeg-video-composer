@@ -202,17 +202,23 @@ const EditorTopBar = ({
     {phase === 'edit' && (
       // Icon-only on phones: spelled out, this CTA took roughly half the titlebar and truncated the
       // project name to a couple of characters. The label returns as soon as there's room.
-      <PressableScale
-        onClick={onCreate}
-        disabled={!allComplete}
-        hoverLift
-        haptic="success"
-        aria-label={t('hub.createCta')}
-        title={t('hub.createCta')}
-        className="brand-gradient group inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-900/30 transition-shadow hover:shadow-brand-500/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/30 disabled:pointer-events-none disabled:opacity-50 sm:px-5 [&_svg]:size-4"
+      // A disabled button shows no tooltip, so the wrapper says what is missing. Disabled, the CTA drops its
+      // gradient for a flat surface: a half-transparent gradient still reads as a live button.
+      <span
+        className="inline-flex shrink-0"
+        title={allComplete ? t('hub.createCta') : t('hub.createBlocked', { done, total })}
       >
-        <Sparkles size={16} /> <span className="hidden sm:inline">{t('hub.createCta')}</span>
-      </PressableScale>
+        <PressableScale
+          onClick={onCreate}
+          disabled={!allComplete}
+          hoverLift
+          haptic="success"
+          aria-label={t('hub.createCta')}
+          className="brand-gradient group inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-900/30 transition-shadow hover:shadow-brand-500/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/30 disabled:pointer-events-none disabled:bg-surface-2 disabled:[background-image:none] disabled:text-muted-foreground disabled:shadow-none disabled:ring-1 disabled:ring-foreground/10 sm:px-5 [&_svg]:size-4"
+        >
+          <Sparkles size={16} /> <span className="hidden sm:inline">{t('hub.createCta')}</span>
+        </PressableScale>
+      </span>
     )}
   </header>
 );
@@ -350,22 +356,17 @@ const ProgramArea = ({ clipFile, section, editForClip, onEditChange, template, m
   );
 };
 
-// The panel's title block. On phones the kind eyebrow (Record / Details) sits inline with the title
-// instead of stacking above it — the same two facts on one line rather than two, so the panel body
-// starts that much higher up the fold.
+// The panel's title block: one row, the scene's title on the left and its kind (Record / Details) as a
+// quiet meta on the right, the same header the template builder's panels use.
 const PanelHeader = ({ title, eyebrow }: { title: string | null; eyebrow: string | null }) => {
   if (!title) return null;
 
-  const eyebrowClass =
-    'text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-brand-600/70 dark:text-brand-300/60';
-
   return (
-    <header className="shrink-0 border-b border-foreground/10 px-4 py-2 short:py-1 sm:px-5 sm:py-3">
-      {eyebrow && <p className={`hidden sm:block short:hidden ${eyebrowClass}`}>{eyebrow}</p>}
-      <h2 className="flex min-w-0 items-baseline gap-2 font-display text-base font-bold text-foreground short:text-sm sm:text-lg">
-        {eyebrow && <span className={`shrink-0 sm:hidden short:inline ${eyebrowClass}`}>{eyebrow}</span>}
-        <span className="truncate">{title}</span>
+    <header className="flex shrink-0 items-baseline justify-between gap-3 border-b border-divider px-4 py-3 short:py-1.5 sm:px-5">
+      <h2 className="min-w-0 truncate font-display text-base font-semibold text-foreground short:text-sm sm:text-lg">
+        {title}
       </h2>
+      {eyebrow ? <span className="shrink-0 text-xs text-muted-foreground">{eyebrow}</span> : null}
     </header>
   );
 };
