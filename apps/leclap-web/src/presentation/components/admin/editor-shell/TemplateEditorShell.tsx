@@ -220,6 +220,7 @@ export const TemplateEditorShell = ({
           <SceneRenderScope state={state} sectionIndex={sel.selectedIndex} preview={agent.preview}>
             <EditorPanelSwitch
               activeTool={sel.activeTool}
+              sectionIndex={sel.selectedIndex}
               state={state}
               section={selectedSection}
               partials={listAvailablePartials(localPartials)}

@@ -19,7 +19,7 @@ interface ProgramMonitorProps {
 export const ProgramMonitor = ({ children, label, note, meta, swapKey, transport, controls }: ProgramMonitorProps) => (
   <div className="flex h-full min-h-0 flex-col">
     <div className="studio-stage relative min-h-0 flex-1">
-      <div key={swapKey} className="fade-in h-full motion-reduce:animate-none">
+      <div key={swapKey} className="monitor-swap h-full motion-reduce:animate-none">
         {children}
       </div>
 
