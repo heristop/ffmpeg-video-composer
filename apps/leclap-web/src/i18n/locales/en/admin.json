@@ -1172,7 +1172,10 @@
     "keyMove": "move",
     "keyTick": "tick",
     "keyPreview": "preview",
-    "keyDefault": "default"
+    "keyDefault": "default",
+    "pickerLabel": "Music",
+    "keysHintSingle": "Arrow keys move between tracks. Enter picks a track, Space previews it.",
+    "keyPick": "pick"
   },
   "form": {
     "fieldId": "Field ID",

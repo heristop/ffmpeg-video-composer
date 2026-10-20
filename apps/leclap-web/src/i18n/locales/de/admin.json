@@ -1172,7 +1172,10 @@
     "keyMove": "wechseln",
     "keyTick": "anhaken",
     "keyPreview": "anhören",
-    "keyDefault": "Standard"
+    "keyDefault": "Standard",
+    "pickerLabel": "Musik",
+    "keysHintSingle": "Pfeiltasten wechseln den Track. Enter wählt ihn, Leertaste spielt ihn an.",
+    "keyPick": "wählen"
   },
   "form": {
     "fieldId": "Feld-ID",

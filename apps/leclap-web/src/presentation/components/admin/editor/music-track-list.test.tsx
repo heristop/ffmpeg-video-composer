@@ -90,3 +90,22 @@ describe('music catalog durations', () => {
     expect(MUSIC_LIBRARY.every((item) => (item.durationSec ?? 0) > 0)).toBe(true);
   });
 });
+
+describe('MusicTrackPicker', () => {
+  it('offers the tracks as one choice, with radio rows', async () => {
+    const { MusicTrackPicker } = await import('./music-track-list');
+    const html = renderToStaticMarkup(
+      <I18nextProvider i18n={i18n}>
+        <MusicTrackPicker items={[first, second]} selectedId={second.id} onSelect={noop} />
+      </I18nextProvider>
+    );
+
+    expect(html).toContain('role="radiogroup"');
+    expect(html.match(/role="radio"/g)).toHaveLength(2);
+    expect(html.match(/aria-checked="true"/g)).toHaveLength(1);
+    expect(html).toContain(`aria-label="${admin.musicSection.pickerLabel}"`);
+    expect(html).toContain(admin.musicSection.keysHintSingle);
+    expect(html).not.toContain(admin.musicSection.default);
+    expect(html).toContain(`</kbd> ${admin.musicSection.keyPick}<`);
+  });
+});

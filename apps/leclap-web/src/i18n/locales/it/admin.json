@@ -1172,7 +1172,10 @@
     "keyMove": "sposta",
     "keyTick": "spunta",
     "keyPreview": "ascolta",
-    "keyDefault": "predefinita"
+    "keyDefault": "predefinita",
+    "pickerLabel": "Musica",
+    "keysHintSingle": "Le frecce passano da una traccia all’altra. Invio la sceglie, Spazio la ascolta.",
+    "keyPick": "scegli"
   },
   "form": {
     "fieldId": "ID del campo",

@@ -1,17 +1,14 @@
-import { useState, useId, useRef, useEffect } from 'react';
+import { useState, useId } from 'react';
 import { useMediaDrop, type AcceptSpec } from '@/lib/upload';
 import { describeAccept } from '@/lib/upload/core/describe-accept';
 import type { Rejection } from '@/lib/upload/core/types';
 import { rejectionMessages } from './media-picker-rejections';
 import { useTranslation } from 'react-i18next';
 import { Upload, Music, Image as ImageIcon, Video as VideoIcon, X } from '@/presentation/components/icons';
-import { PlayIcon } from '@/presentation/components/icons/play';
-import { PauseIcon } from '@/presentation/components/icons/pause';
-import { useIconHover } from '@/presentation/components/icons/useIconHover';
 import { cn } from '@/lib/utils';
-import { coverGradient } from '@/lib/poster';
 import { Button, SegmentedControl } from '@/presentation/components/ui';
 import { CheckboxMark } from '@/presentation/components/ui/checkbox';
+import { MusicTrackChecklist, MusicTrackPicker } from './editor/music-track-list';
 import { browserMediaService } from '@/services/browserMediaService';
 import { MUSIC_LIBRARY, BACKGROUND_LIBRARY, type MediaCredit } from '@/data/mediaCatalog';
 import type { MediaChoice } from './templateEditorModel';
@@ -260,6 +257,18 @@ const SingleLibraryGrid = ({ kind, value, onChange, allowedIds }: SingleLibraryG
     return <MediaEmpty kind={kind} message={t('media.emptyLibrary')} />;
   }
 
+  if (kind === 'music') {
+    return (
+      <MusicTrackPicker
+        items={items}
+        selectedId={value?.source === 'library' ? value.id : null}
+        onSelect={(id) => {
+          onChange({ source: 'library', id });
+        }}
+      />
+    );
+  }
+
   return (
     <div className={libraryGridClass}>
       {items.map((item) => {
@@ -267,10 +276,6 @@ const SingleLibraryGrid = ({ kind, value, onChange, allowedIds }: SingleLibraryG
         const pick = () => {
           onChange({ source: 'library', id: item.id });
         };
-
-        if (kind === 'music') {
-          return <MusicCard key={item.id} item={item} selected={selected} onPick={pick} />;
-        }
 
         return <PictureCard key={item.id} item={item} selected={selected} onPick={pick} />;
       })}
@@ -294,6 +299,10 @@ const MultiLibraryGrid = ({ kind, selectedIds, onToggleId, allowedIds }: MultiLi
     return <MediaEmpty kind={kind} message={t('media.emptyMultiLibrary')} />;
   }
 
+  if (kind === 'music') {
+    return <MusicTrackChecklist items={items} selectedIds={selectedIds} onToggle={onToggleId} />;
+  }
+
   return (
     <div className={libraryGridClass}>
       {items.map((item) => {
@@ -301,10 +310,6 @@ const MultiLibraryGrid = ({ kind, selectedIds, onToggleId, allowedIds }: MultiLi
         const toggle = () => {
           onToggleId(item.id);
         };
-
-        if (kind === 'music') {
-          return <MusicCard key={item.id} item={item} selected={selected} onPick={toggle} />;
-        }
 
         return <PictureCard key={item.id} item={item} selected={selected} onPick={toggle} />;
       })}
@@ -329,6 +334,18 @@ const SingleByIdGrid = ({ kind, selectedId, onSelectId, allowedIds }: SingleById
     return <MediaEmpty kind={kind} message={t('media.emptyLibrary')} />;
   }
 
+  if (kind === 'music') {
+    return (
+      <MusicTrackPicker
+        items={items}
+        selectedId={selectedId}
+        onSelect={(id) => {
+          onSelectId(id === selectedId ? null : id);
+        }}
+      />
+    );
+  }
+
   return (
     <div role="radiogroup" className={libraryGridClass}>
       {items.map((item) => {
@@ -337,113 +354,8 @@ const SingleByIdGrid = ({ kind, selectedId, onSelectId, allowedIds }: SingleById
           onSelectId(selected ? null : item.id);
         };
 
-        if (kind === 'music') {
-          return <MusicCard key={item.id} item={item} selected={selected} onPick={pick} />;
-        }
-
         return <PictureCard key={item.id} item={item} selected={selected} onPick={pick} />;
       })}
-    </div>
-  );
-};
-
-// Only one preview plays at a time across the whole picker: starting a track pauses whichever element
-// was playing. The state of each card is driven by its <audio> play/pause events, so a track stopped
-// from another card flips its own button back automatically.
-let activePreview: HTMLAudioElement | null = null;
-
-const MusicCard = ({ item, selected, onPick }: CardProps) => {
-  const { t } = useTranslation('admin');
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [playing, setPlaying] = useState(false);
-  const { ref: playRef, hoverProps: playHoverProps } = useIconHover();
-  const { ref: pauseRef, hoverProps: pauseHoverProps } = useIconHover();
-
-  // Release the shared slot if this card owned it when it unmounts (e.g. switching the Library tab).
-  useEffect(
-    () => () => {
-      const audio = audioRef.current;
-
-      if (audio && activePreview === audio) activePreview = null;
-    },
-    []
-  );
-
-  const toggle = () => {
-    const audio = audioRef.current;
-
-    if (!audio) {
-      return;
-    }
-
-    if (!audio.paused) {
-      audio.pause();
-
-      return;
-    }
-
-    if (activePreview && activePreview !== audio) activePreview.pause();
-
-    activePreview = audio;
-    audio.play().catch(() => {});
-  };
-
-  return (
-    <div
-      className={cn(
-        'relative rounded-xl border p-2 transition-all',
-        selected
-          ? 'border-brand-500 bg-brand-500/5 ring-2 ring-brand-500/30'
-          : 'border-foreground/10 hover:border-brand-500/40'
-      )}
-    >
-      <button type="button" onClick={onPick} aria-pressed={selected} className="block w-full text-left">
-        <span
-          className="relative block aspect-square w-full overflow-hidden rounded-lg"
-          style={item.cover ? undefined : { backgroundImage: coverGradient(item.id) }}
-        >
-          {item.cover ? (
-            <img src={item.cover} alt="" loading="lazy" className="h-full w-full object-cover" />
-          ) : (
-            <Music className="absolute inset-0 m-auto h-8 w-8 text-white/85" />
-          )}
-          {selected ? (
-            <CheckboxMark checked className="absolute left-1.5 top-1.5 shadow-[0_1px_3px_oklch(0_0_0/0.35)]" />
-          ) : null}
-        </span>
-        <span className="mt-2 block truncate text-sm font-semibold text-foreground">{item.title}</span>
-        <span className="block truncate text-xs text-gray-400">{item.author}</span>
-      </button>
-      <button
-        type="button"
-        onClick={toggle}
-        aria-label={playing ? t('media.pause', { title: item.title }) : t('media.play', { title: item.title })}
-        className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-black/55 text-white backdrop-blur transition hover:scale-105 hover:bg-brand-600"
-        {...(playing ? pauseHoverProps : playHoverProps)}
-      >
-        {playing ? (
-          <PauseIcon ref={pauseRef} size={16} />
-        ) : (
-          <PlayIcon ref={playRef} size={16} className="translate-x-px" />
-        )}
-      </button>
-      <audio
-        ref={audioRef}
-        src={item.url}
-        preload="none"
-        onPlay={() => {
-          setPlaying(true);
-        }}
-        onPause={() => {
-          setPlaying(false);
-        }}
-        onEnded={() => {
-          setPlaying(false);
-
-          if (activePreview === audioRef.current) activePreview = null;
-        }}
-        className="sr-only"
-      />
     </div>
   );
 };

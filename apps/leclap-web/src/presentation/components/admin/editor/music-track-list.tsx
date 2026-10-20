@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Info, Loader2, Music } from '@/presentation/components/icons';
 import { PlayIcon } from '@/presentation/components/icons/play';
 import { PauseIcon } from '@/presentation/components/icons/pause';
-import { CheckboxMark } from '@/presentation/components/ui/checkbox';
+import { CheckboxMark, RadioMark } from '@/presentation/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { coverGradient } from '@/lib/poster';
 import { MUSIC_LIBRARY, findMusic, type MediaCredit } from '@/data/mediaCatalog';
@@ -49,32 +49,37 @@ export function TrackArt({ item, className }: { item: MediaCredit; className?: s
   );
 }
 
-interface MusicTrackListProps {
-  selectedIds: string[];
-  allowUpload: boolean;
-  onToggle: (id: string) => void;
-  onMakeDefault: (id: string) => void;
-  onClear: () => void;
-}
+type RowMode = 'multi' | 'single';
 
 function previewOf(preview: PreviewState, id: string): PreviewState | null {
   return preview.trackId === id ? preview : null;
 }
 
-function initialRow(selectedIds: string[]): number {
-  const index = MUSIC_LIBRARY.findIndex((item) => item.id === selectedIds.at(0));
-
-  return Math.max(index, 0);
+function initialRow(items: MediaCredit[], firstSelected: string | undefined): number {
+  return Math.max(
+    items.findIndex((item) => item.id === firstSelected),
+    0
+  );
 }
 
-export function MusicTrackList({ selectedIds, allowUpload, onToggle, onMakeDefault, onClear }: MusicTrackListProps) {
-  const { t } = useTranslation('admin');
-  const hintId = useId();
+interface TrackRowsProps {
+  items: MediaCredit[];
+  mode: RowMode;
+  selectedIds: string[];
+  // Multi mode: the default track (the first ticked) and the way to change it.
+  defaultId?: string;
+  onMakeDefault?: (id: string) => void;
+  onActivate: (id: string) => void;
+  label: string;
+  hintId: string;
+}
+
+// The rows themselves, shared by the editor's shortlist (checkboxes) and the viewer's pick (radios):
+// one tab stop, arrows to move, Enter to tick or pick, Space to preview, D for the default (multi only).
+function TrackRows({ items, mode, selectedIds, defaultId, onMakeDefault, onActivate, label, hintId }: TrackRowsProps) {
   const preview = useMusicPreview();
-  const [activeRow, setActiveRow] = useState(() => initialRow(selectedIds));
+  const [activeRow, setActiveRow] = useState(() => initialRow(items, selectedIds.at(0)));
   const rows = useRef(new Map<number, HTMLButtonElement>());
-  const defaultId = selectedIds.at(0);
-  const standIn = findMusic(defaultId ?? '') ?? MUSIC_LIBRARY.at(0);
 
   const focusRow = (index: number) => {
     setActiveRow(index);
@@ -86,8 +91,8 @@ export function MusicTrackList({ selectedIds, allowUpload, onToggle, onMakeDefau
 
     if (!action || event.altKey || event.metaKey || event.ctrlKey) return;
 
-    // The studio binds Space (program play) and the arrows (scene switching) on window; inside the list
-    // they belong to the list.
+    // The studio binds Space (program play) and the arrows (frame steps, edit points) on window; inside
+    // the list they belong to the list.
     event.preventDefault();
     event.stopPropagation();
 
@@ -104,13 +109,86 @@ export function MusicTrackList({ selectedIds, allowUpload, onToggle, onMakeDefau
     }
 
     if (action === 'makeDefault') {
-      if (selectedIds.includes(item.id)) onMakeDefault(item.id);
+      if (onMakeDefault && selectedIds.includes(item.id)) onMakeDefault(item.id);
 
       return;
     }
 
-    focusRow(moveIndex(action, index, MUSIC_LIBRARY.length));
+    focusRow(moveIndex(action, index, items.length));
   };
+
+  return (
+    <ul role={mode === 'single' ? 'radiogroup' : undefined} aria-label={label} className="-mx-2 grid gap-px">
+      {items.map((item, index) => (
+        <TrackRow
+          key={item.id}
+          item={item}
+          mode={mode}
+          selected={selectedIds.includes(item.id)}
+          isDefault={mode === 'multi' && item.id === defaultId}
+          allowDefault={mode === 'multi' && onMakeDefault !== undefined}
+          preview={previewOf(preview, item.id)}
+          tabbable={index === activeRow}
+          hintId={hintId}
+          rowRef={(node) => {
+            if (node) rows.current.set(index, node);
+          }}
+          onFocus={() => {
+            setActiveRow(index);
+          }}
+          onKeyDown={(event) => {
+            onRowKeyDown(event, index, item);
+          }}
+          onToggle={() => {
+            onActivate(item.id);
+          }}
+          onMakeDefault={() => {
+            onMakeDefault?.(item.id);
+          }}
+        />
+      ))}
+    </ul>
+  );
+}
+
+// A plain multi-select of library tracks, without a default (MediaPicker's shortlist mode).
+export function MusicTrackChecklist({
+  items,
+  selectedIds,
+  onToggle,
+}: {
+  items: MediaCredit[];
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+}) {
+  const { t } = useTranslation('admin');
+  const hintId = useId();
+
+  return (
+    <TrackRows
+      items={items}
+      mode="multi"
+      selectedIds={selectedIds}
+      onActivate={onToggle}
+      label={t('musicSection.listLabel')}
+      hintId={hintId}
+    />
+  );
+}
+
+interface MusicTrackListProps {
+  selectedIds: string[];
+  allowUpload: boolean;
+  onToggle: (id: string) => void;
+  onMakeDefault: (id: string) => void;
+  onClear: () => void;
+}
+
+export function MusicTrackList({ selectedIds, allowUpload, onToggle, onMakeDefault, onClear }: MusicTrackListProps) {
+  const { t } = useTranslation('admin');
+  const hintId = useId();
+  const defaultId = selectedIds.at(0);
+  const standIn = findMusic(defaultId ?? '') ?? MUSIC_LIBRARY.at(0);
 
   return (
     <div className="space-y-2">
@@ -136,56 +214,82 @@ export function MusicTrackList({ selectedIds, allowUpload, onToggle, onMakeDefau
         </p>
       ) : null}
 
-      <ul aria-label={t('musicSection.listLabel')} className="-mx-2 grid gap-px">
-        {MUSIC_LIBRARY.map((item, index) => (
-          <TrackRow
-            key={item.id}
-            item={item}
-            selected={selectedIds.includes(item.id)}
-            isDefault={item.id === defaultId}
-            preview={previewOf(preview, item.id)}
-            tabbable={index === activeRow}
-            hintId={hintId}
-            rowRef={(node) => {
-              if (node) rows.current.set(index, node);
-            }}
-            onFocus={() => {
-              setActiveRow(index);
-            }}
-            onKeyDown={(event) => {
-              onRowKeyDown(event, index, item);
-            }}
-            onToggle={() => {
-              onToggle(item.id);
-            }}
-            onMakeDefault={() => {
-              onMakeDefault(item.id);
-            }}
-          />
-        ))}
-      </ul>
+      <TrackRows
+        items={MUSIC_LIBRARY}
+        mode="multi"
+        selectedIds={selectedIds}
+        defaultId={defaultId}
+        onMakeDefault={onMakeDefault}
+        onActivate={onToggle}
+        label={t('musicSection.listLabel')}
+        hintId={hintId}
+      />
 
       <p id={hintId} className="sr-only">
         {t('musicSection.keysHint')}
       </p>
-      <p
-        aria-hidden="true"
-        className="flex flex-wrap gap-x-3 gap-y-1 pt-1 text-[0.6875rem] text-muted-foreground [@media(hover:none)]:hidden"
-      >
-        <span>
-          <Kbd>↑↓</Kbd> {t('musicSection.keyMove')}
-        </span>
-        <span>
-          <Kbd>Enter</Kbd> {t('musicSection.keyTick')}
-        </span>
-        <span>
-          <Kbd>Space</Kbd> {t('musicSection.keyPreview')}
-        </span>
-        <span>
-          <Kbd>D</Kbd> {t('musicSection.keyDefault')}
-        </span>
-      </p>
+      <KeyLegend
+        keys={[
+          ['↑↓', 'keyMove'],
+          ['Enter', 'keyTick'],
+          ['Space', 'keyPreview'],
+          ['D', 'keyDefault'],
+        ]}
+      />
     </div>
+  );
+}
+
+interface MusicTrackPickerProps {
+  items: MediaCredit[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}
+
+// The viewer's music step: the same rows as one choice (radios), so a viewer can hear a track before
+// picking it and read its full title.
+export function MusicTrackPicker({ items, selectedId, onSelect }: MusicTrackPickerProps) {
+  const { t } = useTranslation('admin');
+  const hintId = useId();
+
+  return (
+    <div className="space-y-2">
+      <TrackRows
+        items={items}
+        mode="single"
+        selectedIds={selectedId ? [selectedId] : []}
+        onActivate={onSelect}
+        label={t('musicSection.pickerLabel')}
+        hintId={hintId}
+      />
+      <p id={hintId} className="sr-only">
+        {t('musicSection.keysHintSingle')}
+      </p>
+      <KeyLegend
+        keys={[
+          ['↑↓', 'keyMove'],
+          ['Enter', 'keyPick'],
+          ['Space', 'keyPreview'],
+        ]}
+      />
+    </div>
+  );
+}
+
+function KeyLegend({ keys }: { keys: Array<[string, string]> }) {
+  const { t } = useTranslation('admin');
+
+  return (
+    <p
+      aria-hidden="true"
+      className="flex flex-wrap gap-x-3 gap-y-1 pt-1 text-[0.6875rem] text-muted-foreground [@media(hover:none)]:hidden"
+    >
+      {keys.map(([key, label]) => (
+        <span key={key}>
+          <Kbd>{key}</Kbd> {t(`musicSection.${label}`)}
+        </span>
+      ))}
+    </p>
   );
 }
 
@@ -199,6 +303,8 @@ function Kbd({ children }: { children: string }) {
 
 interface TrackRowProps {
   item: MediaCredit;
+  mode: RowMode;
+  allowDefault: boolean;
   selected: boolean;
   isDefault: boolean;
   preview: PreviewState | null;
@@ -213,6 +319,8 @@ interface TrackRowProps {
 
 function TrackRow({
   item,
+  mode,
+  allowDefault,
   selected,
   isDefault,
   preview,
@@ -241,11 +349,11 @@ function TrackRow({
       <button
         ref={rowRef}
         type="button"
-        role="checkbox"
+        role={ROW_ROLE[mode]}
         aria-checked={selected}
         aria-labelledby={titleId}
         aria-describedby={`${metaId} ${hintId}`}
-        aria-keyshortcuts="Enter Space D"
+        aria-keyshortcuts={ROW_SHORTCUTS[mode]}
         tabIndex={tabbable ? 0 : -1}
         onFocus={onFocus}
         onClick={onToggle}
@@ -256,7 +364,7 @@ function TrackRow({
         }}
         className="absolute inset-0 rounded-lg"
       />
-      <CheckboxMark checked={selected} className="pointer-events-none" />
+      <RowMark mode={mode} selected={selected} />
       <PreviewCover item={item} status={preview?.status ?? 'idle'} />
       <span className="pointer-events-none min-w-0 py-0.5">
         <span id={titleId} className="block break-words text-sm font-medium leading-snug text-foreground">
@@ -266,7 +374,9 @@ function TrackRow({
           <span id={metaId}>
             <TrackMeta item={item} preview={preview} duration={duration} />
           </span>
-          {selected && !isDefault ? <MakeDefaultButton title={item.title} onMakeDefault={onMakeDefault} /> : null}
+          {allowDefault && selected && !isDefault ? (
+            <MakeDefaultButton title={item.title} onMakeDefault={onMakeDefault} />
+          ) : null}
         </span>
       </span>
       {isDefault ? <DefaultChip /> : <span />}
@@ -323,6 +433,15 @@ function RowPlayhead({ preview, duration }: { preview: PreviewState | null; dura
       />
     </span>
   );
+}
+
+const ROW_ROLE: Record<RowMode, 'radio' | 'checkbox'> = { single: 'radio', multi: 'checkbox' };
+const ROW_SHORTCUTS: Record<RowMode, string> = { single: 'Enter Space', multi: 'Enter Space D' };
+
+function RowMark({ mode, selected }: { mode: RowMode; selected: boolean }) {
+  if (mode === 'single') return <RadioMark checked={selected} className="pointer-events-none" />;
+
+  return <CheckboxMark checked={selected} className="pointer-events-none" />;
 }
 
 export function PreviewGlyph({ status }: { status: PreviewState['status'] }) {

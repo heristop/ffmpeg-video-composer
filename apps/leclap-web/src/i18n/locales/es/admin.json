@@ -1172,7 +1172,10 @@
     "keyMove": "mover",
     "keyTick": "marcar",
     "keyPreview": "escuchar",
-    "keyDefault": "predeterminada"
+    "keyDefault": "predeterminada",
+    "pickerLabel": "Música",
+    "keysHintSingle": "Las flechas cambian de pista. Intro elige una pista, Espacio la escucha.",
+    "keyPick": "elegir"
   },
   "form": {
     "fieldId": "ID del campo",

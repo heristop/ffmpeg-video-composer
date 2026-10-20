@@ -1172,7 +1172,10 @@
     "keyMove": "naviguer",
     "keyTick": "cocher",
     "keyPreview": "écouter",
-    "keyDefault": "par défaut"
+    "keyDefault": "par défaut",
+    "pickerLabel": "Musique",
+    "keysHintSingle": "Les flèches passent d’une piste à l’autre. Entrée choisit une piste, Espace l’écoute.",
+    "keyPick": "choisir"
   },
   "form": {
     "fieldId": "ID du champ",

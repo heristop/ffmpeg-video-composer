@@ -59,6 +59,19 @@ export function CheckboxMark({ checked, className }: { checked: boolean; classNa
   );
 }
 
+// The single-choice counterpart: the same ring and fill, round, with a dot instead of a tick.
+export function RadioMark({ checked, className }: { checked: boolean; className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      data-state={checked ? 'checked' : 'unchecked'}
+      className={cn(checkboxBoxClass, 'rounded-full', className)}
+    >
+      {checked ? <span className="size-2 rounded-full bg-white" /> : null}
+    </span>
+  );
+}
+
 const Checkbox = React.forwardRef<
   React.ComponentRef<typeof CheckboxPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
