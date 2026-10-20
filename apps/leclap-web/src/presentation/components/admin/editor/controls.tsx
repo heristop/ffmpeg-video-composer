@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 const LABEL_CLS = 'block text-xs font-semibold uppercase tracking-widest text-gray-400';
 
 // The filled portion of a studio-range track, as a percent of its [min,max] span (clamped). Fed to the
-// CSS `--range-pct` var so the gradient fill tracks the value cross-browser.
+// CSS `--range-pct` var so the lavender fill tracks the value cross-browser.
 export const rangeFill = (value: number, min: number, max: number): CSSProperties => {
   const span = max - min;
   const pct = span > 0 ? ((value - min) / span) * 100 : 0;
@@ -120,7 +120,7 @@ export const SegmentedControl = <T extends string>({
             }}
             className={cn(
               'tap flex flex-[1_0_auto] items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40',
-              active ? 'brand-gradient text-white shadow-sm shadow-brand-500/20' : 'text-gray-500 hover:text-foreground'
+              active ? 'bg-brand-600 text-white shadow-sm shadow-brand-900/30' : 'text-gray-500 hover:text-foreground'
             )}
           >
             {option.label}

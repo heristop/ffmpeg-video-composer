@@ -161,9 +161,7 @@ const MirrorToggle = ({
               }}
               className={cn(
                 'tap flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-lg px-2 py-1 text-[0.65rem] font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40',
-                active
-                  ? 'brand-gradient text-white shadow-sm shadow-brand-500/20'
-                  : 'text-gray-500 hover:text-foreground'
+                active ? 'bg-brand-600 text-white shadow-sm shadow-brand-900/30' : 'text-gray-500 hover:text-foreground'
               )}
             >
               <span aria-hidden>{axis === 'horizontal' ? '↔' : '↕'}</span>

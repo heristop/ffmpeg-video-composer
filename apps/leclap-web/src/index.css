@@ -1869,7 +1869,7 @@ html.theme-vt::view-transition-new(root) {
   outline-offset: 2px;
 }
 
-/* Studio-themed range slider — a recessed slate groove with a brand→pink fill driven by --range-pct,
+/* Studio-themed range slider — a recessed slate groove with a solid lavender fill driven by --range-pct,
    and a film "playhead" cap thumb. Pairs with the Take Counter number input. Cross-browser via the
    vendor track/thumb pseudo-elements; the thumb ring is the keyboard focus indicator (so the slider
    opts out of the global outline above). Reduced-motion drops the thumb transition. */
@@ -1886,7 +1886,7 @@ html.theme-vt::view-transition-new(root) {
   height: 0.4rem;
   border-radius: 999px;
   background:
-    linear-gradient(90deg, var(--color-brand-500), var(--color-secondary-400)) 0 / var(--range-pct, 0%) 100% no-repeat,
+    linear-gradient(var(--color-brand-500), var(--color-brand-500)) 0 / var(--range-pct, 0%) 100% no-repeat,
     var(--color-surface-inset);
   box-shadow: inset 0 0 0 1px var(--color-divider);
 }
@@ -1901,7 +1901,7 @@ html.theme-vt::view-transition-new(root) {
 .studio-range::-moz-range-progress {
   height: 0.4rem;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-brand-500), var(--color-secondary-400));
+  background: var(--color-brand-500);
 }
 
 .studio-range::-webkit-slider-thumb {
@@ -1968,6 +1968,17 @@ html.theme-vt::view-transition-new(root) {
 .studio-range.hero-scrub {
   height: 2.75rem;
   margin-block: -0.625rem;
+}
+
+/* The landing's scrubber is a brand moment, so it keeps the lavender→pink fill the editor controls dropped. */
+.studio-range.hero-scrub::-webkit-slider-runnable-track {
+  background:
+    linear-gradient(90deg, var(--color-brand-500), var(--color-secondary-400)) 0 / var(--range-pct, 0%) 100% no-repeat,
+    var(--color-surface-inset);
+}
+
+.studio-range.hero-scrub::-moz-range-progress {
+  background: linear-gradient(90deg, var(--color-brand-500), var(--color-secondary-400));
 }
 
 /* The thumb ring below is the indicator; the browser's own outline would box the whole 44px strip. */
