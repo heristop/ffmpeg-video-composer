@@ -100,10 +100,10 @@ function easedStep(previous: TimedKey, key: TimedKey, time: string): string {
   return easedProgressExpr(parseEasing(ease), window, time);
 }
 
-/** The track's value over time as an (unquoted) expression in `time` (default drawtext's `t`). */
-export function trackExpr(keys: readonly TrackKey[], base: string | number = 0, time = 't'): string {
+// The first key's value, then one eased step per later key that changes it.
+function trackTerms(keys: readonly TrackKey[], base: string | number, time: string): [string, ...string[]] {
   const timed = resolveKeyTimes(keys);
-  const terms = [valueExpr(timed[0].v, base)];
+  const terms: [string, ...string[]] = [valueExpr(timed[0].v, base)];
 
   for (let index = 1; index < timed.length; index++) {
     const step = stepExpr(timed[index - 1].v, timed[index].v, base);
@@ -111,7 +111,23 @@ export function trackExpr(keys: readonly TrackKey[], base: string | number = 0, 
     if (step !== null) terms.push(`${step}*(${easedStep(timed[index - 1], timed[index], time)})`);
   }
 
-  return terms.join('+');
+  return terms;
+}
+
+/** The track's value over time as an (unquoted) expression in `time` (default drawtext's `t`). */
+export function trackExpr(keys: readonly TrackKey[], base: string | number = 0, time = 't'): string {
+  return trackTerms(keys, base, time).join('+');
+}
+
+/**
+ * A position track: its steps rounded together to the nearest whole pixel. Overlay and drawtext truncate
+ * x / y, so a spring ringing within half a pixel of its last key, or an ease-out approaching it from the
+ * other side of an integer, flipped the layer a pixel on its last frames; rounded, it lands and holds.
+ */
+export function positionTrackExpr(keys: readonly TrackKey[], base: string | number = 0, time = 't'): string {
+  const [first, ...steps] = trackTerms(keys, base, time);
+
+  return steps.length === 0 ? first : `${first}+round(${steps.join('+')})`;
 }
 
 export interface AnimateTracks {
@@ -131,9 +147,9 @@ export function applyTracks(
   animate: AnimateTracks,
   base: { x: string | number; y: string | number }
 ): void {
-  if (animate.x) values.x = `'${trackExpr(animate.x, base.x)}'`;
+  if (animate.x) values.x = `'${positionTrackExpr(animate.x, base.x)}'`;
 
-  if (animate.y) values.y = `'${trackExpr(animate.y, base.y)}'`;
+  if (animate.y) values.y = `'${positionTrackExpr(animate.y, base.y)}'`;
 
   if (animate.opacity) values.alpha = `'clip(${trackExpr(animate.opacity)},0,1)'`;
 

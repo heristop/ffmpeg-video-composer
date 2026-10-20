@@ -56,21 +56,21 @@ describe('revealToExpr', () => {
   it('rise lifts y up into place and fades in', () => {
     expect(revealToExpr('rise', { x: 0, y: 652 })).toEqual({
       alpha: `'${DEFAULT_RAMP}'`,
-      y: `'(652)+(1-(${DEFAULT_RAMP}))*60'`,
+      y: `'(652)+round((1-(${DEFAULT_RAMP}))*60)'`,
     });
   });
 
   it('slide-left enters from the right (base + offset)', () => {
     expect(revealToExpr('slide-left', base)).toEqual({
       alpha: `'${DEFAULT_RAMP}'`,
-      x: `'((w-text_w)/2)+(1-(${DEFAULT_RAMP}))*60'`,
+      x: `'((w-text_w)/2)+round((1-(${DEFAULT_RAMP}))*60)'`,
     });
   });
 
   it('slide-right enters from the left (base - offset)', () => {
     expect(revealToExpr('slide-right', { x: 64, y: 0 })).toEqual({
       alpha: `'${DEFAULT_RAMP}'`,
-      x: `'(64)-(1-(${DEFAULT_RAMP}))*60'`,
+      x: `'(64)-round((1-(${DEFAULT_RAMP}))*60)'`,
     });
   });
 
@@ -79,7 +79,7 @@ describe('revealToExpr', () => {
 
     expect(revealToExpr({ type: 'rise', delay: 0.5, duration: 0.4, distance: 120 }, { x: 0, y: 100 })).toEqual({
       alpha: `'${ramp}'`,
-      y: `'(100)+(1-(${ramp}))*120'`,
+      y: `'(100)+round((1-(${ramp}))*120)'`,
     });
   });
 
@@ -96,7 +96,7 @@ describe('revealToExpr', () => {
 
     expect(revealToExpr({ type: 'rise', easing: 'ease-out' }, { x: 0, y: 652 })).toEqual({
       alpha: `'${eased}'`,
-      y: `'(652)+(1-(${eased}))*60'`,
+      y: `'(652)+round((1-(${eased}))*60)'`,
     });
   });
 
@@ -127,7 +127,7 @@ describe('titleCardToFilters', () => {
         values: {
           text: { en: 'We did it' },
           x: '77',
-          y: `'(325)+(1-(${RAMP_03}))*60'`,
+          y: `'(325)+round((1-(${RAMP_03}))*60)'`,
           fontfile: 'Anton.ttf',
           fontsize: 61,
           fontcolor: '#ffffff',

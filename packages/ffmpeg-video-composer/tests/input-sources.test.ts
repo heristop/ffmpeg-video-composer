@@ -20,15 +20,15 @@ describe('overlayMotionExpr', () => {
   });
 
   it('rise lifts y from below the base position', () => {
-    expect(overlayMotionExpr('rise', '40:200')).toEqual({ x: '40', y: `(200)+(1-(${RAMP}))*60` });
+    expect(overlayMotionExpr('rise', '40:200')).toEqual({ x: '40', y: `(200)+round((1-(${RAMP}))*60)` });
   });
 
   it('slide-left enters from the right of the base x', () => {
-    expect(overlayMotionExpr('slide-left', '40:200')).toEqual({ x: `(40)+(1-(${RAMP}))*60`, y: '200' });
+    expect(overlayMotionExpr('slide-left', '40:200')).toEqual({ x: `(40)+round((1-(${RAMP}))*60)`, y: '200' });
   });
 
   it('slide-right enters from the left of the base x', () => {
-    expect(overlayMotionExpr('slide-right', '40:200')).toEqual({ x: `(40)-(1-(${RAMP}))*60`, y: '200' });
+    expect(overlayMotionExpr('slide-right', '40:200')).toEqual({ x: `(40)-round((1-(${RAMP}))*60)`, y: '200' });
   });
 
   it('fade emits an alpha fade-in leg filter, no position change', () => {
@@ -37,7 +37,7 @@ describe('overlayMotionExpr', () => {
 
   it('honours custom timing/distance overrides', () => {
     const expr = overlayMotionExpr({ type: 'rise', delay: 0.5, duration: 1, distance: 100 }, '0:0');
-    expect(expr.y).toBe('(0)+(1-(if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,1))))*100');
+    expect(expr.y).toBe('(0)+round((1-(if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,1))))*100)');
   });
 
   // easing wraps the linear ramp p in a curve — pure expression math on the overlay x/y, no new
@@ -48,17 +48,17 @@ describe('overlayMotionExpr', () => {
   it('ease-out wraps the rise/slide ramp in a cubic-out curve', () => {
     expect(overlayMotionExpr({ type: 'rise', easing: 'ease-out' }, '40:200')).toEqual({
       x: '40',
-      y: `(200)+(1-(${EASE_OUT}))*60`,
+      y: `(200)+round((1-(${EASE_OUT}))*60)`,
     });
     expect(overlayMotionExpr({ type: 'slide-left', easing: 'ease-out' }, '40:200')).toEqual({
-      x: `(40)+(1-(${EASE_OUT}))*60`,
+      x: `(40)+round((1-(${EASE_OUT}))*60)`,
       y: '200',
     });
   });
 
   it('ease-in-out wraps the ramp in a smoothstep curve', () => {
     expect(overlayMotionExpr({ type: 'slide-right', easing: 'ease-in-out' }, '40:200')).toEqual({
-      x: `(40)-(1-(${SMOOTHSTEP}))*60`,
+      x: `(40)-round((1-(${SMOOTHSTEP}))*60)`,
       y: '200',
     });
   });

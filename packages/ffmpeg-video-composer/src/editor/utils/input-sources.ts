@@ -1,6 +1,6 @@
 import { assertFiniteNumber, assertSafeArgToken, assertSafeColorToken, assertSafeExpression } from '@/core/arg-guard';
 import type { RevealEasing } from '../presets/text';
-import { easedRamp, phaseDuration } from '../presets/eased-ramp';
+import { easedRamp, phaseDuration, pixelOffset } from '../presets/eased-ramp';
 import type { BackgroundLayer } from '../../schemas/template.schemas';
 import type { GlobalAnimation } from '@/core/types';
 import { isHtmlSequence } from '../html/html-sequence-source';
@@ -261,16 +261,17 @@ function motionResult(args: {
   duration: number;
 }): OverlayMotion {
   const { type, bx, by, ramp, distance, delay, duration } = args;
+  const offset = pixelOffset(`(1-(${ramp}))*${distance}`);
 
   switch (type) {
     case 'fade':
       return { legFilter: `fade=t=in:st=${trimNum(delay)}:d=${trimNum(duration)}:alpha=1` };
     case 'rise':
-      return { x: bx, y: `(${by})+(1-(${ramp}))*${distance}` };
+      return { x: bx, y: `(${by})+${offset}` };
     case 'slide-left':
-      return { x: `(${bx})+(1-(${ramp}))*${distance}`, y: by };
+      return { x: `(${bx})+${offset}`, y: by };
     default:
-      return { x: `(${bx})-(1-(${ramp}))*${distance}`, y: by };
+      return { x: `(${bx})-${offset}`, y: by };
   }
 }
 
