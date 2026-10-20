@@ -180,6 +180,7 @@
         "standard": "Equilibrio entre imagen y tiempo de render.",
         "high": "La imagen más nítida; tarda más en renderizar y el archivo pesa más."
       }
-    }
+    },
+    "createBlocked": "Rellena antes cada escena ({{done}} de {{total}} listas)"
   }
 }

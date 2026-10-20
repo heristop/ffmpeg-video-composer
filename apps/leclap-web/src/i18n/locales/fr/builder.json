@@ -180,6 +180,7 @@
         "standard": "Le bon équilibre entre image et temps de rendu.",
         "high": "L’image la plus nette ; rendu plus long, fichier plus lourd."
       }
-    }
+    },
+    "createBlocked": "Remplis d’abord chaque scène ({{done}} sur {{total}} prêtes)"
   }
 }

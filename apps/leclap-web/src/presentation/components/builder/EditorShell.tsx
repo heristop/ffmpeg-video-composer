@@ -202,17 +202,23 @@ const EditorTopBar = ({
     {phase === 'edit' && (
       // Icon-only on phones: spelled out, this CTA took roughly half the titlebar and truncated the
       // project name to a couple of characters. The label returns as soon as there's room.
-      <PressableScale
-        onClick={onCreate}
-        disabled={!allComplete}
-        hoverLift
-        haptic="success"
-        aria-label={t('hub.createCta')}
-        title={t('hub.createCta')}
-        className="brand-gradient group inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-900/30 transition-shadow hover:shadow-brand-500/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/30 disabled:pointer-events-none disabled:opacity-50 sm:px-5 [&_svg]:size-4"
+      // A disabled button shows no tooltip, so the wrapper says what is missing. Disabled, the CTA drops its
+      // gradient for a flat surface: a half-transparent gradient still reads as a live button.
+      <span
+        className="inline-flex shrink-0"
+        title={allComplete ? t('hub.createCta') : t('hub.createBlocked', { done, total })}
       >
-        <Sparkles size={16} /> <span className="hidden sm:inline">{t('hub.createCta')}</span>
-      </PressableScale>
+        <PressableScale
+          onClick={onCreate}
+          disabled={!allComplete}
+          hoverLift
+          haptic="success"
+          aria-label={t('hub.createCta')}
+          className="brand-gradient group inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-900/30 transition-shadow hover:shadow-brand-500/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/30 disabled:pointer-events-none disabled:bg-surface-2 disabled:[background-image:none] disabled:text-muted-foreground disabled:shadow-none disabled:ring-1 disabled:ring-foreground/10 sm:px-5 [&_svg]:size-4"
+        >
+          <Sparkles size={16} /> <span className="hidden sm:inline">{t('hub.createCta')}</span>
+        </PressableScale>
+      </span>
     )}
   </header>
 );
