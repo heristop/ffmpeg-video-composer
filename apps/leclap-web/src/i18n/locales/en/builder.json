@@ -125,7 +125,10 @@
     "use": "Use take {{number}}",
     "remove": "Remove take {{number}}",
     "addAnother": "Record another take",
-    "addTake": "Add a take"
+    "addTake": "Add a take",
+    "confirmRemove": "Remove take {{number}}? The recording is discarded.",
+    "keep": "Keep",
+    "confirm": "Remove"
   },
   "edit": {
     "trim": "Trim",
