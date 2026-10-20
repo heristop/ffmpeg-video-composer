@@ -150,6 +150,7 @@ export const PartialPanelSwitch = ({
     <PanelFrame title={title}>
       <SectionFields
         section={section}
+        sections={state.sections}
         orientation={state.orientation}
         variables={collectVariables(state)}
         partials={partials}

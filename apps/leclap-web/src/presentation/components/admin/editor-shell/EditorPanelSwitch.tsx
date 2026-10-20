@@ -72,6 +72,7 @@ export const EditorPanelSwitch = ({
       >
         <SectionFields
           section={section}
+          sections={state.sections}
           orientation={state.orientation}
           variables={collectVariables(state)}
           partials={partials}

@@ -9,12 +9,10 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { resolveCanvasDrop, type DropPayload, type DropPoint } from './canvasDrop';
 import { htmlPreviewEnv } from './html-layer/html-layer-env';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
-import { PreviewSurface } from '../editor/PreviewSurface';
 import { newBaseLayer } from '../editor/layerGeometry';
 import { findBackground, BACKGROUND_LIBRARY } from '@/data/mediaCatalog';
-import { SECTION_ICON } from '@/lib/sectionMeta';
-import { sectionFallbackMeta, formFieldChips, type FallbackKind } from './sectionFallback';
 import { MusicStagePreview } from './music-stage-preview';
+import { FormStagePreview } from './form-stage-preview';
 import {
   collectVariables,
   type BackgroundLayer,
@@ -54,45 +52,6 @@ const EmptyState = ({ label }: { label: string }) => (
     {label}
   </div>
 );
-
-// An informative, painted frame for a form scene: it has no backdrop or text overlays to edit, so the
-// monitor lists the fields the viewer will fill. Music scenes get their own MusicStagePreview.
-const FallbackPreview = ({ section }: { section: EditorSection }) => {
-  const { t } = useTranslation('admin');
-  const kind = section.kind as FallbackKind;
-  const meta = sectionFallbackMeta(kind);
-  const Icon = SECTION_ICON[kind];
-  const chips = formFieldChips(section);
-
-  return (
-    <div className="grid h-full place-items-center p-4">
-      <div className="relative w-full max-w-md">
-        <PreviewSurface className="aspect-video w-full" />
-        <div className="absolute inset-0 grid place-items-center p-6 text-center">
-          <div className="grid justify-items-center gap-2">
-            <span className="grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white/85">
-              <Icon className="h-5 w-5" />
-            </span>
-            <span className="text-sm font-semibold text-white/90">{t(meta.titleKey)}</span>
-            <span className="max-w-xs text-xs leading-snug text-white/60">{t(meta.subtitleKey)}</span>
-            {chips.length > 0 && (
-              <ul className="mt-1 flex flex-wrap justify-center gap-1.5">
-                {chips.map((chip, i) => (
-                  <li
-                    key={i}
-                    className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[0.7rem] font-medium text-white/75"
-                  >
-                    {chip}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // The selected effect's live preview props, or undefined when no engine effect is selected.
 const effectPreview = (
@@ -234,7 +193,9 @@ export const EditorMonitor = ({
 
   if (section.kind === 'music') return <MusicStagePreview section={section} />;
 
-  if (!hasOverlayCanvas(section)) return <FallbackPreview section={section} />;
+  if (section.kind === 'form') return <FormStagePreview section={section} sections={state.sections} />;
+
+  if (!hasOverlayCanvas(section)) return <EmptyState label={t('shell.monitorEmpty')} />;
 
   return (
     <EditorMonitorCanvas

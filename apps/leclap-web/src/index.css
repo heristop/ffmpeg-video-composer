@@ -261,6 +261,8 @@ body {
   --animate-dock-stretch: dock-stretch 0.32s var(--ease-spring);
   /* A checkbox tick drawing itself in (the glyph's path uses pathLength=1). */
   --animate-check-draw: check-draw 0.22s var(--ease-out-expo) both;
+  /* A list row arriving in place (a new form field, an undo bar): a short rise and fade, no reflow. */
+  --animate-field-in: field-in 0.18s var(--ease-out-expo) both;
   /* The stacked shell's two surfaces enter from the side their tab sits on, so switching reads as
      travel across one room rather than two unrelated screens appearing in place. */
   --animate-surface-in-left: surface-in-left 0.26s var(--ease-out-expo) both;
@@ -1376,6 +1378,18 @@ body {
 /* translateY + opacity only — animating a fractional scale() promotes the element to a GPU layer
    rasterized at that sub-pixel scale, and mobile WebKit/Blink keeps that blurry raster after the
    transform settles, leaving text permanently soft. */
+@keyframes field-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes check-draw {
   from {
     stroke-dasharray: 1;
