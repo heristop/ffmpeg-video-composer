@@ -198,10 +198,9 @@ const armsAt = (fromSlam: number): number => {
   return mix(ARMS_UP, ARMS_REST, springProgress(fromSlam - LOWER_AFTER, LOWER));
 };
 
+// The wind-up keeps his smile: a focused brow there reads as a frown just before the render lands.
 const moodAt = (fromSlam: number): ClappyMood => {
-  if (fromSlam < 0) return 'focused';
-
-  if (fromSlam < LOWER_AFTER + 0.2) return 'grin';
+  if (fromSlam >= 0 && fromSlam < LOWER_AFTER + 0.2) return 'grin';
 
   return 'smile';
 };

@@ -152,6 +152,11 @@ describe('cheerFrame', () => {
     expect(cheerFrame(0).pose.angle).toBeCloseTo(REST_ANGLE);
   });
 
+  it('smiles through the wind-up instead of frowning before the slam', () => {
+    expect(cheerFrame(0).pose.mood).toBe('smile');
+    expect(cheerFrame(SLAM_AT - 0.05).pose.mood).toBe('smile');
+  });
+
   it('winds the clapper up wider before the slam', () => {
     expect(cheerFrame(SLAM_AT - 0.2).pose.angle).toBeLessThan(REST_ANGLE - 5);
   });
