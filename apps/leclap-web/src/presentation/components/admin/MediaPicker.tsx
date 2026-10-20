@@ -4,13 +4,14 @@ import { describeAccept } from '@/lib/upload/core/describe-accept';
 import type { Rejection } from '@/lib/upload/core/types';
 import { rejectionMessages } from './media-picker-rejections';
 import { useTranslation } from 'react-i18next';
-import { Upload, Music, Image as ImageIcon, Video as VideoIcon, Check, X } from '@/presentation/components/icons';
+import { Upload, Music, Image as ImageIcon, Video as VideoIcon, X } from '@/presentation/components/icons';
 import { PlayIcon } from '@/presentation/components/icons/play';
 import { PauseIcon } from '@/presentation/components/icons/pause';
 import { useIconHover } from '@/presentation/components/icons/useIconHover';
 import { cn } from '@/lib/utils';
 import { coverGradient } from '@/lib/poster';
 import { Button, SegmentedControl } from '@/presentation/components/ui';
+import { CheckboxMark } from '@/presentation/components/ui/checkbox';
 import { browserMediaService } from '@/services/browserMediaService';
 import { MUSIC_LIBRARY, BACKGROUND_LIBRARY, type MediaCredit } from '@/data/mediaCatalog';
 import type { MediaChoice } from './templateEditorModel';
@@ -407,9 +408,7 @@ const MusicCard = ({ item, selected, onPick }: CardProps) => {
             <Music className="absolute inset-0 m-auto h-8 w-8 text-white/85" />
           )}
           {selected ? (
-            <span className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-brand-500">
-              <Check className="h-3 w-3 text-white" />
-            </span>
+            <CheckboxMark checked className="absolute left-1.5 top-1.5 shadow-[0_1px_3px_oklch(0_0_0/0.35)]" />
           ) : null}
         </span>
         <span className="mt-2 block truncate text-sm font-semibold text-foreground">{item.title}</span>
@@ -486,7 +485,7 @@ const PictureCard = ({ item, selected, onPick }: CardProps) => (
         {item.author} · {item.license}
       </span>
     </span>
-    {selected ? <Check className="absolute right-2 top-2 h-4 w-4 rounded-full bg-brand-500 p-0.5 text-white" /> : null}
+    {selected ? <CheckboxMark checked className="absolute right-2 top-2 shadow-[0_1px_3px_oklch(0_0_0/0.35)]" /> : null}
   </button>
 );
 

@@ -259,6 +259,8 @@ body {
   --animate-phone-sheen: phone-sheen 7s var(--ease-out-expo) infinite;
   /* Magnetic stretch the editor tool-dock indicator plays as it springs to a new tool. */
   --animate-dock-stretch: dock-stretch 0.32s var(--ease-spring);
+  /* A checkbox tick drawing itself in (the glyph's path uses pathLength=1). */
+  --animate-check-draw: check-draw 0.22s var(--ease-out-expo) both;
   /* The stacked shell's two surfaces enter from the side their tab sits on, so switching reads as
      travel across one room rather than two unrelated screens appearing in place. */
   --animate-surface-in-left: surface-in-left 0.26s var(--ease-out-expo) both;
@@ -1374,6 +1376,18 @@ body {
 /* translateY + opacity only — animating a fractional scale() promotes the element to a GPU layer
    rasterized at that sub-pixel scale, and mobile WebKit/Blink keeps that blurry raster after the
    transform settles, leaving text permanently soft. */
+@keyframes check-draw {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
