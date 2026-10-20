@@ -35,6 +35,7 @@ import { htmlLayersFrom, type HtmlLayer } from './html-layer';
 import { sectionAudioExtrasFrom } from './visual-audio';
 import { optionalTemplateFields } from './optional-template-fields';
 import { videoSectionOptions } from './video-section-fields';
+import { bindFieldSpecs } from './form-field-specs';
 
 function formSectionFrom(s: Section): EditorSection {
   const fields = (s.options?.fields ?? []) as Array<{
@@ -348,12 +349,16 @@ export function toEditorState(template: EditableTemplate | null): EditorState {
   const global = template.descriptor.global;
   const imported = editorSectionsFrom(template.descriptor);
   const colorsList = colorsListFrom(global);
+  const sections = bindFieldSpecs(
+    imported.map(({ section }) => section),
+    global
+  );
 
   return {
     id: template.id,
     ...importedIdentity(template, imported),
     orientation: template.orientation,
-    sections: imported.map(({ section }) => section),
+    sections,
     globalVariables: globalVariablesFrom(global),
     audio: audioFrom(global),
     defaultTransition: defaultTransitionFrom(global),
