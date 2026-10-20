@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.0] - 2026-10-19
+## [0.6.0] - 2026-10-20
 
 ### Added
 
@@ -22,9 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   raw filters (trusted local templates only). Without it, raw filters are allow-listed by the engine and a
   template that uses a filter outside the list fails with `filter_not_allowed`.
 - `leclap brand <url>` writes a brand kit, a theme and binding rules.
-- `leclap samples` lists 53 samples: `layer-keyframes` animates cards and shapes with layer keyframe tracks
+- `leclap samples` lists 59 samples: `layer-keyframes` animates cards and shapes with layer keyframe tracks
   (pop-in, squash and stretch, flip, needle, parallax), `blend-motion-blur` mixes layers with blend modes and
-  blurs their motion, and `masks` cuts layers and a video section with shape masks and track mattes.
+  blurs their motion, `masks` cuts layers and a video section with shape masks and track mattes, and
+  `html-motion`, `vector-shapes`, `line-draw`, `fx-burst`, `fx-liquid` and `fx-glitch-iris-sheen` join the list.
 - `leclap render` and `leclap validate` take everything `ffmpeg-video-composer` 3.2.0 adds: layer keyframe
   tracks (`options.animate`, `options.origin`), the `path` and `shape` graphics, animated html cards
   (`data-motion` with the input's `motion` map), layer blend modes (`options.blend`) and `motionBlur`, masks and
