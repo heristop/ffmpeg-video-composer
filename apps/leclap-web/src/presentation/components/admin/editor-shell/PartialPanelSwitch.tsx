@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Info } from '@/presentation/components/icons';
 import { CopyIcon } from '@/presentation/components/icons/copy';
@@ -13,6 +13,7 @@ import { addableKinds } from './AddElementMenu';
 import { ElementBlock } from './ElementBlock';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
 import { sectionLabelKey } from './section-label';
+import { PanelFrame } from './panel-frame';
 
 // True when the section owns any addable visual element, so the left panel hosts the unified Add menu
 // + element list + inspector below the section-level fields.
@@ -31,21 +32,6 @@ interface PartialPanelSwitchProps {
   onSelectElement: (ref: ElementRef | null) => void;
   onDuplicate: () => void;
 }
-
-// A panel shell mirroring EditorPanelSwitch's PanelFrame: eyebrow + title over a swap-animated body.
-const PanelFrame = ({ eyebrow, title, children }: { eyebrow: string; title: string; children: ReactNode }) => (
-  <div className="flex min-h-0 flex-1 flex-col">
-    <header className="shrink-0 border-b border-brand-500/20 bg-brand-500/10 px-4 py-3 [@media(max-height:700px)]:py-2">
-      <span className="block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-300">
-        {eyebrow}
-      </span>
-      <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-    </header>
-    <div className="panel-swap min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 pb-6 [scrollbar-width:thin] motion-reduce:animate-none">
-      {children}
-    </div>
-  </div>
-);
 
 const PanelPlaceholder = ({ message }: { message: string }) => (
   <p className="text-sm text-muted-foreground">{message}</p>
@@ -136,7 +122,7 @@ export const PartialPanelSwitch = ({
 
   if (activeTool === 'basics') {
     return (
-      <PanelFrame eyebrow={t('shell.tools')} title={t('shell.basics')}>
+      <PanelFrame title={t('shell.basics')}>
         <PartialBasics state={state} readonly={readonly} idLocked={idLocked} patch={patch} />
       </PanelFrame>
     );
@@ -144,7 +130,7 @@ export const PartialPanelSwitch = ({
 
   if (!section) {
     return (
-      <PanelFrame eyebrow={t('shell.tools')} title={t('shell.scenes')}>
+      <PanelFrame title={t('shell.scenes')}>
         <PanelPlaceholder message={t('shell.monitorEmpty')} />
       </PanelFrame>
     );
@@ -154,14 +140,14 @@ export const PartialPanelSwitch = ({
 
   if (readonly) {
     return (
-      <PanelFrame eyebrow={t('shell.scenes')} title={title}>
+      <PanelFrame title={title}>
         <ReadonlyNotice onDuplicate={onDuplicate} />
       </PanelFrame>
     );
   }
 
   return (
-    <PanelFrame eyebrow={t('shell.scenes')} title={title}>
+    <PanelFrame title={title}>
       <SectionFields
         section={section}
         orientation={state.orientation}

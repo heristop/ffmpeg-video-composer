@@ -18,7 +18,7 @@ import { EditorPanelSwitch } from './EditorPanelSwitch';
 import { EditorSceneTimeline } from './EditorSceneTimeline';
 import { useBuilderAgent, useProgramMonitor, useTemplatePersistence } from './use-template-editor-shell';
 import { ShellTitlebar, ShellMonitor, ShellModals, useShellModals, SceneRenderScope } from './shell-slots';
-import { sectionLabelKey, sectionTitle } from './section-label';
+import { sectionTitle } from './section-label';
 
 interface TemplateEditorShellProps {
   initial: Template | null;
@@ -268,7 +268,6 @@ export const TemplateEditorShell = ({
             onTransition={setTransition}
             defaultTransition={state.defaultTransition}
             sectionTitle={(section) => sectionTitle(section, t)}
-            sectionKindLabel={(section) => t(sectionLabelKey(section.kind))}
             onBrowsePresets={() => {
               modals.open('presets');
             }}

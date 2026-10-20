@@ -14,7 +14,7 @@ import { PARTIAL_PICKER_ID, PartialTitlebar } from './PartialTitlebar';
 import { PartialPanelSwitch } from './PartialPanelSwitch';
 import { usePartialEditorState } from './usePartialEditorState';
 import { useSectionSelection } from './useSectionSelection';
-import { sectionLabelKey, sectionTitle } from './section-label';
+import { sectionTitle } from './section-label';
 
 const EDITABLE_PARTIAL_KINDS: readonly EditorSection['kind'][] = ['video', 'form', 'color', 'image'];
 
@@ -146,7 +146,6 @@ export const PartialEditorShell = ({ initialDraft = null }: PartialEditorShellPr
             onReorder={editor.reorderScenes}
             onTransition={ops.setTransition}
             sectionTitle={(section) => sectionTitle(section, t)}
-            sectionKindLabel={(section) => t(sectionLabelKey(section.kind))}
             addKinds={EDITABLE_PARTIAL_KINDS}
           />
         }
