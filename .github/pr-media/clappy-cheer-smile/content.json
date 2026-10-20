@@ -1,17 +1,30 @@
 {
   "ticket": "PR CLAPPY SMILE",
-  "summary": "Clappy keeps his smile through the wind-up before the render lands",
+  "summary": "Clappy smiles through the wind-up and keeps his arms up after",
   "clipSeconds": 6,
-  "freeze": { "at": 3.97, "hold": 3 },
-  "intro": { "headline": "NO FROWN AT 100%" },
-  "outro": { "headline": "REVIEW THE CHEER WIND-UP", "subtitle": "The mood in clappy.logic.ts moodAt" },
+  "freeze": {
+    "at": 3.97,
+    "hold": 3
+  },
+  "intro": {
+    "headline": "NO FROWN, ARMS STAY UP"
+  },
+  "outro": {
+    "headline": "REVIEW THE CHEER WIND-UP",
+    "subtitle": "moodAt and armsAt in clappy.logic.ts"
+  },
   "sides": [
     {
       "side": "before",
       "badge": "BEFORE",
       "capture": "raw/before.mp4",
       "trim": 31,
-      "highlight": { "x": 735, "y": 265, "w": 145, "h": 135 },
+      "highlight": {
+        "x": 735,
+        "y": 265,
+        "w": 145,
+        "h": 135
+      },
       "callout": "A flat frown",
       "chip": "A frown just before 100%",
       "pane": {
@@ -23,13 +36,18 @@
       "side": "after",
       "badge": "AFTER",
       "capture": "raw/after.mp4",
-      "trim": 25.75,
-      "highlight": { "x": 725, "y": 262, "w": 145, "h": 135 },
+      "trim": 29.33,
+      "highlight": {
+        "x": 735,
+        "y": 265,
+        "w": 145,
+        "h": 135
+      },
       "callout": "Smiling all the way",
-      "chip": "Smiling through the wind-up",
+      "chip": "Smiling, then arms stay up",
       "pane": {
         "title": "Smiling to the slam",
-        "desc": "The wind-up keeps his smile, then the slam grins as before. The app's render cheer gets it too."
+        "desc": "The wind-up keeps his smile, then the arms go up at the slam and stay up, smiling."
       }
     }
   ]

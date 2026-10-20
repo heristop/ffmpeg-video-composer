@@ -51,6 +51,8 @@ for (const [name, width, height] of [
   await page.screenshot({ path: `${outDir}/${label}-${name}-windup.png` });
   await sleep(1800);
   await page.screenshot({ path: `${outDir}/${label}-${name}-landed.png` });
+  await sleep(1500);
+  await page.screenshot({ path: `${outDir}/${label}-${name}-settled.png` });
   await ctx.close();
 }
 
