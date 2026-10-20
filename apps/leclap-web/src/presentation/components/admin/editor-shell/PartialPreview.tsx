@@ -5,7 +5,6 @@ import { FONTS } from '@leclap/creative-kit/fonts';
 import { listAvailablePartials, materializeTemplatePartials } from '@/services/templatePartialService';
 import { userPartialService } from '@/services/userPartialService';
 import type { TemplateDescriptor } from 'ffmpeg-video-composer/src/core/types.d.ts';
-import { PreviewSurface } from '../editor/PreviewSurface';
 import type { EditorSection } from '../templateEditorModel';
 import { resolvePartialImageUrl } from './partialPreviewBackground';
 
@@ -199,7 +198,8 @@ const FallbackTile = ({
 }) => (
   <div className="grid h-full place-items-center p-4 sm:p-6">
     <div className="relative aspect-video w-full max-w-full">
-      <PreviewSurface className="h-full w-full" />
+      {/* A plain program-out frame, not the sky illustration: the partial's content is unknown here. */}
+      <div className="h-full w-full rounded-lg border border-foreground/10 bg-player-ink" />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-white">
         <span className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/60">{label}</span>
         <span className="font-display text-base font-semibold text-white/90">{id}</span>

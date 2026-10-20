@@ -150,7 +150,14 @@
       "namePlaceholder": "key",
       "valuePlaceholder": "value",
       "add": "Add variable",
-      "colorValue": "Variable {{index}} colour"
+      "colorValue": "Variable {{index}} colour",
+      "usedIn_one": "Shown in scene {{list}}.",
+      "usedIn_other": "Shown in scenes {{list}}.",
+      "unused": "Not used yet. Type #{{name}} in a text to show it.",
+      "problem": {
+        "chars": "Letters, digits, _, - and . only, not ending on a dot.",
+        "duplicate": "A form field or another variable already uses this name."
+      }
     },
     "colorsList": {
       "label": "Colour palette",
@@ -288,7 +295,10 @@
     "frameStep": "Step one frame",
     "secondStep": "Step one second",
     "editPoints": "Previous / next edit point",
-    "backToEditing": "Back to editing the scene"
+    "backToEditing": "Back to editing the scene",
+    "groupEdit": "Editing",
+    "groupMove": "Moving around",
+    "groupPlay": "Playback"
   },
   "presets": {
     "pickerTitle": "Start your template",
@@ -310,10 +320,6 @@
     }
   },
   "monitor": {
-    "fallbackMusicTitle": "Music selection",
-    "fallbackMusicSubtitle": "Sets the template's background music — it plays under the video with nothing on screen.",
-    "fallbackFormTitle": "Form fields",
-    "fallbackFormSubtitle": "Viewers fill these fields before rendering; their answers feed the template variables.",
     "playing": "Playing",
     "play": "Play",
     "pause": "Pause",
@@ -327,7 +333,24 @@
     "musicAlternativesMore": "Viewers can switch to {{list}} and {{count}} more.",
     "musicUploadToo": "Or upload their own.",
     "parked": "Program",
-    "fps": "{{fps}} fps"
+    "fps": "{{fps}} fps",
+    "formRegion": "Form preview",
+    "formTitle": "Before the render",
+    "formLead": "What viewers fill in. Nothing from this scene shows on screen.",
+    "formEmpty": "No fields yet.",
+    "formRequired": "required",
+    "formAnswers": "Where the answers go",
+    "formScenes_one": "Scene {{list}}",
+    "formScenes_other": "Scenes {{list}}",
+    "formNowhere": "Not on screen yet",
+    "formSample": {
+      "text": "Their answer",
+      "number": "0",
+      "enum": "Pick one",
+      "url": "https://…",
+      "color": "#7C83FD",
+      "time": "00:00"
+    }
   },
   "testRender": {
     "rendering": "Rendering…",
@@ -1202,7 +1225,46 @@
     "fieldLabelPlaceholder": "Label",
     "maxLength": "Max length",
     "removeField": "Remove field",
-    "addField": "Add field"
+    "addField": "Add field",
+    "intro": "Viewers fill these in before the render. Each answer becomes a #variable your scenes can show.",
+    "empty": "No fields yet. Add one, then type its #variable in a scene to show the answer.",
+    "listLabel": "Form fields",
+    "untitled": "Untitled field",
+    "type": {
+      "label": "Type",
+      "text": "Text",
+      "number": "Number",
+      "enum": "Choice",
+      "url": "Link",
+      "color": "Colour",
+      "time": "Time"
+    },
+    "required": "Viewers must fill this",
+    "optionalMark": "Optional",
+    "default": "Default",
+    "defaultHint": "Used when the viewer leaves it empty.",
+    "optionalEmpty": "Left empty, it shows nothing.",
+    "help": "Help line",
+    "helpHint": "Shown under the field in the viewer’s form.",
+    "options": "Choices",
+    "optionsHint": "One per line.",
+    "maxLengthHint": "The form stops at {{count}} characters.",
+    "idProblem": {
+      "empty": "Give the field an id.",
+      "chars": "Letters, digits and _ only.",
+      "duplicate": "Another field or variable already uses this id."
+    },
+    "labelEmpty": "Give the field a label viewers can read.",
+    "usedIn_one": "Shown in scene {{list}}.",
+    "usedIn_other": "Shown in scenes {{list}}.",
+    "unused": "Not shown yet. Type #{{name}} in a scene text to use it.",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "moveUpTooltip": "Move up (Alt+↑)",
+    "moveDownTooltip": "Move down (Alt+↓)",
+    "reorderHint": "Alt+↑ / Alt+↓ moves the field",
+    "removed": "Removed “{{label}}”.",
+    "undo": "Undo"
   },
   "reveal": {
     "label": "Entrance",

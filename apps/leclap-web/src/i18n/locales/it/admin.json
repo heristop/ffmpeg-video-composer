@@ -150,7 +150,14 @@
       "namePlaceholder": "chiave",
       "valuePlaceholder": "valore",
       "add": "Aggiungi variabile",
-      "colorValue": "Colore della variabile {{index}}"
+      "colorValue": "Colore della variabile {{index}}",
+      "usedIn_one": "Mostrata nella scena {{list}}.",
+      "usedIn_other": "Mostrata nelle scene {{list}}.",
+      "unused": "Non ancora usata. Scrivi #{{name}} in un testo per mostrarla.",
+      "problem": {
+        "chars": "Solo lettere, cifre, _, - e ., senza punto finale.",
+        "duplicate": "Un campo del modulo o un’altra variabile usa già questo nome."
+      }
     },
     "colorsList": {
       "label": "Palette colori",
@@ -288,7 +295,10 @@
     "frameStep": "Avanza di un fotogramma",
     "secondStep": "Avanza di un secondo",
     "editPoints": "Punto di montaggio precedente / successivo",
-    "backToEditing": "Torna a modificare la scena"
+    "backToEditing": "Torna a modificare la scena",
+    "groupEdit": "Modifica",
+    "groupMove": "Navigazione",
+    "groupPlay": "Riproduzione"
   },
   "presets": {
     "pickerTitle": "Inizia il tuo modello",
@@ -310,10 +320,6 @@
     }
   },
   "monitor": {
-    "fallbackMusicTitle": "Selezione musicale",
-    "fallbackMusicSubtitle": "Imposta la musica di sottofondo del modello: suona sotto il video, senza nulla sullo schermo.",
-    "fallbackFormTitle": "Campi del modulo",
-    "fallbackFormSubtitle": "Gli spettatori compilano questi campi prima del rendering; le risposte alimentano le variabili del modello.",
     "playing": "Riproduzione",
     "play": "Riproduci",
     "pause": "Pausa",
@@ -327,7 +333,24 @@
     "musicAlternativesMore": "Gli spettatori possono passare a {{list}} e ad altre {{count}}.",
     "musicUploadToo": "O caricare la propria.",
     "parked": "Programma",
-    "fps": "{{fps}} fps"
+    "fps": "{{fps}} fps",
+    "formRegion": "Anteprima del modulo",
+    "formTitle": "Prima del render",
+    "formLead": "Ciò che compilano gli spettatori. Nulla di questa scena appare sullo schermo.",
+    "formEmpty": "Ancora nessun campo.",
+    "formRequired": "obbligatorio",
+    "formAnswers": "Dove vanno le risposte",
+    "formScenes_one": "Scena {{list}}",
+    "formScenes_other": "Scene {{list}}",
+    "formNowhere": "Non ancora sullo schermo",
+    "formSample": {
+      "text": "La sua risposta",
+      "number": "0",
+      "enum": "Scegli",
+      "url": "https://…",
+      "color": "#7C83FD",
+      "time": "00:00"
+    }
   },
   "testRender": {
     "rendering": "Rendering…",
@@ -1202,7 +1225,46 @@
     "fieldLabelPlaceholder": "Etichetta",
     "maxLength": "Lunghezza massima",
     "removeField": "Rimuovi campo",
-    "addField": "Aggiungi campo"
+    "addField": "Aggiungi campo",
+    "intro": "Gli spettatori li compilano prima del render. Ogni risposta diventa una #variabile che le tue scene possono mostrare.",
+    "empty": "Ancora nessun campo. Aggiungine uno, poi scrivi la sua #variabile in una scena per mostrare la risposta.",
+    "listLabel": "Campi del modulo",
+    "untitled": "Campo senza titolo",
+    "type": {
+      "label": "Tipo",
+      "text": "Testo",
+      "number": "Numero",
+      "enum": "Scelta",
+      "url": "Link",
+      "color": "Colore",
+      "time": "Ora"
+    },
+    "required": "Gli spettatori devono compilarlo",
+    "optionalMark": "Facoltativo",
+    "default": "Valore predefinito",
+    "defaultHint": "Usato se lo spettatore lo lascia vuoto.",
+    "optionalEmpty": "Se resta vuoto, non mostra nulla.",
+    "help": "Riga di aiuto",
+    "helpHint": "Mostrata sotto il campo nel modulo dello spettatore.",
+    "options": "Scelte",
+    "optionsHint": "Una per riga.",
+    "maxLengthHint": "Il modulo si ferma a {{count}} caratteri.",
+    "idProblem": {
+      "empty": "Dai un identificativo al campo.",
+      "chars": "Solo lettere, cifre e _.",
+      "duplicate": "Un altro campo o una variabile usa già questo identificativo."
+    },
+    "labelEmpty": "Dai al campo un’etichetta leggibile.",
+    "usedIn_one": "Mostrato nella scena {{list}}.",
+    "usedIn_other": "Mostrato nelle scene {{list}}.",
+    "unused": "Non ancora mostrato. Scrivi #{{name}} in un testo di scena per usarlo.",
+    "moveUp": "Sposta su",
+    "moveDown": "Sposta giù",
+    "moveUpTooltip": "Sposta su (Alt+↑)",
+    "moveDownTooltip": "Sposta giù (Alt+↓)",
+    "reorderHint": "Alt+↑ / Alt+↓ sposta il campo",
+    "removed": "«{{label}}» rimosso.",
+    "undo": "Annulla"
   },
   "reveal": {
     "label": "Entrata",

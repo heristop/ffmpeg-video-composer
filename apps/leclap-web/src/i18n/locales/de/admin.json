@@ -150,7 +150,14 @@
       "namePlaceholder": "Schlüssel",
       "valuePlaceholder": "Wert",
       "add": "Variable hinzufügen",
-      "colorValue": "Farbe von Variable {{index}}"
+      "colorValue": "Farbe von Variable {{index}}",
+      "usedIn_one": "Erscheint in Szene {{list}}.",
+      "usedIn_other": "Erscheint in den Szenen {{list}}.",
+      "unused": "Noch nicht verwendet. Tippe #{{name}} in einen Text, um sie zu zeigen.",
+      "problem": {
+        "chars": "Nur Buchstaben, Ziffern, _, - und ., nicht mit einem Punkt am Ende.",
+        "duplicate": "Ein Formularfeld oder eine andere Variable nutzt diesen Namen schon."
+      }
     },
     "colorsList": {
       "label": "Farbpalette",
@@ -288,7 +295,10 @@
     "frameStep": "Ein Bild weiter",
     "secondStep": "Eine Sekunde weiter",
     "editPoints": "Vorheriger / nächster Schnittpunkt",
-    "backToEditing": "Zurück zur Szenenbearbeitung"
+    "backToEditing": "Zurück zur Szenenbearbeitung",
+    "groupEdit": "Bearbeiten",
+    "groupMove": "Navigation",
+    "groupPlay": "Wiedergabe"
   },
   "presets": {
     "pickerTitle": "Starte deine Vorlage",
@@ -310,10 +320,6 @@
     }
   },
   "monitor": {
-    "fallbackMusicTitle": "Musikauswahl",
-    "fallbackMusicSubtitle": "Legt die Hintergrundmusik der Vorlage fest — sie läuft unter dem Video, ohne etwas auf dem Bildschirm.",
-    "fallbackFormTitle": "Formularfelder",
-    "fallbackFormSubtitle": "Zuschauer füllen diese Felder vor dem Rendern aus; ihre Antworten speisen die Vorlagen-Variablen.",
     "playing": "Wiedergabe",
     "play": "Abspielen",
     "pause": "Pause",
@@ -327,7 +333,24 @@
     "musicAlternativesMore": "Zuschauer können zu {{list}} und {{count}} weiteren wechseln.",
     "musicUploadToo": "Oder ihren eigenen hochladen.",
     "parked": "Programm",
-    "fps": "{{fps}} fps"
+    "fps": "{{fps}} fps",
+    "formRegion": "Formularvorschau",
+    "formTitle": "Vor dem Rendern",
+    "formLead": "Was Zuschauer ausfüllen. Nichts aus dieser Szene erscheint im Bild.",
+    "formEmpty": "Noch keine Felder.",
+    "formRequired": "Pflichtfeld",
+    "formAnswers": "Wohin die Antworten gehen",
+    "formScenes_one": "Szene {{list}}",
+    "formScenes_other": "Szenen {{list}}",
+    "formNowhere": "Noch nicht im Bild",
+    "formSample": {
+      "text": "Ihre Antwort",
+      "number": "0",
+      "enum": "Auswählen",
+      "url": "https://…",
+      "color": "#7C83FD",
+      "time": "00:00"
+    }
   },
   "testRender": {
     "rendering": "Rendering …",
@@ -1202,7 +1225,46 @@
     "fieldLabelPlaceholder": "Bezeichnung",
     "maxLength": "Maximale Länge",
     "removeField": "Feld entfernen",
-    "addField": "Feld hinzufügen"
+    "addField": "Feld hinzufügen",
+    "intro": "Zuschauer füllen sie vor dem Rendern aus. Jede Antwort wird zu einer #Variable, die deine Szenen zeigen können.",
+    "empty": "Noch keine Felder. Füge eins hinzu und tippe seine #Variable in eine Szene, um die Antwort zu zeigen.",
+    "listLabel": "Formularfelder",
+    "untitled": "Unbenanntes Feld",
+    "type": {
+      "label": "Typ",
+      "text": "Text",
+      "number": "Zahl",
+      "enum": "Auswahl",
+      "url": "Link",
+      "color": "Farbe",
+      "time": "Zeit"
+    },
+    "required": "Zuschauer müssen es ausfüllen",
+    "optionalMark": "Optional",
+    "default": "Standardwert",
+    "defaultHint": "Wird verwendet, wenn der Zuschauer es leer lässt.",
+    "optionalEmpty": "Leer gelassen, zeigt es nichts.",
+    "help": "Hilfezeile",
+    "helpHint": "Erscheint unter dem Feld im Formular des Zuschauers.",
+    "options": "Auswahlwerte",
+    "optionsHint": "Einer pro Zeile.",
+    "maxLengthHint": "Das Formular stoppt bei {{count}} Zeichen.",
+    "idProblem": {
+      "empty": "Gib dem Feld eine ID.",
+      "chars": "Nur Buchstaben, Ziffern und _.",
+      "duplicate": "Ein anderes Feld oder eine Variable nutzt diese ID schon."
+    },
+    "labelEmpty": "Gib dem Feld eine lesbare Bezeichnung.",
+    "usedIn_one": "Erscheint in Szene {{list}}.",
+    "usedIn_other": "Erscheint in den Szenen {{list}}.",
+    "unused": "Noch nicht sichtbar. Tippe #{{name}} in einen Szenentext, um es zu nutzen.",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "moveUpTooltip": "Nach oben (Alt+↑)",
+    "moveDownTooltip": "Nach unten (Alt+↓)",
+    "reorderHint": "Alt+↑ / Alt+↓ verschiebt das Feld",
+    "removed": "„{{label}}“ entfernt.",
+    "undo": "Rückgängig"
   },
   "reveal": {
     "label": "Eingang",

@@ -64,11 +64,6 @@ export const StarterPresetPicker = ({ open, onPick, onBlank, onGenerate }: Start
                 {/* flex-wrap lets the glyph strip drop under the copy on narrow phones. */}
                 <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                   <span className="flex min-w-0 items-center gap-2.5">
-                    <span
-                      aria-hidden
-                      className="h-8 w-1.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: preset.accent }}
-                    />
                     <span className="min-w-0">
                       <span className="block text-sm font-semibold text-foreground">{t(preset.nameKey)}</span>
                       <span className="block text-xs text-gray-500">{t(preset.descriptionKey)}</span>
@@ -80,23 +75,26 @@ export const StarterPresetPicker = ({ open, onPick, onBlank, onGenerate }: Start
             </li>
           ))}
         </ul>
-        <button
-          type="button"
-          onClick={onBlank}
-          className="tap mt-1 inline-flex min-h-11 cursor-pointer items-center justify-self-start rounded-lg px-1 text-sm font-medium text-gray-500 underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
-        >
-          {t('presets.startBlank')}
-        </button>
-        {onGenerate && (
+        {/* The way out of the presets, as real buttons on one row rather than two loose links. */}
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-divider pt-4">
           <button
             type="button"
-            onClick={onGenerate}
-            className="tap inline-flex min-h-11 cursor-pointer items-center gap-1.5 justify-self-start rounded-lg px-1 text-sm font-medium text-brand-300 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
+            onClick={onBlank}
+            className="tap inline-flex min-h-10 cursor-pointer items-center rounded-lg border border-divider px-4 text-sm font-medium text-foreground transition-colors hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
           >
-            <Sparkles aria-hidden className="size-4" />
-            {tAi('fromPresets')}
+            {t('presets.startBlank')}
           </button>
-        )}
+          {onGenerate && (
+            <button
+              type="button"
+              onClick={onGenerate}
+              className="tap inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-brand-300 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
+            >
+              <Sparkles aria-hidden className="size-4" />
+              {tAi('fromPresets')}
+            </button>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

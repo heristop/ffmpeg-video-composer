@@ -261,6 +261,8 @@ body {
   --animate-dock-stretch: dock-stretch 0.32s var(--ease-spring);
   /* A checkbox tick drawing itself in (the glyph's path uses pathLength=1). */
   --animate-check-draw: check-draw 0.22s var(--ease-out-expo) both;
+  /* A list row arriving in place (a new form field, an undo bar): a short rise and fade, no reflow. */
+  --animate-field-in: field-in 0.18s var(--ease-out-expo) both;
   /* The stacked shell's two surfaces enter from the side their tab sits on, so switching reads as
      travel across one room rather than two unrelated screens appearing in place. */
   --animate-surface-in-left: surface-in-left 0.26s var(--ease-out-expo) both;
@@ -851,8 +853,16 @@ body {
 
 /* Contextual-panel content swap: a shorter, gentler rise than the page-level `fade-in` so changing    */
 /* scene/tool reads as the panel re-settling, not a fresh entrance. Keyed remount drives it.           */
+/* A tool or scene change in the editor panel: a quick settle, short enough to read as a cut, not a show.
+   A scene change slides in from the side the scene sits on (PanelFrame sets --swap-x / --swap-y). */
 @utility panel-swap {
-  animation: panel-swap 0.28s var(--ease-out-expo) both;
+  animation: panel-swap 0.2s var(--ease-out-expo) both;
+}
+
+/* The program monitor changing what it shows (another scene, play mode): a plain cross-fade in place. The
+   monitor does not move, so its content does not travel either. */
+@utility monitor-swap {
+  animation: monitor-swap 0.18s var(--ease-smooth) both;
 }
 
 /* Edge-fade mask on the horizontal scene strip: cut-off cells fade out toward both ends so the lane   */
@@ -1376,6 +1386,18 @@ body {
 /* translateY + opacity only — animating a fractional scale() promotes the element to a GPU layer
    rasterized at that sub-pixel scale, and mobile WebKit/Blink keeps that blurry raster after the
    transform settles, leaving text permanently soft. */
+@keyframes field-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes check-draw {
   from {
     stroke-dasharray: 1;
@@ -1442,10 +1464,20 @@ body {
   }
 }
 
+@keyframes monitor-swap {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes panel-swap {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translate(var(--swap-x, 0px), var(--swap-y, 4px));
   }
   to {
     opacity: 1;

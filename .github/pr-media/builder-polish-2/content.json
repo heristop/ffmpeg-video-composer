@@ -1,0 +1,42 @@
+{
+  "_note": "Captures come from record.mjs with RECORD=1 (SIDE=before on feat/builder-music-panel, SIDE=after on this branch). trim is the start offset so both runs open the form scene at the same second.",
+  "ticket": "PR #140",
+  "summary": "Form fields as a list, with types, defaults and a real preview",
+  "clipSeconds": 7.5,
+  "freeze": { "at": 3.2, "hold": 3 },
+  "intro": {
+    "headline": "FORM SCENES YOU CAN READ"
+  },
+  "outro": {
+    "headline": "REVIEW THE FORM SCENE FIRST",
+    "subtitle": "Then the variables notes and the shortcut sheet"
+  },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.webm",
+      "trim": 5.4,
+      "highlight": { "x": 66, "y": 130, "w": 934, "h": 440 },
+      "callout": "Raw ids, no types",
+      "chip": "Loose inputs, a sky card",
+      "pane": {
+        "title": "Three inputs per field",
+        "desc": "A raw id, a native spinner, no type or default. The stage shows a sky with the labels as pills."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.webm",
+      "trim": 6.1,
+      "highlight": { "x": 66, "y": 130, "w": 934, "h": 440 },
+      "callout": "Typed and previewed",
+      "chip": "A field list",
+      "pane": {
+        "title": "A numbered field list",
+        "desc": "Type, default, help and required per field; the stage shows the viewer's form and where answers go."
+      }
+    }
+  ]
+}

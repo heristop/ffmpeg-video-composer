@@ -17,7 +17,7 @@ import { addableKinds } from './AddElementMenu';
 import { ElementBlock } from './ElementBlock';
 import { sectionLabelKey } from './section-label';
 import { BasicsPanel } from './basics-panel';
-import { PanelFrame } from './panel-frame';
+import { PanelFrame, usePanelTravel } from './panel-frame';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
 
 // True when the section owns any addable visual element (video/color/image), so the left panel hosts
@@ -26,6 +26,8 @@ const hasElements = (section: EditorSection): boolean => addableKinds(section).l
 
 interface EditorPanelSwitchProps {
   activeTool: EditorToolId;
+  // The selected scene's position, so a scene change slides in from its side of the strip.
+  sectionIndex?: number;
   state: EditorState;
   section: EditorSection | null;
   partials: AvailablePartial[];
@@ -45,6 +47,7 @@ const PanelPlaceholder = ({ message }: { message: string }) => (
 // name + orientation; audio → the global mix; variables/advanced → placeholders (refined later phase).
 export const EditorPanelSwitch = ({
   activeTool,
+  sectionIndex = 0,
   state,
   section,
   partials,
@@ -55,6 +58,7 @@ export const EditorPanelSwitch = ({
   onSelectElement,
 }: EditorPanelSwitchProps) => {
   const { t } = useTranslation('admin');
+  const travel = usePanelTravel(sectionIndex);
 
   if (activeTool === 'scenes') {
     if (!section) {
@@ -67,11 +71,14 @@ export const EditorPanelSwitch = ({
 
     return (
       <PanelFrame
+        swapKey={`scene-${String(sectionIndex)}`}
+        travel={travel}
         title={t(sectionLabelKey(section.kind))}
         meta={t('shell.sceneOf', { index: state.sections.indexOf(section) + 1, count: state.sections.length })}
       >
         <SectionFields
           section={section}
+          sections={state.sections}
           orientation={state.orientation}
           variables={collectVariables(state)}
           partials={partials}
@@ -93,7 +100,7 @@ export const EditorPanelSwitch = ({
 
   if (activeTool === 'basics') {
     return (
-      <PanelFrame title={t('shell.basics')}>
+      <PanelFrame swapKey="basics" title={t('shell.basics')}>
         <BasicsPanel state={state} patch={patch} />
       </PanelFrame>
     );
@@ -101,7 +108,7 @@ export const EditorPanelSwitch = ({
 
   if (activeTool === 'audio') {
     return (
-      <PanelFrame title={t('shell.audio')}>
+      <PanelFrame swapKey="audio" title={t('shell.audio')}>
         <AudioPanel
           audio={state.audio}
           onChange={(audio) => {
@@ -114,14 +121,14 @@ export const EditorPanelSwitch = ({
 
   if (activeTool === 'variables') {
     return (
-      <PanelFrame title={t('shell.variables')}>
+      <PanelFrame swapKey="variables" title={t('shell.variables')}>
         <GlobalVariablesEditor state={state} patch={patch} />
       </PanelFrame>
     );
   }
 
   return (
-    <PanelFrame title={t('shell.advanced')}>
+    <PanelFrame swapKey="advanced" title={t('shell.advanced')}>
       <div className="space-y-4">
         <PaletteAndTheme state={state} patch={patch} />
         <WholeVideoLookGrade state={state} patch={patch} />
