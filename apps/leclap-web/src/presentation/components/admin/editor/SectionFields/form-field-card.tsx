@@ -13,7 +13,7 @@ import { fieldIdProblem, type FieldIdProblem } from './form-fields.logic';
 
 const TYPES: readonly FormFieldType[] = ['text', 'number', 'enum', 'url', 'color', 'time'];
 const LENGTH_PRESETS = [20, 40, 80, 160];
-const LABEL_CLS = 'mb-1.5 block text-xs font-medium text-muted-foreground';
+const LABEL_CLS = 'mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-400';
 const HINT_CLS = 'mt-1 text-xs leading-snug text-muted-foreground';
 const ERROR_CLS = 'mt-1 text-xs leading-snug text-[var(--color-error)]';
 
