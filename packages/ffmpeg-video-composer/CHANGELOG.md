@@ -7,17 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-- Animations settle without shaking on their last frames. A lowered easing curve that never overshoots now
-  stays monotone and inside 0..1 (slope-limited pieces, clipped), so an ease-out such as `$expo` no longer
-  dips past its end and pops a layer 1-2 px a frame before it lands. Overlay and drawtext motion offsets
-  (`motion` rise and slide, text reveals and exits, `animate` x/y tracks, kinetic piece tracks) are rounded to
-  the nearest pixel instead of truncated, so a spring that rings within half a pixel of rest holds it. In
-  animated HTML cards, element scales are planned on the 0.01 grid Satori draws transforms at and a turn
-  within 0.29° of rest holds it, so a springing element no longer drifts up to a pixel off its own centre.
-
-## [3.2.0] - 2026-10-19
+## [3.2.0] - 2026-10-20
 
 ### Added
 
@@ -34,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   when `getMotionWarnings` is given the target build's capabilities). Validation also advises
   `motion_blur_static` and `motion_blur_ignored`.
 - Sample `blend-motion-blur` and motion-review fixtures `layer-blend` and `motion-blur`.
+- Six more packaged samples: `html-motion` (animated html cards), `vector-shapes`, `line-draw`, `fx-burst`,
+  `fx-liquid` and `fx-glitch-iris-sheen`. `layer-keyframes` and `kinetic-type` blur their fast moves with
+  `motionBlur`, and `effects-tour` adds shaped-iris and bands beats plus blend-mode, mask, shape and motion-blur
+  beats. 59 samples in all.
 - Masks and track mattes: an image, animation or html layer takes `options.mask`, and a video or project_video
   section takes `options.mask`. A mask is a `shape` (`rect` with `radius`, `ellipse`, or a `path` `d` of
   M/L/H/V/C/Q/Z, 4000 characters at most) drawn once at compile time into a grey image, or a `layer`, another
@@ -202,6 +196,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Animations settle without shaking on their last frames. A lowered easing curve that never overshoots now
+  stays monotone and inside 0..1 (slope-limited pieces, clipped), so an ease-out such as `$expo` no longer
+  dips past its end and pops a layer 1-2 px a frame before it lands. Overlay and drawtext motion offsets
+  (`motion` rise and slide, text reveals and exits, `animate` x/y tracks, kinetic piece tracks) are rounded to
+  the nearest pixel instead of truncated, so a spring that rings within half a pixel of rest holds it. In
+  animated HTML cards, element scales are planned on the 0.01 grid Satori draws transforms at and a turn
+  within 0.29° of rest holds it, so a springing element no longer drifts up to a pixel off its own centre.
 - A `video` section with a clip and an overlay layer (HTML, image or animation) no longer fails in FFmpeg with
   "Stream specifier ':v' matches no streams". Overlays now sit on the clip instead of the silent audio track
   that muted sections (the default) add.
