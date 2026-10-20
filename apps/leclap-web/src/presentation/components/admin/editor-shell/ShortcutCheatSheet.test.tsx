@@ -21,6 +21,11 @@ describe('deck copy', () => {
     }
 
     expect(admin.shortcuts.deleteScene).toContain('scene strip');
+    expect([admin.shortcuts.groupEdit, admin.shortcuts.groupMove, admin.shortcuts.groupPlay]).toEqual([
+      'Editing',
+      'Moving around',
+      'Playback',
+    ]);
     expect(admin.monitor.parked).toBe('Program');
   });
 

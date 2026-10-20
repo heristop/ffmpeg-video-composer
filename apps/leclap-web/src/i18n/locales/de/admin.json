@@ -288,7 +288,10 @@
     "frameStep": "Ein Bild weiter",
     "secondStep": "Eine Sekunde weiter",
     "editPoints": "Vorheriger / nächster Schnittpunkt",
-    "backToEditing": "Zurück zur Szenenbearbeitung"
+    "backToEditing": "Zurück zur Szenenbearbeitung",
+    "groupEdit": "Bearbeiten",
+    "groupMove": "Navigation",
+    "groupPlay": "Wiedergabe"
   },
   "presets": {
     "pickerTitle": "Starte deine Vorlage",

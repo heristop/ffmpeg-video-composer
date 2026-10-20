@@ -288,7 +288,10 @@
     "frameStep": "Avanzar un fotograma",
     "secondStep": "Avanzar un segundo",
     "editPoints": "Punto de edición anterior / siguiente",
-    "backToEditing": "Volver a editar la escena"
+    "backToEditing": "Volver a editar la escena",
+    "groupEdit": "Edición",
+    "groupMove": "Navegación",
+    "groupPlay": "Reproducción"
   },
   "presets": {
     "pickerTitle": "Empieza tu plantilla",
