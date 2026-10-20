@@ -5,6 +5,7 @@
 // (the actual file download/upload wiring lives in the component); unit-testable in node.
 import { OrientationSchema } from 'ffmpeg-video-composer/src/schemas/global.schemas.ts';
 import { BaseTemplateValidator } from 'ffmpeg-video-composer/src/services/BaseTemplateValidator.ts';
+import { materializeTemplatePartials } from '@/services/templatePartialService';
 import {
   buildDescriptor,
   toEditorState,
@@ -58,6 +59,19 @@ function importedOrientation(value: string | undefined, current: Orientation): O
   return parsed.data;
 }
 
+// The validator only knows partials a descriptor carries itself, but a bundled template names the shared
+// catalog's (`flash-card`) and a local one its own. Check the descriptor with the registry expanded; the
+// copy kept in the editor stays as authored, refs intact.
+function materializedForCheck(parsed: unknown): { ok: true; value: unknown } | { ok: false; error: string } {
+  if (parsed === null || typeof parsed !== 'object') return { ok: true, value: parsed };
+
+  try {
+    return { ok: true, value: materializeTemplatePartials(parsed) };
+  } catch (error) {
+    return { ok: false, error: `partial: ${error instanceof Error ? error.message : 'Unknown template partial'}` };
+  }
+}
+
 // Parse + validate raw JSON text into an EditorState. The current id carries over so the import
 // lands as an undoable edit of the same template (not a brand-new one), but the imported
 // descriptor's own identity wins: toEditorState prefers descriptor.meta name/description over the
@@ -73,7 +87,11 @@ export function importDescriptorJson(text: string, current: EditorState): Import
     return { ok: false, errors: [`Invalid JSON: ${error instanceof Error ? error.message : 'parse error'}`] };
   }
 
-  const result = new BaseTemplateValidator().validateTemplate(parsed);
+  const materialized = materializedForCheck(parsed);
+
+  if (!materialized.ok) return { ok: false, errors: [materialized.error] };
+
+  const result = new BaseTemplateValidator().validateTemplate(materialized.value);
 
   if (!result.success) {
     return { ok: false, errors: readableErrors(result.errors ?? []) };
