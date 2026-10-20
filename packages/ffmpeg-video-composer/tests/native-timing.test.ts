@@ -25,7 +25,7 @@ describe('native timing contracts', () => {
     );
     const ramp = 'if(lt(t,2),0,if(lt(t,3),(t-2)/1,1))';
     expect(values.alpha).toBe(`'(1-(1-pow(1-(${ramp}),3)))'`);
-    expect(values.y).toBe(`'(200)-(1-pow(1-(${ramp}),3))*60'`);
+    expect(values.y).toBe(`'(200)-round((1-pow(1-(${ramp}),3))*60)'`);
   });
 
   it('preserves existing output for omitted or explicit linear exit easing', () => {

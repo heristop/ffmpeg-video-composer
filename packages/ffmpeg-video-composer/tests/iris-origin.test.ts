@@ -91,8 +91,8 @@ describe('iris origin: lowering', () => {
     expect(graph).toContain(
       'color=c=black:s=320x180:r=30:d=0.6,format=gray[dt0m0];color=c=black:s=320x180:r=30:d=0.6,format=gray[dt0m1];' +
         "[dt0m0][dt0m1]xfade=transition=custom:expr='255*clip((323.493789*(if(lt((0.6*(1-P)),0),0," +
-        'if(lt((0.6*(1-P)),0.3),0+((0.6*(1-P))-0)*(1.666667+((0.6*(1-P))-0)*(0+((0.6*(1-P))-0)*0)),' +
-        'if(lt((0.6*(1-P)),0.6),0.5+((0.6*(1-P))-0.3)*(1.666667+((0.6*(1-P))-0.3)*(0+((0.6*(1-P))-0.3)*0)),1))))' +
+        'clip(if(lt((0.6*(1-P)),0.3),0+((0.6*(1-P))-0)*(1.666667+((0.6*(1-P))-0)*(0+((0.6*(1-P))-0)*0)),' +
+        'if(lt((0.6*(1-P)),0.6),0.5+((0.6*(1-P))-0.3)*(1.666667+((0.6*(1-P))-0.3)*(0+((0.6*(1-P))-0.3)*0)),1)),0,1)))' +
         "-hypot(X-32,Y-36))/1.5+0.5,0,1)'" +
         ':duration=0.6:offset=0,scale=1280:720:flags=bilinear,format=gray,settb=AVTB,setpts=N/(30*TB)[dt0mask];' +
         '[dt0in]setpts=N/(30*TB)[dt0ig];[dt0ig][dt0mask]alphamerge[dt0ia];[dt0tail]setpts=N/(30*TB)[dt0tg];' +
@@ -106,8 +106,8 @@ describe('iris origin: lowering', () => {
     const rim = designedTransitionGraph({ ...BOUNDARY, origin: { x: 0.1, y: 0.2 }, ease: 'linear', rim: '#F6C445' });
     const e =
       'if(lt((0.6*(1-P)),0),0,' +
-      'if(lt((0.6*(1-P)),0.3),0+((0.6*(1-P))-0)*(1.666667+((0.6*(1-P))-0)*(0+((0.6*(1-P))-0)*0)),' +
-      'if(lt((0.6*(1-P)),0.6),0.5+((0.6*(1-P))-0.3)*(1.666667+((0.6*(1-P))-0.3)*(0+((0.6*(1-P))-0.3)*0)),1)))';
+      'clip(if(lt((0.6*(1-P)),0.3),0+((0.6*(1-P))-0)*(1.666667+((0.6*(1-P))-0)*(0+((0.6*(1-P))-0)*0)),' +
+      'if(lt((0.6*(1-P)),0.6),0.5+((0.6*(1-P))-0.3)*(1.666667+((0.6*(1-P))-0.3)*(0+((0.6*(1-P))-0.3)*0)),1)),0,1))';
 
     // The disc is unchanged; its overlay now feeds the rim instead of the mix.
     expect(rim).toContain(plain.slice(0, plain.indexOf('[dt0tg][dt0ia]overlay=0:0[dt0mix]')));

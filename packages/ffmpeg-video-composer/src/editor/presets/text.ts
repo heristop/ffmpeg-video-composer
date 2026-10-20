@@ -1,6 +1,6 @@
 import { findFont, isFontRef, type FontInput } from '@/core/fonts';
 import type { EasingSpec } from '@/core/motion/easing';
-import { alphaRampExpr, easedRamp, num, phaseDuration } from './eased-ramp';
+import { alphaRampExpr, easedRamp, num, phaseDuration, pixelOffset } from './eased-ramp';
 
 export { easeRampExpr } from './eased-ramp';
 
@@ -90,7 +90,7 @@ function normalize(input: RevealInput): Reveal {
 // A position expression that starts `distance` px off `base` (on the `sign` side) and eases to `base`
 // as the ramp completes. `base` may be a number or an ffmpeg expression, so it is parenthesised.
 function offset(base: string | number, sign: '+' | '-', distance: number, rampExpr: string): string {
-  return `'(${base})${sign}(1-(${rampExpr}))*${num(distance)}'`;
+  return `'(${base})${sign}${pixelOffset(`(1-(${rampExpr}))*${num(distance)}`)}'`;
 }
 
 /**
@@ -192,7 +192,7 @@ function enterTerm(enter: Reveal): PhaseTerm {
   const enterDuration = phaseDuration(enter.duration, enter.easing, DEFAULT_DURATION);
   const r = easedRamp(enter.delay ?? DEFAULT_DELAY, enterDuration, enter.easing);
   const dist = num(enter.distance ?? DEFAULT_DISTANCE);
-  const ease = `(1-(${r}))*${dist}`;
+  const ease = pixelOffset(`(1-(${r}))*${dist}`);
   const alpha = `(${alphaRampExpr(r, enter.easing)})`;
 
   if (enter.type === 'rise') return { alpha, yTerm: `+${ease}` };
@@ -210,7 +210,7 @@ function exitTerm(ex: Exit, duration: number): PhaseTerm {
   const exDur = phaseDuration(ex.duration, ex.easing, DEFAULT_DURATION);
   const r = easedRamp(ex.after ?? Math.max(0, duration - exDur), exDur, ex.easing);
   const dist = num(ex.distance ?? DEFAULT_DISTANCE);
-  const ease = `(${r})*${dist}`;
+  const ease = pixelOffset(`(${r})*${dist}`);
   const alpha = `(1-(${alphaRampExpr(r, ex.easing)}))`;
 
   if (ex.type === 'rise') return { alpha, yTerm: `-${ease}` };

@@ -14,7 +14,7 @@ describe('native overshoot easing', () => {
     });
     const expressions = revealToExpr(reveal, { x: 100, y: 200 });
     expect(evaluateExpr(expressions.y, { t: 0 })).toBe(280);
-    expect(evaluateExpr(expressions.y, { t: 0.5 })).toBeCloseTo(192.9842, 4);
+    expect(evaluateExpr(expressions.y, { t: 0.5 })).toBe(193);
     expect(evaluateExpr(expressions.alpha, { t: 0.5 })).toBe(1);
     expect(evaluateExpr(expressions.y, { t: 1 })).toBe(200);
     expect(evaluateExpr(expressions.y, { t: 2 })).toBe(200);

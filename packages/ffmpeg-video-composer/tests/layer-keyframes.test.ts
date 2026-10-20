@@ -16,7 +16,7 @@ describe('layerKeyframes: position tracks', () => {
   it('lowers an absolute x track to an overlay x expression, y stays at rest, no leg filters', () => {
     const plan = layerKeyframes({ position: '100:200', animate: { x: [{ v: 0 }, { t: 1, v: 300 }] } }, 30);
 
-    expect(plan).toEqual({ legFilters: [], x: `0+300*(${LINEAR_1S})`, y: '200' });
+    expect(plan).toEqual({ legFilters: [], x: `0+round(300*(${LINEAR_1S}))`, y: '200' });
   });
 
   it('keeps relative values relative to options.position', () => {
@@ -25,7 +25,7 @@ describe('layerKeyframes: position tracks', () => {
       30
     );
 
-    expect(plan.x).toBe(`(100)-40+40*(${LINEAR_HALF})`);
+    expect(plan.x).toBe(`(100)-40+round(40*(${LINEAR_HALF}))`);
     expect(plan.y).toBe('(200)+30');
   });
 

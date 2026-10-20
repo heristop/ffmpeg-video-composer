@@ -35,6 +35,15 @@ export function easeRampExpr(rampExpr: string, easing: EasingSpec | undefined): 
   return rampExpr;
 }
 
+/**
+ * A position's motion offset, rounded to the nearest whole pixel. Overlay and drawtext truncate their x / y,
+ * which flips a layer by a pixel whenever its value rings around rest (a spring tail) or approaches it from
+ * the other side of an integer; rounding the offset alone holds the rest exactly where a still layer sits.
+ */
+export function pixelOffset(offsetExpr: string): string {
+  return `round(${offsetExpr})`;
+}
+
 /** The eased ramp over [delay, delay + duration] for any easing spec. */
 export function easedRamp(delay: number, duration: number, easing: EasingSpec | undefined): string {
   if (easing === undefined || isLegacyEasing(easing)) return easeRampExpr(ramp(delay, duration), easing);

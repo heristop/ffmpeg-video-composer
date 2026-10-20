@@ -8,7 +8,7 @@
 //   centre = origin + S·R(θ)·d, and the frame is drawn at centre − (w, h)/2.
 
 import { fmt } from '@/core/motion/hermite';
-import { trackExpr } from '@/core/motion/tracks';
+import { positionTrackExpr } from '@/core/motion/tracks';
 import type { LayerAnimate, LayerOrigin } from '../../schemas/layer-animate.schemas';
 import type { OverlayMotion } from '../utils/input-sources';
 
@@ -141,8 +141,8 @@ function layerBase(options: PositionInput, transform: PositionTransform, motion:
   const animate = options.animate ?? {};
 
   return [
-    animate.x ? trackExpr(animate.x, rx) : (motion.x ?? rx),
-    animate.y ? trackExpr(animate.y, ry) : (motion.y ?? ry),
+    animate.x ? positionTrackExpr(animate.x, rx) : (motion.x ?? rx),
+    animate.y ? positionTrackExpr(animate.y, ry) : (motion.y ?? ry),
   ];
 }
 

@@ -1338,7 +1338,7 @@ describe('MapManager', () => {
       const { manager, filterManager } = build({ section: animationSection() });
       manager.addAnimationOverlay(makeAnimInput({ position: '40:200', motion: 'slide-left' }), 2);
       expect(overlayFilterValue(filterManager)).toBe(
-        "x='(40)+(1-(if(lt(t,0.3),0,if(lt(t,0.9),(t-0.3)/0.6,1))))*60':y='200':eof_action=pass"
+        "x='(40)+round((1-(if(lt(t,0.3),0,if(lt(t,0.9),(t-0.3)/0.6,1))))*60)':y='200':eof_action=pass"
       );
     });
 
@@ -1510,7 +1510,7 @@ describe('MapManager', () => {
         '320:180'
       );
       const overlay = (filterManager.addFilter.mock.calls as Array<[Filter]>).find(([f]) => f.type === 'overlay')?.[0];
-      expect(overlay?.value).toBe("x='320':y='(180)+(1-(if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,1))))*60'");
+      expect(overlay?.value).toBe("x='320':y='(180)+round((1-(if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5)/1,1))))*60)'");
     });
 
     it('combines a reveal fade with an opacity chain on one leg', () => {

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Animations settle without shaking on their last frames. A lowered easing curve that never overshoots now
+  stays monotone and inside 0..1 (slope-limited pieces, clipped), so an ease-out such as `$expo` no longer
+  dips past its end and pops a layer 1-2 px a frame before it lands. Overlay and drawtext motion offsets
+  (`motion` rise and slide, text reveals and exits, `animate` x/y tracks, kinetic piece tracks) are rounded to
+  the nearest pixel instead of truncated, so a spring that rings within half a pixel of rest holds it. In
+  animated HTML cards, element scales are planned on the 0.01 grid Satori draws transforms at and a turn
+  within 0.29° of rest holds it, so a springing element no longer drifts up to a pixel off its own centre.
+
 ## [3.2.0] - 2026-10-19
 
 ### Added

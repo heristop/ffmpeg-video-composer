@@ -240,7 +240,7 @@ describe('captionToFilters', () => {
   it('reveal "slide-left": overrides x with a kinetic expression off the placement', () => {
     const [f] = captionToFilters({ text: { en: 'Hi' }, align: 'left', reveal: 'slide-left' });
     const values = f.values as Record<string, unknown>;
-    expect(values.x).toBe(`'(80)+(1-(if(lt(t,0.3),0,if(lt(t,0.9),(t-0.3)/0.6,1))))*60'`);
+    expect(values.x).toBe(`'(80)+round((1-(if(lt(t,0.3),0,if(lt(t,0.9),(t-0.3)/0.6,1))))*60)'`);
     expect(values.alpha).toBe(`'if(lt(t,0.3),0,if(lt(t,0.9),(t-0.3)/0.6,1))'`);
   });
 

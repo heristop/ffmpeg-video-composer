@@ -5,7 +5,7 @@
 
 import type { Filter } from '@/core/types';
 import type { KineticBlock } from '../../schemas/kinetic.schemas';
-import { trackExpr, type TrackKey } from '@/core/motion/tracks';
+import { positionTrackExpr, trackExpr, type TrackKey } from '@/core/motion/tracks';
 import { fmt } from '@/core/motion/hermite';
 import type { LayoutPiece } from '@/core/kinetic/layout';
 import type { ResolvedKinetic } from '@/core/kinetic/resolve';
@@ -45,7 +45,7 @@ export function quoted(expr: string): string {
 }
 
 function offset(base: number, keys: TrackKey[], time: string): string {
-  const expr = trackExpr(keys, 0, time);
+  const expr = positionTrackExpr(keys, 0, time);
 
   return expr === '0' ? fmt(base) : quoted(`${fmt(base)}+(${expr})`);
 }
@@ -64,11 +64,11 @@ function pieceX(settings: ResolvedKinetic, draw: PieceDraw, scale: string | null
   const t = style.t ?? 't';
 
   if (style.anchored) {
-    return quoted(`${fmt(settings.x)}+(${trackExpr(tracks.x, 0, t)})${ALIGN_ANCHOR[settings.align]}`);
+    return quoted(`${fmt(settings.x)}+(${positionTrackExpr(tracks.x, 0, t)})${ALIGN_ANCHOR[settings.align]}`);
   }
 
   // A scaled unit grows around its own centre: anchor x on the centre, y on the em box.
-  if (scale) return quoted(`${fmt(piece.x + piece.width / 2)}+(${trackExpr(tracks.x, 0, t)})-text_w/2`);
+  if (scale) return quoted(`${fmt(piece.x + piece.width / 2)}+(${positionTrackExpr(tracks.x, 0, t)})-text_w/2`);
 
   return offset(piece.x, tracks.x, t);
 }
@@ -90,7 +90,7 @@ export function pieceFilter(
   const baseline = scale
     ? `${fmt(piece.y + size / 2)}+${fmt(size * (BASELINE - 0.5))}*(${scale})`
     : fmt(piece.y + size * BASELINE);
-  const y = `${baseline}-max_glyph_a+(${trackExpr(tracks.y, 0, t)})${waveTerm(block, settings, draw, t)}`;
+  const y = `${baseline}-max_glyph_a+(${positionTrackExpr(tracks.y, 0, t)})${waveTerm(block, settings, draw, t)}`;
   const values: Record<string, unknown> = {
     text: piece.text,
     fontfile: settings.font,

@@ -3,6 +3,12 @@
 // first state shows from the layer's start (the lead) and the last is held by the overlay, so a 0.6 s
 // entrance in a 6 s section draws ~18 frames. States are rounded, so the plan, and the frames drawn from it,
 // are the same on every host. Bounded: a span over HTML_MOTION_MAX_SPAN is refused before it is walked.
+//
+// Satori writes each transform as an SVG matrix rounded to two decimals, but works out the shift that keeps
+// a scaled or turned element on its own centre from the exact values. A scale is therefore planned on that
+// same 0.01 grid (the matrix and its shift then agree), and a turn closer to its rest than the matrix can
+// draw is held at rest: otherwise a spring tail draws its element up to a pixel off, a different way on
+// every frame.
 
 import type { TrackKey } from '../motion/tracks';
 import { trackSpan, trackValueAt } from '../motion/track-value';
@@ -100,12 +106,23 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
+// A turn whose sine rounds to 0.00 in Satori's matrix (|θ| < 0.2865°) draws as a shift, not a turn.
+const SATORI_TURN_STEP = 0.29;
+
+// The turn at `time`, held at its rest once it is within a step Satori can draw of it.
+function turnAt(spec: ElementMotionSpec, time: number): number {
+  const turn = trackAt(spec, 'rotate', time, 0, 2);
+  const rest = trackAt(spec, 'rotate', Infinity, 0, 2);
+
+  return clamp(Math.abs(turn - rest) < SATORI_TURN_STEP ? rest : turn, -HTML_MOTION_MAX_TURN, HTML_MOTION_MAX_TURN);
+}
+
 function stateAt(spec: ElementMotionSpec, time: number): ElementState {
   return {
     x: clamp(trackAt(spec, 'x', time, 0, 2), -HTML_MOTION_MAX_OFFSET, HTML_MOTION_MAX_OFFSET),
     y: clamp(trackAt(spec, 'y', time, 0, 2), -HTML_MOTION_MAX_OFFSET, HTML_MOTION_MAX_OFFSET),
-    scale: clamp(trackAt(spec, 'scale', time, 1, 4), 0, 10),
-    rotate: clamp(trackAt(spec, 'rotate', time, 0, 2), -HTML_MOTION_MAX_TURN, HTML_MOTION_MAX_TURN),
+    scale: clamp(trackAt(spec, 'scale', time, 1, 2), 0, 10),
+    rotate: turnAt(spec, time),
     opacity: clamp(trackAt(spec, 'opacity', time, 1, 4), 0, 1),
   };
 }

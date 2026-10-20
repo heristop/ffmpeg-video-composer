@@ -221,7 +221,7 @@ describe('AnimationComposer.appendAnimations', () => {
     await composer.appendAnimations('/build/output.mp4');
 
     expect(executed[0]).toContain(
-      "[0:v][1:v]overlay=x='10':y='(20)+(1-(if(lt(t,0),0,if(lt(t,1),(t-0)/1,1))))*40':eof_action=pass:shortest=1[vout]"
+      "[0:v][1:v]overlay=x='10':y='(20)+round((1-(if(lt(t,0),0,if(lt(t,1),(t-0)/1,1))))*40)':eof_action=pass:shortest=1[vout]"
     );
   });
 

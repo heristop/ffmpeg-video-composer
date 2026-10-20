@@ -6,6 +6,11 @@
 // so springs, beziers and elastic curves all cost a few multiply-adds per frame, read the same on every
 // backend, and stay inside the expression subset the engine's own geometry evaluator understands.
 // Segmentation is adaptive: a piece splits until it stays within TOLERANCE of the true curve.
+//
+// An animation must also settle: where the true curve runs one way across a piece, the piece's slopes are
+// limited (Fritsch–Carlson) so its cubic never turns back nor passes its ends, and a curve that stays in
+// 0..1 is clipped to it. Overlay and drawtext truncate positions to whole pixels, so an ease-out whose fit
+// dipped a millionth past its end drew its layer a pixel off on the frame before it landed.
 
 import type { Curve, CurveFn } from './curves';
 
@@ -47,10 +52,53 @@ function slope(fn: CurveFn, p: number, width: number): number {
   return (fn(hi) - fn(lo)) / (hi - lo);
 }
 
-function hermite(fn: CurveFn, { a, b }: Piece, p: number): number {
+// Whether the true curve runs one way only across the piece (or holds still), probed like the fit.
+function monotoneOn(fn: CurveFn, { a, b }: Piece): boolean {
+  const y0 = fn(a);
+  const delta = fn(b) - y0;
+  let previous = y0;
+
+  for (let i = 1; i <= PROBES; i++) {
+    const value = fn(a + ((b - a) * i) / PROBES);
+
+    if ((value - previous) * delta < 0 || (delta === 0 && value !== y0)) return false;
+
+    previous = value;
+  }
+
+  return true;
+}
+
+// Fritsch–Carlson: end slopes against the secant, kept on its side and inside the circle of radius 3, keep
+// a cubic Hermite piece monotone and between its end values.
+function limited(m0: number, m1: number, secant: number): [number, number] {
+  if (secant === 0) return [0, 0];
+
+  const alpha = Math.max(0, m0 / secant);
+  const beta = Math.max(0, m1 / secant);
+  const radius = Math.hypot(alpha, beta);
+  const tau = radius > 3 ? 3 / radius : 1;
+
+  return [alpha * tau * secant, beta * tau * secant];
+}
+
+// The piece's end slopes in progress per unit of p, limited where the true curve is monotone.
+function pieceSlopes(fn: CurveFn, piece: Piece): [number, number] {
+  const width = piece.b - piece.a;
+  const m0 = slope(fn, piece.a, width);
+  const m1 = slope(fn, piece.b, width);
+
+  if (!monotoneOn(fn, piece)) return [m0, m1];
+
+  return limited(m0, m1, (fn(piece.b) - fn(piece.a)) / width);
+}
+
+function hermite(fn: CurveFn, piece: Piece, p: number): number {
+  const { a, b } = piece;
   const width = b - a;
   const u = (p - a) / width;
-  const [y0, y1, m0, m1] = [fn(a), fn(b), slope(fn, a, width) * width, slope(fn, b, width) * width];
+  const slopes = pieceSlopes(fn, piece);
+  const [y0, y1, m0, m1] = [fn(a), fn(b), slopes[0] * width, slopes[1] * width];
 
   return (
     (2 * u ** 3 - 3 * u ** 2 + 1) * y0 +
@@ -97,8 +145,7 @@ function pieceExpr(fn: CurveFn, piece: Piece, window: Window, time: string): str
   const t0 = window.delay + piece.a * window.duration;
   const y0 = fn(piece.a);
   const y1 = fn(piece.b);
-  const m0 = slope(fn, piece.a, piece.b - piece.a) / window.duration;
-  const m1 = slope(fn, piece.b, piece.b - piece.a) / window.duration;
+  const [m0, m1] = pieceSlopes(fn, piece).map((m) => m / window.duration);
   const c2 = (3 * (y1 - y0)) / span ** 2 - (2 * m0 + m1) / span;
   const c3 = (m0 + m1) / span ** 2 - (2 * (y1 - y0)) / span ** 3;
   const u = `(${time}-${fmt(t0)})`;
@@ -132,5 +179,17 @@ export function easedProgressExpr(curve: Curve, window: Window, time = 't'): str
     body = `if(lt(${time},${bound}),${pieceExpr(curve.fn, pieces[i], window, time)},${body})`;
   }
 
-  return `${start}${body})`;
+  return `${start}${withinUnit(curve.fn) ? `clip(${body},0,1)` : body})`;
+}
+
+// Whether the curve stays in 0..1 (no overshoot, no anticipation): its fit, rounded to six decimals, may
+// then be clipped to it.
+function withinUnit(fn: CurveFn): boolean {
+  for (let i = 0; i <= 1024; i++) {
+    const value = fn(i / 1024);
+
+    if (value < 0 || value > 1) return false;
+  }
+
+  return true;
 }

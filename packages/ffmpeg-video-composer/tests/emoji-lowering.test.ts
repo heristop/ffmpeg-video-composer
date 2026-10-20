@@ -109,7 +109,7 @@ describe('emoji lowering', () => {
     const graph = await sectionCommand(template(caption('Go 👉', { reveal: 'rise' })));
 
     expect(graph).toContain('format=rgba,fade=t=in:st=0.3:d=0.6:alpha=1[card_emoji_0_src]');
-    expect(graph).toMatch(/overlay=x='\d+':y='\(\(\(H-\([\d.]+\)\)-110\)\+\(1-\(if\(lt\(t,0\.3\)/);
+    expect(graph).toMatch(/overlay=x='\d+':y='\(\(\(H-\([\d.]+\)\)-110\)\+round\(\(1-\(if\(lt\(t,0\.3\)/);
   });
 
   it('shares the text enable window', async () => {

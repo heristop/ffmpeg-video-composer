@@ -74,8 +74,8 @@ describe('iris shape: lowering', () => {
     expect(graph).toContain(
       '[3:v]format=gray16le,setsar=1,setpts=PTS-STARTPTS[dt0m0];color=c=black:s=640x360:r=30:d=0.6,format=gray16le[dt0m1];' +
         "[dt0m0][dt0m1]xfade=transition=custom:expr='65535*clip(((-163.8375+65862.675*(if(lt((0.6*(1-P)),0),0," +
-        'if(lt((0.6*(1-P)),0.3),0+((0.6*(1-P))-0)*(1.666667+((0.6*(1-P))-0)*(0+((0.6*(1-P))-0)*0)),' +
-        'if(lt((0.6*(1-P)),0.6),0.5+((0.6*(1-P))-0.3)*(1.666667+((0.6*(1-P))-0.3)*(0+((0.6*(1-P))-0.3)*0)),1)))))' +
+        'clip(if(lt((0.6*(1-P)),0.3),0+((0.6*(1-P))-0)*(1.666667+((0.6*(1-P))-0)*(0+((0.6*(1-P))-0)*0)),' +
+        'if(lt((0.6*(1-P)),0.6),0.5+((0.6*(1-P))-0.3)*(1.666667+((0.6*(1-P))-0.3)*(0+((0.6*(1-P))-0.3)*0)),1)),0,1))))' +
         "-A)/327.675+0.5,0,1)':duration=0.6:offset=0,format=gray,scale=1280:720:flags=bilinear,format=gray,settb=AVTB,setpts=N/(30*TB)[dt0mask];" +
         '[dt0in]setpts=N/(30*TB)[dt0ic];[dt0tail]setpts=N/(30*TB)[dt0tc];' +
         '[dt0ic][dt0mask]alphamerge[dt0ia];[dt0tc][dt0ia]overlay=0:0[dt0mix]'
