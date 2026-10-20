@@ -62,3 +62,9 @@ describe('FormAnswersPreview', () => {
     expect(shownOnScreen(template, 'note')).toBe(false);
   });
 });
+
+describe('studio create button copy', () => {
+  it('says what is missing while the video cannot be made yet', () => {
+    expect(builder.hub.createBlocked).toBe('Fill every scene first ({{done}} of {{total}} ready)');
+  });
+});

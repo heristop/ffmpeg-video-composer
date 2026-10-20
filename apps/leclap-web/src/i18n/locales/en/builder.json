@@ -180,6 +180,7 @@
         "standard": "Balanced picture and render time.",
         "high": "Sharpest picture; slower to render, larger file."
       }
-    }
+    },
+    "createBlocked": "Fill every scene first ({{done}} of {{total}} ready)"
   }
 }
