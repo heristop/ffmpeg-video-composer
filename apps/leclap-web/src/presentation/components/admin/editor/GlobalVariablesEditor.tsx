@@ -10,10 +10,38 @@ import { normalizeHex } from '@/lib/color';
 import type { EditorState } from '../templateEditorModel';
 import { EDITOR_INPUT_CLASS } from './editorStyles';
 import { FieldGroupHeader } from './FieldGroupHeader';
+import { allFieldNames, scenesUsing, variableNameProblem } from './SectionFields/form-fields.logic';
 
 interface GlobalVariablesEditorProps {
   state: EditorState;
   patch: (p: Partial<EditorState>) => void;
+}
+
+// The line under a variable row: what is wrong with its name, else where the scenes show it.
+function VariableNote({ state, index }: { state: EditorState; index: number }) {
+  const { t } = useTranslation('admin');
+  const { name } = state.globalVariables[index];
+  const others = [
+    ...state.globalVariables.filter((_, i) => i !== index).map((variable) => variable.name),
+    ...allFieldNames(state),
+  ];
+  const problem = variableNameProblem(name, others);
+
+  if (problem) {
+    return <p className="col-span-3 text-xs text-[var(--color-error)]">{t(`editor.variables.problem.${problem}`)}</p>;
+  }
+
+  if (name.trim() === '') return null;
+
+  const scenes = scenesUsing(state.sections, name);
+
+  return (
+    <p className="col-span-3 text-xs text-muted-foreground">
+      {scenes.length > 0
+        ? t('editor.variables.usedIn', { list: scenes.join(', '), count: scenes.length })
+        : t('editor.variables.unused', { name })}
+    </p>
+  );
 }
 
 export const GlobalVariablesEditor = ({ state, patch }: GlobalVariablesEditorProps) => {
@@ -38,7 +66,7 @@ export const GlobalVariablesEditor = ({ state, patch }: GlobalVariablesEditorPro
           </p>
         )}
         {globalVariables.map((variable, i) => (
-          <div key={i} className="grid grid-cols-[1fr_1fr_auto] items-center gap-2">
+          <div key={i} className="grid grid-cols-[1fr_1fr_auto] items-center gap-x-2 gap-y-1">
             <div className="relative">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm text-brand-600 dark:text-brand-300">
                 #
@@ -93,6 +121,7 @@ export const GlobalVariablesEditor = ({ state, patch }: GlobalVariablesEditorPro
             >
               <Trash2 className="h-4 w-4" />
             </button>
+            <VariableNote state={state} index={i} />
           </div>
         ))}
         <button

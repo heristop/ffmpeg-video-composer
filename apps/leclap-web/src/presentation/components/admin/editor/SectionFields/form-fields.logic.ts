@@ -74,3 +74,13 @@ export function moveField<T>(fields: readonly T[], from: number, to: number): T[
 
   return next;
 }
+
+// A template variable name (variableSyntax's token charset: word characters, dots and hyphens, not ending
+// on a dot). Blank stays quiet: the row is just being filled in.
+export function variableNameProblem(name: string, others: readonly string[]): 'chars' | 'duplicate' | null {
+  if (name.trim() === '') return null;
+
+  if (!/^[\w.-]*[\w-]$/.test(name)) return 'chars';
+
+  return others.includes(name) ? 'duplicate' : null;
+}

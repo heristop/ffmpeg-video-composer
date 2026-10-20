@@ -150,7 +150,14 @@
       "namePlaceholder": "key",
       "valuePlaceholder": "value",
       "add": "Add variable",
-      "colorValue": "Variable {{index}} colour"
+      "colorValue": "Variable {{index}} colour",
+      "usedIn_one": "Shown in scene {{list}}.",
+      "usedIn_other": "Shown in scenes {{list}}.",
+      "unused": "Not used yet. Type #{{name}} in a text to show it.",
+      "problem": {
+        "chars": "Letters, digits, _, - and . only, not ending on a dot.",
+        "duplicate": "A form field or another variable already uses this name."
+      }
     },
     "colorsList": {
       "label": "Colour palette",

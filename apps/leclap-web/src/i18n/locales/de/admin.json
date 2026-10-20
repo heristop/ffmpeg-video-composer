@@ -150,7 +150,14 @@
       "namePlaceholder": "Schlüssel",
       "valuePlaceholder": "Wert",
       "add": "Variable hinzufügen",
-      "colorValue": "Farbe von Variable {{index}}"
+      "colorValue": "Farbe von Variable {{index}}",
+      "usedIn_one": "Erscheint in Szene {{list}}.",
+      "usedIn_other": "Erscheint in den Szenen {{list}}.",
+      "unused": "Noch nicht verwendet. Tippe #{{name}} in einen Text, um sie zu zeigen.",
+      "problem": {
+        "chars": "Nur Buchstaben, Ziffern, _, - und ., nicht mit einem Punkt am Ende.",
+        "duplicate": "Ein Formularfeld oder eine andere Variable nutzt diesen Namen schon."
+      }
     },
     "colorsList": {
       "label": "Farbpalette",

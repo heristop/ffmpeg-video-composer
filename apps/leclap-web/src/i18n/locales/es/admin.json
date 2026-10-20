@@ -150,7 +150,14 @@
       "namePlaceholder": "clave",
       "valuePlaceholder": "valor",
       "add": "Añadir variable",
-      "colorValue": "Color de la variable {{index}}"
+      "colorValue": "Color de la variable {{index}}",
+      "usedIn_one": "Se muestra en la escena {{list}}.",
+      "usedIn_other": "Se muestra en las escenas {{list}}.",
+      "unused": "Aún sin usar. Escribe #{{name}} en un texto para mostrarla.",
+      "problem": {
+        "chars": "Solo letras, dígitos, _, - y ., sin punto final.",
+        "duplicate": "Un campo del formulario u otra variable ya usa este nombre."
+      }
     },
     "colorsList": {
       "label": "Paleta de colores",
