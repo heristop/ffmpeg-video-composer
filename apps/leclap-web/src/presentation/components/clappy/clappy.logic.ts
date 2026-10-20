@@ -192,16 +192,12 @@ const clapAngle = (
   return mix(0, rest, springProgress(fromSlam - HOLD, reopen));
 };
 
-const armsAt = (fromSlam: number): number => {
-  if (fromSlam < LOWER_AFTER) return mix(ARMS_REST, ARMS_UP, springProgress(fromSlam, THROW));
+// The arms go up at the slam and stay up: the finished render ends on Clappy celebrating, smiling.
+const armsAt = (fromSlam: number): number => mix(ARMS_REST, ARMS_UP, springProgress(fromSlam, THROW));
 
-  return mix(ARMS_UP, ARMS_REST, springProgress(fromSlam - LOWER_AFTER, LOWER));
-};
-
+// The wind-up keeps his smile: a focused brow there reads as a frown just before the render lands.
 const moodAt = (fromSlam: number): ClappyMood => {
-  if (fromSlam < 0) return 'focused';
-
-  if (fromSlam < LOWER_AFTER + 0.2) return 'grin';
+  if (fromSlam >= 0 && fromSlam < LOWER_AFTER + 0.2) return 'grin';
 
   return 'smile';
 };
@@ -222,8 +218,8 @@ export interface CheerFrame {
 
 /**
  * The cheer that greets a finished render, `seconds` in: Clappy winds the clapper up, slams it shut at
- * SLAM_AT, throws both arms up grinning while the stick wobbles back open, then lowers them into a smile and
- * holds it from CHEER_SECONDS on.
+ * SLAM_AT, throws both arms up grinning while the stick wobbles back open, then keeps them up and settles into a
+ * smile, held from CHEER_SECONDS on.
  */
 export const cheerFrame = (seconds: number): CheerFrame => {
   const fromSlam = Math.min(seconds, CHEER_SECONDS) - SLAM_AT;
