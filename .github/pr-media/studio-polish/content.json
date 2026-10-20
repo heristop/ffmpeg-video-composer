@@ -1,0 +1,42 @@
+{
+  "_note": "Captures come from record.mjs with RECORD=1 (SIDE=before on feat/builder-polish-2, SIDE=after on this branch). trim is the start offset so both editors open at the same second.",
+  "ticket": "PR #141",
+  "summary": "The studio shows the answers a form scene collects",
+  "clipSeconds": 5.5,
+  "freeze": { "at": 3.4, "hold": 3 },
+  "intro": {
+    "headline": "POLISH THE STUDIO"
+  },
+  "outro": {
+    "headline": "REVIEW THE FORM MONITOR FIRST",
+    "subtitle": "Then the take gallery and the create button"
+  },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.webm",
+      "trim": 5.3,
+      "highlight": { "x": 66, "y": 130, "w": 934, "h": 460 },
+      "callout": "A placeholder",
+      "chip": "A placeholder card",
+      "pane": {
+        "title": "A placeholder",
+        "desc": "The monitor names the scene while the answers go nowhere you can see."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.webm",
+      "trim": 5.2,
+      "highlight": { "x": 66, "y": 130, "w": 934, "h": 460 },
+      "callout": "The answers, live",
+      "chip": "The answers, live",
+      "pane": {
+        "title": "Your answers",
+        "desc": "Each field with what was typed and whether a scene shows it; the header is one row."
+      }
+    }
+  ]
+}

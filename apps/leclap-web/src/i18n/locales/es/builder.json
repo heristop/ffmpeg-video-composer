@@ -75,7 +75,12 @@
         "weeks": "hace {{count}} sem",
         "months": "hace {{count}} mes"
       }
-    }
+    },
+    "answersTitle": "Tus respuestas",
+    "answersLead": "El formulario no sale en pantalla; rellenan las escenas que las usan.",
+    "answersEmpty": "Aún sin rellenar",
+    "answersShown": "En pantalla",
+    "answersNotShown": "No sale en pantalla"
   },
   "stepProcess": {
     "title": "Crear vídeo",
@@ -120,7 +125,10 @@
     "use": "Usar la toma {{number}}",
     "remove": "Quitar la toma {{number}}",
     "addAnother": "Grabar otra toma",
-    "addTake": "Añadir una toma"
+    "addTake": "Añadir una toma",
+    "confirmRemove": "¿Quitar la toma {{number}}? La grabación se descarta.",
+    "keep": "Conservar",
+    "confirm": "Quitar"
   },
   "edit": {
     "trim": "Recortar",
@@ -175,6 +183,7 @@
         "standard": "Equilibrio entre imagen y tiempo de render.",
         "high": "La imagen más nítida; tarda más en renderizar y el archivo pesa más."
       }
-    }
+    },
+    "createBlocked": "Rellena antes cada escena ({{done}} de {{total}} listas)"
   }
 }

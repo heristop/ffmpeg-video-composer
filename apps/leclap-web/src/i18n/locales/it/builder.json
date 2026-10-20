@@ -75,7 +75,12 @@
         "weeks": "{{count}}sett. fa",
         "months": "{{count}}mesi fa"
       }
-    }
+    },
+    "answersTitle": "Le tue risposte",
+    "answersLead": "Il modulo resta fuori scena; riempiono le scene che le usano.",
+    "answersEmpty": "Non ancora compilato",
+    "answersShown": "Sullo schermo",
+    "answersNotShown": "Non sullo schermo"
   },
   "stepProcess": {
     "title": "Crea il video",
@@ -120,7 +125,10 @@
     "use": "Usa la ripresa {{number}}",
     "remove": "Rimuovi la ripresa {{number}}",
     "addAnother": "Registra un’altra ripresa",
-    "addTake": "Aggiungi una ripresa"
+    "addTake": "Aggiungi una ripresa",
+    "confirmRemove": "Rimuovere la ripresa {{number}}? La registrazione viene scartata.",
+    "keep": "Tieni",
+    "confirm": "Rimuovi"
   },
   "edit": {
     "trim": "Taglia",
@@ -175,6 +183,7 @@
         "standard": "Equilibrio tra immagine e tempo di render.",
         "high": "L’immagine più nitida; il render è più lento e il file più pesante."
       }
-    }
+    },
+    "createBlocked": "Prima compila ogni scena ({{done}} di {{total}} pronte)"
   }
 }

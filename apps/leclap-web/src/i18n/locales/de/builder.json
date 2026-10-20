@@ -75,7 +75,12 @@
         "weeks": "vor {{count}} Wo.",
         "months": "vor {{count}} Mon."
       }
-    }
+    },
+    "answersTitle": "Deine Antworten",
+    "answersLead": "Das Formular bleibt unsichtbar; sie füllen die Szenen, die sie nutzen.",
+    "answersEmpty": "Noch nicht ausgefüllt",
+    "answersShown": "Im Bild",
+    "answersNotShown": "Nicht im Bild"
   },
   "stepProcess": {
     "title": "Video erstellen",
@@ -120,7 +125,10 @@
     "use": "Aufnahme {{number}} verwenden",
     "remove": "Aufnahme {{number}} entfernen",
     "addAnother": "Weitere Aufnahme machen",
-    "addTake": "Aufnahme hinzufügen"
+    "addTake": "Aufnahme hinzufügen",
+    "confirmRemove": "Take {{number}} entfernen? Die Aufnahme wird verworfen.",
+    "keep": "Behalten",
+    "confirm": "Entfernen"
   },
   "edit": {
     "trim": "Schneiden",
@@ -175,6 +183,7 @@
         "standard": "Ausgewogen zwischen Bild und Renderzeit.",
         "high": "Schärfstes Bild; der Render dauert länger, die Datei wird größer."
       }
-    }
+    },
+    "createBlocked": "Erst jede Szene ausfüllen ({{done}} von {{total}} fertig)"
   }
 }

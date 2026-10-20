@@ -54,7 +54,9 @@ const PosterTile = ({
         <Check className="h-3 w-3" strokeWidth={2.5} />
       </span>
     )}
-    {durationLabel ? (
+    {/* The compact tile is too short for three corner badges, and its title needs the width below: the
+        length is left out there (the take's own thumbnail shows it). */}
+    {durationLabel && !compact ? (
       <span className="absolute bottom-1.5 right-1.5 rounded bg-black/65 px-1.5 py-0.5 text-[0.65rem] font-semibold tabular-nums text-white">
         {durationLabel}
       </span>
@@ -68,6 +70,19 @@ function cellWidthClass(compact: boolean, widthRem: number | undefined): string 
   if (widthRem !== undefined) return 'w-(--clip-w) gap-1.5';
 
   return compact ? 'w-24 gap-1 sm:w-28' : 'w-28 gap-1.5 sm:w-32';
+}
+
+function CellTitle({ title }: { title: string }) {
+  return <span className="line-clamp-1 text-xs font-medium text-foreground short:hidden">{title}</span>;
+}
+
+function cellStyle(widthRem: number | undefined): CSSProperties | undefined {
+  return widthRem === undefined ? undefined : ({ '--clip-w': `${String(widthRem)}rem` } as CSSProperties);
+}
+
+// A tab reports selection, a button reports the current scene.
+function selectionState(role: 'tab' | 'button', active: boolean) {
+  return role === 'tab' ? { 'aria-selected': active } : { 'aria-current': active };
 }
 
 // One timeline cell — the shared visual for the studio filmstrip and the template-editor timeline.
@@ -93,15 +108,11 @@ export const SceneCell = ({
   compact = false,
   widthRem,
 }: SceneCellProps) => (
-  <div
-    className="relative shrink-0"
-    style={widthRem === undefined ? undefined : ({ '--clip-w': `${widthRem}rem` } as CSSProperties)}
-  >
+  <div className="relative shrink-0" style={cellStyle(widthRem)}>
     <PressableScale
       ref={buttonRef}
       role={role}
-      aria-selected={role === 'tab' ? active : undefined}
-      aria-current={role === 'button' ? active : undefined}
+      {...selectionState(role, active)}
       tabIndex={tabIndex}
       onKeyDown={onKeyDown}
       onClick={onSelect}
@@ -139,7 +150,7 @@ export const SceneCell = ({
           {eyebrow}
         </span>
       ) : null}
-      <span className="line-clamp-1 text-xs font-medium text-foreground short:hidden">{title}</span>
+      <CellTitle title={title} />
     </PressableScale>
     {trailing}
   </div>
