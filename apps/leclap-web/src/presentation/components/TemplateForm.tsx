@@ -78,6 +78,10 @@ const getFieldPlaceholder = (field: FormField, label: string, t: TFunction<'temp
   return t('form.placeholder.generic', { label: label.toLowerCase() });
 };
 
+// The template's default shows as the placeholder: it is what the video gets if the field stays empty.
+const fieldPlaceholder = (field: FormField, label: string, t: TFunction<'templates'>): string =>
+  field.contract?.default === undefined ? getFieldPlaceholder(field, label, t) : String(field.contract.default);
+
 // What the line under a field says: a value that does not fit always shows; "required" only once the
 // viewer has touched the field, so an untouched form does not open in red.
 const fieldErrorMessage = (
@@ -154,7 +158,7 @@ const FormFieldItem = ({ field, index, formData, touched, onFieldChange }: FormF
   const IconComponent = getFieldIcon(field);
   // The author's label in the viewer's language, when the template carries one.
   const label = resolveTranslation(field.label, i18n.language) ?? field.name;
-  const placeholder = getFieldPlaceholder(field, label, t);
+  const placeholder = fieldPlaceholder(field, label, t);
   const value = formData[field.name] || '';
   const errorMessage = fieldErrorMessage(field, value, touched, t);
   const hasError = errorMessage !== null;
@@ -179,6 +183,9 @@ const FormFieldItem = ({ field, index, formData, touched, onFieldChange }: FormF
           </span>
         )}
       </label>
+      {field.contract?.description ? (
+        <p className="-mt-1 text-xs text-muted-foreground">{field.contract.description}</p>
+      ) : null}
 
       <FieldInput
         field={field}

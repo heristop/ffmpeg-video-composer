@@ -109,7 +109,8 @@ export type SectionFit = 'cover' | 'letterbox' | 'blur' | 'off';
 export const SECTION_FIT_MODES: readonly SectionFit[] = ['cover', 'letterbox', 'blur', 'off'];
 
 // --- Editor-friendly section model (flattened; compiled to a descriptor on save) ---
-export type FormField = { name: string; label: string; maxLength: number };
+export type { FormField, FormFieldType } from './form-field';
+import type { FormField } from './form-field';
 
 // A single positionable text overlay on a video section. x/y are [0,1] fractions
 // of the frame; fontcolor/boxcolor are hex strings like '#ffffff'. boxOpacity is

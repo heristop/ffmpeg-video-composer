@@ -18,6 +18,7 @@ import {
   visualExtras,
   watermarkField,
 } from './build-descriptor-fragments';
+import { fieldSpecsGlobal } from './form-field-specs';
 
 function formDescriptorFrom(section: { kind: 'form'; fields: FormField[] }, index: number): Section {
   return {
@@ -316,6 +317,7 @@ export function buildDescriptor(state: EditorState): TemplateDescriptor {
     // '{{ colorN }}' tokens from there at compile time).
     ...(palette.length > 0 ? { colorsList: palette, variables: { colorsList: palette } } : {}),
     ...mediaGlobals(state.sections),
+    ...fieldSpecsGlobal(state),
   };
 
   const variables = authorVariables(state.globalVariables);
