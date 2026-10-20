@@ -125,7 +125,10 @@
     "use": "Utiliser la prise {{number}}",
     "remove": "Supprimer la prise {{number}}",
     "addAnother": "Filmer une autre prise",
-    "addTake": "Ajouter une prise"
+    "addTake": "Ajouter une prise",
+    "confirmRemove": "Supprimer la prise {{number}} ? L’enregistrement est perdu.",
+    "keep": "Garder",
+    "confirm": "Supprimer"
   },
   "edit": {
     "trim": "Rogner",

@@ -125,7 +125,10 @@
     "use": "Usar la toma {{number}}",
     "remove": "Quitar la toma {{number}}",
     "addAnother": "Grabar otra toma",
-    "addTake": "Añadir una toma"
+    "addTake": "Añadir una toma",
+    "confirmRemove": "¿Quitar la toma {{number}}? La grabación se descarta.",
+    "keep": "Conservar",
+    "confirm": "Quitar"
   },
   "edit": {
     "trim": "Recortar",

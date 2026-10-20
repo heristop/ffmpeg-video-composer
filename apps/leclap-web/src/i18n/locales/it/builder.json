@@ -125,7 +125,10 @@
     "use": "Usa la ripresa {{number}}",
     "remove": "Rimuovi la ripresa {{number}}",
     "addAnother": "Registra un’altra ripresa",
-    "addTake": "Aggiungi una ripresa"
+    "addTake": "Aggiungi una ripresa",
+    "confirmRemove": "Rimuovere la ripresa {{number}}? La registrazione viene scartata.",
+    "keep": "Tieni",
+    "confirm": "Rimuovi"
   },
   "edit": {
     "trim": "Taglia",

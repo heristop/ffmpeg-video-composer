@@ -125,7 +125,10 @@
     "use": "Aufnahme {{number}} verwenden",
     "remove": "Aufnahme {{number}} entfernen",
     "addAnother": "Weitere Aufnahme machen",
-    "addTake": "Aufnahme hinzufügen"
+    "addTake": "Aufnahme hinzufügen",
+    "confirmRemove": "Take {{number}} entfernen? Die Aufnahme wird verworfen.",
+    "keep": "Behalten",
+    "confirm": "Entfernen"
   },
   "edit": {
     "trim": "Schneiden",
