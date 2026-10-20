@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { alternativesSummary, makeDefault, moveIndex, trackKeyAction } from './music-track-list.logic';
+import { alternativesSummary, filterTracks, makeDefault, moveIndex, trackKeyAction } from './music-track-list.logic';
 
 describe('makeDefault', () => {
   it('moves the track to the front and keeps the others in order', () => {
@@ -42,5 +42,30 @@ describe('alternativesSummary', () => {
   it('names two alternatives and counts the rest', () => {
     expect(alternativesSummary(['a', 'b', 'c', 'd'])).toEqual({ shown: ['a', 'b'], more: 2 });
     expect(alternativesSummary(['a'])).toEqual({ shown: ['a'], more: 0 });
+  });
+});
+
+describe('filterTracks', () => {
+  const tracks = [
+    { id: 'a', bpm: 80, moods: ['calm'] },
+    { id: 'b', bpm: 128, moods: ['upbeat'] },
+    { id: 'c', moods: ['calm', 'jazzy'] },
+    { id: 'd', bpm: 100 },
+  ];
+  const ids = (list: Array<{ id: string }>) => list.map((track) => track.id);
+
+  it('keeps everything with no filter', () => {
+    expect(ids(filterTracks(tracks, 'all', 'any'))).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('filters by publisher mood', () => {
+    expect(ids(filterTracks(tracks, 'calm', 'any'))).toEqual(['a', 'c']);
+  });
+
+  it('filters by tempo band and leaves out tracks without a trusted tempo', () => {
+    expect(ids(filterTracks(tracks, 'all', 'slow'))).toEqual(['a']);
+    expect(ids(filterTracks(tracks, 'all', 'mid'))).toEqual(['d']);
+    expect(ids(filterTracks(tracks, 'all', 'fast'))).toEqual(['b']);
+    expect(ids(filterTracks(tracks, 'calm', 'fast'))).toEqual([]);
   });
 });

@@ -1,0 +1,178 @@
+{
+  "generatedBy": "scripts/analyze-music-profile.ts",
+  "bars": 64,
+  "tracks": {
+    "afterword-zen-lofi": {
+      "durationSec": 172,
+      "bpm": 136,
+      "moods": ["calm"],
+      "peaks": "215669679fysstruwqptrwpvtstuqvncb5d8cc6b6twpxrwvtsvuvvtwtzusuxd2"
+    },
+    "autumn-day": {
+      "durationSec": 75,
+      "bpm": 126,
+      "moods": ["calm"],
+      "peaks": "micheutgqkctglomzwpnfxtfvnjf9ecbqcwvdwlhdppbznaihddajebngpigtrku"
+    },
+    "cafe-jazz": {
+      "durationSec": 133,
+      "bpm": 84,
+      "moods": ["calm", "jazzy"],
+      "peaks": "acgc9psmpsmtnqmfpqpupsxqsgbowwqvwwtsofgrvkfesnqsrsmlmbg8ommqlgze"
+    },
+    "carefree": {
+      "durationSec": 205,
+      "moods": ["upbeat"],
+      "peaks": "rpsorqsqtmtosurqqorrtsvswuruttvvsqrqqtprqsqzpspupyqknmknojojnlma"
+    },
+    "chill-hip-hop": {
+      "durationSec": 77,
+      "bpm": 107,
+      "moods": ["calm"],
+      "peaks": "mqhhnplsnhqopnhopnonuztstwxztuvzusuvxyvuvztsuvwwxtvztsuvxwvvd100"
+    },
+    "chillhop-jazz-coffee-shop": {
+      "durationSec": 173,
+      "moods": ["jazzy"],
+      "peaks": "twtvrvrvwwtywwuxxxwzwwtxvvuwuxtvvvvwvvuuvwuwwxvywwvyxwwqkheefad2"
+    },
+    "chillhop-remain": {
+      "durationSec": 167,
+      "peaks": "qqqprrsqltsvxrtvtwrruuqotrqrqptrsotjrplpprsrxwtyuvxvwuvwxzwypoe1"
+    },
+    "dreamy-fall-people": {
+      "durationSec": 150,
+      "moods": ["calm"],
+      "peaks": "9898ba999aotqwxutsszxsvrxuusswztvruzsvowyuqstyqefdfeusswytvruyf1"
+    },
+    "fluffing-a-duck": {
+      "durationSec": 67,
+      "bpm": 82,
+      "moods": ["playful"],
+      "peaks": "ppnttomnpnrrqokpoaormlkpkupzlclolprrnklnmqqqkkn9qqoninlpozk21000"
+    },
+    "frosty-shadow-of-winter": {
+      "durationSec": 148,
+      "bpm": 130,
+      "moods": ["calm"],
+      "peaks": "22363cwjqrmrzpoksrsulpsmuzbiifkhvnntptxiqqmswoqksrwrhdkbloaid841"
+    },
+    "indie-rock-dreamy": {
+      "durationSec": 188,
+      "bpm": 117,
+      "moods": ["calm"],
+      "peaks": "mmmmmnonnnqolmnmlqporrnxwyxwnkrssststsstowxwxwxyyzxwififcwzyvwvh"
+    },
+    "local-forecast-elevator": {
+      "durationSec": 189,
+      "bpm": 109,
+      "moods": ["jazzy"],
+      "peaks": "okonaaccmjjilhkztlqpffigfhhmwtyvhfhfimfniogmxsytcebfegdkfkelfke9"
+    },
+    "lofi-cafe": {
+      "durationSec": 151,
+      "bpm": 133,
+      "peaks": "itqpptbmqnnsootoosgqursqsvptwpqedhnqqxbrvquk7cda9rqzvtyvoxuvyh74"
+    },
+    "lofi-chill": {
+      "durationSec": 140,
+      "moods": ["calm"],
+      "peaks": "upupsytrzryxtxsxsrzxrxsyysvpssoogffgoytysryrzxsxsxutztryrwvoupn0"
+    },
+    "lofi-chill-audiodollar": {
+      "durationSec": 107,
+      "bpm": 85,
+      "moods": ["calm"],
+      "peaks": "3699bbjnrprmprmtnsqtrmurvwwytvvszwuvuslsqmrrrmrpjtonqodcb8641100"
+    },
+    "lofi-hip-hop": {
+      "durationSec": 78,
+      "peaks": "dijgjii5hwvpjsyrinutlnxwnkmztgoywmkrsqjtxriiywqjtyrhh79b89a66500"
+    },
+    "lofi-jazz-hip-hop": {
+      "durationSec": 115,
+      "moods": ["jazzy"],
+      "peaks": "tswdoxxwywvxwwveqywxxwtywxu8rzvsr8rzvxyvuzuyrcuzuzytwyuzp6xyvtsb"
+    },
+    "lofi-jazz-music": {
+      "durationSec": 177,
+      "bpm": 65,
+      "moods": ["jazzy"],
+      "peaks": "ahhjelqqfljlnsquqyrsnlsqqvurwvtvlrpruvztyspaupttyzsoztsotrogc931"
+    },
+    "lofi-sentimental-jazz": {
+      "durationSec": 100,
+      "moods": ["calm", "jazzy"],
+      "peaks": "jd9h85frofpqrnvkjmrptxjouqnqviopuoozlmsxpmyqlpxmnspogujqrpkmoihj"
+    },
+    "lofi-study": {
+      "durationSec": 126,
+      "bpm": 88,
+      "peaks": "98abkoyxwxvwvywzswwwxxxwxyyq66777c89chmyxwzxuywzxtxwxxxvwxyxt300"
+    },
+    "monkeys-spinning-monkeys": {
+      "durationSec": 125,
+      "moods": ["playful"],
+      "peaks": "knprolllklfjdiknuqmmkjmkijdjggdhifcfnosqrprtrwxuvvyxrwxquurzvsvy"
+    },
+    "oga-lofi-again": {
+      "durationSec": 88,
+      "bpm": 120,
+      "peaks": "ulopnsipnkntokqptrqstoovlrmhovoojnznhtnrqhhiknifjmhjjiikjgpneikb"
+    },
+    "oga-lofi-loop": {
+      "durationSec": 128,
+      "bpm": 120,
+      "peaks": "ofjiogmlpgohvhpjtkslwkppujhgujmiphmjsipitgmgzmslspspznoowjhhwkmg"
+    },
+    "once-in-paris": {
+      "durationSec": 132,
+      "bpm": 160,
+      "peaks": "kfbkdkysyvvtxxuvyrzwswviibjibkhdlgkwsxuvuxyuwttzwrwvxvwyrukebid7"
+    },
+    "party-dance": {
+      "durationSec": 94,
+      "bpm": 110,
+      "moods": ["upbeat"],
+      "peaks": "8889a9jommogtxzwwzxwyxwkyxwyywxyxxzegdcfddedeegoyxxyypzywyv84320"
+    },
+    "point-being": {
+      "durationSec": 150,
+      "peaks": "djhtunxqsuzpuouruuuptwuuqwysrsptcjhtvnxqsuzptouruuuptwuupxysrspt"
+    },
+    "since-2-am": {
+      "durationSec": 257,
+      "bpm": 80,
+      "peaks": "rntvvyvuzmjpsrtsrtsqtsrtspurrt647547cbiqquprvqqvqrvprwprvppwnpu1"
+    },
+    "split-memories": {
+      "durationSec": 153,
+      "moods": ["calm"],
+      "peaks": "ilsslutmruvsxyqpxxsyvrouzqtwwmtwsswunuxquxuqrytsyuosxtrzxnpyrlvh"
+    },
+    "sunset-stars": {
+      "durationSec": 176,
+      "bpm": 98,
+      "moods": ["calm"],
+      "peaks": "uqlgemivqpkhokyrvpmsqzrsqlsqyoqkkpmulphhkkvqsnnkrysuoomswrqkga91"
+    },
+    "the-builder": {
+      "durationSec": 118,
+      "bpm": 123,
+      "moods": ["upbeat"],
+      "peaks": "3356mpolrpurtonojjogamorozrrsqqpnomofbooopqtrqwqponkmeanpomovt10"
+    },
+    "tropical-cocktail": {
+      "durationSec": 127,
+      "bpm": 105,
+      "moods": ["upbeat"],
+      "peaks": "dhdefhhgmtxwvvvwuvtwvutvwvuqjkkksxwswxxvvvzwwwxxxvxyzuwkhggg8e91"
+    },
+    "we-jazz-lofi-soul": {
+      "durationSec": 177,
+      "bpm": 82,
+      "moods": ["jazzy"],
+      "peaks": "nnooqqtttrtuvuqvzwuuwvtwvpvtnljklosttvsrvupmnmmhknmijlmjjmrli750"
+    }
+  }
+}

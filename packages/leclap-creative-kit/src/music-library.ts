@@ -9,7 +9,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'YouTube Audio Library (no attribution required)',
     sourceUrl: 'https://www.youtube.com/audiolibrary',
     file: 'point-being.mp3',
-    durationSec: 150,
   },
   {
     id: 'tropical-cocktail',
@@ -18,7 +17,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/pop-tropical-cocktail-159121/',
     file: 'tropical-cocktail.mp3',
-    durationSec: 127,
   },
   {
     id: 'autumn-day',
@@ -27,7 +25,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'CC BY 3.0',
     sourceUrl: 'https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100765',
     file: 'autumn-day.mp3',
-    durationSec: 75,
   },
   {
     id: 'monkeys-spinning-monkeys',
@@ -36,7 +33,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'CC BY 3.0',
     sourceUrl: 'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Monkeys%20Spinning%20Monkeys.mp3',
     file: 'monkeys-spinning-monkeys.mp3',
-    durationSec: 125,
   },
   {
     id: 'fluffing-a-duck',
@@ -45,7 +41,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'CC BY 3.0',
     sourceUrl: 'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Fluffing%20a%20Duck.mp3',
     file: 'fluffing-a-duck.mp3',
-    durationSec: 67,
   },
   {
     id: 'carefree',
@@ -54,7 +49,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'CC BY 3.0',
     sourceUrl: 'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Carefree.mp3',
     file: 'carefree.mp3',
-    durationSec: 205,
   },
   {
     id: 'the-builder',
@@ -63,7 +57,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'CC BY 3.0',
     sourceUrl: 'https://incompetech.com/music/royalty-free/mp3-royaltyfree/The%20Builder.mp3',
     file: 'the-builder.mp3',
-    durationSec: 118,
   },
   {
     id: 'local-forecast-elevator',
@@ -72,7 +65,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'CC BY 3.0',
     sourceUrl: 'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Local%20Forecast%20-%20Elevator.mp3',
     file: 'local-forecast-elevator.mp3',
-    durationSec: 189,
   },
   {
     id: 'lofi-sentimental-jazz',
@@ -81,7 +73,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/lofi-lo-fi-music-loop-sentimental-jazzy-love-473154/',
     file: 'lofi-sentimental-jazz.mp3',
-    durationSec: 100,
   },
   {
     id: 'lofi-chill',
@@ -90,7 +81,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/lofi-chill-519566/',
     file: 'lofi-chill.mp3',
-    durationSec: 140,
   },
   {
     id: 'lofi-hip-hop',
@@ -99,7 +89,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/lofi-lofi-hip-hop-519408/',
     file: 'lofi-hip-hop.mp3',
-    durationSec: 78,
   },
   {
     id: 'party-dance',
@@ -108,7 +97,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/dance-party-dance-526227/',
     file: 'party-dance.mp3',
-    durationSec: 94,
   },
   {
     id: 'indie-rock-dreamy',
@@ -117,7 +105,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/rock-indie-rock-dreamy-537459/',
     file: 'indie-rock-dreamy.mp3',
-    durationSec: 188,
   },
   {
     id: 'cafe-jazz',
@@ -126,7 +113,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/beats-peaceful-cafe-jazz-relaxing-coffee-shop-541031/',
     file: 'cafe-jazz.mp3',
-    durationSec: 133,
   },
   {
     id: 'once-in-paris',
@@ -135,7 +121,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/beats-once-in-paris-168895/',
     file: 'once-in-paris.mp3',
-    durationSec: 132,
   },
   {
     id: 'split-memories',
@@ -144,7 +129,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/beats-cozy-lofi-beat-split-memmories-248205/',
     file: 'split-memories.mp3',
-    durationSec: 153,
   },
   {
     id: 'sunset-stars',
@@ -153,7 +137,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/beats-cozy-lofi-beat-sunset-stars-253833/',
     file: 'sunset-stars.mp3',
-    durationSec: 176,
   },
   {
     id: 'frosty-shadow-of-winter',
@@ -162,7 +145,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/beats-lo-fi-chill-beat-frosty-shadow-of-winter-136165/',
     file: 'frosty-shadow-of-winter.mp3',
-    durationSec: 148,
   },
   {
     id: 'lofi-jazz-hip-hop',
@@ -171,7 +153,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/lofi-lofi-jazz-hip-hop-479218/',
     file: 'lofi-jazz-hip-hop.mp3',
-    durationSec: 115,
   },
   {
     id: 'lofi-jazz-music',
@@ -180,7 +161,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/lofi-lofi-jazz-music-485312/',
     file: 'lofi-jazz-music.mp3',
-    durationSec: 177,
   },
   {
     id: 'lofi-cafe',
@@ -189,7 +169,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/beats-lofi-cafe-427593/',
     file: 'lofi-cafe.mp3',
-    durationSec: 151,
   },
   {
     id: 'we-jazz-lofi-soul',
@@ -198,7 +177,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/traditional-jazz-we-jazz-lofi-soul-363084/',
     file: 'we-jazz-lofi-soul.mp3',
-    durationSec: 177,
   },
   {
     id: 'lofi-chill-audiodollar',
@@ -207,7 +185,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/beats-lo-fi-lo-fi-chill-535316/',
     file: 'lofi-chill-audiodollar.mp3',
-    durationSec: 107,
   },
   {
     id: 'chillhop-remain',
@@ -216,7 +193,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/beats-chillhop-remain-594997/',
     file: 'chillhop-remain.mp3',
-    durationSec: 167,
   },
   {
     id: 'dreamy-fall-people',
@@ -225,7 +201,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/beats-dreamy-fall-people-lo-fi-chill-vlog-179957/',
     file: 'dreamy-fall-people.mp3',
-    durationSec: 150,
   },
   {
     id: 'chillhop-jazz-coffee-shop',
@@ -234,7 +209,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/lofi-chillhop-jazz-coffee-shop-552792/',
     file: 'chillhop-jazz-coffee-shop.mp3',
-    durationSec: 173,
   },
   {
     id: 'lofi-study',
@@ -243,7 +217,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/old-school-hip-hop-lofi-study-576576/',
     file: 'lofi-study.mp3',
-    durationSec: 126,
   },
   {
     id: 'afterword-zen-lofi',
@@ -252,7 +225,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/lofi-afterword-zen-lofi-469291/',
     file: 'afterword-zen-lofi.mp3',
-    durationSec: 172,
   },
   {
     id: 'chill-hip-hop',
@@ -261,7 +233,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'Pixabay License (free, no attribution required)',
     sourceUrl: 'https://pixabay.com/music/beats-chill-hip-hop-version-2-544088/',
     file: 'chill-hip-hop.mp3',
-    durationSec: 77,
   },
   {
     id: 'oga-lofi-again',
@@ -270,7 +241,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'CC0',
     sourceUrl: 'https://opengameart.org/content/lofi-again',
     file: 'oga-lofi-again.mp3',
-    durationSec: 88,
   },
   {
     id: 'oga-lofi-loop',
@@ -279,7 +249,6 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'CC0',
     sourceUrl: 'https://opengameart.org/content/lofi-hip-hop-loop',
     file: 'oga-lofi-loop.mp3',
-    durationSec: 128,
   },
   {
     id: 'since-2-am',
@@ -288,6 +257,5 @@ export const MUSIC_LIBRARY: MediaCredit[] = [
     license: 'CC0',
     sourceUrl: 'https://opengameart.org/content/since-2-am',
     file: 'since-2-am.mp3',
-    durationSec: 257,
   },
 ];

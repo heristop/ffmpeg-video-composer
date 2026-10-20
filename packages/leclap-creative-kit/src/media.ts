@@ -11,7 +11,6 @@ export interface MediaCredit {
   license: string;
   sourceUrl: string;
   file: string; // filename only, e.g. 'point-being.mp3'
-  durationSec?: number; // track length in whole seconds (music only), shown next to the track in pickers
 }
 
 export { MUSIC_LIBRARY, BACKGROUND_LIBRARY };

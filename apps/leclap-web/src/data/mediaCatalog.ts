@@ -3,6 +3,7 @@ import {
   BACKGROUND_LIBRARY as CORE_BG,
   type MediaCredit as CoreMediaCredit,
 } from '@leclap/creative-kit/media';
+import { findMusicProfile, type MusicProfile } from '@leclap/creative-kit/music-profile';
 import {
   ANIMATION_GROUPS,
   ENGINE_LIBRARY,
@@ -13,15 +14,18 @@ import {
 } from '@leclap/creative-kit/editor';
 import { ANIMATION_FILES, ANIMATION_THUMBS } from './animations.generated';
 
-export type MediaCredit = CoreMediaCredit & {
-  url: string; // same-origin path under /public, derived from `file`
-  cover?: string; // cover-art image URL (/assets/covers/<id>.webp); the music card falls back to a generated cover
-};
+export type MediaCredit = CoreMediaCredit &
+  Partial<MusicProfile> & {
+    url: string; // same-origin path under /public, derived from `file`
+    cover?: string; // cover-art image URL (/assets/covers/<id>.webp); the music card falls back to a generated cover
+  };
 
 export type AnimationAsset = { id: string; label: string; file: string; url: string };
 
+// Music tracks carry their measured profile (length, waveform, tempo, publisher moods) for the pickers.
 export const MUSIC_LIBRARY: MediaCredit[] = CORE_MUSIC.map((m) => ({
   ...m,
+  ...findMusicProfile(m.id),
   url: `/musics/${m.file}`,
   cover: `/assets/covers/${m.id}.webp`,
 })).sort((a, b) => a.title.localeCompare(b.title));

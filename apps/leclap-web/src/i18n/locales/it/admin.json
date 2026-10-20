@@ -1175,7 +1175,25 @@
     "keyDefault": "predefinita",
     "pickerLabel": "Musica",
     "keysHintSingle": "Le frecce passano da una traccia all’altra. Invio la sceglie, Spazio la ascolta.",
-    "keyPick": "scegli"
+    "keyPick": "scegli",
+    "bpm": "{{bpm}} BPM",
+    "seek": "Riproduci {{title}} da qui",
+    "filterMood": "Atmosfera",
+    "filterTempo": "Tempo",
+    "noMatch": "Nessuna traccia corrisponde a questi filtri.",
+    "mood": {
+      "all": "Tutte",
+      "calm": "Calma",
+      "upbeat": "Vivace",
+      "jazzy": "Jazz",
+      "playful": "Giocosa"
+    },
+    "tempo": {
+      "any": "Qualsiasi",
+      "slow": "Sotto 90",
+      "mid": "90–120",
+      "fast": "Sopra 120"
+    }
   },
   "form": {
     "fieldId": "ID del campo",

@@ -6,6 +6,7 @@ import { Music, Trash2 } from '@/presentation/components/icons';
 import { cn } from '@/lib/utils';
 import type { EditorSection } from '../templateEditorModel';
 import { programMusicTrack } from './program-music.logic';
+import { Waveform } from '../editor/waveform';
 
 interface MusicLaneProps {
   section: Extract<EditorSection, { kind: 'music' }>;
@@ -30,21 +31,28 @@ export function MusicLane({ section, index, selected, canDelete, onSelect, onDel
           onSelect(index);
         }}
         className={cn(
-          'flex h-8 w-full min-w-0 items-center gap-2 rounded-lg border px-2.5 text-left text-xs transition-colors duration-150',
+          'relative flex h-8 w-full min-w-0 items-center gap-2 overflow-hidden rounded-lg border px-2.5 text-left text-xs transition-colors duration-150',
           selected
             ? 'border-brand-500 bg-brand-500/15 text-foreground'
             : 'border-foreground/10 bg-brand-500/[0.06] text-muted-foreground hover:border-brand-500/40 hover:text-foreground'
         )}
       >
-        <Music aria-hidden="true" className="size-3.5 shrink-0 text-brand-300" />
-        <span className="min-w-0 truncate font-medium">{track?.title ?? t('shell.musicLaneEmpty')}</span>
+        {track?.peaks ? (
+          <Waveform
+            peaks={track.peaks}
+            progress={0}
+            className="pointer-events-none absolute inset-x-2 inset-y-1.5 opacity-35"
+          />
+        ) : null}
+        <Music aria-hidden="true" className="relative size-3.5 shrink-0 text-brand-300" />
+        <span className="relative min-w-0 truncate font-medium">{track?.title ?? t('shell.musicLaneEmpty')}</span>
         {others > 0 ? (
           <span className="shrink-0 tabular-nums text-muted-foreground">
             {t('shell.musicLaneMore', { count: others })}
           </span>
         ) : null}
         {section.allowed.length === 0 ? (
-          <span className="shrink-0 text-muted-foreground">{t('monitor.musicStandIn')}</span>
+          <span className="relative shrink-0 text-muted-foreground">{t('monitor.musicStandIn')}</span>
         ) : null}
       </button>
       {selected ? (

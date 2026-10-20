@@ -1175,7 +1175,25 @@
     "keyDefault": "par défaut",
     "pickerLabel": "Musique",
     "keysHintSingle": "Les flèches passent d’une piste à l’autre. Entrée choisit une piste, Espace l’écoute.",
-    "keyPick": "choisir"
+    "keyPick": "choisir",
+    "bpm": "{{bpm}} BPM",
+    "seek": "Écouter {{title}} à partir d’ici",
+    "filterMood": "Ambiance",
+    "filterTempo": "Tempo",
+    "noMatch": "Aucune piste ne correspond à ces filtres.",
+    "mood": {
+      "all": "Toutes",
+      "calm": "Calme",
+      "upbeat": "Entraînante",
+      "jazzy": "Jazzy",
+      "playful": "Espiègle"
+    },
+    "tempo": {
+      "any": "Tous",
+      "slow": "Moins de 90",
+      "mid": "90–120",
+      "fast": "Plus de 120"
+    }
   },
   "form": {
     "fieldId": "ID du champ",

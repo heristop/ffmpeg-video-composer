@@ -7,9 +7,11 @@ import { findMusic, type MediaCredit } from '@/data/mediaCatalog';
 import type { EditorSection } from '../templateEditorModel';
 import { musicSectionTrack } from './sectionFallback';
 import { PreviewGlyph, TrackArt } from '../editor/music-track-list';
+import { Waveform } from '../editor/waveform';
 import {
   formatTrackTime,
   playheadRatio,
+  seekPreview,
   togglePreview,
   trackDuration,
   useMusicPreview,
@@ -64,6 +66,53 @@ export function MusicStagePreview({ section }: { section: MusicSection }) {
   );
 }
 
+// The default track's waveform as the playhead (click to play from a spot), or a plain bar without one.
+function StagePlayhead({
+  track,
+  preview,
+  duration,
+}: {
+  track: MediaCredit;
+  preview: PreviewState | null;
+  duration: number;
+}) {
+  const { t } = useTranslation('admin');
+  const progress = playheadRatio(preview, duration);
+
+  if (track.peaks) {
+    return (
+      <Waveform
+        peaks={track.peaks}
+        progress={progress}
+        onSeek={(ratio) => {
+          seekPreview(track, ratio);
+        }}
+        seekLabel={t('musicSection.seek', { title: track.title })}
+        className="h-8 min-w-0 flex-1"
+      />
+    );
+  }
+
+  return (
+    <span aria-hidden="true" className="block h-1 min-w-0 flex-1 overflow-hidden rounded-full bg-foreground/10">
+      <span className="block h-full origin-left bg-brand-400" style={{ transform: `scaleX(${progress})` }} />
+    </span>
+  );
+}
+
+// Tempo and the publisher's moods, when the catalog knows them.
+function TrackFacts({ track }: { track: MediaCredit }) {
+  const { t } = useTranslation('admin');
+  const facts = [
+    ...(track.bpm ? [t('musicSection.bpm', { bpm: track.bpm })] : []),
+    ...(track.moods ?? []).map((mood) => t(`musicSection.mood.${mood}`)),
+  ];
+
+  if (facts.length === 0) return null;
+
+  return <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">{facts.join(' · ')}</p>;
+}
+
 function StageTrackHeader({ track, standIn }: { track: MediaCredit; standIn: boolean }) {
   const { t } = useTranslation('admin');
 
@@ -78,6 +127,7 @@ function StageTrackHeader({ track, standIn }: { track: MediaCredit; standIn: boo
           {track.title}
         </h3>
         <p className="mt-1 break-words text-sm text-muted-foreground">{track.author}</p>
+        <TrackFacts track={track} />
         <span
           title={standIn ? undefined : t('musicSection.defaultTooltip')}
           className={cn(
@@ -113,12 +163,7 @@ function StageTransport({ track, preview }: { track: MediaCredit; preview: Previ
         >
           <PreviewGlyph status={status} />
         </button>
-        <span aria-hidden="true" className="block h-1 min-w-0 flex-1 overflow-hidden rounded-full bg-foreground/10">
-          <span
-            className="block h-full origin-left bg-brand-400"
-            style={{ transform: `scaleX(${playheadRatio(preview, duration)})` }}
-          />
-        </span>
+        <StagePlayhead track={track} preview={preview} duration={duration} />
         <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
           {formatTrackTime(preview?.currentTime ?? 0)} / {formatTrackTime(duration)}
         </span>

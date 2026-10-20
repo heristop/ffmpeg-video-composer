@@ -95,6 +95,25 @@ export function stopPreview() {
   if (state.status !== 'idle' || state.trackId !== null) emit(IDLE);
 }
 
+function startPreview(track: PreviewTrack, at: number) {
+  // Another sound source (the program monitor's playback) stands down when a preview starts.
+  for (const listener of startListeners) listener();
+
+  const media = element();
+  media.pause();
+  media.src = track.url;
+  // Before the metadata loads this sets where playback will start.
+  media.currentTime = at;
+  emit({ trackId: track.id, status: 'loading', currentTime: at, duration: track.durationSec ?? 0 });
+
+  media.play().catch((error: unknown) => {
+    // A newer toggle aborting this one is not a failure worth showing.
+    if (error instanceof DOMException && error.name === 'AbortError') return;
+
+    if (state.trackId === track.id) emit({ status: 'error' });
+  });
+}
+
 // Start a track, or stop it when it is the one already sounding (or loading).
 export function togglePreview(track: PreviewTrack) {
   const sounding = state.trackId === track.id && (state.status === 'playing' || state.status === 'loading');
@@ -105,21 +124,23 @@ export function togglePreview(track: PreviewTrack) {
     return;
   }
 
-  // Another sound source (the program monitor's playback) stands down when a preview starts.
-  for (const listener of startListeners) listener();
+  startPreview(track, 0);
+}
 
-  const media = element();
-  media.pause();
-  media.src = track.url;
-  media.currentTime = 0;
-  emit({ trackId: track.id, status: 'loading', currentTime: 0, duration: track.durationSec ?? 0 });
+// Jump to `ratio` (0..1) of a track: within the sounding track, or starting it from there.
+export function seekPreview(track: PreviewTrack, ratio: number) {
+  const sounding = state.trackId === track.id && (state.status === 'playing' || state.status === 'loading');
+  const duration = sounding && state.duration > 0 ? state.duration : (track.durationSec ?? 0);
+  const at = Math.max(0, Math.min(1, ratio)) * duration;
 
-  media.play().catch((error: unknown) => {
-    // A newer toggle aborting this one is not a failure worth showing.
-    if (error instanceof DOMException && error.name === 'AbortError') return;
+  if (sounding && audio) {
+    audio.currentTime = at;
+    emit({ currentTime: at });
 
-    if (state.trackId === track.id) emit({ status: 'error' });
-  });
+    return;
+  }
+
+  startPreview(track, at);
 }
 
 // Runs `listener` whenever a track preview starts; returns the unsubscribe.

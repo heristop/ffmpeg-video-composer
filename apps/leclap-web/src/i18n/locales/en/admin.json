@@ -1175,7 +1175,25 @@
     "keyDefault": "default",
     "pickerLabel": "Music",
     "keysHintSingle": "Arrow keys move between tracks. Enter picks a track, Space previews it.",
-    "keyPick": "pick"
+    "keyPick": "pick",
+    "bpm": "{{bpm}} BPM",
+    "seek": "Play {{title}} from here",
+    "filterMood": "Mood",
+    "filterTempo": "Tempo",
+    "noMatch": "No track matches these filters.",
+    "mood": {
+      "all": "All",
+      "calm": "Calm",
+      "upbeat": "Upbeat",
+      "jazzy": "Jazzy",
+      "playful": "Playful"
+    },
+    "tempo": {
+      "any": "Any",
+      "slow": "Under 90",
+      "mid": "90–120",
+      "fast": "Over 120"
+    }
   },
   "form": {
     "fieldId": "Field ID",

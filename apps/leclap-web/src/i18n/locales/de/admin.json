@@ -1175,7 +1175,25 @@
     "keyDefault": "Standard",
     "pickerLabel": "Musik",
     "keysHintSingle": "Pfeiltasten wechseln den Track. Enter wählt ihn, Leertaste spielt ihn an.",
-    "keyPick": "wählen"
+    "keyPick": "wählen",
+    "bpm": "{{bpm}} BPM",
+    "seek": "{{title}} ab hier abspielen",
+    "filterMood": "Stimmung",
+    "filterTempo": "Tempo",
+    "noMatch": "Kein Track passt zu diesen Filtern.",
+    "mood": {
+      "all": "Alle",
+      "calm": "Ruhig",
+      "upbeat": "Beschwingt",
+      "jazzy": "Jazzig",
+      "playful": "Verspielt"
+    },
+    "tempo": {
+      "any": "Alle",
+      "slow": "Unter 90",
+      "mid": "90–120",
+      "fast": "Über 120"
+    }
   },
   "form": {
     "fieldId": "Feld-ID",

@@ -48,3 +48,28 @@ export function moveIndex(action: TrackKeyAction, index: number, count: number):
 export function alternativesSummary(titles: string[], max = 2): { shown: string[]; more: number } {
   return { shown: titles.slice(0, max), more: Math.max(0, titles.length - max) };
 }
+
+export type MoodFilter = 'all' | 'calm' | 'upbeat' | 'jazzy' | 'playful';
+export type TempoFilter = 'any' | 'slow' | 'mid' | 'fast';
+
+interface Filterable {
+  bpm?: number;
+  moods?: readonly string[];
+}
+
+// Under 90, 90–120, over 120 BPM. A track without a trusted tempo only shows under "any".
+function inTempo(bpm: number | undefined, tempo: TempoFilter): boolean {
+  if (tempo === 'any') return true;
+
+  if (bpm === undefined) return false;
+
+  if (tempo === 'slow') return bpm < 90;
+
+  if (tempo === 'mid') return bpm >= 90 && bpm <= 120;
+
+  return bpm > 120;
+}
+
+export function filterTracks<T extends Filterable>(items: readonly T[], mood: MoodFilter, tempo: TempoFilter): T[] {
+  return items.filter((item) => (mood === 'all' || item.moods?.includes(mood) === true) && inTempo(item.bpm, tempo));
+}

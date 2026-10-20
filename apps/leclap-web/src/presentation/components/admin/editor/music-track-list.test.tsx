@@ -36,7 +36,7 @@ describe('MusicTrackList', () => {
     const html = render([second.id]);
 
     expect(html.match(/role="checkbox"/g)).toHaveLength(MUSIC_LIBRARY.length);
-    expect(html.match(/aria-checked="true"/g)).toHaveLength(1);
+    expect(html.match(/role="checkbox" aria-checked="true"/g)).toHaveLength(1);
   });
 
   it('keeps one tab stop for the whole list, on the default track', () => {
@@ -107,5 +107,24 @@ describe('MusicTrackPicker', () => {
     expect(html).toContain(admin.musicSection.keysHintSingle);
     expect(html).not.toContain(admin.musicSection.default);
     expect(html).toContain(`</kbd> ${admin.musicSection.keyPick}<`);
+  });
+});
+
+describe('catalog depth in the shortlist', () => {
+  it('offers mood and tempo filters and prints a trusted tempo', () => {
+    const html = render([]);
+    const withBpm = MUSIC_LIBRARY.find((item) => item.bpm !== undefined);
+
+    expect(html).toContain(`aria-label="${admin.musicSection.filterMood}"`);
+    expect(html).toContain(`aria-label="${admin.musicSection.filterTempo}"`);
+    expect(html).toContain(`>${admin.musicSection.mood.calm}<`);
+    expect(html).toContain(`>${admin.musicSection.tempo.slow}<`);
+    expect(html).toContain(`${String(withBpm?.bpm)} BPM`);
+    expect(admin.musicSection.noMatch).toBeTruthy();
+    expect(admin.musicSection.seek).toContain('{{title}}');
+  });
+
+  it('carries a 64-bar waveform for every library track', () => {
+    expect(MUSIC_LIBRARY.every((item) => item.peaks?.length === 64)).toBe(true);
   });
 });

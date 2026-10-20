@@ -1175,7 +1175,25 @@
     "keyDefault": "predeterminada",
     "pickerLabel": "Música",
     "keysHintSingle": "Las flechas cambian de pista. Intro elige una pista, Espacio la escucha.",
-    "keyPick": "elegir"
+    "keyPick": "elegir",
+    "bpm": "{{bpm}} BPM",
+    "seek": "Reproducir {{title}} desde aquí",
+    "filterMood": "Ambiente",
+    "filterTempo": "Tempo",
+    "noMatch": "Ninguna pista coincide con estos filtros.",
+    "mood": {
+      "all": "Todas",
+      "calm": "Tranquila",
+      "upbeat": "Animada",
+      "jazzy": "Jazzística",
+      "playful": "Juguetona"
+    },
+    "tempo": {
+      "any": "Cualquiera",
+      "slow": "Menos de 90",
+      "mid": "90–120",
+      "fast": "Más de 120"
+    }
   },
   "form": {
     "fieldId": "ID del campo",

@@ -14,13 +14,16 @@ import { MUSIC_LIBRARY, findMusic, type MediaCredit } from '@/data/mediaCatalog'
 import {
   formatTrackTime,
   playheadRatio,
+  seekPreview,
   stopPreview,
   togglePreview,
   trackDuration,
   useMusicPreview,
   type PreviewState,
 } from './music-preview';
-import { moveIndex, trackKeyAction } from './music-track-list.logic';
+import { filterTracks, moveIndex, trackKeyAction, type MoodFilter, type TempoFilter } from './music-track-list.logic';
+import { SegmentedControl } from './controls';
+import { Waveform } from './waveform';
 
 // The library covers carry the title and artist in their lower third; the list already prints both,
 // so the thumbnail crops to the illustration above that band.
@@ -189,6 +192,9 @@ export function MusicTrackList({ selectedIds, allowUpload, onToggle, onMakeDefau
   const hintId = useId();
   const defaultId = selectedIds.at(0);
   const standIn = findMusic(defaultId ?? '') ?? MUSIC_LIBRARY.at(0);
+  const [mood, setMood] = useState<MoodFilter>('all');
+  const [tempo, setTempo] = useState<TempoFilter>('any');
+  const shown = filterTracks(MUSIC_LIBRARY, mood, tempo);
 
   return (
     <div className="space-y-2">
@@ -214,8 +220,17 @@ export function MusicTrackList({ selectedIds, allowUpload, onToggle, onMakeDefau
         </p>
       ) : null}
 
+      <TrackFilters mood={mood} tempo={tempo} onMood={setMood} onTempo={setTempo} />
+
+      {shown.length === 0 ? (
+        <p className="rounded-md bg-foreground/[0.04] px-3 py-2 text-xs text-muted-foreground">
+          {t('musicSection.noMatch')}
+        </p>
+      ) : null}
+
       <TrackRows
-        items={MUSIC_LIBRARY}
+        key={`${mood}:${tempo}`}
+        items={shown}
         mode="multi"
         selectedIds={selectedIds}
         defaultId={defaultId}
@@ -235,6 +250,40 @@ export function MusicTrackList({ selectedIds, allowUpload, onToggle, onMakeDefau
           ['Space', 'keyPreview'],
           ['D', 'keyDefault'],
         ]}
+      />
+    </div>
+  );
+}
+
+const MOODS: readonly MoodFilter[] = ['all', 'calm', 'upbeat', 'jazzy', 'playful'];
+const TEMPOS: readonly TempoFilter[] = ['any', 'slow', 'mid', 'fast'];
+
+function TrackFilters({
+  mood,
+  tempo,
+  onMood,
+  onTempo,
+}: {
+  mood: MoodFilter;
+  tempo: TempoFilter;
+  onMood: (mood: MoodFilter) => void;
+  onTempo: (tempo: TempoFilter) => void;
+}) {
+  const { t } = useTranslation('admin');
+
+  return (
+    <div className="grid gap-2">
+      <SegmentedControl
+        label={t('musicSection.filterMood')}
+        value={mood}
+        onChange={onMood}
+        options={MOODS.map((value) => ({ value, label: t(`musicSection.mood.${value}`) }))}
+      />
+      <SegmentedControl
+        label={t('musicSection.filterTempo')}
+        value={tempo}
+        onChange={onTempo}
+        options={TEMPOS.map((value) => ({ value, label: t(`musicSection.tempo.${value}`) }))}
       />
     </div>
   );
@@ -378,9 +427,10 @@ function TrackRow({
             <MakeDefaultButton title={item.title} onMakeDefault={onMakeDefault} />
           ) : null}
         </span>
+        <RowWaveform item={item} preview={preview} duration={duration} />
       </span>
       {isDefault ? <DefaultChip /> : <span />}
-      <RowPlayhead preview={preview} duration={duration} />
+      {item.peaks ? null : <RowPlayhead preview={preview} duration={duration} />}
     </li>
   );
 }
@@ -415,6 +465,33 @@ function PreviewCover({ item, status }: { item: MediaCredit; status: PreviewStat
         <PreviewGlyph status={status} />
       </span>
     </button>
+  );
+}
+
+// While a track previews, its waveform is the playhead: hover marks a spot, a click plays from there.
+function RowWaveform({
+  item,
+  preview,
+  duration,
+}: {
+  item: MediaCredit;
+  preview: PreviewState | null;
+  duration: number;
+}) {
+  const { t } = useTranslation('admin');
+
+  if (!item.peaks || !preview || preview.status === 'error') return null;
+
+  return (
+    <Waveform
+      peaks={item.peaks}
+      progress={playheadRatio(preview, duration)}
+      onSeek={(ratio) => {
+        seekPreview(item, ratio);
+      }}
+      seekLabel={t('musicSection.seek', { title: item.title })}
+      className="pointer-events-auto relative z-10 mt-1.5 h-4 w-full max-w-60"
+    />
   );
 }
 
@@ -473,6 +550,7 @@ function TrackMeta({ item, preview, duration }: { item: MediaCredit; preview: Pr
     <>
       <span className="break-words">{item.author}</span>
       {duration > 0 ? <span className="tabular-nums"> · {formatTrackTime(duration)}</span> : null}
+      {item.bpm ? <span className="tabular-nums"> · {t('musicSection.bpm', { bpm: item.bpm })}</span> : null}
     </>
   );
 }
