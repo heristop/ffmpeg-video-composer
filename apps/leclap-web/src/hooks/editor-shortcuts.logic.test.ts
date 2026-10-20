@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { resolveShortcut, isTypingTarget, ALWAYS_ALLOW_IN_INPUTS, type KeyEventLike } from './editor-shortcuts.logic';
+import {
+  resolveShortcut,
+  isTypingTarget,
+  inSceneStrip,
+  ALWAYS_ALLOW_IN_INPUTS,
+  SCENE_STRIP_ONLY,
+  type KeyEventLike,
+} from './editor-shortcuts.logic';
 
 const key = (over: Partial<KeyEventLike>): KeyEventLike => ({
   key: '',
@@ -36,11 +43,24 @@ describe('resolveShortcut', () => {
     expect(resolveShortcut(key({ key: 'Delete' }))).toBe('delete-scene');
   });
 
-  it('maps scene navigation on bare arrows', () => {
-    expect(resolveShortcut(key({ key: 'ArrowRight' }))).toBe('next-scene');
-    expect(resolveShortcut(key({ key: 'ArrowDown' }))).toBe('next-scene');
-    expect(resolveShortcut(key({ key: 'ArrowLeft' }))).toBe('prev-scene');
-    expect(resolveShortcut(key({ key: 'ArrowUp' }))).toBe('prev-scene');
+  it('steps frames on ←/→ and seconds with Shift', () => {
+    expect(resolveShortcut(key({ key: 'ArrowRight' }))).toBe('frame-forward');
+    expect(resolveShortcut(key({ key: 'ArrowLeft' }))).toBe('frame-back');
+    expect(resolveShortcut(key({ key: 'ArrowRight', shiftKey: true }))).toBe('second-forward');
+    expect(resolveShortcut(key({ key: 'ArrowLeft', shiftKey: true }))).toBe('second-back');
+  });
+
+  it('jumps between edit points on ↑/↓ and switches scenes on Page Up/Down', () => {
+    expect(resolveShortcut(key({ key: 'ArrowDown' }))).toBe('next-edit');
+    expect(resolveShortcut(key({ key: 'ArrowUp' }))).toBe('prev-edit');
+    expect(resolveShortcut(key({ key: 'PageDown' }))).toBe('next-scene');
+    expect(resolveShortcut(key({ key: 'PageUp' }))).toBe('prev-scene');
+  });
+
+  it('shuttles on J/K/L', () => {
+    expect(resolveShortcut(key({ key: 'j' }))).toBe('shuttle-back');
+    expect(resolveShortcut(key({ key: 'K' }))).toBe('shuttle-stop');
+    expect(resolveShortcut(key({ key: 'l' }))).toBe('shuttle-forward');
   });
 
   it('maps add scene on n, play on space, tools on brackets', () => {
@@ -94,5 +114,17 @@ describe('ALWAYS_ALLOW_IN_INPUTS', () => {
   it('does not include destructive bare-key actions', () => {
     expect(ALWAYS_ALLOW_IN_INPUTS.has('delete-scene')).toBe(false);
     expect(ALWAYS_ALLOW_IN_INPUTS.has('toggle-play')).toBe(false);
+  });
+});
+
+describe('scene deletion scope', () => {
+  it('only lets Delete remove a scene from inside the scene strip', () => {
+    const inside = { tagName: 'BUTTON', isContentEditable: false, closest: () => ({}) };
+    const outside = { tagName: 'BUTTON', isContentEditable: false, closest: () => null };
+
+    expect(SCENE_STRIP_ONLY.has('delete-scene')).toBe(true);
+    expect(inSceneStrip(inside)).toBe(true);
+    expect(inSceneStrip(outside)).toBe(false);
+    expect(inSceneStrip(null)).toBe(false);
   });
 });

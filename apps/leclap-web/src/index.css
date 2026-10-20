@@ -259,6 +259,8 @@ body {
   --animate-phone-sheen: phone-sheen 7s var(--ease-out-expo) infinite;
   /* Magnetic stretch the editor tool-dock indicator plays as it springs to a new tool. */
   --animate-dock-stretch: dock-stretch 0.32s var(--ease-spring);
+  /* A checkbox tick drawing itself in (the glyph's path uses pathLength=1). */
+  --animate-check-draw: check-draw 0.22s var(--ease-out-expo) both;
   /* The stacked shell's two surfaces enter from the side their tab sits on, so switching reads as
      travel across one room rather than two unrelated screens appearing in place. */
   --animate-surface-in-left: surface-in-left 0.26s var(--ease-out-expo) both;
@@ -1374,6 +1376,18 @@ body {
 /* translateY + opacity only — animating a fractional scale() promotes the element to a GPU layer
    rasterized at that sub-pixel scale, and mobile WebKit/Blink keeps that blurry raster after the
    transform settles, leaving text permanently soft. */
+@keyframes check-draw {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -1855,7 +1869,7 @@ html.theme-vt::view-transition-new(root) {
   outline-offset: 2px;
 }
 
-/* Studio-themed range slider — a recessed slate groove with a brand→pink fill driven by --range-pct,
+/* Studio-themed range slider — a recessed slate groove with a solid lavender fill driven by --range-pct,
    and a film "playhead" cap thumb. Pairs with the Take Counter number input. Cross-browser via the
    vendor track/thumb pseudo-elements; the thumb ring is the keyboard focus indicator (so the slider
    opts out of the global outline above). Reduced-motion drops the thumb transition. */
@@ -1872,7 +1886,7 @@ html.theme-vt::view-transition-new(root) {
   height: 0.4rem;
   border-radius: 999px;
   background:
-    linear-gradient(90deg, var(--color-brand-500), var(--color-secondary-400)) 0 / var(--range-pct, 0%) 100% no-repeat,
+    linear-gradient(var(--color-brand-500), var(--color-brand-500)) 0 / var(--range-pct, 0%) 100% no-repeat,
     var(--color-surface-inset);
   box-shadow: inset 0 0 0 1px var(--color-divider);
 }
@@ -1887,7 +1901,7 @@ html.theme-vt::view-transition-new(root) {
 .studio-range::-moz-range-progress {
   height: 0.4rem;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-brand-500), var(--color-secondary-400));
+  background: var(--color-brand-500);
 }
 
 .studio-range::-webkit-slider-thumb {
@@ -1954,6 +1968,50 @@ html.theme-vt::view-transition-new(root) {
 .studio-range.hero-scrub {
   height: 2.75rem;
   margin-block: -0.625rem;
+}
+
+/* The program transport's playhead: a full-height bar rather than a cap, so the frame it marks reads at a
+   glance against the scene-edge hairlines. */
+.studio-range.transport-scrub::-webkit-slider-thumb {
+  width: 0.25rem;
+  height: 1.5rem;
+  margin-top: -0.55rem;
+  border: 0;
+  border-radius: 0.125rem;
+  background: var(--color-foreground);
+  box-shadow:
+    0 0 0 1px var(--color-brand-500),
+    0 1px 4px oklch(0 0 0 / 0.4);
+}
+
+.studio-range.transport-scrub::-moz-range-thumb {
+  width: 0.25rem;
+  height: 1.5rem;
+  border: 0;
+  border-radius: 0.125rem;
+  background: var(--color-foreground);
+  box-shadow:
+    0 0 0 1px var(--color-brand-500),
+    0 1px 4px oklch(0 0 0 / 0.4);
+}
+
+.studio-range.transport-scrub:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-brand-500) 55%, transparent);
+}
+
+.studio-range.transport-scrub:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-brand-500) 55%, transparent);
+}
+
+/* The landing's scrubber is a brand moment, so it keeps the lavender→pink fill the editor controls dropped. */
+.studio-range.hero-scrub::-webkit-slider-runnable-track {
+  background:
+    linear-gradient(90deg, var(--color-brand-500), var(--color-secondary-400)) 0 / var(--range-pct, 0%) 100% no-repeat,
+    var(--color-surface-inset);
+}
+
+.studio-range.hero-scrub::-moz-range-progress {
+  background: linear-gradient(90deg, var(--color-brand-500), var(--color-secondary-400));
 }
 
 /* The thumb ring below is the indicator; the browser's own outline would box the whole 44px strip. */

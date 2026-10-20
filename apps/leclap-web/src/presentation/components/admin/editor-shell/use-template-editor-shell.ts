@@ -8,7 +8,8 @@ import { userTemplateService } from '@/services/userTemplateService';
 import type { StoredTemplate } from '@/stores/userTemplateStore';
 import type { EditorState } from '../templateEditorModel';
 import { toUserTemplate } from './user-template';
-import { buildMasterTimeline } from './program-timeline.logic';
+import { buildMasterTimeline, sceneClockAt } from './program-timeline.logic';
+import { adjacentEdge, PREVIEW_FPS, sceneEdges, stepFrames } from './program-music.logic';
 import { useProgramClock } from './use-program-clock';
 import { saveBlocker, saveFeedback, type SaveBlocker } from './save-blocker.logic';
 
@@ -25,12 +26,54 @@ export function useProgramMonitor(state: EditorState) {
   );
   const playTotal = playTimeline.at(-1)?.end ?? 0;
   const clock = useProgramClock(playTotal, reduced);
+  // Parked on the program: after a scrub, a frame step or an edit-point jump the monitor keeps showing
+  // the frame under the playhead, like a paused program monitor, until the author goes back to editing.
+  const [parked, setParked] = useState(false);
   const exitPlayMode = (): void => {
     clock.pause();
+    setParked(false);
+  };
+  const park = (t: number): void => {
+    clock.pause();
+    clock.seekTo(t);
+    setParked(true);
+  };
+  // J/K/L: a second press in the same direction doubles the speed, up to 4x.
+  const shuttle = (direction: 1 | -1): void => {
+    const same = clock.playing && Math.sign(clock.rate) === direction;
+    const speed = same ? Math.min(Math.abs(clock.rate) * 2, MAX_SHUTTLE) : 1;
+    setParked(true);
+    clock.play(direction * speed);
   };
 
-  return { clock, playTimeline, playMode: clock.playing, exitPlayMode };
+  return {
+    clock,
+    playTimeline,
+    playMode: clock.playing || parked,
+    exitPlayMode,
+    park,
+    shuttle,
+    // Space: play/pause, staying on the program frame when it pauses.
+    togglePlay: (): void => {
+      setParked(true);
+      clock.toggle();
+    },
+    // The scene under the playhead, so leaving the program view lands on what was showing.
+    sceneAtPlayhead: (): number | null => sceneClockAt(playTimeline, clock.current())?.index ?? null,
+    // ←/→ step a frame, Shift+←/→ a second.
+    step: (count: number, unit: 'frame' | 'second'): void => {
+      park(stepFrames(clock.current(), unit === 'second' ? count * PREVIEW_FPS : count, playTotal));
+    },
+    jumpEdit: (direction: 1 | -1): number | null => {
+      const edge = adjacentEdge(sceneEdges(playTimeline), clock.current(), direction);
+      park(edge);
+
+      return sceneClockAt(playTimeline, edge)?.index ?? null;
+    },
+  };
 }
+
+const MAX_SHUTTLE = 4;
 
 interface PersistenceArgs {
   state: EditorState;

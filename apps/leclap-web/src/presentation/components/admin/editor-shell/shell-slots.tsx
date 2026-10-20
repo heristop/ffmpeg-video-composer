@@ -16,6 +16,7 @@ import type { Segment } from './program-timeline.logic';
 import type { ProgramClock } from './use-program-clock';
 import { ProgramPlayer } from './program-player';
 import { ProgramTransport } from './program-transport';
+import { useMonitorChrome } from './monitor-chrome';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
 import type { SaveFeedback } from './save-blocker.logic';
 import { setModalOpen, type ShellModal } from './shell-modals.logic';
@@ -101,6 +102,8 @@ interface ShellMonitorProps {
   clock: ProgramClock;
   playTimeline: Segment[];
   playMode: boolean;
+  // Parks the program monitor on a scrubbed time.
+  onSeek: (seconds: number) => void;
 }
 
 // Play mode swaps the WYSIWYG edit canvas for the playback surface; the transport only shows once
@@ -117,15 +120,20 @@ export const ShellMonitor = ({
   clock,
   playTimeline,
   playMode,
+  onSeek,
 }: ShellMonitorProps) => {
   const { t } = useTranslation('admin');
+  const chrome = useMonitorChrome(state, clock, playTimeline, playMode, t);
 
   return (
     <ProgramMonitor
-      label={playMode ? t('monitor.playing') : t('shell.preview')}
-      meta={t(`orientationLabel.${state.orientation}`)}
+      label={chrome.label}
+      meta={chrome.meta}
+      controls={chrome.controls}
       swapKey={playMode ? 'play' : String(selectedIndex)}
-      transport={playTimeline.length > 0 ? <ProgramTransport clock={clock} timeline={playTimeline} /> : undefined}
+      transport={
+        playTimeline.length > 0 ? <ProgramTransport clock={clock} timeline={playTimeline} onSeek={onSeek} /> : undefined
+      }
     >
       {playMode ? (
         <ProgramPlayer state={state} clock={clock} timeline={playTimeline} />

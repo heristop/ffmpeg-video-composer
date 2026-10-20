@@ -17,6 +17,7 @@ import type { ProgramClock } from './use-program-clock';
 import { previewEnvOf } from './fx-preview/preview-env';
 import { FRAME_FIT_CLASS, FRAME_STAGE_CLASS } from './frame-fit';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { SafeGuides } from './safe-guides';
 
 interface Mounted {
   active: number; // original section index under the playhead
@@ -219,6 +220,7 @@ export const ProgramPlayer = ({ state, clock, timeline }: ProgramPlayerProps) =>
             />
           </div>
         ))}
+        <SafeGuides orientation={state.orientation} />
       </div>
     </div>
   );

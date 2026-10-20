@@ -260,7 +260,15 @@
     "partialUnset": "Aucun fragment sélectionné",
     "dragToReorder": "Glisse pour réordonner",
     "timelineEmptyTitle": "Construisez votre histoire scène par scène",
-    "timelineEmptyCta": "Parcourir les modèles de départ"
+    "timelineEmptyCta": "Parcourir les modèles de départ",
+    "sceneOf": "Scène {{index}} sur {{count}}",
+    "duplicateSceneTooltip": "Dupliquer la scène (⌘D)",
+    "deleteSceneTooltip": "Supprimer la scène (Suppr)",
+    "musicLaneEmpty": "Musique",
+    "musicLaneMore": "+{{count}} proposées",
+    "safeGuides": "Zones sûres",
+    "safeGuidesTooltip": "Afficher les zones sûres action (90 %) et titre (80 %)",
+    "playTooltip": "Lecture / pause (Espace)"
   },
   "shortcuts": {
     "title": "Raccourcis clavier",
@@ -269,13 +277,18 @@
     "redo": "Rétablir",
     "save": "Enregistrer le modèle",
     "duplicateScene": "Dupliquer la scène",
-    "deleteScene": "Supprimer la scène",
+    "deleteScene": "Supprimer la scène (dans la bande de scènes)",
     "addScene": "Ajouter une scène",
     "prevScene": "Scène précédente",
     "nextScene": "Scène suivante",
     "tools": "Outil précédent / suivant",
     "playPause": "Lecture / pause de l’aperçu",
-    "showHelp": "Afficher les raccourcis"
+    "showHelp": "Afficher les raccourcis",
+    "shuttle": "Lecture arrière / arrêt / avant",
+    "frameStep": "Avancer d’une image",
+    "secondStep": "Avancer d’une seconde",
+    "editPoints": "Point de montage précédent / suivant",
+    "backToEditing": "Revenir à l’édition de la scène"
   },
   "presets": {
     "pickerTitle": "Démarrez votre modèle",
@@ -304,7 +317,17 @@
     "playing": "Lecture",
     "play": "Lecture",
     "pause": "Pause",
-    "scrub": "Naviguer dans la vidéo"
+    "scrub": "Naviguer dans la vidéo",
+    "musicRegion": "Musique de ce modèle",
+    "musicStandIn": "Doublure",
+    "musicStandInNote": "Rien de coché pour l’instant. Les brouillons empruntent cette piste.",
+    "musicAudioOnly": "Joue sous chaque scène. Rien à l’écran.",
+    "musicOnlyTrack": "Les spectateurs n’ont que cette piste.",
+    "musicAlternatives": "Les spectateurs peuvent passer à {{list}}.",
+    "musicAlternativesMore": "Les spectateurs peuvent passer à {{list}} et {{count}} autres.",
+    "musicUploadToo": "Ou importer la leur.",
+    "parked": "Programme",
+    "fps": "{{fps}} i/s"
   },
   "testRender": {
     "rendering": "Rendu en cours…",
@@ -1129,8 +1152,48 @@
     "hint": "Remplir recadre l'image pour remplir le cadre ; Letterbox garde tout visible avec des bandes ; Flou garde tout visible sur une copie floutée au lieu des bandes ; Désactivé utilise le fichier tel quel, sans l'ajuster au cadre."
   },
   "musicSection": {
-    "pickTracks": "Choisis les pistes proposées aux spectateurs.",
-    "allowUpload": "Autoriser les spectateurs à importer leur propre piste"
+    "pickTracks": "Coche les pistes proposées aux spectateurs. La piste par défaut joue tant qu’ils n’en choisissent pas une autre.",
+    "allowUpload": "Autoriser les spectateurs à importer leur propre piste",
+    "listLabel": "Bibliothèque musicale",
+    "count": "{{count}} sur {{total}} proposées",
+    "clear": "Tout décocher",
+    "empty": "Rien de coché. Les brouillons empruntent {{title}}, et les spectateurs n’ont aucune piste à choisir.",
+    "emptyUpload": "Rien de coché. Les brouillons empruntent {{title}}, et les spectateurs ne peuvent qu’importer la leur.",
+    "default": "Par défaut",
+    "defaultTooltip": "Joue tant que le spectateur ne choisit pas une autre piste",
+    "makeDefault": "Par défaut",
+    "makeDefaultLabel": "Mettre {{title}} par défaut",
+    "makeDefaultTooltip": "Mettre par défaut (D)",
+    "preview": "Écouter {{title}}",
+    "stopPreview": "Arrêter {{title}}",
+    "previewTooltip": "Écouter (Espace)",
+    "previewError": "Cette piste refuse de jouer. Vérifie la connexion et réessaie.",
+    "keysHint": "Les flèches passent d’une piste à l’autre. Entrée coche une piste, Espace l’écoute, D la met par défaut.",
+    "keyMove": "naviguer",
+    "keyTick": "cocher",
+    "keyPreview": "écouter",
+    "keyDefault": "par défaut",
+    "pickerLabel": "Musique",
+    "keysHintSingle": "Les flèches passent d’une piste à l’autre. Entrée choisit une piste, Espace l’écoute.",
+    "keyPick": "choisir",
+    "bpm": "{{bpm}} BPM",
+    "seek": "Écouter {{title}} à partir d’ici",
+    "filterMood": "Ambiance",
+    "filterTempo": "Tempo",
+    "noMatch": "Aucune piste ne correspond à ces filtres.",
+    "mood": {
+      "all": "Toutes",
+      "calm": "Calme",
+      "upbeat": "Entraînante",
+      "jazzy": "Jazzy",
+      "playful": "Espiègle"
+    },
+    "tempo": {
+      "any": "Tous",
+      "slow": "Moins de 90",
+      "mid": "90–120",
+      "fast": "Plus de 120"
+    }
   },
   "form": {
     "fieldId": "ID du champ",

@@ -1,0 +1,587 @@
+// The template editor's music shortlist: a dense track list rather than a grid of covers. Each row is
+// one tab stop (a role="checkbox" button stretched over the row); the arrows move between rows, Enter
+// ticks, Space previews, D makes the track the default. The cover doubles as the preview button, so
+// the art is never covered by a control, and titles wrap rather than truncate.
+import { useId, useRef, useState, type KeyboardEvent } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Info, Loader2, Music } from '@/presentation/components/icons';
+import { PlayIcon } from '@/presentation/components/icons/play';
+import { PauseIcon } from '@/presentation/components/icons/pause';
+import { CheckboxMark, RadioMark } from '@/presentation/components/ui/checkbox';
+import { cn } from '@/lib/utils';
+import { coverGradient } from '@/lib/poster';
+import { MUSIC_LIBRARY, findMusic, type MediaCredit } from '@/data/mediaCatalog';
+import {
+  formatTrackTime,
+  playheadRatio,
+  seekPreview,
+  stopPreview,
+  togglePreview,
+  trackDuration,
+  useMusicPreview,
+  type PreviewState,
+} from './music-preview';
+import { filterTracks, moveIndex, trackKeyAction, type MoodFilter, type TempoFilter } from './music-track-list.logic';
+import { SegmentedControl } from './controls';
+import { Waveform } from './waveform';
+
+// The library covers carry the title and artist in their lower third; the list already prints both,
+// so the thumbnail crops to the illustration above that band.
+export function TrackArt({ item, className }: { item: MediaCredit; className?: string }) {
+  if (!item.cover) {
+    return (
+      <span
+        className={cn('relative block overflow-hidden', className)}
+        style={{ backgroundImage: coverGradient(item.id) }}
+      >
+        <Music className="absolute inset-0 m-auto size-1/2 text-white/85" />
+      </span>
+    );
+  }
+
+  return (
+    <span className={cn('relative block overflow-hidden bg-surface-inset', className)}>
+      <img
+        src={item.cover}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        className="absolute left-[-32%] top-[-5%] h-[164%] w-[164%] max-w-none object-cover"
+      />
+    </span>
+  );
+}
+
+type RowMode = 'multi' | 'single';
+
+function previewOf(preview: PreviewState, id: string): PreviewState | null {
+  return preview.trackId === id ? preview : null;
+}
+
+function initialRow(items: MediaCredit[], firstSelected: string | undefined): number {
+  return Math.max(
+    items.findIndex((item) => item.id === firstSelected),
+    0
+  );
+}
+
+interface TrackRowsProps {
+  items: MediaCredit[];
+  mode: RowMode;
+  selectedIds: string[];
+  // Multi mode: the default track (the first ticked) and the way to change it.
+  defaultId?: string;
+  onMakeDefault?: (id: string) => void;
+  onActivate: (id: string) => void;
+  label: string;
+  hintId: string;
+}
+
+// The rows themselves, shared by the editor's shortlist (checkboxes) and the viewer's pick (radios):
+// one tab stop, arrows to move, Enter to tick or pick, Space to preview, D for the default (multi only).
+function TrackRows({ items, mode, selectedIds, defaultId, onMakeDefault, onActivate, label, hintId }: TrackRowsProps) {
+  const preview = useMusicPreview();
+  const [activeRow, setActiveRow] = useState(() => initialRow(items, selectedIds.at(0)));
+  const rows = useRef(new Map<number, HTMLButtonElement>());
+
+  const focusRow = (index: number) => {
+    setActiveRow(index);
+    rows.current.get(index)?.focus();
+  };
+
+  const onRowKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number, item: MediaCredit) => {
+    const action = trackKeyAction(event.key);
+
+    if (!action || event.altKey || event.metaKey || event.ctrlKey) return;
+
+    // The studio binds Space (program play) and the arrows (frame steps, edit points) on window; inside
+    // the list they belong to the list.
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (action === 'preview') {
+      togglePreview(item);
+
+      return;
+    }
+
+    if (action === 'stop') {
+      stopPreview();
+
+      return;
+    }
+
+    if (action === 'makeDefault') {
+      if (onMakeDefault && selectedIds.includes(item.id)) onMakeDefault(item.id);
+
+      return;
+    }
+
+    focusRow(moveIndex(action, index, items.length));
+  };
+
+  return (
+    <ul role={mode === 'single' ? 'radiogroup' : undefined} aria-label={label} className="-mx-2 grid gap-px">
+      {items.map((item, index) => (
+        <TrackRow
+          key={item.id}
+          item={item}
+          mode={mode}
+          selected={selectedIds.includes(item.id)}
+          isDefault={mode === 'multi' && item.id === defaultId}
+          allowDefault={mode === 'multi' && onMakeDefault !== undefined}
+          preview={previewOf(preview, item.id)}
+          tabbable={index === activeRow}
+          hintId={hintId}
+          rowRef={(node) => {
+            if (node) rows.current.set(index, node);
+          }}
+          onFocus={() => {
+            setActiveRow(index);
+          }}
+          onKeyDown={(event) => {
+            onRowKeyDown(event, index, item);
+          }}
+          onToggle={() => {
+            onActivate(item.id);
+          }}
+          onMakeDefault={() => {
+            onMakeDefault?.(item.id);
+          }}
+        />
+      ))}
+    </ul>
+  );
+}
+
+// A plain multi-select of library tracks, without a default (MediaPicker's shortlist mode).
+export function MusicTrackChecklist({
+  items,
+  selectedIds,
+  onToggle,
+}: {
+  items: MediaCredit[];
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+}) {
+  const { t } = useTranslation('admin');
+  const hintId = useId();
+
+  return (
+    <TrackRows
+      items={items}
+      mode="multi"
+      selectedIds={selectedIds}
+      onActivate={onToggle}
+      label={t('musicSection.listLabel')}
+      hintId={hintId}
+    />
+  );
+}
+
+interface MusicTrackListProps {
+  selectedIds: string[];
+  allowUpload: boolean;
+  onToggle: (id: string) => void;
+  onMakeDefault: (id: string) => void;
+  onClear: () => void;
+}
+
+export function MusicTrackList({ selectedIds, allowUpload, onToggle, onMakeDefault, onClear }: MusicTrackListProps) {
+  const { t } = useTranslation('admin');
+  const hintId = useId();
+  const defaultId = selectedIds.at(0);
+  const standIn = findMusic(defaultId ?? '') ?? MUSIC_LIBRARY.at(0);
+  const [mood, setMood] = useState<MoodFilter>('all');
+  const [tempo, setTempo] = useState<TempoFilter>('any');
+  const shown = filterTracks(MUSIC_LIBRARY, mood, tempo);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex min-h-8 items-center justify-between gap-3">
+        <p aria-live="polite" className="text-xs font-medium tabular-nums text-muted-foreground">
+          {t('musicSection.count', { count: selectedIds.length, total: MUSIC_LIBRARY.length })}
+        </p>
+        {selectedIds.length > 0 ? (
+          <button
+            type="button"
+            onClick={onClear}
+            className="-mr-2 h-8 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+          >
+            {t('musicSection.clear')}
+          </button>
+        ) : null}
+      </div>
+
+      {selectedIds.length === 0 && standIn ? (
+        <p className="flex gap-2 rounded-md bg-foreground/[0.04] px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+          <Info aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
+          <span>{t(allowUpload ? 'musicSection.emptyUpload' : 'musicSection.empty', { title: standIn.title })}</span>
+        </p>
+      ) : null}
+
+      <TrackFilters mood={mood} tempo={tempo} onMood={setMood} onTempo={setTempo} />
+
+      {shown.length === 0 ? (
+        <p className="rounded-md bg-foreground/[0.04] px-3 py-2 text-xs text-muted-foreground">
+          {t('musicSection.noMatch')}
+        </p>
+      ) : null}
+
+      <TrackRows
+        key={`${mood}:${tempo}`}
+        items={shown}
+        mode="multi"
+        selectedIds={selectedIds}
+        defaultId={defaultId}
+        onMakeDefault={onMakeDefault}
+        onActivate={onToggle}
+        label={t('musicSection.listLabel')}
+        hintId={hintId}
+      />
+
+      <p id={hintId} className="sr-only">
+        {t('musicSection.keysHint')}
+      </p>
+      <KeyLegend
+        keys={[
+          ['↑↓', 'keyMove'],
+          ['Enter', 'keyTick'],
+          ['Space', 'keyPreview'],
+          ['D', 'keyDefault'],
+        ]}
+      />
+    </div>
+  );
+}
+
+const MOODS: readonly MoodFilter[] = ['all', 'calm', 'upbeat', 'jazzy', 'playful'];
+const TEMPOS: readonly TempoFilter[] = ['any', 'slow', 'mid', 'fast'];
+
+function TrackFilters({
+  mood,
+  tempo,
+  onMood,
+  onTempo,
+}: {
+  mood: MoodFilter;
+  tempo: TempoFilter;
+  onMood: (mood: MoodFilter) => void;
+  onTempo: (tempo: TempoFilter) => void;
+}) {
+  const { t } = useTranslation('admin');
+
+  return (
+    <div className="grid gap-2">
+      <SegmentedControl
+        label={t('musicSection.filterMood')}
+        value={mood}
+        onChange={onMood}
+        options={MOODS.map((value) => ({ value, label: t(`musicSection.mood.${value}`) }))}
+      />
+      <SegmentedControl
+        label={t('musicSection.filterTempo')}
+        value={tempo}
+        onChange={onTempo}
+        options={TEMPOS.map((value) => ({ value, label: t(`musicSection.tempo.${value}`) }))}
+      />
+    </div>
+  );
+}
+
+interface MusicTrackPickerProps {
+  items: MediaCredit[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}
+
+// The viewer's music step: the same rows as one choice (radios), so a viewer can hear a track before
+// picking it and read its full title.
+export function MusicTrackPicker({ items, selectedId, onSelect }: MusicTrackPickerProps) {
+  const { t } = useTranslation('admin');
+  const hintId = useId();
+
+  return (
+    <div className="space-y-2">
+      <TrackRows
+        items={items}
+        mode="single"
+        selectedIds={selectedId ? [selectedId] : []}
+        onActivate={onSelect}
+        label={t('musicSection.pickerLabel')}
+        hintId={hintId}
+      />
+      <p id={hintId} className="sr-only">
+        {t('musicSection.keysHintSingle')}
+      </p>
+      <KeyLegend
+        keys={[
+          ['↑↓', 'keyMove'],
+          ['Enter', 'keyPick'],
+          ['Space', 'keyPreview'],
+        ]}
+      />
+    </div>
+  );
+}
+
+function KeyLegend({ keys }: { keys: Array<[string, string]> }) {
+  const { t } = useTranslation('admin');
+
+  return (
+    <p
+      aria-hidden="true"
+      className="flex flex-wrap gap-x-3 gap-y-1 pt-1 text-[0.6875rem] text-muted-foreground [@media(hover:none)]:hidden"
+    >
+      {keys.map(([key, label]) => (
+        <span key={key}>
+          <Kbd>{key}</Kbd> {t(`musicSection.${label}`)}
+        </span>
+      ))}
+    </p>
+  );
+}
+
+function Kbd({ children }: { children: string }) {
+  return (
+    <kbd className="rounded-[0.25rem] border border-foreground/15 bg-surface-inset px-1 py-px font-sans text-[0.625rem] font-medium text-foreground/80">
+      {children}
+    </kbd>
+  );
+}
+
+interface TrackRowProps {
+  item: MediaCredit;
+  mode: RowMode;
+  allowDefault: boolean;
+  selected: boolean;
+  isDefault: boolean;
+  preview: PreviewState | null;
+  tabbable: boolean;
+  hintId: string;
+  rowRef: (node: HTMLButtonElement | null) => void;
+  onFocus: () => void;
+  onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
+  onToggle: () => void;
+  onMakeDefault: () => void;
+}
+
+function TrackRow({
+  item,
+  mode,
+  allowDefault,
+  selected,
+  isDefault,
+  preview,
+  tabbable,
+  hintId,
+  rowRef,
+  onFocus,
+  onKeyDown,
+  onToggle,
+  onMakeDefault,
+}: TrackRowProps) {
+  const titleId = useId();
+  const metaId = useId();
+  const duration = trackDuration(preview, item.durationSec);
+
+  return (
+    <li
+      data-music-track={item.id}
+      data-selected={selected}
+      className={cn(
+        'group relative grid min-h-14 grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-x-3 rounded-lg py-1.5 pl-2 pr-2.5 transition-colors duration-150',
+        selected ? 'bg-brand-500/[0.09] hover:bg-brand-500/[0.13]' : 'hover:bg-foreground/[0.04]'
+      )}
+    >
+      {/* The row's one tab stop, stretched under the cover and the default control. */}
+      <button
+        ref={rowRef}
+        type="button"
+        role={ROW_ROLE[mode]}
+        aria-checked={selected}
+        aria-labelledby={titleId}
+        aria-describedby={`${metaId} ${hintId}`}
+        aria-keyshortcuts={ROW_SHORTCUTS[mode]}
+        tabIndex={tabbable ? 0 : -1}
+        onFocus={onFocus}
+        onClick={onToggle}
+        onKeyDown={onKeyDown}
+        onKeyUp={(event) => {
+          // Space is the preview key here; keep the button from also treating it as a click.
+          if (event.key === ' ') event.preventDefault();
+        }}
+        className="absolute inset-0 rounded-lg"
+      />
+      <RowMark mode={mode} selected={selected} />
+      <PreviewCover item={item} status={preview?.status ?? 'idle'} />
+      <span className="pointer-events-none min-w-0 py-0.5">
+        <span id={titleId} className="block break-words text-sm font-medium leading-snug text-foreground">
+          {item.title}
+        </span>
+        <span className="mt-0.5 flex flex-wrap items-baseline gap-x-2 text-xs leading-snug text-muted-foreground">
+          <span id={metaId}>
+            <TrackMeta item={item} preview={preview} duration={duration} />
+          </span>
+          {allowDefault && selected && !isDefault ? (
+            <MakeDefaultButton title={item.title} onMakeDefault={onMakeDefault} />
+          ) : null}
+        </span>
+        <RowWaveform item={item} preview={preview} duration={duration} />
+      </span>
+      {isDefault ? <DefaultChip /> : <span />}
+      {item.peaks ? null : <RowPlayhead preview={preview} duration={duration} />}
+    </li>
+  );
+}
+
+// The cover is the preview button: hidden glyph until hover (always shown on touch, or while sounding).
+function PreviewCover({ item, status }: { item: MediaCredit; status: PreviewState['status'] }) {
+  const { t } = useTranslation('admin');
+  const sounding = status === 'playing' || status === 'loading';
+  const glyphShown = sounding || status === 'error';
+
+  return (
+    <button
+      type="button"
+      tabIndex={-1}
+      onClick={() => {
+        togglePreview(item);
+      }}
+      aria-pressed={sounding}
+      aria-label={t(sounding ? 'musicSection.stopPreview' : 'musicSection.preview', { title: item.title })}
+      title={t('musicSection.previewTooltip')}
+      className="relative z-10 size-11 overflow-hidden rounded-md shadow-[0_0_0_1px_var(--color-divider)]"
+    >
+      <TrackArt item={item} className="size-full" />
+      <span
+        className={cn(
+          'absolute inset-0 grid place-items-center bg-player-ink/55 text-player-fg transition-opacity duration-150',
+          glyphShown
+            ? 'opacity-100'
+            : 'opacity-0 group-hover:opacity-100 [@media(hover:none)]:bg-player-ink/35 [@media(hover:none)]:opacity-100'
+        )}
+      >
+        <PreviewGlyph status={status} />
+      </span>
+    </button>
+  );
+}
+
+// While a track previews, its waveform is the playhead: hover marks a spot, a click plays from there.
+function RowWaveform({
+  item,
+  preview,
+  duration,
+}: {
+  item: MediaCredit;
+  preview: PreviewState | null;
+  duration: number;
+}) {
+  const { t } = useTranslation('admin');
+
+  if (!item.peaks || !preview || preview.status === 'error') return null;
+
+  return (
+    <Waveform
+      peaks={item.peaks}
+      progress={playheadRatio(preview, duration)}
+      onSeek={(ratio) => {
+        seekPreview(item, ratio);
+      }}
+      seekLabel={t('musicSection.seek', { title: item.title })}
+      className="pointer-events-auto relative z-10 mt-1.5 h-4 w-full max-w-60"
+    />
+  );
+}
+
+// A thin playhead along the row's foot while its track is the one previewing.
+function RowPlayhead({ preview, duration }: { preview: PreviewState | null; duration: number }) {
+  if (!preview || preview.status === 'error') return null;
+
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-x-2 bottom-0 h-0.5 overflow-hidden rounded-full bg-foreground/10"
+    >
+      <span
+        className="block h-full origin-left bg-brand-400"
+        style={{ transform: `scaleX(${playheadRatio(preview, duration)})` }}
+      />
+    </span>
+  );
+}
+
+const ROW_ROLE: Record<RowMode, 'radio' | 'checkbox'> = { single: 'radio', multi: 'checkbox' };
+const ROW_SHORTCUTS: Record<RowMode, string> = { single: 'Enter Space', multi: 'Enter Space D' };
+
+function RowMark({ mode, selected }: { mode: RowMode; selected: boolean }) {
+  if (mode === 'single') return <RadioMark checked={selected} className="pointer-events-none" />;
+
+  return <CheckboxMark checked={selected} className="pointer-events-none" />;
+}
+
+export function PreviewGlyph({ status }: { status: PreviewState['status'] }) {
+  if (status === 'loading') {
+    return <Loader2 aria-hidden="true" className="size-4 animate-spin motion-reduce:animate-none" />;
+  }
+
+  if (status === 'playing') return <PauseIcon size={16} />;
+
+  return <PlayIcon size={16} className="translate-x-px" />;
+}
+
+function TrackMeta({ item, preview, duration }: { item: MediaCredit; preview: PreviewState | null; duration: number }) {
+  const { t } = useTranslation('admin');
+
+  if (preview?.status === 'error') {
+    return <span className="text-[var(--color-error)]">{t('musicSection.previewError')}</span>;
+  }
+
+  if (preview) {
+    return (
+      <span className="tabular-nums text-brand-300">
+        {formatTrackTime(preview.currentTime)} / {formatTrackTime(duration)}
+      </span>
+    );
+  }
+
+  return (
+    <>
+      <span className="break-words">{item.author}</span>
+      {duration > 0 ? <span className="tabular-nums"> · {formatTrackTime(duration)}</span> : null}
+      {item.bpm ? <span className="tabular-nums"> · {t('musicSection.bpm', { bpm: item.bpm })}</span> : null}
+    </>
+  );
+}
+
+function DefaultChip() {
+  const { t } = useTranslation('admin');
+
+  return (
+    <span
+      title={t('musicSection.defaultTooltip')}
+      className="relative z-10 rounded-[0.3125rem] bg-brand-500/20 px-1.5 py-0.5 text-[0.6875rem] font-medium text-brand-200"
+    >
+      {t('musicSection.default')}
+    </span>
+  );
+}
+
+// Lives in the meta line, so showing it on hover never reflows the title.
+function MakeDefaultButton({ title, onMakeDefault }: { title: string; onMakeDefault: () => void }) {
+  const { t } = useTranslation('admin');
+
+  return (
+    <button
+      type="button"
+      tabIndex={-1}
+      onClick={onMakeDefault}
+      aria-label={t('musicSection.makeDefaultLabel', { title })}
+      title={t('musicSection.makeDefaultTooltip')}
+      className="pointer-events-auto relative z-10 font-medium text-brand-300 underline-offset-2 opacity-0 transition-opacity duration-150 hover:underline group-focus-within:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+    >
+      {t('musicSection.makeDefault')}
+    </button>
+  );
+}

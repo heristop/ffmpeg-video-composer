@@ -260,7 +260,15 @@
     "partialUnset": "Ningún fragmento seleccionado",
     "dragToReorder": "Arrastra para reordenar",
     "timelineEmptyTitle": "Construye tu historia escena a escena",
-    "timelineEmptyCta": "Explorar plantillas de inicio"
+    "timelineEmptyCta": "Explorar plantillas de inicio",
+    "sceneOf": "Escena {{index}} de {{count}}",
+    "duplicateSceneTooltip": "Duplicar escena (⌘D)",
+    "deleteSceneTooltip": "Eliminar escena (Supr)",
+    "musicLaneEmpty": "Música",
+    "musicLaneMore": "+{{count}} ofrecidas",
+    "safeGuides": "Zonas seguras",
+    "safeGuidesTooltip": "Mostrar las zonas seguras de acción (90 %) y de títulos (80 %)",
+    "playTooltip": "Reproducir / pausa (Espacio)"
   },
   "shortcuts": {
     "title": "Atajos de teclado",
@@ -269,13 +277,18 @@
     "redo": "Rehacer",
     "save": "Guardar plantilla",
     "duplicateScene": "Duplicar escena",
-    "deleteScene": "Eliminar escena",
+    "deleteScene": "Eliminar escena (en la tira de escenas)",
     "addScene": "Añadir escena",
     "prevScene": "Escena anterior",
     "nextScene": "Escena siguiente",
     "tools": "Herramienta anterior / siguiente",
     "playPause": "Reproducir / pausar vista previa",
-    "showHelp": "Mostrar atajos"
+    "showHelp": "Mostrar atajos",
+    "shuttle": "Atrás / parar / adelante",
+    "frameStep": "Avanzar un fotograma",
+    "secondStep": "Avanzar un segundo",
+    "editPoints": "Punto de edición anterior / siguiente",
+    "backToEditing": "Volver a editar la escena"
   },
   "presets": {
     "pickerTitle": "Empieza tu plantilla",
@@ -304,7 +317,17 @@
     "playing": "Reproduciendo",
     "play": "Reproducir",
     "pause": "Pausa",
-    "scrub": "Desplazarse por el vídeo"
+    "scrub": "Desplazarse por el vídeo",
+    "musicRegion": "Música de esta plantilla",
+    "musicStandIn": "Suplente",
+    "musicStandInNote": "Aún no hay nada marcado. Los borradores toman prestada esta pista.",
+    "musicAudioOnly": "Suena bajo cada escena. Nada en pantalla.",
+    "musicOnlyTrack": "Los espectadores solo tienen esta pista.",
+    "musicAlternatives": "Los espectadores pueden cambiar a {{list}}.",
+    "musicAlternativesMore": "Los espectadores pueden cambiar a {{list}} y {{count}} más.",
+    "musicUploadToo": "O subir la suya.",
+    "parked": "Programa",
+    "fps": "{{fps}} fps"
   },
   "testRender": {
     "rendering": "Renderizando…",
@@ -1129,8 +1152,48 @@
     "hint": "Rellenar recorta el material para llenar el cuadro; Letterbox lo muestra entero con bandas; Desenfoque lo muestra entero sobre una copia desenfocada en lugar de bandas; Desactivado usa el archivo tal cual, sin ajustarlo al cuadro."
   },
   "musicSection": {
-    "pickTracks": "Elige las pistas entre las que pueden elegir los espectadores.",
-    "allowUpload": "Permitir que los espectadores suban su propia pista"
+    "pickTracks": "Marca las pistas que pueden elegir los espectadores. La predeterminada suena salvo que elijan otra.",
+    "allowUpload": "Permitir que los espectadores suban su propia pista",
+    "listLabel": "Biblioteca musical",
+    "count": "{{count}} de {{total}} ofrecidas",
+    "clear": "Desmarcar",
+    "empty": "Nada marcado. Los borradores toman prestada {{title}}, y los espectadores no tienen pista que elegir.",
+    "emptyUpload": "Nada marcado. Los borradores toman prestada {{title}}, y los espectadores solo pueden subir la suya.",
+    "default": "Predeterminada",
+    "defaultTooltip": "Suena salvo que el espectador elija otra pista",
+    "makeDefault": "Predeterminar",
+    "makeDefaultLabel": "Hacer {{title}} la predeterminada",
+    "makeDefaultTooltip": "Hacer predeterminada (D)",
+    "preview": "Escuchar {{title}}",
+    "stopPreview": "Detener {{title}}",
+    "previewTooltip": "Escuchar (Espacio)",
+    "previewError": "Esta pista no se reproduce. Revisa la conexión y vuelve a intentarlo.",
+    "keysHint": "Las flechas cambian de pista. Intro marca una pista, Espacio la escucha, D la hace predeterminada.",
+    "keyMove": "mover",
+    "keyTick": "marcar",
+    "keyPreview": "escuchar",
+    "keyDefault": "predeterminada",
+    "pickerLabel": "Música",
+    "keysHintSingle": "Las flechas cambian de pista. Intro elige una pista, Espacio la escucha.",
+    "keyPick": "elegir",
+    "bpm": "{{bpm}} BPM",
+    "seek": "Reproducir {{title}} desde aquí",
+    "filterMood": "Ambiente",
+    "filterTempo": "Tempo",
+    "noMatch": "Ninguna pista coincide con estos filtros.",
+    "mood": {
+      "all": "Todas",
+      "calm": "Tranquila",
+      "upbeat": "Animada",
+      "jazzy": "Jazzística",
+      "playful": "Juguetona"
+    },
+    "tempo": {
+      "any": "Cualquiera",
+      "slow": "Menos de 90",
+      "mid": "90–120",
+      "fast": "Más de 120"
+    }
   },
   "form": {
     "fieldId": "ID del campo",

@@ -260,7 +260,15 @@
     "partialUnset": "Kein Partial ausgewählt",
     "dragToReorder": "Zum Sortieren ziehen",
     "timelineEmptyTitle": "Baue deine Geschichte Szene für Szene",
-    "timelineEmptyCta": "Startvorlagen durchstöbern"
+    "timelineEmptyCta": "Startvorlagen durchstöbern",
+    "sceneOf": "Szene {{index}} von {{count}}",
+    "duplicateSceneTooltip": "Szene duplizieren (⌘D)",
+    "deleteSceneTooltip": "Szene löschen (Entf)",
+    "musicLaneEmpty": "Musik",
+    "musicLaneMore": "+{{count}} angeboten",
+    "safeGuides": "Sichere Bereiche",
+    "safeGuidesTooltip": "Aktionssicheren (90 %) und titelsicheren (80 %) Bereich zeigen",
+    "playTooltip": "Wiedergabe / Pause (Leertaste)"
   },
   "shortcuts": {
     "title": "Tastenkürzel",
@@ -269,13 +277,18 @@
     "redo": "Wiederholen",
     "save": "Vorlage speichern",
     "duplicateScene": "Szene duplizieren",
-    "deleteScene": "Szene löschen",
+    "deleteScene": "Szene löschen (im Szenenstreifen)",
     "addScene": "Szene hinzufügen",
     "prevScene": "Vorherige Szene",
     "nextScene": "Nächste Szene",
     "tools": "Vorheriges / nächstes Werkzeug",
     "playPause": "Vorschau abspielen / pausieren",
-    "showHelp": "Kürzel anzeigen"
+    "showHelp": "Kürzel anzeigen",
+    "shuttle": "Rückwärts / Stopp / Vorwärts",
+    "frameStep": "Ein Bild weiter",
+    "secondStep": "Eine Sekunde weiter",
+    "editPoints": "Vorheriger / nächster Schnittpunkt",
+    "backToEditing": "Zurück zur Szenenbearbeitung"
   },
   "presets": {
     "pickerTitle": "Starte deine Vorlage",
@@ -304,7 +317,17 @@
     "playing": "Wiedergabe",
     "play": "Abspielen",
     "pause": "Pause",
-    "scrub": "Im Video spulen"
+    "scrub": "Im Video spulen",
+    "musicRegion": "Musik dieser Vorlage",
+    "musicStandIn": "Platzhalter",
+    "musicStandInNote": "Noch nichts angehakt. Entwurfsvorschauen leihen sich diesen Track.",
+    "musicAudioOnly": "Läuft unter jeder Szene. Nichts auf dem Bildschirm.",
+    "musicOnlyTrack": "Zuschauer bekommen nur diesen Track.",
+    "musicAlternatives": "Zuschauer können zu {{list}} wechseln.",
+    "musicAlternativesMore": "Zuschauer können zu {{list}} und {{count}} weiteren wechseln.",
+    "musicUploadToo": "Oder ihren eigenen hochladen.",
+    "parked": "Programm",
+    "fps": "{{fps}} fps"
   },
   "testRender": {
     "rendering": "Rendering …",
@@ -1129,8 +1152,48 @@
     "hint": "Füllen beschneidet das Material, um den Rahmen zu füllen; Letterbox zeigt alles mit Balken; Unschärfe zeigt alles über einer unscharfen Kopie statt Balken; Aus verwendet die Datei unverändert, ohne Anpassung an den Rahmen."
   },
   "musicSection": {
-    "pickTracks": "Wähle die Tracks, aus denen Zuschauer wählen können.",
-    "allowUpload": "Zuschauern erlauben, ihren eigenen Track hochzuladen"
+    "pickTracks": "Hake die Tracks an, aus denen Zuschauer wählen können. Der Standard läuft, solange sie keinen anderen wählen.",
+    "allowUpload": "Zuschauern erlauben, ihren eigenen Track hochzuladen",
+    "listLabel": "Musikbibliothek",
+    "count": "{{count}} von {{total}} angeboten",
+    "clear": "Leeren",
+    "empty": "Nichts angehakt. Entwurfsvorschauen leihen sich {{title}}, und Zuschauer haben keinen Track zur Wahl.",
+    "emptyUpload": "Nichts angehakt. Entwurfsvorschauen leihen sich {{title}}, und Zuschauer können nur ihren eigenen hochladen.",
+    "default": "Standard",
+    "defaultTooltip": "Läuft, solange der Zuschauer keinen anderen Track wählt",
+    "makeDefault": "Als Standard",
+    "makeDefaultLabel": "{{title}} als Standard festlegen",
+    "makeDefaultTooltip": "Als Standard festlegen (D)",
+    "preview": "{{title}} anhören",
+    "stopPreview": "{{title}} stoppen",
+    "previewTooltip": "Anhören (Leertaste)",
+    "previewError": "Dieser Track spielt nicht ab. Prüfe die Verbindung und versuche es erneut.",
+    "keysHint": "Pfeiltasten wechseln den Track. Enter hakt ihn an, Leertaste spielt ihn an, D macht ihn zum Standard.",
+    "keyMove": "wechseln",
+    "keyTick": "anhaken",
+    "keyPreview": "anhören",
+    "keyDefault": "Standard",
+    "pickerLabel": "Musik",
+    "keysHintSingle": "Pfeiltasten wechseln den Track. Enter wählt ihn, Leertaste spielt ihn an.",
+    "keyPick": "wählen",
+    "bpm": "{{bpm}} BPM",
+    "seek": "{{title}} ab hier abspielen",
+    "filterMood": "Stimmung",
+    "filterTempo": "Tempo",
+    "noMatch": "Kein Track passt zu diesen Filtern.",
+    "mood": {
+      "all": "Alle",
+      "calm": "Ruhig",
+      "upbeat": "Beschwingt",
+      "jazzy": "Jazzig",
+      "playful": "Verspielt"
+    },
+    "tempo": {
+      "any": "Alle",
+      "slow": "Unter 90",
+      "mid": "90–120",
+      "fast": "Über 120"
+    }
   },
   "form": {
     "fieldId": "Feld-ID",

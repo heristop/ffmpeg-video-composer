@@ -1,0 +1,42 @@
+{
+  "_note": "Captures come from record.mjs (SIDE=before on the merge base, SIDE=after on the branch). trim is the start offset into each 1024x768 capture, so both runs open the music scene at the same second.",
+  "ticket": "PR #139",
+  "summary": "A track list you can read, hear and pick from",
+  "clipSeconds": 6,
+  "freeze": { "at": 3.6, "hold": 3 },
+  "intro": {
+    "headline": "POLISH THE TEMPLATE BUILDER"
+  },
+  "outro": {
+    "headline": "REVIEW THE MUSIC SCENE FIRST",
+    "subtitle": "Then the transport keys and the scene strip"
+  },
+  "sides": [
+    {
+      "side": "before",
+      "badge": "BEFORE",
+      "capture": "raw/before.webm",
+      "trim": 5.6,
+      "highlight": { "x": 66, "y": 130, "w": 934, "h": 460 },
+      "callout": "Which one is the default?",
+      "chip": "Covers, cut titles",
+      "pane": {
+        "title": "A grid of covers",
+        "desc": "Titles cut off, a play button over the art, no count and no default. The stage shows a sky."
+      }
+    },
+    {
+      "side": "after",
+      "badge": "AFTER",
+      "capture": "raw/after.webm",
+      "trim": 5.1,
+      "highlight": { "x": 66, "y": 130, "w": 934, "h": 460 },
+      "callout": "Ticked, counted, default marked",
+      "chip": "A track list",
+      "pane": {
+        "title": "A track list",
+        "desc": "Full titles, length and tempo, a waveform playhead, and the stage plays the default track."
+      }
+    }
+  ]
+}

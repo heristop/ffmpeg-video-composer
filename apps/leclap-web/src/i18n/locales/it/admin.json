@@ -260,7 +260,15 @@
     "partialUnset": "Nessun partial selezionato",
     "dragToReorder": "Trascina per riordinare",
     "timelineEmptyTitle": "Costruisci la tua storia scena per scena",
-    "timelineEmptyCta": "Sfoglia i modelli di partenza"
+    "timelineEmptyCta": "Sfoglia i modelli di partenza",
+    "sceneOf": "Scena {{index}} di {{count}}",
+    "duplicateSceneTooltip": "Duplica scena (⌘D)",
+    "deleteSceneTooltip": "Elimina scena (Canc)",
+    "musicLaneEmpty": "Musica",
+    "musicLaneMore": "+{{count}} proposte",
+    "safeGuides": "Aree sicure",
+    "safeGuidesTooltip": "Mostra le aree sicure per l’azione (90%) e i titoli (80%)",
+    "playTooltip": "Riproduci / pausa (Spazio)"
   },
   "shortcuts": {
     "title": "Scorciatoie da tastiera",
@@ -269,13 +277,18 @@
     "redo": "Ripeti",
     "save": "Salva modello",
     "duplicateScene": "Duplica scena",
-    "deleteScene": "Elimina scena",
+    "deleteScene": "Elimina scena (nella striscia delle scene)",
     "addScene": "Aggiungi scena",
     "prevScene": "Scena precedente",
     "nextScene": "Scena successiva",
     "tools": "Strumento precedente / successivo",
     "playPause": "Riproduci / metti in pausa anteprima",
-    "showHelp": "Mostra scorciatoie"
+    "showHelp": "Mostra scorciatoie",
+    "shuttle": "Indietro / stop / avanti",
+    "frameStep": "Avanza di un fotogramma",
+    "secondStep": "Avanza di un secondo",
+    "editPoints": "Punto di montaggio precedente / successivo",
+    "backToEditing": "Torna a modificare la scena"
   },
   "presets": {
     "pickerTitle": "Inizia il tuo modello",
@@ -304,7 +317,17 @@
     "playing": "Riproduzione",
     "play": "Riproduci",
     "pause": "Pausa",
-    "scrub": "Scorri il video"
+    "scrub": "Scorri il video",
+    "musicRegion": "Musica di questo modello",
+    "musicStandIn": "Controfigura",
+    "musicStandInNote": "Ancora nulla di spuntato. Le bozze prendono in prestito questa traccia.",
+    "musicAudioOnly": "Suona sotto ogni scena. Nulla sullo schermo.",
+    "musicOnlyTrack": "Gli spettatori hanno solo questa traccia.",
+    "musicAlternatives": "Gli spettatori possono passare a {{list}}.",
+    "musicAlternativesMore": "Gli spettatori possono passare a {{list}} e ad altre {{count}}.",
+    "musicUploadToo": "O caricare la propria.",
+    "parked": "Programma",
+    "fps": "{{fps}} fps"
   },
   "testRender": {
     "rendering": "Rendering…",
@@ -1129,8 +1152,48 @@
     "hint": "Riempi ritaglia il materiale per riempire il riquadro; Letterbox lo mostra intero con bande; Sfocato lo mostra intero su una copia sfocata invece delle bande; Disattivato usa il file così com'è, senza adattarlo al riquadro."
   },
   "musicSection": {
-    "pickTracks": "Scegli le tracce tra cui gli spettatori possono selezionare.",
-    "allowUpload": "Consenti agli spettatori di caricare la propria traccia"
+    "pickTracks": "Spunta le tracce tra cui gli spettatori possono scegliere. Quella predefinita suona finché non ne scelgono un’altra.",
+    "allowUpload": "Consenti agli spettatori di caricare la propria traccia",
+    "listLabel": "Libreria musicale",
+    "count": "{{count}} di {{total}} proposte",
+    "clear": "Deseleziona",
+    "empty": "Nulla di spuntato. Le bozze prendono in prestito {{title}}, e gli spettatori non hanno tracce da scegliere.",
+    "emptyUpload": "Nulla di spuntato. Le bozze prendono in prestito {{title}}, e gli spettatori possono solo caricare la propria.",
+    "default": "Predefinita",
+    "defaultTooltip": "Suona finché lo spettatore non sceglie un’altra traccia",
+    "makeDefault": "Predefinisci",
+    "makeDefaultLabel": "Rendi {{title}} predefinita",
+    "makeDefaultTooltip": "Rendi predefinita (D)",
+    "preview": "Ascolta {{title}}",
+    "stopPreview": "Ferma {{title}}",
+    "previewTooltip": "Ascolta (Spazio)",
+    "previewError": "Questa traccia non parte. Controlla la connessione e riprova.",
+    "keysHint": "Le frecce passano da una traccia all’altra. Invio la spunta, Spazio la ascolta, D la rende predefinita.",
+    "keyMove": "sposta",
+    "keyTick": "spunta",
+    "keyPreview": "ascolta",
+    "keyDefault": "predefinita",
+    "pickerLabel": "Musica",
+    "keysHintSingle": "Le frecce passano da una traccia all’altra. Invio la sceglie, Spazio la ascolta.",
+    "keyPick": "scegli",
+    "bpm": "{{bpm}} BPM",
+    "seek": "Riproduci {{title}} da qui",
+    "filterMood": "Atmosfera",
+    "filterTempo": "Tempo",
+    "noMatch": "Nessuna traccia corrisponde a questi filtri.",
+    "mood": {
+      "all": "Tutte",
+      "calm": "Calma",
+      "upbeat": "Vivace",
+      "jazzy": "Jazz",
+      "playful": "Giocosa"
+    },
+    "tempo": {
+      "any": "Qualsiasi",
+      "slow": "Sotto 90",
+      "mid": "90–120",
+      "fast": "Sopra 120"
+    }
   },
   "form": {
     "fieldId": "ID del campo",

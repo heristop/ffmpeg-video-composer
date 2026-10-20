@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SectionFields } from '../editor/SectionFields';
 import { AudioPanel } from '../editor/AudioPanel';
@@ -18,6 +17,7 @@ import { addableKinds } from './AddElementMenu';
 import { ElementBlock } from './ElementBlock';
 import { sectionLabelKey } from './section-label';
 import { BasicsPanel } from './basics-panel';
+import { PanelFrame } from './panel-frame';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
 
 // True when the section owns any addable visual element (video/color/image), so the left panel hosts
@@ -35,23 +35,6 @@ interface EditorPanelSwitchProps {
   selection: SectionSelectionState;
   onSelectElement: (ref: ElementRef | null) => void;
 }
-
-// A panel shell: an eyebrow + title header above a swap-animated body, matching the studio panel chrome.
-// The header is pinned (shrink-0) and compacts on short viewports so the scrollable body keeps as much
-// height as possible; overscroll stays contained so panel scroll never chains into the page.
-const PanelFrame = ({ eyebrow, title, children }: { eyebrow: string; title: string; children: ReactNode }) => (
-  <div className="flex min-h-0 flex-1 flex-col">
-    <header className="shrink-0 border-b border-brand-500/20 bg-brand-500/10 px-4 py-3 [@media(max-height:700px)]:py-2">
-      <span className="block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-300">
-        {eyebrow}
-      </span>
-      <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-    </header>
-    <div className="panel-swap min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 pb-6 [scrollbar-width:thin] motion-reduce:animate-none [@media(max-height:700px)]:p-3 [@media(max-height:700px)]:pb-5">
-      {children}
-    </div>
-  </div>
-);
 
 // A muted placeholder body for panels whose authoring UI isn't wired into the shell yet.
 const PanelPlaceholder = ({ message }: { message: string }) => (
@@ -76,14 +59,17 @@ export const EditorPanelSwitch = ({
   if (activeTool === 'scenes') {
     if (!section) {
       return (
-        <PanelFrame eyebrow={t('shell.tools')} title={t('shell.scenes')}>
+        <PanelFrame title={t('shell.scenes')}>
           <PanelPlaceholder message={t('shell.monitorEmpty')} />
         </PanelFrame>
       );
     }
 
     return (
-      <PanelFrame eyebrow={t('shell.scenes')} title={t(sectionLabelKey(section.kind))}>
+      <PanelFrame
+        title={t(sectionLabelKey(section.kind))}
+        meta={t('shell.sceneOf', { index: state.sections.indexOf(section) + 1, count: state.sections.length })}
+      >
         <SectionFields
           section={section}
           orientation={state.orientation}
@@ -107,7 +93,7 @@ export const EditorPanelSwitch = ({
 
   if (activeTool === 'basics') {
     return (
-      <PanelFrame eyebrow={t('shell.tools')} title={t('shell.basics')}>
+      <PanelFrame title={t('shell.basics')}>
         <BasicsPanel state={state} patch={patch} />
       </PanelFrame>
     );
@@ -115,7 +101,7 @@ export const EditorPanelSwitch = ({
 
   if (activeTool === 'audio') {
     return (
-      <PanelFrame eyebrow={t('shell.tools')} title={t('shell.audio')}>
+      <PanelFrame title={t('shell.audio')}>
         <AudioPanel
           audio={state.audio}
           onChange={(audio) => {
@@ -128,14 +114,14 @@ export const EditorPanelSwitch = ({
 
   if (activeTool === 'variables') {
     return (
-      <PanelFrame eyebrow={t('shell.tools')} title={t('shell.variables')}>
+      <PanelFrame title={t('shell.variables')}>
         <GlobalVariablesEditor state={state} patch={patch} />
       </PanelFrame>
     );
   }
 
   return (
-    <PanelFrame eyebrow={t('shell.tools')} title={t('shell.advanced')}>
+    <PanelFrame title={t('shell.advanced')}>
       <div className="space-y-4">
         <PaletteAndTheme state={state} patch={patch} />
         <WholeVideoLookGrade state={state} patch={patch} />

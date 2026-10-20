@@ -3,6 +3,7 @@ import {
   createHistory,
   newSection,
   addSection,
+  removeSection,
   type EditorState,
 } from '@/presentation/components/admin/templateEditorModel';
 
@@ -85,5 +86,16 @@ describe('createHistory (useEditorHistory backbone)', () => {
     expect(history.state.sections).toHaveLength(1);
     history.redo();
     expect(history.state.sections).toHaveLength(1);
+  });
+
+  it('brings a deleted scene back on undo (the Delete shortcut goes through this history)', () => {
+    const history = createHistory(addSection(base(), 'color'));
+    history.set(removeSection(history.state, 1));
+
+    expect(history.state.sections).toHaveLength(1);
+
+    history.undo();
+
+    expect(history.state.sections.map((section) => section.kind)).toEqual(['video', 'color']);
   });
 });
