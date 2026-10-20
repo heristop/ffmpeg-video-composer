@@ -310,10 +310,6 @@
     }
   },
   "monitor": {
-    "fallbackMusicTitle": "Sélection musicale",
-    "fallbackMusicSubtitle": "Définit la musique de fond du modèle — elle joue sous la vidéo, sans rien à l’écran.",
-    "fallbackFormTitle": "Champs de formulaire",
-    "fallbackFormSubtitle": "Les spectateurs remplissent ces champs avant le rendu ; leurs réponses alimentent les variables du modèle.",
     "playing": "Lecture",
     "play": "Lecture",
     "pause": "Pause",
@@ -327,7 +323,24 @@
     "musicAlternativesMore": "Les spectateurs peuvent passer à {{list}} et {{count}} autres.",
     "musicUploadToo": "Ou importer la leur.",
     "parked": "Programme",
-    "fps": "{{fps}} i/s"
+    "fps": "{{fps}} i/s",
+    "formRegion": "Aperçu du formulaire",
+    "formTitle": "Avant le rendu",
+    "formLead": "Ce que les spectateurs remplissent. Rien de cette scène ne s’affiche à l’écran.",
+    "formEmpty": "Aucun champ pour l’instant.",
+    "formRequired": "obligatoire",
+    "formAnswers": "Où vont les réponses",
+    "formScenes_one": "Scène {{list}}",
+    "formScenes_other": "Scènes {{list}}",
+    "formNowhere": "Pas encore à l’écran",
+    "formSample": {
+      "text": "Sa réponse",
+      "number": "0",
+      "enum": "Choisir",
+      "url": "https://…",
+      "color": "#7C83FD",
+      "time": "00:00"
+    }
   },
   "testRender": {
     "rendering": "Rendu en cours…",
@@ -1202,7 +1215,46 @@
     "fieldLabelPlaceholder": "Libellé",
     "maxLength": "Longueur max",
     "removeField": "Supprimer le champ",
-    "addField": "Ajouter un champ"
+    "addField": "Ajouter un champ",
+    "intro": "Les spectateurs les remplissent avant le rendu. Chaque réponse devient une #variable que tes scènes peuvent afficher.",
+    "empty": "Aucun champ pour l’instant. Ajoutes-en un, puis tape sa #variable dans une scène pour afficher la réponse.",
+    "listLabel": "Champs du formulaire",
+    "untitled": "Champ sans titre",
+    "type": {
+      "label": "Type",
+      "text": "Texte",
+      "number": "Nombre",
+      "enum": "Choix",
+      "url": "Lien",
+      "color": "Couleur",
+      "time": "Heure"
+    },
+    "required": "Les spectateurs doivent le remplir",
+    "optionalMark": "Facultatif",
+    "default": "Valeur par défaut",
+    "defaultHint": "Utilisée si le spectateur le laisse vide.",
+    "optionalEmpty": "Laissé vide, il n’affiche rien.",
+    "help": "Ligne d’aide",
+    "helpHint": "Affichée sous le champ dans le formulaire du spectateur.",
+    "options": "Choix",
+    "optionsHint": "Un par ligne.",
+    "maxLengthHint": "Le formulaire s’arrête à {{count}} caractères.",
+    "idProblem": {
+      "empty": "Donne un identifiant au champ.",
+      "chars": "Lettres, chiffres et _ uniquement.",
+      "duplicate": "Un autre champ ou une variable utilise déjà cet identifiant."
+    },
+    "labelEmpty": "Donne au champ un libellé lisible.",
+    "usedIn_one": "Affiché dans la scène {{list}}.",
+    "usedIn_other": "Affiché dans les scènes {{list}}.",
+    "unused": "Pas encore affiché. Tape #{{name}} dans un texte de scène pour l’utiliser.",
+    "moveUp": "Monter",
+    "moveDown": "Descendre",
+    "moveUpTooltip": "Monter (Alt+↑)",
+    "moveDownTooltip": "Descendre (Alt+↓)",
+    "reorderHint": "Alt+↑ / Alt+↓ déplace le champ",
+    "removed": "« {{label}} » supprimé.",
+    "undo": "Annuler"
   },
   "reveal": {
     "label": "Entrée",

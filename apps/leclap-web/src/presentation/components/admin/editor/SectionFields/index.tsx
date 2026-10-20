@@ -12,6 +12,8 @@ import type { AvailablePartial } from '@/services/templatePartialService';
 
 interface SectionFieldsProps {
   section: EditorSection;
+  // The template's scenes (form fields show where each answer is used).
+  sections?: EditorSection[];
   orientation: EditorState['orientation'];
   variables: string[];
   partials: AvailablePartial[];
@@ -21,6 +23,7 @@ interface SectionFieldsProps {
 
 export const SectionFields = ({
   section,
+  sections,
   orientation,
   variables,
   partials,
@@ -71,5 +74,7 @@ export const SectionFields = ({
     return <MusicFields section={section} onChange={onChange} />;
   }
 
-  return <FormFields section={section} onChange={onChange} inputCls={inputCls} />;
+  return (
+    <FormFields section={section} onChange={onChange} inputCls={inputCls} sections={sections} variables={variables} />
+  );
 };

@@ -1,39 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { sectionFallbackMeta, formFieldChips, musicSectionTrack } from './sectionFallback';
+import { musicSectionTrack } from './sectionFallback';
 import { newSection } from '../templateEditorModel';
 import { MUSIC_LIBRARY } from '@/data/mediaCatalog';
-
-describe('sectionFallbackMeta', () => {
-  it('gives music and form distinct copy keys', () => {
-    expect(sectionFallbackMeta('music')).toEqual({
-      titleKey: 'monitor.fallbackMusicTitle',
-      subtitleKey: 'monitor.fallbackMusicSubtitle',
-    });
-    expect(sectionFallbackMeta('form').titleKey).toBe('monitor.fallbackFormTitle');
-  });
-});
-
-describe('formFieldChips', () => {
-  it('lists the form field labels', () => {
-    const form = newSection('form');
-    expect(formFieldChips(form)).toEqual(['Label']); // default label from the factory
-  });
-
-  it('falls back to the field name and drops empties', () => {
-    const form = newSection('form');
-    if (form.kind !== 'form') throw new Error('expected a form section');
-    form.fields = [
-      { name: 'email', label: '  ', maxLength: 40 },
-      { name: '  ', label: 'Name', maxLength: 40 },
-      { name: '  ', label: '  ', maxLength: 40 },
-    ];
-    expect(formFieldChips(form)).toEqual(['email', 'Name']);
-  });
-
-  it('returns nothing for non-form sections', () => {
-    expect(formFieldChips(newSection('music'))).toEqual([]);
-  });
-});
 
 describe('musicSectionTrack', () => {
   it('resolves the first allowed library track', () => {

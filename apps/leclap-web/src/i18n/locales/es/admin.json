@@ -310,10 +310,6 @@
     }
   },
   "monitor": {
-    "fallbackMusicTitle": "Selección de música",
-    "fallbackMusicSubtitle": "Define la música de fondo de la plantilla: suena bajo el vídeo, sin nada en pantalla.",
-    "fallbackFormTitle": "Campos del formulario",
-    "fallbackFormSubtitle": "Los espectadores rellenan estos campos antes del renderizado; sus respuestas alimentan las variables de la plantilla.",
     "playing": "Reproduciendo",
     "play": "Reproducir",
     "pause": "Pausa",
@@ -327,7 +323,24 @@
     "musicAlternativesMore": "Los espectadores pueden cambiar a {{list}} y {{count}} más.",
     "musicUploadToo": "O subir la suya.",
     "parked": "Programa",
-    "fps": "{{fps}} fps"
+    "fps": "{{fps}} fps",
+    "formRegion": "Vista previa del formulario",
+    "formTitle": "Antes del render",
+    "formLead": "Lo que rellenan los espectadores. Nada de esta escena aparece en pantalla.",
+    "formEmpty": "Aún no hay campos.",
+    "formRequired": "obligatorio",
+    "formAnswers": "Adónde van las respuestas",
+    "formScenes_one": "Escena {{list}}",
+    "formScenes_other": "Escenas {{list}}",
+    "formNowhere": "Aún no está en pantalla",
+    "formSample": {
+      "text": "Su respuesta",
+      "number": "0",
+      "enum": "Elegir",
+      "url": "https://…",
+      "color": "#7C83FD",
+      "time": "00:00"
+    }
   },
   "testRender": {
     "rendering": "Renderizando…",
@@ -1202,7 +1215,46 @@
     "fieldLabelPlaceholder": "Etiqueta",
     "maxLength": "Longitud máxima",
     "removeField": "Quitar campo",
-    "addField": "Añadir campo"
+    "addField": "Añadir campo",
+    "intro": "Los espectadores los rellenan antes del render. Cada respuesta se convierte en una #variable que tus escenas pueden mostrar.",
+    "empty": "Aún no hay campos. Añade uno y escribe su #variable en una escena para mostrar la respuesta.",
+    "listLabel": "Campos del formulario",
+    "untitled": "Campo sin título",
+    "type": {
+      "label": "Tipo",
+      "text": "Texto",
+      "number": "Número",
+      "enum": "Opción",
+      "url": "Enlace",
+      "color": "Color",
+      "time": "Hora"
+    },
+    "required": "Los espectadores deben rellenarlo",
+    "optionalMark": "Opcional",
+    "default": "Valor por defecto",
+    "defaultHint": "Se usa si el espectador lo deja vacío.",
+    "optionalEmpty": "Si queda vacío, no muestra nada.",
+    "help": "Línea de ayuda",
+    "helpHint": "Aparece bajo el campo en el formulario del espectador.",
+    "options": "Opciones",
+    "optionsHint": "Una por línea.",
+    "maxLengthHint": "El formulario se detiene en {{count}} caracteres.",
+    "idProblem": {
+      "empty": "Dale un identificador al campo.",
+      "chars": "Solo letras, dígitos y _.",
+      "duplicate": "Otro campo o variable ya usa este identificador."
+    },
+    "labelEmpty": "Dale al campo una etiqueta legible.",
+    "usedIn_one": "Se muestra en la escena {{list}}.",
+    "usedIn_other": "Se muestra en las escenas {{list}}.",
+    "unused": "Aún no se muestra. Escribe #{{name}} en un texto de escena para usarlo.",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "moveUpTooltip": "Subir (Alt+↑)",
+    "moveDownTooltip": "Bajar (Alt+↓)",
+    "reorderHint": "Alt+↑ / Alt+↓ mueve el campo",
+    "removed": "«{{label}}» eliminado.",
+    "undo": "Deshacer"
   },
   "reveal": {
     "label": "Entrada",
