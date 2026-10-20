@@ -304,7 +304,15 @@
     "playing": "Wiedergabe",
     "play": "Abspielen",
     "pause": "Pause",
-    "scrub": "Im Video spulen"
+    "scrub": "Im Video spulen",
+    "musicRegion": "Musik dieser Vorlage",
+    "musicStandIn": "Platzhalter",
+    "musicStandInNote": "Noch nichts angehakt. Entwurfsvorschauen leihen sich diesen Track.",
+    "musicAudioOnly": "Läuft unter jeder Szene. Nichts auf dem Bildschirm.",
+    "musicOnlyTrack": "Zuschauer bekommen nur diesen Track.",
+    "musicAlternatives": "Zuschauer können zu {{list}} wechseln.",
+    "musicAlternativesMore": "Zuschauer können zu {{list}} und {{count}} weiteren wechseln.",
+    "musicUploadToo": "Oder ihren eigenen hochladen."
   },
   "testRender": {
     "rendering": "Rendering …",
@@ -1129,8 +1137,27 @@
     "hint": "Füllen beschneidet das Material, um den Rahmen zu füllen; Letterbox zeigt alles mit Balken; Unschärfe zeigt alles über einer unscharfen Kopie statt Balken; Aus verwendet die Datei unverändert, ohne Anpassung an den Rahmen."
   },
   "musicSection": {
-    "pickTracks": "Wähle die Tracks, aus denen Zuschauer wählen können.",
-    "allowUpload": "Zuschauern erlauben, ihren eigenen Track hochzuladen"
+    "pickTracks": "Hake die Tracks an, aus denen Zuschauer wählen können. Der Standard läuft, solange sie keinen anderen wählen.",
+    "allowUpload": "Zuschauern erlauben, ihren eigenen Track hochzuladen",
+    "listLabel": "Musikbibliothek",
+    "count": "{{count}} von {{total}} angeboten",
+    "clear": "Leeren",
+    "empty": "Nichts angehakt. Entwurfsvorschauen leihen sich {{title}}, und Zuschauer haben keinen Track zur Wahl.",
+    "emptyUpload": "Nichts angehakt. Entwurfsvorschauen leihen sich {{title}}, und Zuschauer können nur ihren eigenen hochladen.",
+    "default": "Standard",
+    "defaultTooltip": "Läuft, solange der Zuschauer keinen anderen Track wählt",
+    "makeDefault": "Als Standard",
+    "makeDefaultLabel": "{{title}} als Standard festlegen",
+    "makeDefaultTooltip": "Als Standard festlegen (D)",
+    "preview": "{{title}} anhören",
+    "stopPreview": "{{title}} stoppen",
+    "previewTooltip": "Anhören (Leertaste)",
+    "previewError": "Dieser Track spielt nicht ab. Prüfe die Verbindung und versuche es erneut.",
+    "keysHint": "Pfeiltasten wechseln den Track. Enter hakt ihn an, Leertaste spielt ihn an, D macht ihn zum Standard.",
+    "keyMove": "wechseln",
+    "keyTick": "anhaken",
+    "keyPreview": "anhören",
+    "keyDefault": "Standard"
   },
   "form": {
     "fieldId": "Feld-ID",

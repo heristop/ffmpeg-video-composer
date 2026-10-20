@@ -304,7 +304,15 @@
     "playing": "Riproduzione",
     "play": "Riproduci",
     "pause": "Pausa",
-    "scrub": "Scorri il video"
+    "scrub": "Scorri il video",
+    "musicRegion": "Musica di questo modello",
+    "musicStandIn": "Controfigura",
+    "musicStandInNote": "Ancora nulla di spuntato. Le bozze prendono in prestito questa traccia.",
+    "musicAudioOnly": "Suona sotto ogni scena. Nulla sullo schermo.",
+    "musicOnlyTrack": "Gli spettatori hanno solo questa traccia.",
+    "musicAlternatives": "Gli spettatori possono passare a {{list}}.",
+    "musicAlternativesMore": "Gli spettatori possono passare a {{list}} e ad altre {{count}}.",
+    "musicUploadToo": "O caricare la propria."
   },
   "testRender": {
     "rendering": "Rendering…",
@@ -1129,8 +1137,27 @@
     "hint": "Riempi ritaglia il materiale per riempire il riquadro; Letterbox lo mostra intero con bande; Sfocato lo mostra intero su una copia sfocata invece delle bande; Disattivato usa il file così com'è, senza adattarlo al riquadro."
   },
   "musicSection": {
-    "pickTracks": "Scegli le tracce tra cui gli spettatori possono selezionare.",
-    "allowUpload": "Consenti agli spettatori di caricare la propria traccia"
+    "pickTracks": "Spunta le tracce tra cui gli spettatori possono scegliere. Quella predefinita suona finché non ne scelgono un’altra.",
+    "allowUpload": "Consenti agli spettatori di caricare la propria traccia",
+    "listLabel": "Libreria musicale",
+    "count": "{{count}} di {{total}} proposte",
+    "clear": "Deseleziona",
+    "empty": "Nulla di spuntato. Le bozze prendono in prestito {{title}}, e gli spettatori non hanno tracce da scegliere.",
+    "emptyUpload": "Nulla di spuntato. Le bozze prendono in prestito {{title}}, e gli spettatori possono solo caricare la propria.",
+    "default": "Predefinita",
+    "defaultTooltip": "Suona finché lo spettatore non sceglie un’altra traccia",
+    "makeDefault": "Predefinisci",
+    "makeDefaultLabel": "Rendi {{title}} predefinita",
+    "makeDefaultTooltip": "Rendi predefinita (D)",
+    "preview": "Ascolta {{title}}",
+    "stopPreview": "Ferma {{title}}",
+    "previewTooltip": "Ascolta (Spazio)",
+    "previewError": "Questa traccia non parte. Controlla la connessione e riprova.",
+    "keysHint": "Le frecce passano da una traccia all’altra. Invio la spunta, Spazio la ascolta, D la rende predefinita.",
+    "keyMove": "sposta",
+    "keyTick": "spunta",
+    "keyPreview": "ascolta",
+    "keyDefault": "predefinita"
   },
   "form": {
     "fieldId": "ID del campo",

@@ -13,7 +13,8 @@ import { PreviewSurface } from '../editor/PreviewSurface';
 import { newBaseLayer } from '../editor/layerGeometry';
 import { findBackground, BACKGROUND_LIBRARY } from '@/data/mediaCatalog';
 import { SECTION_ICON } from '@/lib/sectionMeta';
-import { sectionFallbackMeta, formFieldChips, musicSectionTrack, type FallbackKind } from './sectionFallback';
+import { sectionFallbackMeta, formFieldChips, type FallbackKind } from './sectionFallback';
+import { MusicStagePreview } from './music-stage-preview';
 import {
   collectVariables,
   type BackgroundLayer,
@@ -54,18 +55,14 @@ const EmptyState = ({ label }: { label: string }) => (
   </div>
 );
 
-// An informative, painted frame for the non-visual section kinds (music / form) — they have no backdrop
-// or text overlays to edit, so the monitor explains what the scene does. Form scenes list the fields the
-// viewer will fill; music scenes note that they're audio-only.
+// An informative, painted frame for a form scene: it has no backdrop or text overlays to edit, so the
+// monitor lists the fields the viewer will fill. Music scenes get their own MusicStagePreview.
 const FallbackPreview = ({ section }: { section: EditorSection }) => {
   const { t } = useTranslation('admin');
   const kind = section.kind as FallbackKind;
   const meta = sectionFallbackMeta(kind);
   const Icon = SECTION_ICON[kind];
   const chips = formFieldChips(section);
-  // Music scenes surface the selected (or default) track's name, so the monitor shows which track the
-  // render will lay under the video.
-  const track = musicSectionTrack(section);
 
   return (
     <div className="grid h-full place-items-center p-4">
@@ -90,7 +87,6 @@ const FallbackPreview = ({ section }: { section: EditorSection }) => {
                 ))}
               </ul>
             )}
-            {track && <p className="mt-2 max-w-xs truncate text-xs font-medium text-white/75">{track.title}</p>}
           </div>
         </div>
       </div>
@@ -235,6 +231,8 @@ export const EditorMonitor = ({
   if (!section) return <EmptyState label={t('shell.monitorEmpty')} />;
 
   if (section.kind === 'partial') return <PartialPreview section={section} />;
+
+  if (section.kind === 'music') return <MusicStagePreview section={section} />;
 
   if (!hasOverlayCanvas(section)) return <FallbackPreview section={section} />;
 

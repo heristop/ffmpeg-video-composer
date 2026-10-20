@@ -304,7 +304,15 @@
     "playing": "Playing",
     "play": "Play",
     "pause": "Pause",
-    "scrub": "Seek through the video"
+    "scrub": "Seek through the video",
+    "musicRegion": "Music for this template",
+    "musicStandIn": "Stand-in",
+    "musicStandInNote": "Nothing ticked yet. Draft previews borrow this track.",
+    "musicAudioOnly": "Plays under every scene. Nothing on screen.",
+    "musicOnlyTrack": "Viewers get this track only.",
+    "musicAlternatives": "Viewers can switch to {{list}}.",
+    "musicAlternativesMore": "Viewers can switch to {{list}} and {{count}} more.",
+    "musicUploadToo": "Or upload their own."
   },
   "testRender": {
     "rendering": "Rendering…",
@@ -1129,8 +1137,27 @@
     "hint": "Fill crops the footage to fill the frame; Letterbox keeps it all visible with bars; Blur keeps it all visible over a blurred copy instead of bars; Off uses the file as-is, without fitting it to the frame."
   },
   "musicSection": {
-    "pickTracks": "Pick the tracks viewers can choose from.",
-    "allowUpload": "Allow viewers to upload their own track"
+    "pickTracks": "Tick the tracks viewers can choose from. The default plays unless they pick another.",
+    "allowUpload": "Allow viewers to upload their own track",
+    "listLabel": "Music library",
+    "count": "{{count}} of {{total}} offered",
+    "clear": "Clear",
+    "empty": "Nothing ticked. Draft previews borrow {{title}}, and viewers get no track to pick.",
+    "emptyUpload": "Nothing ticked. Draft previews borrow {{title}}, and viewers can only upload their own.",
+    "default": "Default",
+    "defaultTooltip": "Plays unless the viewer picks another track",
+    "makeDefault": "Make default",
+    "makeDefaultLabel": "Make {{title}} the default",
+    "makeDefaultTooltip": "Make default (D)",
+    "preview": "Preview {{title}}",
+    "stopPreview": "Stop {{title}}",
+    "previewTooltip": "Preview (Space)",
+    "previewError": "This track won't play. Check the connection and try again.",
+    "keysHint": "Arrow keys move between tracks. Enter ticks a track, Space previews it, D makes it the default.",
+    "keyMove": "move",
+    "keyTick": "tick",
+    "keyPreview": "preview",
+    "keyDefault": "default"
   },
   "form": {
     "fieldId": "Field ID",

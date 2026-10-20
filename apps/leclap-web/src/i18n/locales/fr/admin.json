@@ -304,7 +304,15 @@
     "playing": "Lecture",
     "play": "Lecture",
     "pause": "Pause",
-    "scrub": "Naviguer dans la vidéo"
+    "scrub": "Naviguer dans la vidéo",
+    "musicRegion": "Musique de ce modèle",
+    "musicStandIn": "Doublure",
+    "musicStandInNote": "Rien de coché pour l’instant. Les brouillons empruntent cette piste.",
+    "musicAudioOnly": "Joue sous chaque scène. Rien à l’écran.",
+    "musicOnlyTrack": "Les spectateurs n’ont que cette piste.",
+    "musicAlternatives": "Les spectateurs peuvent passer à {{list}}.",
+    "musicAlternativesMore": "Les spectateurs peuvent passer à {{list}} et {{count}} autres.",
+    "musicUploadToo": "Ou importer la leur."
   },
   "testRender": {
     "rendering": "Rendu en cours…",
@@ -1129,8 +1137,27 @@
     "hint": "Remplir recadre l'image pour remplir le cadre ; Letterbox garde tout visible avec des bandes ; Flou garde tout visible sur une copie floutée au lieu des bandes ; Désactivé utilise le fichier tel quel, sans l'ajuster au cadre."
   },
   "musicSection": {
-    "pickTracks": "Choisis les pistes proposées aux spectateurs.",
-    "allowUpload": "Autoriser les spectateurs à importer leur propre piste"
+    "pickTracks": "Coche les pistes proposées aux spectateurs. La piste par défaut joue tant qu’ils n’en choisissent pas une autre.",
+    "allowUpload": "Autoriser les spectateurs à importer leur propre piste",
+    "listLabel": "Bibliothèque musicale",
+    "count": "{{count}} sur {{total}} proposées",
+    "clear": "Tout décocher",
+    "empty": "Rien de coché. Les brouillons empruntent {{title}}, et les spectateurs n’ont aucune piste à choisir.",
+    "emptyUpload": "Rien de coché. Les brouillons empruntent {{title}}, et les spectateurs ne peuvent qu’importer la leur.",
+    "default": "Par défaut",
+    "defaultTooltip": "Joue tant que le spectateur ne choisit pas une autre piste",
+    "makeDefault": "Par défaut",
+    "makeDefaultLabel": "Mettre {{title}} par défaut",
+    "makeDefaultTooltip": "Mettre par défaut (D)",
+    "preview": "Écouter {{title}}",
+    "stopPreview": "Arrêter {{title}}",
+    "previewTooltip": "Écouter (Espace)",
+    "previewError": "Cette piste refuse de jouer. Vérifie la connexion et réessaie.",
+    "keysHint": "Les flèches passent d’une piste à l’autre. Entrée coche une piste, Espace l’écoute, D la met par défaut.",
+    "keyMove": "naviguer",
+    "keyTick": "cocher",
+    "keyPreview": "écouter",
+    "keyDefault": "par défaut"
   },
   "form": {
     "fieldId": "ID du champ",

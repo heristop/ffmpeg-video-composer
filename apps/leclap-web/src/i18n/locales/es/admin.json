@@ -304,7 +304,15 @@
     "playing": "Reproduciendo",
     "play": "Reproducir",
     "pause": "Pausa",
-    "scrub": "Desplazarse por el vídeo"
+    "scrub": "Desplazarse por el vídeo",
+    "musicRegion": "Música de esta plantilla",
+    "musicStandIn": "Suplente",
+    "musicStandInNote": "Aún no hay nada marcado. Los borradores toman prestada esta pista.",
+    "musicAudioOnly": "Suena bajo cada escena. Nada en pantalla.",
+    "musicOnlyTrack": "Los espectadores solo tienen esta pista.",
+    "musicAlternatives": "Los espectadores pueden cambiar a {{list}}.",
+    "musicAlternativesMore": "Los espectadores pueden cambiar a {{list}} y {{count}} más.",
+    "musicUploadToo": "O subir la suya."
   },
   "testRender": {
     "rendering": "Renderizando…",
@@ -1129,8 +1137,27 @@
     "hint": "Rellenar recorta el material para llenar el cuadro; Letterbox lo muestra entero con bandas; Desenfoque lo muestra entero sobre una copia desenfocada en lugar de bandas; Desactivado usa el archivo tal cual, sin ajustarlo al cuadro."
   },
   "musicSection": {
-    "pickTracks": "Elige las pistas entre las que pueden elegir los espectadores.",
-    "allowUpload": "Permitir que los espectadores suban su propia pista"
+    "pickTracks": "Marca las pistas que pueden elegir los espectadores. La predeterminada suena salvo que elijan otra.",
+    "allowUpload": "Permitir que los espectadores suban su propia pista",
+    "listLabel": "Biblioteca musical",
+    "count": "{{count}} de {{total}} ofrecidas",
+    "clear": "Desmarcar",
+    "empty": "Nada marcado. Los borradores toman prestada {{title}}, y los espectadores no tienen pista que elegir.",
+    "emptyUpload": "Nada marcado. Los borradores toman prestada {{title}}, y los espectadores solo pueden subir la suya.",
+    "default": "Predeterminada",
+    "defaultTooltip": "Suena salvo que el espectador elija otra pista",
+    "makeDefault": "Predeterminar",
+    "makeDefaultLabel": "Hacer {{title}} la predeterminada",
+    "makeDefaultTooltip": "Hacer predeterminada (D)",
+    "preview": "Escuchar {{title}}",
+    "stopPreview": "Detener {{title}}",
+    "previewTooltip": "Escuchar (Espacio)",
+    "previewError": "Esta pista no se reproduce. Revisa la conexión y vuelve a intentarlo.",
+    "keysHint": "Las flechas cambian de pista. Intro marca una pista, Espacio la escucha, D la hace predeterminada.",
+    "keyMove": "mover",
+    "keyTick": "marcar",
+    "keyPreview": "escuchar",
+    "keyDefault": "predeterminada"
   },
   "form": {
     "fieldId": "ID del campo",
