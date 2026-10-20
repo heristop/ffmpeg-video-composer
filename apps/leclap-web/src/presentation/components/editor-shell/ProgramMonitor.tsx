@@ -8,13 +8,15 @@ interface ProgramMonitorProps {
   swapKey?: string;
   /** Optional transport bar (play/scrub) docked between the stage and the status strip. */
   transport?: ReactNode;
+  /** Optional monitor switches (e.g. safe areas) on the status strip, before the meta. */
+  controls?: ReactNode;
 }
 
 // The program-monitor stage: the preview floats on a recessed, vignetted workspace (`studio-stage`)
 // framed like a video deck — corner registration brackets, a REC tally dot on the status strip and a
 // lavender→pink program-out scrubber along the bottom edge, echoing the kinetic ProgramMonitor. When
 // a transport is passed it sits flush under the stage's gradient edge, above the status strip.
-export const ProgramMonitor = ({ children, label, note, meta, swapKey, transport }: ProgramMonitorProps) => (
+export const ProgramMonitor = ({ children, label, note, meta, swapKey, transport, controls }: ProgramMonitorProps) => (
   <div className="flex h-full min-h-0 flex-col">
     <div className="studio-stage relative min-h-0 flex-1">
       <div key={swapKey} className="fade-in h-full motion-reduce:animate-none">
@@ -54,7 +56,10 @@ export const ProgramMonitor = ({ children, label, note, meta, swapKey, transport
           {note ? ` · ${note}` : ''}
         </span>
       </span>
-      {meta ? <span className="shrink-0 tabular-nums">{meta}</span> : null}
+      <span className="flex shrink-0 items-center gap-3">
+        {controls}
+        {meta ? <span className="tabular-nums">{meta}</span> : null}
+      </span>
     </div>
   </div>
 );

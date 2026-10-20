@@ -260,7 +260,15 @@
     "partialUnset": "Kein Partial ausgewählt",
     "dragToReorder": "Zum Sortieren ziehen",
     "timelineEmptyTitle": "Baue deine Geschichte Szene für Szene",
-    "timelineEmptyCta": "Startvorlagen durchstöbern"
+    "timelineEmptyCta": "Startvorlagen durchstöbern",
+    "sceneOf": "Szene {{index}} von {{count}}",
+    "duplicateSceneTooltip": "Szene duplizieren (⌘D)",
+    "deleteSceneTooltip": "Szene löschen (Entf)",
+    "musicLaneEmpty": "Musik",
+    "musicLaneMore": "+{{count}} angeboten",
+    "safeGuides": "Sichere Bereiche",
+    "safeGuidesTooltip": "Aktionssicheren (90 %) und titelsicheren (80 %) Bereich zeigen",
+    "playTooltip": "Wiedergabe / Pause (Leertaste)"
   },
   "shortcuts": {
     "title": "Tastenkürzel",

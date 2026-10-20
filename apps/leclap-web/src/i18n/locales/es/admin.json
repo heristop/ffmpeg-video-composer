@@ -260,7 +260,15 @@
     "partialUnset": "Ningún fragmento seleccionado",
     "dragToReorder": "Arrastra para reordenar",
     "timelineEmptyTitle": "Construye tu historia escena a escena",
-    "timelineEmptyCta": "Explorar plantillas de inicio"
+    "timelineEmptyCta": "Explorar plantillas de inicio",
+    "sceneOf": "Escena {{index}} de {{count}}",
+    "duplicateSceneTooltip": "Duplicar escena (⌘D)",
+    "deleteSceneTooltip": "Eliminar escena (Supr)",
+    "musicLaneEmpty": "Música",
+    "musicLaneMore": "+{{count}} ofrecidas",
+    "safeGuides": "Zonas seguras",
+    "safeGuidesTooltip": "Mostrar las zonas seguras de acción (90 %) y de títulos (80 %)",
+    "playTooltip": "Reproducir / pausa (Espacio)"
   },
   "shortcuts": {
     "title": "Atajos de teclado",

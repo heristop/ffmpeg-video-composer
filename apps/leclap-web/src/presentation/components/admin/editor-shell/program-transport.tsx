@@ -56,6 +56,7 @@ export const ProgramTransport = ({ clock, timeline, onSeek }: ProgramTransportPr
         type="button"
         onClick={clock.toggle}
         aria-label={clock.playing ? t('monitor.pause') : t('monitor.play')}
+        title={t('shell.playTooltip')}
         className="tap relative grid size-9 shrink-0 cursor-pointer place-items-center rounded-full bg-brand-500/15 text-brand-600 transition-colors before:absolute before:-inset-1 before:content-[''] hover:bg-brand-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 dark:text-brand-300"
       >
         {clock.playing ? <PauseIcon size={16} /> : <PlayIcon size={16} className="translate-x-px" />}

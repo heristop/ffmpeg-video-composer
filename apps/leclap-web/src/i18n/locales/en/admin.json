@@ -260,7 +260,15 @@
     "partialUnset": "No partial selected",
     "dragToReorder": "Drag to reorder",
     "timelineEmptyTitle": "Build your story scene by scene",
-    "timelineEmptyCta": "Browse starter templates"
+    "timelineEmptyCta": "Browse starter templates",
+    "sceneOf": "Scene {{index}} of {{count}}",
+    "duplicateSceneTooltip": "Duplicate scene (⌘D)",
+    "deleteSceneTooltip": "Delete scene (Del)",
+    "musicLaneEmpty": "Music",
+    "musicLaneMore": "+{{count}} offered",
+    "safeGuides": "Safe areas",
+    "safeGuidesTooltip": "Show the 90% action-safe and 80% title-safe areas",
+    "playTooltip": "Play / pause (Space)"
   },
   "shortcuts": {
     "title": "Keyboard shortcuts",

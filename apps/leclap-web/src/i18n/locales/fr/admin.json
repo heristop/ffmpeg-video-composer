@@ -260,7 +260,15 @@
     "partialUnset": "Aucun fragment sélectionné",
     "dragToReorder": "Glisse pour réordonner",
     "timelineEmptyTitle": "Construisez votre histoire scène par scène",
-    "timelineEmptyCta": "Parcourir les modèles de départ"
+    "timelineEmptyCta": "Parcourir les modèles de départ",
+    "sceneOf": "Scène {{index}} sur {{count}}",
+    "duplicateSceneTooltip": "Dupliquer la scène (⌘D)",
+    "deleteSceneTooltip": "Supprimer la scène (Suppr)",
+    "musicLaneEmpty": "Musique",
+    "musicLaneMore": "+{{count}} proposées",
+    "safeGuides": "Zones sûres",
+    "safeGuidesTooltip": "Afficher les zones sûres action (90 %) et titre (80 %)",
+    "playTooltip": "Lecture / pause (Espace)"
   },
   "shortcuts": {
     "title": "Raccourcis clavier",

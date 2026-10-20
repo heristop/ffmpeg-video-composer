@@ -24,6 +24,7 @@ import { BackgroundLayerBoxes } from '../BackgroundLayerBoxes';
 import { combinedLookGradeFilter } from '../editor/lookFilters';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
 import { FRAME_FIT_CLASS } from './frame-fit';
+import { SafeGuides } from './safe-guides';
 import { OverlayBox } from './sectionCanvasBox';
 import { AnimationOverlayItem, ImageOverlayItem } from './sectionCanvasMediaItems';
 import { SugarPreviewLayer } from './SugarPreviewLayer';
@@ -447,6 +448,7 @@ export const SectionCanvas = ({
           onEndEdit={onEndEdit}
         />
       ))}
+      <SafeGuides orientation={orientation} />
     </div>
   );
 };
