@@ -150,7 +150,14 @@
       "namePlaceholder": "chiave",
       "valuePlaceholder": "valore",
       "add": "Aggiungi variabile",
-      "colorValue": "Colore della variabile {{index}}"
+      "colorValue": "Colore della variabile {{index}}",
+      "usedIn_one": "Mostrata nella scena {{list}}.",
+      "usedIn_other": "Mostrata nelle scene {{list}}.",
+      "unused": "Non ancora usata. Scrivi #{{name}} in un testo per mostrarla.",
+      "problem": {
+        "chars": "Solo lettere, cifre, _, - e ., senza punto finale.",
+        "duplicate": "Un campo del modulo o un’altra variabile usa già questo nome."
+      }
     },
     "colorsList": {
       "label": "Palette colori",

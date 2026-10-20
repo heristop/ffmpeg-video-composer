@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { newSection, type EditorSection } from '../../templateEditorModel';
-import { fieldIdProblem, followsLabel, moveField, scenesUsing, slugFieldId, uniqueFieldId } from './form-fields.logic';
+import {
+  variableNameProblem,
+  fieldIdProblem,
+  followsLabel,
+  moveField,
+  scenesUsing,
+  slugFieldId,
+  uniqueFieldId,
+} from './form-fields.logic';
 
 describe('field ids', () => {
   it('derives a word-character id from the label', () => {
@@ -47,5 +55,15 @@ describe('moveField', () => {
     expect(moveField(['a', 'b', 'c'], 0, 2)).toEqual(['b', 'c', 'a']);
     expect(moveField(['a', 'b', 'c'], 2, 5)).toEqual(['a', 'b', 'c']);
     expect(moveField(['a', 'b', 'c'], 1, 0)).toEqual(['b', 'a', 'c']);
+  });
+});
+
+describe('variableNameProblem', () => {
+  it('accepts dotted and hyphenated names and flags the rest', () => {
+    expect(variableNameProblem('brand.name', [])).toBeNull();
+    expect(variableNameProblem('', [])).toBeNull();
+    expect(variableNameProblem('brand name', [])).toBe('chars');
+    expect(variableNameProblem('brand.', [])).toBe('chars');
+    expect(variableNameProblem('topic', ['topic'])).toBe('duplicate');
   });
 });
