@@ -10,6 +10,7 @@ import { displayFromTokens } from '@/lib/variableSyntax';
 import { cn } from '@/lib/utils';
 import { aspectClass, orientationOf, type Orientation } from './editorPanels';
 import { useObjectUrl } from './useObjectUrl';
+import { FormAnswersPreview } from './form-answers-preview';
 import type { SceneModel } from './sceneStatus';
 
 // Reference output dimensions the descriptor's absolute px (drawtext y/fontsize, drawbox x/y/w/h) are
@@ -185,6 +186,33 @@ const Placeholder = ({
   );
 };
 
+// What fills the frame: the recorded clip, the answers of a form scene, or the empty-state guidance.
+function PreviewBase({
+  url,
+  section,
+  template,
+  model,
+  title,
+  Icon,
+}: {
+  url: string | null | undefined;
+  section: InputSection | null;
+  template: Template;
+  model: SceneModel;
+  title: string;
+  Icon: ComponentType<{ className?: string }>;
+}) {
+  const { t } = useTranslation('builder');
+
+  if (url) return <video src={url} className="h-full w-full object-cover" autoPlay loop muted playsInline />;
+
+  if (section?.kind === 'form') {
+    return <FormAnswersPreview template={template} section={section} formData={model.formData} />;
+  }
+
+  return <Placeholder kind={section?.kind} title={title} Icon={Icon} t={t} />;
+}
+
 // Derive the section's overlays, vars, placeholder title and glyph — kept out of the component so its
 // render stays simple (and under the complexity budget).
 const previewData = (
@@ -232,11 +260,7 @@ export const SectionPreview = ({ template, section, model }: SectionPreviewProps
         )}
         style={{ containerType: 'size' }}
       >
-        {url ? (
-          <video src={url} className="h-full w-full object-cover" autoPlay loop muted playsInline />
-        ) : (
-          <Placeholder kind={section?.kind} title={title} Icon={Icon} t={t} />
-        )}
+        <PreviewBase url={url} section={section} template={template} model={model} title={title} Icon={Icon} />
 
         <Overlays filters={filters} refW={refW} refH={refH} vars={vars} />
       </div>

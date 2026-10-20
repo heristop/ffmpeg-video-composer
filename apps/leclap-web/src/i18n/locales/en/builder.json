@@ -75,7 +75,12 @@
         "weeks": "{{count}}w ago",
         "months": "{{count}}mo ago"
       }
-    }
+    },
+    "answersTitle": "Your answers",
+    "answersLead": "The form stays off screen; these fill the scenes that use them.",
+    "answersEmpty": "Not filled yet",
+    "answersShown": "On screen",
+    "answersNotShown": "Not on screen"
   },
   "stepProcess": {
     "title": "Create Video",

@@ -75,7 +75,12 @@
         "weeks": "{{count}}sett. fa",
         "months": "{{count}}mesi fa"
       }
-    }
+    },
+    "answersTitle": "Le tue risposte",
+    "answersLead": "Il modulo resta fuori scena; riempiono le scene che le usano.",
+    "answersEmpty": "Non ancora compilato",
+    "answersShown": "Sullo schermo",
+    "answersNotShown": "Non sullo schermo"
   },
   "stepProcess": {
     "title": "Crea il video",

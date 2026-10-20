@@ -75,7 +75,12 @@
         "weeks": "hace {{count}} sem",
         "months": "hace {{count}} mes"
       }
-    }
+    },
+    "answersTitle": "Tus respuestas",
+    "answersLead": "El formulario no sale en pantalla; rellenan las escenas que las usan.",
+    "answersEmpty": "Aún sin rellenar",
+    "answersShown": "En pantalla",
+    "answersNotShown": "No sale en pantalla"
   },
   "stepProcess": {
     "title": "Crear vídeo",
