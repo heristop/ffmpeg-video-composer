@@ -288,7 +288,10 @@
     "frameStep": "Step one frame",
     "secondStep": "Step one second",
     "editPoints": "Previous / next edit point",
-    "backToEditing": "Back to editing the scene"
+    "backToEditing": "Back to editing the scene",
+    "groupEdit": "Editing",
+    "groupMove": "Moving around",
+    "groupPlay": "Playback"
   },
   "presets": {
     "pickerTitle": "Start your template",

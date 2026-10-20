@@ -16,23 +16,44 @@ const modKey = (): string => {
 };
 
 // One row = an i18n label key + the key chips to render for it. `mod` is substituted at render time.
-const ROWS: Array<{ labelKey: string; keys: string[] }> = [
-  { labelKey: 'shortcuts.undo', keys: ['mod', 'Z'] },
-  { labelKey: 'shortcuts.redo', keys: ['mod', '⇧', 'Z'] },
-  { labelKey: 'shortcuts.save', keys: ['mod', 'S'] },
-  { labelKey: 'shortcuts.duplicateScene', keys: ['mod', 'D'] },
-  { labelKey: 'shortcuts.deleteScene', keys: ['Del'] },
-  { labelKey: 'shortcuts.addScene', keys: ['N'] },
-  { labelKey: 'shortcuts.prevScene', keys: ['PgUp'] },
-  { labelKey: 'shortcuts.nextScene', keys: ['PgDn'] },
-  { labelKey: 'shortcuts.tools', keys: ['[', ']'] },
-  { labelKey: 'shortcuts.playPause', keys: ['Space'] },
-  { labelKey: 'shortcuts.shuttle', keys: ['J', 'K', 'L'] },
-  { labelKey: 'shortcuts.frameStep', keys: ['←', '→'] },
-  { labelKey: 'shortcuts.secondStep', keys: ['⇧', '←', '→'] },
-  { labelKey: 'shortcuts.editPoints', keys: ['↑', '↓'] },
-  { labelKey: 'shortcuts.backToEditing', keys: ['Esc'] },
-  { labelKey: 'shortcuts.showHelp', keys: ['?'] },
+interface Row {
+  labelKey: string;
+  keys: string[];
+}
+
+// Grouped the way the keys are used: editing the template, moving around it, playing it back.
+const GROUPS: Array<{ titleKey: string; rows: Row[] }> = [
+  {
+    titleKey: 'shortcuts.groupEdit',
+    rows: [
+      { labelKey: 'shortcuts.undo', keys: ['mod', 'Z'] },
+      { labelKey: 'shortcuts.redo', keys: ['mod', '⇧', 'Z'] },
+      { labelKey: 'shortcuts.save', keys: ['mod', 'S'] },
+      { labelKey: 'shortcuts.addScene', keys: ['N'] },
+      { labelKey: 'shortcuts.duplicateScene', keys: ['mod', 'D'] },
+      { labelKey: 'shortcuts.deleteScene', keys: ['Del'] },
+    ],
+  },
+  {
+    titleKey: 'shortcuts.groupMove',
+    rows: [
+      { labelKey: 'shortcuts.prevScene', keys: ['PgUp'] },
+      { labelKey: 'shortcuts.nextScene', keys: ['PgDn'] },
+      { labelKey: 'shortcuts.tools', keys: ['[', ']'] },
+      { labelKey: 'shortcuts.backToEditing', keys: ['Esc'] },
+      { labelKey: 'shortcuts.showHelp', keys: ['?'] },
+    ],
+  },
+  {
+    titleKey: 'shortcuts.groupPlay',
+    rows: [
+      { labelKey: 'shortcuts.playPause', keys: ['Space'] },
+      { labelKey: 'shortcuts.shuttle', keys: ['J', 'K', 'L'] },
+      { labelKey: 'shortcuts.frameStep', keys: ['←', '→'] },
+      { labelKey: 'shortcuts.secondStep', keys: ['⇧', '←', '→'] },
+      { labelKey: 'shortcuts.editPoints', keys: ['↑', '↓'] },
+    ],
+  },
 ];
 
 const Kbd = ({ children }: { children: string }) => (
@@ -55,26 +76,35 @@ export const ShortcutCheatSheet = ({ open, onClose }: ShortcutCheatSheetProps) =
       }}
     >
       {/* Capped to the small-viewport height so the list scrolls instead of clipping offscreen. */}
-      <DialogContent className="max-h-[calc(100dvh-2rem)] max-w-md overflow-y-auto overscroll-contain">
+      <DialogContent className="max-h-[calc(100dvh-2rem)] max-w-2xl overflow-y-auto overscroll-contain">
         <DialogHeader>
           <DialogTitle>{t('shortcuts.title')}</DialogTitle>
           <DialogDescription>{t('shortcuts.hint')}</DialogDescription>
         </DialogHeader>
-        <ul className="mt-2 grid">
-          {ROWS.map((row) => (
-            <li
-              key={row.labelKey}
-              className="flex items-center justify-between gap-4 border-b border-foreground/5 py-1.5 last:border-b-0"
-            >
-              <span className="text-sm text-gray-300">{t(row.labelKey)}</span>
-              <span className="flex shrink-0 items-center gap-1">
-                {row.keys.map((k, i) => (
-                  <Kbd key={i}>{k === 'mod' ? mod : k}</Kbd>
+        <div className="mt-2 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+          {GROUPS.map((group) => (
+            <section key={group.titleKey} className="min-w-0">
+              <h3 className="mb-1 text-xs font-semibold uppercase tracking-widest text-gray-400">
+                {t(group.titleKey)}
+              </h3>
+              <ul className="grid">
+                {group.rows.map((row) => (
+                  <li
+                    key={row.labelKey}
+                    className="flex items-center justify-between gap-4 border-b border-foreground/5 py-1.5 last:border-b-0"
+                  >
+                    <span className="text-sm text-gray-300">{t(row.labelKey)}</span>
+                    <span className="flex shrink-0 items-center gap-1">
+                      {row.keys.map((k, i) => (
+                        <Kbd key={i}>{k === 'mod' ? mod : k}</Kbd>
+                      ))}
+                    </span>
+                  </li>
                 ))}
-              </span>
-            </li>
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
       </DialogContent>
     </Dialog>
   );

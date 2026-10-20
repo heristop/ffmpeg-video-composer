@@ -288,7 +288,10 @@
     "frameStep": "Avanza di un fotogramma",
     "secondStep": "Avanza di un secondo",
     "editPoints": "Punto di montaggio precedente / successivo",
-    "backToEditing": "Torna a modificare la scena"
+    "backToEditing": "Torna a modificare la scena",
+    "groupEdit": "Modifica",
+    "groupMove": "Navigazione",
+    "groupPlay": "Riproduzione"
   },
   "presets": {
     "pickerTitle": "Inizia il tuo modello",

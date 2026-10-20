@@ -288,7 +288,10 @@
     "frameStep": "Avancer d’une image",
     "secondStep": "Avancer d’une seconde",
     "editPoints": "Point de montage précédent / suivant",
-    "backToEditing": "Revenir à l’édition de la scène"
+    "backToEditing": "Revenir à l’édition de la scène",
+    "groupEdit": "Édition",
+    "groupMove": "Navigation",
+    "groupPlay": "Lecture"
   },
   "presets": {
     "pickerTitle": "Démarrez votre modèle",
