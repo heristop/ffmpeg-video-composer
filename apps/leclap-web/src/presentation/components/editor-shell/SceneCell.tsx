@@ -54,7 +54,8 @@ const PosterTile = ({
         <Check className="h-3 w-3" strokeWidth={2.5} />
       </span>
     )}
-    {/* The compact tile is too short for three corner badges: its length moves under the poster instead. */}
+    {/* The compact tile is too short for three corner badges, and its title needs the width below: the
+        length is left out there (the take's own thumbnail shows it). */}
     {durationLabel && !compact ? (
       <span className="absolute bottom-1.5 right-1.5 rounded bg-black/65 px-1.5 py-0.5 text-[0.65rem] font-semibold tabular-nums text-white">
         {durationLabel}
@@ -71,14 +72,8 @@ function cellWidthClass(compact: boolean, widthRem: number | undefined): string 
   return compact ? 'w-24 gap-1 sm:w-28' : 'w-28 gap-1.5 sm:w-32';
 }
 
-// The cell's title, with the scene length beside it on the compact cell.
-function CellTitle({ title, meta }: { title: string; meta?: string }) {
-  return (
-    <span className="flex min-w-0 items-baseline justify-between gap-1.5 short:hidden">
-      <span className="line-clamp-1 min-w-0 text-xs font-medium text-foreground">{title}</span>
-      {meta ? <span className="shrink-0 text-[0.65rem] tabular-nums text-muted-foreground">{meta}</span> : null}
-    </span>
-  );
+function CellTitle({ title }: { title: string }) {
+  return <span className="line-clamp-1 text-xs font-medium text-foreground short:hidden">{title}</span>;
 }
 
 function cellStyle(widthRem: number | undefined): CSSProperties | undefined {
@@ -155,7 +150,7 @@ export const SceneCell = ({
           {eyebrow}
         </span>
       ) : null}
-      <CellTitle title={title} meta={compact ? durationLabel : undefined} />
+      <CellTitle title={title} />
     </PressableScale>
     {trailing}
   </div>
