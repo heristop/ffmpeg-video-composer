@@ -23,10 +23,15 @@ const ROWS: Array<{ labelKey: string; keys: string[] }> = [
   { labelKey: 'shortcuts.duplicateScene', keys: ['mod', 'D'] },
   { labelKey: 'shortcuts.deleteScene', keys: ['Del'] },
   { labelKey: 'shortcuts.addScene', keys: ['N'] },
-  { labelKey: 'shortcuts.prevScene', keys: ['←'] },
-  { labelKey: 'shortcuts.nextScene', keys: ['→'] },
+  { labelKey: 'shortcuts.prevScene', keys: ['PgUp'] },
+  { labelKey: 'shortcuts.nextScene', keys: ['PgDn'] },
   { labelKey: 'shortcuts.tools', keys: ['[', ']'] },
   { labelKey: 'shortcuts.playPause', keys: ['Space'] },
+  { labelKey: 'shortcuts.shuttle', keys: ['J', 'K', 'L'] },
+  { labelKey: 'shortcuts.frameStep', keys: ['←', '→'] },
+  { labelKey: 'shortcuts.secondStep', keys: ['⇧', '←', '→'] },
+  { labelKey: 'shortcuts.editPoints', keys: ['↑', '↓'] },
+  { labelKey: 'shortcuts.backToEditing', keys: ['Esc'] },
   { labelKey: 'shortcuts.showHelp', keys: ['?'] },
 ];
 

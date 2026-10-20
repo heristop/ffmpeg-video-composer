@@ -269,13 +269,18 @@
     "redo": "Wiederholen",
     "save": "Vorlage speichern",
     "duplicateScene": "Szene duplizieren",
-    "deleteScene": "Szene löschen",
+    "deleteScene": "Szene löschen (im Szenenstreifen)",
     "addScene": "Szene hinzufügen",
     "prevScene": "Vorherige Szene",
     "nextScene": "Nächste Szene",
     "tools": "Vorheriges / nächstes Werkzeug",
     "playPause": "Vorschau abspielen / pausieren",
-    "showHelp": "Kürzel anzeigen"
+    "showHelp": "Kürzel anzeigen",
+    "shuttle": "Rückwärts / Stopp / Vorwärts",
+    "frameStep": "Ein Bild weiter",
+    "secondStep": "Eine Sekunde weiter",
+    "editPoints": "Vorheriger / nächster Schnittpunkt",
+    "backToEditing": "Zurück zur Szenenbearbeitung"
   },
   "presets": {
     "pickerTitle": "Starte deine Vorlage",
@@ -312,7 +317,9 @@
     "musicOnlyTrack": "Zuschauer bekommen nur diesen Track.",
     "musicAlternatives": "Zuschauer können zu {{list}} wechseln.",
     "musicAlternativesMore": "Zuschauer können zu {{list}} und {{count}} weiteren wechseln.",
-    "musicUploadToo": "Oder ihren eigenen hochladen."
+    "musicUploadToo": "Oder ihren eigenen hochladen.",
+    "parked": "Programm",
+    "fps": "{{fps}} fps"
   },
   "testRender": {
     "rendering": "Rendering …",

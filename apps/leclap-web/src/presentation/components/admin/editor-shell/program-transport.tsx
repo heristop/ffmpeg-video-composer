@@ -1,5 +1,5 @@
-// The program monitor's transport bar: play/pause, a scrubbable timeline with scene tick marks, and
-// an NLE timecode readout. All per-frame updates (range value, gradient fill, timecode text) are
+// The program monitor's transport bar: play/pause, a scrubbable timeline with full-height scene edges a
+// scrub snaps to, a playhead bar, and an SMPTE timecode readout with its frame rate. All per-frame updates (range value, gradient fill, timecode text) are
 // written straight to refs by the clock subscription — the studio-range/--range-pct pattern from the
 // home hero — so scrubbing and playback stay at 60fps with zero re-renders.
 import { useEffect, useRef, type ChangeEvent } from 'react';
@@ -8,16 +8,21 @@ import { PlayIcon } from '@/presentation/components/icons/play';
 import { PauseIcon } from '@/presentation/components/icons/pause';
 import { formatTimecode } from '../../home/hero-timecode.logic';
 import { totalDuration, type Segment } from './program-timeline.logic';
+import { PREVIEW_FPS, sceneEdges, snapToEdge } from './program-music.logic';
 import type { ProgramClock } from './use-program-clock';
 
 const SCRUB_RESOLUTION = 1000;
+// A scrub within this share of the timeline of a scene edge lands on the edge.
+const SNAP_SHARE = 0.012;
 
 interface ProgramTransportProps {
   clock: ProgramClock;
   timeline: Segment[];
+  // Parks the program monitor on `seconds` (pausing playback), so the scrubbed frame shows.
+  onSeek: (seconds: number) => void;
 }
 
-export const ProgramTransport = ({ clock, timeline }: ProgramTransportProps) => {
+export const ProgramTransport = ({ clock, timeline, onSeek }: ProgramTransportProps) => {
   const { t } = useTranslation('admin');
   const rangeRef = useRef<HTMLInputElement>(null);
   const timecodeRef = useRef<HTMLSpanElement>(null);
@@ -29,7 +34,7 @@ export const ProgramTransport = ({ clock, timeline }: ProgramTransportProps) => 
       const range = rangeRef.current;
       const readout = timecodeRef.current;
 
-      if (readout) readout.textContent = formatTimecode(time);
+      if (readout) readout.textContent = formatTimecode(time, PREVIEW_FPS);
 
       if (!range) return;
 
@@ -39,7 +44,8 @@ export const ProgramTransport = ({ clock, timeline }: ProgramTransportProps) => 
   }, [clock, total]);
 
   const onScrub = (event: ChangeEvent<HTMLInputElement>): void => {
-    clock.seekRatio(event.target.valueAsNumber / SCRUB_RESOLUTION);
+    const seconds = (event.target.valueAsNumber / SCRUB_RESOLUTION) * total;
+    onSeek(snapToEdge(sceneEdges(timeline), seconds, total * SNAP_SHARE));
   };
 
   return (
@@ -63,21 +69,24 @@ export const ProgramTransport = ({ clock, timeline }: ProgramTransportProps) => 
           defaultValue={0}
           onChange={onScrub}
           aria-label={t('monitor.scrub')}
-          className="studio-range w-full"
+          className="studio-range transport-scrub w-full"
         />
-        {/* Scene boundary ticks over the track, so cuts are visible while scrubbing. */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-1/2 h-0 -translate-y-1/2">
+        {/* Scene edges as full-height hairlines, so cuts read while scrubbing (and the scrub snaps to them). */}
+        <div aria-hidden className="pointer-events-none absolute inset-0">
           {timeline.slice(0, -1).map((segment) => (
             <span
               key={segment.index}
-              className="absolute top-[-4px] h-2 w-px bg-foreground/30"
+              className="absolute inset-y-0.5 w-px bg-foreground/25"
               style={{ left: `${((segment.end / total) * 100).toFixed(2)}%` }}
             />
           ))}
         </div>
       </div>
-      <span ref={timecodeRef} className="w-24 shrink-0 text-right font-mono text-[0.7rem] tabular-nums text-gray-500">
-        00:00:00:00
+      <span className="flex shrink-0 items-baseline gap-1.5 font-mono text-[0.7rem] tabular-nums">
+        <span ref={timecodeRef} className="text-foreground/85">
+          00:00:00:00
+        </span>
+        <span className="text-gray-500">{t('monitor.fps', { fps: PREVIEW_FPS })}</span>
       </span>
     </div>
   );

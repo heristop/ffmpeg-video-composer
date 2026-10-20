@@ -269,13 +269,18 @@
     "redo": "Redo",
     "save": "Save template",
     "duplicateScene": "Duplicate scene",
-    "deleteScene": "Delete scene",
+    "deleteScene": "Delete scene (in the scene strip)",
     "addScene": "Add scene",
     "prevScene": "Previous scene",
     "nextScene": "Next scene",
     "tools": "Previous / next tool",
     "playPause": "Play / pause preview",
-    "showHelp": "Show shortcuts"
+    "showHelp": "Show shortcuts",
+    "shuttle": "Shuttle back / stop / forward",
+    "frameStep": "Step one frame",
+    "secondStep": "Step one second",
+    "editPoints": "Previous / next edit point",
+    "backToEditing": "Back to editing the scene"
   },
   "presets": {
     "pickerTitle": "Start your template",
@@ -312,7 +317,9 @@
     "musicOnlyTrack": "Viewers get this track only.",
     "musicAlternatives": "Viewers can switch to {{list}}.",
     "musicAlternativesMore": "Viewers can switch to {{list}} and {{count}} more.",
-    "musicUploadToo": "Or upload their own."
+    "musicUploadToo": "Or upload their own.",
+    "parked": "Program",
+    "fps": "{{fps}} fps"
   },
   "testRender": {
     "rendering": "Rendering…",

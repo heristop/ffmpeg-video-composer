@@ -6,7 +6,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export interface ProgramClock {
   playing: boolean;
-  play: () => void;
+  // Playback speed and direction: 1 is real time, 2 double speed, -1 backwards (J/K/L shuttle).
+  rate: number;
+  play: (rate?: number) => void;
   pause: () => void;
   toggle: () => void;
   seekTo: (seconds: number) => void;
@@ -17,6 +19,7 @@ export interface ProgramClock {
 
 export function useProgramClock(total: number, reduced: boolean): ProgramClock {
   const [playing, setPlaying] = useState(false);
+  const [rate, setRate] = useState(1);
   const timeRef = useRef(0);
   const totalRef = useRef(total);
   const subscribers = useRef(new Set<(t: number) => void>());
@@ -41,11 +44,12 @@ export function useProgramClock(total: number, reduced: boolean): ProgramClock {
     if (playing && !reduced) {
       let last = performance.now();
       frame = requestAnimationFrame(function tick(now: number) {
-        timeRef.current = Math.min(totalRef.current, timeRef.current + (now - last) / 1000);
+        timeRef.current = Math.min(totalRef.current, Math.max(0, timeRef.current + (rate * (now - last)) / 1000));
         last = now;
         broadcast();
 
-        if (timeRef.current >= totalRef.current) {
+        // Forward stops at the end, reverse at the start.
+        if (rate > 0 ? timeRef.current >= totalRef.current : timeRef.current <= 0) {
           setPlaying(false);
 
           return;
@@ -58,7 +62,7 @@ export function useProgramClock(total: number, reduced: boolean): ProgramClock {
     return () => {
       cancelAnimationFrame(frame);
     };
-  }, [playing, reduced, broadcast]);
+  }, [playing, rate, reduced, broadcast]);
 
   const seekTo = useCallback(
     (seconds: number) => {
@@ -75,9 +79,13 @@ export function useProgramClock(total: number, reduced: boolean): ProgramClock {
     [seekTo]
   );
 
-  const play = useCallback(() => {
-    // Replay from the top when the playhead is parked at the end.
-    if (timeRef.current >= totalRef.current) timeRef.current = 0;
+  const play = useCallback((nextRate = 1) => {
+    // Replay from the top when the playhead is parked at the end (from the end when reversing at 0).
+    if (nextRate > 0 && timeRef.current >= totalRef.current) timeRef.current = 0;
+
+    if (nextRate < 0 && timeRef.current <= 0) timeRef.current = totalRef.current;
+
+    setRate(nextRate);
     setPlaying(true);
   }, []);
 
@@ -86,6 +94,7 @@ export function useProgramClock(total: number, reduced: boolean): ProgramClock {
   }, []);
 
   const toggle = useCallback(() => {
+    setRate(1);
     setPlaying((was) => {
       if (!was && timeRef.current >= totalRef.current) timeRef.current = 0;
 
@@ -105,7 +114,7 @@ export function useProgramClock(total: number, reduced: boolean): ProgramClock {
   const current = useCallback(() => timeRef.current, []);
 
   return useMemo(
-    () => ({ playing, play, pause, toggle, seekTo, seekRatio, current, subscribe }),
-    [playing, play, pause, toggle, seekTo, seekRatio, current, subscribe]
+    () => ({ playing, rate, play, pause, toggle, seekTo, seekRatio, current, subscribe }),
+    [playing, rate, play, pause, toggle, seekTo, seekRatio, current, subscribe]
   );
 }

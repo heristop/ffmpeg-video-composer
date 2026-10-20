@@ -269,13 +269,18 @@
     "redo": "Ripeti",
     "save": "Salva modello",
     "duplicateScene": "Duplica scena",
-    "deleteScene": "Elimina scena",
+    "deleteScene": "Elimina scena (nella striscia delle scene)",
     "addScene": "Aggiungi scena",
     "prevScene": "Scena precedente",
     "nextScene": "Scena successiva",
     "tools": "Strumento precedente / successivo",
     "playPause": "Riproduci / metti in pausa anteprima",
-    "showHelp": "Mostra scorciatoie"
+    "showHelp": "Mostra scorciatoie",
+    "shuttle": "Indietro / stop / avanti",
+    "frameStep": "Avanza di un fotogramma",
+    "secondStep": "Avanza di un secondo",
+    "editPoints": "Punto di montaggio precedente / successivo",
+    "backToEditing": "Torna a modificare la scena"
   },
   "presets": {
     "pickerTitle": "Inizia il tuo modello",
@@ -312,7 +317,9 @@
     "musicOnlyTrack": "Gli spettatori hanno solo questa traccia.",
     "musicAlternatives": "Gli spettatori possono passare a {{list}}.",
     "musicAlternativesMore": "Gli spettatori possono passare a {{list}} e ad altre {{count}}.",
-    "musicUploadToo": "O caricare la propria."
+    "musicUploadToo": "O caricare la propria.",
+    "parked": "Programma",
+    "fps": "{{fps}} fps"
   },
   "testRender": {
     "rendering": "Rendering…",

@@ -269,13 +269,18 @@
     "redo": "Rehacer",
     "save": "Guardar plantilla",
     "duplicateScene": "Duplicar escena",
-    "deleteScene": "Eliminar escena",
+    "deleteScene": "Eliminar escena (en la tira de escenas)",
     "addScene": "Añadir escena",
     "prevScene": "Escena anterior",
     "nextScene": "Escena siguiente",
     "tools": "Herramienta anterior / siguiente",
     "playPause": "Reproducir / pausar vista previa",
-    "showHelp": "Mostrar atajos"
+    "showHelp": "Mostrar atajos",
+    "shuttle": "Atrás / parar / adelante",
+    "frameStep": "Avanzar un fotograma",
+    "secondStep": "Avanzar un segundo",
+    "editPoints": "Punto de edición anterior / siguiente",
+    "backToEditing": "Volver a editar la escena"
   },
   "presets": {
     "pickerTitle": "Empieza tu plantilla",
@@ -312,7 +317,9 @@
     "musicOnlyTrack": "Los espectadores solo tienen esta pista.",
     "musicAlternatives": "Los espectadores pueden cambiar a {{list}}.",
     "musicAlternativesMore": "Los espectadores pueden cambiar a {{list}} y {{count}} más.",
-    "musicUploadToo": "O subir la suya."
+    "musicUploadToo": "O subir la suya.",
+    "parked": "Programa",
+    "fps": "{{fps}} fps"
   },
   "testRender": {
     "rendering": "Renderizando…",

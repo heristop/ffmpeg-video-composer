@@ -7,6 +7,8 @@ import {
   resolveShortcut,
   isTypingTarget,
   ALWAYS_ALLOW_IN_INPUTS,
+  SCENE_STRIP_ONLY,
+  inSceneStrip,
   type EditorShortcutAction,
 } from './editor-shortcuts.logic';
 
@@ -26,8 +28,21 @@ export interface EditorShortcutHandlers {
   onTogglePlay?: () => void;
   onShowHelp: () => void;
   onDismissHelp: () => void;
+  // Deck transport: frame/second steps, edit-point jumps and J/K/L shuttle. Absent = key left alone.
+  onStep?: (frames: number, unit: 'frame' | 'second') => void;
+  onJumpEdit?: (direction: 1 | -1) => void;
+  onShuttle?: (direction: 1 | -1 | 0) => void;
   // Disable the whole layer while another surface owns the keyboard (e.g. a modal). Defaults to true.
   enabled?: boolean;
+}
+
+// A handler bound to its arguments, or undefined when the handler isn't wired.
+function bind<A extends unknown[]>(fn: ((...args: A) => void) | undefined, ...args: A): (() => void) | undefined {
+  if (!fn) return undefined;
+
+  return () => {
+    fn(...args);
+  };
 }
 
 // Resolve an action to its handler (or undefined when the feature isn't wired). A missing handler means
@@ -47,6 +62,15 @@ const handlerFor = (action: EditorShortcutAction, h: EditorShortcutHandlers): ((
     'toggle-play': h.onTogglePlay,
     'show-help': h.onShowHelp,
     'dismiss-help': h.onDismissHelp,
+    'frame-back': bind(h.onStep, -1, 'frame'),
+    'frame-forward': bind(h.onStep, 1, 'frame'),
+    'second-back': bind(h.onStep, -1, 'second'),
+    'second-forward': bind(h.onStep, 1, 'second'),
+    'prev-edit': bind(h.onJumpEdit, -1),
+    'next-edit': bind(h.onJumpEdit, 1),
+    'shuttle-back': bind(h.onShuttle, -1),
+    'shuttle-stop': bind(h.onShuttle, 0),
+    'shuttle-forward': bind(h.onShuttle, 1),
   };
 
   return map[action];
@@ -77,6 +101,8 @@ export function useEditorShortcuts(handlers: EditorShortcutHandlers): void {
       const typing = isTypingTarget(target);
 
       if (typing && !ALWAYS_ALLOW_IN_INPUTS.has(action)) return;
+
+      if (SCENE_STRIP_ONLY.has(action) && !inSceneStrip(target)) return;
 
       event.preventDefault();
       run();

@@ -27,6 +27,7 @@ let audio: HTMLAudioElement | null = null;
 let frame = 0;
 let users = 0;
 const listeners = new Set<() => void>();
+const startListeners = new Set<() => void>();
 
 function emit(next: Partial<PreviewState>) {
   state = { ...state, ...next };
@@ -104,6 +105,9 @@ export function togglePreview(track: PreviewTrack) {
     return;
   }
 
+  // Another sound source (the program monitor's playback) stands down when a preview starts.
+  for (const listener of startListeners) listener();
+
   const media = element();
   media.pause();
   media.src = track.url;
@@ -116,6 +120,15 @@ export function togglePreview(track: PreviewTrack) {
 
     if (state.trackId === track.id) emit({ status: 'error' });
   });
+}
+
+// Runs `listener` whenever a track preview starts; returns the unsubscribe.
+export function onPreviewStart(listener: () => void): () => void {
+  startListeners.add(listener);
+
+  return () => {
+    startListeners.delete(listener);
+  };
 }
 
 // The shared preview state, plus the guarantee that the preview stops once no surface shows it.

@@ -247,6 +247,7 @@ export const EditorSceneTimeline = ({
     <div
       ref={containerRef}
       role="toolbar"
+      data-scene-strip=""
       aria-label={t('shell.scenes')}
       className="track-edge-fade flex flex-1 items-stretch gap-2 overflow-x-auto overscroll-x-contain px-3 py-2.5 [scrollbar-width:thin]"
     >

@@ -141,15 +141,34 @@ export const TemplateEditorShell = ({
     onPrevTool: () => {
       dispatch({ type: 'selectTool', tool: prevTool(tools, sel.activeTool) });
     },
-    onTogglePlay: () => {
-      monitor.clock.toggle();
-    },
+    onTogglePlay: monitor.togglePlay,
     onShowHelp: () => {
       modals.open('help');
     },
-    // The help dialog closes itself on Escape (Radix); this fires with it closed — exit play mode.
+    // The help dialog closes itself on Escape (Radix); this fires with it closed — back to editing the
+    // scene the playhead was on.
     onDismissHelp: () => {
-      if (monitor.playMode) monitor.exitPlayMode();
+      if (!monitor.playMode) return;
+
+      const index = monitor.sceneAtPlayhead();
+      monitor.exitPlayMode();
+
+      if (index !== null) dispatch({ type: 'selectScene', index });
+    },
+    onStep: monitor.step,
+    onJumpEdit: (direction) => {
+      const index = monitor.jumpEdit(direction);
+
+      if (index !== null) dispatch({ type: 'selectScene', index });
+    },
+    onShuttle: (direction) => {
+      if (direction === 0) {
+        monitor.clock.pause();
+
+        return;
+      }
+
+      monitor.shuttle(direction);
     },
     enabled: !modals.anyOpen,
   });
@@ -229,6 +248,7 @@ export const TemplateEditorShell = ({
             clock={monitor.clock}
             playTimeline={monitor.playTimeline}
             playMode={monitor.playMode}
+            onSeek={monitor.park}
           />
         }
         timeline={

@@ -16,6 +16,7 @@ import type { Segment } from './program-timeline.logic';
 import type { ProgramClock } from './use-program-clock';
 import { ProgramPlayer } from './program-player';
 import { ProgramTransport } from './program-transport';
+import { useProgramMusic } from './use-program-music';
 import type { ElementRef, SectionSelectionState } from './useSectionSelection';
 import type { SaveFeedback } from './save-blocker.logic';
 import { setModalOpen, type ShellModal } from './shell-modals.logic';
@@ -101,6 +102,15 @@ interface ShellMonitorProps {
   clock: ProgramClock;
   playTimeline: Segment[];
   playMode: boolean;
+  // Parks the program monitor on a scrubbed time.
+  onSeek: (seconds: number) => void;
+}
+
+// The monitor's status label: editing a scene, playing the program, or parked on a program frame.
+function monitorLabel(playMode: boolean, playing: boolean, t: (key: string) => string): string {
+  if (!playMode) return t('shell.preview');
+
+  return playing ? t('monitor.playing') : t('monitor.parked');
 }
 
 // Play mode swaps the WYSIWYG edit canvas for the playback surface; the transport only shows once
@@ -117,15 +127,19 @@ export const ShellMonitor = ({
   clock,
   playTimeline,
   playMode,
+  onSeek,
 }: ShellMonitorProps) => {
   const { t } = useTranslation('admin');
+  useProgramMusic(state, clock, playTimeline);
 
   return (
     <ProgramMonitor
-      label={playMode ? t('monitor.playing') : t('shell.preview')}
+      label={monitorLabel(playMode, clock.playing, t)}
       meta={t(`orientationLabel.${state.orientation}`)}
       swapKey={playMode ? 'play' : String(selectedIndex)}
-      transport={playTimeline.length > 0 ? <ProgramTransport clock={clock} timeline={playTimeline} /> : undefined}
+      transport={
+        playTimeline.length > 0 ? <ProgramTransport clock={clock} timeline={playTimeline} onSeek={onSeek} /> : undefined
+      }
     >
       {playMode ? (
         <ProgramPlayer state={state} clock={clock} timeline={playTimeline} />

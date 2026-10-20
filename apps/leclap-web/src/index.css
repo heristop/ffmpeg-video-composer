@@ -1970,6 +1970,39 @@ html.theme-vt::view-transition-new(root) {
   margin-block: -0.625rem;
 }
 
+/* The program transport's playhead: a full-height bar rather than a cap, so the frame it marks reads at a
+   glance against the scene-edge hairlines. */
+.studio-range.transport-scrub::-webkit-slider-thumb {
+  width: 0.25rem;
+  height: 1.5rem;
+  margin-top: -0.55rem;
+  border: 0;
+  border-radius: 0.125rem;
+  background: var(--color-foreground);
+  box-shadow:
+    0 0 0 1px var(--color-brand-500),
+    0 1px 4px oklch(0 0 0 / 0.4);
+}
+
+.studio-range.transport-scrub::-moz-range-thumb {
+  width: 0.25rem;
+  height: 1.5rem;
+  border: 0;
+  border-radius: 0.125rem;
+  background: var(--color-foreground);
+  box-shadow:
+    0 0 0 1px var(--color-brand-500),
+    0 1px 4px oklch(0 0 0 / 0.4);
+}
+
+.studio-range.transport-scrub:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-brand-500) 55%, transparent);
+}
+
+.studio-range.transport-scrub:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-brand-500) 55%, transparent);
+}
+
 /* The landing's scrubber is a brand moment, so it keeps the lavender→pink fill the editor controls dropped. */
 .studio-range.hero-scrub::-webkit-slider-runnable-track {
   background:
