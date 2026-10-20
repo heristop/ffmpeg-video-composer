@@ -350,22 +350,17 @@ const ProgramArea = ({ clipFile, section, editForClip, onEditChange, template, m
   );
 };
 
-// The panel's title block. On phones the kind eyebrow (Record / Details) sits inline with the title
-// instead of stacking above it — the same two facts on one line rather than two, so the panel body
-// starts that much higher up the fold.
+// The panel's title block: one row, the scene's title on the left and its kind (Record / Details) as a
+// quiet meta on the right, the same header the template builder's panels use.
 const PanelHeader = ({ title, eyebrow }: { title: string | null; eyebrow: string | null }) => {
   if (!title) return null;
 
-  const eyebrowClass =
-    'text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-brand-600/70 dark:text-brand-300/60';
-
   return (
-    <header className="shrink-0 border-b border-foreground/10 px-4 py-2 short:py-1 sm:px-5 sm:py-3">
-      {eyebrow && <p className={`hidden sm:block short:hidden ${eyebrowClass}`}>{eyebrow}</p>}
-      <h2 className="flex min-w-0 items-baseline gap-2 font-display text-base font-bold text-foreground short:text-sm sm:text-lg">
-        {eyebrow && <span className={`shrink-0 sm:hidden short:inline ${eyebrowClass}`}>{eyebrow}</span>}
-        <span className="truncate">{title}</span>
+    <header className="flex shrink-0 items-baseline justify-between gap-3 border-b border-divider px-4 py-3 short:py-1.5 sm:px-5">
+      <h2 className="min-w-0 truncate font-display text-base font-semibold text-foreground short:text-sm sm:text-lg">
+        {title}
       </h2>
+      {eyebrow ? <span className="shrink-0 text-xs text-muted-foreground">{eyebrow}</span> : null}
     </header>
   );
 };
