@@ -11,6 +11,8 @@ import { TransitionPicker } from '../editor/TransitionPicker';
 import { AddSceneMenu } from './AddSceneMenu';
 import { isPristineTimeline } from './timelinePristine';
 import { cn } from '@/lib/utils';
+import { clipWidthRem, secondsLabel } from './scene-strip.logic';
+import { MusicLane } from './music-lane';
 
 interface EditorSceneTimelineProps {
   sections: EditorSection[];
@@ -25,7 +27,6 @@ interface EditorSceneTimelineProps {
   // effective transition so the lane never claims "Cut" while the render fades.
   defaultTransition?: DefaultTransition;
   sectionTitle: (section: EditorSection, index: number) => string;
-  sectionKindLabel: (section: EditorSection) => string;
   // Restricts the add-scene menu to these kinds (partials allow only video/form/color/image).
   addKinds?: readonly SectionKind[];
   // When set, an untouched cold-start timeline shows a "browse starter templates" hint that calls this.
@@ -84,7 +85,6 @@ function SceneItemCard({
   ringed,
   canDelete,
   sectionTitle,
-  sectionKindLabel,
   itemPointerDown,
   onSelect,
   onDuplicate,
@@ -98,7 +98,6 @@ function SceneItemCard({
   ringed: boolean;
   canDelete: boolean;
   sectionTitle: (section: EditorSection, index: number) => string;
-  sectionKindLabel: (section: EditorSection) => string;
   itemPointerDown: (index: number) => React.PointerEventHandler<HTMLDivElement>;
   onSelect: (index: number) => void;
   onDuplicate: (index: number) => void;
@@ -121,8 +120,9 @@ function SceneItemCard({
         index={index}
         role="button"
         title={displayFromTokens(sectionTitle(section, index))}
-        eyebrow={sectionKindLabel(section)}
         icon={SECTION_ICON[section.kind]}
+        widthRem={clipWidthRem(section)}
+        durationLabel={secondsLabel(section)}
         active={index === selectedIndex}
         tabIndex={index === selectedIndex ? 0 : -1}
         onSelect={() => {
@@ -157,7 +157,6 @@ function SceneItem({
   canDelete,
   defaultTransition,
   sectionTitle,
-  sectionKindLabel,
   itemPointerDown,
   onSelect,
   onDuplicate,
@@ -174,7 +173,6 @@ function SceneItem({
   canDelete: boolean;
   defaultTransition?: DefaultTransition;
   sectionTitle: (section: EditorSection, index: number) => string;
-  sectionKindLabel: (section: EditorSection) => string;
   itemPointerDown: (index: number) => React.PointerEventHandler<HTMLDivElement>;
   onSelect: (index: number) => void;
   onDuplicate: (index: number) => void;
@@ -196,7 +194,6 @@ function SceneItem({
         ringed={ringed}
         canDelete={canDelete}
         sectionTitle={sectionTitle}
-        sectionKindLabel={sectionKindLabel}
         itemPointerDown={itemPointerDown}
         onSelect={onSelect}
         onDuplicate={onDuplicate}
@@ -233,7 +230,6 @@ export const EditorSceneTimeline = ({
   onTransition,
   defaultTransition,
   sectionTitle,
-  sectionKindLabel,
   addKinds,
   onBrowsePresets,
   highlighted,
@@ -259,27 +255,45 @@ export const EditorSceneTimeline = ({
           {t('shell.dragToReorder')}
         </span>
       )}
-      {sections.map((section, i) => (
-        <SceneItem
-          key={keyOf(section)}
-          section={section}
-          index={i}
-          sections={sections}
-          selectedIndex={selectedIndex}
-          draggingIndex={draggingIndex}
-          highlighted={highlighted}
-          canDelete={canDelete}
-          defaultTransition={defaultTransition}
-          sectionTitle={sectionTitle}
-          sectionKindLabel={sectionKindLabel}
-          itemPointerDown={itemPointerDown}
-          onSelect={onSelect}
-          onDuplicate={onDuplicate}
-          onDelete={onDelete}
-          onTransition={onTransition}
-          t={t}
-        />
-      ))}
+      <div className="flex shrink-0 flex-col gap-1.5">
+        <div className="flex items-stretch gap-2">
+          {sections.map((section, i) =>
+            section.kind === 'music' ? null : (
+              <SceneItem
+                key={keyOf(section)}
+                section={section}
+                index={i}
+                sections={sections}
+                selectedIndex={selectedIndex}
+                draggingIndex={draggingIndex}
+                highlighted={highlighted}
+                canDelete={canDelete}
+                defaultTransition={defaultTransition}
+                sectionTitle={sectionTitle}
+                itemPointerDown={itemPointerDown}
+                onSelect={onSelect}
+                onDuplicate={onDuplicate}
+                onDelete={onDelete}
+                onTransition={onTransition}
+                t={t}
+              />
+            )
+          )}
+        </div>
+        {sections.map((section, i) =>
+          section.kind === 'music' ? (
+            <MusicLane
+              key={keyOf(section)}
+              section={section}
+              index={i}
+              selected={i === selectedIndex}
+              canDelete={canDelete}
+              onSelect={onSelect}
+              onDelete={onDelete}
+            />
+          ) : null
+        )}
+      </div>
       <motion.div layout transition={REORDER_SPRING} className="flex">
         <AddSceneMenu onAdd={onAdd} kinds={addKinds} />
       </motion.div>
@@ -315,6 +329,7 @@ const CellActions = ({ canDelete, onDuplicate, onDelete, t }: CellActionsProps) 
     <button
       type="button"
       aria-label={t('shell.duplicateScene')}
+      title={t('shell.duplicateSceneTooltip')}
       onClick={onDuplicate}
       className="tap relative grid size-7 place-items-center rounded-md bg-black/55 text-white transition-colors before:absolute before:-inset-1 before:content-[''] hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
     >
@@ -323,6 +338,7 @@ const CellActions = ({ canDelete, onDuplicate, onDelete, t }: CellActionsProps) 
     <button
       type="button"
       aria-label={t('shell.deleteScene')}
+      title={t('shell.deleteSceneTooltip')}
       disabled={!canDelete}
       onClick={onDelete}
       className="tap relative grid size-7 place-items-center rounded-md bg-black/55 text-white transition-colors before:absolute before:-inset-1 before:content-[''] hover:bg-[var(--color-error)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-error)]/60 disabled:pointer-events-none disabled:opacity-40"

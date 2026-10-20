@@ -1,4 +1,4 @@
-import { type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
+import { type CSSProperties, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
 import { Check, type LucideIcon } from '@/presentation/components/icons';
 import { cn } from '@/lib/utils';
 import { PressableScale } from '@/presentation/components/kinetic';
@@ -6,7 +6,10 @@ import { PressableScale } from '@/presentation/components/kinetic';
 interface SceneCellProps {
   index: number;
   title: string;
-  eyebrow: string;
+  // The kind label above the title; omitted where the title already says it (the template editor).
+  eyebrow?: string;
+  // Width in rem, for a lane that sizes clips by their duration; the default is a fixed card.
+  widthRem?: number;
   icon: LucideIcon;
   poster?: ReactNode;
   done?: boolean;
@@ -61,6 +64,12 @@ const PosterTile = ({
   </span>
 );
 
+function cellWidthClass(compact: boolean, widthRem: number | undefined): string {
+  if (widthRem !== undefined) return 'w-(--clip-w) gap-1.5';
+
+  return compact ? 'w-24 gap-1 sm:w-28' : 'w-28 gap-1.5 sm:w-32';
+}
+
 // One timeline cell — the shared visual for the studio filmstrip and the template-editor timeline.
 // A poster (or kind-icon tile), index badge, completion check, duration chip, next-highlight and
 // active "playhead" accent, then a kind eyebrow + title. Purely presentational.
@@ -82,8 +91,12 @@ export const SceneCell = ({
   buttonRef,
   trailing,
   compact = false,
+  widthRem,
 }: SceneCellProps) => (
-  <div className="relative shrink-0">
+  <div
+    className="relative shrink-0"
+    style={widthRem === undefined ? undefined : ({ '--clip-w': `${widthRem}rem` } as CSSProperties)}
+  >
     <PressableScale
       ref={buttonRef}
       role={role}
@@ -96,9 +109,10 @@ export const SceneCell = ({
       // The label is normally the cell's own text, but that text is hidden on a short viewport
       // (see below), so name the control explicitly or it goes silent for assistive tech there.
       aria-label={title}
+      title={title}
       className={cn(
         'spotlight group relative flex flex-col rounded-xl border p-1.5 text-left transition-all duration-200 ease-[var(--ease-spring)] motion-reduce:transition-none sm:p-2',
-        compact ? 'w-24 gap-1 sm:w-28' : 'w-28 gap-1.5 sm:w-32',
+        cellWidthClass(compact, widthRem),
         'short:w-16 short:gap-0.5 short:p-1',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50',
         active
@@ -120,9 +134,11 @@ export const SceneCell = ({
           and the row it costs is a row the capture controls need. On a short viewport the title goes
           too and the cell falls back to its poster, which still shows index, done check and active
           accent; those text rows are the panel's only source of height there. */}
-      <span className="hidden text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-brand-600/70 sm:block short:hidden dark:text-brand-300/60">
-        {eyebrow}
-      </span>
+      {eyebrow ? (
+        <span className="hidden text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-brand-600/70 sm:block short:hidden dark:text-brand-300/60">
+          {eyebrow}
+        </span>
+      ) : null}
       <span className="line-clamp-1 text-xs font-medium text-foreground short:hidden">{title}</span>
     </PressableScale>
     {trailing}
