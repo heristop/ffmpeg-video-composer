@@ -75,7 +75,12 @@
         "weeks": "vor {{count}} Wo.",
         "months": "vor {{count}} Mon."
       }
-    }
+    },
+    "answersTitle": "Deine Antworten",
+    "answersLead": "Das Formular bleibt unsichtbar; sie füllen die Szenen, die sie nutzen.",
+    "answersEmpty": "Noch nicht ausgefüllt",
+    "answersShown": "Im Bild",
+    "answersNotShown": "Nicht im Bild"
   },
   "stepProcess": {
     "title": "Video erstellen",

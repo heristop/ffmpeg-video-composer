@@ -75,7 +75,12 @@
         "weeks": "il y a {{count}} sem",
         "months": "il y a {{count}} mois"
       }
-    }
+    },
+    "answersTitle": "Tes réponses",
+    "answersLead": "Le formulaire reste hors champ ; elles remplissent les scènes qui les utilisent.",
+    "answersEmpty": "Pas encore rempli",
+    "answersShown": "À l’écran",
+    "answersNotShown": "Pas à l’écran"
   },
   "stepProcess": {
     "title": "Créer la vidéo",
