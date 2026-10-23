@@ -36,7 +36,21 @@ describe('FFmpegDeviceAdapter', () => {
     const result = await adapter.execute('-y -i a.mp4 -vf scale=1280:720 out.mp4');
 
     expect(result).toEqual({ rc: 0 });
-    expect(run).toHaveBeenCalledWith(['-y', '-i', 'a.mp4', '-vf', 'scale=1280:720', 'out.mp4']);
+    expect(run).toHaveBeenCalledWith(['-nostdin', '-y', '-i', 'a.mp4', '-vf', 'scale=1280:720', 'out.mp4']);
+  });
+
+  it('execute() always runs with -nostdin, once', async () => {
+    // The engine runs fftools inside the app process: without -nostdin, ffmpeg polls the app's stdin
+    // and installs a SIGQUIT handler there, so a SIGQUIT sent to the app (Android's ANR stack dump)
+    // sets the shutdown flag and a finished encode exits 255.
+    const run = vi.fn().mockResolvedValue({ code: 0, log: '' });
+    const adapter = new FFmpegDeviceAdapter(engineWith({ run }));
+
+    await adapter.execute('-y -i a.mp4 out.mp4');
+    await adapter.execute('-nostdin -y -i a.mp4 out.mp4');
+
+    expect(run).toHaveBeenNthCalledWith(1, ['-nostdin', '-y', '-i', 'a.mp4', 'out.mp4']);
+    expect(run).toHaveBeenNthCalledWith(2, ['-nostdin', '-y', '-i', 'a.mp4', 'out.mp4']);
   });
 
   it('execute() throws with the captured log when the engine returns a non-zero exit code', async () => {

@@ -1,5 +1,6 @@
 package expo.modules.leclapffmpeg
 
+import android.system.Os
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -15,6 +16,13 @@ import uniffi.leclap_ffmpeg_core.version as nativeVersion
 class LeclapFfmpegModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("LeclapFfmpeg")
+
+    // The engine captures ffmpeg's stderr and ffprobe's stdout through a file in Rust's temp_dir(),
+    // which reads TMPDIR. Android sets none, so Rust falls back to /data/local/tmp (shell-owned, not
+    // writable by the app): the capture silently fails and every log comes back empty.
+    OnCreate {
+      appContext.reactContext?.cacheDir?.let { Os.setenv("TMPDIR", it.absolutePath, true) }
+    }
 
     Function("version") { nativeVersion() }
 
