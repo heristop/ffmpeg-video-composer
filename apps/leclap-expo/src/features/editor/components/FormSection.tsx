@@ -38,7 +38,7 @@ const FormField = ({
       placeholder={t('enterField', { label: field.label.en })}
       multiline={field.maxLength > 100}
     />
-    <FieldCounter value={formData[field.name].length} maxLength={field.maxLength} />
+    <FieldCounter value={(formData[field.name] || '').length} maxLength={field.maxLength} />
   </View>
 );
 
