@@ -83,7 +83,10 @@ class FFmpegDeviceAdapter extends AbstractFFmpeg {
   }
 
   execute = async (command: string): Promise<{ rc: number }> => {
-    const args = parseCommand(command);
+    // fftools runs inside the app process: -nostdin keeps it off the app's stdin and stops it from
+    // installing a SIGQUIT handler, so an ANR stack dump can't flag a running encode as interrupted.
+    const parsed = parseCommand(command);
+    const args = parsed.includes('-nostdin') ? parsed : ['-nostdin', ...parsed];
     const stopProgress = this.startProgressTracking(args);
 
     try {

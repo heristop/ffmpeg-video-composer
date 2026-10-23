@@ -271,6 +271,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Overlay rotation, opacity, start and duration and layer keyframe values are checked as numbers (or
   `+n`/`-n`) where the engine writes them, for callers that skip validation; so are a layer's rotation and
   an overlay's loop `start`, `duration` and `loops`.
+- React Native entry: device renders always run with `-nostdin`. The engine runs FFmpeg inside the app
+  process, where it otherwise read the app's stdin and took over `SIGQUIT`, which Android sends for its
+  stack dumps: a render that had written every frame could still exit 255 as if cancelled.
 
 ## [3.1.0] - 2026-10-11
 
